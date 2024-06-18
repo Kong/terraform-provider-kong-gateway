@@ -2,7 +2,7 @@ name: Generate SDK
 on:
   pull_request:
     paths:
-      - "gen.yaml"
+      - ".speakeasy/gen.yaml"
     types: [opened, synchronize]
 jobs:
   generate:

@@ -1,4 +1,4 @@
-speakeasyVersion: 1.308.1
+speakeasyVersion: 1.308.2
 sources:
     Gateway:
         sourceNamespace: gateway
@@ -8,10 +8,11 @@ sources:
             - latest
     gateway:
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:120a6615d22474ccf8ef83baf6551126231dd412ce1186190a664e29fba2f33b
-        sourceBlobDigest: sha256:3c03059883ded5b5bb1451b41112b40ecebaa9efcd8da568cf0d19960bba8443
+        sourceRevisionDigest: sha256:b2ad57ee4755275a7e5f12ea184745bf5b07628da25981ede11299082db2b9f9
+        sourceBlobDigest: sha256:314607092877d568102e041ddd808f13177ee9533afff9bc507eedfe59e6d0f4
         tags:
             - latest
+            - add-openapi
 targets:
     my-first-target:
         source: Gateway
@@ -22,8 +23,8 @@ targets:
     tf:
         source: gateway
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:120a6615d22474ccf8ef83baf6551126231dd412ce1186190a664e29fba2f33b
-        sourceBlobDigest: sha256:3c03059883ded5b5bb1451b41112b40ecebaa9efcd8da568cf0d19960bba8443
+        sourceRevisionDigest: sha256:b2ad57ee4755275a7e5f12ea184745bf5b07628da25981ede11299082db2b9f9
+        sourceBlobDigest: sha256:314607092877d568102e041ddd808f13177ee9533afff9bc507eedfe59e6d0f4
         outLocation: .
 workflow:
     workflowVersion: 1.0.0

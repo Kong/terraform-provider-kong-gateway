@@ -2,7 +2,7 @@ name: Generate SDK
 on:
   pull_request:
     paths:
-      - "gen.yaml"
+      - ".speakeasy/gen.yaml"
     types: [opened, synchronize]
 jobs:
   generate:
@@ -23,6 +23,11 @@ jobs:
         run: |
           mkdir -p ~/.speakeasy
           echo 'speakeasy_api_key: ${{ secrets.SPEAKEASY_API_KEY }}' > ~/.speakeasy/config.yaml
+
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ">= 1.20"
+          cache: true
 
       - name: Checkout current repo
         uses: actions/checkout@v4

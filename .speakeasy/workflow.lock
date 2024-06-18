@@ -1,0 +1,43 @@
+speakeasyVersion: 1.308.1
+sources:
+    Gateway:
+        sourceNamespace: gateway
+        sourceRevisionDigest: sha256:a9d1ffb2e5c08a13a8d8c067194b75c1c91e88de372d3307a2346503eed1a048
+        sourceBlobDigest: sha256:12c185668023fb1569a35f18b3ea09ea0cb2a4c876d07d6f6f6db273912b3b8c
+        tags:
+            - latest
+    gateway:
+        sourceNamespace: gateway
+        sourceRevisionDigest: sha256:120a6615d22474ccf8ef83baf6551126231dd412ce1186190a664e29fba2f33b
+        sourceBlobDigest: sha256:3c03059883ded5b5bb1451b41112b40ecebaa9efcd8da568cf0d19960bba8443
+        tags:
+            - latest
+targets:
+    my-first-target:
+        source: Gateway
+        sourceNamespace: gateway
+        sourceRevisionDigest: sha256:a9d1ffb2e5c08a13a8d8c067194b75c1c91e88de372d3307a2346503eed1a048
+        sourceBlobDigest: sha256:12c185668023fb1569a35f18b3ea09ea0cb2a4c876d07d6f6f6db273912b3b8c
+        outLocation: .
+    tf:
+        source: gateway
+        sourceNamespace: gateway
+        sourceRevisionDigest: sha256:120a6615d22474ccf8ef83baf6551126231dd412ce1186190a664e29fba2f33b
+        sourceBlobDigest: sha256:3c03059883ded5b5bb1451b41112b40ecebaa9efcd8da568cf0d19960bba8443
+        outLocation: .
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        gateway:
+            inputs:
+                - location: ./openapi.yaml
+            overlays:
+                - location: ./overlay.yaml
+            registry:
+                location: registry.speakeasyapi.dev/kong/kong/gateway
+    targets:
+        tf:
+            target: terraform
+            source: gateway
+            output: .

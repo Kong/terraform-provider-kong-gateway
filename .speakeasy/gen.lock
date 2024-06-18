@@ -1,0 +1,18 @@
+lockVersion: 2.0.0
+id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
+management:
+  docChecksum: 6a290f4c84f7ef802e0038482d981aa3
+  docVersion: 0.0.1
+  speakeasyVersion: 1.308.1
+  generationVersion: 2.342.6
+  releaseVersion: 0.0.0
+  configChecksum: 9ad3b37410fae44612bd9f9440d09e49
+features:
+  terraform:
+    additionalDependencies: 0.1.0
+    constsAndDefaults: 0.1.4
+    core: 3.21.3
+    globalServerURLs: 2.82.1
+    inputOutputModels: 2.83.0
+    typeOverrides: 2.81.1
+generatedFiles: []

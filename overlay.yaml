@@ -1,0 +1,25 @@
+overlay: 1.0.0
+info:
+  title: |
+    Process generated OAS for Terraform usage
+  version: 0.0.0
+actions:
+  # Need a specific selector so that we don't delete properties named "default"
+  - target: $..properties[*].default
+    remove: true
+
+  # Vault
+  - target: $["components"]["schemas"]["Vault"]["properties"]["config"]
+    update:
+      x-speakeasy-type-override: any
+
+  # Plugin
+  - target: $["components"]["schemas"]["PluginWithoutParents"]["properties"]["ordering"]
+    update:
+      x-speakeasy-type-override: any
+
+  # Credentials
+  - target: $["components"]["schemas"]["BasicAuthWithoutParents"]["properties"]["password"]
+    update:
+      writeOnly: true
+      x-speakeasy-param-sensitive: true

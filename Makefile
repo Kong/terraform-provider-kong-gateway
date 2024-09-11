@@ -3,7 +3,7 @@
 all: speakeasy
 
 speakeasy: check-speakeasy
-	speakeasy run
+	speakeasy run -o console --skip-versioning
 	@git clean -fd examples docs > /dev/null
 	@git checkout -- README.md examples/README.md
 	@rm USAGE.md

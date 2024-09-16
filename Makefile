@@ -4,7 +4,7 @@ all: speakeasy
 
 speakeasy: check-speakeasy
 	speakeasy run -o console --skip-versioning
-	@git clean -fd examples docs > /dev/null
+	@go generate .
 	@git checkout -- README.md examples/README.md
 	@rm USAGE.md
 

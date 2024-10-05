@@ -23,3 +23,8 @@ resource "kong-gateway_consumer" "example_consumer" {
   tags      = [ "consumer1" ]
 }
 ```
+
+## Argument Reference
+
+In addition to generic [provider arguments](https://developer.hashicorp.com/terraform/language/providers/configuration), The provider configuration block accepts the following arguments.
+* `server_url` - (Required) The URL and port of the Kong admin API

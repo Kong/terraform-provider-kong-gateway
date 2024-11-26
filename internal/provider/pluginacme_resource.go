@@ -37,19 +37,19 @@ type PluginAcmeResource struct {
 
 // PluginAcmeResourceModel describes the resource data model.
 type PluginAcmeResourceModel struct {
-	Config        *tfTypes.CreateAcmePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer            `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer            `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                     `tfsdk:"created_at"`
-	Enabled       types.Bool                      `tfsdk:"enabled"`
-	ID            types.String                    `tfsdk:"id"`
-	InstanceName  types.String                    `tfsdk:"instance_name"`
-	Ordering      types.String                    `tfsdk:"ordering"`
-	Protocols     []types.String                  `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer            `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer            `tfsdk:"service"`
-	Tags          []types.String                  `tfsdk:"tags"`
-	UpdatedAt     types.Int64                     `tfsdk:"updated_at"`
+	Config        tfTypes.AcmePluginConfig   `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                `tfsdk:"created_at"`
+	Enabled       types.Bool                 `tfsdk:"enabled"`
+	ID            types.String               `tfsdk:"id"`
+	InstanceName  types.String               `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
+	Protocols     []types.String             `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
+	Tags          []types.String             `tfsdk:"tags"`
+	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
 }
 
 func (r *PluginAcmeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,8 +61,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 		MarkdownDescription: "PluginAcme Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"account_email": schema.StringAttribute{
 						Computed:    true,
@@ -428,17 +427,38 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -521,7 +541,7 @@ func (r *PluginAcmeResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request := data.ToSharedCreateAcmePlugin()
+	request := data.ToSharedAcmePluginInput()
 	res, err := r.client.Plugins.CreateAcmePlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -620,10 +640,10 @@ func (r *PluginAcmeResource) Update(ctx context.Context, req resource.UpdateRequ
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createAcmePlugin := data.ToSharedCreateAcmePlugin()
+	acmePlugin := data.ToSharedAcmePluginInput()
 	request := operations.UpdateAcmePluginRequest{
-		PluginID:         pluginID,
-		CreateAcmePlugin: createAcmePlugin,
+		PluginID:   pluginID,
+		AcmePlugin: acmePlugin,
 	}
 	res, err := r.client.Plugins.UpdateAcmePlugin(ctx, request)
 	if err != nil {

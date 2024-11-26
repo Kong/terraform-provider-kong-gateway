@@ -9,8 +9,8 @@ import (
 
 type UpdateAwslambdaPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID              string                        `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateAwsLambdaPlugin *shared.CreateAwsLambdaPlugin `request:"mediaType=application/json"`
+	PluginID        string                       `pathParam:"style=simple,explode=false,name=PluginId"`
+	AwsLambdaPlugin *shared.AwsLambdaPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAwslambdaPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateAwslambdaPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAwslambdaPluginRequest) GetCreateAwsLambdaPlugin() *shared.CreateAwsLambdaPlugin {
+func (o *UpdateAwslambdaPluginRequest) GetAwsLambdaPlugin() *shared.AwsLambdaPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateAwsLambdaPlugin
+	return o.AwsLambdaPlugin
 }
 
 type UpdateAwslambdaPluginResponse struct {

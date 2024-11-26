@@ -6,76 +6,75 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-type GraphqlProxyCacheAdvancedPluginMemory struct {
+type Memory struct {
 	// The name of the shared dictionary in which to hold cache entities when the memory strategy is selected. This dictionary currently must be defined manually in the Kong Nginx template.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginMemory) GetDictionaryName() *string {
+func (o *Memory) GetDictionaryName() *string {
 	if o == nil {
 		return nil
 	}
 	return o.DictionaryName
 }
 
-type GraphqlProxyCacheAdvancedPluginClusterNodes struct {
+type ClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginClusterNodes) GetIP() *string {
+func (o *ClusterNodes) GetIP() *string {
 	if o == nil {
 		return nil
 	}
 	return o.IP
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginClusterNodes) GetPort() *int64 {
+func (o *ClusterNodes) GetPort() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.Port
 }
 
-type GraphqlProxyCacheAdvancedPluginSentinelNodes struct {
+type SentinelNodes struct {
 	// A string representing a host name, such as example.com.
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginSentinelNodes) GetHost() *string {
+func (o *SentinelNodes) GetHost() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Host
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginSentinelNodes) GetPort() *int64 {
+func (o *SentinelNodes) GetPort() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.Port
 }
 
-// GraphqlProxyCacheAdvancedPluginSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
-type GraphqlProxyCacheAdvancedPluginSentinelRole string
+// SentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+type SentinelRole string
 
 const (
-	GraphqlProxyCacheAdvancedPluginSentinelRoleMaster GraphqlProxyCacheAdvancedPluginSentinelRole = "master"
-	GraphqlProxyCacheAdvancedPluginSentinelRoleSlave  GraphqlProxyCacheAdvancedPluginSentinelRole = "slave"
-	GraphqlProxyCacheAdvancedPluginSentinelRoleAny    GraphqlProxyCacheAdvancedPluginSentinelRole = "any"
+	SentinelRoleMaster SentinelRole = "master"
+	SentinelRoleSlave  SentinelRole = "slave"
+	SentinelRoleAny    SentinelRole = "any"
 )
 
-func (e GraphqlProxyCacheAdvancedPluginSentinelRole) ToPointer() *GraphqlProxyCacheAdvancedPluginSentinelRole {
+func (e SentinelRole) ToPointer() *SentinelRole {
 	return &e
 }
-func (e *GraphqlProxyCacheAdvancedPluginSentinelRole) UnmarshalJSON(data []byte) error {
+func (e *SentinelRole) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -86,18 +85,18 @@ func (e *GraphqlProxyCacheAdvancedPluginSentinelRole) UnmarshalJSON(data []byte)
 	case "slave":
 		fallthrough
 	case "any":
-		*e = GraphqlProxyCacheAdvancedPluginSentinelRole(v)
+		*e = SentinelRole(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GraphqlProxyCacheAdvancedPluginSentinelRole: %v", v)
+		return fmt.Errorf("invalid value for SentinelRole: %v", v)
 	}
 }
 
-type GraphqlProxyCacheAdvancedPluginRedis struct {
+type Redis struct {
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
-	ClusterNodes []GraphqlProxyCacheAdvancedPluginClusterNodes `json:"cluster_nodes,omitempty"`
+	ClusterNodes []ClusterNodes `json:"cluster_nodes,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
 	// If the connection to Redis is proxied (e.g. Envoy), set it `true`. Set the `host` and `port` to point to the proxy address.
@@ -121,11 +120,11 @@ type GraphqlProxyCacheAdvancedPluginRedis struct {
 	// Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
 	SentinelMaster *string `json:"sentinel_master,omitempty"`
 	// Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.
-	SentinelNodes []GraphqlProxyCacheAdvancedPluginSentinelNodes `json:"sentinel_nodes,omitempty"`
+	SentinelNodes []SentinelNodes `json:"sentinel_nodes,omitempty"`
 	// Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.
 	SentinelPassword *string `json:"sentinel_password,omitempty"`
 	// Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
-	SentinelRole *GraphqlProxyCacheAdvancedPluginSentinelRole `json:"sentinel_role,omitempty"`
+	SentinelRole *SentinelRole `json:"sentinel_role,omitempty"`
 	// Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.
 	SentinelUsername *string `json:"sentinel_username,omitempty"`
 	// A string representing an SNI (server name indication) value for TLS.
@@ -138,165 +137,165 @@ type GraphqlProxyCacheAdvancedPluginRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
+func (o *Redis) GetClusterMaxRedirections() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.ClusterMaxRedirections
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetClusterNodes() []GraphqlProxyCacheAdvancedPluginClusterNodes {
+func (o *Redis) GetClusterNodes() []ClusterNodes {
 	if o == nil {
 		return nil
 	}
 	return o.ClusterNodes
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetConnectTimeout() *int64 {
+func (o *Redis) GetConnectTimeout() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.ConnectTimeout
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetConnectionIsProxied() *bool {
+func (o *Redis) GetConnectionIsProxied() *bool {
 	if o == nil {
 		return nil
 	}
 	return o.ConnectionIsProxied
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetDatabase() *int64 {
+func (o *Redis) GetDatabase() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.Database
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetHost() *string {
+func (o *Redis) GetHost() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Host
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetKeepaliveBacklog() *int64 {
+func (o *Redis) GetKeepaliveBacklog() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.KeepaliveBacklog
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetKeepalivePoolSize() *int64 {
+func (o *Redis) GetKeepalivePoolSize() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.KeepalivePoolSize
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetPassword() *string {
+func (o *Redis) GetPassword() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Password
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetPort() *int64 {
+func (o *Redis) GetPort() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.Port
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetReadTimeout() *int64 {
+func (o *Redis) GetReadTimeout() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.ReadTimeout
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSendTimeout() *int64 {
+func (o *Redis) GetSendTimeout() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.SendTimeout
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSentinelMaster() *string {
+func (o *Redis) GetSentinelMaster() *string {
 	if o == nil {
 		return nil
 	}
 	return o.SentinelMaster
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSentinelNodes() []GraphqlProxyCacheAdvancedPluginSentinelNodes {
+func (o *Redis) GetSentinelNodes() []SentinelNodes {
 	if o == nil {
 		return nil
 	}
 	return o.SentinelNodes
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSentinelPassword() *string {
+func (o *Redis) GetSentinelPassword() *string {
 	if o == nil {
 		return nil
 	}
 	return o.SentinelPassword
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSentinelRole() *GraphqlProxyCacheAdvancedPluginSentinelRole {
+func (o *Redis) GetSentinelRole() *SentinelRole {
 	if o == nil {
 		return nil
 	}
 	return o.SentinelRole
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSentinelUsername() *string {
+func (o *Redis) GetSentinelUsername() *string {
 	if o == nil {
 		return nil
 	}
 	return o.SentinelUsername
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetServerName() *string {
+func (o *Redis) GetServerName() *string {
 	if o == nil {
 		return nil
 	}
 	return o.ServerName
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSsl() *bool {
+func (o *Redis) GetSsl() *bool {
 	if o == nil {
 		return nil
 	}
 	return o.Ssl
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetSslVerify() *bool {
+func (o *Redis) GetSslVerify() *bool {
 	if o == nil {
 		return nil
 	}
 	return o.SslVerify
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginRedis) GetUsername() *string {
+func (o *Redis) GetUsername() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Username
 }
 
-// GraphqlProxyCacheAdvancedPluginStrategy - The backing data store in which to hold cached entities. Accepted value is `memory`.
-type GraphqlProxyCacheAdvancedPluginStrategy string
+// Strategy - The backing data store in which to hold cached entities. Accepted value is `memory`.
+type Strategy string
 
 const (
-	GraphqlProxyCacheAdvancedPluginStrategyMemory GraphqlProxyCacheAdvancedPluginStrategy = "memory"
-	GraphqlProxyCacheAdvancedPluginStrategyRedis  GraphqlProxyCacheAdvancedPluginStrategy = "redis"
+	StrategyMemory Strategy = "memory"
+	StrategyRedis  Strategy = "redis"
 )
 
-func (e GraphqlProxyCacheAdvancedPluginStrategy) ToPointer() *GraphqlProxyCacheAdvancedPluginStrategy {
+func (e Strategy) ToPointer() *Strategy {
 	return &e
 }
-func (e *GraphqlProxyCacheAdvancedPluginStrategy) UnmarshalJSON(data []byte) error {
+func (e *Strategy) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -305,10 +304,10 @@ func (e *GraphqlProxyCacheAdvancedPluginStrategy) UnmarshalJSON(data []byte) err
 	case "memory":
 		fallthrough
 	case "redis":
-		*e = GraphqlProxyCacheAdvancedPluginStrategy(v)
+		*e = Strategy(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GraphqlProxyCacheAdvancedPluginStrategy: %v", v)
+		return fmt.Errorf("invalid value for Strategy: %v", v)
 	}
 }
 
@@ -316,11 +315,11 @@ type GraphqlProxyCacheAdvancedPluginConfig struct {
 	// Unhandled errors while trying to retrieve a cache entry (such as redis down) are resolved with `Bypass`, with the request going upstream.
 	BypassOnErr *bool `json:"bypass_on_err,omitempty"`
 	// TTL in seconds of cache entities. Must be a value greater than 0.
-	CacheTTL *int64                                 `json:"cache_ttl,omitempty"`
-	Memory   *GraphqlProxyCacheAdvancedPluginMemory `json:"memory,omitempty"`
-	Redis    *GraphqlProxyCacheAdvancedPluginRedis  `json:"redis,omitempty"`
+	CacheTTL *int64  `json:"cache_ttl,omitempty"`
+	Memory   *Memory `json:"memory,omitempty"`
+	Redis    *Redis  `json:"redis,omitempty"`
 	// The backing data store in which to hold cached entities. Accepted value is `memory`.
-	Strategy *GraphqlProxyCacheAdvancedPluginStrategy `json:"strategy,omitempty"`
+	Strategy *Strategy `json:"strategy,omitempty"`
 	// Relevant headers considered for the cache key. If undefined, none of the headers are taken into consideration.
 	VaryHeaders []string `json:"vary_headers,omitempty"`
 }
@@ -339,21 +338,21 @@ func (o *GraphqlProxyCacheAdvancedPluginConfig) GetCacheTTL() *int64 {
 	return o.CacheTTL
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginConfig) GetMemory() *GraphqlProxyCacheAdvancedPluginMemory {
+func (o *GraphqlProxyCacheAdvancedPluginConfig) GetMemory() *Memory {
 	if o == nil {
 		return nil
 	}
 	return o.Memory
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginConfig) GetRedis() *GraphqlProxyCacheAdvancedPluginRedis {
+func (o *GraphqlProxyCacheAdvancedPluginConfig) GetRedis() *Redis {
 	if o == nil {
 		return nil
 	}
 	return o.Redis
 }
 
-func (o *GraphqlProxyCacheAdvancedPluginConfig) GetStrategy() *GraphqlProxyCacheAdvancedPluginStrategy {
+func (o *GraphqlProxyCacheAdvancedPluginConfig) GetStrategy() *Strategy {
 	if o == nil {
 		return nil
 	}
@@ -365,6 +364,70 @@ func (o *GraphqlProxyCacheAdvancedPluginConfig) GetVaryHeaders() []string {
 		return nil
 	}
 	return o.VaryHeaders
+}
+
+// GraphqlProxyCacheAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type GraphqlProxyCacheAdvancedPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type GraphqlProxyCacheAdvancedPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type GraphqlProxyCacheAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type GraphqlProxyCacheAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type GraphqlProxyCacheAdvancedPluginOrdering struct {
+	After  *GraphqlProxyCacheAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *GraphqlProxyCacheAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginOrdering) GetAfter() *GraphqlProxyCacheAdvancedPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginOrdering) GetBefore() *GraphqlProxyCacheAdvancedPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type GraphqlProxyCacheAdvancedPluginProtocols string
@@ -417,29 +480,6 @@ func (e *GraphqlProxyCacheAdvancedPluginProtocols) UnmarshalJSON(data []byte) er
 	}
 }
 
-// GraphqlProxyCacheAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type GraphqlProxyCacheAdvancedPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *GraphqlProxyCacheAdvancedPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type GraphqlProxyCacheAdvancedPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *GraphqlProxyCacheAdvancedPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // GraphqlProxyCacheAdvancedPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type GraphqlProxyCacheAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -464,29 +504,30 @@ func (o *GraphqlProxyCacheAdvancedPluginService) GetID() *string {
 	return o.ID
 }
 
+// GraphqlProxyCacheAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type GraphqlProxyCacheAdvancedPlugin struct {
-	Config *GraphqlProxyCacheAdvancedPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"graphql-proxy-cache-advanced" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []GraphqlProxyCacheAdvancedPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config GraphqlProxyCacheAdvancedPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *GraphqlProxyCacheAdvancedPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *GraphqlProxyCacheAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                    `json:"enabled,omitempty"`
+	ID           *string                                  `json:"id,omitempty"`
+	InstanceName *string                                  `json:"instance_name,omitempty"`
+	name         string                                   `const:"graphql-proxy-cache-advanced" json:"name"`
+	Ordering     *GraphqlProxyCacheAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []GraphqlProxyCacheAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *GraphqlProxyCacheAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *GraphqlProxyCacheAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (g GraphqlProxyCacheAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -500,11 +541,25 @@ func (g *GraphqlProxyCacheAdvancedPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetConfig() *GraphqlProxyCacheAdvancedPluginConfig {
+func (o *GraphqlProxyCacheAdvancedPlugin) GetConfig() GraphqlProxyCacheAdvancedPluginConfig {
+	if o == nil {
+		return GraphqlProxyCacheAdvancedPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *GraphqlProxyCacheAdvancedPlugin) GetConsumer() *GraphqlProxyCacheAdvancedPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *GraphqlProxyCacheAdvancedPlugin) GetConsumerGroup() *GraphqlProxyCacheAdvancedPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *GraphqlProxyCacheAdvancedPlugin) GetCreatedAt() *int64 {
@@ -535,11 +590,11 @@ func (o *GraphqlProxyCacheAdvancedPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetName() *string {
-	return types.String("graphql-proxy-cache-advanced")
+func (o *GraphqlProxyCacheAdvancedPlugin) GetName() string {
+	return "graphql-proxy-cache-advanced"
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetOrdering() any {
+func (o *GraphqlProxyCacheAdvancedPlugin) GetOrdering() *GraphqlProxyCacheAdvancedPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -551,6 +606,20 @@ func (o *GraphqlProxyCacheAdvancedPlugin) GetProtocols() []GraphqlProxyCacheAdva
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *GraphqlProxyCacheAdvancedPlugin) GetRoute() *GraphqlProxyCacheAdvancedPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *GraphqlProxyCacheAdvancedPlugin) GetService() *GraphqlProxyCacheAdvancedPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *GraphqlProxyCacheAdvancedPlugin) GetTags() []string {
@@ -567,30 +636,116 @@ func (o *GraphqlProxyCacheAdvancedPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetConsumer() *GraphqlProxyCacheAdvancedPluginConsumer {
+// GraphqlProxyCacheAdvancedPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type GraphqlProxyCacheAdvancedPluginInput struct {
+	Config GraphqlProxyCacheAdvancedPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *GraphqlProxyCacheAdvancedPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *GraphqlProxyCacheAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                    `json:"enabled,omitempty"`
+	ID           *string                                  `json:"id,omitempty"`
+	InstanceName *string                                  `json:"instance_name,omitempty"`
+	name         string                                   `const:"graphql-proxy-cache-advanced" json:"name"`
+	Ordering     *GraphqlProxyCacheAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []GraphqlProxyCacheAdvancedPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *GraphqlProxyCacheAdvancedPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *GraphqlProxyCacheAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetConfig() GraphqlProxyCacheAdvancedPluginConfig {
+	if o == nil {
+		return GraphqlProxyCacheAdvancedPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetConsumer() *GraphqlProxyCacheAdvancedPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetConsumerGroup() *GraphqlProxyCacheAdvancedPluginConsumerGroup {
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetConsumerGroup() *GraphqlProxyCacheAdvancedPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetRoute() *GraphqlProxyCacheAdvancedPluginRoute {
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetName() string {
+	return "graphql-proxy-cache-advanced"
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetOrdering() *GraphqlProxyCacheAdvancedPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetProtocols() []GraphqlProxyCacheAdvancedPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetRoute() *GraphqlProxyCacheAdvancedPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *GraphqlProxyCacheAdvancedPlugin) GetService() *GraphqlProxyCacheAdvancedPluginService {
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetService() *GraphqlProxyCacheAdvancedPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *GraphqlProxyCacheAdvancedPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

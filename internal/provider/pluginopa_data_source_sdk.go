@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,26 +10,21 @@ import (
 
 func (r *PluginOpaDataSourceModel) RefreshFromSharedOpaPlugin(resp *shared.OpaPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Config.IncludeBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeBodyInOpaInput)
+		r.Config.IncludeConsumerInOpaInput = types.BoolPointerValue(resp.Config.IncludeConsumerInOpaInput)
+		r.Config.IncludeParsedJSONBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeParsedJSONBodyInOpaInput)
+		r.Config.IncludeRouteInOpaInput = types.BoolPointerValue(resp.Config.IncludeRouteInOpaInput)
+		r.Config.IncludeServiceInOpaInput = types.BoolPointerValue(resp.Config.IncludeServiceInOpaInput)
+		r.Config.IncludeURICapturesInOpaInput = types.BoolPointerValue(resp.Config.IncludeURICapturesInOpaInput)
+		r.Config.OpaHost = types.StringPointerValue(resp.Config.OpaHost)
+		r.Config.OpaPath = types.StringPointerValue(resp.Config.OpaPath)
+		r.Config.OpaPort = types.Int64PointerValue(resp.Config.OpaPort)
+		if resp.Config.OpaProtocol != nil {
+			r.Config.OpaProtocol = types.StringValue(string(*resp.Config.OpaProtocol))
 		} else {
-			r.Config = &tfTypes.CreateOpaPluginConfig{}
-			r.Config.IncludeBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeBodyInOpaInput)
-			r.Config.IncludeConsumerInOpaInput = types.BoolPointerValue(resp.Config.IncludeConsumerInOpaInput)
-			r.Config.IncludeParsedJSONBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeParsedJSONBodyInOpaInput)
-			r.Config.IncludeRouteInOpaInput = types.BoolPointerValue(resp.Config.IncludeRouteInOpaInput)
-			r.Config.IncludeServiceInOpaInput = types.BoolPointerValue(resp.Config.IncludeServiceInOpaInput)
-			r.Config.IncludeURICapturesInOpaInput = types.BoolPointerValue(resp.Config.IncludeURICapturesInOpaInput)
-			r.Config.OpaHost = types.StringPointerValue(resp.Config.OpaHost)
-			r.Config.OpaPath = types.StringPointerValue(resp.Config.OpaPath)
-			r.Config.OpaPort = types.Int64PointerValue(resp.Config.OpaPort)
-			if resp.Config.OpaProtocol != nil {
-				r.Config.OpaProtocol = types.StringValue(string(*resp.Config.OpaProtocol))
-			} else {
-				r.Config.OpaProtocol = types.StringNull()
-			}
-			r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
+			r.Config.OpaProtocol = types.StringNull()
 		}
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -48,10 +42,27 @@ func (r *PluginOpaDataSourceModel) RefreshFromSharedOpaPlugin(resp *shared.OpaPl
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

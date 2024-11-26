@@ -9,8 +9,8 @@ import (
 
 type UpdateLogglyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateLogglyPlugin *shared.CreateLogglyPlugin `request:"mediaType=application/json"`
+	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	LogglyPlugin *shared.LogglyPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateLogglyPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateLogglyPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateLogglyPluginRequest) GetCreateLogglyPlugin() *shared.CreateLogglyPlugin {
+func (o *UpdateLogglyPluginRequest) GetLogglyPlugin() *shared.LogglyPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateLogglyPlugin
+	return o.LogglyPlugin
 }
 
 type UpdateLogglyPluginResponse struct {

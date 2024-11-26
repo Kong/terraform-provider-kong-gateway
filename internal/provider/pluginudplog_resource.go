@@ -34,19 +34,19 @@ type PluginUDPLogResource struct {
 
 // PluginUDPLogResourceModel describes the resource data model.
 type PluginUDPLogResourceModel struct {
-	Config        *tfTypes.CreateUDPLogPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer              `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer              `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                       `tfsdk:"created_at"`
-	Enabled       types.Bool                        `tfsdk:"enabled"`
-	ID            types.String                      `tfsdk:"id"`
-	InstanceName  types.String                      `tfsdk:"instance_name"`
-	Ordering      types.String                      `tfsdk:"ordering"`
-	Protocols     []types.String                    `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer              `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer              `tfsdk:"service"`
-	Tags          []types.String                    `tfsdk:"tags"`
-	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
+	Config        tfTypes.UDPLogPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                `tfsdk:"created_at"`
+	Enabled       types.Bool                 `tfsdk:"enabled"`
+	ID            types.String               `tfsdk:"id"`
+	InstanceName  types.String               `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
+	Protocols     []types.String             `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
+	Tags          []types.String             `tfsdk:"tags"`
+	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
 }
 
 func (r *PluginUDPLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,8 +58,7 @@ func (r *PluginUDPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginUDPLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"custom_fields_by_lua": schema.MapAttribute{
 						Computed:    true,
@@ -122,17 +121,38 @@ func (r *PluginUDPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -215,7 +235,7 @@ func (r *PluginUDPLogResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := data.ToSharedCreateUDPLogPlugin()
+	request := data.ToSharedUDPLogPluginInput()
 	res, err := r.client.Plugins.CreateUdplogPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -314,10 +334,10 @@ func (r *PluginUDPLogResource) Update(ctx context.Context, req resource.UpdateRe
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createUDPLogPlugin := data.ToSharedCreateUDPLogPlugin()
+	udpLogPlugin := data.ToSharedUDPLogPluginInput()
 	request := operations.UpdateUdplogPluginRequest{
-		PluginID:           pluginID,
-		CreateUDPLogPlugin: createUDPLogPlugin,
+		PluginID:     pluginID,
+		UDPLogPlugin: udpLogPlugin,
 	}
 	res, err := r.client.Plugins.UpdateUdplogPlugin(ctx, request)
 	if err != nil {

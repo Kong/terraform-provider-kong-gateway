@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -33,19 +32,19 @@ type PluginProxyCacheResource struct {
 
 // PluginProxyCacheResourceModel describes the resource data model.
 type PluginProxyCacheResourceModel struct {
-	Config        *tfTypes.CreateProxyCachePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                  `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                  `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                           `tfsdk:"created_at"`
-	Enabled       types.Bool                            `tfsdk:"enabled"`
-	ID            types.String                          `tfsdk:"id"`
-	InstanceName  types.String                          `tfsdk:"instance_name"`
-	Ordering      types.String                          `tfsdk:"ordering"`
-	Protocols     []types.String                        `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                  `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                  `tfsdk:"service"`
-	Tags          []types.String                        `tfsdk:"tags"`
-	UpdatedAt     types.Int64                           `tfsdk:"updated_at"`
+	Config        tfTypes.ProxyCachePluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer           `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer           `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                    `tfsdk:"created_at"`
+	Enabled       types.Bool                     `tfsdk:"enabled"`
+	ID            types.String                   `tfsdk:"id"`
+	InstanceName  types.String                   `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering     `tfsdk:"ordering"`
+	Protocols     []types.String                 `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer           `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer           `tfsdk:"service"`
+	Tags          []types.String                 `tfsdk:"tags"`
+	UpdatedAt     types.Int64                    `tfsdk:"updated_at"`
 }
 
 func (r *PluginProxyCacheResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,8 +56,7 @@ func (r *PluginProxyCacheResource) Schema(ctx context.Context, req resource.Sche
 		MarkdownDescription: "PluginProxyCache Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"cache_control": schema.BoolAttribute{
 						Computed:    true,
@@ -181,17 +179,38 @@ func (r *PluginProxyCacheResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -274,7 +293,7 @@ func (r *PluginProxyCacheResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	request := data.ToSharedCreateProxyCachePlugin()
+	request := data.ToSharedProxyCachePluginInput()
 	res, err := r.client.Plugins.CreateProxycachePlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -373,10 +392,10 @@ func (r *PluginProxyCacheResource) Update(ctx context.Context, req resource.Upda
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createProxyCachePlugin := data.ToSharedCreateProxyCachePlugin()
+	proxyCachePlugin := data.ToSharedProxyCachePluginInput()
 	request := operations.UpdateProxycachePluginRequest{
-		PluginID:               pluginID,
-		CreateProxyCachePlugin: createProxyCachePlugin,
+		PluginID:         pluginID,
+		ProxyCachePlugin: proxyCachePlugin,
 	}
 	res, err := r.client.Plugins.UpdateProxycachePlugin(ctx, request)
 	if err != nil {

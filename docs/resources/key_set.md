@@ -14,6 +14,7 @@ KeySet Resource
 
 ```terraform
 resource "kong-gateway_key_set" "my_keyset" {
+  id   = "...my_id..."
   name = "...my_name..."
   tags = [
     "..."

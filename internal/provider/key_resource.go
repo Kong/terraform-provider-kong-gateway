@@ -55,6 +55,7 @@ func (r *KeyResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"jwk": schema.StringAttribute{
 				Computed:    true,
@@ -62,8 +63,7 @@ func (r *KeyResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Description: `A JSON Web Key represented as a string.`,
 			},
 			"kid": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `A unique identifier for a key.`,
 			},
 			"name": schema.StringAttribute{

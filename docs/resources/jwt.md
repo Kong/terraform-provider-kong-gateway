@@ -18,6 +18,7 @@ resource "kong-gateway_jwt" "my_jwt" {
   consumer = {
     id = "...my_id..."
   }
+  id             = "...my_id..."
   key            = "...my_key..."
   rsa_public_key = "...my_rsa_public_key..."
   secret         = "...my_secret..."

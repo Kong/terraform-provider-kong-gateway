@@ -31,10 +31,11 @@ type GatewayConsumerGroupMemberResource struct {
 
 // GatewayConsumerGroupMemberResourceModel describes the resource data model.
 type GatewayConsumerGroupMemberResourceModel struct {
-	ConsumerGroup   *tfTypes.ConsumerGroup `tfsdk:"consumer_group"`
-	ConsumerGroupID types.String           `tfsdk:"consumer_group_id"`
-	ConsumerID      types.String           `tfsdk:"consumer_id"`
-	Consumers       []tfTypes.Consumer     `tfsdk:"consumers"`
+	ConsumerGroup        *tfTypes.ConsumerGroup `tfsdk:"consumer_group"`
+	ConsumerGroupID      types.String           `tfsdk:"consumer_group_id"`
+	ConsumerID           types.String           `tfsdk:"consumer_id"`
+	ConsumerIDOrUsername types.String           `tfsdk:"consumer_id_or_username"`
+	Consumers            []tfTypes.Consumer     `tfsdk:"consumers"`
 }
 
 func (r *GatewayConsumerGroupMemberResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -81,6 +82,9 @@ func (r *GatewayConsumerGroupMemberResource) Schema(ctx context.Context, req res
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 				Description: `Requires replacement if changed.`,
+			},
+			"consumer_id_or_username": schema.StringAttribute{
+				Required: true,
 			},
 			"consumers": schema.ListNestedAttribute{
 				Computed: true,
@@ -255,12 +259,12 @@ func (r *GatewayConsumerGroupMemberResource) Delete(ctx context.Context, req res
 	var consumerGroupID string
 	consumerGroupID = data.ConsumerGroupID.ValueString()
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	var consumerIDOrUsername string
+	consumerIDOrUsername = data.ConsumerIDOrUsername.ValueString()
 
 	request := operations.RemoveConsumerFromGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-		ConsumerID:      consumerID,
+		ConsumerGroupID:      consumerGroupID,
+		ConsumerIDOrUsername: consumerIDOrUsername,
 	}
 	res, err := r.client.ConsumerGroups.RemoveConsumerFromGroup(ctx, request)
 	if err != nil {

@@ -29,7 +29,7 @@ func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsum
 			r.ConsumerGroup = &tfTypes.ConsumerGroup{}
 			r.ConsumerGroup.CreatedAt = types.Int64PointerValue(resp.ConsumerGroup.CreatedAt)
 			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
-			r.ConsumerGroup.Name = types.StringPointerValue(resp.ConsumerGroup.Name)
+			r.ConsumerGroup.Name = types.StringValue(resp.ConsumerGroup.Name)
 			r.ConsumerGroup.Tags = []types.String{}
 			for _, v := range resp.ConsumerGroup.Tags {
 				r.ConsumerGroup.Tags = append(r.ConsumerGroup.Tags, types.StringValue(v))

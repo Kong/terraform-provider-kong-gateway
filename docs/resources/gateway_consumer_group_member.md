@@ -14,8 +14,9 @@ GatewayConsumerGroupMember Resource
 
 ```terraform
 resource "kong-gateway_gateway_consumer_group_member" "my_gatewayconsumergroupmember" {
-  consumer_group_id = "...my_consumer_group_id..."
-  consumer_id       = "cf4c7e60-11db-49dd-b300-7c7e5f0f7e6b"
+  consumer_group_id       = "...my_consumer_group_id..."
+  consumer_id             = "cf4c7e60-11db-49dd-b300-7c7e5f0f7e6b"
+  consumer_id_or_username = "...my_consumer_id_or_username..."
 }
 ```
 
@@ -25,6 +26,7 @@ resource "kong-gateway_gateway_consumer_group_member" "my_gatewayconsumergroupme
 ### Required
 
 - `consumer_group_id` (String) Requires replacement if changed.
+- `consumer_id_or_username` (String)
 
 ### Optional
 

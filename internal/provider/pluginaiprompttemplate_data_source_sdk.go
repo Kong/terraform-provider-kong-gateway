@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,27 +10,22 @@ import (
 
 func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplatePlugin(resp *shared.AiPromptTemplatePlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateAiPromptTemplatePluginConfig{}
-			r.Config.AllowUntemplatedRequests = types.BoolPointerValue(resp.Config.AllowUntemplatedRequests)
-			r.Config.LogOriginalRequest = types.BoolPointerValue(resp.Config.LogOriginalRequest)
-			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
-			r.Config.Templates = []tfTypes.Templates{}
-			if len(r.Config.Templates) > len(resp.Config.Templates) {
-				r.Config.Templates = r.Config.Templates[:len(resp.Config.Templates)]
-			}
-			for templatesCount, templatesItem := range resp.Config.Templates {
-				var templates1 tfTypes.Templates
-				templates1.Name = types.StringValue(templatesItem.Name)
-				templates1.Template = types.StringValue(templatesItem.Template)
-				if templatesCount+1 > len(r.Config.Templates) {
-					r.Config.Templates = append(r.Config.Templates, templates1)
-				} else {
-					r.Config.Templates[templatesCount].Name = templates1.Name
-					r.Config.Templates[templatesCount].Template = templates1.Template
-				}
+		r.Config.AllowUntemplatedRequests = types.BoolPointerValue(resp.Config.AllowUntemplatedRequests)
+		r.Config.LogOriginalRequest = types.BoolPointerValue(resp.Config.LogOriginalRequest)
+		r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
+		r.Config.Templates = []tfTypes.Templates{}
+		if len(r.Config.Templates) > len(resp.Config.Templates) {
+			r.Config.Templates = r.Config.Templates[:len(resp.Config.Templates)]
+		}
+		for templatesCount, templatesItem := range resp.Config.Templates {
+			var templates1 tfTypes.Templates
+			templates1.Name = types.StringValue(templatesItem.Name)
+			templates1.Template = types.StringValue(templatesItem.Template)
+			if templatesCount+1 > len(r.Config.Templates) {
+				r.Config.Templates = append(r.Config.Templates, templates1)
+			} else {
+				r.Config.Templates[templatesCount].Name = templates1.Name
+				r.Config.Templates[templatesCount].Template = templates1.Template
 			}
 		}
 		if resp.Consumer == nil {
@@ -51,10 +45,27 @@ func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplat
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

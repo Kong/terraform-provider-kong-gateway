@@ -7,7 +7,7 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 type StorageConfig struct {
 	Consul *Consul                 `tfsdk:"consul"`
 	Kong   map[string]types.String `tfsdk:"kong"`
-	Redis  *CreateAcmePluginRedis  `tfsdk:"redis"`
+	Redis  *AcmePluginRedis        `tfsdk:"redis"`
 	Shm    *Shm                    `tfsdk:"shm"`
-	Vault  *CreateAcmePluginVault  `tfsdk:"vault"`
+	Vault  *AcmePluginVault        `tfsdk:"vault"`
 }

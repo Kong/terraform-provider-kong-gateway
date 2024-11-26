@@ -32,6 +32,7 @@ type BasicAuthDataSourceModel struct {
 	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
 	CreatedAt types.Int64          `tfsdk:"created_at"`
 	ID        types.String         `tfsdk:"id"`
+	Password  types.String         `tfsdk:"password"`
 	Tags      []types.String       `tfsdk:"tags"`
 	Username  types.String         `tfsdk:"username"`
 }
@@ -60,6 +61,9 @@ func (r *BasicAuthDataSource) Schema(ctx context.Context, req datasource.SchemaR
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
+				Computed: true,
+			},
+			"password": schema.StringAttribute{
 				Computed: true,
 			},
 			"tags": schema.ListAttribute{

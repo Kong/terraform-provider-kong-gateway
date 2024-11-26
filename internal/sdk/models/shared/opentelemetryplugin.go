@@ -6,28 +6,27 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-type OpentelemetryPluginHeaderType string
+type HeaderType string
 
 const (
-	OpentelemetryPluginHeaderTypePreserve OpentelemetryPluginHeaderType = "preserve"
-	OpentelemetryPluginHeaderTypeIgnore   OpentelemetryPluginHeaderType = "ignore"
-	OpentelemetryPluginHeaderTypeB3       OpentelemetryPluginHeaderType = "b3"
-	OpentelemetryPluginHeaderTypeB3Single OpentelemetryPluginHeaderType = "b3-single"
-	OpentelemetryPluginHeaderTypeW3c      OpentelemetryPluginHeaderType = "w3c"
-	OpentelemetryPluginHeaderTypeJaeger   OpentelemetryPluginHeaderType = "jaeger"
-	OpentelemetryPluginHeaderTypeOt       OpentelemetryPluginHeaderType = "ot"
-	OpentelemetryPluginHeaderTypeAws      OpentelemetryPluginHeaderType = "aws"
-	OpentelemetryPluginHeaderTypeGcp      OpentelemetryPluginHeaderType = "gcp"
-	OpentelemetryPluginHeaderTypeDatadog  OpentelemetryPluginHeaderType = "datadog"
+	HeaderTypePreserve HeaderType = "preserve"
+	HeaderTypeIgnore   HeaderType = "ignore"
+	HeaderTypeB3       HeaderType = "b3"
+	HeaderTypeB3Single HeaderType = "b3-single"
+	HeaderTypeW3c      HeaderType = "w3c"
+	HeaderTypeJaeger   HeaderType = "jaeger"
+	HeaderTypeOt       HeaderType = "ot"
+	HeaderTypeAws      HeaderType = "aws"
+	HeaderTypeGcp      HeaderType = "gcp"
+	HeaderTypeDatadog  HeaderType = "datadog"
 )
 
-func (e OpentelemetryPluginHeaderType) ToPointer() *OpentelemetryPluginHeaderType {
+func (e HeaderType) ToPointer() *HeaderType {
 	return &e
 }
-func (e *OpentelemetryPluginHeaderType) UnmarshalJSON(data []byte) error {
+func (e *HeaderType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -52,31 +51,31 @@ func (e *OpentelemetryPluginHeaderType) UnmarshalJSON(data []byte) error {
 	case "gcp":
 		fallthrough
 	case "datadog":
-		*e = OpentelemetryPluginHeaderType(v)
+		*e = HeaderType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for OpentelemetryPluginHeaderType: %v", v)
+		return fmt.Errorf("invalid value for HeaderType: %v", v)
 	}
 }
 
-// OpentelemetryPluginDefaultFormat - The default header format to use when extractors did not match any format in the incoming headers and `inject` is configured with the value: `preserve`. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in `extract`.
-type OpentelemetryPluginDefaultFormat string
+// DefaultFormat - The default header format to use when extractors did not match any format in the incoming headers and `inject` is configured with the value: `preserve`. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in `extract`.
+type DefaultFormat string
 
 const (
-	OpentelemetryPluginDefaultFormatW3c      OpentelemetryPluginDefaultFormat = "w3c"
-	OpentelemetryPluginDefaultFormatDatadog  OpentelemetryPluginDefaultFormat = "datadog"
-	OpentelemetryPluginDefaultFormatB3       OpentelemetryPluginDefaultFormat = "b3"
-	OpentelemetryPluginDefaultFormatGcp      OpentelemetryPluginDefaultFormat = "gcp"
-	OpentelemetryPluginDefaultFormatB3Single OpentelemetryPluginDefaultFormat = "b3-single"
-	OpentelemetryPluginDefaultFormatJaeger   OpentelemetryPluginDefaultFormat = "jaeger"
-	OpentelemetryPluginDefaultFormatAws      OpentelemetryPluginDefaultFormat = "aws"
-	OpentelemetryPluginDefaultFormatOt       OpentelemetryPluginDefaultFormat = "ot"
+	DefaultFormatW3c      DefaultFormat = "w3c"
+	DefaultFormatDatadog  DefaultFormat = "datadog"
+	DefaultFormatB3       DefaultFormat = "b3"
+	DefaultFormatGcp      DefaultFormat = "gcp"
+	DefaultFormatB3Single DefaultFormat = "b3-single"
+	DefaultFormatJaeger   DefaultFormat = "jaeger"
+	DefaultFormatAws      DefaultFormat = "aws"
+	DefaultFormatOt       DefaultFormat = "ot"
 )
 
-func (e OpentelemetryPluginDefaultFormat) ToPointer() *OpentelemetryPluginDefaultFormat {
+func (e DefaultFormat) ToPointer() *DefaultFormat {
 	return &e
 }
-func (e *OpentelemetryPluginDefaultFormat) UnmarshalJSON(data []byte) error {
+func (e *DefaultFormat) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -97,29 +96,29 @@ func (e *OpentelemetryPluginDefaultFormat) UnmarshalJSON(data []byte) error {
 	case "aws":
 		fallthrough
 	case "ot":
-		*e = OpentelemetryPluginDefaultFormat(v)
+		*e = DefaultFormat(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for OpentelemetryPluginDefaultFormat: %v", v)
+		return fmt.Errorf("invalid value for DefaultFormat: %v", v)
 	}
 }
 
-type OpentelemetryPluginExtract string
+type Extract string
 
 const (
-	OpentelemetryPluginExtractW3c     OpentelemetryPluginExtract = "w3c"
-	OpentelemetryPluginExtractDatadog OpentelemetryPluginExtract = "datadog"
-	OpentelemetryPluginExtractB3      OpentelemetryPluginExtract = "b3"
-	OpentelemetryPluginExtractGcp     OpentelemetryPluginExtract = "gcp"
-	OpentelemetryPluginExtractJaeger  OpentelemetryPluginExtract = "jaeger"
-	OpentelemetryPluginExtractAws     OpentelemetryPluginExtract = "aws"
-	OpentelemetryPluginExtractOt      OpentelemetryPluginExtract = "ot"
+	ExtractW3c     Extract = "w3c"
+	ExtractDatadog Extract = "datadog"
+	ExtractB3      Extract = "b3"
+	ExtractGcp     Extract = "gcp"
+	ExtractJaeger  Extract = "jaeger"
+	ExtractAws     Extract = "aws"
+	ExtractOt      Extract = "ot"
 )
 
-func (e OpentelemetryPluginExtract) ToPointer() *OpentelemetryPluginExtract {
+func (e Extract) ToPointer() *Extract {
 	return &e
 }
-func (e *OpentelemetryPluginExtract) UnmarshalJSON(data []byte) error {
+func (e *Extract) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -138,31 +137,31 @@ func (e *OpentelemetryPluginExtract) UnmarshalJSON(data []byte) error {
 	case "aws":
 		fallthrough
 	case "ot":
-		*e = OpentelemetryPluginExtract(v)
+		*e = Extract(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for OpentelemetryPluginExtract: %v", v)
+		return fmt.Errorf("invalid value for Extract: %v", v)
 	}
 }
 
-type OpentelemetryPluginInject string
+type Inject string
 
 const (
-	OpentelemetryPluginInjectPreserve OpentelemetryPluginInject = "preserve"
-	OpentelemetryPluginInjectW3c      OpentelemetryPluginInject = "w3c"
-	OpentelemetryPluginInjectDatadog  OpentelemetryPluginInject = "datadog"
-	OpentelemetryPluginInjectB3       OpentelemetryPluginInject = "b3"
-	OpentelemetryPluginInjectGcp      OpentelemetryPluginInject = "gcp"
-	OpentelemetryPluginInjectB3Single OpentelemetryPluginInject = "b3-single"
-	OpentelemetryPluginInjectJaeger   OpentelemetryPluginInject = "jaeger"
-	OpentelemetryPluginInjectAws      OpentelemetryPluginInject = "aws"
-	OpentelemetryPluginInjectOt       OpentelemetryPluginInject = "ot"
+	InjectPreserve Inject = "preserve"
+	InjectW3c      Inject = "w3c"
+	InjectDatadog  Inject = "datadog"
+	InjectB3       Inject = "b3"
+	InjectGcp      Inject = "gcp"
+	InjectB3Single Inject = "b3-single"
+	InjectJaeger   Inject = "jaeger"
+	InjectAws      Inject = "aws"
+	InjectOt       Inject = "ot"
 )
 
-func (e OpentelemetryPluginInject) ToPointer() *OpentelemetryPluginInject {
+func (e Inject) ToPointer() *Inject {
 	return &e
 }
-func (e *OpentelemetryPluginInject) UnmarshalJSON(data []byte) error {
+func (e *Inject) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -185,46 +184,46 @@ func (e *OpentelemetryPluginInject) UnmarshalJSON(data []byte) error {
 	case "aws":
 		fallthrough
 	case "ot":
-		*e = OpentelemetryPluginInject(v)
+		*e = Inject(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for OpentelemetryPluginInject: %v", v)
+		return fmt.Errorf("invalid value for Inject: %v", v)
 	}
 }
 
-type OpentelemetryPluginPropagation struct {
+type Propagation struct {
 	// Header names to clear after context extraction. This allows to extract the context from a certain header and then remove it from the request, useful when extraction and injection are performed on different header formats and the original header should not be sent to the upstream. If left empty, no headers are cleared.
 	Clear []string `json:"clear,omitempty"`
 	// The default header format to use when extractors did not match any format in the incoming headers and `inject` is configured with the value: `preserve`. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in `extract`.
-	DefaultFormat OpentelemetryPluginDefaultFormat `json:"default_format"`
+	DefaultFormat DefaultFormat `json:"default_format"`
 	// Header formats used to extract tracing context from incoming requests. If multiple values are specified, the first one found will be used for extraction. If left empty, Kong will not extract any tracing context information from incoming requests and generate a trace with no parent and a new trace ID.
-	Extract []OpentelemetryPluginExtract `json:"extract,omitempty"`
+	Extract []Extract `json:"extract,omitempty"`
 	// Header formats used to inject tracing context. The value `preserve` will use the same header format as the incoming request. If multiple values are specified, all of them will be used during injection. If left empty, Kong will not inject any tracing context information in outgoing requests.
-	Inject []OpentelemetryPluginInject `json:"inject,omitempty"`
+	Inject []Inject `json:"inject,omitempty"`
 }
 
-func (o *OpentelemetryPluginPropagation) GetClear() []string {
+func (o *Propagation) GetClear() []string {
 	if o == nil {
 		return nil
 	}
 	return o.Clear
 }
 
-func (o *OpentelemetryPluginPropagation) GetDefaultFormat() OpentelemetryPluginDefaultFormat {
+func (o *Propagation) GetDefaultFormat() DefaultFormat {
 	if o == nil {
-		return OpentelemetryPluginDefaultFormat("")
+		return DefaultFormat("")
 	}
 	return o.DefaultFormat
 }
 
-func (o *OpentelemetryPluginPropagation) GetExtract() []OpentelemetryPluginExtract {
+func (o *Propagation) GetExtract() []Extract {
 	if o == nil {
 		return nil
 	}
 	return o.Extract
 }
 
-func (o *OpentelemetryPluginPropagation) GetInject() []OpentelemetryPluginInject {
+func (o *Propagation) GetInject() []Inject {
 	if o == nil {
 		return nil
 	}
@@ -339,15 +338,15 @@ type OpentelemetryPluginConfig struct {
 	// The number of spans to be sent in a single batch.
 	BatchSpanCount *int64 `json:"batch_span_count,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
-	ConnectTimeout *int64                         `json:"connect_timeout,omitempty"`
-	HeaderType     *OpentelemetryPluginHeaderType `json:"header_type,omitempty"`
+	ConnectTimeout *int64      `json:"connect_timeout,omitempty"`
+	HeaderType     *HeaderType `json:"header_type,omitempty"`
 	// The custom headers to be added in the HTTP request sent to the OTLP server. This setting is useful for adding the authentication headers (token) for the APM backend.
 	Headers                      map[string]any `json:"headers,omitempty"`
 	HTTPResponseHeaderForTraceid *string        `json:"http_response_header_for_traceid,omitempty"`
 	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
-	LogsEndpoint *string                         `json:"logs_endpoint,omitempty"`
-	Propagation  *OpentelemetryPluginPropagation `json:"propagation,omitempty"`
-	Queue        *OpentelemetryPluginQueue       `json:"queue,omitempty"`
+	LogsEndpoint *string                   `json:"logs_endpoint,omitempty"`
+	Propagation  *Propagation              `json:"propagation,omitempty"`
+	Queue        *OpentelemetryPluginQueue `json:"queue,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 	ReadTimeout        *int64         `json:"read_timeout,omitempty"`
 	ResourceAttributes map[string]any `json:"resource_attributes,omitempty"`
@@ -380,7 +379,7 @@ func (o *OpentelemetryPluginConfig) GetConnectTimeout() *int64 {
 	return o.ConnectTimeout
 }
 
-func (o *OpentelemetryPluginConfig) GetHeaderType() *OpentelemetryPluginHeaderType {
+func (o *OpentelemetryPluginConfig) GetHeaderType() *HeaderType {
 	if o == nil {
 		return nil
 	}
@@ -408,7 +407,7 @@ func (o *OpentelemetryPluginConfig) GetLogsEndpoint() *string {
 	return o.LogsEndpoint
 }
 
-func (o *OpentelemetryPluginConfig) GetPropagation() *OpentelemetryPluginPropagation {
+func (o *OpentelemetryPluginConfig) GetPropagation() *Propagation {
 	if o == nil {
 		return nil
 	}
@@ -455,6 +454,70 @@ func (o *OpentelemetryPluginConfig) GetTracesEndpoint() *string {
 		return nil
 	}
 	return o.TracesEndpoint
+}
+
+// OpentelemetryPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type OpentelemetryPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *OpentelemetryPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type OpentelemetryPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *OpentelemetryPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type OpentelemetryPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *OpentelemetryPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type OpentelemetryPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *OpentelemetryPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type OpentelemetryPluginOrdering struct {
+	After  *OpentelemetryPluginAfter  `json:"after,omitempty"`
+	Before *OpentelemetryPluginBefore `json:"before,omitempty"`
+}
+
+func (o *OpentelemetryPluginOrdering) GetAfter() *OpentelemetryPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *OpentelemetryPluginOrdering) GetBefore() *OpentelemetryPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type OpentelemetryPluginProtocols string
@@ -507,29 +570,6 @@ func (e *OpentelemetryPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// OpentelemetryPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type OpentelemetryPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *OpentelemetryPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type OpentelemetryPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *OpentelemetryPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // OpentelemetryPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type OpentelemetryPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -554,29 +594,30 @@ func (o *OpentelemetryPluginService) GetID() *string {
 	return o.ID
 }
 
+// OpentelemetryPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type OpentelemetryPlugin struct {
-	Config *OpentelemetryPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"opentelemetry" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []OpentelemetryPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config OpentelemetryPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *OpentelemetryPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *OpentelemetryPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                        `json:"enabled,omitempty"`
+	ID           *string                      `json:"id,omitempty"`
+	InstanceName *string                      `json:"instance_name,omitempty"`
+	name         string                       `const:"opentelemetry" json:"name"`
+	Ordering     *OpentelemetryPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []OpentelemetryPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *OpentelemetryPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *OpentelemetryPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (o OpentelemetryPlugin) MarshalJSON() ([]byte, error) {
@@ -590,11 +631,25 @@ func (o *OpentelemetryPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *OpentelemetryPlugin) GetConfig() *OpentelemetryPluginConfig {
+func (o *OpentelemetryPlugin) GetConfig() OpentelemetryPluginConfig {
+	if o == nil {
+		return OpentelemetryPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *OpentelemetryPlugin) GetConsumer() *OpentelemetryPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *OpentelemetryPlugin) GetConsumerGroup() *OpentelemetryPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *OpentelemetryPlugin) GetCreatedAt() *int64 {
@@ -625,11 +680,11 @@ func (o *OpentelemetryPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *OpentelemetryPlugin) GetName() *string {
-	return types.String("opentelemetry")
+func (o *OpentelemetryPlugin) GetName() string {
+	return "opentelemetry"
 }
 
-func (o *OpentelemetryPlugin) GetOrdering() any {
+func (o *OpentelemetryPlugin) GetOrdering() *OpentelemetryPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -641,6 +696,20 @@ func (o *OpentelemetryPlugin) GetProtocols() []OpentelemetryPluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *OpentelemetryPlugin) GetRoute() *OpentelemetryPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *OpentelemetryPlugin) GetService() *OpentelemetryPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *OpentelemetryPlugin) GetTags() []string {
@@ -657,30 +726,116 @@ func (o *OpentelemetryPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *OpentelemetryPlugin) GetConsumer() *OpentelemetryPluginConsumer {
+// OpentelemetryPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type OpentelemetryPluginInput struct {
+	Config OpentelemetryPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *OpentelemetryPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *OpentelemetryPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                        `json:"enabled,omitempty"`
+	ID           *string                      `json:"id,omitempty"`
+	InstanceName *string                      `json:"instance_name,omitempty"`
+	name         string                       `const:"opentelemetry" json:"name"`
+	Ordering     *OpentelemetryPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []OpentelemetryPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *OpentelemetryPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *OpentelemetryPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (o OpentelemetryPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpentelemetryPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpentelemetryPluginInput) GetConfig() OpentelemetryPluginConfig {
+	if o == nil {
+		return OpentelemetryPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *OpentelemetryPluginInput) GetConsumer() *OpentelemetryPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *OpentelemetryPlugin) GetConsumerGroup() *OpentelemetryPluginConsumerGroup {
+func (o *OpentelemetryPluginInput) GetConsumerGroup() *OpentelemetryPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *OpentelemetryPlugin) GetRoute() *OpentelemetryPluginRoute {
+func (o *OpentelemetryPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *OpentelemetryPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *OpentelemetryPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *OpentelemetryPluginInput) GetName() string {
+	return "opentelemetry"
+}
+
+func (o *OpentelemetryPluginInput) GetOrdering() *OpentelemetryPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *OpentelemetryPluginInput) GetProtocols() []OpentelemetryPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *OpentelemetryPluginInput) GetRoute() *OpentelemetryPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *OpentelemetryPlugin) GetService() *OpentelemetryPluginService {
+func (o *OpentelemetryPluginInput) GetService() *OpentelemetryPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *OpentelemetryPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

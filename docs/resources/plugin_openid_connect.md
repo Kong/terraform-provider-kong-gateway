@@ -32,11 +32,11 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
       "..."
     ]
     authorization_cookie_domain    = "...my_authorization_cookie_domain..."
-    authorization_cookie_http_only = false
+    authorization_cookie_http_only = true
     authorization_cookie_name      = "...my_authorization_cookie_name..."
     authorization_cookie_path      = "...my_authorization_cookie_path..."
     authorization_cookie_same_site = "Lax"
-    authorization_cookie_secure    = true
+    authorization_cookie_secure    = false
     authorization_endpoint         = "...my_authorization_endpoint..."
     authorization_query_args_client = [
       "..."
@@ -52,10 +52,10 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     bearer_token_param_type = [
       "cookie"
     ]
-    by_username_ignore_case = true
+    by_username_ignore_case = false
     cache_introspection     = true
     cache_token_exchange    = true
-    cache_tokens            = false
+    cache_tokens            = true
     cache_tokens_salt       = "...my_cache_tokens_salt..."
     cache_ttl               = 4.72
     cache_ttl_max           = 0.06
@@ -123,16 +123,16 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
           port = 57214
         }
       ]
-      connect_timeout       = 982158282
-      connection_is_proxied = false
+      connect_timeout       = 982158285
+      connection_is_proxied = true
       database              = 9
       host                  = "...my_host..."
-      keepalive_backlog     = 246205285
+      keepalive_backlog     = 246205291
       keepalive_pool_size   = 322806210
       password              = "...my_password..."
       port                  = 3692
-      read_timeout          = 1341530037
-      send_timeout          = 2024267449
+      read_timeout          = 1341530044
+      send_timeout          = 2024267446
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -144,7 +144,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
       sentinel_role     = "slave"
       sentinel_username = "...my_sentinel_username..."
       server_name       = "...my_server_name..."
-      ssl               = true
+      ssl               = false
       ssl_verify        = true
       username          = "...my_username..."
     }
@@ -192,11 +192,11 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     dpop_use_nonce                      = true
     enable_hs_signatures                = false
     end_session_endpoint                = "...my_end_session_endpoint..."
-    expose_error_code                   = true
+    expose_error_code                   = false
     extra_jwks_uris = [
       "..."
     ]
-    forbidden_destroy_session = false
+    forbidden_destroy_session = true
     forbidden_error_message   = "...my_forbidden_error_message..."
     forbidden_redirect_uri = [
       "..."
@@ -220,7 +220,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ignore_signature = [
       "userinfo"
     ]
-    introspect_jwt_tokens              = false
+    introspect_jwt_tokens              = true
     introspection_accept               = "application/json"
     introspection_check_active         = false
     introspection_endpoint             = "...my_introspection_endpoint..."
@@ -273,8 +273,8 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
       "..."
     ]
     logout_revoke               = false
-    logout_revoke_access_token  = false
-    logout_revoke_refresh_token = true
+    logout_revoke_access_token  = true
+    logout_revoke_refresh_token = false
     logout_uri_suffix           = "...my_logout_uri_suffix..."
     max_age                     = 6.65
     mtls_introspection_endpoint = "...my_mtls_introspection_endpoint..."
@@ -301,17 +301,17 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
           port = 23549
         }
       ]
-      connect_timeout       = 1702562500
-      connection_is_proxied = true
+      connect_timeout       = 1702562507
+      connection_is_proxied = false
       database              = 5
       host                  = "...my_host..."
-      keepalive_backlog     = 1466734252
-      keepalive_pool_size   = 1177237232
+      keepalive_backlog     = 1466734250
+      keepalive_pool_size   = 1177237243
       password              = "...my_password..."
       port                  = 31761
       prefix                = "...my_prefix..."
-      read_timeout          = 1817869745
-      send_timeout          = 1963309238
+      read_timeout          = 1817869754
+      send_timeout          = 1963309234
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -333,8 +333,8 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     refresh_token_param_type = [
       "query"
     ]
-    refresh_tokens                        = false
-    require_proof_key_for_code_exchange   = true
+    refresh_tokens                        = true
+    require_proof_key_for_code_exchange   = false
     require_pushed_authorization_requests = false
     require_signed_request_object         = true
     resolve_distributed_claims            = false
@@ -352,7 +352,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     roles_required = [
       "..."
     ]
-    run_on_preflight = true
+    run_on_preflight = false
     scopes = [
       "..."
     ]
@@ -366,11 +366,11 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     session_absolute_timeout          = 2.42
     session_audience                  = "...my_session_audience..."
     session_cookie_domain             = "...my_session_cookie_domain..."
-    session_cookie_http_only          = true
+    session_cookie_http_only          = false
     session_cookie_name               = "...my_session_cookie_name..."
     session_cookie_path               = "...my_session_cookie_path..."
     session_cookie_same_site          = "Default"
-    session_cookie_secure             = true
+    session_cookie_secure             = false
     session_enforce_same_subject      = false
     session_hash_storage_key          = true
     session_hash_subject              = true
@@ -379,7 +379,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     session_memcached_port            = 4879
     session_memcached_prefix          = "...my_session_memcached_prefix..."
     session_memcached_socket          = "...my_session_memcached_socket..."
-    session_remember                  = true
+    session_remember                  = false
     session_remember_absolute_timeout = 6.53
     session_remember_cookie_name      = "...my_session_remember_cookie_name..."
     session_remember_rolling_timeout  = 4.66
@@ -392,12 +392,12 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     session_rolling_timeout       = 6.97
     session_secret                = "...my_session_secret..."
     session_storage               = "redis"
-    session_store_metadata        = true
+    session_store_metadata        = false
     ssl_verify                    = true
     timeout                       = 4.71
     tls_client_auth_cert_id       = "...my_tls_client_auth_cert_id..."
-    tls_client_auth_ssl_verify    = true
-    token_cache_key_include_scope = false
+    tls_client_auth_ssl_verify    = false
+    token_cache_key_include_scope = true
     token_endpoint                = "...my_token_endpoint..."
     token_endpoint_auth_method    = "tls_client_auth"
     token_exchange_endpoint       = "...my_token_exchange_endpoint..."
@@ -426,7 +426,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     token_post_args_values = [
       "..."
     ]
-    unauthorized_destroy_session = false
+    unauthorized_destroy_session = true
     unauthorized_error_message   = "...my_unauthorized_error_message..."
     unauthorized_redirect_uri = [
       "..."
@@ -472,9 +472,9 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ]
     using_pseudo_issuer = true
     verify_claims       = false
-    verify_nonce        = false
-    verify_parameters   = false
-    verify_signature    = false
+    verify_nonce        = true
+    verify_parameters   = true
+    verify_signature    = true
   }
   consumer = {
     id = "...my_id..."
@@ -482,9 +482,21 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
+  id            = "...my_id..."
   instance_name = "...my_instance_name..."
-  ordering      = "{ \"see\": \"documentation\" }"
+  ordering = {
+    after = {
+      access = [
+        "..."
+      ]
+    }
+    before = {
+      access = [
+        "..."
+      ]
+    }
+  }
   protocols = [
     "tcp"
   ]
@@ -503,14 +515,17 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
 <!-- schema generated by tfplugindocs -->
 ## Schema
 
-### Optional
+### Required
 
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
+
+### Optional
+
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) (see [below for nested schema](#nestedatt--consumer_group))
 - `enabled` (Boolean) Whether the plugin is applied.
 - `instance_name` (String)
-- `ordering` (String) Parsed as JSON.
+- `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
 - `protocols` (List of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
@@ -891,6 +906,31 @@ Optional:
 Optional:
 
 - `id` (String)
+
+
+<a id="nestedatt--ordering"></a>
+### Nested Schema for `ordering`
+
+Optional:
+
+- `after` (Attributes) (see [below for nested schema](#nestedatt--ordering--after))
+- `before` (Attributes) (see [below for nested schema](#nestedatt--ordering--before))
+
+<a id="nestedatt--ordering--after"></a>
+### Nested Schema for `ordering.after`
+
+Optional:
+
+- `access` (List of String)
+
+
+<a id="nestedatt--ordering--before"></a>
+### Nested Schema for `ordering.before`
+
+Optional:
+
+- `access` (List of String)
+
 
 
 <a id="nestedatt--route"></a>

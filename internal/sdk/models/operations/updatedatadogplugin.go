@@ -9,8 +9,8 @@ import (
 
 type UpdateDatadogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateDatadogPlugin *shared.CreateDatadogPlugin `request:"mediaType=application/json"`
+	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	DatadogPlugin *shared.DatadogPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateDatadogPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateDatadogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateDatadogPluginRequest) GetCreateDatadogPlugin() *shared.CreateDatadogPlugin {
+func (o *UpdateDatadogPluginRequest) GetDatadogPlugin() *shared.DatadogPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateDatadogPlugin
+	return o.DatadogPlugin
 }
 
 type UpdateDatadogPluginResponse struct {

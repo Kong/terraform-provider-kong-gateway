@@ -6,21 +6,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-type StatsdPluginConsumerIdentifierDefault string
+type ConsumerIdentifierDefault string
 
 const (
-	StatsdPluginConsumerIdentifierDefaultConsumerID StatsdPluginConsumerIdentifierDefault = "consumer_id"
-	StatsdPluginConsumerIdentifierDefaultCustomID   StatsdPluginConsumerIdentifierDefault = "custom_id"
-	StatsdPluginConsumerIdentifierDefaultUsername   StatsdPluginConsumerIdentifierDefault = "username"
+	ConsumerIdentifierDefaultConsumerID ConsumerIdentifierDefault = "consumer_id"
+	ConsumerIdentifierDefaultCustomID   ConsumerIdentifierDefault = "custom_id"
+	ConsumerIdentifierDefaultUsername   ConsumerIdentifierDefault = "username"
 )
 
-func (e StatsdPluginConsumerIdentifierDefault) ToPointer() *StatsdPluginConsumerIdentifierDefault {
+func (e ConsumerIdentifierDefault) ToPointer() *ConsumerIdentifierDefault {
 	return &e
 }
-func (e *StatsdPluginConsumerIdentifierDefault) UnmarshalJSON(data []byte) error {
+func (e *ConsumerIdentifierDefault) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -31,10 +30,10 @@ func (e *StatsdPluginConsumerIdentifierDefault) UnmarshalJSON(data []byte) error
 	case "custom_id":
 		fallthrough
 	case "username":
-		*e = StatsdPluginConsumerIdentifierDefault(v)
+		*e = ConsumerIdentifierDefault(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginConsumerIdentifierDefault: %v", v)
+		return fmt.Errorf("invalid value for ConsumerIdentifierDefault: %v", v)
 	}
 }
 
@@ -134,20 +133,20 @@ func (e *StatsdPluginName) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// StatsdPluginServiceIdentifier - Service detail.
-type StatsdPluginServiceIdentifier string
+// ServiceIdentifier - Service detail.
+type ServiceIdentifier string
 
 const (
-	StatsdPluginServiceIdentifierServiceID         StatsdPluginServiceIdentifier = "service_id"
-	StatsdPluginServiceIdentifierServiceName       StatsdPluginServiceIdentifier = "service_name"
-	StatsdPluginServiceIdentifierServiceHost       StatsdPluginServiceIdentifier = "service_host"
-	StatsdPluginServiceIdentifierServiceNameOrHost StatsdPluginServiceIdentifier = "service_name_or_host"
+	ServiceIdentifierServiceID         ServiceIdentifier = "service_id"
+	ServiceIdentifierServiceName       ServiceIdentifier = "service_name"
+	ServiceIdentifierServiceHost       ServiceIdentifier = "service_host"
+	ServiceIdentifierServiceNameOrHost ServiceIdentifier = "service_name_or_host"
 )
 
-func (e StatsdPluginServiceIdentifier) ToPointer() *StatsdPluginServiceIdentifier {
+func (e ServiceIdentifier) ToPointer() *ServiceIdentifier {
 	return &e
 }
-func (e *StatsdPluginServiceIdentifier) UnmarshalJSON(data []byte) error {
+func (e *ServiceIdentifier) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -160,10 +159,10 @@ func (e *StatsdPluginServiceIdentifier) UnmarshalJSON(data []byte) error {
 	case "service_host":
 		fallthrough
 	case "service_name_or_host":
-		*e = StatsdPluginServiceIdentifier(v)
+		*e = ServiceIdentifier(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginServiceIdentifier: %v", v)
+		return fmt.Errorf("invalid value for ServiceIdentifier: %v", v)
 	}
 }
 
@@ -206,18 +205,18 @@ func (e *StatsdPluginStatType) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// StatsdPluginWorkspaceIdentifier - Workspace detail.
-type StatsdPluginWorkspaceIdentifier string
+// WorkspaceIdentifier - Workspace detail.
+type WorkspaceIdentifier string
 
 const (
-	StatsdPluginWorkspaceIdentifierWorkspaceID   StatsdPluginWorkspaceIdentifier = "workspace_id"
-	StatsdPluginWorkspaceIdentifierWorkspaceName StatsdPluginWorkspaceIdentifier = "workspace_name"
+	WorkspaceIdentifierWorkspaceID   WorkspaceIdentifier = "workspace_id"
+	WorkspaceIdentifierWorkspaceName WorkspaceIdentifier = "workspace_name"
 )
 
-func (e StatsdPluginWorkspaceIdentifier) ToPointer() *StatsdPluginWorkspaceIdentifier {
+func (e WorkspaceIdentifier) ToPointer() *WorkspaceIdentifier {
 	return &e
 }
-func (e *StatsdPluginWorkspaceIdentifier) UnmarshalJSON(data []byte) error {
+func (e *WorkspaceIdentifier) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -226,10 +225,10 @@ func (e *StatsdPluginWorkspaceIdentifier) UnmarshalJSON(data []byte) error {
 	case "workspace_id":
 		fallthrough
 	case "workspace_name":
-		*e = StatsdPluginWorkspaceIdentifier(v)
+		*e = WorkspaceIdentifier(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginWorkspaceIdentifier: %v", v)
+		return fmt.Errorf("invalid value for WorkspaceIdentifier: %v", v)
 	}
 }
 
@@ -241,11 +240,11 @@ type StatsdPluginMetrics struct {
 	// Sampling rate
 	SampleRate *float64 `json:"sample_rate,omitempty"`
 	// Service detail.
-	ServiceIdentifier *StatsdPluginServiceIdentifier `json:"service_identifier,omitempty"`
+	ServiceIdentifier *ServiceIdentifier `json:"service_identifier,omitempty"`
 	// Determines what sort of event a metric represents.
 	StatType StatsdPluginStatType `json:"stat_type"`
 	// Workspace detail.
-	WorkspaceIdentifier *StatsdPluginWorkspaceIdentifier `json:"workspace_identifier,omitempty"`
+	WorkspaceIdentifier *WorkspaceIdentifier `json:"workspace_identifier,omitempty"`
 }
 
 func (o *StatsdPluginMetrics) GetConsumerIdentifier() *StatsdPluginConsumerIdentifier {
@@ -269,7 +268,7 @@ func (o *StatsdPluginMetrics) GetSampleRate() *float64 {
 	return o.SampleRate
 }
 
-func (o *StatsdPluginMetrics) GetServiceIdentifier() *StatsdPluginServiceIdentifier {
+func (o *StatsdPluginMetrics) GetServiceIdentifier() *ServiceIdentifier {
 	if o == nil {
 		return nil
 	}
@@ -283,7 +282,7 @@ func (o *StatsdPluginMetrics) GetStatType() StatsdPluginStatType {
 	return o.StatType
 }
 
-func (o *StatsdPluginMetrics) GetWorkspaceIdentifier() *StatsdPluginWorkspaceIdentifier {
+func (o *StatsdPluginMetrics) GetWorkspaceIdentifier() *WorkspaceIdentifier {
 	if o == nil {
 		return nil
 	}
@@ -392,19 +391,19 @@ func (o *StatsdPluginQueue) GetMaxRetryTime() *float64 {
 	return o.MaxRetryTime
 }
 
-type StatsdPluginServiceIdentifierDefault string
+type ServiceIdentifierDefault string
 
 const (
-	StatsdPluginServiceIdentifierDefaultServiceID         StatsdPluginServiceIdentifierDefault = "service_id"
-	StatsdPluginServiceIdentifierDefaultServiceName       StatsdPluginServiceIdentifierDefault = "service_name"
-	StatsdPluginServiceIdentifierDefaultServiceHost       StatsdPluginServiceIdentifierDefault = "service_host"
-	StatsdPluginServiceIdentifierDefaultServiceNameOrHost StatsdPluginServiceIdentifierDefault = "service_name_or_host"
+	ServiceIdentifierDefaultServiceID         ServiceIdentifierDefault = "service_id"
+	ServiceIdentifierDefaultServiceName       ServiceIdentifierDefault = "service_name"
+	ServiceIdentifierDefaultServiceHost       ServiceIdentifierDefault = "service_host"
+	ServiceIdentifierDefaultServiceNameOrHost ServiceIdentifierDefault = "service_name_or_host"
 )
 
-func (e StatsdPluginServiceIdentifierDefault) ToPointer() *StatsdPluginServiceIdentifierDefault {
+func (e ServiceIdentifierDefault) ToPointer() *ServiceIdentifierDefault {
 	return &e
 }
-func (e *StatsdPluginServiceIdentifierDefault) UnmarshalJSON(data []byte) error {
+func (e *ServiceIdentifierDefault) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -417,26 +416,26 @@ func (e *StatsdPluginServiceIdentifierDefault) UnmarshalJSON(data []byte) error 
 	case "service_host":
 		fallthrough
 	case "service_name_or_host":
-		*e = StatsdPluginServiceIdentifierDefault(v)
+		*e = ServiceIdentifierDefault(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginServiceIdentifierDefault: %v", v)
+		return fmt.Errorf("invalid value for ServiceIdentifierDefault: %v", v)
 	}
 }
 
-type StatsdPluginTagStyle string
+type TagStyle string
 
 const (
-	StatsdPluginTagStyleDogstatsd StatsdPluginTagStyle = "dogstatsd"
-	StatsdPluginTagStyleInfluxdb  StatsdPluginTagStyle = "influxdb"
-	StatsdPluginTagStyleLibrato   StatsdPluginTagStyle = "librato"
-	StatsdPluginTagStyleSignalfx  StatsdPluginTagStyle = "signalfx"
+	TagStyleDogstatsd TagStyle = "dogstatsd"
+	TagStyleInfluxdb  TagStyle = "influxdb"
+	TagStyleLibrato   TagStyle = "librato"
+	TagStyleSignalfx  TagStyle = "signalfx"
 )
 
-func (e StatsdPluginTagStyle) ToPointer() *StatsdPluginTagStyle {
+func (e TagStyle) ToPointer() *TagStyle {
 	return &e
 }
-func (e *StatsdPluginTagStyle) UnmarshalJSON(data []byte) error {
+func (e *TagStyle) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -449,24 +448,24 @@ func (e *StatsdPluginTagStyle) UnmarshalJSON(data []byte) error {
 	case "librato":
 		fallthrough
 	case "signalfx":
-		*e = StatsdPluginTagStyle(v)
+		*e = TagStyle(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginTagStyle: %v", v)
+		return fmt.Errorf("invalid value for TagStyle: %v", v)
 	}
 }
 
-type StatsdPluginWorkspaceIdentifierDefault string
+type WorkspaceIdentifierDefault string
 
 const (
-	StatsdPluginWorkspaceIdentifierDefaultWorkspaceID   StatsdPluginWorkspaceIdentifierDefault = "workspace_id"
-	StatsdPluginWorkspaceIdentifierDefaultWorkspaceName StatsdPluginWorkspaceIdentifierDefault = "workspace_name"
+	WorkspaceIdentifierDefaultWorkspaceID   WorkspaceIdentifierDefault = "workspace_id"
+	WorkspaceIdentifierDefaultWorkspaceName WorkspaceIdentifierDefault = "workspace_name"
 )
 
-func (e StatsdPluginWorkspaceIdentifierDefault) ToPointer() *StatsdPluginWorkspaceIdentifierDefault {
+func (e WorkspaceIdentifierDefault) ToPointer() *WorkspaceIdentifierDefault {
 	return &e
 }
-func (e *StatsdPluginWorkspaceIdentifierDefault) UnmarshalJSON(data []byte) error {
+func (e *WorkspaceIdentifierDefault) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -475,18 +474,18 @@ func (e *StatsdPluginWorkspaceIdentifierDefault) UnmarshalJSON(data []byte) erro
 	case "workspace_id":
 		fallthrough
 	case "workspace_name":
-		*e = StatsdPluginWorkspaceIdentifierDefault(v)
+		*e = WorkspaceIdentifierDefault(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for StatsdPluginWorkspaceIdentifierDefault: %v", v)
+		return fmt.Errorf("invalid value for WorkspaceIdentifierDefault: %v", v)
 	}
 }
 
 type StatsdPluginConfig struct {
 	// List of status code ranges that are allowed to be logged in metrics.
-	AllowStatusCodes          []string                               `json:"allow_status_codes,omitempty"`
-	ConsumerIdentifierDefault *StatsdPluginConsumerIdentifierDefault `json:"consumer_identifier_default,omitempty"`
-	FlushTimeout              *float64                               `json:"flush_timeout,omitempty"`
+	AllowStatusCodes          []string                   `json:"allow_status_codes,omitempty"`
+	ConsumerIdentifierDefault *ConsumerIdentifierDefault `json:"consumer_identifier_default,omitempty"`
+	FlushTimeout              *float64                   `json:"flush_timeout,omitempty"`
 	// The IP address or hostname of StatsD server to send data to.
 	Host             *string `json:"host,omitempty"`
 	HostnameInPrefix *bool   `json:"hostname_in_prefix,omitempty"`
@@ -495,15 +494,15 @@ type StatsdPluginConfig struct {
 	// The port of StatsD server to send data to.
 	Port *int64 `json:"port,omitempty"`
 	// String to prefix to each metric's name.
-	Prefix                     *string                                 `json:"prefix,omitempty"`
-	Queue                      *StatsdPluginQueue                      `json:"queue,omitempty"`
-	QueueSize                  *int64                                  `json:"queue_size,omitempty"`
-	RetryCount                 *int64                                  `json:"retry_count,omitempty"`
-	ServiceIdentifierDefault   *StatsdPluginServiceIdentifierDefault   `json:"service_identifier_default,omitempty"`
-	TagStyle                   *StatsdPluginTagStyle                   `json:"tag_style,omitempty"`
-	UDPPacketSize              *float64                                `json:"udp_packet_size,omitempty"`
-	UseTCP                     *bool                                   `json:"use_tcp,omitempty"`
-	WorkspaceIdentifierDefault *StatsdPluginWorkspaceIdentifierDefault `json:"workspace_identifier_default,omitempty"`
+	Prefix                     *string                     `json:"prefix,omitempty"`
+	Queue                      *StatsdPluginQueue          `json:"queue,omitempty"`
+	QueueSize                  *int64                      `json:"queue_size,omitempty"`
+	RetryCount                 *int64                      `json:"retry_count,omitempty"`
+	ServiceIdentifierDefault   *ServiceIdentifierDefault   `json:"service_identifier_default,omitempty"`
+	TagStyle                   *TagStyle                   `json:"tag_style,omitempty"`
+	UDPPacketSize              *float64                    `json:"udp_packet_size,omitempty"`
+	UseTCP                     *bool                       `json:"use_tcp,omitempty"`
+	WorkspaceIdentifierDefault *WorkspaceIdentifierDefault `json:"workspace_identifier_default,omitempty"`
 }
 
 func (o *StatsdPluginConfig) GetAllowStatusCodes() []string {
@@ -513,7 +512,7 @@ func (o *StatsdPluginConfig) GetAllowStatusCodes() []string {
 	return o.AllowStatusCodes
 }
 
-func (o *StatsdPluginConfig) GetConsumerIdentifierDefault() *StatsdPluginConsumerIdentifierDefault {
+func (o *StatsdPluginConfig) GetConsumerIdentifierDefault() *ConsumerIdentifierDefault {
 	if o == nil {
 		return nil
 	}
@@ -583,14 +582,14 @@ func (o *StatsdPluginConfig) GetRetryCount() *int64 {
 	return o.RetryCount
 }
 
-func (o *StatsdPluginConfig) GetServiceIdentifierDefault() *StatsdPluginServiceIdentifierDefault {
+func (o *StatsdPluginConfig) GetServiceIdentifierDefault() *ServiceIdentifierDefault {
 	if o == nil {
 		return nil
 	}
 	return o.ServiceIdentifierDefault
 }
 
-func (o *StatsdPluginConfig) GetTagStyle() *StatsdPluginTagStyle {
+func (o *StatsdPluginConfig) GetTagStyle() *TagStyle {
 	if o == nil {
 		return nil
 	}
@@ -611,11 +610,75 @@ func (o *StatsdPluginConfig) GetUseTCP() *bool {
 	return o.UseTCP
 }
 
-func (o *StatsdPluginConfig) GetWorkspaceIdentifierDefault() *StatsdPluginWorkspaceIdentifierDefault {
+func (o *StatsdPluginConfig) GetWorkspaceIdentifierDefault() *WorkspaceIdentifierDefault {
 	if o == nil {
 		return nil
 	}
 	return o.WorkspaceIdentifierDefault
+}
+
+// StatsdPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type StatsdPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *StatsdPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type StatsdPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *StatsdPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type StatsdPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *StatsdPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type StatsdPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *StatsdPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type StatsdPluginOrdering struct {
+	After  *StatsdPluginAfter  `json:"after,omitempty"`
+	Before *StatsdPluginBefore `json:"before,omitempty"`
+}
+
+func (o *StatsdPluginOrdering) GetAfter() *StatsdPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *StatsdPluginOrdering) GetBefore() *StatsdPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type StatsdPluginProtocols string
@@ -668,29 +731,6 @@ func (e *StatsdPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// StatsdPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type StatsdPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *StatsdPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type StatsdPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *StatsdPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // StatsdPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type StatsdPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -715,29 +755,30 @@ func (o *StatsdPluginService) GetID() *string {
 	return o.ID
 }
 
+// StatsdPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type StatsdPlugin struct {
-	Config *StatsdPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"statsd" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []StatsdPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config StatsdPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *StatsdPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *StatsdPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                 `json:"enabled,omitempty"`
+	ID           *string               `json:"id,omitempty"`
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"statsd" json:"name"`
+	Ordering     *StatsdPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []StatsdPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *StatsdPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *StatsdPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s StatsdPlugin) MarshalJSON() ([]byte, error) {
@@ -751,11 +792,25 @@ func (s *StatsdPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *StatsdPlugin) GetConfig() *StatsdPluginConfig {
+func (o *StatsdPlugin) GetConfig() StatsdPluginConfig {
+	if o == nil {
+		return StatsdPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *StatsdPlugin) GetConsumer() *StatsdPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *StatsdPlugin) GetConsumerGroup() *StatsdPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *StatsdPlugin) GetCreatedAt() *int64 {
@@ -786,11 +841,11 @@ func (o *StatsdPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *StatsdPlugin) GetName() *string {
-	return types.String("statsd")
+func (o *StatsdPlugin) GetName() string {
+	return "statsd"
 }
 
-func (o *StatsdPlugin) GetOrdering() any {
+func (o *StatsdPlugin) GetOrdering() *StatsdPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -802,6 +857,20 @@ func (o *StatsdPlugin) GetProtocols() []StatsdPluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *StatsdPlugin) GetRoute() *StatsdPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *StatsdPlugin) GetService() *StatsdPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *StatsdPlugin) GetTags() []string {
@@ -818,30 +887,116 @@ func (o *StatsdPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *StatsdPlugin) GetConsumer() *StatsdPluginConsumer {
+// StatsdPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type StatsdPluginInput struct {
+	Config StatsdPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *StatsdPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *StatsdPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                 `json:"enabled,omitempty"`
+	ID           *string               `json:"id,omitempty"`
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"statsd" json:"name"`
+	Ordering     *StatsdPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []StatsdPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *StatsdPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *StatsdPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (s StatsdPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *StatsdPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *StatsdPluginInput) GetConfig() StatsdPluginConfig {
+	if o == nil {
+		return StatsdPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *StatsdPluginInput) GetConsumer() *StatsdPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *StatsdPlugin) GetConsumerGroup() *StatsdPluginConsumerGroup {
+func (o *StatsdPluginInput) GetConsumerGroup() *StatsdPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *StatsdPlugin) GetRoute() *StatsdPluginRoute {
+func (o *StatsdPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *StatsdPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *StatsdPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *StatsdPluginInput) GetName() string {
+	return "statsd"
+}
+
+func (o *StatsdPluginInput) GetOrdering() *StatsdPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *StatsdPluginInput) GetProtocols() []StatsdPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *StatsdPluginInput) GetRoute() *StatsdPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *StatsdPlugin) GetService() *StatsdPluginService {
+func (o *StatsdPluginInput) GetService() *StatsdPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *StatsdPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

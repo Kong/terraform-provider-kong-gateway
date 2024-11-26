@@ -18,10 +18,11 @@ func (r *BasicAuthDataSourceModel) RefreshFromSharedBasicAuth(resp *shared.Basic
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
+		r.Password = types.StringValue(resp.Password)
 		r.Tags = []types.String{}
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
-		r.Username = types.StringPointerValue(resp.Username)
+		r.Username = types.StringValue(resp.Username)
 	}
 }

@@ -9,8 +9,8 @@ import (
 
 type UpdateAiproxyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateAiProxyPlugin *shared.CreateAiProxyPlugin `request:"mediaType=application/json"`
+	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	AiProxyPlugin *shared.AiProxyPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAiproxyPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateAiproxyPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAiproxyPluginRequest) GetCreateAiProxyPlugin() *shared.CreateAiProxyPlugin {
+func (o *UpdateAiproxyPluginRequest) GetAiProxyPlugin() *shared.AiProxyPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateAiProxyPlugin
+	return o.AiProxyPlugin
 }
 
 type UpdateAiproxyPluginResponse struct {

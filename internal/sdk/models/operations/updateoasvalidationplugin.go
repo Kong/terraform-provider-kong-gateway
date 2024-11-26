@@ -9,8 +9,8 @@ import (
 
 type UpdateOasvalidationPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateOasValidationPlugin *shared.CreateOasValidationPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	OasValidationPlugin *shared.OasValidationPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOasvalidationPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateOasvalidationPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOasvalidationPluginRequest) GetCreateOasValidationPlugin() *shared.CreateOasValidationPlugin {
+func (o *UpdateOasvalidationPluginRequest) GetOasValidationPlugin() *shared.OasValidationPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateOasValidationPlugin
+	return o.OasValidationPlugin
 }
 
 type UpdateOasvalidationPluginResponse struct {

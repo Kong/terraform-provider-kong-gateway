@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,14 +10,9 @@ import (
 
 func (r *PluginUpstreamTimeoutDataSourceModel) RefreshFromSharedUpstreamTimeoutPlugin(resp *shared.UpstreamTimeoutPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateUpstreamTimeoutPluginConfig{}
-			r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
-			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
-			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
-		}
+		r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
+		r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
+		r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -36,10 +30,27 @@ func (r *PluginUpstreamTimeoutDataSourceModel) RefreshFromSharedUpstreamTimeoutP
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

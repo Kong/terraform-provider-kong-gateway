@@ -35,19 +35,19 @@ type PluginHTTPLogResource struct {
 
 // PluginHTTPLogResourceModel describes the resource data model.
 type PluginHTTPLogResourceModel struct {
-	Config        *tfTypes.CreateHTTPLogPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer               `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer               `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                        `tfsdk:"created_at"`
-	Enabled       types.Bool                         `tfsdk:"enabled"`
-	ID            types.String                       `tfsdk:"id"`
-	InstanceName  types.String                       `tfsdk:"instance_name"`
-	Ordering      types.String                       `tfsdk:"ordering"`
-	Protocols     []types.String                     `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer               `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer               `tfsdk:"service"`
-	Tags          []types.String                     `tfsdk:"tags"`
-	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
+	Config        tfTypes.HTTPLogPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                 `tfsdk:"created_at"`
+	Enabled       types.Bool                  `tfsdk:"enabled"`
+	ID            types.String                `tfsdk:"id"`
+	InstanceName  types.String                `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
+	Protocols     []types.String              `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer        `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer        `tfsdk:"service"`
+	Tags          []types.String              `tfsdk:"tags"`
+	UpdatedAt     types.Int64                 `tfsdk:"updated_at"`
 }
 
 func (r *PluginHTTPLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,8 +59,7 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "PluginHTTPLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"content_type": schema.StringAttribute{
 						Computed:    true,
@@ -222,17 +221,38 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -315,7 +335,7 @@ func (r *PluginHTTPLogResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := data.ToSharedCreateHTTPLogPlugin()
+	request := data.ToSharedHTTPLogPluginInput()
 	res, err := r.client.Plugins.CreateHttplogPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -414,10 +434,10 @@ func (r *PluginHTTPLogResource) Update(ctx context.Context, req resource.UpdateR
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createHTTPLogPlugin := data.ToSharedCreateHTTPLogPlugin()
+	httpLogPlugin := data.ToSharedHTTPLogPluginInput()
 	request := operations.UpdateHttplogPluginRequest{
-		PluginID:            pluginID,
-		CreateHTTPLogPlugin: createHTTPLogPlugin,
+		PluginID:      pluginID,
+		HTTPLogPlugin: httpLogPlugin,
 	}
 	res, err := r.client.Plugins.UpdateHttplogPlugin(ctx, request)
 	if err != nil {

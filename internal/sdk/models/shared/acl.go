@@ -14,12 +14,19 @@ func (o *ACLConsumer) GetID() *string {
 }
 
 type ACL struct {
+	Consumer *ACLConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64       `json:"created_at,omitempty"`
-	Group     *string      `json:"group,omitempty"`
-	ID        *string      `json:"id,omitempty"`
-	Tags      []string     `json:"tags,omitempty"`
-	Consumer  *ACLConsumer `json:"consumer,omitempty"`
+	CreatedAt *int64   `json:"created_at,omitempty"`
+	Group     string   `json:"group"`
+	ID        *string  `json:"id,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+}
+
+func (o *ACL) GetConsumer() *ACLConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
 }
 
 func (o *ACL) GetCreatedAt() *int64 {
@@ -29,9 +36,9 @@ func (o *ACL) GetCreatedAt() *int64 {
 	return o.CreatedAt
 }
 
-func (o *ACL) GetGroup() *string {
+func (o *ACL) GetGroup() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.Group
 }
@@ -50,31 +57,11 @@ func (o *ACL) GetTags() []string {
 	return o.Tags
 }
 
-func (o *ACL) GetConsumer() *ACLConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
 type ACLInput struct {
-	Group    *string      `json:"group,omitempty"`
-	Tags     []string     `json:"tags,omitempty"`
 	Consumer *ACLConsumer `json:"consumer,omitempty"`
-}
-
-func (o *ACLInput) GetGroup() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Group
-}
-
-func (o *ACLInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
+	Group    string       `json:"group"`
+	ID       *string      `json:"id,omitempty"`
+	Tags     []string     `json:"tags,omitempty"`
 }
 
 func (o *ACLInput) GetConsumer() *ACLConsumer {
@@ -82,4 +69,25 @@ func (o *ACLInput) GetConsumer() *ACLConsumer {
 		return nil
 	}
 	return o.Consumer
+}
+
+func (o *ACLInput) GetGroup() string {
+	if o == nil {
+		return ""
+	}
+	return o.Group
+}
+
+func (o *ACLInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *ACLInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

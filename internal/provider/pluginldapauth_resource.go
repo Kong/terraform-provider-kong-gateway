@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -33,19 +32,19 @@ type PluginLdapAuthResource struct {
 
 // PluginLdapAuthResourceModel describes the resource data model.
 type PluginLdapAuthResourceModel struct {
-	Config        *tfTypes.CreateLdapAuthPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                         `tfsdk:"created_at"`
-	Enabled       types.Bool                          `tfsdk:"enabled"`
-	ID            types.String                        `tfsdk:"id"`
-	InstanceName  types.String                        `tfsdk:"instance_name"`
-	Ordering      types.String                        `tfsdk:"ordering"`
-	Protocols     []types.String                      `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                `tfsdk:"service"`
-	Tags          []types.String                      `tfsdk:"tags"`
-	UpdatedAt     types.Int64                         `tfsdk:"updated_at"`
+	Config        tfTypes.LdapAuthPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer         `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer         `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                  `tfsdk:"created_at"`
+	Enabled       types.Bool                   `tfsdk:"enabled"`
+	ID            types.String                 `tfsdk:"id"`
+	InstanceName  types.String                 `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering   `tfsdk:"ordering"`
+	Protocols     []types.String               `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer         `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer         `tfsdk:"service"`
+	Tags          []types.String               `tfsdk:"tags"`
+	UpdatedAt     types.Int64                  `tfsdk:"updated_at"`
 }
 
 func (r *PluginLdapAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,8 +56,7 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 		MarkdownDescription: "PluginLdapAuth Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -167,17 +165,38 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -260,7 +279,7 @@ func (r *PluginLdapAuthResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	request := data.ToSharedCreateLdapAuthPlugin()
+	request := data.ToSharedLdapAuthPluginInput()
 	res, err := r.client.Plugins.CreateLdapauthPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -359,10 +378,10 @@ func (r *PluginLdapAuthResource) Update(ctx context.Context, req resource.Update
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createLdapAuthPlugin := data.ToSharedCreateLdapAuthPlugin()
+	ldapAuthPlugin := data.ToSharedLdapAuthPluginInput()
 	request := operations.UpdateLdapauthPluginRequest{
-		PluginID:             pluginID,
-		CreateLdapAuthPlugin: createLdapAuthPlugin,
+		PluginID:       pluginID,
+		LdapAuthPlugin: ldapAuthPlugin,
 	}
 	res, err := r.client.Plugins.UpdateLdapauthPlugin(ctx, request)
 	if err != nil {

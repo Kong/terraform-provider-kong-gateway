@@ -6,23 +6,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// SamlPluginNameidFormat - The requested `NameId` format. Options available are: - `Unspecified` - `EmailAddress` - `Persistent` - `Transient`
-type SamlPluginNameidFormat string
+// NameidFormat - The requested `NameId` format. Options available are: - `Unspecified` - `EmailAddress` - `Persistent` - `Transient`
+type NameidFormat string
 
 const (
-	SamlPluginNameidFormatUnspecified  SamlPluginNameidFormat = "Unspecified"
-	SamlPluginNameidFormatEmailAddress SamlPluginNameidFormat = "EmailAddress"
-	SamlPluginNameidFormatPersistent   SamlPluginNameidFormat = "Persistent"
-	SamlPluginNameidFormatTransient    SamlPluginNameidFormat = "Transient"
+	NameidFormatUnspecified  NameidFormat = "Unspecified"
+	NameidFormatEmailAddress NameidFormat = "EmailAddress"
+	NameidFormatPersistent   NameidFormat = "Persistent"
+	NameidFormatTransient    NameidFormat = "Transient"
 )
 
-func (e SamlPluginNameidFormat) ToPointer() *SamlPluginNameidFormat {
+func (e NameidFormat) ToPointer() *NameidFormat {
 	return &e
 }
-func (e *SamlPluginNameidFormat) UnmarshalJSON(data []byte) error {
+func (e *NameidFormat) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -35,10 +34,10 @@ func (e *SamlPluginNameidFormat) UnmarshalJSON(data []byte) error {
 	case "Persistent":
 		fallthrough
 	case "Transient":
-		*e = SamlPluginNameidFormat(v)
+		*e = NameidFormat(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SamlPluginNameidFormat: %v", v)
+		return fmt.Errorf("invalid value for NameidFormat: %v", v)
 	}
 }
 
@@ -324,18 +323,18 @@ func (o *SamlPluginRedis) GetUsername() *string {
 	return o.Username
 }
 
-// SamlPluginRequestDigestAlgorithm - The digest algorithm for Authn requests: - `SHA256` - `SHA1`
-type SamlPluginRequestDigestAlgorithm string
+// RequestDigestAlgorithm - The digest algorithm for Authn requests: - `SHA256` - `SHA1`
+type RequestDigestAlgorithm string
 
 const (
-	SamlPluginRequestDigestAlgorithmSha256 SamlPluginRequestDigestAlgorithm = "SHA256"
-	SamlPluginRequestDigestAlgorithmSha1   SamlPluginRequestDigestAlgorithm = "SHA1"
+	RequestDigestAlgorithmSha256 RequestDigestAlgorithm = "SHA256"
+	RequestDigestAlgorithmSha1   RequestDigestAlgorithm = "SHA1"
 )
 
-func (e SamlPluginRequestDigestAlgorithm) ToPointer() *SamlPluginRequestDigestAlgorithm {
+func (e RequestDigestAlgorithm) ToPointer() *RequestDigestAlgorithm {
 	return &e
 }
-func (e *SamlPluginRequestDigestAlgorithm) UnmarshalJSON(data []byte) error {
+func (e *RequestDigestAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -344,26 +343,26 @@ func (e *SamlPluginRequestDigestAlgorithm) UnmarshalJSON(data []byte) error {
 	case "SHA256":
 		fallthrough
 	case "SHA1":
-		*e = SamlPluginRequestDigestAlgorithm(v)
+		*e = RequestDigestAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SamlPluginRequestDigestAlgorithm: %v", v)
+		return fmt.Errorf("invalid value for RequestDigestAlgorithm: %v", v)
 	}
 }
 
-// SamlPluginRequestSignatureAlgorithm - The signature algorithm for signing Authn requests. Options available are: - `SHA256` - `SHA384` - `SHA512`
-type SamlPluginRequestSignatureAlgorithm string
+// RequestSignatureAlgorithm - The signature algorithm for signing Authn requests. Options available are: - `SHA256` - `SHA384` - `SHA512`
+type RequestSignatureAlgorithm string
 
 const (
-	SamlPluginRequestSignatureAlgorithmSha256 SamlPluginRequestSignatureAlgorithm = "SHA256"
-	SamlPluginRequestSignatureAlgorithmSha384 SamlPluginRequestSignatureAlgorithm = "SHA384"
-	SamlPluginRequestSignatureAlgorithmSha512 SamlPluginRequestSignatureAlgorithm = "SHA512"
+	RequestSignatureAlgorithmSha256 RequestSignatureAlgorithm = "SHA256"
+	RequestSignatureAlgorithmSha384 RequestSignatureAlgorithm = "SHA384"
+	RequestSignatureAlgorithmSha512 RequestSignatureAlgorithm = "SHA512"
 )
 
-func (e SamlPluginRequestSignatureAlgorithm) ToPointer() *SamlPluginRequestSignatureAlgorithm {
+func (e RequestSignatureAlgorithm) ToPointer() *RequestSignatureAlgorithm {
 	return &e
 }
-func (e *SamlPluginRequestSignatureAlgorithm) UnmarshalJSON(data []byte) error {
+func (e *RequestSignatureAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -374,25 +373,25 @@ func (e *SamlPluginRequestSignatureAlgorithm) UnmarshalJSON(data []byte) error {
 	case "SHA384":
 		fallthrough
 	case "SHA512":
-		*e = SamlPluginRequestSignatureAlgorithm(v)
+		*e = RequestSignatureAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SamlPluginRequestSignatureAlgorithm: %v", v)
+		return fmt.Errorf("invalid value for RequestSignatureAlgorithm: %v", v)
 	}
 }
 
-// SamlPluginResponseDigestAlgorithm - The algorithm for verifying digest in SAML responses: - `SHA256` - `SHA1`
-type SamlPluginResponseDigestAlgorithm string
+// ResponseDigestAlgorithm - The algorithm for verifying digest in SAML responses: - `SHA256` - `SHA1`
+type ResponseDigestAlgorithm string
 
 const (
-	SamlPluginResponseDigestAlgorithmSha256 SamlPluginResponseDigestAlgorithm = "SHA256"
-	SamlPluginResponseDigestAlgorithmSha1   SamlPluginResponseDigestAlgorithm = "SHA1"
+	ResponseDigestAlgorithmSha256 ResponseDigestAlgorithm = "SHA256"
+	ResponseDigestAlgorithmSha1   ResponseDigestAlgorithm = "SHA1"
 )
 
-func (e SamlPluginResponseDigestAlgorithm) ToPointer() *SamlPluginResponseDigestAlgorithm {
+func (e ResponseDigestAlgorithm) ToPointer() *ResponseDigestAlgorithm {
 	return &e
 }
-func (e *SamlPluginResponseDigestAlgorithm) UnmarshalJSON(data []byte) error {
+func (e *ResponseDigestAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -401,26 +400,26 @@ func (e *SamlPluginResponseDigestAlgorithm) UnmarshalJSON(data []byte) error {
 	case "SHA256":
 		fallthrough
 	case "SHA1":
-		*e = SamlPluginResponseDigestAlgorithm(v)
+		*e = ResponseDigestAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SamlPluginResponseDigestAlgorithm: %v", v)
+		return fmt.Errorf("invalid value for ResponseDigestAlgorithm: %v", v)
 	}
 }
 
-// SamlPluginResponseSignatureAlgorithm - The algorithm for validating signatures in SAML responses. Options available are: - `SHA256` - `SHA384` - `SHA512`
-type SamlPluginResponseSignatureAlgorithm string
+// ResponseSignatureAlgorithm - The algorithm for validating signatures in SAML responses. Options available are: - `SHA256` - `SHA384` - `SHA512`
+type ResponseSignatureAlgorithm string
 
 const (
-	SamlPluginResponseSignatureAlgorithmSha256 SamlPluginResponseSignatureAlgorithm = "SHA256"
-	SamlPluginResponseSignatureAlgorithmSha384 SamlPluginResponseSignatureAlgorithm = "SHA384"
-	SamlPluginResponseSignatureAlgorithmSha512 SamlPluginResponseSignatureAlgorithm = "SHA512"
+	ResponseSignatureAlgorithmSha256 ResponseSignatureAlgorithm = "SHA256"
+	ResponseSignatureAlgorithmSha384 ResponseSignatureAlgorithm = "SHA384"
+	ResponseSignatureAlgorithmSha512 ResponseSignatureAlgorithm = "SHA512"
 )
 
-func (e SamlPluginResponseSignatureAlgorithm) ToPointer() *SamlPluginResponseSignatureAlgorithm {
+func (e ResponseSignatureAlgorithm) ToPointer() *ResponseSignatureAlgorithm {
 	return &e
 }
-func (e *SamlPluginResponseSignatureAlgorithm) UnmarshalJSON(data []byte) error {
+func (e *ResponseSignatureAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -431,10 +430,10 @@ func (e *SamlPluginResponseSignatureAlgorithm) UnmarshalJSON(data []byte) error 
 	case "SHA384":
 		fallthrough
 	case "SHA512":
-		*e = SamlPluginResponseSignatureAlgorithm(v)
+		*e = ResponseSignatureAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SamlPluginResponseSignatureAlgorithm: %v", v)
+		return fmt.Errorf("invalid value for ResponseSignatureAlgorithm: %v", v)
 	}
 }
 
@@ -598,22 +597,22 @@ type SamlPluginConfig struct {
 	// The unique identifier of the IdP application. Formatted as a URL containing information about the IdP so the SP can validate that the SAML assertions it receives are issued from the correct IdP.
 	Issuer *string `json:"issuer,omitempty"`
 	// The requested `NameId` format. Options available are: - `Unspecified` - `EmailAddress` - `Persistent` - `Transient`
-	NameidFormat *SamlPluginNameidFormat `json:"nameid_format,omitempty"`
-	Redis        *SamlPluginRedis        `json:"redis,omitempty"`
+	NameidFormat *NameidFormat    `json:"nameid_format,omitempty"`
+	Redis        *SamlPluginRedis `json:"redis,omitempty"`
 	// The digest algorithm for Authn requests: - `SHA256` - `SHA1`
-	RequestDigestAlgorithm *SamlPluginRequestDigestAlgorithm `json:"request_digest_algorithm,omitempty"`
+	RequestDigestAlgorithm *RequestDigestAlgorithm `json:"request_digest_algorithm,omitempty"`
 	// The signature algorithm for signing Authn requests. Options available are: - `SHA256` - `SHA384` - `SHA512`
-	RequestSignatureAlgorithm *SamlPluginRequestSignatureAlgorithm `json:"request_signature_algorithm,omitempty"`
+	RequestSignatureAlgorithm *RequestSignatureAlgorithm `json:"request_signature_algorithm,omitempty"`
 	// The certificate for signing requests.
 	RequestSigningCertificate *string `json:"request_signing_certificate,omitempty"`
 	// The private key for signing requests.  If this parameter is set, requests sent to the IdP are signed.  The `request_signing_certificate` parameter must be set as well.
 	RequestSigningKey *string `json:"request_signing_key,omitempty"`
 	// The algorithm for verifying digest in SAML responses: - `SHA256` - `SHA1`
-	ResponseDigestAlgorithm *SamlPluginResponseDigestAlgorithm `json:"response_digest_algorithm,omitempty"`
+	ResponseDigestAlgorithm *ResponseDigestAlgorithm `json:"response_digest_algorithm,omitempty"`
 	// The private encryption key required to decrypt encrypted assertions.
 	ResponseEncryptionKey *string `json:"response_encryption_key,omitempty"`
 	// The algorithm for validating signatures in SAML responses. Options available are: - `SHA256` - `SHA384` - `SHA512`
-	ResponseSignatureAlgorithm *SamlPluginResponseSignatureAlgorithm `json:"response_signature_algorithm,omitempty"`
+	ResponseSignatureAlgorithm *ResponseSignatureAlgorithm `json:"response_signature_algorithm,omitempty"`
 	// The session cookie absolute timeout in seconds. Specifies how long the session can be used until it is no longer valid.
 	SessionAbsoluteTimeout *float64 `json:"session_absolute_timeout,omitempty"`
 	// The session audience, for example "my-application"
@@ -703,7 +702,7 @@ func (o *SamlPluginConfig) GetIssuer() *string {
 	return o.Issuer
 }
 
-func (o *SamlPluginConfig) GetNameidFormat() *SamlPluginNameidFormat {
+func (o *SamlPluginConfig) GetNameidFormat() *NameidFormat {
 	if o == nil {
 		return nil
 	}
@@ -717,14 +716,14 @@ func (o *SamlPluginConfig) GetRedis() *SamlPluginRedis {
 	return o.Redis
 }
 
-func (o *SamlPluginConfig) GetRequestDigestAlgorithm() *SamlPluginRequestDigestAlgorithm {
+func (o *SamlPluginConfig) GetRequestDigestAlgorithm() *RequestDigestAlgorithm {
 	if o == nil {
 		return nil
 	}
 	return o.RequestDigestAlgorithm
 }
 
-func (o *SamlPluginConfig) GetRequestSignatureAlgorithm() *SamlPluginRequestSignatureAlgorithm {
+func (o *SamlPluginConfig) GetRequestSignatureAlgorithm() *RequestSignatureAlgorithm {
 	if o == nil {
 		return nil
 	}
@@ -745,7 +744,7 @@ func (o *SamlPluginConfig) GetRequestSigningKey() *string {
 	return o.RequestSigningKey
 }
 
-func (o *SamlPluginConfig) GetResponseDigestAlgorithm() *SamlPluginResponseDigestAlgorithm {
+func (o *SamlPluginConfig) GetResponseDigestAlgorithm() *ResponseDigestAlgorithm {
 	if o == nil {
 		return nil
 	}
@@ -759,7 +758,7 @@ func (o *SamlPluginConfig) GetResponseEncryptionKey() *string {
 	return o.ResponseEncryptionKey
 }
 
-func (o *SamlPluginConfig) GetResponseSignatureAlgorithm() *SamlPluginResponseSignatureAlgorithm {
+func (o *SamlPluginConfig) GetResponseSignatureAlgorithm() *ResponseSignatureAlgorithm {
 	if o == nil {
 		return nil
 	}
@@ -955,6 +954,70 @@ func (o *SamlPluginConfig) GetValidateAssertionSignature() *bool {
 	return o.ValidateAssertionSignature
 }
 
+// SamlPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type SamlPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *SamlPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type SamlPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *SamlPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type SamlPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *SamlPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type SamlPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *SamlPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type SamlPluginOrdering struct {
+	After  *SamlPluginAfter  `json:"after,omitempty"`
+	Before *SamlPluginBefore `json:"before,omitempty"`
+}
+
+func (o *SamlPluginOrdering) GetAfter() *SamlPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *SamlPluginOrdering) GetBefore() *SamlPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
 type SamlPluginProtocols string
 
 const (
@@ -1005,29 +1068,6 @@ func (e *SamlPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// SamlPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type SamlPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *SamlPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type SamlPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *SamlPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // SamlPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type SamlPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -1052,29 +1092,30 @@ func (o *SamlPluginService) GetID() *string {
 	return o.ID
 }
 
+// SamlPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SamlPlugin struct {
-	Config *SamlPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"saml" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config SamlPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *SamlPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *SamlPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool               `json:"enabled,omitempty"`
+	ID           *string             `json:"id,omitempty"`
+	InstanceName *string             `json:"instance_name,omitempty"`
+	name         string              `const:"saml" json:"name"`
+	Ordering     *SamlPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *SamlPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *SamlPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s SamlPlugin) MarshalJSON() ([]byte, error) {
@@ -1088,11 +1129,25 @@ func (s *SamlPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *SamlPlugin) GetConfig() *SamlPluginConfig {
+func (o *SamlPlugin) GetConfig() SamlPluginConfig {
+	if o == nil {
+		return SamlPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *SamlPlugin) GetConsumer() *SamlPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *SamlPlugin) GetConsumerGroup() *SamlPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *SamlPlugin) GetCreatedAt() *int64 {
@@ -1123,11 +1178,11 @@ func (o *SamlPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *SamlPlugin) GetName() *string {
-	return types.String("saml")
+func (o *SamlPlugin) GetName() string {
+	return "saml"
 }
 
-func (o *SamlPlugin) GetOrdering() any {
+func (o *SamlPlugin) GetOrdering() *SamlPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -1139,6 +1194,20 @@ func (o *SamlPlugin) GetProtocols() []SamlPluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *SamlPlugin) GetRoute() *SamlPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *SamlPlugin) GetService() *SamlPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *SamlPlugin) GetTags() []string {
@@ -1155,30 +1224,116 @@ func (o *SamlPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *SamlPlugin) GetConsumer() *SamlPluginConsumer {
+// SamlPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type SamlPluginInput struct {
+	Config SamlPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *SamlPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *SamlPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool               `json:"enabled,omitempty"`
+	ID           *string             `json:"id,omitempty"`
+	InstanceName *string             `json:"instance_name,omitempty"`
+	name         string              `const:"saml" json:"name"`
+	Ordering     *SamlPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *SamlPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *SamlPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (s SamlPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *SamlPluginInput) GetConfig() SamlPluginConfig {
+	if o == nil {
+		return SamlPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *SamlPluginInput) GetConsumer() *SamlPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *SamlPlugin) GetConsumerGroup() *SamlPluginConsumerGroup {
+func (o *SamlPluginInput) GetConsumerGroup() *SamlPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *SamlPlugin) GetRoute() *SamlPluginRoute {
+func (o *SamlPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *SamlPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *SamlPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *SamlPluginInput) GetName() string {
+	return "saml"
+}
+
+func (o *SamlPluginInput) GetOrdering() *SamlPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *SamlPluginInput) GetProtocols() []SamlPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *SamlPluginInput) GetRoute() *SamlPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *SamlPlugin) GetService() *SamlPluginService {
+func (o *SamlPluginInput) GetService() *SamlPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *SamlPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

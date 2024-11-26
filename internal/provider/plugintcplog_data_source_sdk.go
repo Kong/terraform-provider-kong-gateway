@@ -12,32 +12,27 @@ import (
 
 func (r *PluginTCPLogDataSourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.TCPLogPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateTCPLogPluginConfig{}
-			if len(resp.Config.CustomFieldsByLua) > 0 {
-				r.Config.CustomFieldsByLua = make(map[string]types.String)
-				for key, value := range resp.Config.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
-				}
+		if len(resp.Config.CustomFieldsByLua) > 0 {
+			r.Config.CustomFieldsByLua = make(map[string]types.String)
+			for key, value := range resp.Config.CustomFieldsByLua {
+				result, _ := json.Marshal(value)
+				r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
 			}
-			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
-			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
-			r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
-			r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
 		}
+		r.Config.Host = types.StringPointerValue(resp.Config.Host)
+		if resp.Config.Keepalive != nil {
+			r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
+		} else {
+			r.Config.Keepalive = types.NumberNull()
+		}
+		r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+		if resp.Config.Timeout != nil {
+			r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
+		} else {
+			r.Config.Timeout = types.NumberNull()
+		}
+		r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
+		r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -55,10 +50,27 @@ func (r *PluginTCPLogDataSourceModel) RefreshFromSharedTCPLogPlugin(resp *shared
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

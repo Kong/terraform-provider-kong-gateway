@@ -9,8 +9,8 @@ import (
 
 type UpdateJwedecryptPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                         `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateJweDecryptPlugin *shared.CreateJweDecryptPlugin `request:"mediaType=application/json"`
+	PluginID         string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	JweDecryptPlugin *shared.JweDecryptPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateJwedecryptPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateJwedecryptPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateJwedecryptPluginRequest) GetCreateJweDecryptPlugin() *shared.CreateJweDecryptPlugin {
+func (o *UpdateJwedecryptPluginRequest) GetJweDecryptPlugin() *shared.JweDecryptPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateJweDecryptPlugin
+	return o.JweDecryptPlugin
 }
 
 type UpdateJwedecryptPluginResponse struct {

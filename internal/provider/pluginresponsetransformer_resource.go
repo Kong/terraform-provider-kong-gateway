@@ -8,13 +8,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -32,19 +30,19 @@ type PluginResponseTransformerResource struct {
 
 // PluginResponseTransformerResourceModel describes the resource data model.
 type PluginResponseTransformerResourceModel struct {
-	Config        *tfTypes.CreateResponseTransformerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                           `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                           `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                    `tfsdk:"created_at"`
-	Enabled       types.Bool                                     `tfsdk:"enabled"`
-	ID            types.String                                   `tfsdk:"id"`
-	InstanceName  types.String                                   `tfsdk:"instance_name"`
-	Ordering      types.String                                   `tfsdk:"ordering"`
-	Protocols     []types.String                                 `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                           `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                           `tfsdk:"service"`
-	Tags          []types.String                                 `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                    `tfsdk:"updated_at"`
+	Config        tfTypes.ResponseTransformerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer                    `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer                    `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                             `tfsdk:"created_at"`
+	Enabled       types.Bool                              `tfsdk:"enabled"`
+	ID            types.String                            `tfsdk:"id"`
+	InstanceName  types.String                            `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering              `tfsdk:"ordering"`
+	Protocols     []types.String                          `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer                    `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer                    `tfsdk:"service"`
+	Tags          []types.String                          `tfsdk:"tags"`
+	UpdatedAt     types.Int64                             `tfsdk:"updated_at"`
 }
 
 func (r *PluginResponseTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -56,8 +54,7 @@ func (r *PluginResponseTransformerResource) Schema(ctx context.Context, req reso
 		MarkdownDescription: "PluginResponseTransformer Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"add": schema.SingleNestedAttribute{
 						Computed: true,
@@ -194,17 +191,38 @@ func (r *PluginResponseTransformerResource) Schema(ctx context.Context, req reso
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -287,7 +305,7 @@ func (r *PluginResponseTransformerResource) Create(ctx context.Context, req reso
 		return
 	}
 
-	request := data.ToSharedCreateResponseTransformerPlugin()
+	request := data.ToSharedResponseTransformerPluginInput()
 	res, err := r.client.Plugins.CreateResponsetransformerPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -386,10 +404,10 @@ func (r *PluginResponseTransformerResource) Update(ctx context.Context, req reso
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createResponseTransformerPlugin := data.ToSharedCreateResponseTransformerPlugin()
+	responseTransformerPlugin := data.ToSharedResponseTransformerPluginInput()
 	request := operations.UpdateResponsetransformerPluginRequest{
-		PluginID:                        pluginID,
-		CreateResponseTransformerPlugin: createResponseTransformerPlugin,
+		PluginID:                  pluginID,
+		ResponseTransformerPlugin: responseTransformerPlugin,
 	}
 	res, err := r.client.Plugins.UpdateResponsetransformerPlugin(ctx, request)
 	if err != nil {

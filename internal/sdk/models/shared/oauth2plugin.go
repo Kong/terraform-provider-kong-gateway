@@ -6,22 +6,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// Oauth2PluginPkce - Specifies a mode of how the Proof Key for Code Exchange (PKCE) should be handled by the plugin.
-type Oauth2PluginPkce string
+// Pkce - Specifies a mode of how the Proof Key for Code Exchange (PKCE) should be handled by the plugin.
+type Pkce string
 
 const (
-	Oauth2PluginPkceNone   Oauth2PluginPkce = "none"
-	Oauth2PluginPkceLax    Oauth2PluginPkce = "lax"
-	Oauth2PluginPkceStrict Oauth2PluginPkce = "strict"
+	PkceNone   Pkce = "none"
+	PkceLax    Pkce = "lax"
+	PkceStrict Pkce = "strict"
 )
 
-func (e Oauth2PluginPkce) ToPointer() *Oauth2PluginPkce {
+func (e Pkce) ToPointer() *Pkce {
 	return &e
 }
-func (e *Oauth2PluginPkce) UnmarshalJSON(data []byte) error {
+func (e *Pkce) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -32,10 +31,10 @@ func (e *Oauth2PluginPkce) UnmarshalJSON(data []byte) error {
 	case "lax":
 		fallthrough
 	case "strict":
-		*e = Oauth2PluginPkce(v)
+		*e = Pkce(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Oauth2PluginPkce: %v", v)
+		return fmt.Errorf("invalid value for Pkce: %v", v)
 	}
 }
 
@@ -62,7 +61,7 @@ type Oauth2PluginConfig struct {
 	MandatoryScope         *bool `json:"mandatory_scope,omitempty"`
 	PersistentRefreshToken *bool `json:"persistent_refresh_token,omitempty"`
 	// Specifies a mode of how the Proof Key for Code Exchange (PKCE) should be handled by the plugin.
-	Pkce *Oauth2PluginPkce `json:"pkce,omitempty"`
+	Pkce *Pkce `json:"pkce,omitempty"`
 	// The unique key the plugin has generated when it has been added to the Service.
 	ProvisionKey *string `json:"provision_key,omitempty"`
 	// When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
@@ -154,7 +153,7 @@ func (o *Oauth2PluginConfig) GetPersistentRefreshToken() *bool {
 	return o.PersistentRefreshToken
 }
 
-func (o *Oauth2PluginConfig) GetPkce() *Oauth2PluginPkce {
+func (o *Oauth2PluginConfig) GetPkce() *Pkce {
 	if o == nil {
 		return nil
 	}
@@ -201,6 +200,70 @@ func (o *Oauth2PluginConfig) GetTokenExpiration() *float64 {
 		return nil
 	}
 	return o.TokenExpiration
+}
+
+// Oauth2PluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type Oauth2PluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *Oauth2PluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type Oauth2PluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *Oauth2PluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type Oauth2PluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2PluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2PluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2PluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2PluginOrdering struct {
+	After  *Oauth2PluginAfter  `json:"after,omitempty"`
+	Before *Oauth2PluginBefore `json:"before,omitempty"`
+}
+
+func (o *Oauth2PluginOrdering) GetAfter() *Oauth2PluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *Oauth2PluginOrdering) GetBefore() *Oauth2PluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type Oauth2PluginProtocols string
@@ -253,29 +316,6 @@ func (e *Oauth2PluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// Oauth2PluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type Oauth2PluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *Oauth2PluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type Oauth2PluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *Oauth2PluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // Oauth2PluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type Oauth2PluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -300,29 +340,30 @@ func (o *Oauth2PluginService) GetID() *string {
 	return o.ID
 }
 
+// Oauth2Plugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type Oauth2Plugin struct {
-	Config *Oauth2PluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"oauth2" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []Oauth2PluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config Oauth2PluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *Oauth2PluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *Oauth2PluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                 `json:"enabled,omitempty"`
+	ID           *string               `json:"id,omitempty"`
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"oauth2" json:"name"`
+	Ordering     *Oauth2PluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []Oauth2PluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *Oauth2PluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *Oauth2PluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (o Oauth2Plugin) MarshalJSON() ([]byte, error) {
@@ -336,11 +377,25 @@ func (o *Oauth2Plugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *Oauth2Plugin) GetConfig() *Oauth2PluginConfig {
+func (o *Oauth2Plugin) GetConfig() Oauth2PluginConfig {
+	if o == nil {
+		return Oauth2PluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *Oauth2Plugin) GetConsumer() *Oauth2PluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *Oauth2Plugin) GetConsumerGroup() *Oauth2PluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *Oauth2Plugin) GetCreatedAt() *int64 {
@@ -371,11 +426,11 @@ func (o *Oauth2Plugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *Oauth2Plugin) GetName() *string {
-	return types.String("oauth2")
+func (o *Oauth2Plugin) GetName() string {
+	return "oauth2"
 }
 
-func (o *Oauth2Plugin) GetOrdering() any {
+func (o *Oauth2Plugin) GetOrdering() *Oauth2PluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -387,6 +442,20 @@ func (o *Oauth2Plugin) GetProtocols() []Oauth2PluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *Oauth2Plugin) GetRoute() *Oauth2PluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *Oauth2Plugin) GetService() *Oauth2PluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *Oauth2Plugin) GetTags() []string {
@@ -403,30 +472,116 @@ func (o *Oauth2Plugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *Oauth2Plugin) GetConsumer() *Oauth2PluginConsumer {
+// Oauth2PluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type Oauth2PluginInput struct {
+	Config Oauth2PluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *Oauth2PluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *Oauth2PluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                 `json:"enabled,omitempty"`
+	ID           *string               `json:"id,omitempty"`
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"oauth2" json:"name"`
+	Ordering     *Oauth2PluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []Oauth2PluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *Oauth2PluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *Oauth2PluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (o Oauth2PluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *Oauth2PluginInput) GetConfig() Oauth2PluginConfig {
+	if o == nil {
+		return Oauth2PluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *Oauth2PluginInput) GetConsumer() *Oauth2PluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *Oauth2Plugin) GetConsumerGroup() *Oauth2PluginConsumerGroup {
+func (o *Oauth2PluginInput) GetConsumerGroup() *Oauth2PluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *Oauth2Plugin) GetRoute() *Oauth2PluginRoute {
+func (o *Oauth2PluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *Oauth2PluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *Oauth2PluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *Oauth2PluginInput) GetName() string {
+	return "oauth2"
+}
+
+func (o *Oauth2PluginInput) GetOrdering() *Oauth2PluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *Oauth2PluginInput) GetProtocols() []Oauth2PluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *Oauth2PluginInput) GetRoute() *Oauth2PluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *Oauth2Plugin) GetService() *Oauth2PluginService {
+func (o *Oauth2PluginInput) GetService() *Oauth2PluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *Oauth2PluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

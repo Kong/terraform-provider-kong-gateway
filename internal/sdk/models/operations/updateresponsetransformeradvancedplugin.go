@@ -9,8 +9,8 @@ import (
 
 type UpdateResponsetransformeradvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                                string                                          `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateResponseTransformerAdvancedPlugin *shared.CreateResponseTransformerAdvancedPlugin `request:"mediaType=application/json"`
+	PluginID                          string                                         `pathParam:"style=simple,explode=false,name=PluginId"`
+	ResponseTransformerAdvancedPlugin *shared.ResponseTransformerAdvancedPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateResponsetransformeradvancedPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateResponsetransformeradvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateResponsetransformeradvancedPluginRequest) GetCreateResponseTransformerAdvancedPlugin() *shared.CreateResponseTransformerAdvancedPlugin {
+func (o *UpdateResponsetransformeradvancedPluginRequest) GetResponseTransformerAdvancedPlugin() *shared.ResponseTransformerAdvancedPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateResponseTransformerAdvancedPlugin
+	return o.ResponseTransformerAdvancedPlugin
 }
 
 type UpdateResponsetransformeradvancedPluginResponse struct {

@@ -9,8 +9,8 @@ import (
 
 type UpdateHmacauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID             string                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateHmacAuthPlugin *shared.CreateHmacAuthPlugin `request:"mediaType=application/json"`
+	PluginID       string                      `pathParam:"style=simple,explode=false,name=PluginId"`
+	HmacAuthPlugin *shared.HmacAuthPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateHmacauthPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateHmacauthPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateHmacauthPluginRequest) GetCreateHmacAuthPlugin() *shared.CreateHmacAuthPlugin {
+func (o *UpdateHmacauthPluginRequest) GetHmacAuthPlugin() *shared.HmacAuthPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateHmacAuthPlugin
+	return o.HmacAuthPlugin
 }
 
 type UpdateHmacauthPluginResponse struct {

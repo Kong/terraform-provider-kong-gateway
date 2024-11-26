@@ -62,10 +62,10 @@ func (r *BasicAuthResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"password": schema.StringAttribute{
-				Optional:  true,
-				Sensitive: true,
+				Required: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
@@ -73,8 +73,7 @@ func (r *BasicAuthResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType: types.StringType,
 			},
 			"username": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 		},
 	}
@@ -140,34 +139,6 @@ func (r *BasicAuthResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 	data.RefreshFromSharedBasicAuth(res.BasicAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
-	var basicAuthID string
-	basicAuthID = data.ID.ValueString()
-
-	request1 := operations.GetBasicAuthRequest{
-		BasicAuthID: basicAuthID,
-	}
-	res1, err := r.client.BasicAuthCredentials.GetBasicAuth(ctx, request1)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res1 != nil && res1.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res1.RawResponse))
-		}
-		return
-	}
-	if res1 == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res1))
-		return
-	}
-	if res1.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res1.StatusCode), debugResponse(res1.RawResponse))
-		return
-	}
-	if !(res1.BasicAuth != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
-		return
-	}
-	data.RefreshFromSharedBasicAuth(res1.BasicAuth)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 
 	// Save updated data into Terraform state
@@ -271,34 +242,6 @@ func (r *BasicAuthResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 	data.RefreshFromSharedBasicAuth(res.BasicAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
-	var basicAuthId1 string
-	basicAuthId1 = data.ID.ValueString()
-
-	request1 := operations.GetBasicAuthRequest{
-		BasicAuthID: basicAuthId1,
-	}
-	res1, err := r.client.BasicAuthCredentials.GetBasicAuth(ctx, request1)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res1 != nil && res1.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res1.RawResponse))
-		}
-		return
-	}
-	if res1 == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res1))
-		return
-	}
-	if res1.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res1.StatusCode), debugResponse(res1.RawResponse))
-		return
-	}
-	if !(res1.BasicAuth != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
-		return
-	}
-	data.RefreshFromSharedBasicAuth(res1.BasicAuth)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 
 	// Save updated data into Terraform state

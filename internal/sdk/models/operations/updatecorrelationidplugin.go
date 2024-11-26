@@ -9,8 +9,8 @@ import (
 
 type UpdateCorrelationidPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateCorrelationIDPlugin *shared.CreateCorrelationIDPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	CorrelationIDPlugin *shared.CorrelationIDPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateCorrelationidPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateCorrelationidPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateCorrelationidPluginRequest) GetCreateCorrelationIDPlugin() *shared.CreateCorrelationIDPlugin {
+func (o *UpdateCorrelationidPluginRequest) GetCorrelationIDPlugin() *shared.CorrelationIDPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateCorrelationIDPlugin
+	return o.CorrelationIDPlugin
 }
 
 type UpdateCorrelationidPluginResponse struct {

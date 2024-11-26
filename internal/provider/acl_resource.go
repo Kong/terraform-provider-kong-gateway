@@ -60,11 +60,11 @@ func (r *ACLResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"group": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,

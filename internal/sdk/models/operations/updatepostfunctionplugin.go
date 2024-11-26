@@ -9,8 +9,8 @@ import (
 
 type UpdatePostfunctionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                           `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreatePostFunctionPlugin *shared.CreatePostFunctionPlugin `request:"mediaType=application/json"`
+	PluginID           string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PostFunctionPlugin *shared.PostFunctionPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdatePostfunctionPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdatePostfunctionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdatePostfunctionPluginRequest) GetCreatePostFunctionPlugin() *shared.CreatePostFunctionPlugin {
+func (o *UpdatePostfunctionPluginRequest) GetPostFunctionPlugin() *shared.PostFunctionPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreatePostFunctionPlugin
+	return o.PostFunctionPlugin
 }
 
 type UpdatePostfunctionPluginResponse struct {

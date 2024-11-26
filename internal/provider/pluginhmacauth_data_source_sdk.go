@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -12,28 +11,23 @@ import (
 
 func (r *PluginHmacAuthDataSourceModel) RefreshFromSharedHmacAuthPlugin(resp *shared.HmacAuthPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateHmacAuthPluginConfig{}
-			r.Config.Algorithms = []types.String{}
-			for _, v := range resp.Config.Algorithms {
-				r.Config.Algorithms = append(r.Config.Algorithms, types.StringValue(string(v)))
-			}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			if resp.Config.ClockSkew != nil {
-				r.Config.ClockSkew = types.NumberValue(big.NewFloat(float64(*resp.Config.ClockSkew)))
-			} else {
-				r.Config.ClockSkew = types.NumberNull()
-			}
-			r.Config.EnforceHeaders = []types.String{}
-			for _, v := range resp.Config.EnforceHeaders {
-				r.Config.EnforceHeaders = append(r.Config.EnforceHeaders, types.StringValue(v))
-			}
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
+		r.Config.Algorithms = []types.String{}
+		for _, v := range resp.Config.Algorithms {
+			r.Config.Algorithms = append(r.Config.Algorithms, types.StringValue(string(v)))
 		}
+		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+		if resp.Config.ClockSkew != nil {
+			r.Config.ClockSkew = types.NumberValue(big.NewFloat(float64(*resp.Config.ClockSkew)))
+		} else {
+			r.Config.ClockSkew = types.NumberNull()
+		}
+		r.Config.EnforceHeaders = []types.String{}
+		for _, v := range resp.Config.EnforceHeaders {
+			r.Config.EnforceHeaders = append(r.Config.EnforceHeaders, types.StringValue(v))
+		}
+		r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+		r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+		r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -51,10 +45,27 @@ func (r *PluginHmacAuthDataSourceModel) RefreshFromSharedHmacAuthPlugin(resp *sh
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

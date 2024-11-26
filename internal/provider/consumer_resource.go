@@ -56,6 +56,7 @@ func (r *ConsumerResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,

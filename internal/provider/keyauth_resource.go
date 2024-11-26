@@ -61,10 +61,10 @@ func (r *KeyAuthResource) Schema(ctx context.Context, req resource.SchemaRequest
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"key": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,

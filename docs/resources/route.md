@@ -21,12 +21,13 @@ resource "kong-gateway_route" "my_route" {
     }
   ]
   headers = {
-    "see" : jsonencode("documentation"),
+    key = "value",
   }
   hosts = [
     "..."
   ]
   https_redirect_status_code = 308
+  id                         = "...my_id..."
   methods = [
     "..."
   ]
@@ -35,12 +36,12 @@ resource "kong-gateway_route" "my_route" {
   paths = [
     "..."
   ]
-  preserve_host = true
+  preserve_host = false
   protocols = [
     "tls"
   ]
   regex_priority     = 7
-  request_buffering  = true
+  request_buffering  = false
   response_buffering = true
   service = {
     id = "...my_id..."

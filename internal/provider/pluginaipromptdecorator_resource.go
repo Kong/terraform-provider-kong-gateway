@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -35,19 +34,19 @@ type PluginAiPromptDecoratorResource struct {
 
 // PluginAiPromptDecoratorResourceModel describes the resource data model.
 type PluginAiPromptDecoratorResourceModel struct {
-	Config        *tfTypes.CreateAiPromptDecoratorPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                         `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                         `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                  `tfsdk:"created_at"`
-	Enabled       types.Bool                                   `tfsdk:"enabled"`
-	ID            types.String                                 `tfsdk:"id"`
-	InstanceName  types.String                                 `tfsdk:"instance_name"`
-	Ordering      types.String                                 `tfsdk:"ordering"`
-	Protocols     []types.String                               `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                         `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                         `tfsdk:"service"`
-	Tags          []types.String                               `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                  `tfsdk:"updated_at"`
+	Config        tfTypes.AiPromptDecoratorPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer                  `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer                  `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                           `tfsdk:"created_at"`
+	Enabled       types.Bool                            `tfsdk:"enabled"`
+	ID            types.String                          `tfsdk:"id"`
+	InstanceName  types.String                          `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering            `tfsdk:"ordering"`
+	Protocols     []types.String                        `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer                  `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer                  `tfsdk:"service"`
+	Tags          []types.String                        `tfsdk:"tags"`
+	UpdatedAt     types.Int64                           `tfsdk:"updated_at"`
 }
 
 func (r *PluginAiPromptDecoratorResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,8 +58,7 @@ func (r *PluginAiPromptDecoratorResource) Schema(ctx context.Context, req resour
 		MarkdownDescription: "PluginAiPromptDecorator Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
@@ -173,17 +171,38 @@ func (r *PluginAiPromptDecoratorResource) Schema(ctx context.Context, req resour
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -266,7 +285,7 @@ func (r *PluginAiPromptDecoratorResource) Create(ctx context.Context, req resour
 		return
 	}
 
-	request := data.ToSharedCreateAiPromptDecoratorPlugin()
+	request := data.ToSharedAiPromptDecoratorPluginInput()
 	res, err := r.client.Plugins.CreateAipromptdecoratorPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -365,10 +384,10 @@ func (r *PluginAiPromptDecoratorResource) Update(ctx context.Context, req resour
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createAiPromptDecoratorPlugin := data.ToSharedCreateAiPromptDecoratorPlugin()
+	aiPromptDecoratorPlugin := data.ToSharedAiPromptDecoratorPluginInput()
 	request := operations.UpdateAipromptdecoratorPluginRequest{
-		PluginID:                      pluginID,
-		CreateAiPromptDecoratorPlugin: createAiPromptDecoratorPlugin,
+		PluginID:                pluginID,
+		AiPromptDecoratorPlugin: aiPromptDecoratorPlugin,
 	}
 	res, err := r.client.Plugins.UpdateAipromptdecoratorPlugin(ctx, request)
 	if err != nil {

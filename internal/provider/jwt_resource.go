@@ -88,6 +88,7 @@ func (r *JwtResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"key": schema.StringAttribute{
 				Computed: true,

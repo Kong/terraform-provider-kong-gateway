@@ -9,8 +9,8 @@ import (
 
 type UpdateExittransformerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                    string                              `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateExitTransformerPlugin *shared.CreateExitTransformerPlugin `request:"mediaType=application/json"`
+	PluginID              string                             `pathParam:"style=simple,explode=false,name=PluginId"`
+	ExitTransformerPlugin *shared.ExitTransformerPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateExittransformerPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateExittransformerPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateExittransformerPluginRequest) GetCreateExitTransformerPlugin() *shared.CreateExitTransformerPlugin {
+func (o *UpdateExittransformerPluginRequest) GetExitTransformerPlugin() *shared.ExitTransformerPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateExitTransformerPlugin
+	return o.ExitTransformerPlugin
 }
 
 type UpdateExittransformerPluginResponse struct {

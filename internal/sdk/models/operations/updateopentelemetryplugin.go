@@ -9,8 +9,8 @@ import (
 
 type UpdateOpentelemetryPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateOpentelemetryPlugin *shared.CreateOpentelemetryPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	OpentelemetryPlugin *shared.OpentelemetryPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOpentelemetryPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateOpentelemetryPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOpentelemetryPluginRequest) GetCreateOpentelemetryPlugin() *shared.CreateOpentelemetryPlugin {
+func (o *UpdateOpentelemetryPluginRequest) GetOpentelemetryPlugin() *shared.OpentelemetryPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateOpentelemetryPlugin
+	return o.OpentelemetryPlugin
 }
 
 type UpdateOpentelemetryPluginResponse struct {

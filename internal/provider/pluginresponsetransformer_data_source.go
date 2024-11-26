@@ -29,19 +29,19 @@ type PluginResponseTransformerDataSource struct {
 
 // PluginResponseTransformerDataSourceModel describes the data model.
 type PluginResponseTransformerDataSourceModel struct {
-	Config        *tfTypes.CreateResponseTransformerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                           `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                           `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                    `tfsdk:"created_at"`
-	Enabled       types.Bool                                     `tfsdk:"enabled"`
-	ID            types.String                                   `tfsdk:"id"`
-	InstanceName  types.String                                   `tfsdk:"instance_name"`
-	Ordering      types.String                                   `tfsdk:"ordering"`
-	Protocols     []types.String                                 `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                           `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                           `tfsdk:"service"`
-	Tags          []types.String                                 `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                    `tfsdk:"updated_at"`
+	Config        tfTypes.ResponseTransformerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer                    `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer                    `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                             `tfsdk:"created_at"`
+	Enabled       types.Bool                              `tfsdk:"enabled"`
+	ID            types.String                            `tfsdk:"id"`
+	InstanceName  types.String                            `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering              `tfsdk:"ordering"`
+	Protocols     []types.String                          `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer                    `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer                    `tfsdk:"service"`
+	Tags          []types.String                          `tfsdk:"tags"`
+	UpdatedAt     types.Int64                             `tfsdk:"updated_at"`
 }
 
 // Metadata returns the data source type name.
@@ -174,9 +174,28 @@ func (r *PluginResponseTransformerDataSource) Schema(ctx context.Context, req da
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Description: `Parsed as JSON.`,
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+				},
 			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,

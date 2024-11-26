@@ -14,13 +14,20 @@ func (o *HMACAuthConsumer) GetID() *string {
 }
 
 type HMACAuth struct {
+	Consumer *HMACAuthConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64            `json:"created_at,omitempty"`
-	ID        *string           `json:"id,omitempty"`
-	Secret    *string           `json:"secret,omitempty"`
-	Tags      []string          `json:"tags,omitempty"`
-	Username  *string           `json:"username,omitempty"`
-	Consumer  *HMACAuthConsumer `json:"consumer,omitempty"`
+	CreatedAt *int64   `json:"created_at,omitempty"`
+	ID        *string  `json:"id,omitempty"`
+	Secret    *string  `json:"secret,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+	Username  string   `json:"username"`
+}
+
+func (o *HMACAuth) GetConsumer() *HMACAuthConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
 }
 
 func (o *HMACAuth) GetCreatedAt() *int64 {
@@ -51,25 +58,33 @@ func (o *HMACAuth) GetTags() []string {
 	return o.Tags
 }
 
-func (o *HMACAuth) GetUsername() *string {
+func (o *HMACAuth) GetUsername() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.Username
 }
 
-func (o *HMACAuth) GetConsumer() *HMACAuthConsumer {
+type HMACAuthInput struct {
+	Consumer *HMACAuthConsumer `json:"consumer,omitempty"`
+	ID       *string           `json:"id,omitempty"`
+	Secret   *string           `json:"secret,omitempty"`
+	Tags     []string          `json:"tags,omitempty"`
+	Username string            `json:"username"`
+}
+
+func (o *HMACAuthInput) GetConsumer() *HMACAuthConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-type HMACAuthInput struct {
-	Secret   *string           `json:"secret,omitempty"`
-	Tags     []string          `json:"tags,omitempty"`
-	Username *string           `json:"username,omitempty"`
-	Consumer *HMACAuthConsumer `json:"consumer,omitempty"`
+func (o *HMACAuthInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
 }
 
 func (o *HMACAuthInput) GetSecret() *string {
@@ -86,16 +101,9 @@ func (o *HMACAuthInput) GetTags() []string {
 	return o.Tags
 }
 
-func (o *HMACAuthInput) GetUsername() *string {
+func (o *HMACAuthInput) GetUsername() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.Username
-}
-
-func (o *HMACAuthInput) GetConsumer() *HMACAuthConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
 }

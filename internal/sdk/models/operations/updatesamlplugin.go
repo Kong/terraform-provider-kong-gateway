@@ -9,8 +9,8 @@ import (
 
 type UpdateSamlPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID         string                   `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateSamlPlugin *shared.CreateSamlPlugin `request:"mediaType=application/json"`
+	PluginID   string                  `pathParam:"style=simple,explode=false,name=PluginId"`
+	SamlPlugin *shared.SamlPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateSamlPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateSamlPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateSamlPluginRequest) GetCreateSamlPlugin() *shared.CreateSamlPlugin {
+func (o *UpdateSamlPluginRequest) GetSamlPlugin() *shared.SamlPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateSamlPlugin
+	return o.SamlPlugin
 }
 
 type UpdateSamlPluginResponse struct {

@@ -30,12 +30,12 @@ type SniResource struct {
 
 // SniResourceModel describes the resource data model.
 type SniResourceModel struct {
-	Certificate *tfTypes.ACLConsumer `tfsdk:"certificate"`
-	CreatedAt   types.Int64          `tfsdk:"created_at"`
-	ID          types.String         `tfsdk:"id"`
-	Name        types.String         `tfsdk:"name"`
-	Tags        []types.String       `tfsdk:"tags"`
-	UpdatedAt   types.Int64          `tfsdk:"updated_at"`
+	Certificate tfTypes.ACLConsumer `tfsdk:"certificate"`
+	CreatedAt   types.Int64         `tfsdk:"created_at"`
+	ID          types.String        `tfsdk:"id"`
+	Name        types.String        `tfsdk:"name"`
+	Tags        []types.String      `tfsdk:"tags"`
+	UpdatedAt   types.Int64         `tfsdk:"updated_at"`
 }
 
 func (r *SniResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -47,8 +47,7 @@ func (r *SniResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 		MarkdownDescription: "Sni Resource",
 		Attributes: map[string]schema.Attribute{
 			"certificate": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						Computed: true,
@@ -63,10 +62,10 @@ func (r *SniResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"name": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `The SNI name to associate with the given certificate.`,
 			},
 			"tags": schema.ListAttribute{

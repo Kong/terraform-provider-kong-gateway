@@ -10,27 +10,25 @@ import (
 
 func (r *VaultResourceModel) ToSharedVaultInput() *shared.VaultInput {
 	var config interface{}
-	if !r.Config.IsUnknown() && !r.Config.IsNull() {
-		_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
-	}
+	_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
 	description := new(string)
 	if !r.Description.IsUnknown() && !r.Description.IsNull() {
 		*description = r.Description.ValueString()
 	} else {
 		description = nil
 	}
-	name := new(string)
-	if !r.Name.IsUnknown() && !r.Name.IsNull() {
-		*name = r.Name.ValueString()
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
 	} else {
-		name = nil
+		id = nil
 	}
-	prefix := new(string)
-	if !r.Prefix.IsUnknown() && !r.Prefix.IsNull() {
-		*prefix = r.Prefix.ValueString()
-	} else {
-		prefix = nil
-	}
+	var name string
+	name = r.Name.ValueString()
+
+	var prefix string
+	prefix = r.Prefix.ValueString()
+
 	var tags []string = []string{}
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
@@ -38,6 +36,7 @@ func (r *VaultResourceModel) ToSharedVaultInput() *shared.VaultInput {
 	out := shared.VaultInput{
 		Config:      config,
 		Description: description,
+		ID:          id,
 		Name:        name,
 		Prefix:      prefix,
 		Tags:        tags,
@@ -47,17 +46,13 @@ func (r *VaultResourceModel) ToSharedVaultInput() *shared.VaultInput {
 
 func (r *VaultResourceModel) RefreshFromSharedVault(resp *shared.Vault) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = types.StringNull()
-		} else {
-			configResult, _ := json.Marshal(resp.Config)
-			r.Config = types.StringValue(string(configResult))
-		}
+		configResult, _ := json.Marshal(resp.Config)
+		r.Config = types.StringValue(string(configResult))
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Description = types.StringPointerValue(resp.Description)
 		r.ID = types.StringPointerValue(resp.ID)
-		r.Name = types.StringPointerValue(resp.Name)
-		r.Prefix = types.StringPointerValue(resp.Prefix)
+		r.Name = types.StringValue(resp.Name)
+		r.Prefix = types.StringValue(resp.Prefix)
 		r.Tags = []types.String{}
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))

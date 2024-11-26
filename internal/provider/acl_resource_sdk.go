@@ -9,16 +9,6 @@ import (
 )
 
 func (r *ACLResourceModel) ToSharedACLInput() *shared.ACLInput {
-	group := new(string)
-	if !r.Group.IsUnknown() && !r.Group.IsNull() {
-		*group = r.Group.ValueString()
-	} else {
-		group = nil
-	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
 	var consumer *shared.ACLConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -31,10 +21,24 @@ func (r *ACLResourceModel) ToSharedACLInput() *shared.ACLInput {
 			ID: id,
 		}
 	}
+	var group string
+	group = r.Group.ValueString()
+
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
 	out := shared.ACLInput{
-		Group:    group,
-		Tags:     tags,
 		Consumer: consumer,
+		Group:    group,
+		ID:       id1,
+		Tags:     tags,
 	}
 	return &out
 }
@@ -48,7 +52,7 @@ func (r *ACLResourceModel) RefreshFromSharedACL(resp *shared.ACL) {
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Group = types.StringPointerValue(resp.Group)
+		r.Group = types.StringValue(resp.Group)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Tags = []types.String{}
 		for _, v := range resp.Tags {

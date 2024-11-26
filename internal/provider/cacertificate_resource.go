@@ -46,8 +46,7 @@ func (r *CACertificateResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "CACertificate Resource",
 		Attributes: map[string]schema.Attribute{
 			"cert": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `PEM-encoded public certificate of the CA.`,
 			},
 			"cert_digest": schema.StringAttribute{
@@ -61,6 +60,7 @@ func (r *CACertificateResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,

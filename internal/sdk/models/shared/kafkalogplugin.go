@@ -6,22 +6,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// KafkaLogPluginMechanism - The SASL authentication mechanism.  Supported options: `PLAIN` or `SCRAM-SHA-256`.
-type KafkaLogPluginMechanism string
+// Mechanism - The SASL authentication mechanism.  Supported options: `PLAIN` or `SCRAM-SHA-256`.
+type Mechanism string
 
 const (
-	KafkaLogPluginMechanismPlain       KafkaLogPluginMechanism = "PLAIN"
-	KafkaLogPluginMechanismScramSha256 KafkaLogPluginMechanism = "SCRAM-SHA-256"
-	KafkaLogPluginMechanismScramSha512 KafkaLogPluginMechanism = "SCRAM-SHA-512"
+	MechanismPlain       Mechanism = "PLAIN"
+	MechanismScramSha256 Mechanism = "SCRAM-SHA-256"
+	MechanismScramSha512 Mechanism = "SCRAM-SHA-512"
 )
 
-func (e KafkaLogPluginMechanism) ToPointer() *KafkaLogPluginMechanism {
+func (e Mechanism) ToPointer() *Mechanism {
 	return &e
 }
-func (e *KafkaLogPluginMechanism) UnmarshalJSON(data []byte) error {
+func (e *Mechanism) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -32,10 +31,10 @@ func (e *KafkaLogPluginMechanism) UnmarshalJSON(data []byte) error {
 	case "SCRAM-SHA-256":
 		fallthrough
 	case "SCRAM-SHA-512":
-		*e = KafkaLogPluginMechanism(v)
+		*e = Mechanism(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for KafkaLogPluginMechanism: %v", v)
+		return fmt.Errorf("invalid value for Mechanism: %v", v)
 	}
 }
 
@@ -63,9 +62,9 @@ func (e *KafkaLogPluginStrategy) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type KafkaLogPluginAuthentication struct {
+type Authentication struct {
 	// The SASL authentication mechanism.  Supported options: `PLAIN` or `SCRAM-SHA-256`.
-	Mechanism *KafkaLogPluginMechanism `json:"mechanism,omitempty"`
+	Mechanism *Mechanism `json:"mechanism,omitempty"`
 	// Password for SASL authentication.
 	Password *string `json:"password,omitempty"`
 	// The authentication strategy for the plugin, the only option for the value is `sasl`.
@@ -76,75 +75,75 @@ type KafkaLogPluginAuthentication struct {
 	User *string `json:"user,omitempty"`
 }
 
-func (o *KafkaLogPluginAuthentication) GetMechanism() *KafkaLogPluginMechanism {
+func (o *Authentication) GetMechanism() *Mechanism {
 	if o == nil {
 		return nil
 	}
 	return o.Mechanism
 }
 
-func (o *KafkaLogPluginAuthentication) GetPassword() *string {
+func (o *Authentication) GetPassword() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Password
 }
 
-func (o *KafkaLogPluginAuthentication) GetStrategy() *KafkaLogPluginStrategy {
+func (o *Authentication) GetStrategy() *KafkaLogPluginStrategy {
 	if o == nil {
 		return nil
 	}
 	return o.Strategy
 }
 
-func (o *KafkaLogPluginAuthentication) GetTokenauth() *bool {
+func (o *Authentication) GetTokenauth() *bool {
 	if o == nil {
 		return nil
 	}
 	return o.Tokenauth
 }
 
-func (o *KafkaLogPluginAuthentication) GetUser() *string {
+func (o *Authentication) GetUser() *string {
 	if o == nil {
 		return nil
 	}
 	return o.User
 }
 
-type KafkaLogPluginBootstrapServers struct {
+type BootstrapServers struct {
 	// A string representing a host name, such as example.com.
 	Host string `json:"host"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port int64 `json:"port"`
 }
 
-func (o *KafkaLogPluginBootstrapServers) GetHost() string {
+func (o *BootstrapServers) GetHost() string {
 	if o == nil {
 		return ""
 	}
 	return o.Host
 }
 
-func (o *KafkaLogPluginBootstrapServers) GetPort() int64 {
+func (o *BootstrapServers) GetPort() int64 {
 	if o == nil {
 		return 0
 	}
 	return o.Port
 }
 
-// KafkaLogPluginProducerRequestAcks - The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
-type KafkaLogPluginProducerRequestAcks int64
+// ProducerRequestAcks - The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
+type ProducerRequestAcks int64
 
 const (
-	KafkaLogPluginProducerRequestAcksMinus1 KafkaLogPluginProducerRequestAcks = -1
-	KafkaLogPluginProducerRequestAcksZero   KafkaLogPluginProducerRequestAcks = 0
-	KafkaLogPluginProducerRequestAcksOne    KafkaLogPluginProducerRequestAcks = 1
+	ProducerRequestAcksMinus1 ProducerRequestAcks = -1
+	ProducerRequestAcksZero   ProducerRequestAcks = 0
+	ProducerRequestAcksOne    ProducerRequestAcks = 1
 )
 
-func (e KafkaLogPluginProducerRequestAcks) ToPointer() *KafkaLogPluginProducerRequestAcks {
+func (e ProducerRequestAcks) ToPointer() *ProducerRequestAcks {
 	return &e
 }
-func (e *KafkaLogPluginProducerRequestAcks) UnmarshalJSON(data []byte) error {
+func (e *ProducerRequestAcks) UnmarshalJSON(data []byte) error {
 	var v int64
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -155,10 +154,10 @@ func (e *KafkaLogPluginProducerRequestAcks) UnmarshalJSON(data []byte) error {
 	case 0:
 		fallthrough
 	case 1:
-		*e = KafkaLogPluginProducerRequestAcks(v)
+		*e = ProducerRequestAcks(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for KafkaLogPluginProducerRequestAcks: %v", v)
+		return fmt.Errorf("invalid value for ProducerRequestAcks: %v", v)
 	}
 }
 
@@ -184,9 +183,9 @@ func (o *KafkaLogPluginSecurity) GetSsl() *bool {
 }
 
 type KafkaLogPluginConfig struct {
-	Authentication *KafkaLogPluginAuthentication `json:"authentication,omitempty"`
+	Authentication *Authentication `json:"authentication,omitempty"`
 	// Set of bootstrap brokers in a `{host: host, port: port}` list format.
-	BootstrapServers []KafkaLogPluginBootstrapServers `json:"bootstrap_servers,omitempty"`
+	BootstrapServers []BootstrapServers `json:"bootstrap_servers,omitempty"`
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
 	ClusterName *string `json:"cluster_name,omitempty"`
 	// Lua code as a key-value map
@@ -200,7 +199,7 @@ type KafkaLogPluginConfig struct {
 	// Maximum time interval in milliseconds between buffer flushes in asynchronous mode.
 	ProducerAsyncFlushTimeout *int64 `json:"producer_async_flush_timeout,omitempty"`
 	// The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
-	ProducerRequestAcks *KafkaLogPluginProducerRequestAcks `json:"producer_request_acks,omitempty"`
+	ProducerRequestAcks *ProducerRequestAcks `json:"producer_request_acks,omitempty"`
 	// Maximum size of a Produce request in bytes.
 	ProducerRequestLimitsBytesPerRequest *int64 `json:"producer_request_limits_bytes_per_request,omitempty"`
 	// Maximum number of messages to include into a single Produce request.
@@ -218,14 +217,14 @@ type KafkaLogPluginConfig struct {
 	Topic *string `json:"topic,omitempty"`
 }
 
-func (o *KafkaLogPluginConfig) GetAuthentication() *KafkaLogPluginAuthentication {
+func (o *KafkaLogPluginConfig) GetAuthentication() *Authentication {
 	if o == nil {
 		return nil
 	}
 	return o.Authentication
 }
 
-func (o *KafkaLogPluginConfig) GetBootstrapServers() []KafkaLogPluginBootstrapServers {
+func (o *KafkaLogPluginConfig) GetBootstrapServers() []BootstrapServers {
 	if o == nil {
 		return nil
 	}
@@ -281,7 +280,7 @@ func (o *KafkaLogPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
 	return o.ProducerAsyncFlushTimeout
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestAcks() *KafkaLogPluginProducerRequestAcks {
+func (o *KafkaLogPluginConfig) GetProducerRequestAcks() *ProducerRequestAcks {
 	if o == nil {
 		return nil
 	}
@@ -344,6 +343,70 @@ func (o *KafkaLogPluginConfig) GetTopic() *string {
 	return o.Topic
 }
 
+// KafkaLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type KafkaLogPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *KafkaLogPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type KafkaLogPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *KafkaLogPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type KafkaLogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *KafkaLogPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type KafkaLogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *KafkaLogPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type KafkaLogPluginOrdering struct {
+	After  *KafkaLogPluginAfter  `json:"after,omitempty"`
+	Before *KafkaLogPluginBefore `json:"before,omitempty"`
+}
+
+func (o *KafkaLogPluginOrdering) GetAfter() *KafkaLogPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *KafkaLogPluginOrdering) GetBefore() *KafkaLogPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
 type KafkaLogPluginProtocols string
 
 const (
@@ -394,29 +457,6 @@ func (e *KafkaLogPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// KafkaLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type KafkaLogPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *KafkaLogPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type KafkaLogPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *KafkaLogPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // KafkaLogPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type KafkaLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -441,29 +481,30 @@ func (o *KafkaLogPluginService) GetID() *string {
 	return o.ID
 }
 
+// KafkaLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KafkaLogPlugin struct {
-	Config *KafkaLogPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"kafka-log" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []KafkaLogPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config KafkaLogPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *KafkaLogPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *KafkaLogPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                   `json:"enabled,omitempty"`
+	ID           *string                 `json:"id,omitempty"`
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"kafka-log" json:"name"`
+	Ordering     *KafkaLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []KafkaLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *KafkaLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *KafkaLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (k KafkaLogPlugin) MarshalJSON() ([]byte, error) {
@@ -477,11 +518,25 @@ func (k *KafkaLogPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *KafkaLogPlugin) GetConfig() *KafkaLogPluginConfig {
+func (o *KafkaLogPlugin) GetConfig() KafkaLogPluginConfig {
+	if o == nil {
+		return KafkaLogPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *KafkaLogPlugin) GetConsumer() *KafkaLogPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *KafkaLogPlugin) GetConsumerGroup() *KafkaLogPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *KafkaLogPlugin) GetCreatedAt() *int64 {
@@ -512,11 +567,11 @@ func (o *KafkaLogPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *KafkaLogPlugin) GetName() *string {
-	return types.String("kafka-log")
+func (o *KafkaLogPlugin) GetName() string {
+	return "kafka-log"
 }
 
-func (o *KafkaLogPlugin) GetOrdering() any {
+func (o *KafkaLogPlugin) GetOrdering() *KafkaLogPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -528,6 +583,20 @@ func (o *KafkaLogPlugin) GetProtocols() []KafkaLogPluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *KafkaLogPlugin) GetRoute() *KafkaLogPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *KafkaLogPlugin) GetService() *KafkaLogPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *KafkaLogPlugin) GetTags() []string {
@@ -544,30 +613,116 @@ func (o *KafkaLogPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *KafkaLogPlugin) GetConsumer() *KafkaLogPluginConsumer {
+// KafkaLogPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type KafkaLogPluginInput struct {
+	Config KafkaLogPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *KafkaLogPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *KafkaLogPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                   `json:"enabled,omitempty"`
+	ID           *string                 `json:"id,omitempty"`
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"kafka-log" json:"name"`
+	Ordering     *KafkaLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []KafkaLogPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *KafkaLogPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *KafkaLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (k KafkaLogPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KafkaLogPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *KafkaLogPluginInput) GetConfig() KafkaLogPluginConfig {
+	if o == nil {
+		return KafkaLogPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *KafkaLogPluginInput) GetConsumer() *KafkaLogPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *KafkaLogPlugin) GetConsumerGroup() *KafkaLogPluginConsumerGroup {
+func (o *KafkaLogPluginInput) GetConsumerGroup() *KafkaLogPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *KafkaLogPlugin) GetRoute() *KafkaLogPluginRoute {
+func (o *KafkaLogPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *KafkaLogPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *KafkaLogPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *KafkaLogPluginInput) GetName() string {
+	return "kafka-log"
+}
+
+func (o *KafkaLogPluginInput) GetOrdering() *KafkaLogPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *KafkaLogPluginInput) GetProtocols() []KafkaLogPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *KafkaLogPluginInput) GetRoute() *KafkaLogPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *KafkaLogPlugin) GetService() *KafkaLogPluginService {
+func (o *KafkaLogPluginInput) GetService() *KafkaLogPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *KafkaLogPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

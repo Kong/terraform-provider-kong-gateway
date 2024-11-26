@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,53 +10,48 @@ import (
 
 func (r *PluginProxyCacheDataSourceModel) RefreshFromSharedProxyCachePlugin(resp *shared.ProxyCachePlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Config.CacheControl = types.BoolPointerValue(resp.Config.CacheControl)
+		r.Config.CacheTTL = types.Int64PointerValue(resp.Config.CacheTTL)
+		r.Config.ContentType = []types.String{}
+		for _, v := range resp.Config.ContentType {
+			r.Config.ContentType = append(r.Config.ContentType, types.StringValue(v))
+		}
+		r.Config.IgnoreURICase = types.BoolPointerValue(resp.Config.IgnoreURICase)
+		if resp.Config.Memory == nil {
+			r.Config.Memory = nil
 		} else {
-			r.Config = &tfTypes.CreateProxyCachePluginConfig{}
-			r.Config.CacheControl = types.BoolPointerValue(resp.Config.CacheControl)
-			r.Config.CacheTTL = types.Int64PointerValue(resp.Config.CacheTTL)
-			r.Config.ContentType = []types.String{}
-			for _, v := range resp.Config.ContentType {
-				r.Config.ContentType = append(r.Config.ContentType, types.StringValue(v))
-			}
-			r.Config.IgnoreURICase = types.BoolPointerValue(resp.Config.IgnoreURICase)
-			if resp.Config.Memory == nil {
-				r.Config.Memory = nil
-			} else {
-				r.Config.Memory = &tfTypes.Memory{}
-				r.Config.Memory.DictionaryName = types.StringPointerValue(resp.Config.Memory.DictionaryName)
-			}
-			r.Config.RequestMethod = []types.String{}
-			for _, v := range resp.Config.RequestMethod {
-				r.Config.RequestMethod = append(r.Config.RequestMethod, types.StringValue(string(v)))
-			}
-			r.Config.ResponseCode = []types.Int64{}
-			for _, v := range resp.Config.ResponseCode {
-				r.Config.ResponseCode = append(r.Config.ResponseCode, types.Int64Value(v))
-			}
-			if resp.Config.ResponseHeaders == nil {
-				r.Config.ResponseHeaders = nil
-			} else {
-				r.Config.ResponseHeaders = &tfTypes.ResponseHeaders{}
-				r.Config.ResponseHeaders.Age = types.BoolPointerValue(resp.Config.ResponseHeaders.Age)
-				r.Config.ResponseHeaders.XCacheKey = types.BoolPointerValue(resp.Config.ResponseHeaders.XCacheKey)
-				r.Config.ResponseHeaders.XCacheStatus = types.BoolPointerValue(resp.Config.ResponseHeaders.XCacheStatus)
-			}
-			r.Config.StorageTTL = types.Int64PointerValue(resp.Config.StorageTTL)
-			if resp.Config.Strategy != nil {
-				r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
-			} else {
-				r.Config.Strategy = types.StringNull()
-			}
-			r.Config.VaryHeaders = []types.String{}
-			for _, v := range resp.Config.VaryHeaders {
-				r.Config.VaryHeaders = append(r.Config.VaryHeaders, types.StringValue(v))
-			}
-			r.Config.VaryQueryParams = []types.String{}
-			for _, v := range resp.Config.VaryQueryParams {
-				r.Config.VaryQueryParams = append(r.Config.VaryQueryParams, types.StringValue(v))
-			}
+			r.Config.Memory = &tfTypes.Memory{}
+			r.Config.Memory.DictionaryName = types.StringPointerValue(resp.Config.Memory.DictionaryName)
+		}
+		r.Config.RequestMethod = []types.String{}
+		for _, v := range resp.Config.RequestMethod {
+			r.Config.RequestMethod = append(r.Config.RequestMethod, types.StringValue(string(v)))
+		}
+		r.Config.ResponseCode = []types.Int64{}
+		for _, v := range resp.Config.ResponseCode {
+			r.Config.ResponseCode = append(r.Config.ResponseCode, types.Int64Value(v))
+		}
+		if resp.Config.ResponseHeaders == nil {
+			r.Config.ResponseHeaders = nil
+		} else {
+			r.Config.ResponseHeaders = &tfTypes.ResponseHeaders{}
+			r.Config.ResponseHeaders.Age = types.BoolPointerValue(resp.Config.ResponseHeaders.Age)
+			r.Config.ResponseHeaders.XCacheKey = types.BoolPointerValue(resp.Config.ResponseHeaders.XCacheKey)
+			r.Config.ResponseHeaders.XCacheStatus = types.BoolPointerValue(resp.Config.ResponseHeaders.XCacheStatus)
+		}
+		r.Config.StorageTTL = types.Int64PointerValue(resp.Config.StorageTTL)
+		if resp.Config.Strategy != nil {
+			r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
+		} else {
+			r.Config.Strategy = types.StringNull()
+		}
+		r.Config.VaryHeaders = []types.String{}
+		for _, v := range resp.Config.VaryHeaders {
+			r.Config.VaryHeaders = append(r.Config.VaryHeaders, types.StringValue(v))
+		}
+		r.Config.VaryQueryParams = []types.String{}
+		for _, v := range resp.Config.VaryQueryParams {
+			r.Config.VaryQueryParams = append(r.Config.VaryQueryParams, types.StringValue(v))
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -76,10 +70,27 @@ func (r *PluginProxyCacheDataSourceModel) RefreshFromSharedProxyCachePlugin(resp
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

@@ -9,8 +9,8 @@ import (
 
 type UpdateWebsocketsizelimitPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                       string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateWebsocketSizeLimitPlugin *shared.CreateWebsocketSizeLimitPlugin `request:"mediaType=application/json"`
+	PluginID                 string                                `pathParam:"style=simple,explode=false,name=PluginId"`
+	WebsocketSizeLimitPlugin *shared.WebsocketSizeLimitPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateWebsocketsizelimitPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateWebsocketsizelimitPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateWebsocketsizelimitPluginRequest) GetCreateWebsocketSizeLimitPlugin() *shared.CreateWebsocketSizeLimitPlugin {
+func (o *UpdateWebsocketsizelimitPluginRequest) GetWebsocketSizeLimitPlugin() *shared.WebsocketSizeLimitPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateWebsocketSizeLimitPlugin
+	return o.WebsocketSizeLimitPlugin
 }
 
 type UpdateWebsocketsizelimitPluginResponse struct {

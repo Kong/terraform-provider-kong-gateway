@@ -7,8 +7,8 @@ import (
 )
 
 type RemoveConsumerFromGroupRequest struct {
-	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
-	ConsumerID      string `pathParam:"style=simple,explode=false,name=ConsumerId"`
+	ConsumerGroupID      string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
+	ConsumerIDOrUsername string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
 }
 
 func (o *RemoveConsumerFromGroupRequest) GetConsumerGroupID() string {
@@ -18,11 +18,11 @@ func (o *RemoveConsumerFromGroupRequest) GetConsumerGroupID() string {
 	return o.ConsumerGroupID
 }
 
-func (o *RemoveConsumerFromGroupRequest) GetConsumerID() string {
+func (o *RemoveConsumerFromGroupRequest) GetConsumerIDOrUsername() string {
 	if o == nil {
 		return ""
 	}
-	return o.ConsumerID
+	return o.ConsumerIDOrUsername
 }
 
 type RemoveConsumerFromGroupResponse struct {

@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
@@ -24,7 +25,8 @@ type KongGatewayProvider struct {
 
 // KongGatewayProviderModel describes the provider data model.
 type KongGatewayProviderModel struct {
-	ServerURL types.String `tfsdk:"server_url"`
+	ServerURL  types.String `tfsdk:"server_url"`
+	AdminToken types.String `tfsdk:"admin_token"`
 }
 
 func (p *KongGatewayProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -43,6 +45,10 @@ func (p *KongGatewayProvider) Schema(ctx context.Context, req provider.SchemaReq
 				MarkdownDescription: "Server URL (defaults to {protocol}://{hostname}:{port}{path})",
 				Optional:            true,
 				Required:            false,
+			},
+			"admin_token": schema.StringAttribute{
+				Sensitive: true,
+				Optional:  true,
 			},
 		},
 	}
@@ -63,9 +69,23 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		ServerURL = "{protocol}://{hostname}:{port}{path}"
 	}
 
+	adminToken := new(string)
+	if !data.AdminToken.IsUnknown() && !data.AdminToken.IsNull() {
+		*adminToken = data.AdminToken.ValueString()
+	} else {
+		adminToken = nil
+	}
+	security := shared.Security{
+		AdminToken: adminToken,
+	}
+
+	httpClient := http.DefaultClient
+	httpClient.Transport = NewLoggingHTTPTransport(http.DefaultTransport)
+
 	opts := []sdk.SDKOption{
 		sdk.WithServerURL(ServerURL),
-		sdk.WithClient(http.DefaultClient),
+		sdk.WithSecurity(security),
+		sdk.WithClient(httpClient),
 	}
 	client := sdk.New(opts...)
 
@@ -87,6 +107,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewKeyResource,
 		NewKeyAuthResource,
 		NewKeySetResource,
+		NewMTLSAuthResource,
 		NewPluginACLResource,
 		NewPluginAcmeResource,
 		NewPluginAiPromptDecoratorResource,
@@ -187,6 +208,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewKeyDataSource,
 		NewKeyAuthDataSource,
 		NewKeySetDataSource,
+		NewMTLSAuthDataSource,
 		NewPluginACLDataSource,
 		NewPluginAcmeDataSource,
 		NewPluginAiPromptDecoratorDataSource,

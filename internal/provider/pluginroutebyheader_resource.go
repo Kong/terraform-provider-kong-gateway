@@ -36,19 +36,19 @@ type PluginRouteByHeaderResource struct {
 
 // PluginRouteByHeaderResourceModel describes the resource data model.
 type PluginRouteByHeaderResourceModel struct {
-	Config        *tfTypes.CreateRouteByHeaderPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                     `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                     `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      types.String                             `tfsdk:"ordering"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                     `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                     `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
+	Config        tfTypes.RouteByHeaderPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer              `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering        `tfsdk:"ordering"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer              `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer              `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
 }
 
 func (r *PluginRouteByHeaderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,8 +60,7 @@ func (r *PluginRouteByHeaderResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginRouteByHeader Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"rules": schema.ListNestedAttribute{
 						Computed: true,
@@ -127,17 +126,38 @@ func (r *PluginRouteByHeaderResource) Schema(ctx context.Context, req resource.S
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -220,7 +240,7 @@ func (r *PluginRouteByHeaderResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := data.ToSharedCreateRouteByHeaderPlugin()
+	request := data.ToSharedRouteByHeaderPluginInput()
 	res, err := r.client.Plugins.CreateRoutebyheaderPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -319,10 +339,10 @@ func (r *PluginRouteByHeaderResource) Update(ctx context.Context, req resource.U
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createRouteByHeaderPlugin := data.ToSharedCreateRouteByHeaderPlugin()
+	routeByHeaderPlugin := data.ToSharedRouteByHeaderPluginInput()
 	request := operations.UpdateRoutebyheaderPluginRequest{
-		PluginID:                  pluginID,
-		CreateRouteByHeaderPlugin: createRouteByHeaderPlugin,
+		PluginID:            pluginID,
+		RouteByHeaderPlugin: routeByHeaderPlugin,
 	}
 	res, err := r.client.Plugins.UpdateRoutebyheaderPlugin(ctx, request)
 	if err != nil {

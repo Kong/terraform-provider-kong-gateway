@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,17 +10,12 @@ import (
 
 func (r *PluginTLSMetadataHeadersDataSourceModel) RefreshFromSharedTLSMetadataHeadersPlugin(resp *shared.TLSMetadataHeadersPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateTLSMetadataHeadersPluginConfig{}
-			r.Config.ClientCertFingerprintHeaderName = types.StringPointerValue(resp.Config.ClientCertFingerprintHeaderName)
-			r.Config.ClientCertHeaderName = types.StringPointerValue(resp.Config.ClientCertHeaderName)
-			r.Config.ClientCertIssuerDnHeaderName = types.StringPointerValue(resp.Config.ClientCertIssuerDnHeaderName)
-			r.Config.ClientCertSubjectDnHeaderName = types.StringPointerValue(resp.Config.ClientCertSubjectDnHeaderName)
-			r.Config.ClientSerialHeaderName = types.StringPointerValue(resp.Config.ClientSerialHeaderName)
-			r.Config.InjectClientCertDetails = types.BoolPointerValue(resp.Config.InjectClientCertDetails)
-		}
+		r.Config.ClientCertFingerprintHeaderName = types.StringPointerValue(resp.Config.ClientCertFingerprintHeaderName)
+		r.Config.ClientCertHeaderName = types.StringPointerValue(resp.Config.ClientCertHeaderName)
+		r.Config.ClientCertIssuerDnHeaderName = types.StringPointerValue(resp.Config.ClientCertIssuerDnHeaderName)
+		r.Config.ClientCertSubjectDnHeaderName = types.StringPointerValue(resp.Config.ClientCertSubjectDnHeaderName)
+		r.Config.ClientSerialHeaderName = types.StringPointerValue(resp.Config.ClientSerialHeaderName)
+		r.Config.InjectClientCertDetails = types.BoolPointerValue(resp.Config.InjectClientCertDetails)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -39,10 +33,27 @@ func (r *PluginTLSMetadataHeadersDataSourceModel) RefreshFromSharedTLSMetadataHe
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

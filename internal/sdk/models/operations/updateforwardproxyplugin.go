@@ -9,8 +9,8 @@ import (
 
 type UpdateForwardproxyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                           `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateForwardProxyPlugin *shared.CreateForwardProxyPlugin `request:"mediaType=application/json"`
+	PluginID           string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	ForwardProxyPlugin *shared.ForwardProxyPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateForwardproxyPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateForwardproxyPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateForwardproxyPluginRequest) GetCreateForwardProxyPlugin() *shared.CreateForwardProxyPlugin {
+func (o *UpdateForwardproxyPluginRequest) GetForwardProxyPlugin() *shared.ForwardProxyPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateForwardProxyPlugin
+	return o.ForwardProxyPlugin
 }
 
 type UpdateForwardproxyPluginResponse struct {

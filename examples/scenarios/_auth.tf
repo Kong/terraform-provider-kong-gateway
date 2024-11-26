@@ -8,4 +8,5 @@ terraform {
 
 provider "kong-gateway" {
   server_url = "http://localhost:8001"
+  # admin_token = "your_rbac_token_here__enterprise_only"
 }

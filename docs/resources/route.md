@@ -21,12 +21,13 @@ resource "kong-gateway_route" "my_route" {
     }
   ]
   headers = {
-    key = jsonencode("value"),
+    key = "value",
   }
   hosts = [
     "..."
   ]
   https_redirect_status_code = 308
+  id                         = "...my_id..."
   methods = [
     "..."
   ]

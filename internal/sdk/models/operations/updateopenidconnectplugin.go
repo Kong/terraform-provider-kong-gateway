@@ -9,8 +9,8 @@ import (
 
 type UpdateOpenidconnectPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateOpenidConnectPlugin *shared.CreateOpenidConnectPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	OpenidConnectPlugin *shared.OpenidConnectPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOpenidconnectPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateOpenidconnectPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOpenidconnectPluginRequest) GetCreateOpenidConnectPlugin() *shared.CreateOpenidConnectPlugin {
+func (o *UpdateOpenidconnectPluginRequest) GetOpenidConnectPlugin() *shared.OpenidConnectPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateOpenidConnectPlugin
+	return o.OpenidConnectPlugin
 }
 
 type UpdateOpenidconnectPluginResponse struct {

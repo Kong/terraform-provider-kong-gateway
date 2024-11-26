@@ -9,22 +9,6 @@ import (
 )
 
 func (r *BasicAuthResourceModel) ToSharedBasicAuthInput() *shared.BasicAuthInput {
-	password := new(string)
-	if !r.Password.IsUnknown() && !r.Password.IsNull() {
-		*password = r.Password.ValueString()
-	} else {
-		password = nil
-	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	username := new(string)
-	if !r.Username.IsUnknown() && !r.Username.IsNull() {
-		*username = r.Username.ValueString()
-	} else {
-		username = nil
-	}
 	var consumer *shared.BasicAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -37,11 +21,28 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuthInput() *shared.BasicAuthInput
 			ID: id,
 		}
 	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	var password string
+	password = r.Password.ValueString()
+
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	var username string
+	username = r.Username.ValueString()
+
 	out := shared.BasicAuthInput{
+		Consumer: consumer,
+		ID:       id1,
 		Password: password,
 		Tags:     tags,
 		Username: username,
-		Consumer: consumer,
 	}
 	return &out
 }
@@ -56,10 +57,11 @@ func (r *BasicAuthResourceModel) RefreshFromSharedBasicAuth(resp *shared.BasicAu
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
+		r.Password = types.StringValue(resp.Password)
 		r.Tags = []types.String{}
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
-		r.Username = types.StringPointerValue(resp.Username)
+		r.Username = types.StringValue(resp.Username)
 	}
 }

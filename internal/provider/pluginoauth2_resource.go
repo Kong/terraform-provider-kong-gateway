@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -33,19 +32,19 @@ type PluginOauth2Resource struct {
 
 // PluginOauth2ResourceModel describes the resource data model.
 type PluginOauth2ResourceModel struct {
-	Config        *tfTypes.CreateOauth2PluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer              `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer              `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                       `tfsdk:"created_at"`
-	Enabled       types.Bool                        `tfsdk:"enabled"`
-	ID            types.String                      `tfsdk:"id"`
-	InstanceName  types.String                      `tfsdk:"instance_name"`
-	Ordering      types.String                      `tfsdk:"ordering"`
-	Protocols     []types.String                    `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer              `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer              `tfsdk:"service"`
-	Tags          []types.String                    `tfsdk:"tags"`
-	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
+	Config        tfTypes.Oauth2PluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                `tfsdk:"created_at"`
+	Enabled       types.Bool                 `tfsdk:"enabled"`
+	ID            types.String               `tfsdk:"id"`
+	InstanceName  types.String               `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
+	Protocols     []types.String             `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
+	Tags          []types.String             `tfsdk:"tags"`
+	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
 }
 
 func (r *PluginOauth2Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,8 +56,7 @@ func (r *PluginOauth2Resource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginOauth2 Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"accept_http_if_already_terminated": schema.BoolAttribute{
 						Computed:    true,
@@ -191,17 +189,38 @@ func (r *PluginOauth2Resource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -284,7 +303,7 @@ func (r *PluginOauth2Resource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := data.ToSharedCreateOauth2Plugin()
+	request := data.ToSharedOauth2PluginInput()
 	res, err := r.client.Plugins.CreateOauth2Plugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -383,10 +402,10 @@ func (r *PluginOauth2Resource) Update(ctx context.Context, req resource.UpdateRe
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createOauth2Plugin := data.ToSharedCreateOauth2Plugin()
+	oauth2Plugin := data.ToSharedOauth2PluginInput()
 	request := operations.UpdateOauth2PluginRequest{
-		PluginID:           pluginID,
-		CreateOauth2Plugin: createOauth2Plugin,
+		PluginID:     pluginID,
+		Oauth2Plugin: oauth2Plugin,
 	}
 	res, err := r.client.Plugins.UpdateOauth2Plugin(ctx, request)
 	if err != nil {

@@ -9,8 +9,8 @@ import (
 
 type UpdateAipromptguardPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateAiPromptGuardPlugin *shared.CreateAiPromptGuardPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	AiPromptGuardPlugin *shared.AiPromptGuardPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAipromptguardPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateAipromptguardPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAipromptguardPluginRequest) GetCreateAiPromptGuardPlugin() *shared.CreateAiPromptGuardPlugin {
+func (o *UpdateAipromptguardPluginRequest) GetAiPromptGuardPlugin() *shared.AiPromptGuardPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateAiPromptGuardPlugin
+	return o.AiPromptGuardPlugin
 }
 
 type UpdateAipromptguardPluginResponse struct {

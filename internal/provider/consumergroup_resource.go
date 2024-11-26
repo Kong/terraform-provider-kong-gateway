@@ -50,10 +50,10 @@ func (r *ConsumerGroupResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,

@@ -62,6 +62,7 @@ func (r *HMACAuthResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"secret": schema.StringAttribute{
 				Computed: true,
@@ -73,8 +74,7 @@ func (r *HMACAuthResource) Schema(ctx context.Context, req resource.SchemaReques
 				ElementType: types.StringType,
 			},
 			"username": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 			},
 		},
 	}

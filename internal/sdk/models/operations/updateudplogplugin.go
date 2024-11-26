@@ -9,8 +9,8 @@ import (
 
 type UpdateUdplogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateUDPLogPlugin *shared.CreateUDPLogPlugin `request:"mediaType=application/json"`
+	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	UDPLogPlugin *shared.UDPLogPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateUdplogPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateUdplogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateUdplogPluginRequest) GetCreateUDPLogPlugin() *shared.CreateUDPLogPlugin {
+func (o *UpdateUdplogPluginRequest) GetUDPLogPlugin() *shared.UDPLogPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateUDPLogPlugin
+	return o.UDPLogPlugin
 }
 
 type UpdateUdplogPluginResponse struct {

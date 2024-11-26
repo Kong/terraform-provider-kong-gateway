@@ -35,7 +35,7 @@ func (s *SNIs) ListSni(ctx context.Context, request operations.ListSniRequest, o
 		Context:        ctx,
 		OperationID:    "list-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -75,6 +75,10 @@ func (s *SNIs) ListSni(ctx context.Context, request operations.ListSniRequest, o
 
 	if err := utils.PopulateQueryParams(ctx, req, request, nil); err != nil {
 		return nil, fmt.Errorf("error populating query params: %w", err)
+	}
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
 	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
@@ -174,7 +178,7 @@ func (s *SNIs) CreateSni(ctx context.Context, request shared.SNIInput, opts ...o
 		Context:        ctx,
 		OperationID:    "create-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -217,6 +221,10 @@ func (s *SNIs) CreateSni(ctx context.Context, request shared.SNIInput, opts ...o
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -315,7 +323,7 @@ func (s *SNIs) DeleteSni(ctx context.Context, request operations.DeleteSniReques
 		Context:        ctx,
 		OperationID:    "delete-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -352,6 +360,10 @@ func (s *SNIs) DeleteSni(ctx context.Context, request operations.DeleteSniReques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -430,7 +442,7 @@ func (s *SNIs) GetSni(ctx context.Context, request operations.GetSniRequest, opt
 		Context:        ctx,
 		OperationID:    "get-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -467,6 +479,10 @@ func (s *SNIs) GetSni(ctx context.Context, request operations.GetSniRequest, opt
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -566,7 +582,7 @@ func (s *SNIs) UpdateSni(ctx context.Context, request operations.UpdateSniReques
 		Context:        ctx,
 		OperationID:    "update-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -609,6 +625,10 @@ func (s *SNIs) UpdateSni(ctx context.Context, request operations.UpdateSniReques
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -708,7 +728,7 @@ func (s *SNIs) UpsertSni(ctx context.Context, request operations.UpsertSniReques
 		Context:        ctx,
 		OperationID:    "upsert-sni",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -751,6 +771,10 @@ func (s *SNIs) UpsertSni(ctx context.Context, request operations.UpsertSniReques
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {

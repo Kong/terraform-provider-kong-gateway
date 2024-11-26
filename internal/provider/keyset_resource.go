@@ -50,6 +50,7 @@ func (r *KeySetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"name": schema.StringAttribute{
 				Computed: true,

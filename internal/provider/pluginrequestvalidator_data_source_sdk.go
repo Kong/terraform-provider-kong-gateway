@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,49 +10,44 @@ import (
 
 func (r *PluginRequestValidatorDataSourceModel) RefreshFromSharedRequestValidatorPlugin(resp *shared.RequestValidatorPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateRequestValidatorPluginConfig{}
-			r.Config.AllowedContentTypes = []types.String{}
-			for _, v := range resp.Config.AllowedContentTypes {
-				r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
-			}
-			r.Config.BodySchema = types.StringPointerValue(resp.Config.BodySchema)
-			r.Config.ContentTypeParameterValidation = types.BoolPointerValue(resp.Config.ContentTypeParameterValidation)
-			r.Config.ParameterSchema = []tfTypes.ParameterSchema{}
-			if len(r.Config.ParameterSchema) > len(resp.Config.ParameterSchema) {
-				r.Config.ParameterSchema = r.Config.ParameterSchema[:len(resp.Config.ParameterSchema)]
-			}
-			for parameterSchemaCount, parameterSchemaItem := range resp.Config.ParameterSchema {
-				var parameterSchema1 tfTypes.ParameterSchema
-				parameterSchema1.Explode = types.BoolPointerValue(parameterSchemaItem.Explode)
-				parameterSchema1.In = types.StringValue(string(parameterSchemaItem.In))
-				parameterSchema1.Name = types.StringValue(parameterSchemaItem.Name)
-				parameterSchema1.Required = types.BoolValue(parameterSchemaItem.Required)
-				parameterSchema1.Schema = types.StringPointerValue(parameterSchemaItem.Schema)
-				if parameterSchemaItem.Style != nil {
-					parameterSchema1.Style = types.StringValue(string(*parameterSchemaItem.Style))
-				} else {
-					parameterSchema1.Style = types.StringNull()
-				}
-				if parameterSchemaCount+1 > len(r.Config.ParameterSchema) {
-					r.Config.ParameterSchema = append(r.Config.ParameterSchema, parameterSchema1)
-				} else {
-					r.Config.ParameterSchema[parameterSchemaCount].Explode = parameterSchema1.Explode
-					r.Config.ParameterSchema[parameterSchemaCount].In = parameterSchema1.In
-					r.Config.ParameterSchema[parameterSchemaCount].Name = parameterSchema1.Name
-					r.Config.ParameterSchema[parameterSchemaCount].Required = parameterSchema1.Required
-					r.Config.ParameterSchema[parameterSchemaCount].Schema = parameterSchema1.Schema
-					r.Config.ParameterSchema[parameterSchemaCount].Style = parameterSchema1.Style
-				}
-			}
-			r.Config.VerboseResponse = types.BoolPointerValue(resp.Config.VerboseResponse)
-			if resp.Config.Version != nil {
-				r.Config.Version = types.StringValue(string(*resp.Config.Version))
+		r.Config.AllowedContentTypes = []types.String{}
+		for _, v := range resp.Config.AllowedContentTypes {
+			r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
+		}
+		r.Config.BodySchema = types.StringPointerValue(resp.Config.BodySchema)
+		r.Config.ContentTypeParameterValidation = types.BoolPointerValue(resp.Config.ContentTypeParameterValidation)
+		r.Config.ParameterSchema = []tfTypes.ParameterSchema{}
+		if len(r.Config.ParameterSchema) > len(resp.Config.ParameterSchema) {
+			r.Config.ParameterSchema = r.Config.ParameterSchema[:len(resp.Config.ParameterSchema)]
+		}
+		for parameterSchemaCount, parameterSchemaItem := range resp.Config.ParameterSchema {
+			var parameterSchema1 tfTypes.ParameterSchema
+			parameterSchema1.Explode = types.BoolPointerValue(parameterSchemaItem.Explode)
+			parameterSchema1.In = types.StringValue(string(parameterSchemaItem.In))
+			parameterSchema1.Name = types.StringValue(parameterSchemaItem.Name)
+			parameterSchema1.Required = types.BoolValue(parameterSchemaItem.Required)
+			parameterSchema1.Schema = types.StringPointerValue(parameterSchemaItem.Schema)
+			if parameterSchemaItem.Style != nil {
+				parameterSchema1.Style = types.StringValue(string(*parameterSchemaItem.Style))
 			} else {
-				r.Config.Version = types.StringNull()
+				parameterSchema1.Style = types.StringNull()
 			}
+			if parameterSchemaCount+1 > len(r.Config.ParameterSchema) {
+				r.Config.ParameterSchema = append(r.Config.ParameterSchema, parameterSchema1)
+			} else {
+				r.Config.ParameterSchema[parameterSchemaCount].Explode = parameterSchema1.Explode
+				r.Config.ParameterSchema[parameterSchemaCount].In = parameterSchema1.In
+				r.Config.ParameterSchema[parameterSchemaCount].Name = parameterSchema1.Name
+				r.Config.ParameterSchema[parameterSchemaCount].Required = parameterSchema1.Required
+				r.Config.ParameterSchema[parameterSchemaCount].Schema = parameterSchema1.Schema
+				r.Config.ParameterSchema[parameterSchemaCount].Style = parameterSchema1.Style
+			}
+		}
+		r.Config.VerboseResponse = types.BoolPointerValue(resp.Config.VerboseResponse)
+		if resp.Config.Version != nil {
+			r.Config.Version = types.StringValue(string(*resp.Config.Version))
+		} else {
+			r.Config.Version = types.StringNull()
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -72,10 +66,27 @@ func (r *PluginRequestValidatorDataSourceModel) RefreshFromSharedRequestValidato
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

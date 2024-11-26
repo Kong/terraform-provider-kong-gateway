@@ -38,7 +38,7 @@ func (s *Plugins) ListPlugin(ctx context.Context, request operations.ListPluginR
 		Context:        ctx,
 		OperationID:    "list-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -78,6 +78,10 @@ func (s *Plugins) ListPlugin(ctx context.Context, request operations.ListPluginR
 
 	if err := utils.PopulateQueryParams(ctx, req, request, nil); err != nil {
 		return nil, fmt.Errorf("error populating query params: %w", err)
+	}
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
 	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
@@ -177,7 +181,7 @@ func (s *Plugins) CreatePlugin(ctx context.Context, request shared.PluginInput, 
 		Context:        ctx,
 		OperationID:    "create-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -220,6 +224,10 @@ func (s *Plugins) CreatePlugin(ctx context.Context, request shared.PluginInput, 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -313,12 +321,12 @@ func (s *Plugins) CreatePlugin(ctx context.Context, request shared.PluginInput, 
 
 // CreateACLPlugin - Create a ACL plugin
 // Create a ACL plugin
-func (s *Plugins) CreateACLPlugin(ctx context.Context, request *shared.CreateACLPlugin, opts ...operations.Option) (*operations.CreateACLPluginResponse, error) {
+func (s *Plugins) CreateACLPlugin(ctx context.Context, request *shared.ACLPluginInput, opts ...operations.Option) (*operations.CreateACLPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-acl-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -361,6 +369,10 @@ func (s *Plugins) CreateACLPlugin(ctx context.Context, request *shared.CreateACL
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -454,12 +466,12 @@ func (s *Plugins) CreateACLPlugin(ctx context.Context, request *shared.CreateACL
 
 // CreateAcmePlugin - Create a Acme plugin
 // Create a Acme plugin
-func (s *Plugins) CreateAcmePlugin(ctx context.Context, request *shared.CreateAcmePlugin, opts ...operations.Option) (*operations.CreateAcmePluginResponse, error) {
+func (s *Plugins) CreateAcmePlugin(ctx context.Context, request *shared.AcmePluginInput, opts ...operations.Option) (*operations.CreateAcmePluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-acme-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -502,6 +514,10 @@ func (s *Plugins) CreateAcmePlugin(ctx context.Context, request *shared.CreateAc
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -595,12 +611,12 @@ func (s *Plugins) CreateAcmePlugin(ctx context.Context, request *shared.CreateAc
 
 // CreateAipromptdecoratorPlugin - Create a AiPromptDecorator plugin
 // Create a AiPromptDecorator plugin
-func (s *Plugins) CreateAipromptdecoratorPlugin(ctx context.Context, request *shared.CreateAiPromptDecoratorPlugin, opts ...operations.Option) (*operations.CreateAipromptdecoratorPluginResponse, error) {
+func (s *Plugins) CreateAipromptdecoratorPlugin(ctx context.Context, request *shared.AiPromptDecoratorPluginInput, opts ...operations.Option) (*operations.CreateAipromptdecoratorPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-aipromptdecorator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -643,6 +659,10 @@ func (s *Plugins) CreateAipromptdecoratorPlugin(ctx context.Context, request *sh
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -736,12 +756,12 @@ func (s *Plugins) CreateAipromptdecoratorPlugin(ctx context.Context, request *sh
 
 // CreateAipromptguardPlugin - Create a AiPromptGuard plugin
 // Create a AiPromptGuard plugin
-func (s *Plugins) CreateAipromptguardPlugin(ctx context.Context, request *shared.CreateAiPromptGuardPlugin, opts ...operations.Option) (*operations.CreateAipromptguardPluginResponse, error) {
+func (s *Plugins) CreateAipromptguardPlugin(ctx context.Context, request *shared.AiPromptGuardPluginInput, opts ...operations.Option) (*operations.CreateAipromptguardPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-aipromptguard-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -784,6 +804,10 @@ func (s *Plugins) CreateAipromptguardPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -877,12 +901,12 @@ func (s *Plugins) CreateAipromptguardPlugin(ctx context.Context, request *shared
 
 // CreateAiprompttemplatePlugin - Create a AiPromptTemplate plugin
 // Create a AiPromptTemplate plugin
-func (s *Plugins) CreateAiprompttemplatePlugin(ctx context.Context, request *shared.CreateAiPromptTemplatePlugin, opts ...operations.Option) (*operations.CreateAiprompttemplatePluginResponse, error) {
+func (s *Plugins) CreateAiprompttemplatePlugin(ctx context.Context, request *shared.AiPromptTemplatePluginInput, opts ...operations.Option) (*operations.CreateAiprompttemplatePluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-aiprompttemplate-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -925,6 +949,10 @@ func (s *Plugins) CreateAiprompttemplatePlugin(ctx context.Context, request *sha
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1018,12 +1046,12 @@ func (s *Plugins) CreateAiprompttemplatePlugin(ctx context.Context, request *sha
 
 // CreateAiproxyPlugin - Create a AiProxy plugin
 // Create a AiProxy plugin
-func (s *Plugins) CreateAiproxyPlugin(ctx context.Context, request *shared.CreateAiProxyPlugin, opts ...operations.Option) (*operations.CreateAiproxyPluginResponse, error) {
+func (s *Plugins) CreateAiproxyPlugin(ctx context.Context, request *shared.AiProxyPluginInput, opts ...operations.Option) (*operations.CreateAiproxyPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-aiproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1066,6 +1094,10 @@ func (s *Plugins) CreateAiproxyPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1159,12 +1191,12 @@ func (s *Plugins) CreateAiproxyPlugin(ctx context.Context, request *shared.Creat
 
 // CreateAirequesttransformerPlugin - Create a AiRequestTransformer plugin
 // Create a AiRequestTransformer plugin
-func (s *Plugins) CreateAirequesttransformerPlugin(ctx context.Context, request *shared.CreateAiRequestTransformerPlugin, opts ...operations.Option) (*operations.CreateAirequesttransformerPluginResponse, error) {
+func (s *Plugins) CreateAirequesttransformerPlugin(ctx context.Context, request *shared.AiRequestTransformerPluginInput, opts ...operations.Option) (*operations.CreateAirequesttransformerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-airequesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1207,6 +1239,10 @@ func (s *Plugins) CreateAirequesttransformerPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1300,12 +1336,12 @@ func (s *Plugins) CreateAirequesttransformerPlugin(ctx context.Context, request 
 
 // CreateAiresponsetransformerPlugin - Create a AiResponseTransformer plugin
 // Create a AiResponseTransformer plugin
-func (s *Plugins) CreateAiresponsetransformerPlugin(ctx context.Context, request *shared.CreateAiResponseTransformerPlugin, opts ...operations.Option) (*operations.CreateAiresponsetransformerPluginResponse, error) {
+func (s *Plugins) CreateAiresponsetransformerPlugin(ctx context.Context, request *shared.AiResponseTransformerPluginInput, opts ...operations.Option) (*operations.CreateAiresponsetransformerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-airesponsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1348,6 +1384,10 @@ func (s *Plugins) CreateAiresponsetransformerPlugin(ctx context.Context, request
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1441,12 +1481,12 @@ func (s *Plugins) CreateAiresponsetransformerPlugin(ctx context.Context, request
 
 // CreateAwslambdaPlugin - Create a AwsLambda plugin
 // Create a AwsLambda plugin
-func (s *Plugins) CreateAwslambdaPlugin(ctx context.Context, request *shared.CreateAwsLambdaPlugin, opts ...operations.Option) (*operations.CreateAwslambdaPluginResponse, error) {
+func (s *Plugins) CreateAwslambdaPlugin(ctx context.Context, request *shared.AwsLambdaPluginInput, opts ...operations.Option) (*operations.CreateAwslambdaPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-awslambda-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1489,6 +1529,10 @@ func (s *Plugins) CreateAwslambdaPlugin(ctx context.Context, request *shared.Cre
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1582,12 +1626,12 @@ func (s *Plugins) CreateAwslambdaPlugin(ctx context.Context, request *shared.Cre
 
 // CreateAzurefunctionsPlugin - Create a AzureFunctions plugin
 // Create a AzureFunctions plugin
-func (s *Plugins) CreateAzurefunctionsPlugin(ctx context.Context, request *shared.CreateAzureFunctionsPlugin, opts ...operations.Option) (*operations.CreateAzurefunctionsPluginResponse, error) {
+func (s *Plugins) CreateAzurefunctionsPlugin(ctx context.Context, request *shared.AzureFunctionsPluginInput, opts ...operations.Option) (*operations.CreateAzurefunctionsPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-azurefunctions-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1630,6 +1674,10 @@ func (s *Plugins) CreateAzurefunctionsPlugin(ctx context.Context, request *share
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1723,12 +1771,12 @@ func (s *Plugins) CreateAzurefunctionsPlugin(ctx context.Context, request *share
 
 // CreateBasicauthPlugin - Create a BasicAuth plugin
 // Create a BasicAuth plugin
-func (s *Plugins) CreateBasicauthPlugin(ctx context.Context, request *shared.CreateBasicAuthPlugin, opts ...operations.Option) (*operations.CreateBasicauthPluginResponse, error) {
+func (s *Plugins) CreateBasicauthPlugin(ctx context.Context, request *shared.BasicAuthPluginInput, opts ...operations.Option) (*operations.CreateBasicauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-basicauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1771,6 +1819,10 @@ func (s *Plugins) CreateBasicauthPlugin(ctx context.Context, request *shared.Cre
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -1864,12 +1916,12 @@ func (s *Plugins) CreateBasicauthPlugin(ctx context.Context, request *shared.Cre
 
 // CreateBotdetectionPlugin - Create a BotDetection plugin
 // Create a BotDetection plugin
-func (s *Plugins) CreateBotdetectionPlugin(ctx context.Context, request *shared.CreateBotDetectionPlugin, opts ...operations.Option) (*operations.CreateBotdetectionPluginResponse, error) {
+func (s *Plugins) CreateBotdetectionPlugin(ctx context.Context, request *shared.BotDetectionPluginInput, opts ...operations.Option) (*operations.CreateBotdetectionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-botdetection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -1912,6 +1964,10 @@ func (s *Plugins) CreateBotdetectionPlugin(ctx context.Context, request *shared.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2005,12 +2061,12 @@ func (s *Plugins) CreateBotdetectionPlugin(ctx context.Context, request *shared.
 
 // CreateCanaryPlugin - Create a Canary plugin
 // Create a Canary plugin
-func (s *Plugins) CreateCanaryPlugin(ctx context.Context, request *shared.CreateCanaryPlugin, opts ...operations.Option) (*operations.CreateCanaryPluginResponse, error) {
+func (s *Plugins) CreateCanaryPlugin(ctx context.Context, request *shared.CanaryPluginInput, opts ...operations.Option) (*operations.CreateCanaryPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-canary-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2053,6 +2109,10 @@ func (s *Plugins) CreateCanaryPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2146,12 +2206,12 @@ func (s *Plugins) CreateCanaryPlugin(ctx context.Context, request *shared.Create
 
 // CreateCorrelationidPlugin - Create a CorrelationId plugin
 // Create a CorrelationId plugin
-func (s *Plugins) CreateCorrelationidPlugin(ctx context.Context, request *shared.CreateCorrelationIDPlugin, opts ...operations.Option) (*operations.CreateCorrelationidPluginResponse, error) {
+func (s *Plugins) CreateCorrelationidPlugin(ctx context.Context, request *shared.CorrelationIDPluginInput, opts ...operations.Option) (*operations.CreateCorrelationidPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-correlationid-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2194,6 +2254,10 @@ func (s *Plugins) CreateCorrelationidPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2287,12 +2351,12 @@ func (s *Plugins) CreateCorrelationidPlugin(ctx context.Context, request *shared
 
 // CreateCorsPlugin - Create a Cors plugin
 // Create a Cors plugin
-func (s *Plugins) CreateCorsPlugin(ctx context.Context, request *shared.CreateCorsPlugin, opts ...operations.Option) (*operations.CreateCorsPluginResponse, error) {
+func (s *Plugins) CreateCorsPlugin(ctx context.Context, request *shared.CorsPluginInput, opts ...operations.Option) (*operations.CreateCorsPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-cors-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2335,6 +2399,10 @@ func (s *Plugins) CreateCorsPlugin(ctx context.Context, request *shared.CreateCo
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2428,12 +2496,12 @@ func (s *Plugins) CreateCorsPlugin(ctx context.Context, request *shared.CreateCo
 
 // CreateDatadogPlugin - Create a Datadog plugin
 // Create a Datadog plugin
-func (s *Plugins) CreateDatadogPlugin(ctx context.Context, request *shared.CreateDatadogPlugin, opts ...operations.Option) (*operations.CreateDatadogPluginResponse, error) {
+func (s *Plugins) CreateDatadogPlugin(ctx context.Context, request *shared.DatadogPluginInput, opts ...operations.Option) (*operations.CreateDatadogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-datadog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2476,6 +2544,10 @@ func (s *Plugins) CreateDatadogPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2569,12 +2641,12 @@ func (s *Plugins) CreateDatadogPlugin(ctx context.Context, request *shared.Creat
 
 // CreateDegraphqlPlugin - Create a Degraphql plugin
 // Create a Degraphql plugin
-func (s *Plugins) CreateDegraphqlPlugin(ctx context.Context, request *shared.CreateDegraphqlPlugin, opts ...operations.Option) (*operations.CreateDegraphqlPluginResponse, error) {
+func (s *Plugins) CreateDegraphqlPlugin(ctx context.Context, request *shared.DegraphqlPluginInput, opts ...operations.Option) (*operations.CreateDegraphqlPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-degraphql-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2617,6 +2689,10 @@ func (s *Plugins) CreateDegraphqlPlugin(ctx context.Context, request *shared.Cre
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2710,12 +2786,12 @@ func (s *Plugins) CreateDegraphqlPlugin(ctx context.Context, request *shared.Cre
 
 // CreateExittransformerPlugin - Create a ExitTransformer plugin
 // Create a ExitTransformer plugin
-func (s *Plugins) CreateExittransformerPlugin(ctx context.Context, request *shared.CreateExitTransformerPlugin, opts ...operations.Option) (*operations.CreateExittransformerPluginResponse, error) {
+func (s *Plugins) CreateExittransformerPlugin(ctx context.Context, request *shared.ExitTransformerPluginInput, opts ...operations.Option) (*operations.CreateExittransformerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-exittransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2758,6 +2834,10 @@ func (s *Plugins) CreateExittransformerPlugin(ctx context.Context, request *shar
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2851,12 +2931,12 @@ func (s *Plugins) CreateExittransformerPlugin(ctx context.Context, request *shar
 
 // CreateFilelogPlugin - Create a FileLog plugin
 // Create a FileLog plugin
-func (s *Plugins) CreateFilelogPlugin(ctx context.Context, request *shared.CreateFileLogPlugin, opts ...operations.Option) (*operations.CreateFilelogPluginResponse, error) {
+func (s *Plugins) CreateFilelogPlugin(ctx context.Context, request *shared.FileLogPluginInput, opts ...operations.Option) (*operations.CreateFilelogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-filelog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -2899,6 +2979,10 @@ func (s *Plugins) CreateFilelogPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -2992,12 +3076,12 @@ func (s *Plugins) CreateFilelogPlugin(ctx context.Context, request *shared.Creat
 
 // CreateForwardproxyPlugin - Create a ForwardProxy plugin
 // Create a ForwardProxy plugin
-func (s *Plugins) CreateForwardproxyPlugin(ctx context.Context, request *shared.CreateForwardProxyPlugin, opts ...operations.Option) (*operations.CreateForwardproxyPluginResponse, error) {
+func (s *Plugins) CreateForwardproxyPlugin(ctx context.Context, request *shared.ForwardProxyPluginInput, opts ...operations.Option) (*operations.CreateForwardproxyPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-forwardproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3040,6 +3124,10 @@ func (s *Plugins) CreateForwardproxyPlugin(ctx context.Context, request *shared.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3133,12 +3221,12 @@ func (s *Plugins) CreateForwardproxyPlugin(ctx context.Context, request *shared.
 
 // CreateGraphqlproxycacheadvancedPlugin - Create a GraphqlProxyCacheAdvanced plugin
 // Create a GraphqlProxyCacheAdvanced plugin
-func (s *Plugins) CreateGraphqlproxycacheadvancedPlugin(ctx context.Context, request *shared.CreateGraphqlProxyCacheAdvancedPlugin, opts ...operations.Option) (*operations.CreateGraphqlproxycacheadvancedPluginResponse, error) {
+func (s *Plugins) CreateGraphqlproxycacheadvancedPlugin(ctx context.Context, request *shared.GraphqlProxyCacheAdvancedPluginInput, opts ...operations.Option) (*operations.CreateGraphqlproxycacheadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-graphqlproxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3181,6 +3269,10 @@ func (s *Plugins) CreateGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3274,12 +3366,12 @@ func (s *Plugins) CreateGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 
 // CreateGraphqlratelimitingadvancedPlugin - Create a GraphqlRateLimitingAdvanced plugin
 // Create a GraphqlRateLimitingAdvanced plugin
-func (s *Plugins) CreateGraphqlratelimitingadvancedPlugin(ctx context.Context, request *shared.CreateGraphqlRateLimitingAdvancedPlugin, opts ...operations.Option) (*operations.CreateGraphqlratelimitingadvancedPluginResponse, error) {
+func (s *Plugins) CreateGraphqlratelimitingadvancedPlugin(ctx context.Context, request *shared.GraphqlRateLimitingAdvancedPluginInput, opts ...operations.Option) (*operations.CreateGraphqlratelimitingadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-graphqlratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3322,6 +3414,10 @@ func (s *Plugins) CreateGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3415,12 +3511,12 @@ func (s *Plugins) CreateGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 
 // CreateGrpcgatewayPlugin - Create a GrpcGateway plugin
 // Create a GrpcGateway plugin
-func (s *Plugins) CreateGrpcgatewayPlugin(ctx context.Context, request *shared.CreateGrpcGatewayPlugin, opts ...operations.Option) (*operations.CreateGrpcgatewayPluginResponse, error) {
+func (s *Plugins) CreateGrpcgatewayPlugin(ctx context.Context, request *shared.GrpcGatewayPluginInput, opts ...operations.Option) (*operations.CreateGrpcgatewayPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-grpcgateway-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3463,6 +3559,10 @@ func (s *Plugins) CreateGrpcgatewayPlugin(ctx context.Context, request *shared.C
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3556,12 +3656,12 @@ func (s *Plugins) CreateGrpcgatewayPlugin(ctx context.Context, request *shared.C
 
 // CreateGrpcwebPlugin - Create a GrpcWeb plugin
 // Create a GrpcWeb plugin
-func (s *Plugins) CreateGrpcwebPlugin(ctx context.Context, request *shared.CreateGrpcWebPlugin, opts ...operations.Option) (*operations.CreateGrpcwebPluginResponse, error) {
+func (s *Plugins) CreateGrpcwebPlugin(ctx context.Context, request *shared.GrpcWebPluginInput, opts ...operations.Option) (*operations.CreateGrpcwebPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-grpcweb-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3604,6 +3704,10 @@ func (s *Plugins) CreateGrpcwebPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3697,12 +3801,12 @@ func (s *Plugins) CreateGrpcwebPlugin(ctx context.Context, request *shared.Creat
 
 // CreateHmacauthPlugin - Create a HmacAuth plugin
 // Create a HmacAuth plugin
-func (s *Plugins) CreateHmacauthPlugin(ctx context.Context, request *shared.CreateHmacAuthPlugin, opts ...operations.Option) (*operations.CreateHmacauthPluginResponse, error) {
+func (s *Plugins) CreateHmacauthPlugin(ctx context.Context, request *shared.HmacAuthPluginInput, opts ...operations.Option) (*operations.CreateHmacauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-hmacauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3745,6 +3849,10 @@ func (s *Plugins) CreateHmacauthPlugin(ctx context.Context, request *shared.Crea
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3838,12 +3946,12 @@ func (s *Plugins) CreateHmacauthPlugin(ctx context.Context, request *shared.Crea
 
 // CreateHttplogPlugin - Create a HttpLog plugin
 // Create a HttpLog plugin
-func (s *Plugins) CreateHttplogPlugin(ctx context.Context, request *shared.CreateHTTPLogPlugin, opts ...operations.Option) (*operations.CreateHttplogPluginResponse, error) {
+func (s *Plugins) CreateHttplogPlugin(ctx context.Context, request *shared.HTTPLogPluginInput, opts ...operations.Option) (*operations.CreateHttplogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-httplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -3886,6 +3994,10 @@ func (s *Plugins) CreateHttplogPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -3979,12 +4091,12 @@ func (s *Plugins) CreateHttplogPlugin(ctx context.Context, request *shared.Creat
 
 // CreateIprestrictionPlugin - Create a IpRestriction plugin
 // Create a IpRestriction plugin
-func (s *Plugins) CreateIprestrictionPlugin(ctx context.Context, request *shared.CreateIPRestrictionPlugin, opts ...operations.Option) (*operations.CreateIprestrictionPluginResponse, error) {
+func (s *Plugins) CreateIprestrictionPlugin(ctx context.Context, request *shared.IPRestrictionPluginInput, opts ...operations.Option) (*operations.CreateIprestrictionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-iprestriction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4027,6 +4139,10 @@ func (s *Plugins) CreateIprestrictionPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4120,12 +4236,12 @@ func (s *Plugins) CreateIprestrictionPlugin(ctx context.Context, request *shared
 
 // CreateJqPlugin - Create a Jq plugin
 // Create a Jq plugin
-func (s *Plugins) CreateJqPlugin(ctx context.Context, request *shared.CreateJqPlugin, opts ...operations.Option) (*operations.CreateJqPluginResponse, error) {
+func (s *Plugins) CreateJqPlugin(ctx context.Context, request *shared.JqPluginInput, opts ...operations.Option) (*operations.CreateJqPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-jq-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4168,6 +4284,10 @@ func (s *Plugins) CreateJqPlugin(ctx context.Context, request *shared.CreateJqPl
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4261,12 +4381,12 @@ func (s *Plugins) CreateJqPlugin(ctx context.Context, request *shared.CreateJqPl
 
 // CreateJwedecryptPlugin - Create a JweDecrypt plugin
 // Create a JweDecrypt plugin
-func (s *Plugins) CreateJwedecryptPlugin(ctx context.Context, request *shared.CreateJweDecryptPlugin, opts ...operations.Option) (*operations.CreateJwedecryptPluginResponse, error) {
+func (s *Plugins) CreateJwedecryptPlugin(ctx context.Context, request *shared.JweDecryptPluginInput, opts ...operations.Option) (*operations.CreateJwedecryptPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-jwedecrypt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4309,6 +4429,10 @@ func (s *Plugins) CreateJwedecryptPlugin(ctx context.Context, request *shared.Cr
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4402,12 +4526,12 @@ func (s *Plugins) CreateJwedecryptPlugin(ctx context.Context, request *shared.Cr
 
 // CreateJwtPlugin - Create a Jwt plugin
 // Create a Jwt plugin
-func (s *Plugins) CreateJwtPlugin(ctx context.Context, request *shared.CreateJwtPlugin, opts ...operations.Option) (*operations.CreateJwtPluginResponse, error) {
+func (s *Plugins) CreateJwtPlugin(ctx context.Context, request *shared.JwtPluginInput, opts ...operations.Option) (*operations.CreateJwtPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-jwt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4450,6 +4574,10 @@ func (s *Plugins) CreateJwtPlugin(ctx context.Context, request *shared.CreateJwt
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4543,12 +4671,12 @@ func (s *Plugins) CreateJwtPlugin(ctx context.Context, request *shared.CreateJwt
 
 // CreateJwtsignerPlugin - Create a JwtSigner plugin
 // Create a JwtSigner plugin
-func (s *Plugins) CreateJwtsignerPlugin(ctx context.Context, request *shared.CreateJwtSignerPlugin, opts ...operations.Option) (*operations.CreateJwtsignerPluginResponse, error) {
+func (s *Plugins) CreateJwtsignerPlugin(ctx context.Context, request *shared.JwtSignerPluginInput, opts ...operations.Option) (*operations.CreateJwtsignerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-jwtsigner-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4591,6 +4719,10 @@ func (s *Plugins) CreateJwtsignerPlugin(ctx context.Context, request *shared.Cre
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4684,12 +4816,12 @@ func (s *Plugins) CreateJwtsignerPlugin(ctx context.Context, request *shared.Cre
 
 // CreateKafkalogPlugin - Create a KafkaLog plugin
 // Create a KafkaLog plugin
-func (s *Plugins) CreateKafkalogPlugin(ctx context.Context, request *shared.CreateKafkaLogPlugin, opts ...operations.Option) (*operations.CreateKafkalogPluginResponse, error) {
+func (s *Plugins) CreateKafkalogPlugin(ctx context.Context, request *shared.KafkaLogPluginInput, opts ...operations.Option) (*operations.CreateKafkalogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-kafkalog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4732,6 +4864,10 @@ func (s *Plugins) CreateKafkalogPlugin(ctx context.Context, request *shared.Crea
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4825,12 +4961,12 @@ func (s *Plugins) CreateKafkalogPlugin(ctx context.Context, request *shared.Crea
 
 // CreateKafkaupstreamPlugin - Create a KafkaUpstream plugin
 // Create a KafkaUpstream plugin
-func (s *Plugins) CreateKafkaupstreamPlugin(ctx context.Context, request *shared.CreateKafkaUpstreamPlugin, opts ...operations.Option) (*operations.CreateKafkaupstreamPluginResponse, error) {
+func (s *Plugins) CreateKafkaupstreamPlugin(ctx context.Context, request *shared.KafkaUpstreamPluginInput, opts ...operations.Option) (*operations.CreateKafkaupstreamPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-kafkaupstream-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -4873,6 +5009,10 @@ func (s *Plugins) CreateKafkaupstreamPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -4966,12 +5106,12 @@ func (s *Plugins) CreateKafkaupstreamPlugin(ctx context.Context, request *shared
 
 // CreateKeyauthPlugin - Create a KeyAuth plugin
 // Create a KeyAuth plugin
-func (s *Plugins) CreateKeyauthPlugin(ctx context.Context, request *shared.CreateKeyAuthPlugin, opts ...operations.Option) (*operations.CreateKeyauthPluginResponse, error) {
+func (s *Plugins) CreateKeyauthPlugin(ctx context.Context, request *shared.KeyAuthPluginInput, opts ...operations.Option) (*operations.CreateKeyauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-keyauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5014,6 +5154,10 @@ func (s *Plugins) CreateKeyauthPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5107,12 +5251,12 @@ func (s *Plugins) CreateKeyauthPlugin(ctx context.Context, request *shared.Creat
 
 // CreateKeyauthencPlugin - Create a KeyAuthEnc plugin
 // Create a KeyAuthEnc plugin
-func (s *Plugins) CreateKeyauthencPlugin(ctx context.Context, request *shared.CreateKeyAuthEncPlugin, opts ...operations.Option) (*operations.CreateKeyauthencPluginResponse, error) {
+func (s *Plugins) CreateKeyauthencPlugin(ctx context.Context, request *shared.KeyAuthEncPluginInput, opts ...operations.Option) (*operations.CreateKeyauthencPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-keyauthenc-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5155,6 +5299,10 @@ func (s *Plugins) CreateKeyauthencPlugin(ctx context.Context, request *shared.Cr
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5248,12 +5396,12 @@ func (s *Plugins) CreateKeyauthencPlugin(ctx context.Context, request *shared.Cr
 
 // CreateKonnectapplicationauthPlugin - Create a KonnectApplicationAuth plugin
 // Create a KonnectApplicationAuth plugin
-func (s *Plugins) CreateKonnectapplicationauthPlugin(ctx context.Context, request *shared.CreateKonnectApplicationAuthPlugin, opts ...operations.Option) (*operations.CreateKonnectapplicationauthPluginResponse, error) {
+func (s *Plugins) CreateKonnectapplicationauthPlugin(ctx context.Context, request *shared.KonnectApplicationAuthPluginInput, opts ...operations.Option) (*operations.CreateKonnectapplicationauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-konnectapplicationauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5296,6 +5444,10 @@ func (s *Plugins) CreateKonnectapplicationauthPlugin(ctx context.Context, reques
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5389,12 +5541,12 @@ func (s *Plugins) CreateKonnectapplicationauthPlugin(ctx context.Context, reques
 
 // CreateLdapauthPlugin - Create a LdapAuth plugin
 // Create a LdapAuth plugin
-func (s *Plugins) CreateLdapauthPlugin(ctx context.Context, request *shared.CreateLdapAuthPlugin, opts ...operations.Option) (*operations.CreateLdapauthPluginResponse, error) {
+func (s *Plugins) CreateLdapauthPlugin(ctx context.Context, request *shared.LdapAuthPluginInput, opts ...operations.Option) (*operations.CreateLdapauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-ldapauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5437,6 +5589,10 @@ func (s *Plugins) CreateLdapauthPlugin(ctx context.Context, request *shared.Crea
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5530,12 +5686,12 @@ func (s *Plugins) CreateLdapauthPlugin(ctx context.Context, request *shared.Crea
 
 // CreateLdapauthadvancedPlugin - Create a LdapAuthAdvanced plugin
 // Create a LdapAuthAdvanced plugin
-func (s *Plugins) CreateLdapauthadvancedPlugin(ctx context.Context, request *shared.CreateLdapAuthAdvancedPlugin, opts ...operations.Option) (*operations.CreateLdapauthadvancedPluginResponse, error) {
+func (s *Plugins) CreateLdapauthadvancedPlugin(ctx context.Context, request *shared.LdapAuthAdvancedPluginInput, opts ...operations.Option) (*operations.CreateLdapauthadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-ldapauthadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5578,6 +5734,10 @@ func (s *Plugins) CreateLdapauthadvancedPlugin(ctx context.Context, request *sha
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5671,12 +5831,12 @@ func (s *Plugins) CreateLdapauthadvancedPlugin(ctx context.Context, request *sha
 
 // CreateLogglyPlugin - Create a Loggly plugin
 // Create a Loggly plugin
-func (s *Plugins) CreateLogglyPlugin(ctx context.Context, request *shared.CreateLogglyPlugin, opts ...operations.Option) (*operations.CreateLogglyPluginResponse, error) {
+func (s *Plugins) CreateLogglyPlugin(ctx context.Context, request *shared.LogglyPluginInput, opts ...operations.Option) (*operations.CreateLogglyPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-loggly-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5719,6 +5879,10 @@ func (s *Plugins) CreateLogglyPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5812,12 +5976,12 @@ func (s *Plugins) CreateLogglyPlugin(ctx context.Context, request *shared.Create
 
 // CreateMockingPlugin - Create a Mocking plugin
 // Create a Mocking plugin
-func (s *Plugins) CreateMockingPlugin(ctx context.Context, request *shared.CreateMockingPlugin, opts ...operations.Option) (*operations.CreateMockingPluginResponse, error) {
+func (s *Plugins) CreateMockingPlugin(ctx context.Context, request *shared.MockingPluginInput, opts ...operations.Option) (*operations.CreateMockingPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-mocking-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -5860,6 +6024,10 @@ func (s *Plugins) CreateMockingPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -5953,12 +6121,12 @@ func (s *Plugins) CreateMockingPlugin(ctx context.Context, request *shared.Creat
 
 // CreateMtlsauthPlugin - Create a MtlsAuth plugin
 // Create a MtlsAuth plugin
-func (s *Plugins) CreateMtlsauthPlugin(ctx context.Context, request *shared.CreateMtlsAuthPlugin, opts ...operations.Option) (*operations.CreateMtlsauthPluginResponse, error) {
+func (s *Plugins) CreateMtlsauthPlugin(ctx context.Context, request *shared.MtlsAuthPluginInput, opts ...operations.Option) (*operations.CreateMtlsauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-mtlsauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6001,6 +6169,10 @@ func (s *Plugins) CreateMtlsauthPlugin(ctx context.Context, request *shared.Crea
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6094,12 +6266,12 @@ func (s *Plugins) CreateMtlsauthPlugin(ctx context.Context, request *shared.Crea
 
 // CreateOasvalidationPlugin - Create a OasValidation plugin
 // Create a OasValidation plugin
-func (s *Plugins) CreateOasvalidationPlugin(ctx context.Context, request *shared.CreateOasValidationPlugin, opts ...operations.Option) (*operations.CreateOasvalidationPluginResponse, error) {
+func (s *Plugins) CreateOasvalidationPlugin(ctx context.Context, request *shared.OasValidationPluginInput, opts ...operations.Option) (*operations.CreateOasvalidationPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-oasvalidation-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6142,6 +6314,10 @@ func (s *Plugins) CreateOasvalidationPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6235,12 +6411,12 @@ func (s *Plugins) CreateOasvalidationPlugin(ctx context.Context, request *shared
 
 // CreateOauth2Plugin - Create a Oauth2 plugin
 // Create a Oauth2 plugin
-func (s *Plugins) CreateOauth2Plugin(ctx context.Context, request *shared.CreateOauth2Plugin, opts ...operations.Option) (*operations.CreateOauth2PluginResponse, error) {
+func (s *Plugins) CreateOauth2Plugin(ctx context.Context, request *shared.Oauth2PluginInput, opts ...operations.Option) (*operations.CreateOauth2PluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-oauth2-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6283,6 +6459,10 @@ func (s *Plugins) CreateOauth2Plugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6376,12 +6556,12 @@ func (s *Plugins) CreateOauth2Plugin(ctx context.Context, request *shared.Create
 
 // CreateOauth2introspectionPlugin - Create a Oauth2Introspection plugin
 // Create a Oauth2Introspection plugin
-func (s *Plugins) CreateOauth2introspectionPlugin(ctx context.Context, request *shared.CreateOauth2IntrospectionPlugin, opts ...operations.Option) (*operations.CreateOauth2introspectionPluginResponse, error) {
+func (s *Plugins) CreateOauth2introspectionPlugin(ctx context.Context, request *shared.Oauth2IntrospectionPluginInput, opts ...operations.Option) (*operations.CreateOauth2introspectionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-oauth2introspection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6424,6 +6604,10 @@ func (s *Plugins) CreateOauth2introspectionPlugin(ctx context.Context, request *
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6517,12 +6701,12 @@ func (s *Plugins) CreateOauth2introspectionPlugin(ctx context.Context, request *
 
 // CreateOpaPlugin - Create a Opa plugin
 // Create a Opa plugin
-func (s *Plugins) CreateOpaPlugin(ctx context.Context, request *shared.CreateOpaPlugin, opts ...operations.Option) (*operations.CreateOpaPluginResponse, error) {
+func (s *Plugins) CreateOpaPlugin(ctx context.Context, request *shared.OpaPluginInput, opts ...operations.Option) (*operations.CreateOpaPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-opa-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6565,6 +6749,10 @@ func (s *Plugins) CreateOpaPlugin(ctx context.Context, request *shared.CreateOpa
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6658,12 +6846,12 @@ func (s *Plugins) CreateOpaPlugin(ctx context.Context, request *shared.CreateOpa
 
 // CreateOpenidconnectPlugin - Create a OpenidConnect plugin
 // Create a OpenidConnect plugin
-func (s *Plugins) CreateOpenidconnectPlugin(ctx context.Context, request *shared.CreateOpenidConnectPlugin, opts ...operations.Option) (*operations.CreateOpenidconnectPluginResponse, error) {
+func (s *Plugins) CreateOpenidconnectPlugin(ctx context.Context, request *shared.OpenidConnectPluginInput, opts ...operations.Option) (*operations.CreateOpenidconnectPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-openidconnect-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6706,6 +6894,10 @@ func (s *Plugins) CreateOpenidconnectPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6799,12 +6991,12 @@ func (s *Plugins) CreateOpenidconnectPlugin(ctx context.Context, request *shared
 
 // CreateOpentelemetryPlugin - Create a Opentelemetry plugin
 // Create a Opentelemetry plugin
-func (s *Plugins) CreateOpentelemetryPlugin(ctx context.Context, request *shared.CreateOpentelemetryPlugin, opts ...operations.Option) (*operations.CreateOpentelemetryPluginResponse, error) {
+func (s *Plugins) CreateOpentelemetryPlugin(ctx context.Context, request *shared.OpentelemetryPluginInput, opts ...operations.Option) (*operations.CreateOpentelemetryPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-opentelemetry-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6847,6 +7039,10 @@ func (s *Plugins) CreateOpentelemetryPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -6940,12 +7136,12 @@ func (s *Plugins) CreateOpentelemetryPlugin(ctx context.Context, request *shared
 
 // CreatePostfunctionPlugin - Create a PostFunction plugin
 // Create a PostFunction plugin
-func (s *Plugins) CreatePostfunctionPlugin(ctx context.Context, request *shared.CreatePostFunctionPlugin, opts ...operations.Option) (*operations.CreatePostfunctionPluginResponse, error) {
+func (s *Plugins) CreatePostfunctionPlugin(ctx context.Context, request *shared.PostFunctionPluginInput, opts ...operations.Option) (*operations.CreatePostfunctionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-postfunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -6988,6 +7184,10 @@ func (s *Plugins) CreatePostfunctionPlugin(ctx context.Context, request *shared.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7081,12 +7281,12 @@ func (s *Plugins) CreatePostfunctionPlugin(ctx context.Context, request *shared.
 
 // CreatePrefunctionPlugin - Create a PreFunction plugin
 // Create a PreFunction plugin
-func (s *Plugins) CreatePrefunctionPlugin(ctx context.Context, request *shared.CreatePreFunctionPlugin, opts ...operations.Option) (*operations.CreatePrefunctionPluginResponse, error) {
+func (s *Plugins) CreatePrefunctionPlugin(ctx context.Context, request *shared.PreFunctionPluginInput, opts ...operations.Option) (*operations.CreatePrefunctionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-prefunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7129,6 +7329,10 @@ func (s *Plugins) CreatePrefunctionPlugin(ctx context.Context, request *shared.C
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7222,12 +7426,12 @@ func (s *Plugins) CreatePrefunctionPlugin(ctx context.Context, request *shared.C
 
 // CreatePrometheusPlugin - Create a Prometheus plugin
 // Create a Prometheus plugin
-func (s *Plugins) CreatePrometheusPlugin(ctx context.Context, request *shared.CreatePrometheusPlugin, opts ...operations.Option) (*operations.CreatePrometheusPluginResponse, error) {
+func (s *Plugins) CreatePrometheusPlugin(ctx context.Context, request *shared.PrometheusPluginInput, opts ...operations.Option) (*operations.CreatePrometheusPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-prometheus-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7270,6 +7474,10 @@ func (s *Plugins) CreatePrometheusPlugin(ctx context.Context, request *shared.Cr
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7363,12 +7571,12 @@ func (s *Plugins) CreatePrometheusPlugin(ctx context.Context, request *shared.Cr
 
 // CreateProxycachePlugin - Create a ProxyCache plugin
 // Create a ProxyCache plugin
-func (s *Plugins) CreateProxycachePlugin(ctx context.Context, request *shared.CreateProxyCachePlugin, opts ...operations.Option) (*operations.CreateProxycachePluginResponse, error) {
+func (s *Plugins) CreateProxycachePlugin(ctx context.Context, request *shared.ProxyCachePluginInput, opts ...operations.Option) (*operations.CreateProxycachePluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-proxycache-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7411,6 +7619,10 @@ func (s *Plugins) CreateProxycachePlugin(ctx context.Context, request *shared.Cr
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7504,12 +7716,12 @@ func (s *Plugins) CreateProxycachePlugin(ctx context.Context, request *shared.Cr
 
 // CreateProxycacheadvancedPlugin - Create a ProxyCacheAdvanced plugin
 // Create a ProxyCacheAdvanced plugin
-func (s *Plugins) CreateProxycacheadvancedPlugin(ctx context.Context, request *shared.CreateProxyCacheAdvancedPlugin, opts ...operations.Option) (*operations.CreateProxycacheadvancedPluginResponse, error) {
+func (s *Plugins) CreateProxycacheadvancedPlugin(ctx context.Context, request *shared.ProxyCacheAdvancedPluginInput, opts ...operations.Option) (*operations.CreateProxycacheadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-proxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7552,6 +7764,10 @@ func (s *Plugins) CreateProxycacheadvancedPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7645,12 +7861,12 @@ func (s *Plugins) CreateProxycacheadvancedPlugin(ctx context.Context, request *s
 
 // CreateRatelimitingPlugin - Create a RateLimiting plugin
 // Create a RateLimiting plugin
-func (s *Plugins) CreateRatelimitingPlugin(ctx context.Context, request *shared.CreateRateLimitingPlugin, opts ...operations.Option) (*operations.CreateRatelimitingPluginResponse, error) {
+func (s *Plugins) CreateRatelimitingPlugin(ctx context.Context, request *shared.RateLimitingPluginInput, opts ...operations.Option) (*operations.CreateRatelimitingPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-ratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7693,6 +7909,10 @@ func (s *Plugins) CreateRatelimitingPlugin(ctx context.Context, request *shared.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7786,12 +8006,12 @@ func (s *Plugins) CreateRatelimitingPlugin(ctx context.Context, request *shared.
 
 // CreateRatelimitingadvancedPlugin - Create a RateLimitingAdvanced plugin
 // Create a RateLimitingAdvanced plugin
-func (s *Plugins) CreateRatelimitingadvancedPlugin(ctx context.Context, request *shared.CreateRateLimitingAdvancedPlugin, opts ...operations.Option) (*operations.CreateRatelimitingadvancedPluginResponse, error) {
+func (s *Plugins) CreateRatelimitingadvancedPlugin(ctx context.Context, request *shared.RateLimitingAdvancedPluginInput, opts ...operations.Option) (*operations.CreateRatelimitingadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-ratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7834,6 +8054,10 @@ func (s *Plugins) CreateRatelimitingadvancedPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -7927,12 +8151,12 @@ func (s *Plugins) CreateRatelimitingadvancedPlugin(ctx context.Context, request 
 
 // CreateRequestsizelimitingPlugin - Create a RequestSizeLimiting plugin
 // Create a RequestSizeLimiting plugin
-func (s *Plugins) CreateRequestsizelimitingPlugin(ctx context.Context, request *shared.CreateRequestSizeLimitingPlugin, opts ...operations.Option) (*operations.CreateRequestsizelimitingPluginResponse, error) {
+func (s *Plugins) CreateRequestsizelimitingPlugin(ctx context.Context, request *shared.RequestSizeLimitingPluginInput, opts ...operations.Option) (*operations.CreateRequestsizelimitingPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-requestsizelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -7975,6 +8199,10 @@ func (s *Plugins) CreateRequestsizelimitingPlugin(ctx context.Context, request *
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8068,12 +8296,12 @@ func (s *Plugins) CreateRequestsizelimitingPlugin(ctx context.Context, request *
 
 // CreateRequestterminationPlugin - Create a RequestTermination plugin
 // Create a RequestTermination plugin
-func (s *Plugins) CreateRequestterminationPlugin(ctx context.Context, request *shared.CreateRequestTerminationPlugin, opts ...operations.Option) (*operations.CreateRequestterminationPluginResponse, error) {
+func (s *Plugins) CreateRequestterminationPlugin(ctx context.Context, request *shared.RequestTerminationPluginInput, opts ...operations.Option) (*operations.CreateRequestterminationPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-requesttermination-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8116,6 +8344,10 @@ func (s *Plugins) CreateRequestterminationPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8209,12 +8441,12 @@ func (s *Plugins) CreateRequestterminationPlugin(ctx context.Context, request *s
 
 // CreateRequesttransformerPlugin - Create a RequestTransformer plugin
 // Create a RequestTransformer plugin
-func (s *Plugins) CreateRequesttransformerPlugin(ctx context.Context, request *shared.CreateRequestTransformerPlugin, opts ...operations.Option) (*operations.CreateRequesttransformerPluginResponse, error) {
+func (s *Plugins) CreateRequesttransformerPlugin(ctx context.Context, request *shared.RequestTransformerPluginInput, opts ...operations.Option) (*operations.CreateRequesttransformerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-requesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8257,6 +8489,10 @@ func (s *Plugins) CreateRequesttransformerPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8350,12 +8586,12 @@ func (s *Plugins) CreateRequesttransformerPlugin(ctx context.Context, request *s
 
 // CreateRequesttransformeradvancedPlugin - Create a RequestTransformerAdvanced plugin
 // Create a RequestTransformerAdvanced plugin
-func (s *Plugins) CreateRequesttransformeradvancedPlugin(ctx context.Context, request *shared.CreateRequestTransformerAdvancedPlugin, opts ...operations.Option) (*operations.CreateRequesttransformeradvancedPluginResponse, error) {
+func (s *Plugins) CreateRequesttransformeradvancedPlugin(ctx context.Context, request *shared.RequestTransformerAdvancedPluginInput, opts ...operations.Option) (*operations.CreateRequesttransformeradvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-requesttransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8398,6 +8634,10 @@ func (s *Plugins) CreateRequesttransformeradvancedPlugin(ctx context.Context, re
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8491,12 +8731,12 @@ func (s *Plugins) CreateRequesttransformeradvancedPlugin(ctx context.Context, re
 
 // CreateRequestvalidatorPlugin - Create a RequestValidator plugin
 // Create a RequestValidator plugin
-func (s *Plugins) CreateRequestvalidatorPlugin(ctx context.Context, request *shared.CreateRequestValidatorPlugin, opts ...operations.Option) (*operations.CreateRequestvalidatorPluginResponse, error) {
+func (s *Plugins) CreateRequestvalidatorPlugin(ctx context.Context, request *shared.RequestValidatorPluginInput, opts ...operations.Option) (*operations.CreateRequestvalidatorPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-requestvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8539,6 +8779,10 @@ func (s *Plugins) CreateRequestvalidatorPlugin(ctx context.Context, request *sha
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8632,12 +8876,12 @@ func (s *Plugins) CreateRequestvalidatorPlugin(ctx context.Context, request *sha
 
 // CreateResponseratelimitingPlugin - Create a ResponseRatelimiting plugin
 // Create a ResponseRatelimiting plugin
-func (s *Plugins) CreateResponseratelimitingPlugin(ctx context.Context, request *shared.CreateResponseRatelimitingPlugin, opts ...operations.Option) (*operations.CreateResponseratelimitingPluginResponse, error) {
+func (s *Plugins) CreateResponseratelimitingPlugin(ctx context.Context, request *shared.ResponseRatelimitingPluginInput, opts ...operations.Option) (*operations.CreateResponseratelimitingPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-responseratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8680,6 +8924,10 @@ func (s *Plugins) CreateResponseratelimitingPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8773,12 +9021,12 @@ func (s *Plugins) CreateResponseratelimitingPlugin(ctx context.Context, request 
 
 // CreateResponsetransformerPlugin - Create a ResponseTransformer plugin
 // Create a ResponseTransformer plugin
-func (s *Plugins) CreateResponsetransformerPlugin(ctx context.Context, request *shared.CreateResponseTransformerPlugin, opts ...operations.Option) (*operations.CreateResponsetransformerPluginResponse, error) {
+func (s *Plugins) CreateResponsetransformerPlugin(ctx context.Context, request *shared.ResponseTransformerPluginInput, opts ...operations.Option) (*operations.CreateResponsetransformerPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-responsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8821,6 +9069,10 @@ func (s *Plugins) CreateResponsetransformerPlugin(ctx context.Context, request *
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -8914,12 +9166,12 @@ func (s *Plugins) CreateResponsetransformerPlugin(ctx context.Context, request *
 
 // CreateResponsetransformeradvancedPlugin - Create a ResponseTransformerAdvanced plugin
 // Create a ResponseTransformerAdvanced plugin
-func (s *Plugins) CreateResponsetransformeradvancedPlugin(ctx context.Context, request *shared.CreateResponseTransformerAdvancedPlugin, opts ...operations.Option) (*operations.CreateResponsetransformeradvancedPluginResponse, error) {
+func (s *Plugins) CreateResponsetransformeradvancedPlugin(ctx context.Context, request *shared.ResponseTransformerAdvancedPluginInput, opts ...operations.Option) (*operations.CreateResponsetransformeradvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-responsetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -8962,6 +9214,10 @@ func (s *Plugins) CreateResponsetransformeradvancedPlugin(ctx context.Context, r
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9055,12 +9311,12 @@ func (s *Plugins) CreateResponsetransformeradvancedPlugin(ctx context.Context, r
 
 // CreateRoutebyheaderPlugin - Create a RouteByHeader plugin
 // Create a RouteByHeader plugin
-func (s *Plugins) CreateRoutebyheaderPlugin(ctx context.Context, request *shared.CreateRouteByHeaderPlugin, opts ...operations.Option) (*operations.CreateRoutebyheaderPluginResponse, error) {
+func (s *Plugins) CreateRoutebyheaderPlugin(ctx context.Context, request *shared.RouteByHeaderPluginInput, opts ...operations.Option) (*operations.CreateRoutebyheaderPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-routebyheader-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9103,6 +9359,10 @@ func (s *Plugins) CreateRoutebyheaderPlugin(ctx context.Context, request *shared
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9196,12 +9456,12 @@ func (s *Plugins) CreateRoutebyheaderPlugin(ctx context.Context, request *shared
 
 // CreateRoutetransformeradvancedPlugin - Create a RouteTransformerAdvanced plugin
 // Create a RouteTransformerAdvanced plugin
-func (s *Plugins) CreateRoutetransformeradvancedPlugin(ctx context.Context, request *shared.CreateRouteTransformerAdvancedPlugin, opts ...operations.Option) (*operations.CreateRoutetransformeradvancedPluginResponse, error) {
+func (s *Plugins) CreateRoutetransformeradvancedPlugin(ctx context.Context, request *shared.RouteTransformerAdvancedPluginInput, opts ...operations.Option) (*operations.CreateRoutetransformeradvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-routetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9244,6 +9504,10 @@ func (s *Plugins) CreateRoutetransformeradvancedPlugin(ctx context.Context, requ
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9337,12 +9601,12 @@ func (s *Plugins) CreateRoutetransformeradvancedPlugin(ctx context.Context, requ
 
 // CreateSamlPlugin - Create a Saml plugin
 // Create a Saml plugin
-func (s *Plugins) CreateSamlPlugin(ctx context.Context, request *shared.CreateSamlPlugin, opts ...operations.Option) (*operations.CreateSamlPluginResponse, error) {
+func (s *Plugins) CreateSamlPlugin(ctx context.Context, request *shared.SamlPluginInput, opts ...operations.Option) (*operations.CreateSamlPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-saml-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9385,6 +9649,10 @@ func (s *Plugins) CreateSamlPlugin(ctx context.Context, request *shared.CreateSa
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9478,12 +9746,12 @@ func (s *Plugins) CreateSamlPlugin(ctx context.Context, request *shared.CreateSa
 
 // CreateSessionPlugin - Create a Session plugin
 // Create a Session plugin
-func (s *Plugins) CreateSessionPlugin(ctx context.Context, request *shared.CreateSessionPlugin, opts ...operations.Option) (*operations.CreateSessionPluginResponse, error) {
+func (s *Plugins) CreateSessionPlugin(ctx context.Context, request *shared.SessionPluginInput, opts ...operations.Option) (*operations.CreateSessionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-session-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9526,6 +9794,10 @@ func (s *Plugins) CreateSessionPlugin(ctx context.Context, request *shared.Creat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9619,12 +9891,12 @@ func (s *Plugins) CreateSessionPlugin(ctx context.Context, request *shared.Creat
 
 // CreateStatsdPlugin - Create a Statsd plugin
 // Create a Statsd plugin
-func (s *Plugins) CreateStatsdPlugin(ctx context.Context, request *shared.CreateStatsdPlugin, opts ...operations.Option) (*operations.CreateStatsdPluginResponse, error) {
+func (s *Plugins) CreateStatsdPlugin(ctx context.Context, request *shared.StatsdPluginInput, opts ...operations.Option) (*operations.CreateStatsdPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-statsd-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9667,6 +9939,10 @@ func (s *Plugins) CreateStatsdPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9760,12 +10036,12 @@ func (s *Plugins) CreateStatsdPlugin(ctx context.Context, request *shared.Create
 
 // CreateStatsdadvancedPlugin - Create a StatsdAdvanced plugin
 // Create a StatsdAdvanced plugin
-func (s *Plugins) CreateStatsdadvancedPlugin(ctx context.Context, request *shared.CreateStatsdAdvancedPlugin, opts ...operations.Option) (*operations.CreateStatsdadvancedPluginResponse, error) {
+func (s *Plugins) CreateStatsdadvancedPlugin(ctx context.Context, request *shared.StatsdAdvancedPluginInput, opts ...operations.Option) (*operations.CreateStatsdadvancedPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-statsdadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9808,6 +10084,10 @@ func (s *Plugins) CreateStatsdadvancedPlugin(ctx context.Context, request *share
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -9901,12 +10181,12 @@ func (s *Plugins) CreateStatsdadvancedPlugin(ctx context.Context, request *share
 
 // CreateSyslogPlugin - Create a Syslog plugin
 // Create a Syslog plugin
-func (s *Plugins) CreateSyslogPlugin(ctx context.Context, request *shared.CreateSyslogPlugin, opts ...operations.Option) (*operations.CreateSyslogPluginResponse, error) {
+func (s *Plugins) CreateSyslogPlugin(ctx context.Context, request *shared.SyslogPluginInput, opts ...operations.Option) (*operations.CreateSyslogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-syslog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -9949,6 +10229,10 @@ func (s *Plugins) CreateSyslogPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10042,12 +10326,12 @@ func (s *Plugins) CreateSyslogPlugin(ctx context.Context, request *shared.Create
 
 // CreateTcplogPlugin - Create a TcpLog plugin
 // Create a TcpLog plugin
-func (s *Plugins) CreateTcplogPlugin(ctx context.Context, request *shared.CreateTCPLogPlugin, opts ...operations.Option) (*operations.CreateTcplogPluginResponse, error) {
+func (s *Plugins) CreateTcplogPlugin(ctx context.Context, request *shared.TCPLogPluginInput, opts ...operations.Option) (*operations.CreateTcplogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-tcplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10090,6 +10374,10 @@ func (s *Plugins) CreateTcplogPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10183,12 +10471,12 @@ func (s *Plugins) CreateTcplogPlugin(ctx context.Context, request *shared.Create
 
 // CreateTlshandshakemodifierPlugin - Create a TlsHandshakeModifier plugin
 // Create a TlsHandshakeModifier plugin
-func (s *Plugins) CreateTlshandshakemodifierPlugin(ctx context.Context, request *shared.CreateTLSHandshakeModifierPlugin, opts ...operations.Option) (*operations.CreateTlshandshakemodifierPluginResponse, error) {
+func (s *Plugins) CreateTlshandshakemodifierPlugin(ctx context.Context, request *shared.TLSHandshakeModifierPluginInput, opts ...operations.Option) (*operations.CreateTlshandshakemodifierPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-tlshandshakemodifier-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10231,6 +10519,10 @@ func (s *Plugins) CreateTlshandshakemodifierPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10324,12 +10616,12 @@ func (s *Plugins) CreateTlshandshakemodifierPlugin(ctx context.Context, request 
 
 // CreateTlsmetadataheadersPlugin - Create a TlsMetadataHeaders plugin
 // Create a TlsMetadataHeaders plugin
-func (s *Plugins) CreateTlsmetadataheadersPlugin(ctx context.Context, request *shared.CreateTLSMetadataHeadersPlugin, opts ...operations.Option) (*operations.CreateTlsmetadataheadersPluginResponse, error) {
+func (s *Plugins) CreateTlsmetadataheadersPlugin(ctx context.Context, request *shared.TLSMetadataHeadersPluginInput, opts ...operations.Option) (*operations.CreateTlsmetadataheadersPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-tlsmetadataheaders-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10372,6 +10664,10 @@ func (s *Plugins) CreateTlsmetadataheadersPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10465,12 +10761,12 @@ func (s *Plugins) CreateTlsmetadataheadersPlugin(ctx context.Context, request *s
 
 // CreateUdplogPlugin - Create a UdpLog plugin
 // Create a UdpLog plugin
-func (s *Plugins) CreateUdplogPlugin(ctx context.Context, request *shared.CreateUDPLogPlugin, opts ...operations.Option) (*operations.CreateUdplogPluginResponse, error) {
+func (s *Plugins) CreateUdplogPlugin(ctx context.Context, request *shared.UDPLogPluginInput, opts ...operations.Option) (*operations.CreateUdplogPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-udplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10513,6 +10809,10 @@ func (s *Plugins) CreateUdplogPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10606,12 +10906,12 @@ func (s *Plugins) CreateUdplogPlugin(ctx context.Context, request *shared.Create
 
 // CreateUpstreamtimeoutPlugin - Create a UpstreamTimeout plugin
 // Create a UpstreamTimeout plugin
-func (s *Plugins) CreateUpstreamtimeoutPlugin(ctx context.Context, request *shared.CreateUpstreamTimeoutPlugin, opts ...operations.Option) (*operations.CreateUpstreamtimeoutPluginResponse, error) {
+func (s *Plugins) CreateUpstreamtimeoutPlugin(ctx context.Context, request *shared.UpstreamTimeoutPluginInput, opts ...operations.Option) (*operations.CreateUpstreamtimeoutPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-upstreamtimeout-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10654,6 +10954,10 @@ func (s *Plugins) CreateUpstreamtimeoutPlugin(ctx context.Context, request *shar
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10747,12 +11051,12 @@ func (s *Plugins) CreateUpstreamtimeoutPlugin(ctx context.Context, request *shar
 
 // CreateVaultauthPlugin - Create a VaultAuth plugin
 // Create a VaultAuth plugin
-func (s *Plugins) CreateVaultauthPlugin(ctx context.Context, request *shared.CreateVaultAuthPlugin, opts ...operations.Option) (*operations.CreateVaultauthPluginResponse, error) {
+func (s *Plugins) CreateVaultauthPlugin(ctx context.Context, request *shared.VaultAuthPluginInput, opts ...operations.Option) (*operations.CreateVaultauthPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-vaultauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10795,6 +11099,10 @@ func (s *Plugins) CreateVaultauthPlugin(ctx context.Context, request *shared.Cre
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -10888,12 +11196,12 @@ func (s *Plugins) CreateVaultauthPlugin(ctx context.Context, request *shared.Cre
 
 // CreateWebsocketsizelimitPlugin - Create a WebsocketSizeLimit plugin
 // Create a WebsocketSizeLimit plugin
-func (s *Plugins) CreateWebsocketsizelimitPlugin(ctx context.Context, request *shared.CreateWebsocketSizeLimitPlugin, opts ...operations.Option) (*operations.CreateWebsocketsizelimitPluginResponse, error) {
+func (s *Plugins) CreateWebsocketsizelimitPlugin(ctx context.Context, request *shared.WebsocketSizeLimitPluginInput, opts ...operations.Option) (*operations.CreateWebsocketsizelimitPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-websocketsizelimit-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -10936,6 +11244,10 @@ func (s *Plugins) CreateWebsocketsizelimitPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11029,12 +11341,12 @@ func (s *Plugins) CreateWebsocketsizelimitPlugin(ctx context.Context, request *s
 
 // CreateWebsocketvalidatorPlugin - Create a WebsocketValidator plugin
 // Create a WebsocketValidator plugin
-func (s *Plugins) CreateWebsocketvalidatorPlugin(ctx context.Context, request *shared.CreateWebsocketValidatorPlugin, opts ...operations.Option) (*operations.CreateWebsocketvalidatorPluginResponse, error) {
+func (s *Plugins) CreateWebsocketvalidatorPlugin(ctx context.Context, request *shared.WebsocketValidatorPluginInput, opts ...operations.Option) (*operations.CreateWebsocketvalidatorPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-websocketvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11077,6 +11389,10 @@ func (s *Plugins) CreateWebsocketvalidatorPlugin(ctx context.Context, request *s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11170,12 +11486,12 @@ func (s *Plugins) CreateWebsocketvalidatorPlugin(ctx context.Context, request *s
 
 // CreateXmlthreatprotectionPlugin - Create a XmlThreatProtection plugin
 // Create a XmlThreatProtection plugin
-func (s *Plugins) CreateXmlthreatprotectionPlugin(ctx context.Context, request *shared.CreateXMLThreatProtectionPlugin, opts ...operations.Option) (*operations.CreateXmlthreatprotectionPluginResponse, error) {
+func (s *Plugins) CreateXmlthreatprotectionPlugin(ctx context.Context, request *shared.XMLThreatProtectionPluginInput, opts ...operations.Option) (*operations.CreateXmlthreatprotectionPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-xmlthreatprotection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11218,6 +11534,10 @@ func (s *Plugins) CreateXmlthreatprotectionPlugin(ctx context.Context, request *
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11311,12 +11631,12 @@ func (s *Plugins) CreateXmlthreatprotectionPlugin(ctx context.Context, request *
 
 // CreateZipkinPlugin - Create a Zipkin plugin
 // Create a Zipkin plugin
-func (s *Plugins) CreateZipkinPlugin(ctx context.Context, request *shared.CreateZipkinPlugin, opts ...operations.Option) (*operations.CreateZipkinPluginResponse, error) {
+func (s *Plugins) CreateZipkinPlugin(ctx context.Context, request *shared.ZipkinPluginInput, opts ...operations.Option) (*operations.CreateZipkinPluginResponse, error) {
 	hookCtx := hooks.HookContext{
 		Context:        ctx,
 		OperationID:    "create-zipkin-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11359,6 +11679,10 @@ func (s *Plugins) CreateZipkinPlugin(ctx context.Context, request *shared.Create
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11457,7 +11781,7 @@ func (s *Plugins) DeletePlugin(ctx context.Context, request operations.DeletePlu
 		Context:        ctx,
 		OperationID:    "delete-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11494,6 +11818,10 @@ func (s *Plugins) DeletePlugin(ctx context.Context, request operations.DeletePlu
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11572,7 +11900,7 @@ func (s *Plugins) GetPlugin(ctx context.Context, request operations.GetPluginReq
 		Context:        ctx,
 		OperationID:    "get-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11609,6 +11937,10 @@ func (s *Plugins) GetPlugin(ctx context.Context, request operations.GetPluginReq
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11708,7 +12040,7 @@ func (s *Plugins) UpdatePlugin(ctx context.Context, request operations.UpdatePlu
 		Context:        ctx,
 		OperationID:    "update-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11751,6 +12083,10 @@ func (s *Plugins) UpdatePlugin(ctx context.Context, request operations.UpdatePlu
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11850,7 +12186,7 @@ func (s *Plugins) UpsertPlugin(ctx context.Context, request operations.UpsertPlu
 		Context:        ctx,
 		OperationID:    "upsert-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -11893,6 +12229,10 @@ func (s *Plugins) UpsertPlugin(ctx context.Context, request operations.UpsertPlu
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -11991,7 +12331,7 @@ func (s *Plugins) DeleteACLPlugin(ctx context.Context, request operations.Delete
 		Context:        ctx,
 		OperationID:    "delete-acl-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12028,6 +12368,10 @@ func (s *Plugins) DeleteACLPlugin(ctx context.Context, request operations.Delete
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12106,7 +12450,7 @@ func (s *Plugins) GetACLPlugin(ctx context.Context, request operations.GetACLPlu
 		Context:        ctx,
 		OperationID:    "get-acl-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12143,6 +12487,10 @@ func (s *Plugins) GetACLPlugin(ctx context.Context, request operations.GetACLPlu
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12242,7 +12590,7 @@ func (s *Plugins) UpdateACLPlugin(ctx context.Context, request operations.Update
 		Context:        ctx,
 		OperationID:    "update-acl-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12262,7 +12610,7 @@ func (s *Plugins) UpdateACLPlugin(ctx context.Context, request operations.Update
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateACLPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ACLPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -12285,6 +12633,10 @@ func (s *Plugins) UpdateACLPlugin(ctx context.Context, request operations.Update
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12383,7 +12735,7 @@ func (s *Plugins) DeleteAcmePlugin(ctx context.Context, request operations.Delet
 		Context:        ctx,
 		OperationID:    "delete-acme-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12420,6 +12772,10 @@ func (s *Plugins) DeleteAcmePlugin(ctx context.Context, request operations.Delet
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12498,7 +12854,7 @@ func (s *Plugins) GetAcmePlugin(ctx context.Context, request operations.GetAcmeP
 		Context:        ctx,
 		OperationID:    "get-acme-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12535,6 +12891,10 @@ func (s *Plugins) GetAcmePlugin(ctx context.Context, request operations.GetAcmeP
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12634,7 +12994,7 @@ func (s *Plugins) UpdateAcmePlugin(ctx context.Context, request operations.Updat
 		Context:        ctx,
 		OperationID:    "update-acme-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12654,7 +13014,7 @@ func (s *Plugins) UpdateAcmePlugin(ctx context.Context, request operations.Updat
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAcmePlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AcmePlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -12677,6 +13037,10 @@ func (s *Plugins) UpdateAcmePlugin(ctx context.Context, request operations.Updat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12775,7 +13139,7 @@ func (s *Plugins) DeleteAipromptdecoratorPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "delete-aipromptdecorator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12812,6 +13176,10 @@ func (s *Plugins) DeleteAipromptdecoratorPlugin(ctx context.Context, request ope
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -12890,7 +13258,7 @@ func (s *Plugins) GetAipromptdecoratorPlugin(ctx context.Context, request operat
 		Context:        ctx,
 		OperationID:    "get-aipromptdecorator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -12927,6 +13295,10 @@ func (s *Plugins) GetAipromptdecoratorPlugin(ctx context.Context, request operat
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13026,7 +13398,7 @@ func (s *Plugins) UpdateAipromptdecoratorPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "update-aipromptdecorator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13046,7 +13418,7 @@ func (s *Plugins) UpdateAipromptdecoratorPlugin(ctx context.Context, request ope
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiPromptDecoratorPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiPromptDecoratorPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -13069,6 +13441,10 @@ func (s *Plugins) UpdateAipromptdecoratorPlugin(ctx context.Context, request ope
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13167,7 +13543,7 @@ func (s *Plugins) DeleteAipromptguardPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-aipromptguard-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13204,6 +13580,10 @@ func (s *Plugins) DeleteAipromptguardPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13282,7 +13662,7 @@ func (s *Plugins) GetAipromptguardPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-aipromptguard-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13319,6 +13699,10 @@ func (s *Plugins) GetAipromptguardPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13418,7 +13802,7 @@ func (s *Plugins) UpdateAipromptguardPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-aipromptguard-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13438,7 +13822,7 @@ func (s *Plugins) UpdateAipromptguardPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiPromptGuardPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiPromptGuardPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -13461,6 +13845,10 @@ func (s *Plugins) UpdateAipromptguardPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13559,7 +13947,7 @@ func (s *Plugins) DeleteAiprompttemplatePlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "delete-aiprompttemplate-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13596,6 +13984,10 @@ func (s *Plugins) DeleteAiprompttemplatePlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13674,7 +14066,7 @@ func (s *Plugins) GetAiprompttemplatePlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "get-aiprompttemplate-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13711,6 +14103,10 @@ func (s *Plugins) GetAiprompttemplatePlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13810,7 +14206,7 @@ func (s *Plugins) UpdateAiprompttemplatePlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "update-aiprompttemplate-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13830,7 +14226,7 @@ func (s *Plugins) UpdateAiprompttemplatePlugin(ctx context.Context, request oper
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiPromptTemplatePlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiPromptTemplatePlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -13853,6 +14249,10 @@ func (s *Plugins) UpdateAiprompttemplatePlugin(ctx context.Context, request oper
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -13951,7 +14351,7 @@ func (s *Plugins) DeleteAiproxyPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-aiproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -13988,6 +14388,10 @@ func (s *Plugins) DeleteAiproxyPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14066,7 +14470,7 @@ func (s *Plugins) GetAiproxyPlugin(ctx context.Context, request operations.GetAi
 		Context:        ctx,
 		OperationID:    "get-aiproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14103,6 +14507,10 @@ func (s *Plugins) GetAiproxyPlugin(ctx context.Context, request operations.GetAi
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14202,7 +14610,7 @@ func (s *Plugins) UpdateAiproxyPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-aiproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14222,7 +14630,7 @@ func (s *Plugins) UpdateAiproxyPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiProxyPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiProxyPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -14245,6 +14653,10 @@ func (s *Plugins) UpdateAiproxyPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14343,7 +14755,7 @@ func (s *Plugins) DeleteAirequesttransformerPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "delete-airequesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14380,6 +14792,10 @@ func (s *Plugins) DeleteAirequesttransformerPlugin(ctx context.Context, request 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14458,7 +14874,7 @@ func (s *Plugins) GetAirequesttransformerPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "get-airequesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14495,6 +14911,10 @@ func (s *Plugins) GetAirequesttransformerPlugin(ctx context.Context, request ope
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14594,7 +15014,7 @@ func (s *Plugins) UpdateAirequesttransformerPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "update-airequesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14614,7 +15034,7 @@ func (s *Plugins) UpdateAirequesttransformerPlugin(ctx context.Context, request 
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiRequestTransformerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiRequestTransformerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -14637,6 +15057,10 @@ func (s *Plugins) UpdateAirequesttransformerPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14735,7 +15159,7 @@ func (s *Plugins) DeleteAiresponsetransformerPlugin(ctx context.Context, request
 		Context:        ctx,
 		OperationID:    "delete-airesponsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14772,6 +15196,10 @@ func (s *Plugins) DeleteAiresponsetransformerPlugin(ctx context.Context, request
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14850,7 +15278,7 @@ func (s *Plugins) GetAiresponsetransformerPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "get-airesponsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -14887,6 +15315,10 @@ func (s *Plugins) GetAiresponsetransformerPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -14986,7 +15418,7 @@ func (s *Plugins) UpdateAiresponsetransformerPlugin(ctx context.Context, request
 		Context:        ctx,
 		OperationID:    "update-airesponsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15006,7 +15438,7 @@ func (s *Plugins) UpdateAiresponsetransformerPlugin(ctx context.Context, request
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAiResponseTransformerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AiResponseTransformerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -15029,6 +15461,10 @@ func (s *Plugins) UpdateAiresponsetransformerPlugin(ctx context.Context, request
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15127,7 +15563,7 @@ func (s *Plugins) DeleteAwslambdaPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "delete-awslambda-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15164,6 +15600,10 @@ func (s *Plugins) DeleteAwslambdaPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15242,7 +15682,7 @@ func (s *Plugins) GetAwslambdaPlugin(ctx context.Context, request operations.Get
 		Context:        ctx,
 		OperationID:    "get-awslambda-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15279,6 +15719,10 @@ func (s *Plugins) GetAwslambdaPlugin(ctx context.Context, request operations.Get
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15378,7 +15822,7 @@ func (s *Plugins) UpdateAwslambdaPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "update-awslambda-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15398,7 +15842,7 @@ func (s *Plugins) UpdateAwslambdaPlugin(ctx context.Context, request operations.
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAwsLambdaPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AwsLambdaPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -15421,6 +15865,10 @@ func (s *Plugins) UpdateAwslambdaPlugin(ctx context.Context, request operations.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15519,7 +15967,7 @@ func (s *Plugins) DeleteAzurefunctionsPlugin(ctx context.Context, request operat
 		Context:        ctx,
 		OperationID:    "delete-azurefunctions-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15556,6 +16004,10 @@ func (s *Plugins) DeleteAzurefunctionsPlugin(ctx context.Context, request operat
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15634,7 +16086,7 @@ func (s *Plugins) GetAzurefunctionsPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "get-azurefunctions-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15671,6 +16123,10 @@ func (s *Plugins) GetAzurefunctionsPlugin(ctx context.Context, request operation
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15770,7 +16226,7 @@ func (s *Plugins) UpdateAzurefunctionsPlugin(ctx context.Context, request operat
 		Context:        ctx,
 		OperationID:    "update-azurefunctions-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15790,7 +16246,7 @@ func (s *Plugins) UpdateAzurefunctionsPlugin(ctx context.Context, request operat
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateAzureFunctionsPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "AzureFunctionsPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -15813,6 +16269,10 @@ func (s *Plugins) UpdateAzurefunctionsPlugin(ctx context.Context, request operat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -15911,7 +16371,7 @@ func (s *Plugins) DeleteBasicauthPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "delete-basicauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -15948,6 +16408,10 @@ func (s *Plugins) DeleteBasicauthPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16026,7 +16490,7 @@ func (s *Plugins) GetBasicauthPlugin(ctx context.Context, request operations.Get
 		Context:        ctx,
 		OperationID:    "get-basicauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16063,6 +16527,10 @@ func (s *Plugins) GetBasicauthPlugin(ctx context.Context, request operations.Get
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16162,7 +16630,7 @@ func (s *Plugins) UpdateBasicauthPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "update-basicauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16182,7 +16650,7 @@ func (s *Plugins) UpdateBasicauthPlugin(ctx context.Context, request operations.
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateBasicAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "BasicAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -16205,6 +16673,10 @@ func (s *Plugins) UpdateBasicauthPlugin(ctx context.Context, request operations.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16303,7 +16775,7 @@ func (s *Plugins) DeleteBotdetectionPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "delete-botdetection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16340,6 +16812,10 @@ func (s *Plugins) DeleteBotdetectionPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16418,7 +16894,7 @@ func (s *Plugins) GetBotdetectionPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "get-botdetection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16455,6 +16931,10 @@ func (s *Plugins) GetBotdetectionPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16554,7 +17034,7 @@ func (s *Plugins) UpdateBotdetectionPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "update-botdetection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16574,7 +17054,7 @@ func (s *Plugins) UpdateBotdetectionPlugin(ctx context.Context, request operatio
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateBotDetectionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "BotDetectionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -16597,6 +17077,10 @@ func (s *Plugins) UpdateBotdetectionPlugin(ctx context.Context, request operatio
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16695,7 +17179,7 @@ func (s *Plugins) DeleteCanaryPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-canary-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16732,6 +17216,10 @@ func (s *Plugins) DeleteCanaryPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16810,7 +17298,7 @@ func (s *Plugins) GetCanaryPlugin(ctx context.Context, request operations.GetCan
 		Context:        ctx,
 		OperationID:    "get-canary-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16847,6 +17335,10 @@ func (s *Plugins) GetCanaryPlugin(ctx context.Context, request operations.GetCan
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -16946,7 +17438,7 @@ func (s *Plugins) UpdateCanaryPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-canary-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -16966,7 +17458,7 @@ func (s *Plugins) UpdateCanaryPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateCanaryPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CanaryPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -16989,6 +17481,10 @@ func (s *Plugins) UpdateCanaryPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17087,7 +17583,7 @@ func (s *Plugins) DeleteCorrelationidPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-correlationid-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17124,6 +17620,10 @@ func (s *Plugins) DeleteCorrelationidPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17202,7 +17702,7 @@ func (s *Plugins) GetCorrelationidPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-correlationid-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17239,6 +17739,10 @@ func (s *Plugins) GetCorrelationidPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17338,7 +17842,7 @@ func (s *Plugins) UpdateCorrelationidPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-correlationid-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17358,7 +17862,7 @@ func (s *Plugins) UpdateCorrelationidPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateCorrelationIDPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CorrelationIDPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -17381,6 +17885,10 @@ func (s *Plugins) UpdateCorrelationidPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17479,7 +17987,7 @@ func (s *Plugins) DeleteCorsPlugin(ctx context.Context, request operations.Delet
 		Context:        ctx,
 		OperationID:    "delete-cors-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17516,6 +18024,10 @@ func (s *Plugins) DeleteCorsPlugin(ctx context.Context, request operations.Delet
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17594,7 +18106,7 @@ func (s *Plugins) GetCorsPlugin(ctx context.Context, request operations.GetCorsP
 		Context:        ctx,
 		OperationID:    "get-cors-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17631,6 +18143,10 @@ func (s *Plugins) GetCorsPlugin(ctx context.Context, request operations.GetCorsP
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17730,7 +18246,7 @@ func (s *Plugins) UpdateCorsPlugin(ctx context.Context, request operations.Updat
 		Context:        ctx,
 		OperationID:    "update-cors-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17750,7 +18266,7 @@ func (s *Plugins) UpdateCorsPlugin(ctx context.Context, request operations.Updat
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateCorsPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CorsPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -17773,6 +18289,10 @@ func (s *Plugins) UpdateCorsPlugin(ctx context.Context, request operations.Updat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17871,7 +18391,7 @@ func (s *Plugins) DeleteDatadogPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-datadog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -17908,6 +18428,10 @@ func (s *Plugins) DeleteDatadogPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -17986,7 +18510,7 @@ func (s *Plugins) GetDatadogPlugin(ctx context.Context, request operations.GetDa
 		Context:        ctx,
 		OperationID:    "get-datadog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18023,6 +18547,10 @@ func (s *Plugins) GetDatadogPlugin(ctx context.Context, request operations.GetDa
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18122,7 +18650,7 @@ func (s *Plugins) UpdateDatadogPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-datadog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18142,7 +18670,7 @@ func (s *Plugins) UpdateDatadogPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateDatadogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "DatadogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -18165,6 +18693,10 @@ func (s *Plugins) UpdateDatadogPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18263,7 +18795,7 @@ func (s *Plugins) DeleteDegraphqlPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "delete-degraphql-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18300,6 +18832,10 @@ func (s *Plugins) DeleteDegraphqlPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18378,7 +18914,7 @@ func (s *Plugins) GetDegraphqlPlugin(ctx context.Context, request operations.Get
 		Context:        ctx,
 		OperationID:    "get-degraphql-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18415,6 +18951,10 @@ func (s *Plugins) GetDegraphqlPlugin(ctx context.Context, request operations.Get
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18514,7 +19054,7 @@ func (s *Plugins) UpdateDegraphqlPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "update-degraphql-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18534,7 +19074,7 @@ func (s *Plugins) UpdateDegraphqlPlugin(ctx context.Context, request operations.
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateDegraphqlPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "DegraphqlPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -18557,6 +19097,10 @@ func (s *Plugins) UpdateDegraphqlPlugin(ctx context.Context, request operations.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18655,7 +19199,7 @@ func (s *Plugins) DeleteExittransformerPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "delete-exittransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18692,6 +19236,10 @@ func (s *Plugins) DeleteExittransformerPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18770,7 +19318,7 @@ func (s *Plugins) GetExittransformerPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "get-exittransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18807,6 +19355,10 @@ func (s *Plugins) GetExittransformerPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -18906,7 +19458,7 @@ func (s *Plugins) UpdateExittransformerPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "update-exittransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -18926,7 +19478,7 @@ func (s *Plugins) UpdateExittransformerPlugin(ctx context.Context, request opera
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateExitTransformerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ExitTransformerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -18949,6 +19501,10 @@ func (s *Plugins) UpdateExittransformerPlugin(ctx context.Context, request opera
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19047,7 +19603,7 @@ func (s *Plugins) DeleteFilelogPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-filelog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19084,6 +19640,10 @@ func (s *Plugins) DeleteFilelogPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19162,7 +19722,7 @@ func (s *Plugins) GetFilelogPlugin(ctx context.Context, request operations.GetFi
 		Context:        ctx,
 		OperationID:    "get-filelog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19199,6 +19759,10 @@ func (s *Plugins) GetFilelogPlugin(ctx context.Context, request operations.GetFi
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19298,7 +19862,7 @@ func (s *Plugins) UpdateFilelogPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-filelog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19318,7 +19882,7 @@ func (s *Plugins) UpdateFilelogPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateFileLogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "FileLogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -19341,6 +19905,10 @@ func (s *Plugins) UpdateFilelogPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19439,7 +20007,7 @@ func (s *Plugins) DeleteForwardproxyPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "delete-forwardproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19476,6 +20044,10 @@ func (s *Plugins) DeleteForwardproxyPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19554,7 +20126,7 @@ func (s *Plugins) GetForwardproxyPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "get-forwardproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19591,6 +20163,10 @@ func (s *Plugins) GetForwardproxyPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19690,7 +20266,7 @@ func (s *Plugins) UpdateForwardproxyPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "update-forwardproxy-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19710,7 +20286,7 @@ func (s *Plugins) UpdateForwardproxyPlugin(ctx context.Context, request operatio
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateForwardProxyPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ForwardProxyPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -19733,6 +20309,10 @@ func (s *Plugins) UpdateForwardproxyPlugin(ctx context.Context, request operatio
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19831,7 +20411,7 @@ func (s *Plugins) DeleteGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 		Context:        ctx,
 		OperationID:    "delete-graphqlproxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19868,6 +20448,10 @@ func (s *Plugins) DeleteGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -19946,7 +20530,7 @@ func (s *Plugins) GetGraphqlproxycacheadvancedPlugin(ctx context.Context, reques
 		Context:        ctx,
 		OperationID:    "get-graphqlproxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -19983,6 +20567,10 @@ func (s *Plugins) GetGraphqlproxycacheadvancedPlugin(ctx context.Context, reques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20082,7 +20670,7 @@ func (s *Plugins) UpdateGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 		Context:        ctx,
 		OperationID:    "update-graphqlproxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20102,7 +20690,7 @@ func (s *Plugins) UpdateGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateGraphqlProxyCacheAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "GraphqlProxyCacheAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -20125,6 +20713,10 @@ func (s *Plugins) UpdateGraphqlproxycacheadvancedPlugin(ctx context.Context, req
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20223,7 +20815,7 @@ func (s *Plugins) DeleteGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 		Context:        ctx,
 		OperationID:    "delete-graphqlratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20260,6 +20852,10 @@ func (s *Plugins) DeleteGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20338,7 +20934,7 @@ func (s *Plugins) GetGraphqlratelimitingadvancedPlugin(ctx context.Context, requ
 		Context:        ctx,
 		OperationID:    "get-graphqlratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20375,6 +20971,10 @@ func (s *Plugins) GetGraphqlratelimitingadvancedPlugin(ctx context.Context, requ
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20474,7 +21074,7 @@ func (s *Plugins) UpdateGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 		Context:        ctx,
 		OperationID:    "update-graphqlratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20494,7 +21094,7 @@ func (s *Plugins) UpdateGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateGraphqlRateLimitingAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "GraphqlRateLimitingAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -20517,6 +21117,10 @@ func (s *Plugins) UpdateGraphqlratelimitingadvancedPlugin(ctx context.Context, r
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20615,7 +21219,7 @@ func (s *Plugins) DeleteGrpcgatewayPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "delete-grpcgateway-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20652,6 +21256,10 @@ func (s *Plugins) DeleteGrpcgatewayPlugin(ctx context.Context, request operation
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20730,7 +21338,7 @@ func (s *Plugins) GetGrpcgatewayPlugin(ctx context.Context, request operations.G
 		Context:        ctx,
 		OperationID:    "get-grpcgateway-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20767,6 +21375,10 @@ func (s *Plugins) GetGrpcgatewayPlugin(ctx context.Context, request operations.G
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -20866,7 +21478,7 @@ func (s *Plugins) UpdateGrpcgatewayPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "update-grpcgateway-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -20886,7 +21498,7 @@ func (s *Plugins) UpdateGrpcgatewayPlugin(ctx context.Context, request operation
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateGrpcGatewayPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "GrpcGatewayPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -20909,6 +21521,10 @@ func (s *Plugins) UpdateGrpcgatewayPlugin(ctx context.Context, request operation
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21007,7 +21623,7 @@ func (s *Plugins) DeleteGrpcwebPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-grpcweb-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21044,6 +21660,10 @@ func (s *Plugins) DeleteGrpcwebPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21122,7 +21742,7 @@ func (s *Plugins) GetGrpcwebPlugin(ctx context.Context, request operations.GetGr
 		Context:        ctx,
 		OperationID:    "get-grpcweb-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21159,6 +21779,10 @@ func (s *Plugins) GetGrpcwebPlugin(ctx context.Context, request operations.GetGr
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21258,7 +21882,7 @@ func (s *Plugins) UpdateGrpcwebPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-grpcweb-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21278,7 +21902,7 @@ func (s *Plugins) UpdateGrpcwebPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateGrpcWebPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "GrpcWebPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -21301,6 +21925,10 @@ func (s *Plugins) UpdateGrpcwebPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21399,7 +22027,7 @@ func (s *Plugins) DeleteHmacauthPlugin(ctx context.Context, request operations.D
 		Context:        ctx,
 		OperationID:    "delete-hmacauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21436,6 +22064,10 @@ func (s *Plugins) DeleteHmacauthPlugin(ctx context.Context, request operations.D
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21514,7 +22146,7 @@ func (s *Plugins) GetHmacauthPlugin(ctx context.Context, request operations.GetH
 		Context:        ctx,
 		OperationID:    "get-hmacauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21551,6 +22183,10 @@ func (s *Plugins) GetHmacauthPlugin(ctx context.Context, request operations.GetH
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21650,7 +22286,7 @@ func (s *Plugins) UpdateHmacauthPlugin(ctx context.Context, request operations.U
 		Context:        ctx,
 		OperationID:    "update-hmacauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21670,7 +22306,7 @@ func (s *Plugins) UpdateHmacauthPlugin(ctx context.Context, request operations.U
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateHmacAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "HmacAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -21693,6 +22329,10 @@ func (s *Plugins) UpdateHmacauthPlugin(ctx context.Context, request operations.U
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21791,7 +22431,7 @@ func (s *Plugins) DeleteHttplogPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-httplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21828,6 +22468,10 @@ func (s *Plugins) DeleteHttplogPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -21906,7 +22550,7 @@ func (s *Plugins) GetHttplogPlugin(ctx context.Context, request operations.GetHt
 		Context:        ctx,
 		OperationID:    "get-httplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -21943,6 +22587,10 @@ func (s *Plugins) GetHttplogPlugin(ctx context.Context, request operations.GetHt
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22042,7 +22690,7 @@ func (s *Plugins) UpdateHttplogPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-httplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22062,7 +22710,7 @@ func (s *Plugins) UpdateHttplogPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateHTTPLogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "HTTPLogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -22085,6 +22733,10 @@ func (s *Plugins) UpdateHttplogPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22183,7 +22835,7 @@ func (s *Plugins) DeleteIprestrictionPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-iprestriction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22220,6 +22872,10 @@ func (s *Plugins) DeleteIprestrictionPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22298,7 +22954,7 @@ func (s *Plugins) GetIprestrictionPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-iprestriction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22335,6 +22991,10 @@ func (s *Plugins) GetIprestrictionPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22434,7 +23094,7 @@ func (s *Plugins) UpdateIprestrictionPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-iprestriction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22454,7 +23114,7 @@ func (s *Plugins) UpdateIprestrictionPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateIPRestrictionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "IPRestrictionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -22477,6 +23137,10 @@ func (s *Plugins) UpdateIprestrictionPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22575,7 +23239,7 @@ func (s *Plugins) DeleteJqPlugin(ctx context.Context, request operations.DeleteJ
 		Context:        ctx,
 		OperationID:    "delete-jq-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22612,6 +23276,10 @@ func (s *Plugins) DeleteJqPlugin(ctx context.Context, request operations.DeleteJ
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22690,7 +23358,7 @@ func (s *Plugins) GetJqPlugin(ctx context.Context, request operations.GetJqPlugi
 		Context:        ctx,
 		OperationID:    "get-jq-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22727,6 +23395,10 @@ func (s *Plugins) GetJqPlugin(ctx context.Context, request operations.GetJqPlugi
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22826,7 +23498,7 @@ func (s *Plugins) UpdateJqPlugin(ctx context.Context, request operations.UpdateJ
 		Context:        ctx,
 		OperationID:    "update-jq-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -22846,7 +23518,7 @@ func (s *Plugins) UpdateJqPlugin(ctx context.Context, request operations.UpdateJ
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateJqPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "JqPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -22869,6 +23541,10 @@ func (s *Plugins) UpdateJqPlugin(ctx context.Context, request operations.UpdateJ
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -22967,7 +23643,7 @@ func (s *Plugins) DeleteJwedecryptPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "delete-jwedecrypt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23004,6 +23680,10 @@ func (s *Plugins) DeleteJwedecryptPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23082,7 +23762,7 @@ func (s *Plugins) GetJwedecryptPlugin(ctx context.Context, request operations.Ge
 		Context:        ctx,
 		OperationID:    "get-jwedecrypt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23119,6 +23799,10 @@ func (s *Plugins) GetJwedecryptPlugin(ctx context.Context, request operations.Ge
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23218,7 +23902,7 @@ func (s *Plugins) UpdateJwedecryptPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "update-jwedecrypt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23238,7 +23922,7 @@ func (s *Plugins) UpdateJwedecryptPlugin(ctx context.Context, request operations
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateJweDecryptPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "JweDecryptPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -23261,6 +23945,10 @@ func (s *Plugins) UpdateJwedecryptPlugin(ctx context.Context, request operations
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23359,7 +24047,7 @@ func (s *Plugins) DeleteJwtPlugin(ctx context.Context, request operations.Delete
 		Context:        ctx,
 		OperationID:    "delete-jwt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23396,6 +24084,10 @@ func (s *Plugins) DeleteJwtPlugin(ctx context.Context, request operations.Delete
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23474,7 +24166,7 @@ func (s *Plugins) GetJwtPlugin(ctx context.Context, request operations.GetJwtPlu
 		Context:        ctx,
 		OperationID:    "get-jwt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23511,6 +24203,10 @@ func (s *Plugins) GetJwtPlugin(ctx context.Context, request operations.GetJwtPlu
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23610,7 +24306,7 @@ func (s *Plugins) UpdateJwtPlugin(ctx context.Context, request operations.Update
 		Context:        ctx,
 		OperationID:    "update-jwt-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23630,7 +24326,7 @@ func (s *Plugins) UpdateJwtPlugin(ctx context.Context, request operations.Update
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateJwtPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "JwtPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -23653,6 +24349,10 @@ func (s *Plugins) UpdateJwtPlugin(ctx context.Context, request operations.Update
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23751,7 +24451,7 @@ func (s *Plugins) DeleteJwtsignerPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "delete-jwtsigner-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23788,6 +24488,10 @@ func (s *Plugins) DeleteJwtsignerPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -23866,7 +24570,7 @@ func (s *Plugins) GetJwtsignerPlugin(ctx context.Context, request operations.Get
 		Context:        ctx,
 		OperationID:    "get-jwtsigner-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -23903,6 +24607,10 @@ func (s *Plugins) GetJwtsignerPlugin(ctx context.Context, request operations.Get
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24002,7 +24710,7 @@ func (s *Plugins) UpdateJwtsignerPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "update-jwtsigner-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24022,7 +24730,7 @@ func (s *Plugins) UpdateJwtsignerPlugin(ctx context.Context, request operations.
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateJwtSignerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "JwtSignerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -24045,6 +24753,10 @@ func (s *Plugins) UpdateJwtsignerPlugin(ctx context.Context, request operations.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24143,7 +24855,7 @@ func (s *Plugins) DeleteKafkalogPlugin(ctx context.Context, request operations.D
 		Context:        ctx,
 		OperationID:    "delete-kafkalog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24180,6 +24892,10 @@ func (s *Plugins) DeleteKafkalogPlugin(ctx context.Context, request operations.D
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24258,7 +24974,7 @@ func (s *Plugins) GetKafkalogPlugin(ctx context.Context, request operations.GetK
 		Context:        ctx,
 		OperationID:    "get-kafkalog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24295,6 +25011,10 @@ func (s *Plugins) GetKafkalogPlugin(ctx context.Context, request operations.GetK
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24394,7 +25114,7 @@ func (s *Plugins) UpdateKafkalogPlugin(ctx context.Context, request operations.U
 		Context:        ctx,
 		OperationID:    "update-kafkalog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24414,7 +25134,7 @@ func (s *Plugins) UpdateKafkalogPlugin(ctx context.Context, request operations.U
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateKafkaLogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "KafkaLogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -24437,6 +25157,10 @@ func (s *Plugins) UpdateKafkalogPlugin(ctx context.Context, request operations.U
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24535,7 +25259,7 @@ func (s *Plugins) DeleteKafkaupstreamPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-kafkaupstream-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24572,6 +25296,10 @@ func (s *Plugins) DeleteKafkaupstreamPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24650,7 +25378,7 @@ func (s *Plugins) GetKafkaupstreamPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-kafkaupstream-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24687,6 +25415,10 @@ func (s *Plugins) GetKafkaupstreamPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24786,7 +25518,7 @@ func (s *Plugins) UpdateKafkaupstreamPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-kafkaupstream-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24806,7 +25538,7 @@ func (s *Plugins) UpdateKafkaupstreamPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateKafkaUpstreamPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "KafkaUpstreamPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -24829,6 +25561,10 @@ func (s *Plugins) UpdateKafkaupstreamPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -24927,7 +25663,7 @@ func (s *Plugins) DeleteKeyauthPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-keyauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -24964,6 +25700,10 @@ func (s *Plugins) DeleteKeyauthPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25042,7 +25782,7 @@ func (s *Plugins) GetKeyauthPlugin(ctx context.Context, request operations.GetKe
 		Context:        ctx,
 		OperationID:    "get-keyauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25079,6 +25819,10 @@ func (s *Plugins) GetKeyauthPlugin(ctx context.Context, request operations.GetKe
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25178,7 +25922,7 @@ func (s *Plugins) UpdateKeyauthPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-keyauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25198,7 +25942,7 @@ func (s *Plugins) UpdateKeyauthPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateKeyAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "KeyAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -25221,6 +25965,10 @@ func (s *Plugins) UpdateKeyauthPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25319,7 +26067,7 @@ func (s *Plugins) DeleteKeyauthencPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "delete-keyauthenc-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25356,6 +26104,10 @@ func (s *Plugins) DeleteKeyauthencPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25434,7 +26186,7 @@ func (s *Plugins) GetKeyauthencPlugin(ctx context.Context, request operations.Ge
 		Context:        ctx,
 		OperationID:    "get-keyauthenc-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25471,6 +26223,10 @@ func (s *Plugins) GetKeyauthencPlugin(ctx context.Context, request operations.Ge
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25570,7 +26326,7 @@ func (s *Plugins) UpdateKeyauthencPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "update-keyauthenc-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25590,7 +26346,7 @@ func (s *Plugins) UpdateKeyauthencPlugin(ctx context.Context, request operations
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateKeyAuthEncPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "KeyAuthEncPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -25613,6 +26369,10 @@ func (s *Plugins) UpdateKeyauthencPlugin(ctx context.Context, request operations
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25711,7 +26471,7 @@ func (s *Plugins) DeleteKonnectapplicationauthPlugin(ctx context.Context, reques
 		Context:        ctx,
 		OperationID:    "delete-konnectapplicationauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25748,6 +26508,10 @@ func (s *Plugins) DeleteKonnectapplicationauthPlugin(ctx context.Context, reques
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25826,7 +26590,7 @@ func (s *Plugins) GetKonnectapplicationauthPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "get-konnectapplicationauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25863,6 +26627,10 @@ func (s *Plugins) GetKonnectapplicationauthPlugin(ctx context.Context, request o
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -25962,7 +26730,7 @@ func (s *Plugins) UpdateKonnectapplicationauthPlugin(ctx context.Context, reques
 		Context:        ctx,
 		OperationID:    "update-konnectapplicationauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -25982,7 +26750,7 @@ func (s *Plugins) UpdateKonnectapplicationauthPlugin(ctx context.Context, reques
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateKonnectApplicationAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "KonnectApplicationAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -26005,6 +26773,10 @@ func (s *Plugins) UpdateKonnectapplicationauthPlugin(ctx context.Context, reques
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26103,7 +26875,7 @@ func (s *Plugins) DeleteLdapauthPlugin(ctx context.Context, request operations.D
 		Context:        ctx,
 		OperationID:    "delete-ldapauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26140,6 +26912,10 @@ func (s *Plugins) DeleteLdapauthPlugin(ctx context.Context, request operations.D
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26218,7 +26994,7 @@ func (s *Plugins) GetLdapauthPlugin(ctx context.Context, request operations.GetL
 		Context:        ctx,
 		OperationID:    "get-ldapauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26255,6 +27031,10 @@ func (s *Plugins) GetLdapauthPlugin(ctx context.Context, request operations.GetL
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26354,7 +27134,7 @@ func (s *Plugins) UpdateLdapauthPlugin(ctx context.Context, request operations.U
 		Context:        ctx,
 		OperationID:    "update-ldapauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26374,7 +27154,7 @@ func (s *Plugins) UpdateLdapauthPlugin(ctx context.Context, request operations.U
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateLdapAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "LdapAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -26397,6 +27177,10 @@ func (s *Plugins) UpdateLdapauthPlugin(ctx context.Context, request operations.U
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26495,7 +27279,7 @@ func (s *Plugins) DeleteLdapauthadvancedPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "delete-ldapauthadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26532,6 +27316,10 @@ func (s *Plugins) DeleteLdapauthadvancedPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26610,7 +27398,7 @@ func (s *Plugins) GetLdapauthadvancedPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "get-ldapauthadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26647,6 +27435,10 @@ func (s *Plugins) GetLdapauthadvancedPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26746,7 +27538,7 @@ func (s *Plugins) UpdateLdapauthadvancedPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "update-ldapauthadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26766,7 +27558,7 @@ func (s *Plugins) UpdateLdapauthadvancedPlugin(ctx context.Context, request oper
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateLdapAuthAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "LdapAuthAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -26789,6 +27581,10 @@ func (s *Plugins) UpdateLdapauthadvancedPlugin(ctx context.Context, request oper
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -26887,7 +27683,7 @@ func (s *Plugins) DeleteLogglyPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-loggly-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -26924,6 +27720,10 @@ func (s *Plugins) DeleteLogglyPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27002,7 +27802,7 @@ func (s *Plugins) GetLogglyPlugin(ctx context.Context, request operations.GetLog
 		Context:        ctx,
 		OperationID:    "get-loggly-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27039,6 +27839,10 @@ func (s *Plugins) GetLogglyPlugin(ctx context.Context, request operations.GetLog
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27138,7 +27942,7 @@ func (s *Plugins) UpdateLogglyPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-loggly-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27158,7 +27962,7 @@ func (s *Plugins) UpdateLogglyPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateLogglyPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "LogglyPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -27181,6 +27985,10 @@ func (s *Plugins) UpdateLogglyPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27279,7 +28087,7 @@ func (s *Plugins) DeleteMockingPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-mocking-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27316,6 +28124,10 @@ func (s *Plugins) DeleteMockingPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27394,7 +28206,7 @@ func (s *Plugins) GetMockingPlugin(ctx context.Context, request operations.GetMo
 		Context:        ctx,
 		OperationID:    "get-mocking-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27431,6 +28243,10 @@ func (s *Plugins) GetMockingPlugin(ctx context.Context, request operations.GetMo
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27530,7 +28346,7 @@ func (s *Plugins) UpdateMockingPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-mocking-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27550,7 +28366,7 @@ func (s *Plugins) UpdateMockingPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateMockingPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "MockingPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -27573,6 +28389,10 @@ func (s *Plugins) UpdateMockingPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27671,7 +28491,7 @@ func (s *Plugins) DeleteMtlsauthPlugin(ctx context.Context, request operations.D
 		Context:        ctx,
 		OperationID:    "delete-mtlsauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27708,6 +28528,10 @@ func (s *Plugins) DeleteMtlsauthPlugin(ctx context.Context, request operations.D
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27786,7 +28610,7 @@ func (s *Plugins) GetMtlsauthPlugin(ctx context.Context, request operations.GetM
 		Context:        ctx,
 		OperationID:    "get-mtlsauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27823,6 +28647,10 @@ func (s *Plugins) GetMtlsauthPlugin(ctx context.Context, request operations.GetM
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -27922,7 +28750,7 @@ func (s *Plugins) UpdateMtlsauthPlugin(ctx context.Context, request operations.U
 		Context:        ctx,
 		OperationID:    "update-mtlsauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -27942,7 +28770,7 @@ func (s *Plugins) UpdateMtlsauthPlugin(ctx context.Context, request operations.U
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateMtlsAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "MtlsAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -27965,6 +28793,10 @@ func (s *Plugins) UpdateMtlsauthPlugin(ctx context.Context, request operations.U
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28063,7 +28895,7 @@ func (s *Plugins) DeleteOasvalidationPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-oasvalidation-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28100,6 +28932,10 @@ func (s *Plugins) DeleteOasvalidationPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28178,7 +29014,7 @@ func (s *Plugins) GetOasvalidationPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-oasvalidation-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28215,6 +29051,10 @@ func (s *Plugins) GetOasvalidationPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28314,7 +29154,7 @@ func (s *Plugins) UpdateOasvalidationPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-oasvalidation-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28334,7 +29174,7 @@ func (s *Plugins) UpdateOasvalidationPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOasValidationPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "OasValidationPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -28357,6 +29197,10 @@ func (s *Plugins) UpdateOasvalidationPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28455,7 +29299,7 @@ func (s *Plugins) DeleteOauth2Plugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-oauth2-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28492,6 +29336,10 @@ func (s *Plugins) DeleteOauth2Plugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28570,7 +29418,7 @@ func (s *Plugins) GetOauth2Plugin(ctx context.Context, request operations.GetOau
 		Context:        ctx,
 		OperationID:    "get-oauth2-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28607,6 +29455,10 @@ func (s *Plugins) GetOauth2Plugin(ctx context.Context, request operations.GetOau
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28706,7 +29558,7 @@ func (s *Plugins) UpdateOauth2Plugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-oauth2-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28726,7 +29578,7 @@ func (s *Plugins) UpdateOauth2Plugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOauth2Plugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "Oauth2Plugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -28749,6 +29601,10 @@ func (s *Plugins) UpdateOauth2Plugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28847,7 +29703,7 @@ func (s *Plugins) DeleteOauth2introspectionPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "delete-oauth2introspection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28884,6 +29740,10 @@ func (s *Plugins) DeleteOauth2introspectionPlugin(ctx context.Context, request o
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -28962,7 +29822,7 @@ func (s *Plugins) GetOauth2introspectionPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "get-oauth2introspection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -28999,6 +29859,10 @@ func (s *Plugins) GetOauth2introspectionPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29098,7 +29962,7 @@ func (s *Plugins) UpdateOauth2introspectionPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "update-oauth2introspection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29118,7 +29982,7 @@ func (s *Plugins) UpdateOauth2introspectionPlugin(ctx context.Context, request o
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOauth2IntrospectionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "Oauth2IntrospectionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -29141,6 +30005,10 @@ func (s *Plugins) UpdateOauth2introspectionPlugin(ctx context.Context, request o
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29239,7 +30107,7 @@ func (s *Plugins) DeleteOpaPlugin(ctx context.Context, request operations.Delete
 		Context:        ctx,
 		OperationID:    "delete-opa-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29276,6 +30144,10 @@ func (s *Plugins) DeleteOpaPlugin(ctx context.Context, request operations.Delete
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29354,7 +30226,7 @@ func (s *Plugins) GetOpaPlugin(ctx context.Context, request operations.GetOpaPlu
 		Context:        ctx,
 		OperationID:    "get-opa-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29391,6 +30263,10 @@ func (s *Plugins) GetOpaPlugin(ctx context.Context, request operations.GetOpaPlu
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29490,7 +30366,7 @@ func (s *Plugins) UpdateOpaPlugin(ctx context.Context, request operations.Update
 		Context:        ctx,
 		OperationID:    "update-opa-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29510,7 +30386,7 @@ func (s *Plugins) UpdateOpaPlugin(ctx context.Context, request operations.Update
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOpaPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "OpaPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -29533,6 +30409,10 @@ func (s *Plugins) UpdateOpaPlugin(ctx context.Context, request operations.Update
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29631,7 +30511,7 @@ func (s *Plugins) DeleteOpenidconnectPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-openidconnect-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29668,6 +30548,10 @@ func (s *Plugins) DeleteOpenidconnectPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29746,7 +30630,7 @@ func (s *Plugins) GetOpenidconnectPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-openidconnect-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29783,6 +30667,10 @@ func (s *Plugins) GetOpenidconnectPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -29882,7 +30770,7 @@ func (s *Plugins) UpdateOpenidconnectPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-openidconnect-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -29902,7 +30790,7 @@ func (s *Plugins) UpdateOpenidconnectPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOpenidConnectPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "OpenidConnectPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -29925,6 +30813,10 @@ func (s *Plugins) UpdateOpenidconnectPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30023,7 +30915,7 @@ func (s *Plugins) DeleteOpentelemetryPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-opentelemetry-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30060,6 +30952,10 @@ func (s *Plugins) DeleteOpentelemetryPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30138,7 +31034,7 @@ func (s *Plugins) GetOpentelemetryPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-opentelemetry-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30175,6 +31071,10 @@ func (s *Plugins) GetOpentelemetryPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30274,7 +31174,7 @@ func (s *Plugins) UpdateOpentelemetryPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-opentelemetry-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30294,7 +31194,7 @@ func (s *Plugins) UpdateOpentelemetryPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateOpentelemetryPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "OpentelemetryPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -30317,6 +31217,10 @@ func (s *Plugins) UpdateOpentelemetryPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30415,7 +31319,7 @@ func (s *Plugins) DeletePostfunctionPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "delete-postfunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30452,6 +31356,10 @@ func (s *Plugins) DeletePostfunctionPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30530,7 +31438,7 @@ func (s *Plugins) GetPostfunctionPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "get-postfunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30567,6 +31475,10 @@ func (s *Plugins) GetPostfunctionPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30666,7 +31578,7 @@ func (s *Plugins) UpdatePostfunctionPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "update-postfunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30686,7 +31598,7 @@ func (s *Plugins) UpdatePostfunctionPlugin(ctx context.Context, request operatio
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreatePostFunctionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "PostFunctionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -30709,6 +31621,10 @@ func (s *Plugins) UpdatePostfunctionPlugin(ctx context.Context, request operatio
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30807,7 +31723,7 @@ func (s *Plugins) DeletePrefunctionPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "delete-prefunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30844,6 +31760,10 @@ func (s *Plugins) DeletePrefunctionPlugin(ctx context.Context, request operation
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -30922,7 +31842,7 @@ func (s *Plugins) GetPrefunctionPlugin(ctx context.Context, request operations.G
 		Context:        ctx,
 		OperationID:    "get-prefunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -30959,6 +31879,10 @@ func (s *Plugins) GetPrefunctionPlugin(ctx context.Context, request operations.G
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31058,7 +31982,7 @@ func (s *Plugins) UpdatePrefunctionPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "update-prefunction-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31078,7 +32002,7 @@ func (s *Plugins) UpdatePrefunctionPlugin(ctx context.Context, request operation
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreatePreFunctionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "PreFunctionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -31101,6 +32025,10 @@ func (s *Plugins) UpdatePrefunctionPlugin(ctx context.Context, request operation
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31199,7 +32127,7 @@ func (s *Plugins) DeletePrometheusPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "delete-prometheus-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31236,6 +32164,10 @@ func (s *Plugins) DeletePrometheusPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31314,7 +32246,7 @@ func (s *Plugins) GetPrometheusPlugin(ctx context.Context, request operations.Ge
 		Context:        ctx,
 		OperationID:    "get-prometheus-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31351,6 +32283,10 @@ func (s *Plugins) GetPrometheusPlugin(ctx context.Context, request operations.Ge
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31450,7 +32386,7 @@ func (s *Plugins) UpdatePrometheusPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "update-prometheus-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31470,7 +32406,7 @@ func (s *Plugins) UpdatePrometheusPlugin(ctx context.Context, request operations
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreatePrometheusPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "PrometheusPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -31493,6 +32429,10 @@ func (s *Plugins) UpdatePrometheusPlugin(ctx context.Context, request operations
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31591,7 +32531,7 @@ func (s *Plugins) DeleteProxycachePlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "delete-proxycache-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31628,6 +32568,10 @@ func (s *Plugins) DeleteProxycachePlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31706,7 +32650,7 @@ func (s *Plugins) GetProxycachePlugin(ctx context.Context, request operations.Ge
 		Context:        ctx,
 		OperationID:    "get-proxycache-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31743,6 +32687,10 @@ func (s *Plugins) GetProxycachePlugin(ctx context.Context, request operations.Ge
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31842,7 +32790,7 @@ func (s *Plugins) UpdateProxycachePlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "update-proxycache-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -31862,7 +32810,7 @@ func (s *Plugins) UpdateProxycachePlugin(ctx context.Context, request operations
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateProxyCachePlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ProxyCachePlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -31885,6 +32833,10 @@ func (s *Plugins) UpdateProxycachePlugin(ctx context.Context, request operations
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -31983,7 +32935,7 @@ func (s *Plugins) DeleteProxycacheadvancedPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-proxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32020,6 +32972,10 @@ func (s *Plugins) DeleteProxycacheadvancedPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32098,7 +33054,7 @@ func (s *Plugins) GetProxycacheadvancedPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-proxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32135,6 +33091,10 @@ func (s *Plugins) GetProxycacheadvancedPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32234,7 +33194,7 @@ func (s *Plugins) UpdateProxycacheadvancedPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-proxycacheadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32254,7 +33214,7 @@ func (s *Plugins) UpdateProxycacheadvancedPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateProxyCacheAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ProxyCacheAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -32277,6 +33237,10 @@ func (s *Plugins) UpdateProxycacheadvancedPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32375,7 +33339,7 @@ func (s *Plugins) DeleteRatelimitingPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "delete-ratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32412,6 +33376,10 @@ func (s *Plugins) DeleteRatelimitingPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32490,7 +33458,7 @@ func (s *Plugins) GetRatelimitingPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "get-ratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32527,6 +33495,10 @@ func (s *Plugins) GetRatelimitingPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32626,7 +33598,7 @@ func (s *Plugins) UpdateRatelimitingPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "update-ratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32646,7 +33618,7 @@ func (s *Plugins) UpdateRatelimitingPlugin(ctx context.Context, request operatio
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRateLimitingPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RateLimitingPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -32669,6 +33641,10 @@ func (s *Plugins) UpdateRatelimitingPlugin(ctx context.Context, request operatio
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32767,7 +33743,7 @@ func (s *Plugins) DeleteRatelimitingadvancedPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "delete-ratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32804,6 +33780,10 @@ func (s *Plugins) DeleteRatelimitingadvancedPlugin(ctx context.Context, request 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -32882,7 +33862,7 @@ func (s *Plugins) GetRatelimitingadvancedPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "get-ratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -32919,6 +33899,10 @@ func (s *Plugins) GetRatelimitingadvancedPlugin(ctx context.Context, request ope
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33018,7 +34002,7 @@ func (s *Plugins) UpdateRatelimitingadvancedPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "update-ratelimitingadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33038,7 +34022,7 @@ func (s *Plugins) UpdateRatelimitingadvancedPlugin(ctx context.Context, request 
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRateLimitingAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RateLimitingAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -33061,6 +34045,10 @@ func (s *Plugins) UpdateRatelimitingadvancedPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33159,7 +34147,7 @@ func (s *Plugins) DeleteRequestsizelimitingPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "delete-requestsizelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33196,6 +34184,10 @@ func (s *Plugins) DeleteRequestsizelimitingPlugin(ctx context.Context, request o
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33274,7 +34266,7 @@ func (s *Plugins) GetRequestsizelimitingPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "get-requestsizelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33311,6 +34303,10 @@ func (s *Plugins) GetRequestsizelimitingPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33410,7 +34406,7 @@ func (s *Plugins) UpdateRequestsizelimitingPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "update-requestsizelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33430,7 +34426,7 @@ func (s *Plugins) UpdateRequestsizelimitingPlugin(ctx context.Context, request o
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRequestSizeLimitingPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RequestSizeLimitingPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -33453,6 +34449,10 @@ func (s *Plugins) UpdateRequestsizelimitingPlugin(ctx context.Context, request o
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33551,7 +34551,7 @@ func (s *Plugins) DeleteRequestterminationPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-requesttermination-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33588,6 +34588,10 @@ func (s *Plugins) DeleteRequestterminationPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33666,7 +34670,7 @@ func (s *Plugins) GetRequestterminationPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-requesttermination-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33703,6 +34707,10 @@ func (s *Plugins) GetRequestterminationPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33802,7 +34810,7 @@ func (s *Plugins) UpdateRequestterminationPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-requesttermination-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33822,7 +34830,7 @@ func (s *Plugins) UpdateRequestterminationPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRequestTerminationPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RequestTerminationPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -33845,6 +34853,10 @@ func (s *Plugins) UpdateRequestterminationPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -33943,7 +34955,7 @@ func (s *Plugins) DeleteRequesttransformerPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-requesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -33980,6 +34992,10 @@ func (s *Plugins) DeleteRequesttransformerPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34058,7 +35074,7 @@ func (s *Plugins) GetRequesttransformerPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-requesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34095,6 +35111,10 @@ func (s *Plugins) GetRequesttransformerPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34194,7 +35214,7 @@ func (s *Plugins) UpdateRequesttransformerPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-requesttransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34214,7 +35234,7 @@ func (s *Plugins) UpdateRequesttransformerPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRequestTransformerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RequestTransformerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -34237,6 +35257,10 @@ func (s *Plugins) UpdateRequesttransformerPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34335,7 +35359,7 @@ func (s *Plugins) DeleteRequesttransformeradvancedPlugin(ctx context.Context, re
 		Context:        ctx,
 		OperationID:    "delete-requesttransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34372,6 +35396,10 @@ func (s *Plugins) DeleteRequesttransformeradvancedPlugin(ctx context.Context, re
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34450,7 +35478,7 @@ func (s *Plugins) GetRequesttransformeradvancedPlugin(ctx context.Context, reque
 		Context:        ctx,
 		OperationID:    "get-requesttransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34487,6 +35515,10 @@ func (s *Plugins) GetRequesttransformeradvancedPlugin(ctx context.Context, reque
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34586,7 +35618,7 @@ func (s *Plugins) UpdateRequesttransformeradvancedPlugin(ctx context.Context, re
 		Context:        ctx,
 		OperationID:    "update-requesttransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34606,7 +35638,7 @@ func (s *Plugins) UpdateRequesttransformeradvancedPlugin(ctx context.Context, re
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRequestTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RequestTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -34629,6 +35661,10 @@ func (s *Plugins) UpdateRequesttransformeradvancedPlugin(ctx context.Context, re
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34727,7 +35763,7 @@ func (s *Plugins) DeleteRequestvalidatorPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "delete-requestvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34764,6 +35800,10 @@ func (s *Plugins) DeleteRequestvalidatorPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34842,7 +35882,7 @@ func (s *Plugins) GetRequestvalidatorPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "get-requestvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34879,6 +35919,10 @@ func (s *Plugins) GetRequestvalidatorPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -34978,7 +36022,7 @@ func (s *Plugins) UpdateRequestvalidatorPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "update-requestvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -34998,7 +36042,7 @@ func (s *Plugins) UpdateRequestvalidatorPlugin(ctx context.Context, request oper
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRequestValidatorPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RequestValidatorPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -35021,6 +36065,10 @@ func (s *Plugins) UpdateRequestvalidatorPlugin(ctx context.Context, request oper
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35119,7 +36167,7 @@ func (s *Plugins) DeleteResponseratelimitingPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "delete-responseratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35156,6 +36204,10 @@ func (s *Plugins) DeleteResponseratelimitingPlugin(ctx context.Context, request 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35234,7 +36286,7 @@ func (s *Plugins) GetResponseratelimitingPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "get-responseratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35271,6 +36323,10 @@ func (s *Plugins) GetResponseratelimitingPlugin(ctx context.Context, request ope
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35370,7 +36426,7 @@ func (s *Plugins) UpdateResponseratelimitingPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "update-responseratelimiting-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35390,7 +36446,7 @@ func (s *Plugins) UpdateResponseratelimitingPlugin(ctx context.Context, request 
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateResponseRatelimitingPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ResponseRatelimitingPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -35413,6 +36469,10 @@ func (s *Plugins) UpdateResponseratelimitingPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35511,7 +36571,7 @@ func (s *Plugins) DeleteResponsetransformerPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "delete-responsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35548,6 +36608,10 @@ func (s *Plugins) DeleteResponsetransformerPlugin(ctx context.Context, request o
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35626,7 +36690,7 @@ func (s *Plugins) GetResponsetransformerPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "get-responsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35663,6 +36727,10 @@ func (s *Plugins) GetResponsetransformerPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35762,7 +36830,7 @@ func (s *Plugins) UpdateResponsetransformerPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "update-responsetransformer-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35782,7 +36850,7 @@ func (s *Plugins) UpdateResponsetransformerPlugin(ctx context.Context, request o
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateResponseTransformerPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ResponseTransformerPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -35805,6 +36873,10 @@ func (s *Plugins) UpdateResponsetransformerPlugin(ctx context.Context, request o
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -35903,7 +36975,7 @@ func (s *Plugins) DeleteResponsetransformeradvancedPlugin(ctx context.Context, r
 		Context:        ctx,
 		OperationID:    "delete-responsetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -35940,6 +37012,10 @@ func (s *Plugins) DeleteResponsetransformeradvancedPlugin(ctx context.Context, r
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36018,7 +37094,7 @@ func (s *Plugins) GetResponsetransformeradvancedPlugin(ctx context.Context, requ
 		Context:        ctx,
 		OperationID:    "get-responsetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36055,6 +37131,10 @@ func (s *Plugins) GetResponsetransformeradvancedPlugin(ctx context.Context, requ
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36154,7 +37234,7 @@ func (s *Plugins) UpdateResponsetransformeradvancedPlugin(ctx context.Context, r
 		Context:        ctx,
 		OperationID:    "update-responsetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36174,7 +37254,7 @@ func (s *Plugins) UpdateResponsetransformeradvancedPlugin(ctx context.Context, r
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateResponseTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ResponseTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -36197,6 +37277,10 @@ func (s *Plugins) UpdateResponsetransformeradvancedPlugin(ctx context.Context, r
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36295,7 +37379,7 @@ func (s *Plugins) DeleteRoutebyheaderPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "delete-routebyheader-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36332,6 +37416,10 @@ func (s *Plugins) DeleteRoutebyheaderPlugin(ctx context.Context, request operati
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36410,7 +37498,7 @@ func (s *Plugins) GetRoutebyheaderPlugin(ctx context.Context, request operations
 		Context:        ctx,
 		OperationID:    "get-routebyheader-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36447,6 +37535,10 @@ func (s *Plugins) GetRoutebyheaderPlugin(ctx context.Context, request operations
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36546,7 +37638,7 @@ func (s *Plugins) UpdateRoutebyheaderPlugin(ctx context.Context, request operati
 		Context:        ctx,
 		OperationID:    "update-routebyheader-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36566,7 +37658,7 @@ func (s *Plugins) UpdateRoutebyheaderPlugin(ctx context.Context, request operati
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRouteByHeaderPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RouteByHeaderPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -36589,6 +37681,10 @@ func (s *Plugins) UpdateRoutebyheaderPlugin(ctx context.Context, request operati
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36687,7 +37783,7 @@ func (s *Plugins) DeleteRoutetransformeradvancedPlugin(ctx context.Context, requ
 		Context:        ctx,
 		OperationID:    "delete-routetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36724,6 +37820,10 @@ func (s *Plugins) DeleteRoutetransformeradvancedPlugin(ctx context.Context, requ
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36802,7 +37902,7 @@ func (s *Plugins) GetRoutetransformeradvancedPlugin(ctx context.Context, request
 		Context:        ctx,
 		OperationID:    "get-routetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36839,6 +37939,10 @@ func (s *Plugins) GetRoutetransformeradvancedPlugin(ctx context.Context, request
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -36938,7 +38042,7 @@ func (s *Plugins) UpdateRoutetransformeradvancedPlugin(ctx context.Context, requ
 		Context:        ctx,
 		OperationID:    "update-routetransformeradvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -36958,7 +38062,7 @@ func (s *Plugins) UpdateRoutetransformeradvancedPlugin(ctx context.Context, requ
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateRouteTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "RouteTransformerAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -36981,6 +38085,10 @@ func (s *Plugins) UpdateRoutetransformeradvancedPlugin(ctx context.Context, requ
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37079,7 +38187,7 @@ func (s *Plugins) DeleteSamlPlugin(ctx context.Context, request operations.Delet
 		Context:        ctx,
 		OperationID:    "delete-saml-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37116,6 +38224,10 @@ func (s *Plugins) DeleteSamlPlugin(ctx context.Context, request operations.Delet
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37194,7 +38306,7 @@ func (s *Plugins) GetSamlPlugin(ctx context.Context, request operations.GetSamlP
 		Context:        ctx,
 		OperationID:    "get-saml-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37231,6 +38343,10 @@ func (s *Plugins) GetSamlPlugin(ctx context.Context, request operations.GetSamlP
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37330,7 +38446,7 @@ func (s *Plugins) UpdateSamlPlugin(ctx context.Context, request operations.Updat
 		Context:        ctx,
 		OperationID:    "update-saml-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37350,7 +38466,7 @@ func (s *Plugins) UpdateSamlPlugin(ctx context.Context, request operations.Updat
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateSamlPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "SamlPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -37373,6 +38489,10 @@ func (s *Plugins) UpdateSamlPlugin(ctx context.Context, request operations.Updat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37471,7 +38591,7 @@ func (s *Plugins) DeleteSessionPlugin(ctx context.Context, request operations.De
 		Context:        ctx,
 		OperationID:    "delete-session-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37508,6 +38628,10 @@ func (s *Plugins) DeleteSessionPlugin(ctx context.Context, request operations.De
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37586,7 +38710,7 @@ func (s *Plugins) GetSessionPlugin(ctx context.Context, request operations.GetSe
 		Context:        ctx,
 		OperationID:    "get-session-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37623,6 +38747,10 @@ func (s *Plugins) GetSessionPlugin(ctx context.Context, request operations.GetSe
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37722,7 +38850,7 @@ func (s *Plugins) UpdateSessionPlugin(ctx context.Context, request operations.Up
 		Context:        ctx,
 		OperationID:    "update-session-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37742,7 +38870,7 @@ func (s *Plugins) UpdateSessionPlugin(ctx context.Context, request operations.Up
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateSessionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "SessionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -37765,6 +38893,10 @@ func (s *Plugins) UpdateSessionPlugin(ctx context.Context, request operations.Up
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37863,7 +38995,7 @@ func (s *Plugins) DeleteStatsdPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-statsd-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -37900,6 +39032,10 @@ func (s *Plugins) DeleteStatsdPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -37978,7 +39114,7 @@ func (s *Plugins) GetStatsdPlugin(ctx context.Context, request operations.GetSta
 		Context:        ctx,
 		OperationID:    "get-statsd-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38015,6 +39151,10 @@ func (s *Plugins) GetStatsdPlugin(ctx context.Context, request operations.GetSta
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38114,7 +39254,7 @@ func (s *Plugins) UpdateStatsdPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-statsd-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38134,7 +39274,7 @@ func (s *Plugins) UpdateStatsdPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateStatsdPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "StatsdPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -38157,6 +39297,10 @@ func (s *Plugins) UpdateStatsdPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38255,7 +39399,7 @@ func (s *Plugins) DeleteStatsdadvancedPlugin(ctx context.Context, request operat
 		Context:        ctx,
 		OperationID:    "delete-statsdadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38292,6 +39436,10 @@ func (s *Plugins) DeleteStatsdadvancedPlugin(ctx context.Context, request operat
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38370,7 +39518,7 @@ func (s *Plugins) GetStatsdadvancedPlugin(ctx context.Context, request operation
 		Context:        ctx,
 		OperationID:    "get-statsdadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38407,6 +39555,10 @@ func (s *Plugins) GetStatsdadvancedPlugin(ctx context.Context, request operation
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38506,7 +39658,7 @@ func (s *Plugins) UpdateStatsdadvancedPlugin(ctx context.Context, request operat
 		Context:        ctx,
 		OperationID:    "update-statsdadvanced-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38526,7 +39678,7 @@ func (s *Plugins) UpdateStatsdadvancedPlugin(ctx context.Context, request operat
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateStatsdAdvancedPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "StatsdAdvancedPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -38549,6 +39701,10 @@ func (s *Plugins) UpdateStatsdadvancedPlugin(ctx context.Context, request operat
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38647,7 +39803,7 @@ func (s *Plugins) DeleteSyslogPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-syslog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38684,6 +39840,10 @@ func (s *Plugins) DeleteSyslogPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38762,7 +39922,7 @@ func (s *Plugins) GetSyslogPlugin(ctx context.Context, request operations.GetSys
 		Context:        ctx,
 		OperationID:    "get-syslog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38799,6 +39959,10 @@ func (s *Plugins) GetSyslogPlugin(ctx context.Context, request operations.GetSys
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -38898,7 +40062,7 @@ func (s *Plugins) UpdateSyslogPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-syslog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -38918,7 +40082,7 @@ func (s *Plugins) UpdateSyslogPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateSyslogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "SyslogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -38941,6 +40105,10 @@ func (s *Plugins) UpdateSyslogPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39039,7 +40207,7 @@ func (s *Plugins) DeleteTcplogPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-tcplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39076,6 +40244,10 @@ func (s *Plugins) DeleteTcplogPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39154,7 +40326,7 @@ func (s *Plugins) GetTcplogPlugin(ctx context.Context, request operations.GetTcp
 		Context:        ctx,
 		OperationID:    "get-tcplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39191,6 +40363,10 @@ func (s *Plugins) GetTcplogPlugin(ctx context.Context, request operations.GetTcp
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39290,7 +40466,7 @@ func (s *Plugins) UpdateTcplogPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-tcplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39310,7 +40486,7 @@ func (s *Plugins) UpdateTcplogPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateTCPLogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "TCPLogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -39333,6 +40509,10 @@ func (s *Plugins) UpdateTcplogPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39431,7 +40611,7 @@ func (s *Plugins) DeleteTlshandshakemodifierPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "delete-tlshandshakemodifier-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39468,6 +40648,10 @@ func (s *Plugins) DeleteTlshandshakemodifierPlugin(ctx context.Context, request 
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39546,7 +40730,7 @@ func (s *Plugins) GetTlshandshakemodifierPlugin(ctx context.Context, request ope
 		Context:        ctx,
 		OperationID:    "get-tlshandshakemodifier-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39583,6 +40767,10 @@ func (s *Plugins) GetTlshandshakemodifierPlugin(ctx context.Context, request ope
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39682,7 +40870,7 @@ func (s *Plugins) UpdateTlshandshakemodifierPlugin(ctx context.Context, request 
 		Context:        ctx,
 		OperationID:    "update-tlshandshakemodifier-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39702,7 +40890,7 @@ func (s *Plugins) UpdateTlshandshakemodifierPlugin(ctx context.Context, request 
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateTLSHandshakeModifierPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "TLSHandshakeModifierPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -39725,6 +40913,10 @@ func (s *Plugins) UpdateTlshandshakemodifierPlugin(ctx context.Context, request 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39823,7 +41015,7 @@ func (s *Plugins) DeleteTlsmetadataheadersPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-tlsmetadataheaders-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39860,6 +41052,10 @@ func (s *Plugins) DeleteTlsmetadataheadersPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -39938,7 +41134,7 @@ func (s *Plugins) GetTlsmetadataheadersPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-tlsmetadataheaders-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -39975,6 +41171,10 @@ func (s *Plugins) GetTlsmetadataheadersPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40074,7 +41274,7 @@ func (s *Plugins) UpdateTlsmetadataheadersPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-tlsmetadataheaders-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40094,7 +41294,7 @@ func (s *Plugins) UpdateTlsmetadataheadersPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateTLSMetadataHeadersPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "TLSMetadataHeadersPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -40117,6 +41317,10 @@ func (s *Plugins) UpdateTlsmetadataheadersPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40215,7 +41419,7 @@ func (s *Plugins) DeleteUdplogPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-udplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40252,6 +41456,10 @@ func (s *Plugins) DeleteUdplogPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40330,7 +41538,7 @@ func (s *Plugins) GetUdplogPlugin(ctx context.Context, request operations.GetUdp
 		Context:        ctx,
 		OperationID:    "get-udplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40367,6 +41575,10 @@ func (s *Plugins) GetUdplogPlugin(ctx context.Context, request operations.GetUdp
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40466,7 +41678,7 @@ func (s *Plugins) UpdateUdplogPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-udplog-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40486,7 +41698,7 @@ func (s *Plugins) UpdateUdplogPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateUDPLogPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "UDPLogPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -40509,6 +41721,10 @@ func (s *Plugins) UpdateUdplogPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40607,7 +41823,7 @@ func (s *Plugins) DeleteUpstreamtimeoutPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "delete-upstreamtimeout-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40644,6 +41860,10 @@ func (s *Plugins) DeleteUpstreamtimeoutPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40722,7 +41942,7 @@ func (s *Plugins) GetUpstreamtimeoutPlugin(ctx context.Context, request operatio
 		Context:        ctx,
 		OperationID:    "get-upstreamtimeout-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40759,6 +41979,10 @@ func (s *Plugins) GetUpstreamtimeoutPlugin(ctx context.Context, request operatio
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40858,7 +42082,7 @@ func (s *Plugins) UpdateUpstreamtimeoutPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "update-upstreamtimeout-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -40878,7 +42102,7 @@ func (s *Plugins) UpdateUpstreamtimeoutPlugin(ctx context.Context, request opera
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateUpstreamTimeoutPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "UpstreamTimeoutPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -40901,6 +42125,10 @@ func (s *Plugins) UpdateUpstreamtimeoutPlugin(ctx context.Context, request opera
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -40999,7 +42227,7 @@ func (s *Plugins) DeleteVaultauthPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "delete-vaultauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41036,6 +42264,10 @@ func (s *Plugins) DeleteVaultauthPlugin(ctx context.Context, request operations.
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41114,7 +42346,7 @@ func (s *Plugins) GetVaultauthPlugin(ctx context.Context, request operations.Get
 		Context:        ctx,
 		OperationID:    "get-vaultauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41151,6 +42383,10 @@ func (s *Plugins) GetVaultauthPlugin(ctx context.Context, request operations.Get
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41250,7 +42486,7 @@ func (s *Plugins) UpdateVaultauthPlugin(ctx context.Context, request operations.
 		Context:        ctx,
 		OperationID:    "update-vaultauth-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41270,7 +42506,7 @@ func (s *Plugins) UpdateVaultauthPlugin(ctx context.Context, request operations.
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateVaultAuthPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "VaultAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -41293,6 +42529,10 @@ func (s *Plugins) UpdateVaultauthPlugin(ctx context.Context, request operations.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41391,7 +42631,7 @@ func (s *Plugins) DeleteWebsocketsizelimitPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-websocketsizelimit-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41428,6 +42668,10 @@ func (s *Plugins) DeleteWebsocketsizelimitPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41506,7 +42750,7 @@ func (s *Plugins) GetWebsocketsizelimitPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-websocketsizelimit-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41543,6 +42787,10 @@ func (s *Plugins) GetWebsocketsizelimitPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41642,7 +42890,7 @@ func (s *Plugins) UpdateWebsocketsizelimitPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-websocketsizelimit-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41662,7 +42910,7 @@ func (s *Plugins) UpdateWebsocketsizelimitPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateWebsocketSizeLimitPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "WebsocketSizeLimitPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -41685,6 +42933,10 @@ func (s *Plugins) UpdateWebsocketsizelimitPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41783,7 +43035,7 @@ func (s *Plugins) DeleteWebsocketvalidatorPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "delete-websocketvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41820,6 +43072,10 @@ func (s *Plugins) DeleteWebsocketvalidatorPlugin(ctx context.Context, request op
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -41898,7 +43154,7 @@ func (s *Plugins) GetWebsocketvalidatorPlugin(ctx context.Context, request opera
 		Context:        ctx,
 		OperationID:    "get-websocketvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -41935,6 +43191,10 @@ func (s *Plugins) GetWebsocketvalidatorPlugin(ctx context.Context, request opera
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42034,7 +43294,7 @@ func (s *Plugins) UpdateWebsocketvalidatorPlugin(ctx context.Context, request op
 		Context:        ctx,
 		OperationID:    "update-websocketvalidator-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42054,7 +43314,7 @@ func (s *Plugins) UpdateWebsocketvalidatorPlugin(ctx context.Context, request op
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateWebsocketValidatorPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "WebsocketValidatorPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -42077,6 +43337,10 @@ func (s *Plugins) UpdateWebsocketvalidatorPlugin(ctx context.Context, request op
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42175,7 +43439,7 @@ func (s *Plugins) DeleteXmlthreatprotectionPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "delete-xmlthreatprotection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42212,6 +43476,10 @@ func (s *Plugins) DeleteXmlthreatprotectionPlugin(ctx context.Context, request o
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42290,7 +43558,7 @@ func (s *Plugins) GetXmlthreatprotectionPlugin(ctx context.Context, request oper
 		Context:        ctx,
 		OperationID:    "get-xmlthreatprotection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42327,6 +43595,10 @@ func (s *Plugins) GetXmlthreatprotectionPlugin(ctx context.Context, request oper
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42426,7 +43698,7 @@ func (s *Plugins) UpdateXmlthreatprotectionPlugin(ctx context.Context, request o
 		Context:        ctx,
 		OperationID:    "update-xmlthreatprotection-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42446,7 +43718,7 @@ func (s *Plugins) UpdateXmlthreatprotectionPlugin(ctx context.Context, request o
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateXMLThreatProtectionPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "XMLThreatProtectionPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -42469,6 +43741,10 @@ func (s *Plugins) UpdateXmlthreatprotectionPlugin(ctx context.Context, request o
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42567,7 +43843,7 @@ func (s *Plugins) DeleteZipkinPlugin(ctx context.Context, request operations.Del
 		Context:        ctx,
 		OperationID:    "delete-zipkin-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42604,6 +43880,10 @@ func (s *Plugins) DeleteZipkinPlugin(ctx context.Context, request operations.Del
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42682,7 +43962,7 @@ func (s *Plugins) GetZipkinPlugin(ctx context.Context, request operations.GetZip
 		Context:        ctx,
 		OperationID:    "get-zipkin-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42719,6 +43999,10 @@ func (s *Plugins) GetZipkinPlugin(ctx context.Context, request operations.GetZip
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42818,7 +44102,7 @@ func (s *Plugins) UpdateZipkinPlugin(ctx context.Context, request operations.Upd
 		Context:        ctx,
 		OperationID:    "update-zipkin-plugin",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42838,7 +44122,7 @@ func (s *Plugins) UpdateZipkinPlugin(ctx context.Context, request operations.Upd
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
 
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "CreateZipkinPlugin", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, true, "ZipkinPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -42861,6 +44145,10 @@ func (s *Plugins) UpdateZipkinPlugin(ctx context.Context, request operations.Upd
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -42959,7 +44247,7 @@ func (s *Plugins) FetchPluginSchema(ctx context.Context, request operations.Fetc
 		Context:        ctx,
 		OperationID:    "fetch-plugin-schema",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -42996,6 +44284,10 @@ func (s *Plugins) FetchPluginSchema(ctx context.Context, request operations.Fetc
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {

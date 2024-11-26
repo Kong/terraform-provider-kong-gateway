@@ -6,43 +6,42 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// AcmePluginAccountKey - The private key associated with the account.
-type AcmePluginAccountKey struct {
+// AccountKey - The private key associated with the account.
+type AccountKey struct {
 	// The Key ID.
 	KeyID string `json:"key_id"`
 	// The ID of the key set to associate the Key ID with.
 	KeySet *string `json:"key_set,omitempty"`
 }
 
-func (o *AcmePluginAccountKey) GetKeyID() string {
+func (o *AccountKey) GetKeyID() string {
 	if o == nil {
 		return ""
 	}
 	return o.KeyID
 }
 
-func (o *AcmePluginAccountKey) GetKeySet() *string {
+func (o *AccountKey) GetKeySet() *string {
 	if o == nil {
 		return nil
 	}
 	return o.KeySet
 }
 
-// AcmePluginCertType - The certificate type to create. The possible values are `'rsa'` for RSA certificate or `'ecc'` for EC certificate.
-type AcmePluginCertType string
+// CertType - The certificate type to create. The possible values are `'rsa'` for RSA certificate or `'ecc'` for EC certificate.
+type CertType string
 
 const (
-	AcmePluginCertTypeRsa AcmePluginCertType = "rsa"
-	AcmePluginCertTypeEcc AcmePluginCertType = "ecc"
+	CertTypeRsa CertType = "rsa"
+	CertTypeEcc CertType = "ecc"
 )
 
-func (e AcmePluginCertType) ToPointer() *AcmePluginCertType {
+func (e CertType) ToPointer() *CertType {
 	return &e
 }
-func (e *AcmePluginCertType) UnmarshalJSON(data []byte) error {
+func (e *CertType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -51,26 +50,26 @@ func (e *AcmePluginCertType) UnmarshalJSON(data []byte) error {
 	case "rsa":
 		fallthrough
 	case "ecc":
-		*e = AcmePluginCertType(v)
+		*e = CertType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for AcmePluginCertType: %v", v)
+		return fmt.Errorf("invalid value for CertType: %v", v)
 	}
 }
 
-// AcmePluginRsaKeySize - RSA private key size for the certificate. The possible values are 2048, 3072, or 4096.
-type AcmePluginRsaKeySize int64
+// RsaKeySize - RSA private key size for the certificate. The possible values are 2048, 3072, or 4096.
+type RsaKeySize int64
 
 const (
-	AcmePluginRsaKeySizeTwoThousandAndFortyEight   AcmePluginRsaKeySize = 2048
-	AcmePluginRsaKeySizeThreeThousandAndSeventyTwo AcmePluginRsaKeySize = 3072
-	AcmePluginRsaKeySizeFourThousandAndNinetySix   AcmePluginRsaKeySize = 4096
+	RsaKeySizeTwoThousandAndFortyEight   RsaKeySize = 2048
+	RsaKeySizeThreeThousandAndSeventyTwo RsaKeySize = 3072
+	RsaKeySizeFourThousandAndNinetySix   RsaKeySize = 4096
 )
 
-func (e AcmePluginRsaKeySize) ToPointer() *AcmePluginRsaKeySize {
+func (e RsaKeySize) ToPointer() *RsaKeySize {
 	return &e
 }
-func (e *AcmePluginRsaKeySize) UnmarshalJSON(data []byte) error {
+func (e *RsaKeySize) UnmarshalJSON(data []byte) error {
 	var v int64
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -81,28 +80,28 @@ func (e *AcmePluginRsaKeySize) UnmarshalJSON(data []byte) error {
 	case 3072:
 		fallthrough
 	case 4096:
-		*e = AcmePluginRsaKeySize(v)
+		*e = RsaKeySize(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for AcmePluginRsaKeySize: %v", v)
+		return fmt.Errorf("invalid value for RsaKeySize: %v", v)
 	}
 }
 
-// AcmePluginStorage - The backend storage type to use. The possible values are `'kong'`, `'shm'`, `'redis'`, `'consul'`, or `'vault'`. In DB-less mode, `'kong'` storage is unavailable. Note that `'shm'` storage does not persist during Kong restarts and does not work for Kong running on different machines, so consider using one of `'kong'`, `'redis'`, `'consul'`, or `'vault'` in production. Please refer to the Hybrid Mode sections below as well.
-type AcmePluginStorage string
+// Storage - The backend storage type to use. The possible values are `'kong'`, `'shm'`, `'redis'`, `'consul'`, or `'vault'`. In DB-less mode, `'kong'` storage is unavailable. Note that `'shm'` storage does not persist during Kong restarts and does not work for Kong running on different machines, so consider using one of `'kong'`, `'redis'`, `'consul'`, or `'vault'` in production. Please refer to the Hybrid Mode sections below as well.
+type Storage string
 
 const (
-	AcmePluginStorageKong   AcmePluginStorage = "kong"
-	AcmePluginStorageShm    AcmePluginStorage = "shm"
-	AcmePluginStorageRedis  AcmePluginStorage = "redis"
-	AcmePluginStorageConsul AcmePluginStorage = "consul"
-	AcmePluginStorageVault  AcmePluginStorage = "vault"
+	StorageKong   Storage = "kong"
+	StorageShm    Storage = "shm"
+	StorageRedis  Storage = "redis"
+	StorageConsul Storage = "consul"
+	StorageVault  Storage = "vault"
 )
 
-func (e AcmePluginStorage) ToPointer() *AcmePluginStorage {
+func (e Storage) ToPointer() *Storage {
 	return &e
 }
-func (e *AcmePluginStorage) UnmarshalJSON(data []byte) error {
+func (e *Storage) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -117,14 +116,14 @@ func (e *AcmePluginStorage) UnmarshalJSON(data []byte) error {
 	case "consul":
 		fallthrough
 	case "vault":
-		*e = AcmePluginStorage(v)
+		*e = Storage(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for AcmePluginStorage: %v", v)
+		return fmt.Errorf("invalid value for Storage: %v", v)
 	}
 }
 
-type AcmePluginConsul struct {
+type Consul struct {
 	// A string representing a host name, such as example.com.
 	Host *string `json:"host,omitempty"`
 	// Boolean representation of https.
@@ -139,64 +138,64 @@ type AcmePluginConsul struct {
 	Token *string `json:"token,omitempty"`
 }
 
-func (o *AcmePluginConsul) GetHost() *string {
+func (o *Consul) GetHost() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Host
 }
 
-func (o *AcmePluginConsul) GetHTTPS() *bool {
+func (o *Consul) GetHTTPS() *bool {
 	if o == nil {
 		return nil
 	}
 	return o.HTTPS
 }
 
-func (o *AcmePluginConsul) GetKvPath() *string {
+func (o *Consul) GetKvPath() *string {
 	if o == nil {
 		return nil
 	}
 	return o.KvPath
 }
 
-func (o *AcmePluginConsul) GetPort() *int64 {
+func (o *Consul) GetPort() *int64 {
 	if o == nil {
 		return nil
 	}
 	return o.Port
 }
 
-func (o *AcmePluginConsul) GetTimeout() *float64 {
+func (o *Consul) GetTimeout() *float64 {
 	if o == nil {
 		return nil
 	}
 	return o.Timeout
 }
 
-func (o *AcmePluginConsul) GetToken() *string {
+func (o *Consul) GetToken() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Token
 }
 
-// AcmePluginExtraOptions - Custom ACME Redis options
-type AcmePluginExtraOptions struct {
+// ExtraOptions - Custom ACME Redis options
+type ExtraOptions struct {
 	// A namespace to prepend to all keys stored in Redis.
 	Namespace *string `json:"namespace,omitempty"`
 	// The number of keys to return in Redis SCAN calls.
 	ScanCount *float64 `json:"scan_count,omitempty"`
 }
 
-func (o *AcmePluginExtraOptions) GetNamespace() *string {
+func (o *ExtraOptions) GetNamespace() *string {
 	if o == nil {
 		return nil
 	}
 	return o.Namespace
 }
 
-func (o *AcmePluginExtraOptions) GetScanCount() *float64 {
+func (o *ExtraOptions) GetScanCount() *float64 {
 	if o == nil {
 		return nil
 	}
@@ -207,7 +206,7 @@ type AcmePluginRedis struct {
 	// Database to use for the Redis connection when using the `redis` strategy
 	Database *int64 `json:"database,omitempty"`
 	// Custom ACME Redis options
-	ExtraOptions *AcmePluginExtraOptions `json:"extra_options,omitempty"`
+	ExtraOptions *ExtraOptions `json:"extra_options,omitempty"`
 	// A string representing a host name, such as example.com.
 	Host *string `json:"host,omitempty"`
 	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
@@ -233,7 +232,7 @@ func (o *AcmePluginRedis) GetDatabase() *int64 {
 	return o.Database
 }
 
-func (o *AcmePluginRedis) GetExtraOptions() *AcmePluginExtraOptions {
+func (o *AcmePluginRedis) GetExtraOptions() *ExtraOptions {
 	if o == nil {
 		return nil
 	}
@@ -296,30 +295,30 @@ func (o *AcmePluginRedis) GetUsername() *string {
 	return o.Username
 }
 
-type AcmePluginShm struct {
+type Shm struct {
 	// Name of shared memory zone used for Kong API gateway storage
 	ShmName *string `json:"shm_name,omitempty"`
 }
 
-func (o *AcmePluginShm) GetShmName() *string {
+func (o *Shm) GetShmName() *string {
 	if o == nil {
 		return nil
 	}
 	return o.ShmName
 }
 
-// AcmePluginAuthMethod - Auth Method, default to token, can be 'token' or 'kubernetes'.
-type AcmePluginAuthMethod string
+// AuthMethod - Auth Method, default to token, can be 'token' or 'kubernetes'.
+type AuthMethod string
 
 const (
-	AcmePluginAuthMethodToken      AcmePluginAuthMethod = "token"
-	AcmePluginAuthMethodKubernetes AcmePluginAuthMethod = "kubernetes"
+	AuthMethodToken      AuthMethod = "token"
+	AuthMethodKubernetes AuthMethod = "kubernetes"
 )
 
-func (e AcmePluginAuthMethod) ToPointer() *AcmePluginAuthMethod {
+func (e AuthMethod) ToPointer() *AuthMethod {
 	return &e
 }
-func (e *AcmePluginAuthMethod) UnmarshalJSON(data []byte) error {
+func (e *AuthMethod) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -328,16 +327,16 @@ func (e *AcmePluginAuthMethod) UnmarshalJSON(data []byte) error {
 	case "token":
 		fallthrough
 	case "kubernetes":
-		*e = AcmePluginAuthMethod(v)
+		*e = AuthMethod(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for AcmePluginAuthMethod: %v", v)
+		return fmt.Errorf("invalid value for AuthMethod: %v", v)
 	}
 }
 
 type AcmePluginVault struct {
 	// Auth Method, default to token, can be 'token' or 'kubernetes'.
-	AuthMethod *AcmePluginAuthMethod `json:"auth_method,omitempty"`
+	AuthMethod *AuthMethod `json:"auth_method,omitempty"`
 	// Vault's authentication path to use.
 	AuthPath *string `json:"auth_path,omitempty"`
 	// The role to try and assign.
@@ -362,7 +361,7 @@ type AcmePluginVault struct {
 	Token *string `json:"token,omitempty"`
 }
 
-func (o *AcmePluginVault) GetAuthMethod() *AcmePluginAuthMethod {
+func (o *AcmePluginVault) GetAuthMethod() *AuthMethod {
 	if o == nil {
 		return nil
 	}
@@ -446,43 +445,43 @@ func (o *AcmePluginVault) GetToken() *string {
 	return o.Token
 }
 
-type AcmePluginStorageConfig struct {
-	Consul *AcmePluginConsul `json:"consul,omitempty"`
-	Kong   map[string]any    `json:"kong,omitempty"`
-	Redis  *AcmePluginRedis  `json:"redis,omitempty"`
-	Shm    *AcmePluginShm    `json:"shm,omitempty"`
-	Vault  *AcmePluginVault  `json:"vault,omitempty"`
+type StorageConfig struct {
+	Consul *Consul          `json:"consul,omitempty"`
+	Kong   map[string]any   `json:"kong,omitempty"`
+	Redis  *AcmePluginRedis `json:"redis,omitempty"`
+	Shm    *Shm             `json:"shm,omitempty"`
+	Vault  *AcmePluginVault `json:"vault,omitempty"`
 }
 
-func (o *AcmePluginStorageConfig) GetConsul() *AcmePluginConsul {
+func (o *StorageConfig) GetConsul() *Consul {
 	if o == nil {
 		return nil
 	}
 	return o.Consul
 }
 
-func (o *AcmePluginStorageConfig) GetKong() map[string]any {
+func (o *StorageConfig) GetKong() map[string]any {
 	if o == nil {
 		return nil
 	}
 	return o.Kong
 }
 
-func (o *AcmePluginStorageConfig) GetRedis() *AcmePluginRedis {
+func (o *StorageConfig) GetRedis() *AcmePluginRedis {
 	if o == nil {
 		return nil
 	}
 	return o.Redis
 }
 
-func (o *AcmePluginStorageConfig) GetShm() *AcmePluginShm {
+func (o *StorageConfig) GetShm() *Shm {
 	if o == nil {
 		return nil
 	}
 	return o.Shm
 }
 
-func (o *AcmePluginStorageConfig) GetVault() *AcmePluginVault {
+func (o *StorageConfig) GetVault() *AcmePluginVault {
 	if o == nil {
 		return nil
 	}
@@ -493,13 +492,13 @@ type AcmePluginConfig struct {
 	// The account identifier. Can be reused in a different plugin instance.
 	AccountEmail *string `json:"account_email,omitempty"`
 	// The private key associated with the account.
-	AccountKey *AcmePluginAccountKey `json:"account_key,omitempty"`
+	AccountKey *AccountKey `json:"account_key,omitempty"`
 	// If set to `true`, the plugin allows all domains and ignores any values in the `domains` list.
 	AllowAnyDomain *bool `json:"allow_any_domain,omitempty"`
 	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
 	APIURI *string `json:"api_uri,omitempty"`
 	// The certificate type to create. The possible values are `'rsa'` for RSA certificate or `'ecc'` for EC certificate.
-	CertType *AcmePluginCertType `json:"cert_type,omitempty"`
+	CertType *CertType `json:"cert_type,omitempty"`
 	// An array of strings representing hosts. A valid host is a string containing one or more labels separated by periods, with at most one wildcard label ('*')
 	Domains []string `json:"domains,omitempty"`
 	// External account binding (EAB) base64-encoded URL string of the HMAC key. You usually don't need to set this unless it is explicitly required by the CA.
@@ -516,10 +515,10 @@ type AcmePluginConfig struct {
 	// Days remaining to renew the certificate before it expires.
 	RenewThresholdDays *float64 `json:"renew_threshold_days,omitempty"`
 	// RSA private key size for the certificate. The possible values are 2048, 3072, or 4096.
-	RsaKeySize *AcmePluginRsaKeySize `json:"rsa_key_size,omitempty"`
+	RsaKeySize *RsaKeySize `json:"rsa_key_size,omitempty"`
 	// The backend storage type to use. The possible values are `'kong'`, `'shm'`, `'redis'`, `'consul'`, or `'vault'`. In DB-less mode, `'kong'` storage is unavailable. Note that `'shm'` storage does not persist during Kong restarts and does not work for Kong running on different machines, so consider using one of `'kong'`, `'redis'`, `'consul'`, or `'vault'` in production. Please refer to the Hybrid Mode sections below as well.
-	Storage       *AcmePluginStorage       `json:"storage,omitempty"`
-	StorageConfig *AcmePluginStorageConfig `json:"storage_config,omitempty"`
+	Storage       *Storage       `json:"storage,omitempty"`
+	StorageConfig *StorageConfig `json:"storage_config,omitempty"`
 	// If you are using Let's Encrypt, you must set this to `true` to agree the terms of service.
 	TosAccepted *bool `json:"tos_accepted,omitempty"`
 }
@@ -531,7 +530,7 @@ func (o *AcmePluginConfig) GetAccountEmail() *string {
 	return o.AccountEmail
 }
 
-func (o *AcmePluginConfig) GetAccountKey() *AcmePluginAccountKey {
+func (o *AcmePluginConfig) GetAccountKey() *AccountKey {
 	if o == nil {
 		return nil
 	}
@@ -552,7 +551,7 @@ func (o *AcmePluginConfig) GetAPIURI() *string {
 	return o.APIURI
 }
 
-func (o *AcmePluginConfig) GetCertType() *AcmePluginCertType {
+func (o *AcmePluginConfig) GetCertType() *CertType {
 	if o == nil {
 		return nil
 	}
@@ -608,21 +607,21 @@ func (o *AcmePluginConfig) GetRenewThresholdDays() *float64 {
 	return o.RenewThresholdDays
 }
 
-func (o *AcmePluginConfig) GetRsaKeySize() *AcmePluginRsaKeySize {
+func (o *AcmePluginConfig) GetRsaKeySize() *RsaKeySize {
 	if o == nil {
 		return nil
 	}
 	return o.RsaKeySize
 }
 
-func (o *AcmePluginConfig) GetStorage() *AcmePluginStorage {
+func (o *AcmePluginConfig) GetStorage() *Storage {
 	if o == nil {
 		return nil
 	}
 	return o.Storage
 }
 
-func (o *AcmePluginConfig) GetStorageConfig() *AcmePluginStorageConfig {
+func (o *AcmePluginConfig) GetStorageConfig() *StorageConfig {
 	if o == nil {
 		return nil
 	}
@@ -634,6 +633,70 @@ func (o *AcmePluginConfig) GetTosAccepted() *bool {
 		return nil
 	}
 	return o.TosAccepted
+}
+
+// AcmePluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type AcmePluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *AcmePluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type AcmePluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *AcmePluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type AcmePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AcmePluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AcmePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AcmePluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AcmePluginOrdering struct {
+	After  *AcmePluginAfter  `json:"after,omitempty"`
+	Before *AcmePluginBefore `json:"before,omitempty"`
+}
+
+func (o *AcmePluginOrdering) GetAfter() *AcmePluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *AcmePluginOrdering) GetBefore() *AcmePluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type AcmePluginProtocols string
@@ -686,29 +749,6 @@ func (e *AcmePluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// AcmePluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type AcmePluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *AcmePluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type AcmePluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *AcmePluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // AcmePluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type AcmePluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -733,29 +773,30 @@ func (o *AcmePluginService) GetID() *string {
 	return o.ID
 }
 
+// AcmePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AcmePlugin struct {
-	Config *AcmePluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"acme" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []AcmePluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config AcmePluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *AcmePluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *AcmePluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool               `json:"enabled,omitempty"`
+	ID           *string             `json:"id,omitempty"`
+	InstanceName *string             `json:"instance_name,omitempty"`
+	name         string              `const:"acme" json:"name"`
+	Ordering     *AcmePluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []AcmePluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *AcmePluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AcmePluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AcmePlugin) MarshalJSON() ([]byte, error) {
@@ -769,11 +810,25 @@ func (a *AcmePlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *AcmePlugin) GetConfig() *AcmePluginConfig {
+func (o *AcmePlugin) GetConfig() AcmePluginConfig {
+	if o == nil {
+		return AcmePluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *AcmePlugin) GetConsumer() *AcmePluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *AcmePlugin) GetConsumerGroup() *AcmePluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *AcmePlugin) GetCreatedAt() *int64 {
@@ -804,11 +859,11 @@ func (o *AcmePlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *AcmePlugin) GetName() *string {
-	return types.String("acme")
+func (o *AcmePlugin) GetName() string {
+	return "acme"
 }
 
-func (o *AcmePlugin) GetOrdering() any {
+func (o *AcmePlugin) GetOrdering() *AcmePluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -820,6 +875,20 @@ func (o *AcmePlugin) GetProtocols() []AcmePluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *AcmePlugin) GetRoute() *AcmePluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *AcmePlugin) GetService() *AcmePluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *AcmePlugin) GetTags() []string {
@@ -836,30 +905,116 @@ func (o *AcmePlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *AcmePlugin) GetConsumer() *AcmePluginConsumer {
+// AcmePluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type AcmePluginInput struct {
+	Config AcmePluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *AcmePluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *AcmePluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool               `json:"enabled,omitempty"`
+	ID           *string             `json:"id,omitempty"`
+	InstanceName *string             `json:"instance_name,omitempty"`
+	name         string              `const:"acme" json:"name"`
+	Ordering     *AcmePluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []AcmePluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *AcmePluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *AcmePluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (a AcmePluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AcmePluginInput) GetConfig() AcmePluginConfig {
+	if o == nil {
+		return AcmePluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *AcmePluginInput) GetConsumer() *AcmePluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *AcmePlugin) GetConsumerGroup() *AcmePluginConsumerGroup {
+func (o *AcmePluginInput) GetConsumerGroup() *AcmePluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *AcmePlugin) GetRoute() *AcmePluginRoute {
+func (o *AcmePluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *AcmePluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *AcmePluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *AcmePluginInput) GetName() string {
+	return "acme"
+}
+
+func (o *AcmePluginInput) GetOrdering() *AcmePluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *AcmePluginInput) GetProtocols() []AcmePluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *AcmePluginInput) GetRoute() *AcmePluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *AcmePlugin) GetService() *AcmePluginService {
+func (o *AcmePluginInput) GetService() *AcmePluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *AcmePluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

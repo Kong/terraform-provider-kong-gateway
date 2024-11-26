@@ -11,42 +11,37 @@ import (
 
 func (r *PluginSyslogDataSourceModel) RefreshFromSharedSyslogPlugin(resp *shared.SyslogPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		if resp.Config.ClientErrorsSeverity != nil {
+			r.Config.ClientErrorsSeverity = types.StringValue(string(*resp.Config.ClientErrorsSeverity))
 		} else {
-			r.Config = &tfTypes.CreateSyslogPluginConfig{}
-			if resp.Config.ClientErrorsSeverity != nil {
-				r.Config.ClientErrorsSeverity = types.StringValue(string(*resp.Config.ClientErrorsSeverity))
-			} else {
-				r.Config.ClientErrorsSeverity = types.StringNull()
+			r.Config.ClientErrorsSeverity = types.StringNull()
+		}
+		if len(resp.Config.CustomFieldsByLua) > 0 {
+			r.Config.CustomFieldsByLua = make(map[string]types.String)
+			for key, value := range resp.Config.CustomFieldsByLua {
+				result, _ := json.Marshal(value)
+				r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
 			}
-			if len(resp.Config.CustomFieldsByLua) > 0 {
-				r.Config.CustomFieldsByLua = make(map[string]types.String)
-				for key, value := range resp.Config.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
-				}
-			}
-			if resp.Config.Facility != nil {
-				r.Config.Facility = types.StringValue(string(*resp.Config.Facility))
-			} else {
-				r.Config.Facility = types.StringNull()
-			}
-			if resp.Config.LogLevel != nil {
-				r.Config.LogLevel = types.StringValue(string(*resp.Config.LogLevel))
-			} else {
-				r.Config.LogLevel = types.StringNull()
-			}
-			if resp.Config.ServerErrorsSeverity != nil {
-				r.Config.ServerErrorsSeverity = types.StringValue(string(*resp.Config.ServerErrorsSeverity))
-			} else {
-				r.Config.ServerErrorsSeverity = types.StringNull()
-			}
-			if resp.Config.SuccessfulSeverity != nil {
-				r.Config.SuccessfulSeverity = types.StringValue(string(*resp.Config.SuccessfulSeverity))
-			} else {
-				r.Config.SuccessfulSeverity = types.StringNull()
-			}
+		}
+		if resp.Config.Facility != nil {
+			r.Config.Facility = types.StringValue(string(*resp.Config.Facility))
+		} else {
+			r.Config.Facility = types.StringNull()
+		}
+		if resp.Config.LogLevel != nil {
+			r.Config.LogLevel = types.StringValue(string(*resp.Config.LogLevel))
+		} else {
+			r.Config.LogLevel = types.StringNull()
+		}
+		if resp.Config.ServerErrorsSeverity != nil {
+			r.Config.ServerErrorsSeverity = types.StringValue(string(*resp.Config.ServerErrorsSeverity))
+		} else {
+			r.Config.ServerErrorsSeverity = types.StringNull()
+		}
+		if resp.Config.SuccessfulSeverity != nil {
+			r.Config.SuccessfulSeverity = types.StringValue(string(*resp.Config.SuccessfulSeverity))
+		} else {
+			r.Config.SuccessfulSeverity = types.StringNull()
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -65,10 +60,27 @@ func (r *PluginSyslogDataSourceModel) RefreshFromSharedSyslogPlugin(resp *shared
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

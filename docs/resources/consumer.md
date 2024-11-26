@@ -15,6 +15,7 @@ Consumer Resource
 ```terraform
 resource "kong-gateway_consumer" "my_consumer" {
   custom_id = "...my_custom_id..."
+  id        = "...my_id..."
   tags = [
     "..."
   ]

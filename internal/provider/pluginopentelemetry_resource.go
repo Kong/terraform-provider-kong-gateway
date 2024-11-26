@@ -36,19 +36,19 @@ type PluginOpentelemetryResource struct {
 
 // PluginOpentelemetryResourceModel describes the resource data model.
 type PluginOpentelemetryResourceModel struct {
-	Config        *tfTypes.CreateOpentelemetryPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                     `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                     `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      types.String                             `tfsdk:"ordering"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                     `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                     `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
+	Config        tfTypes.OpentelemetryPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer              `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering        `tfsdk:"ordering"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer              `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer              `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
 }
 
 func (r *PluginOpentelemetryResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,8 +60,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginOpentelemetry Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"batch_flush_delay": schema.Int64Attribute{
 						Computed:    true,
@@ -283,17 +282,38 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -376,7 +396,7 @@ func (r *PluginOpentelemetryResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := data.ToSharedCreateOpentelemetryPlugin()
+	request := data.ToSharedOpentelemetryPluginInput()
 	res, err := r.client.Plugins.CreateOpentelemetryPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -475,10 +495,10 @@ func (r *PluginOpentelemetryResource) Update(ctx context.Context, req resource.U
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createOpentelemetryPlugin := data.ToSharedCreateOpentelemetryPlugin()
+	opentelemetryPlugin := data.ToSharedOpentelemetryPluginInput()
 	request := operations.UpdateOpentelemetryPluginRequest{
-		PluginID:                  pluginID,
-		CreateOpentelemetryPlugin: createOpentelemetryPlugin,
+		PluginID:            pluginID,
+		OpentelemetryPlugin: opentelemetryPlugin,
 	}
 	res, err := r.client.Plugins.UpdateOpentelemetryPlugin(ctx, request)
 	if err != nil {

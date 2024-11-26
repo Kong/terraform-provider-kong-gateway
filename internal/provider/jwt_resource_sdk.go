@@ -15,6 +15,24 @@ func (r *JwtResourceModel) ToSharedJWTInput() *shared.JWTInput {
 	} else {
 		algorithm = nil
 	}
+	var consumer *shared.JWTConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.JWTConsumer{
+			ID: id,
+		}
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
 	key := new(string)
 	if !r.Key.IsUnknown() && !r.Key.IsNull() {
 		*key = r.Key.ValueString()
@@ -37,25 +55,14 @@ func (r *JwtResourceModel) ToSharedJWTInput() *shared.JWTInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	var consumer *shared.JWTConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.JWTConsumer{
-			ID: id,
-		}
-	}
 	out := shared.JWTInput{
 		Algorithm:    algorithm,
+		Consumer:     consumer,
+		ID:           id1,
 		Key:          key,
 		RsaPublicKey: rsaPublicKey,
 		Secret:       secret,
 		Tags:         tags,
-		Consumer:     consumer,
 	}
 	return &out
 }

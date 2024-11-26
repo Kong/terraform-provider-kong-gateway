@@ -33,7 +33,7 @@ func (s *KeySets) ListKeySet(ctx context.Context, request operations.ListKeySetR
 		Context:        ctx,
 		OperationID:    "list-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -73,6 +73,10 @@ func (s *KeySets) ListKeySet(ctx context.Context, request operations.ListKeySetR
 
 	if err := utils.PopulateQueryParams(ctx, req, request, nil); err != nil {
 		return nil, fmt.Errorf("error populating query params: %w", err)
+	}
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
 	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
@@ -172,7 +176,7 @@ func (s *KeySets) CreateKeySet(ctx context.Context, request shared.KeySetInput, 
 		Context:        ctx,
 		OperationID:    "create-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -215,6 +219,10 @@ func (s *KeySets) CreateKeySet(ctx context.Context, request shared.KeySetInput, 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -313,7 +321,7 @@ func (s *KeySets) DeleteKeySet(ctx context.Context, request operations.DeleteKey
 		Context:        ctx,
 		OperationID:    "delete-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -350,6 +358,10 @@ func (s *KeySets) DeleteKeySet(ctx context.Context, request operations.DeleteKey
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -428,7 +440,7 @@ func (s *KeySets) GetKeySet(ctx context.Context, request operations.GetKeySetReq
 		Context:        ctx,
 		OperationID:    "get-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -465,6 +477,10 @@ func (s *KeySets) GetKeySet(ctx context.Context, request operations.GetKeySetReq
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -564,7 +580,7 @@ func (s *KeySets) UpdateKeySet(ctx context.Context, request operations.UpdateKey
 		Context:        ctx,
 		OperationID:    "update-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -607,6 +623,10 @@ func (s *KeySets) UpdateKeySet(ctx context.Context, request operations.UpdateKey
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {
@@ -706,7 +726,7 @@ func (s *KeySets) UpsertKeySet(ctx context.Context, request operations.UpsertKey
 		Context:        ctx,
 		OperationID:    "upsert-key-set",
 		OAuth2Scopes:   []string{},
-		SecuritySource: nil,
+		SecuritySource: s.sdkConfiguration.Security,
 	}
 
 	o := operations.Options{}
@@ -749,6 +769,10 @@ func (s *KeySets) UpsertKeySet(ctx context.Context, request operations.UpsertKey
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
 	req.Header.Set("Content-Type", reqContentType)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
 
 	req, err = s.sdkConfiguration.Hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
 	if err != nil {

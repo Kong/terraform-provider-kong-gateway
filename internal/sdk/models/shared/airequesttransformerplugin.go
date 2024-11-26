@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
 // AiRequestTransformerPluginParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
@@ -536,7 +535,7 @@ func (e *AiRequestTransformerPluginRouteType) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type AiRequestTransformerPluginLlm struct {
+type Llm struct {
 	Auth    *AiRequestTransformerPluginAuth    `json:"auth,omitempty"`
 	Logging *AiRequestTransformerPluginLogging `json:"logging,omitempty"`
 	Model   *AiRequestTransformerPluginModel   `json:"model,omitempty"`
@@ -544,28 +543,28 @@ type AiRequestTransformerPluginLlm struct {
 	RouteType *AiRequestTransformerPluginRouteType `json:"route_type,omitempty"`
 }
 
-func (o *AiRequestTransformerPluginLlm) GetAuth() *AiRequestTransformerPluginAuth {
+func (o *Llm) GetAuth() *AiRequestTransformerPluginAuth {
 	if o == nil {
 		return nil
 	}
 	return o.Auth
 }
 
-func (o *AiRequestTransformerPluginLlm) GetLogging() *AiRequestTransformerPluginLogging {
+func (o *Llm) GetLogging() *AiRequestTransformerPluginLogging {
 	if o == nil {
 		return nil
 	}
 	return o.Logging
 }
 
-func (o *AiRequestTransformerPluginLlm) GetModel() *AiRequestTransformerPluginModel {
+func (o *Llm) GetModel() *AiRequestTransformerPluginModel {
 	if o == nil {
 		return nil
 	}
 	return o.Model
 }
 
-func (o *AiRequestTransformerPluginLlm) GetRouteType() *AiRequestTransformerPluginRouteType {
+func (o *Llm) GetRouteType() *AiRequestTransformerPluginRouteType {
 	if o == nil {
 		return nil
 	}
@@ -584,8 +583,8 @@ type AiRequestTransformerPluginConfig struct {
 	// An integer representing a port number between 0 and 65535, inclusive.
 	HTTPSProxyPort *int64 `json:"https_proxy_port,omitempty"`
 	// Verify the TLS certificate of the AI upstream service.
-	HTTPSVerify *bool                          `json:"https_verify,omitempty"`
-	Llm         *AiRequestTransformerPluginLlm `json:"llm,omitempty"`
+	HTTPSVerify *bool `json:"https_verify,omitempty"`
+	Llm         *Llm  `json:"llm,omitempty"`
 	// max allowed body size allowed to be introspected
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
 	// Use this prompt to tune the LLM system/assistant message for the incoming proxy request (from the client), and what you are expecting in return.
@@ -636,7 +635,7 @@ func (o *AiRequestTransformerPluginConfig) GetHTTPSVerify() *bool {
 	return o.HTTPSVerify
 }
 
-func (o *AiRequestTransformerPluginConfig) GetLlm() *AiRequestTransformerPluginLlm {
+func (o *AiRequestTransformerPluginConfig) GetLlm() *Llm {
 	if o == nil {
 		return nil
 	}
@@ -662,6 +661,70 @@ func (o *AiRequestTransformerPluginConfig) GetTransformationExtractPattern() *st
 		return nil
 	}
 	return o.TransformationExtractPattern
+}
+
+// AiRequestTransformerPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type AiRequestTransformerPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *AiRequestTransformerPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type AiRequestTransformerPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *AiRequestTransformerPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type AiRequestTransformerPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AiRequestTransformerPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AiRequestTransformerPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AiRequestTransformerPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AiRequestTransformerPluginOrdering struct {
+	After  *AiRequestTransformerPluginAfter  `json:"after,omitempty"`
+	Before *AiRequestTransformerPluginBefore `json:"before,omitempty"`
+}
+
+func (o *AiRequestTransformerPluginOrdering) GetAfter() *AiRequestTransformerPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *AiRequestTransformerPluginOrdering) GetBefore() *AiRequestTransformerPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type AiRequestTransformerPluginProtocols string
@@ -714,29 +777,6 @@ func (e *AiRequestTransformerPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// AiRequestTransformerPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type AiRequestTransformerPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *AiRequestTransformerPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type AiRequestTransformerPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *AiRequestTransformerPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // AiRequestTransformerPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type AiRequestTransformerPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -761,29 +801,30 @@ func (o *AiRequestTransformerPluginService) GetID() *string {
 	return o.ID
 }
 
+// AiRequestTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiRequestTransformerPlugin struct {
-	Config *AiRequestTransformerPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"ai-request-transformer" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []AiRequestTransformerPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config AiRequestTransformerPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *AiRequestTransformerPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *AiRequestTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                               `json:"enabled,omitempty"`
+	ID           *string                             `json:"id,omitempty"`
+	InstanceName *string                             `json:"instance_name,omitempty"`
+	name         string                              `const:"ai-request-transformer" json:"name"`
+	Ordering     *AiRequestTransformerPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []AiRequestTransformerPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *AiRequestTransformerPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiRequestTransformerPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiRequestTransformerPlugin) MarshalJSON() ([]byte, error) {
@@ -797,11 +838,25 @@ func (a *AiRequestTransformerPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *AiRequestTransformerPlugin) GetConfig() *AiRequestTransformerPluginConfig {
+func (o *AiRequestTransformerPlugin) GetConfig() AiRequestTransformerPluginConfig {
+	if o == nil {
+		return AiRequestTransformerPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *AiRequestTransformerPlugin) GetConsumer() *AiRequestTransformerPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *AiRequestTransformerPlugin) GetConsumerGroup() *AiRequestTransformerPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *AiRequestTransformerPlugin) GetCreatedAt() *int64 {
@@ -832,11 +887,11 @@ func (o *AiRequestTransformerPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *AiRequestTransformerPlugin) GetName() *string {
-	return types.String("ai-request-transformer")
+func (o *AiRequestTransformerPlugin) GetName() string {
+	return "ai-request-transformer"
 }
 
-func (o *AiRequestTransformerPlugin) GetOrdering() any {
+func (o *AiRequestTransformerPlugin) GetOrdering() *AiRequestTransformerPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -848,6 +903,20 @@ func (o *AiRequestTransformerPlugin) GetProtocols() []AiRequestTransformerPlugin
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *AiRequestTransformerPlugin) GetRoute() *AiRequestTransformerPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *AiRequestTransformerPlugin) GetService() *AiRequestTransformerPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *AiRequestTransformerPlugin) GetTags() []string {
@@ -864,30 +933,116 @@ func (o *AiRequestTransformerPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *AiRequestTransformerPlugin) GetConsumer() *AiRequestTransformerPluginConsumer {
+// AiRequestTransformerPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type AiRequestTransformerPluginInput struct {
+	Config AiRequestTransformerPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *AiRequestTransformerPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *AiRequestTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                               `json:"enabled,omitempty"`
+	ID           *string                             `json:"id,omitempty"`
+	InstanceName *string                             `json:"instance_name,omitempty"`
+	name         string                              `const:"ai-request-transformer" json:"name"`
+	Ordering     *AiRequestTransformerPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []AiRequestTransformerPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *AiRequestTransformerPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *AiRequestTransformerPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (a AiRequestTransformerPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *AiRequestTransformerPluginInput) GetConfig() AiRequestTransformerPluginConfig {
+	if o == nil {
+		return AiRequestTransformerPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *AiRequestTransformerPluginInput) GetConsumer() *AiRequestTransformerPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *AiRequestTransformerPlugin) GetConsumerGroup() *AiRequestTransformerPluginConsumerGroup {
+func (o *AiRequestTransformerPluginInput) GetConsumerGroup() *AiRequestTransformerPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *AiRequestTransformerPlugin) GetRoute() *AiRequestTransformerPluginRoute {
+func (o *AiRequestTransformerPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *AiRequestTransformerPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *AiRequestTransformerPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *AiRequestTransformerPluginInput) GetName() string {
+	return "ai-request-transformer"
+}
+
+func (o *AiRequestTransformerPluginInput) GetOrdering() *AiRequestTransformerPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *AiRequestTransformerPluginInput) GetProtocols() []AiRequestTransformerPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *AiRequestTransformerPluginInput) GetRoute() *AiRequestTransformerPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *AiRequestTransformerPlugin) GetService() *AiRequestTransformerPluginService {
+func (o *AiRequestTransformerPluginInput) GetService() *AiRequestTransformerPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *AiRequestTransformerPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

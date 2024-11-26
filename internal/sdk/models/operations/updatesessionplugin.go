@@ -9,8 +9,8 @@ import (
 
 type UpdateSessionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateSessionPlugin *shared.CreateSessionPlugin `request:"mediaType=application/json"`
+	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	SessionPlugin *shared.SessionPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateSessionPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateSessionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateSessionPluginRequest) GetCreateSessionPlugin() *shared.CreateSessionPlugin {
+func (o *UpdateSessionPluginRequest) GetSessionPlugin() *shared.SessionPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateSessionPlugin
+	return o.SessionPlugin
 }
 
 type UpdateSessionPluginResponse struct {

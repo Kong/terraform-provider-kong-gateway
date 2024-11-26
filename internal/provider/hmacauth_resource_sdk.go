@@ -9,22 +9,6 @@ import (
 )
 
 func (r *HMACAuthResourceModel) ToSharedHMACAuthInput() *shared.HMACAuthInput {
-	secret := new(string)
-	if !r.Secret.IsUnknown() && !r.Secret.IsNull() {
-		*secret = r.Secret.ValueString()
-	} else {
-		secret = nil
-	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	username := new(string)
-	if !r.Username.IsUnknown() && !r.Username.IsNull() {
-		*username = r.Username.ValueString()
-	} else {
-		username = nil
-	}
 	var consumer *shared.HMACAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -37,11 +21,31 @@ func (r *HMACAuthResourceModel) ToSharedHMACAuthInput() *shared.HMACAuthInput {
 			ID: id,
 		}
 	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	secret := new(string)
+	if !r.Secret.IsUnknown() && !r.Secret.IsNull() {
+		*secret = r.Secret.ValueString()
+	} else {
+		secret = nil
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	var username string
+	username = r.Username.ValueString()
+
 	out := shared.HMACAuthInput{
+		Consumer: consumer,
+		ID:       id1,
 		Secret:   secret,
 		Tags:     tags,
 		Username: username,
-		Consumer: consumer,
 	}
 	return &out
 }
@@ -61,6 +65,6 @@ func (r *HMACAuthResourceModel) RefreshFromSharedHMACAuth(resp *shared.HMACAuth)
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
-		r.Username = types.StringPointerValue(resp.Username)
+		r.Username = types.StringValue(resp.Username)
 	}
 }

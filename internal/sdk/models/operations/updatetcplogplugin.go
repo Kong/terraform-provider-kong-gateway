@@ -9,8 +9,8 @@ import (
 
 type UpdateTcplogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateTCPLogPlugin *shared.CreateTCPLogPlugin `request:"mediaType=application/json"`
+	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	TCPLogPlugin *shared.TCPLogPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateTcplogPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateTcplogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateTcplogPluginRequest) GetCreateTCPLogPlugin() *shared.CreateTCPLogPlugin {
+func (o *UpdateTcplogPluginRequest) GetTCPLogPlugin() *shared.TCPLogPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateTCPLogPlugin
+	return o.TCPLogPlugin
 }
 
 type UpdateTcplogPluginResponse struct {

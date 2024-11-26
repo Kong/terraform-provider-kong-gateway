@@ -9,8 +9,8 @@ import (
 
 type UpdateKonnectapplicationauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                           string                                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateKonnectApplicationAuthPlugin *shared.CreateKonnectApplicationAuthPlugin `request:"mediaType=application/json"`
+	PluginID                     string                                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	KonnectApplicationAuthPlugin *shared.KonnectApplicationAuthPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateKonnectapplicationauthPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateKonnectapplicationauthPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateKonnectapplicationauthPluginRequest) GetCreateKonnectApplicationAuthPlugin() *shared.CreateKonnectApplicationAuthPlugin {
+func (o *UpdateKonnectapplicationauthPluginRequest) GetKonnectApplicationAuthPlugin() *shared.KonnectApplicationAuthPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateKonnectApplicationAuthPlugin
+	return o.KonnectApplicationAuthPlugin
 }
 
 type UpdateKonnectapplicationauthPluginResponse struct {

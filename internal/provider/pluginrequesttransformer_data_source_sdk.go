@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -11,97 +10,92 @@ import (
 
 func (r *PluginRequestTransformerDataSourceModel) RefreshFromSharedRequestTransformerPlugin(resp *shared.RequestTransformerPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		if resp.Config.Add == nil {
+			r.Config.Add = nil
 		} else {
-			r.Config = &tfTypes.CreateRequestTransformerPluginConfig{}
-			if resp.Config.Add == nil {
-				r.Config.Add = nil
-			} else {
-				r.Config.Add = &tfTypes.Add{}
-				r.Config.Add.Body = []types.String{}
-				for _, v := range resp.Config.Add.Body {
-					r.Config.Add.Body = append(r.Config.Add.Body, types.StringValue(v))
-				}
-				r.Config.Add.Headers = []types.String{}
-				for _, v := range resp.Config.Add.Headers {
-					r.Config.Add.Headers = append(r.Config.Add.Headers, types.StringValue(v))
-				}
-				r.Config.Add.Querystring = []types.String{}
-				for _, v := range resp.Config.Add.Querystring {
-					r.Config.Add.Querystring = append(r.Config.Add.Querystring, types.StringValue(v))
-				}
+			r.Config.Add = &tfTypes.Add{}
+			r.Config.Add.Body = []types.String{}
+			for _, v := range resp.Config.Add.Body {
+				r.Config.Add.Body = append(r.Config.Add.Body, types.StringValue(v))
 			}
-			if resp.Config.Append == nil {
-				r.Config.Append = nil
-			} else {
-				r.Config.Append = &tfTypes.Add{}
-				r.Config.Append.Body = []types.String{}
-				for _, v := range resp.Config.Append.Body {
-					r.Config.Append.Body = append(r.Config.Append.Body, types.StringValue(v))
-				}
-				r.Config.Append.Headers = []types.String{}
-				for _, v := range resp.Config.Append.Headers {
-					r.Config.Append.Headers = append(r.Config.Append.Headers, types.StringValue(v))
-				}
-				r.Config.Append.Querystring = []types.String{}
-				for _, v := range resp.Config.Append.Querystring {
-					r.Config.Append.Querystring = append(r.Config.Append.Querystring, types.StringValue(v))
-				}
+			r.Config.Add.Headers = []types.String{}
+			for _, v := range resp.Config.Add.Headers {
+				r.Config.Add.Headers = append(r.Config.Add.Headers, types.StringValue(v))
 			}
-			r.Config.HTTPMethod = types.StringPointerValue(resp.Config.HTTPMethod)
-			if resp.Config.Remove == nil {
-				r.Config.Remove = nil
-			} else {
-				r.Config.Remove = &tfTypes.Add{}
-				r.Config.Remove.Body = []types.String{}
-				for _, v := range resp.Config.Remove.Body {
-					r.Config.Remove.Body = append(r.Config.Remove.Body, types.StringValue(v))
-				}
-				r.Config.Remove.Headers = []types.String{}
-				for _, v := range resp.Config.Remove.Headers {
-					r.Config.Remove.Headers = append(r.Config.Remove.Headers, types.StringValue(v))
-				}
-				r.Config.Remove.Querystring = []types.String{}
-				for _, v := range resp.Config.Remove.Querystring {
-					r.Config.Remove.Querystring = append(r.Config.Remove.Querystring, types.StringValue(v))
-				}
+			r.Config.Add.Querystring = []types.String{}
+			for _, v := range resp.Config.Add.Querystring {
+				r.Config.Add.Querystring = append(r.Config.Add.Querystring, types.StringValue(v))
 			}
-			if resp.Config.Rename == nil {
-				r.Config.Rename = nil
-			} else {
-				r.Config.Rename = &tfTypes.Add{}
-				r.Config.Rename.Body = []types.String{}
-				for _, v := range resp.Config.Rename.Body {
-					r.Config.Rename.Body = append(r.Config.Rename.Body, types.StringValue(v))
-				}
-				r.Config.Rename.Headers = []types.String{}
-				for _, v := range resp.Config.Rename.Headers {
-					r.Config.Rename.Headers = append(r.Config.Rename.Headers, types.StringValue(v))
-				}
-				r.Config.Rename.Querystring = []types.String{}
-				for _, v := range resp.Config.Rename.Querystring {
-					r.Config.Rename.Querystring = append(r.Config.Rename.Querystring, types.StringValue(v))
-				}
+		}
+		if resp.Config.Append == nil {
+			r.Config.Append = nil
+		} else {
+			r.Config.Append = &tfTypes.Add{}
+			r.Config.Append.Body = []types.String{}
+			for _, v := range resp.Config.Append.Body {
+				r.Config.Append.Body = append(r.Config.Append.Body, types.StringValue(v))
 			}
-			if resp.Config.Replace == nil {
-				r.Config.Replace = nil
-			} else {
-				r.Config.Replace = &tfTypes.Replace{}
-				r.Config.Replace.Body = []types.String{}
-				for _, v := range resp.Config.Replace.Body {
-					r.Config.Replace.Body = append(r.Config.Replace.Body, types.StringValue(v))
-				}
-				r.Config.Replace.Headers = []types.String{}
-				for _, v := range resp.Config.Replace.Headers {
-					r.Config.Replace.Headers = append(r.Config.Replace.Headers, types.StringValue(v))
-				}
-				r.Config.Replace.Querystring = []types.String{}
-				for _, v := range resp.Config.Replace.Querystring {
-					r.Config.Replace.Querystring = append(r.Config.Replace.Querystring, types.StringValue(v))
-				}
-				r.Config.Replace.URI = types.StringPointerValue(resp.Config.Replace.URI)
+			r.Config.Append.Headers = []types.String{}
+			for _, v := range resp.Config.Append.Headers {
+				r.Config.Append.Headers = append(r.Config.Append.Headers, types.StringValue(v))
 			}
+			r.Config.Append.Querystring = []types.String{}
+			for _, v := range resp.Config.Append.Querystring {
+				r.Config.Append.Querystring = append(r.Config.Append.Querystring, types.StringValue(v))
+			}
+		}
+		r.Config.HTTPMethod = types.StringPointerValue(resp.Config.HTTPMethod)
+		if resp.Config.Remove == nil {
+			r.Config.Remove = nil
+		} else {
+			r.Config.Remove = &tfTypes.Add{}
+			r.Config.Remove.Body = []types.String{}
+			for _, v := range resp.Config.Remove.Body {
+				r.Config.Remove.Body = append(r.Config.Remove.Body, types.StringValue(v))
+			}
+			r.Config.Remove.Headers = []types.String{}
+			for _, v := range resp.Config.Remove.Headers {
+				r.Config.Remove.Headers = append(r.Config.Remove.Headers, types.StringValue(v))
+			}
+			r.Config.Remove.Querystring = []types.String{}
+			for _, v := range resp.Config.Remove.Querystring {
+				r.Config.Remove.Querystring = append(r.Config.Remove.Querystring, types.StringValue(v))
+			}
+		}
+		if resp.Config.Rename == nil {
+			r.Config.Rename = nil
+		} else {
+			r.Config.Rename = &tfTypes.Add{}
+			r.Config.Rename.Body = []types.String{}
+			for _, v := range resp.Config.Rename.Body {
+				r.Config.Rename.Body = append(r.Config.Rename.Body, types.StringValue(v))
+			}
+			r.Config.Rename.Headers = []types.String{}
+			for _, v := range resp.Config.Rename.Headers {
+				r.Config.Rename.Headers = append(r.Config.Rename.Headers, types.StringValue(v))
+			}
+			r.Config.Rename.Querystring = []types.String{}
+			for _, v := range resp.Config.Rename.Querystring {
+				r.Config.Rename.Querystring = append(r.Config.Rename.Querystring, types.StringValue(v))
+			}
+		}
+		if resp.Config.Replace == nil {
+			r.Config.Replace = nil
+		} else {
+			r.Config.Replace = &tfTypes.Replace{}
+			r.Config.Replace.Body = []types.String{}
+			for _, v := range resp.Config.Replace.Body {
+				r.Config.Replace.Body = append(r.Config.Replace.Body, types.StringValue(v))
+			}
+			r.Config.Replace.Headers = []types.String{}
+			for _, v := range resp.Config.Replace.Headers {
+				r.Config.Replace.Headers = append(r.Config.Replace.Headers, types.StringValue(v))
+			}
+			r.Config.Replace.Querystring = []types.String{}
+			for _, v := range resp.Config.Replace.Querystring {
+				r.Config.Replace.Querystring = append(r.Config.Replace.Querystring, types.StringValue(v))
+			}
+			r.Config.Replace.URI = types.StringPointerValue(resp.Config.Replace.URI)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -120,10 +114,27 @@ func (r *PluginRequestTransformerDataSourceModel) RefreshFromSharedRequestTransf
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

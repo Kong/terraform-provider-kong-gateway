@@ -9,8 +9,8 @@ import (
 
 type UpdateRatelimitingPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                           `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateRateLimitingPlugin *shared.CreateRateLimitingPlugin `request:"mediaType=application/json"`
+	PluginID           string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	RateLimitingPlugin *shared.RateLimitingPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRatelimitingPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateRatelimitingPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRatelimitingPluginRequest) GetCreateRateLimitingPlugin() *shared.CreateRateLimitingPlugin {
+func (o *UpdateRatelimitingPluginRequest) GetRateLimitingPlugin() *shared.RateLimitingPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateRateLimitingPlugin
+	return o.RateLimitingPlugin
 }
 
 type UpdateRatelimitingPluginResponse struct {

@@ -25,6 +25,9 @@ import (
 )
 
 func debugResponse(response *http.Response) string {
+	if v := response.Request.Header.Get("Kong-Admin-Token"); v != "" {
+		response.Request.Header.Set("Kong-Admin-Token", "(sensitive)")
+	}
 	dumpReq, err := httputil.DumpRequest(response.Request, true)
 	if err != nil {
 		dumpReq, err = httputil.DumpRequest(response.Request, false)
@@ -217,6 +220,9 @@ func fieldHeadersFromRequestReader(reader *textproto.Reader, fields map[string]i
 		} else {
 			fields[k] = v
 		}
+	}
+	if _, ok := fields["Kong-Admin-Token"]; ok {
+		fields["Kong-Admin-Token"] = "(sensitive)"
 	}
 
 	return nil

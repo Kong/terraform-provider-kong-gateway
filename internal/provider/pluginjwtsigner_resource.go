@@ -34,19 +34,19 @@ type PluginJwtSignerResource struct {
 
 // PluginJwtSignerResourceModel describes the resource data model.
 type PluginJwtSignerResourceModel struct {
-	Config        *tfTypes.CreateJwtSignerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                 `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                 `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                          `tfsdk:"created_at"`
-	Enabled       types.Bool                           `tfsdk:"enabled"`
-	ID            types.String                         `tfsdk:"id"`
-	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      types.String                         `tfsdk:"ordering"`
-	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                 `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                 `tfsdk:"service"`
-	Tags          []types.String                       `tfsdk:"tags"`
-	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
+	Config        tfTypes.JwtSignerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer          `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer          `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                   `tfsdk:"created_at"`
+	Enabled       types.Bool                    `tfsdk:"enabled"`
+	ID            types.String                  `tfsdk:"id"`
+	InstanceName  types.String                  `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering    `tfsdk:"ordering"`
+	Protocols     []types.String                `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer          `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer          `tfsdk:"service"`
+	Tags          []types.String                `tfsdk:"tags"`
+	UpdatedAt     types.Int64                   `tfsdk:"updated_at"`
 }
 
 func (r *PluginJwtSignerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,8 +58,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 		MarkdownDescription: "PluginJwtSigner Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"access_token_consumer_by": schema.ListAttribute{
 						Computed:    true,
@@ -635,17 +634,38 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -728,7 +748,7 @@ func (r *PluginJwtSignerResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	request := data.ToSharedCreateJwtSignerPlugin()
+	request := data.ToSharedJwtSignerPluginInput()
 	res, err := r.client.Plugins.CreateJwtsignerPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -827,10 +847,10 @@ func (r *PluginJwtSignerResource) Update(ctx context.Context, req resource.Updat
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createJwtSignerPlugin := data.ToSharedCreateJwtSignerPlugin()
+	jwtSignerPlugin := data.ToSharedJwtSignerPluginInput()
 	request := operations.UpdateJwtsignerPluginRequest{
-		PluginID:              pluginID,
-		CreateJwtSignerPlugin: createJwtSignerPlugin,
+		PluginID:        pluginID,
+		JwtSignerPlugin: jwtSignerPlugin,
 	}
 	res, err := r.client.Plugins.UpdateJwtsignerPlugin(ctx, request)
 	if err != nil {

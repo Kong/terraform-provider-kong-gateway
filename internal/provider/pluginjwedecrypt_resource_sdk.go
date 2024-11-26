@@ -3,42 +3,62 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginJweDecryptResourceModel) ToSharedCreateJweDecryptPlugin() *shared.CreateJweDecryptPlugin {
-	var config *shared.CreateJweDecryptPluginConfig
-	if r.Config != nil {
-		forwardHeaderName := new(string)
-		if !r.Config.ForwardHeaderName.IsUnknown() && !r.Config.ForwardHeaderName.IsNull() {
-			*forwardHeaderName = r.Config.ForwardHeaderName.ValueString()
+func (r *PluginJweDecryptResourceModel) ToSharedJweDecryptPluginInput() *shared.JweDecryptPluginInput {
+	forwardHeaderName := new(string)
+	if !r.Config.ForwardHeaderName.IsUnknown() && !r.Config.ForwardHeaderName.IsNull() {
+		*forwardHeaderName = r.Config.ForwardHeaderName.ValueString()
+	} else {
+		forwardHeaderName = nil
+	}
+	var keySets []string = []string{}
+	for _, keySetsItem := range r.Config.KeySets {
+		keySets = append(keySets, keySetsItem.ValueString())
+	}
+	lookupHeaderName := new(string)
+	if !r.Config.LookupHeaderName.IsUnknown() && !r.Config.LookupHeaderName.IsNull() {
+		*lookupHeaderName = r.Config.LookupHeaderName.ValueString()
+	} else {
+		lookupHeaderName = nil
+	}
+	strict := new(bool)
+	if !r.Config.Strict.IsUnknown() && !r.Config.Strict.IsNull() {
+		*strict = r.Config.Strict.ValueBool()
+	} else {
+		strict = nil
+	}
+	config := shared.JweDecryptPluginConfig{
+		ForwardHeaderName: forwardHeaderName,
+		KeySets:           keySets,
+		LookupHeaderName:  lookupHeaderName,
+		Strict:            strict,
+	}
+	var consumer *shared.JweDecryptPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			forwardHeaderName = nil
+			id = nil
 		}
-		var keySets []string = []string{}
-		for _, keySetsItem := range r.Config.KeySets {
-			keySets = append(keySets, keySetsItem.ValueString())
+		consumer = &shared.JweDecryptPluginConsumer{
+			ID: id,
 		}
-		lookupHeaderName := new(string)
-		if !r.Config.LookupHeaderName.IsUnknown() && !r.Config.LookupHeaderName.IsNull() {
-			*lookupHeaderName = r.Config.LookupHeaderName.ValueString()
+	}
+	var consumerGroup *shared.JweDecryptPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
 		} else {
-			lookupHeaderName = nil
+			id1 = nil
 		}
-		strict := new(bool)
-		if !r.Config.Strict.IsUnknown() && !r.Config.Strict.IsNull() {
-			*strict = r.Config.Strict.ValueBool()
-		} else {
-			strict = nil
-		}
-		config = &shared.CreateJweDecryptPluginConfig{
-			ForwardHeaderName: forwardHeaderName,
-			KeySets:           keySets,
-			LookupHeaderName:  lookupHeaderName,
-			Strict:            strict,
+		consumerGroup = &shared.JweDecryptPluginConsumerGroup{
+			ID: id1,
 		}
 	}
 	enabled := new(bool)
@@ -47,101 +67,102 @@ func (r *PluginJweDecryptResourceModel) ToSharedCreateJweDecryptPlugin() *shared
 	} else {
 		enabled = nil
 	}
+	id2 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id2 = r.ID.ValueString()
+	} else {
+		id2 = nil
+	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
 		*instanceName = r.InstanceName.ValueString()
 	} else {
 		instanceName = nil
 	}
-	var ordering interface{}
-	if !r.Ordering.IsUnknown() && !r.Ordering.IsNull() {
-		_ = json.Unmarshal([]byte(r.Ordering.ValueString()), &ordering)
+	var ordering *shared.JweDecryptPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.JweDecryptPluginAfter
+		if r.Ordering.After != nil {
+			var access []string = []string{}
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.JweDecryptPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.JweDecryptPluginBefore
+		if r.Ordering.Before != nil {
+			var access1 []string = []string{}
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.JweDecryptPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.JweDecryptPluginOrdering{
+			After:  after,
+			Before: before,
+		}
 	}
-	var protocols []shared.CreateJweDecryptPluginProtocols = []shared.CreateJweDecryptPluginProtocols{}
+	var protocols []shared.JweDecryptPluginProtocols = []shared.JweDecryptPluginProtocols{}
 	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.CreateJweDecryptPluginProtocols(protocolsItem.ValueString()))
+		protocols = append(protocols, shared.JweDecryptPluginProtocols(protocolsItem.ValueString()))
+	}
+	var route *shared.JweDecryptPluginRoute
+	if r.Route != nil {
+		id3 := new(string)
+		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
+			*id3 = r.Route.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		route = &shared.JweDecryptPluginRoute{
+			ID: id3,
+		}
+	}
+	var service *shared.JweDecryptPluginService
+	if r.Service != nil {
+		id4 := new(string)
+		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
+			*id4 = r.Service.ID.ValueString()
+		} else {
+			id4 = nil
+		}
+		service = &shared.JweDecryptPluginService{
+			ID: id4,
+		}
 	}
 	var tags []string = []string{}
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	var consumer *shared.CreateJweDecryptPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.CreateJweDecryptPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.CreateJweDecryptPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.CreateJweDecryptPluginConsumerGroup{
-			ID: id1,
-		}
-	}
-	var route *shared.CreateJweDecryptPluginRoute
-	if r.Route != nil {
-		id2 := new(string)
-		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id2 = r.Route.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		route = &shared.CreateJweDecryptPluginRoute{
-			ID: id2,
-		}
-	}
-	var service *shared.CreateJweDecryptPluginService
-	if r.Service != nil {
-		id3 := new(string)
-		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id3 = r.Service.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		service = &shared.CreateJweDecryptPluginService{
-			ID: id3,
-		}
-	}
-	out := shared.CreateJweDecryptPlugin{
+	out := shared.JweDecryptPluginInput{
 		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Enabled:       enabled,
+		ID:            id2,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Protocols:     protocols,
-		Tags:          tags,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
 	}
 	return &out
 }
 
 func (r *PluginJweDecryptResourceModel) RefreshFromSharedJweDecryptPlugin(resp *shared.JweDecryptPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateJweDecryptPluginConfig{}
-			r.Config.ForwardHeaderName = types.StringPointerValue(resp.Config.ForwardHeaderName)
-			r.Config.KeySets = []types.String{}
-			for _, v := range resp.Config.KeySets {
-				r.Config.KeySets = append(r.Config.KeySets, types.StringValue(v))
-			}
-			r.Config.LookupHeaderName = types.StringPointerValue(resp.Config.LookupHeaderName)
-			r.Config.Strict = types.BoolPointerValue(resp.Config.Strict)
+		r.Config.ForwardHeaderName = types.StringPointerValue(resp.Config.ForwardHeaderName)
+		r.Config.KeySets = []types.String{}
+		for _, v := range resp.Config.KeySets {
+			r.Config.KeySets = append(r.Config.KeySets, types.StringValue(v))
 		}
+		r.Config.LookupHeaderName = types.StringPointerValue(resp.Config.LookupHeaderName)
+		r.Config.Strict = types.BoolPointerValue(resp.Config.Strict)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -159,10 +180,27 @@ func (r *PluginJweDecryptResourceModel) RefreshFromSharedJweDecryptPlugin(resp *
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

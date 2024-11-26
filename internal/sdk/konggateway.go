@@ -3,10 +3,12 @@
 package sdk
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/hooks"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/retry"
 	"net/http"
 	"time"
@@ -45,8 +47,8 @@ func Float64(f float64) *float64 { return &f }
 func Pointer[T any](v T) *T { return &v }
 
 type sdkConfiguration struct {
-	Client HTTPClient
-
+	Client            HTTPClient
+	Security          func(context.Context) (interface{}, error)
 	ServerURL         string
 	ServerIndex       int
 	ServerDefaults    []map[string]string
@@ -100,9 +102,11 @@ type KongGateway struct {
 	// A JSON Web key set. Key sets are the preferred way to expose keys to plugins because they tell the plugin where to look for keys or have a scoping mechanism to restrict plugins to specific keys.
 	//
 	KeySets *KeySets
+	Keyring *Keyring
 	// A key object holds a representation of asymmetric keys in various formats. When Kong Gateway or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.
 	//
-	Keys *Keys
+	Keys                *Keys
+	MTLSAuthCredentials *MTLSAuthCredentials
 	// A plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. Plugins let you add functionality to services that run behind a Kong Gateway instance, like authentication or rate limiting.
 	// You can find more information about available plugins and which values each plugin accepts at the [Plugin Hub](https://docs.konghq.com/hub/).
 	// <br><br>
@@ -284,6 +288,22 @@ func WithClient(client HTTPClient) SDKOption {
 	}
 }
 
+// WithSecurity configures the SDK to use the provided security details
+func WithSecurity(security shared.Security) SDKOption {
+	return func(sdk *KongGateway) {
+		sdk.sdkConfiguration.Security = utils.AsSecuritySource(security)
+	}
+}
+
+// WithSecuritySource configures the SDK to invoke the Security Source function on each method call to determine authentication
+func WithSecuritySource(security func(context.Context) (shared.Security, error)) SDKOption {
+	return func(sdk *KongGateway) {
+		sdk.sdkConfiguration.Security = func(ctx context.Context) (interface{}, error) {
+			return security(ctx)
+		}
+	}
+}
+
 func WithRetryConfig(retryConfig retry.Config) SDKOption {
 	return func(sdk *KongGateway) {
 		sdk.sdkConfiguration.RetryConfig = &retryConfig
@@ -353,7 +373,11 @@ func New(opts ...SDKOption) *KongGateway {
 
 	sdk.KeySets = newKeySets(sdk.sdkConfiguration)
 
+	sdk.Keyring = newKeyring(sdk.sdkConfiguration)
+
 	sdk.Keys = newKeys(sdk.sdkConfiguration)
+
+	sdk.MTLSAuthCredentials = newMTLSAuthCredentials(sdk.sdkConfiguration)
 
 	sdk.Plugins = newPlugins(sdk.sdkConfiguration)
 

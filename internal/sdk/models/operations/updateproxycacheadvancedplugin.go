@@ -9,8 +9,8 @@ import (
 
 type UpdateProxycacheadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                       string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateProxyCacheAdvancedPlugin *shared.CreateProxyCacheAdvancedPlugin `request:"mediaType=application/json"`
+	PluginID                 string                                `pathParam:"style=simple,explode=false,name=PluginId"`
+	ProxyCacheAdvancedPlugin *shared.ProxyCacheAdvancedPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateProxycacheadvancedPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateProxycacheadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateProxycacheadvancedPluginRequest) GetCreateProxyCacheAdvancedPlugin() *shared.CreateProxyCacheAdvancedPlugin {
+func (o *UpdateProxycacheadvancedPluginRequest) GetProxyCacheAdvancedPlugin() *shared.ProxyCacheAdvancedPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateProxyCacheAdvancedPlugin
+	return o.ProxyCacheAdvancedPlugin
 }
 
 type UpdateProxycacheadvancedPluginResponse struct {

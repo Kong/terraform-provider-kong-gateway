@@ -50,8 +50,7 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 		MarkdownDescription: "Vault Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `The configuration properties for the Vault which can be found on the vaults' documentation page. Parsed as JSON.`,
 				Validators: []validator.String{
 					validators.IsValidJSON(),
@@ -68,15 +67,14 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"name": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `The name of the Vault that's going to be added. Currently, the Vault implementation must be installed in every Kong instance.`,
 			},
 			"prefix": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
+				Required:    true,
 				Description: `The unique prefix (or identifier) for this Vault configuration. The prefix is used to load the right Vault configuration and implementation when referencing secrets with the other entities.`,
 			},
 			"tags": schema.ListAttribute{

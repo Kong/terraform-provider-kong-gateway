@@ -3,23 +3,43 @@
 package provider
 
 import (
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginDegraphqlResourceModel) ToSharedCreateDegraphqlPlugin() *shared.CreateDegraphqlPlugin {
-	var config *shared.CreateDegraphqlPluginConfig
-	if r.Config != nil {
-		graphqlServerPath := new(string)
-		if !r.Config.GraphqlServerPath.IsUnknown() && !r.Config.GraphqlServerPath.IsNull() {
-			*graphqlServerPath = r.Config.GraphqlServerPath.ValueString()
+func (r *PluginDegraphqlResourceModel) ToSharedDegraphqlPluginInput() *shared.DegraphqlPluginInput {
+	graphqlServerPath := new(string)
+	if !r.Config.GraphqlServerPath.IsUnknown() && !r.Config.GraphqlServerPath.IsNull() {
+		*graphqlServerPath = r.Config.GraphqlServerPath.ValueString()
+	} else {
+		graphqlServerPath = nil
+	}
+	config := shared.DegraphqlPluginConfig{
+		GraphqlServerPath: graphqlServerPath,
+	}
+	var consumer *shared.DegraphqlPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			graphqlServerPath = nil
+			id = nil
 		}
-		config = &shared.CreateDegraphqlPluginConfig{
-			GraphqlServerPath: graphqlServerPath,
+		consumer = &shared.DegraphqlPluginConsumer{
+			ID: id,
+		}
+	}
+	var consumerGroup *shared.DegraphqlPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		consumerGroup = &shared.DegraphqlPluginConsumerGroup{
+			ID: id1,
 		}
 	}
 	enabled := new(bool)
@@ -28,95 +48,96 @@ func (r *PluginDegraphqlResourceModel) ToSharedCreateDegraphqlPlugin() *shared.C
 	} else {
 		enabled = nil
 	}
+	id2 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id2 = r.ID.ValueString()
+	} else {
+		id2 = nil
+	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
 		*instanceName = r.InstanceName.ValueString()
 	} else {
 		instanceName = nil
 	}
-	var ordering interface{}
-	if !r.Ordering.IsUnknown() && !r.Ordering.IsNull() {
-		_ = json.Unmarshal([]byte(r.Ordering.ValueString()), &ordering)
+	var ordering *shared.DegraphqlPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.DegraphqlPluginAfter
+		if r.Ordering.After != nil {
+			var access []string = []string{}
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.DegraphqlPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.DegraphqlPluginBefore
+		if r.Ordering.Before != nil {
+			var access1 []string = []string{}
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.DegraphqlPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.DegraphqlPluginOrdering{
+			After:  after,
+			Before: before,
+		}
 	}
-	var protocols []shared.CreateDegraphqlPluginProtocols = []shared.CreateDegraphqlPluginProtocols{}
+	var protocols []shared.DegraphqlPluginProtocols = []shared.DegraphqlPluginProtocols{}
 	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.CreateDegraphqlPluginProtocols(protocolsItem.ValueString()))
+		protocols = append(protocols, shared.DegraphqlPluginProtocols(protocolsItem.ValueString()))
+	}
+	var route *shared.DegraphqlPluginRoute
+	if r.Route != nil {
+		id3 := new(string)
+		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
+			*id3 = r.Route.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		route = &shared.DegraphqlPluginRoute{
+			ID: id3,
+		}
+	}
+	var service *shared.DegraphqlPluginService
+	if r.Service != nil {
+		id4 := new(string)
+		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
+			*id4 = r.Service.ID.ValueString()
+		} else {
+			id4 = nil
+		}
+		service = &shared.DegraphqlPluginService{
+			ID: id4,
+		}
 	}
 	var tags []string = []string{}
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	var consumer *shared.CreateDegraphqlPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.CreateDegraphqlPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.CreateDegraphqlPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.CreateDegraphqlPluginConsumerGroup{
-			ID: id1,
-		}
-	}
-	var route *shared.CreateDegraphqlPluginRoute
-	if r.Route != nil {
-		id2 := new(string)
-		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id2 = r.Route.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		route = &shared.CreateDegraphqlPluginRoute{
-			ID: id2,
-		}
-	}
-	var service *shared.CreateDegraphqlPluginService
-	if r.Service != nil {
-		id3 := new(string)
-		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id3 = r.Service.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		service = &shared.CreateDegraphqlPluginService{
-			ID: id3,
-		}
-	}
-	out := shared.CreateDegraphqlPlugin{
+	out := shared.DegraphqlPluginInput{
 		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Enabled:       enabled,
+		ID:            id2,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Protocols:     protocols,
-		Tags:          tags,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
 	}
 	return &out
 }
 
 func (r *PluginDegraphqlResourceModel) RefreshFromSharedDegraphqlPlugin(resp *shared.DegraphqlPlugin) {
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CreateDegraphqlPluginConfig{}
-			r.Config.GraphqlServerPath = types.StringPointerValue(resp.Config.GraphqlServerPath)
-		}
+		r.Config.GraphqlServerPath = types.StringPointerValue(resp.Config.GraphqlServerPath)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -134,10 +155,27 @@ func (r *PluginDegraphqlResourceModel) RefreshFromSharedDegraphqlPlugin(resp *sh
 		r.ID = types.StringPointerValue(resp.ID)
 		r.InstanceName = types.StringPointerValue(resp.InstanceName)
 		if resp.Ordering == nil {
-			r.Ordering = types.StringNull()
+			r.Ordering = nil
 		} else {
-			orderingResult, _ := json.Marshal(resp.Ordering)
-			r.Ordering = types.StringValue(string(orderingResult))
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
+				r.Ordering.After.Access = []types.String{}
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
+				r.Ordering.Before.Access = []types.String{}
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
 		}
 		r.Protocols = []types.String{}
 		for _, v := range resp.Protocols {

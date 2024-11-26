@@ -8,13 +8,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -32,19 +30,19 @@ type PluginIPRestrictionResource struct {
 
 // PluginIPRestrictionResourceModel describes the resource data model.
 type PluginIPRestrictionResourceModel struct {
-	Config        *tfTypes.CreateIPRestrictionPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                     `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                     `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      types.String                             `tfsdk:"ordering"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                     `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                     `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
+	Config        tfTypes.IPRestrictionPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer              `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering        `tfsdk:"ordering"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer              `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer              `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
 }
 
 func (r *PluginIPRestrictionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -56,8 +54,7 @@ func (r *PluginIPRestrictionResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginIPRestriction Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"allow": schema.ListAttribute{
 						Computed:    true,
@@ -115,17 +112,38 @@ func (r *PluginIPRestrictionResource) Schema(ctx context.Context, req resource.S
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -208,7 +226,7 @@ func (r *PluginIPRestrictionResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := data.ToSharedCreateIPRestrictionPlugin()
+	request := data.ToSharedIPRestrictionPluginInput()
 	res, err := r.client.Plugins.CreateIprestrictionPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -307,10 +325,10 @@ func (r *PluginIPRestrictionResource) Update(ctx context.Context, req resource.U
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createIPRestrictionPlugin := data.ToSharedCreateIPRestrictionPlugin()
+	ipRestrictionPlugin := data.ToSharedIPRestrictionPluginInput()
 	request := operations.UpdateIprestrictionPluginRequest{
-		PluginID:                  pluginID,
-		CreateIPRestrictionPlugin: createIPRestrictionPlugin,
+		PluginID:            pluginID,
+		IPRestrictionPlugin: ipRestrictionPlugin,
 	}
 	res, err := r.client.Plugins.UpdateIprestrictionPlugin(ctx, request)
 	if err != nil {

@@ -6,21 +6,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// HTTPLogPluginContentType - Indicates the type of data sent. The only available option is `application/json`.
-type HTTPLogPluginContentType string
+// ContentType - Indicates the type of data sent. The only available option is `application/json`.
+type ContentType string
 
 const (
-	HTTPLogPluginContentTypeApplicationJSON                 HTTPLogPluginContentType = "application/json"
-	HTTPLogPluginContentTypeApplicationJSONCharsetEqualUTF8 HTTPLogPluginContentType = "application/json; charset=utf-8"
+	ContentTypeApplicationJSON                 ContentType = "application/json"
+	ContentTypeApplicationJSONCharsetEqualUTF8 ContentType = "application/json; charset=utf-8"
 )
 
-func (e HTTPLogPluginContentType) ToPointer() *HTTPLogPluginContentType {
+func (e ContentType) ToPointer() *ContentType {
 	return &e
 }
-func (e *HTTPLogPluginContentType) UnmarshalJSON(data []byte) error {
+func (e *ContentType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -29,26 +28,26 @@ func (e *HTTPLogPluginContentType) UnmarshalJSON(data []byte) error {
 	case "application/json":
 		fallthrough
 	case "application/json; charset=utf-8":
-		*e = HTTPLogPluginContentType(v)
+		*e = ContentType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for HTTPLogPluginContentType: %v", v)
+		return fmt.Errorf("invalid value for ContentType: %v", v)
 	}
 }
 
-// HTTPLogPluginMethod - An optional method used to send data to the HTTP server. Supported values are `POST` (default), `PUT`, and `PATCH`.
-type HTTPLogPluginMethod string
+// Method - An optional method used to send data to the HTTP server. Supported values are `POST` (default), `PUT`, and `PATCH`.
+type Method string
 
 const (
-	HTTPLogPluginMethodPost  HTTPLogPluginMethod = "POST"
-	HTTPLogPluginMethodPut   HTTPLogPluginMethod = "PUT"
-	HTTPLogPluginMethodPatch HTTPLogPluginMethod = "PATCH"
+	MethodPost  Method = "POST"
+	MethodPut   Method = "PUT"
+	MethodPatch Method = "PATCH"
 )
 
-func (e HTTPLogPluginMethod) ToPointer() *HTTPLogPluginMethod {
+func (e Method) ToPointer() *Method {
 	return &e
 }
-func (e *HTTPLogPluginMethod) UnmarshalJSON(data []byte) error {
+func (e *Method) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -59,10 +58,10 @@ func (e *HTTPLogPluginMethod) UnmarshalJSON(data []byte) error {
 	case "PUT":
 		fallthrough
 	case "PATCH":
-		*e = HTTPLogPluginMethod(v)
+		*e = Method(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for HTTPLogPluginMethod: %v", v)
+		return fmt.Errorf("invalid value for Method: %v", v)
 	}
 }
 
@@ -170,7 +169,7 @@ func (o *HTTPLogPluginQueue) GetMaxRetryTime() *float64 {
 
 type HTTPLogPluginConfig struct {
 	// Indicates the type of data sent. The only available option is `application/json`.
-	ContentType *HTTPLogPluginContentType `json:"content_type,omitempty"`
+	ContentType *ContentType `json:"content_type,omitempty"`
 	// Lua code as a key-value map
 	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
 	// Optional time in seconds. If `queue_size` > 1, this is the max idle time before sending a log with less than `queue_size` records.
@@ -182,8 +181,8 @@ type HTTPLogPluginConfig struct {
 	// An optional value in milliseconds that defines how long an idle connection will live before being closed.
 	Keepalive *float64 `json:"keepalive,omitempty"`
 	// An optional method used to send data to the HTTP server. Supported values are `POST` (default), `PUT`, and `PATCH`.
-	Method *HTTPLogPluginMethod `json:"method,omitempty"`
-	Queue  *HTTPLogPluginQueue  `json:"queue,omitempty"`
+	Method *Method             `json:"method,omitempty"`
+	Queue  *HTTPLogPluginQueue `json:"queue,omitempty"`
 	// Maximum number of log entries to be sent on each message to the upstream server.
 	QueueSize *int64 `json:"queue_size,omitempty"`
 	// Number of times to retry when sending data to the upstream server.
@@ -192,7 +191,7 @@ type HTTPLogPluginConfig struct {
 	Timeout *float64 `json:"timeout,omitempty"`
 }
 
-func (o *HTTPLogPluginConfig) GetContentType() *HTTPLogPluginContentType {
+func (o *HTTPLogPluginConfig) GetContentType() *ContentType {
 	if o == nil {
 		return nil
 	}
@@ -234,7 +233,7 @@ func (o *HTTPLogPluginConfig) GetKeepalive() *float64 {
 	return o.Keepalive
 }
 
-func (o *HTTPLogPluginConfig) GetMethod() *HTTPLogPluginMethod {
+func (o *HTTPLogPluginConfig) GetMethod() *Method {
 	if o == nil {
 		return nil
 	}
@@ -267,6 +266,70 @@ func (o *HTTPLogPluginConfig) GetTimeout() *float64 {
 		return nil
 	}
 	return o.Timeout
+}
+
+// HTTPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type HTTPLogPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *HTTPLogPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type HTTPLogPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *HTTPLogPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type HTTPLogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *HTTPLogPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type HTTPLogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *HTTPLogPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type HTTPLogPluginOrdering struct {
+	After  *HTTPLogPluginAfter  `json:"after,omitempty"`
+	Before *HTTPLogPluginBefore `json:"before,omitempty"`
+}
+
+func (o *HTTPLogPluginOrdering) GetAfter() *HTTPLogPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *HTTPLogPluginOrdering) GetBefore() *HTTPLogPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type HTTPLogPluginProtocols string
@@ -319,29 +382,6 @@ func (e *HTTPLogPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// HTTPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type HTTPLogPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *HTTPLogPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type HTTPLogPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *HTTPLogPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // HTTPLogPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type HTTPLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -366,29 +406,30 @@ func (o *HTTPLogPluginService) GetID() *string {
 	return o.ID
 }
 
+// HTTPLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HTTPLogPlugin struct {
-	Config *HTTPLogPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"http-log" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []HTTPLogPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config HTTPLogPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *HTTPLogPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *HTTPLogPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                  `json:"enabled,omitempty"`
+	ID           *string                `json:"id,omitempty"`
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"http-log" json:"name"`
+	Ordering     *HTTPLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []HTTPLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *HTTPLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *HTTPLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (h HTTPLogPlugin) MarshalJSON() ([]byte, error) {
@@ -402,11 +443,25 @@ func (h *HTTPLogPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *HTTPLogPlugin) GetConfig() *HTTPLogPluginConfig {
+func (o *HTTPLogPlugin) GetConfig() HTTPLogPluginConfig {
+	if o == nil {
+		return HTTPLogPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *HTTPLogPlugin) GetConsumerGroup() *HTTPLogPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *HTTPLogPlugin) GetCreatedAt() *int64 {
@@ -437,11 +492,11 @@ func (o *HTTPLogPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *HTTPLogPlugin) GetName() *string {
-	return types.String("http-log")
+func (o *HTTPLogPlugin) GetName() string {
+	return "http-log"
 }
 
-func (o *HTTPLogPlugin) GetOrdering() any {
+func (o *HTTPLogPlugin) GetOrdering() *HTTPLogPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -453,6 +508,20 @@ func (o *HTTPLogPlugin) GetProtocols() []HTTPLogPluginProtocols {
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *HTTPLogPlugin) GetRoute() *HTTPLogPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *HTTPLogPlugin) GetService() *HTTPLogPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *HTTPLogPlugin) GetTags() []string {
@@ -469,30 +538,116 @@ func (o *HTTPLogPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
+// HTTPLogPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type HTTPLogPluginInput struct {
+	Config HTTPLogPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *HTTPLogPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *HTTPLogPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                  `json:"enabled,omitempty"`
+	ID           *string                `json:"id,omitempty"`
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"http-log" json:"name"`
+	Ordering     *HTTPLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []HTTPLogPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *HTTPLogPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *HTTPLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (h HTTPLogPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(h, "", false)
+}
+
+func (h *HTTPLogPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &h, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *HTTPLogPluginInput) GetConfig() HTTPLogPluginConfig {
+	if o == nil {
+		return HTTPLogPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *HTTPLogPluginInput) GetConsumer() *HTTPLogPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *HTTPLogPlugin) GetConsumerGroup() *HTTPLogPluginConsumerGroup {
+func (o *HTTPLogPluginInput) GetConsumerGroup() *HTTPLogPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *HTTPLogPlugin) GetRoute() *HTTPLogPluginRoute {
+func (o *HTTPLogPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *HTTPLogPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *HTTPLogPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *HTTPLogPluginInput) GetName() string {
+	return "http-log"
+}
+
+func (o *HTTPLogPluginInput) GetOrdering() *HTTPLogPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *HTTPLogPluginInput) GetProtocols() []HTTPLogPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *HTTPLogPluginInput) GetRoute() *HTTPLogPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *HTTPLogPlugin) GetService() *HTTPLogPluginService {
+func (o *HTTPLogPluginInput) GetService() *HTTPLogPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *HTTPLogPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

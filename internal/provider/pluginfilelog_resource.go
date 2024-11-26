@@ -35,19 +35,19 @@ type PluginFileLogResource struct {
 
 // PluginFileLogResourceModel describes the resource data model.
 type PluginFileLogResourceModel struct {
-	Config        *tfTypes.CreateFileLogPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer               `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer               `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                        `tfsdk:"created_at"`
-	Enabled       types.Bool                         `tfsdk:"enabled"`
-	ID            types.String                       `tfsdk:"id"`
-	InstanceName  types.String                       `tfsdk:"instance_name"`
-	Ordering      types.String                       `tfsdk:"ordering"`
-	Protocols     []types.String                     `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer               `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer               `tfsdk:"service"`
-	Tags          []types.String                     `tfsdk:"tags"`
-	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
+	Config        tfTypes.FileLogPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                 `tfsdk:"created_at"`
+	Enabled       types.Bool                  `tfsdk:"enabled"`
+	ID            types.String                `tfsdk:"id"`
+	InstanceName  types.String                `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
+	Protocols     []types.String              `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer        `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer        `tfsdk:"service"`
+	Tags          []types.String              `tfsdk:"tags"`
+	UpdatedAt     types.Int64                 `tfsdk:"updated_at"`
 }
 
 func (r *PluginFileLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,8 +59,7 @@ func (r *PluginFileLogResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "PluginFileLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"custom_fields_by_lua": schema.MapAttribute{
 						Computed:    true,
@@ -118,17 +117,38 @@ func (r *PluginFileLogResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -211,7 +231,7 @@ func (r *PluginFileLogResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := data.ToSharedCreateFileLogPlugin()
+	request := data.ToSharedFileLogPluginInput()
 	res, err := r.client.Plugins.CreateFilelogPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -310,10 +330,10 @@ func (r *PluginFileLogResource) Update(ctx context.Context, req resource.UpdateR
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createFileLogPlugin := data.ToSharedCreateFileLogPlugin()
+	fileLogPlugin := data.ToSharedFileLogPluginInput()
 	request := operations.UpdateFilelogPluginRequest{
-		PluginID:            pluginID,
-		CreateFileLogPlugin: createFileLogPlugin,
+		PluginID:      pluginID,
+		FileLogPlugin: fileLogPlugin,
 	}
 	res, err := r.client.Plugins.UpdateFilelogPlugin(ctx, request)
 	if err != nil {

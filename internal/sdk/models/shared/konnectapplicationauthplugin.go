@@ -6,22 +6,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// KonnectApplicationAuthPluginAuthType - The type of authentication to be performed. Possible values are: 'openid-connect', 'key-auth', 'v2-strategies'.
-type KonnectApplicationAuthPluginAuthType string
+// AuthType - The type of authentication to be performed. Possible values are: 'openid-connect', 'key-auth', 'v2-strategies'.
+type AuthType string
 
 const (
-	KonnectApplicationAuthPluginAuthTypeOpenidConnect KonnectApplicationAuthPluginAuthType = "openid-connect"
-	KonnectApplicationAuthPluginAuthTypeKeyAuth       KonnectApplicationAuthPluginAuthType = "key-auth"
-	KonnectApplicationAuthPluginAuthTypeV2Strategies  KonnectApplicationAuthPluginAuthType = "v2-strategies"
+	AuthTypeOpenidConnect AuthType = "openid-connect"
+	AuthTypeKeyAuth       AuthType = "key-auth"
+	AuthTypeV2Strategies  AuthType = "v2-strategies"
 )
 
-func (e KonnectApplicationAuthPluginAuthType) ToPointer() *KonnectApplicationAuthPluginAuthType {
+func (e AuthType) ToPointer() *AuthType {
 	return &e
 }
-func (e *KonnectApplicationAuthPluginAuthType) UnmarshalJSON(data []byte) error {
+func (e *AuthType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -32,10 +31,10 @@ func (e *KonnectApplicationAuthPluginAuthType) UnmarshalJSON(data []byte) error 
 	case "key-auth":
 		fallthrough
 	case "v2-strategies":
-		*e = KonnectApplicationAuthPluginAuthType(v)
+		*e = AuthType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for KonnectApplicationAuthPluginAuthType: %v", v)
+		return fmt.Errorf("invalid value for AuthType: %v", v)
 	}
 }
 
@@ -3951,43 +3950,43 @@ func (o *KonnectApplicationAuthPluginConfigConfig) GetVerifySignature() *bool {
 	return o.VerifySignature
 }
 
-type KonnectApplicationAuthPluginOpenidConnect struct {
+type OpenidConnect struct {
 	// openid-connect plugin configuration.
 	Config *KonnectApplicationAuthPluginConfigConfig `json:"config,omitempty"`
 	// The strategy id the config is tied to.
 	StrategyID string `json:"strategy_id"`
 }
 
-func (o *KonnectApplicationAuthPluginOpenidConnect) GetConfig() *KonnectApplicationAuthPluginConfigConfig {
+func (o *OpenidConnect) GetConfig() *KonnectApplicationAuthPluginConfigConfig {
 	if o == nil {
 		return nil
 	}
 	return o.Config
 }
 
-func (o *KonnectApplicationAuthPluginOpenidConnect) GetStrategyID() string {
+func (o *OpenidConnect) GetStrategyID() string {
 	if o == nil {
 		return ""
 	}
 	return o.StrategyID
 }
 
-// KonnectApplicationAuthPluginV2Strategies - The map of v2 strategies.
-type KonnectApplicationAuthPluginV2Strategies struct {
+// V2Strategies - The map of v2 strategies.
+type V2Strategies struct {
 	// List of key_auth strategies.
 	KeyAuth []KonnectApplicationAuthPluginKeyAuth `json:"key_auth,omitempty"`
 	// List of openid_connect strategies.
-	OpenidConnect []KonnectApplicationAuthPluginOpenidConnect `json:"openid_connect,omitempty"`
+	OpenidConnect []OpenidConnect `json:"openid_connect,omitempty"`
 }
 
-func (o *KonnectApplicationAuthPluginV2Strategies) GetKeyAuth() []KonnectApplicationAuthPluginKeyAuth {
+func (o *V2Strategies) GetKeyAuth() []KonnectApplicationAuthPluginKeyAuth {
 	if o == nil {
 		return nil
 	}
 	return o.KeyAuth
 }
 
-func (o *KonnectApplicationAuthPluginV2Strategies) GetOpenidConnect() []KonnectApplicationAuthPluginOpenidConnect {
+func (o *V2Strategies) GetOpenidConnect() []OpenidConnect {
 	if o == nil {
 		return nil
 	}
@@ -3996,16 +3995,16 @@ func (o *KonnectApplicationAuthPluginV2Strategies) GetOpenidConnect() []KonnectA
 
 type KonnectApplicationAuthPluginConfig struct {
 	// The type of authentication to be performed. Possible values are: 'openid-connect', 'key-auth', 'v2-strategies'.
-	AuthType *KonnectApplicationAuthPluginAuthType `json:"auth_type,omitempty"`
+	AuthType *AuthType `json:"auth_type,omitempty"`
 	// The names of the headers containing the API key. You can specify multiple header names.
 	KeyNames []string `json:"key_names,omitempty"`
 	// The unique scope identifier for the plugin configuration.
 	Scope *string `json:"scope,omitempty"`
 	// The map of v2 strategies.
-	V2Strategies *KonnectApplicationAuthPluginV2Strategies `json:"v2_strategies,omitempty"`
+	V2Strategies *V2Strategies `json:"v2_strategies,omitempty"`
 }
 
-func (o *KonnectApplicationAuthPluginConfig) GetAuthType() *KonnectApplicationAuthPluginAuthType {
+func (o *KonnectApplicationAuthPluginConfig) GetAuthType() *AuthType {
 	if o == nil {
 		return nil
 	}
@@ -4026,11 +4025,75 @@ func (o *KonnectApplicationAuthPluginConfig) GetScope() *string {
 	return o.Scope
 }
 
-func (o *KonnectApplicationAuthPluginConfig) GetV2Strategies() *KonnectApplicationAuthPluginV2Strategies {
+func (o *KonnectApplicationAuthPluginConfig) GetV2Strategies() *V2Strategies {
 	if o == nil {
 		return nil
 	}
 	return o.V2Strategies
+}
+
+// KonnectApplicationAuthPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type KonnectApplicationAuthPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *KonnectApplicationAuthPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type KonnectApplicationAuthPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *KonnectApplicationAuthPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type KonnectApplicationAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *KonnectApplicationAuthPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type KonnectApplicationAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *KonnectApplicationAuthPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type KonnectApplicationAuthPluginOrdering struct {
+	After  *KonnectApplicationAuthPluginAfter  `json:"after,omitempty"`
+	Before *KonnectApplicationAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (o *KonnectApplicationAuthPluginOrdering) GetAfter() *KonnectApplicationAuthPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *KonnectApplicationAuthPluginOrdering) GetBefore() *KonnectApplicationAuthPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type KonnectApplicationAuthPluginProtocols string
@@ -4083,29 +4146,6 @@ func (e *KonnectApplicationAuthPluginProtocols) UnmarshalJSON(data []byte) error
 	}
 }
 
-// KonnectApplicationAuthPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type KonnectApplicationAuthPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *KonnectApplicationAuthPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type KonnectApplicationAuthPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *KonnectApplicationAuthPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // KonnectApplicationAuthPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type KonnectApplicationAuthPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -4130,29 +4170,30 @@ func (o *KonnectApplicationAuthPluginService) GetID() *string {
 	return o.ID
 }
 
+// KonnectApplicationAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KonnectApplicationAuthPlugin struct {
-	Config *KonnectApplicationAuthPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"konnect-application-auth" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []KonnectApplicationAuthPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config KonnectApplicationAuthPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *KonnectApplicationAuthPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *KonnectApplicationAuthPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                 `json:"enabled,omitempty"`
+	ID           *string                               `json:"id,omitempty"`
+	InstanceName *string                               `json:"instance_name,omitempty"`
+	name         string                                `const:"konnect-application-auth" json:"name"`
+	Ordering     *KonnectApplicationAuthPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []KonnectApplicationAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *KonnectApplicationAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *KonnectApplicationAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (k KonnectApplicationAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -4166,11 +4207,25 @@ func (k *KonnectApplicationAuthPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *KonnectApplicationAuthPlugin) GetConfig() *KonnectApplicationAuthPluginConfig {
+func (o *KonnectApplicationAuthPlugin) GetConfig() KonnectApplicationAuthPluginConfig {
+	if o == nil {
+		return KonnectApplicationAuthPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *KonnectApplicationAuthPlugin) GetConsumer() *KonnectApplicationAuthPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *KonnectApplicationAuthPlugin) GetConsumerGroup() *KonnectApplicationAuthPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *KonnectApplicationAuthPlugin) GetCreatedAt() *int64 {
@@ -4201,11 +4256,11 @@ func (o *KonnectApplicationAuthPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *KonnectApplicationAuthPlugin) GetName() *string {
-	return types.String("konnect-application-auth")
+func (o *KonnectApplicationAuthPlugin) GetName() string {
+	return "konnect-application-auth"
 }
 
-func (o *KonnectApplicationAuthPlugin) GetOrdering() any {
+func (o *KonnectApplicationAuthPlugin) GetOrdering() *KonnectApplicationAuthPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -4217,6 +4272,20 @@ func (o *KonnectApplicationAuthPlugin) GetProtocols() []KonnectApplicationAuthPl
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *KonnectApplicationAuthPlugin) GetRoute() *KonnectApplicationAuthPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *KonnectApplicationAuthPlugin) GetService() *KonnectApplicationAuthPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *KonnectApplicationAuthPlugin) GetTags() []string {
@@ -4233,30 +4302,116 @@ func (o *KonnectApplicationAuthPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *KonnectApplicationAuthPlugin) GetConsumer() *KonnectApplicationAuthPluginConsumer {
+// KonnectApplicationAuthPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type KonnectApplicationAuthPluginInput struct {
+	Config KonnectApplicationAuthPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *KonnectApplicationAuthPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *KonnectApplicationAuthPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                 `json:"enabled,omitempty"`
+	ID           *string                               `json:"id,omitempty"`
+	InstanceName *string                               `json:"instance_name,omitempty"`
+	name         string                                `const:"konnect-application-auth" json:"name"`
+	Ordering     *KonnectApplicationAuthPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []KonnectApplicationAuthPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *KonnectApplicationAuthPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *KonnectApplicationAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (k KonnectApplicationAuthPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KonnectApplicationAuthPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetConfig() KonnectApplicationAuthPluginConfig {
+	if o == nil {
+		return KonnectApplicationAuthPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetConsumer() *KonnectApplicationAuthPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *KonnectApplicationAuthPlugin) GetConsumerGroup() *KonnectApplicationAuthPluginConsumerGroup {
+func (o *KonnectApplicationAuthPluginInput) GetConsumerGroup() *KonnectApplicationAuthPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *KonnectApplicationAuthPlugin) GetRoute() *KonnectApplicationAuthPluginRoute {
+func (o *KonnectApplicationAuthPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetName() string {
+	return "konnect-application-auth"
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetOrdering() *KonnectApplicationAuthPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetProtocols() []KonnectApplicationAuthPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetRoute() *KonnectApplicationAuthPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *KonnectApplicationAuthPlugin) GetService() *KonnectApplicationAuthPluginService {
+func (o *KonnectApplicationAuthPluginInput) GetService() *KonnectApplicationAuthPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *KonnectApplicationAuthPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

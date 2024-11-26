@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_boolvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/boolvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
@@ -36,19 +35,19 @@ type PluginRequestValidatorResource struct {
 
 // PluginRequestValidatorResourceModel describes the resource data model.
 type PluginRequestValidatorResourceModel struct {
-	Config        *tfTypes.CreateRequestValidatorPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                        `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                        `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                 `tfsdk:"created_at"`
-	Enabled       types.Bool                                  `tfsdk:"enabled"`
-	ID            types.String                                `tfsdk:"id"`
-	InstanceName  types.String                                `tfsdk:"instance_name"`
-	Ordering      types.String                                `tfsdk:"ordering"`
-	Protocols     []types.String                              `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                        `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                        `tfsdk:"service"`
-	Tags          []types.String                              `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                 `tfsdk:"updated_at"`
+	Config        tfTypes.RequestValidatorPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer                 `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer                 `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                          `tfsdk:"created_at"`
+	Enabled       types.Bool                           `tfsdk:"enabled"`
+	ID            types.String                         `tfsdk:"id"`
+	InstanceName  types.String                         `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering           `tfsdk:"ordering"`
+	Protocols     []types.String                       `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer                 `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer                 `tfsdk:"service"`
+	Tags          []types.String                       `tfsdk:"tags"`
+	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
 }
 
 func (r *PluginRequestValidatorResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,8 +59,7 @@ func (r *PluginRequestValidatorResource) Schema(ctx context.Context, req resourc
 		MarkdownDescription: "PluginRequestValidator Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"allowed_content_types": schema.ListAttribute{
 						Computed:    true,
@@ -196,17 +194,38 @@ func (r *PluginRequestValidatorResource) Schema(ctx context.Context, req resourc
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -289,7 +308,7 @@ func (r *PluginRequestValidatorResource) Create(ctx context.Context, req resourc
 		return
 	}
 
-	request := data.ToSharedCreateRequestValidatorPlugin()
+	request := data.ToSharedRequestValidatorPluginInput()
 	res, err := r.client.Plugins.CreateRequestvalidatorPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -388,10 +407,10 @@ func (r *PluginRequestValidatorResource) Update(ctx context.Context, req resourc
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createRequestValidatorPlugin := data.ToSharedCreateRequestValidatorPlugin()
+	requestValidatorPlugin := data.ToSharedRequestValidatorPluginInput()
 	request := operations.UpdateRequestvalidatorPluginRequest{
-		PluginID:                     pluginID,
-		CreateRequestValidatorPlugin: createRequestValidatorPlugin,
+		PluginID:               pluginID,
+		RequestValidatorPlugin: requestValidatorPlugin,
 	}
 	res, err := r.client.Plugins.UpdateRequestvalidatorPlugin(ctx, request)
 	if err != nil {

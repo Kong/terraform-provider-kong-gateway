@@ -9,8 +9,8 @@ import (
 
 type UpdateACLPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                  `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateACLPlugin *shared.CreateACLPlugin `request:"mediaType=application/json"`
+	PluginID  string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	ACLPlugin *shared.ACLPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateACLPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateACLPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateACLPluginRequest) GetCreateACLPlugin() *shared.CreateACLPlugin {
+func (o *UpdateACLPluginRequest) GetACLPlugin() *shared.ACLPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateACLPlugin
+	return o.ACLPlugin
 }
 
 type UpdateACLPluginResponse struct {

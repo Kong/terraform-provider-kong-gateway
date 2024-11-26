@@ -37,11 +37,14 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 	} else {
 		enabled = nil
 	}
-	host := new(string)
-	if !r.Host.IsUnknown() && !r.Host.IsNull() {
-		*host = r.Host.ValueString()
+	var host string
+	host = r.Host.ValueString()
+
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
 	} else {
-		host = nil
+		id1 = nil
 	}
 	name := new(string)
 	if !r.Name.IsUnknown() && !r.Name.IsNull() {
@@ -55,18 +58,10 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 	} else {
 		path = nil
 	}
-	port := new(int64)
-	if !r.Port.IsUnknown() && !r.Port.IsNull() {
-		*port = r.Port.ValueInt64()
-	} else {
-		port = nil
-	}
-	protocol := new(shared.Protocol)
-	if !r.Protocol.IsUnknown() && !r.Protocol.IsNull() {
-		*protocol = shared.Protocol(r.Protocol.ValueString())
-	} else {
-		protocol = nil
-	}
+	var port int64
+	port = r.Port.ValueInt64()
+
+	protocol := shared.Protocol(r.Protocol.ValueString())
 	readTimeout := new(int64)
 	if !r.ReadTimeout.IsUnknown() && !r.ReadTimeout.IsNull() {
 		*readTimeout = r.ReadTimeout.ValueInt64()
@@ -113,6 +108,7 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 		ConnectTimeout:    connectTimeout,
 		Enabled:           enabled,
 		Host:              host,
+		ID:                id1,
 		Name:              name,
 		Path:              path,
 		Port:              port,
@@ -143,16 +139,12 @@ func (r *ServiceResourceModel) RefreshFromSharedService(resp *shared.Service) {
 		r.ConnectTimeout = types.Int64PointerValue(resp.ConnectTimeout)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.Host = types.StringPointerValue(resp.Host)
+		r.Host = types.StringValue(resp.Host)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringPointerValue(resp.Name)
 		r.Path = types.StringPointerValue(resp.Path)
-		r.Port = types.Int64PointerValue(resp.Port)
-		if resp.Protocol != nil {
-			r.Protocol = types.StringValue(string(*resp.Protocol))
-		} else {
-			r.Protocol = types.StringNull()
-		}
+		r.Port = types.Int64Value(resp.Port)
+		r.Protocol = types.StringValue(string(resp.Protocol))
 		r.ReadTimeout = types.Int64PointerValue(resp.ReadTimeout)
 		r.Retries = types.Int64PointerValue(resp.Retries)
 		r.Tags = []types.String{}

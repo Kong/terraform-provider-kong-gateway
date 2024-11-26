@@ -19,5 +19,6 @@ terraform:
   additionalResources: []
   allowUnknownFieldsInWeakUnions: false
   author: kong
+  defaultErrorName: SDKError
   environmentVariables: []
   packageName: kong-gateway

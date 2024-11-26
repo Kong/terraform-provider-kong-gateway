@@ -9,16 +9,6 @@ import (
 )
 
 func (r *KeyAuthResourceModel) ToSharedKeyAuthInput() *shared.KeyAuthInput {
-	key := new(string)
-	if !r.Key.IsUnknown() && !r.Key.IsNull() {
-		*key = r.Key.ValueString()
-	} else {
-		key = nil
-	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
 	var consumer *shared.KeyAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -31,10 +21,24 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuthInput() *shared.KeyAuthInput {
 			ID: id,
 		}
 	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	var key string
+	key = r.Key.ValueString()
+
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
 	out := shared.KeyAuthInput{
+		Consumer: consumer,
+		ID:       id1,
 		Key:      key,
 		Tags:     tags,
-		Consumer: consumer,
 	}
 	return &out
 }
@@ -49,7 +53,7 @@ func (r *KeyAuthResourceModel) RefreshFromSharedKeyAuth(resp *shared.KeyAuth) {
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
-		r.Key = types.StringPointerValue(resp.Key)
+		r.Key = types.StringValue(resp.Key)
 		r.Tags = []types.String{}
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))

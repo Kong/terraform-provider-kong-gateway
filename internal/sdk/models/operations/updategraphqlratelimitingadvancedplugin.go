@@ -9,8 +9,8 @@ import (
 
 type UpdateGraphqlratelimitingadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                                string                                          `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateGraphqlRateLimitingAdvancedPlugin *shared.CreateGraphqlRateLimitingAdvancedPlugin `request:"mediaType=application/json"`
+	PluginID                          string                                         `pathParam:"style=simple,explode=false,name=PluginId"`
+	GraphqlRateLimitingAdvancedPlugin *shared.GraphqlRateLimitingAdvancedPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateGraphqlratelimitingadvancedPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateGraphqlratelimitingadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateGraphqlratelimitingadvancedPluginRequest) GetCreateGraphqlRateLimitingAdvancedPlugin() *shared.CreateGraphqlRateLimitingAdvancedPlugin {
+func (o *UpdateGraphqlratelimitingadvancedPluginRequest) GetGraphqlRateLimitingAdvancedPlugin() *shared.GraphqlRateLimitingAdvancedPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateGraphqlRateLimitingAdvancedPlugin
+	return o.GraphqlRateLimitingAdvancedPlugin
 }
 
 type UpdateGraphqlratelimitingadvancedPluginResponse struct {

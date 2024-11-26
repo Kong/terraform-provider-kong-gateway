@@ -15,7 +15,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	"regexp"
 )
 
@@ -34,19 +33,19 @@ type PluginRequestTransformerAdvancedResource struct {
 
 // PluginRequestTransformerAdvancedResourceModel describes the resource data model.
 type PluginRequestTransformerAdvancedResourceModel struct {
-	Config        *tfTypes.CreateRequestTransformerAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                                  `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                                  `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                           `tfsdk:"created_at"`
-	Enabled       types.Bool                                            `tfsdk:"enabled"`
-	ID            types.String                                          `tfsdk:"id"`
-	InstanceName  types.String                                          `tfsdk:"instance_name"`
-	Ordering      types.String                                          `tfsdk:"ordering"`
-	Protocols     []types.String                                        `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                                  `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                                  `tfsdk:"service"`
-	Tags          []types.String                                        `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                           `tfsdk:"updated_at"`
+	Config        tfTypes.RequestTransformerAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLConsumer                           `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLConsumer                           `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                                    `tfsdk:"created_at"`
+	Enabled       types.Bool                                     `tfsdk:"enabled"`
+	ID            types.String                                   `tfsdk:"id"`
+	InstanceName  types.String                                   `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering                     `tfsdk:"ordering"`
+	Protocols     []types.String                                 `tfsdk:"protocols"`
+	Route         *tfTypes.ACLConsumer                           `tfsdk:"route"`
+	Service       *tfTypes.ACLConsumer                           `tfsdk:"service"`
+	Tags          []types.String                                 `tfsdk:"tags"`
+	UpdatedAt     types.Int64                                    `tfsdk:"updated_at"`
 }
 
 func (r *PluginRequestTransformerAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,8 +57,7 @@ func (r *PluginRequestTransformerAdvancedResource) Schema(ctx context.Context, r
 		MarkdownDescription: "PluginRequestTransformerAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"add": schema.SingleNestedAttribute{
 						Computed: true,
@@ -243,17 +241,38 @@ func (r *PluginRequestTransformerAdvancedResource) Schema(ctx context.Context, r
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
+				Optional: true,
 			},
 			"instance_name": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
 			},
-			"ordering": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
+			"ordering": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"after": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
+					"before": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"access": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+							},
+						},
+					},
 				},
 			},
 			"protocols": schema.ListAttribute{
@@ -336,7 +355,7 @@ func (r *PluginRequestTransformerAdvancedResource) Create(ctx context.Context, r
 		return
 	}
 
-	request := data.ToSharedCreateRequestTransformerAdvancedPlugin()
+	request := data.ToSharedRequestTransformerAdvancedPluginInput()
 	res, err := r.client.Plugins.CreateRequesttransformeradvancedPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -435,10 +454,10 @@ func (r *PluginRequestTransformerAdvancedResource) Update(ctx context.Context, r
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	createRequestTransformerAdvancedPlugin := data.ToSharedCreateRequestTransformerAdvancedPlugin()
+	requestTransformerAdvancedPlugin := data.ToSharedRequestTransformerAdvancedPluginInput()
 	request := operations.UpdateRequesttransformeradvancedPluginRequest{
-		PluginID:                               pluginID,
-		CreateRequestTransformerAdvancedPlugin: createRequestTransformerAdvancedPlugin,
+		PluginID:                         pluginID,
+		RequestTransformerAdvancedPlugin: requestTransformerAdvancedPlugin,
 	}
 	res, err := r.client.Plugins.UpdateRequesttransformeradvancedPlugin(ctx, request)
 	if err != nil {

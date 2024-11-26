@@ -6,21 +6,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/types"
 )
 
-// GraphqlRateLimitingAdvancedPluginCostStrategy - Strategy to use to evaluate query costs. Either `default` or `node_quantifier`.
-type GraphqlRateLimitingAdvancedPluginCostStrategy string
+// CostStrategy - Strategy to use to evaluate query costs. Either `default` or `node_quantifier`.
+type CostStrategy string
 
 const (
-	GraphqlRateLimitingAdvancedPluginCostStrategyDefault        GraphqlRateLimitingAdvancedPluginCostStrategy = "default"
-	GraphqlRateLimitingAdvancedPluginCostStrategyNodeQuantifier GraphqlRateLimitingAdvancedPluginCostStrategy = "node_quantifier"
+	CostStrategyDefault        CostStrategy = "default"
+	CostStrategyNodeQuantifier CostStrategy = "node_quantifier"
 )
 
-func (e GraphqlRateLimitingAdvancedPluginCostStrategy) ToPointer() *GraphqlRateLimitingAdvancedPluginCostStrategy {
+func (e CostStrategy) ToPointer() *CostStrategy {
 	return &e
 }
-func (e *GraphqlRateLimitingAdvancedPluginCostStrategy) UnmarshalJSON(data []byte) error {
+func (e *CostStrategy) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -29,26 +28,26 @@ func (e *GraphqlRateLimitingAdvancedPluginCostStrategy) UnmarshalJSON(data []byt
 	case "default":
 		fallthrough
 	case "node_quantifier":
-		*e = GraphqlRateLimitingAdvancedPluginCostStrategy(v)
+		*e = CostStrategy(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginCostStrategy: %v", v)
+		return fmt.Errorf("invalid value for CostStrategy: %v", v)
 	}
 }
 
-// GraphqlRateLimitingAdvancedPluginIdentifier - How to define the rate limit key. Can be `ip`, `credential`, `consumer`.
-type GraphqlRateLimitingAdvancedPluginIdentifier string
+// Identifier - How to define the rate limit key. Can be `ip`, `credential`, `consumer`.
+type Identifier string
 
 const (
-	GraphqlRateLimitingAdvancedPluginIdentifierIP         GraphqlRateLimitingAdvancedPluginIdentifier = "ip"
-	GraphqlRateLimitingAdvancedPluginIdentifierCredential GraphqlRateLimitingAdvancedPluginIdentifier = "credential"
-	GraphqlRateLimitingAdvancedPluginIdentifierConsumer   GraphqlRateLimitingAdvancedPluginIdentifier = "consumer"
+	IdentifierIP         Identifier = "ip"
+	IdentifierCredential Identifier = "credential"
+	IdentifierConsumer   Identifier = "consumer"
 )
 
-func (e GraphqlRateLimitingAdvancedPluginIdentifier) ToPointer() *GraphqlRateLimitingAdvancedPluginIdentifier {
+func (e Identifier) ToPointer() *Identifier {
 	return &e
 }
-func (e *GraphqlRateLimitingAdvancedPluginIdentifier) UnmarshalJSON(data []byte) error {
+func (e *Identifier) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -59,10 +58,10 @@ func (e *GraphqlRateLimitingAdvancedPluginIdentifier) UnmarshalJSON(data []byte)
 	case "credential":
 		fallthrough
 	case "consumer":
-		*e = GraphqlRateLimitingAdvancedPluginIdentifier(v)
+		*e = Identifier(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginIdentifier: %v", v)
+		return fmt.Errorf("invalid value for Identifier: %v", v)
 	}
 }
 
@@ -357,18 +356,18 @@ func (e *GraphqlRateLimitingAdvancedPluginStrategy) UnmarshalJSON(data []byte) e
 	}
 }
 
-// GraphqlRateLimitingAdvancedPluginWindowType - Sets the time window to either `sliding` or `fixed`.
-type GraphqlRateLimitingAdvancedPluginWindowType string
+// WindowType - Sets the time window to either `sliding` or `fixed`.
+type WindowType string
 
 const (
-	GraphqlRateLimitingAdvancedPluginWindowTypeFixed   GraphqlRateLimitingAdvancedPluginWindowType = "fixed"
-	GraphqlRateLimitingAdvancedPluginWindowTypeSliding GraphqlRateLimitingAdvancedPluginWindowType = "sliding"
+	WindowTypeFixed   WindowType = "fixed"
+	WindowTypeSliding WindowType = "sliding"
 )
 
-func (e GraphqlRateLimitingAdvancedPluginWindowType) ToPointer() *GraphqlRateLimitingAdvancedPluginWindowType {
+func (e WindowType) ToPointer() *WindowType {
 	return &e
 }
-func (e *GraphqlRateLimitingAdvancedPluginWindowType) UnmarshalJSON(data []byte) error {
+func (e *WindowType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -377,22 +376,22 @@ func (e *GraphqlRateLimitingAdvancedPluginWindowType) UnmarshalJSON(data []byte)
 	case "fixed":
 		fallthrough
 	case "sliding":
-		*e = GraphqlRateLimitingAdvancedPluginWindowType(v)
+		*e = WindowType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginWindowType: %v", v)
+		return fmt.Errorf("invalid value for WindowType: %v", v)
 	}
 }
 
 type GraphqlRateLimitingAdvancedPluginConfig struct {
 	// Strategy to use to evaluate query costs. Either `default` or `node_quantifier`.
-	CostStrategy *GraphqlRateLimitingAdvancedPluginCostStrategy `json:"cost_strategy,omitempty"`
+	CostStrategy *CostStrategy `json:"cost_strategy,omitempty"`
 	// The shared dictionary where counters will be stored until the next sync cycle.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 	// Optionally hide informative response headers. Available options: `true` or `false`.
 	HideClientHeaders *bool `json:"hide_client_headers,omitempty"`
 	// How to define the rate limit key. Can be `ip`, `credential`, `consumer`.
-	Identifier *GraphqlRateLimitingAdvancedPluginIdentifier `json:"identifier,omitempty"`
+	Identifier *Identifier `json:"identifier,omitempty"`
 	// One or more requests-per-window limits to apply.
 	Limit []float64 `json:"limit,omitempty"`
 	// A defined maximum cost per query. 0 means unlimited.
@@ -409,10 +408,10 @@ type GraphqlRateLimitingAdvancedPluginConfig struct {
 	// One or more window sizes to apply a limit to (defined in seconds).
 	WindowSize []float64 `json:"window_size,omitempty"`
 	// Sets the time window to either `sliding` or `fixed`.
-	WindowType *GraphqlRateLimitingAdvancedPluginWindowType `json:"window_type,omitempty"`
+	WindowType *WindowType `json:"window_type,omitempty"`
 }
 
-func (o *GraphqlRateLimitingAdvancedPluginConfig) GetCostStrategy() *GraphqlRateLimitingAdvancedPluginCostStrategy {
+func (o *GraphqlRateLimitingAdvancedPluginConfig) GetCostStrategy() *CostStrategy {
 	if o == nil {
 		return nil
 	}
@@ -433,7 +432,7 @@ func (o *GraphqlRateLimitingAdvancedPluginConfig) GetHideClientHeaders() *bool {
 	return o.HideClientHeaders
 }
 
-func (o *GraphqlRateLimitingAdvancedPluginConfig) GetIdentifier() *GraphqlRateLimitingAdvancedPluginIdentifier {
+func (o *GraphqlRateLimitingAdvancedPluginConfig) GetIdentifier() *Identifier {
 	if o == nil {
 		return nil
 	}
@@ -496,11 +495,75 @@ func (o *GraphqlRateLimitingAdvancedPluginConfig) GetWindowSize() []float64 {
 	return o.WindowSize
 }
 
-func (o *GraphqlRateLimitingAdvancedPluginConfig) GetWindowType() *GraphqlRateLimitingAdvancedPluginWindowType {
+func (o *GraphqlRateLimitingAdvancedPluginConfig) GetWindowType() *WindowType {
 	if o == nil {
 		return nil
 	}
 	return o.WindowType
+}
+
+// GraphqlRateLimitingAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type GraphqlRateLimitingAdvancedPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginConsumer) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type GraphqlRateLimitingAdvancedPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginConsumerGroup) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+type GraphqlRateLimitingAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type GraphqlRateLimitingAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type GraphqlRateLimitingAdvancedPluginOrdering struct {
+	After  *GraphqlRateLimitingAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *GraphqlRateLimitingAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginOrdering) GetAfter() *GraphqlRateLimitingAdvancedPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginOrdering) GetBefore() *GraphqlRateLimitingAdvancedPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
 }
 
 type GraphqlRateLimitingAdvancedPluginProtocols string
@@ -553,29 +616,6 @@ func (e *GraphqlRateLimitingAdvancedPluginProtocols) UnmarshalJSON(data []byte) 
 	}
 }
 
-// GraphqlRateLimitingAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type GraphqlRateLimitingAdvancedPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *GraphqlRateLimitingAdvancedPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type GraphqlRateLimitingAdvancedPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *GraphqlRateLimitingAdvancedPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
 // GraphqlRateLimitingAdvancedPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 type GraphqlRateLimitingAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
@@ -600,29 +640,30 @@ func (o *GraphqlRateLimitingAdvancedPluginService) GetID() *string {
 	return o.ID
 }
 
+// GraphqlRateLimitingAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type GraphqlRateLimitingAdvancedPlugin struct {
-	Config *GraphqlRateLimitingAdvancedPluginConfig `json:"config,omitempty"`
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool   `json:"enabled,omitempty"`
-	ID           *string `json:"id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	name         *string `const:"graphql-rate-limiting-advanced" json:"name,omitempty"`
-	Ordering     any     `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []GraphqlRateLimitingAdvancedPluginProtocols `json:"protocols,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	Config GraphqlRateLimitingAdvancedPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer      *GraphqlRateLimitingAdvancedPluginConsumer      `json:"consumer,omitempty"`
 	ConsumerGroup *GraphqlRateLimitingAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                      `json:"enabled,omitempty"`
+	ID           *string                                    `json:"id,omitempty"`
+	InstanceName *string                                    `json:"instance_name,omitempty"`
+	name         string                                     `const:"graphql-rate-limiting-advanced" json:"name"`
+	Ordering     *GraphqlRateLimitingAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []GraphqlRateLimitingAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
 	Route *GraphqlRateLimitingAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *GraphqlRateLimitingAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (g GraphqlRateLimitingAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -636,11 +677,25 @@ func (g *GraphqlRateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetConfig() *GraphqlRateLimitingAdvancedPluginConfig {
+func (o *GraphqlRateLimitingAdvancedPlugin) GetConfig() GraphqlRateLimitingAdvancedPluginConfig {
+	if o == nil {
+		return GraphqlRateLimitingAdvancedPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *GraphqlRateLimitingAdvancedPlugin) GetConsumer() *GraphqlRateLimitingAdvancedPluginConsumer {
 	if o == nil {
 		return nil
 	}
-	return o.Config
+	return o.Consumer
+}
+
+func (o *GraphqlRateLimitingAdvancedPlugin) GetConsumerGroup() *GraphqlRateLimitingAdvancedPluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
 }
 
 func (o *GraphqlRateLimitingAdvancedPlugin) GetCreatedAt() *int64 {
@@ -671,11 +726,11 @@ func (o *GraphqlRateLimitingAdvancedPlugin) GetInstanceName() *string {
 	return o.InstanceName
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetName() *string {
-	return types.String("graphql-rate-limiting-advanced")
+func (o *GraphqlRateLimitingAdvancedPlugin) GetName() string {
+	return "graphql-rate-limiting-advanced"
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetOrdering() any {
+func (o *GraphqlRateLimitingAdvancedPlugin) GetOrdering() *GraphqlRateLimitingAdvancedPluginOrdering {
 	if o == nil {
 		return nil
 	}
@@ -687,6 +742,20 @@ func (o *GraphqlRateLimitingAdvancedPlugin) GetProtocols() []GraphqlRateLimiting
 		return nil
 	}
 	return o.Protocols
+}
+
+func (o *GraphqlRateLimitingAdvancedPlugin) GetRoute() *GraphqlRateLimitingAdvancedPluginRoute {
+	if o == nil {
+		return nil
+	}
+	return o.Route
+}
+
+func (o *GraphqlRateLimitingAdvancedPlugin) GetService() *GraphqlRateLimitingAdvancedPluginService {
+	if o == nil {
+		return nil
+	}
+	return o.Service
 }
 
 func (o *GraphqlRateLimitingAdvancedPlugin) GetTags() []string {
@@ -703,30 +772,116 @@ func (o *GraphqlRateLimitingAdvancedPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetConsumer() *GraphqlRateLimitingAdvancedPluginConsumer {
+// GraphqlRateLimitingAdvancedPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+type GraphqlRateLimitingAdvancedPluginInput struct {
+	Config GraphqlRateLimitingAdvancedPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer      *GraphqlRateLimitingAdvancedPluginConsumer      `json:"consumer,omitempty"`
+	ConsumerGroup *GraphqlRateLimitingAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Whether the plugin is applied.
+	Enabled      *bool                                      `json:"enabled,omitempty"`
+	ID           *string                                    `json:"id,omitempty"`
+	InstanceName *string                                    `json:"instance_name,omitempty"`
+	name         string                                     `const:"graphql-rate-limiting-advanced" json:"name"`
+	Ordering     *GraphqlRateLimitingAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+	Protocols []GraphqlRateLimitingAdvancedPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+	Route *GraphqlRateLimitingAdvancedPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *GraphqlRateLimitingAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+}
+
+func (g GraphqlRateLimitingAdvancedPluginInput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginInput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetConfig() GraphqlRateLimitingAdvancedPluginConfig {
+	if o == nil {
+		return GraphqlRateLimitingAdvancedPluginConfig{}
+	}
+	return o.Config
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetConsumer() *GraphqlRateLimitingAdvancedPluginConsumer {
 	if o == nil {
 		return nil
 	}
 	return o.Consumer
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetConsumerGroup() *GraphqlRateLimitingAdvancedPluginConsumerGroup {
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetConsumerGroup() *GraphqlRateLimitingAdvancedPluginConsumerGroup {
 	if o == nil {
 		return nil
 	}
 	return o.ConsumerGroup
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetRoute() *GraphqlRateLimitingAdvancedPluginRoute {
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetInstanceName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.InstanceName
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetName() string {
+	return "graphql-rate-limiting-advanced"
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetOrdering() *GraphqlRateLimitingAdvancedPluginOrdering {
+	if o == nil {
+		return nil
+	}
+	return o.Ordering
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetProtocols() []GraphqlRateLimitingAdvancedPluginProtocols {
+	if o == nil {
+		return nil
+	}
+	return o.Protocols
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetRoute() *GraphqlRateLimitingAdvancedPluginRoute {
 	if o == nil {
 		return nil
 	}
 	return o.Route
 }
 
-func (o *GraphqlRateLimitingAdvancedPlugin) GetService() *GraphqlRateLimitingAdvancedPluginService {
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetService() *GraphqlRateLimitingAdvancedPluginService {
 	if o == nil {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *GraphqlRateLimitingAdvancedPluginInput) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
 }

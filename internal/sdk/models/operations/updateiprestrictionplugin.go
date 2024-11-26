@@ -9,8 +9,8 @@ import (
 
 type UpdateIprestrictionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	CreateIPRestrictionPlugin *shared.CreateIPRestrictionPlugin `request:"mediaType=application/json"`
+	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	IPRestrictionPlugin *shared.IPRestrictionPluginInput `request:"mediaType=application/json"`
 }
 
 func (o *UpdateIprestrictionPluginRequest) GetPluginID() string {
@@ -20,11 +20,11 @@ func (o *UpdateIprestrictionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateIprestrictionPluginRequest) GetCreateIPRestrictionPlugin() *shared.CreateIPRestrictionPlugin {
+func (o *UpdateIprestrictionPluginRequest) GetIPRestrictionPlugin() *shared.IPRestrictionPluginInput {
 	if o == nil {
 		return nil
 	}
-	return o.CreateIPRestrictionPlugin
+	return o.IPRestrictionPlugin
 }
 
 type UpdateIprestrictionPluginResponse struct {

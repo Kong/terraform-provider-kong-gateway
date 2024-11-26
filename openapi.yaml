@@ -106,6 +106,15 @@ components:
             schema:
                 type: string
             x-speakeasy-match: id
+        MTLSAuthId:
+            description: ID of the MTLS-auth credential to lookup
+            example: ""
+            in: path
+            name: MTLSAuthId
+            required: true
+            schema:
+                type: string
+            x-speakeasy-match: id
         PaginationOffset:
             description: Offset from which to return the next set of resources. Use the value of the 'offset' field from the response of a list operation as input here to paginate through all the resources
             in: query
@@ -207,18 +216,38 @@ components:
             description: Unauthorized
     schemas:
         ACL:
-            allOf:
-                - $ref: '#/components/schemas/ACLWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: ACL
+            additionalProperties: false
+            example:
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                group: foo
+                id: b1f34145-0343-41a4-9602-4c69dec2f269
+            properties:
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                group:
+                    type: string
+                id:
+                    nullable: true
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - group
+            type: object
+            x-speakeasy-entity: ACL
         ACLPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -254,6 +283,10 @@ components:
                     const: acl
                     type: string
         ACLWithoutParents:
+            additionalProperties: false
+            example:
+                group: foo
+                id: b1f34145-0343-41a4-9602-4c69dec2f269
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
@@ -262,12 +295,14 @@ components:
                 group:
                     type: string
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 tags:
                     items:
                         type: string
                     type: array
+            required:
+                - group
             type: object
             x-speakeasy-entity: ACL
         AcmePlugin:
@@ -1488,18 +1523,42 @@ components:
                     const: azure-functions
                     type: string
         BasicAuth:
-            allOf:
-                - $ref: '#/components/schemas/BasicAuthWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: BasicAuth
+            additionalProperties: false
+            example:
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                password: hashedsoopersecretvalue
+                username: darius
+            properties:
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                password:
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+                username:
+                    type: string
+            required:
+                - username
+                - password
+            type: object
+            x-speakeasy-entity: BasicAuth
         BasicAuthPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -1525,13 +1584,18 @@ components:
                     const: basic-auth
                     type: string
         BasicAuthWithoutParents:
+            additionalProperties: false
+            example:
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                password: hashedsoopersecretvalue
+                username: darius
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 password:
                     type: string
@@ -1541,6 +1605,9 @@ components:
                     type: array
                 username:
                     type: string
+            required:
+                - username
+                - password
             type: object
             x-speakeasy-entity: BasicAuth
         BotDetectionPlugin:
@@ -1571,19 +1638,28 @@ components:
                     const: bot-detection
                     type: string
         CACertificate:
+            additionalProperties: false
+            description: A CA certificate object represents a trusted CA. These objects are used by Kong to verify the validity of a client or server certificate.
+            example:
+                cert: |-
+                    -----BEGIN CERTIFICATE-----
+                    certificate-content
+                    -----END CERTIFICATE-----
+                id: b2f34145-0343-41a4-9602-4c69dec2f260
             properties:
                 cert:
                     description: PEM-encoded public certificate of the CA.
                     type: string
                 cert_digest:
                     description: SHA256 hex digest of the public certificate. This field is read-only and it cannot be set by the caller, the value is automatically computed.
+                    nullable: true
                     type: string
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 tags:
                     description: An optional set of strings associated with the Certificate for grouping and filtering.
@@ -1594,6 +1670,8 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - cert
             type: object
             x-speakeasy-entity: CACertificate
         CanaryPlugin:
@@ -1678,26 +1756,45 @@ components:
                     const: canary
                     type: string
         Certificate:
+            additionalProperties: false
+            description: 'A certificate object represents a public certificate, and can be optionally paired with the corresponding private key. These objects are used by Kong to handle SSL/TLS termination for encrypted requests, or for use as a trusted CA store when validating peer certificate of client/service. Certificates are optionally associated with SNI objects to tie a cert/key pair to one or more hostnames. If intermediate certificates are required in addition to the main certificate, they should be concatenated together into one string according to the following order: main certificate on the top, followed by any intermediates.'
+            example:
+                cert: |-
+                    -----BEGIN CERTIFICATE-----
+                    certificate-content
+                    -----END CERTIFICATE-----
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                key: |-
+                    -----BEGIN PRIVATE KEY-----
+                    private-key-content
+                    -----END PRIVATE KEY-----
             properties:
                 cert:
                     description: PEM-encoded public certificate chain of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
                     type: string
                 cert_alt:
                     description: PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+                    nullable: true
                     type: string
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 key:
                     description: PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
                     type: string
                 key_alt:
                     description: PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+                    nullable: true
                     type: string
+                snis:
+                    items:
+                        type: string
+                    nullable: true
+                    type: array
                 tags:
                     description: An optional set of strings associated with the Certificate for grouping and filtering.
                     items:
@@ -1707,9 +1804,20 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - cert
+                - key
             type: object
             x-speakeasy-entity: Certificate
         Consumer:
+            additionalProperties: false
+            description: The Consumer object represents a consumer - or a user - of a Service. You can either rely on Kong as the primary datastore, or you can map the consumer list with your database to keep consistency between Kong and your existing primary datastore.
+            example:
+                custom_id: "4200"
+                id: 8a388226-80e8-4027-a486-25e4f7db5d21
+                tags:
+                    - silver-tier
+                username: bob-the-builder
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
@@ -1717,9 +1825,10 @@ components:
                     type: integer
                 custom_id:
                     description: Field for storing an existing unique ID for the Consumer - useful for mapping Kong with users in your existing database. You must send either this field or `username` with the request.
+                    nullable: true
                     type: string
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 tags:
                     description: An optional set of strings associated with the Consumer for grouping and filtering.
@@ -1732,17 +1841,19 @@ components:
                     type: integer
                 username:
                     description: The unique username of the Consumer. You must send either this field or `custom_id` with the request.
+                    nullable: true
                     type: string
             type: object
             x-speakeasy-entity: Consumer
         ConsumerGroup:
+            additionalProperties: false
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
                     type: string
@@ -1754,6 +1865,8 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - name
             type: object
             x-speakeasy-entity: ConsumerGroup
         ConsumerGroupInsideWrapper:
@@ -1858,401 +1971,6 @@ components:
                 name:
                     const: cors
                     type: string
-        CreateACLPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ACLPluginConfig'
-            x-speakeasy-entity: PluginACL
-        CreateAcmePlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AcmePluginConfig'
-            x-speakeasy-entity: PluginAcme
-        CreateAiPromptDecoratorPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiPromptDecoratorPluginConfig'
-            x-speakeasy-entity: PluginAiPromptDecorator
-        CreateAiPromptGuardPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiPromptGuardPluginConfig'
-            x-speakeasy-entity: PluginAiPromptGuard
-        CreateAiPromptTemplatePlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiPromptTemplatePluginConfig'
-            x-speakeasy-entity: PluginAiPromptTemplate
-        CreateAiProxyPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiProxyPluginConfig'
-            x-speakeasy-entity: PluginAiProxy
-        CreateAiRequestTransformerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiRequestTransformerPluginConfig'
-            x-speakeasy-entity: PluginAiRequestTransformer
-        CreateAiResponseTransformerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AiResponseTransformerPluginConfig'
-            x-speakeasy-entity: PluginAiResponseTransformer
-        CreateAwsLambdaPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AwsLambdaPluginConfig'
-            x-speakeasy-entity: PluginAwsLambda
-        CreateAzureFunctionsPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/AzureFunctionsPluginConfig'
-            x-speakeasy-entity: PluginAzureFunctions
-        CreateBasicAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/BasicAuthPluginConfig'
-            x-speakeasy-entity: PluginBasicAuth
-        CreateBotDetectionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/BotDetectionPluginConfig'
-            x-speakeasy-entity: PluginBotDetection
-        CreateCanaryPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/CanaryPluginConfig'
-            x-speakeasy-entity: PluginCanary
-        CreateCorrelationIdPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/CorrelationIdPluginConfig'
-            x-speakeasy-entity: PluginCorrelationId
-        CreateCorsPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/CorsPluginConfig'
-            x-speakeasy-entity: PluginCors
-        CreateDatadogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/DatadogPluginConfig'
-            x-speakeasy-entity: PluginDatadog
-        CreateDegraphqlPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/DegraphqlPluginConfig'
-            x-speakeasy-entity: PluginDegraphql
-        CreateExitTransformerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ExitTransformerPluginConfig'
-            x-speakeasy-entity: PluginExitTransformer
-        CreateFileLogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/FileLogPluginConfig'
-            x-speakeasy-entity: PluginFileLog
-        CreateForwardProxyPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ForwardProxyPluginConfig'
-            x-speakeasy-entity: PluginForwardProxy
-        CreateGraphqlProxyCacheAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/GraphqlProxyCacheAdvancedPluginConfig'
-            x-speakeasy-entity: PluginGraphqlProxyCacheAdvanced
-        CreateGraphqlRateLimitingAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/GraphqlRateLimitingAdvancedPluginConfig'
-            x-speakeasy-entity: PluginGraphqlRateLimitingAdvanced
-        CreateGrpcGatewayPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/GrpcGatewayPluginConfig'
-            x-speakeasy-entity: PluginGrpcGateway
-        CreateGrpcWebPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/GrpcWebPluginConfig'
-            x-speakeasy-entity: PluginGrpcWeb
-        CreateHmacAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/HmacAuthPluginConfig'
-            x-speakeasy-entity: PluginHmacAuth
-        CreateHttpLogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/HttpLogPluginConfig'
-            x-speakeasy-entity: PluginHttpLog
-        CreateIpRestrictionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/IpRestrictionPluginConfig'
-            x-speakeasy-entity: PluginIpRestriction
-        CreateJqPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/JqPluginConfig'
-            x-speakeasy-entity: PluginJq
-        CreateJweDecryptPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/JweDecryptPluginConfig'
-            x-speakeasy-entity: PluginJweDecrypt
-        CreateJwtPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/JwtPluginConfig'
-            x-speakeasy-entity: PluginJwt
-        CreateJwtSignerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/JwtSignerPluginConfig'
-            x-speakeasy-entity: PluginJwtSigner
-        CreateKafkaLogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/KafkaLogPluginConfig'
-            x-speakeasy-entity: PluginKafkaLog
-        CreateKafkaUpstreamPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/KafkaUpstreamPluginConfig'
-            x-speakeasy-entity: PluginKafkaUpstream
-        CreateKeyAuthEncPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/KeyAuthEncPluginConfig'
-            x-speakeasy-entity: PluginKeyAuthEnc
-        CreateKeyAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/KeyAuthPluginConfig'
-            x-speakeasy-entity: PluginKeyAuth
-        CreateKonnectApplicationAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/KonnectApplicationAuthPluginConfig'
-            x-speakeasy-entity: PluginKonnectApplicationAuth
-        CreateLdapAuthAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/LdapAuthAdvancedPluginConfig'
-            x-speakeasy-entity: PluginLdapAuthAdvanced
-        CreateLdapAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/LdapAuthPluginConfig'
-            x-speakeasy-entity: PluginLdapAuth
-        CreateLogglyPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/LogglyPluginConfig'
-            x-speakeasy-entity: PluginLoggly
-        CreateMockingPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/MockingPluginConfig'
-            x-speakeasy-entity: PluginMocking
-        CreateMtlsAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/MtlsAuthPluginConfig'
-            x-speakeasy-entity: PluginMtlsAuth
-        CreateOasValidationPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/OasValidationPluginConfig'
-            x-speakeasy-entity: PluginOasValidation
-        CreateOauth2IntrospectionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/Oauth2IntrospectionPluginConfig'
-            x-speakeasy-entity: PluginOauth2Introspection
-        CreateOauth2Plugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/Oauth2PluginConfig'
-            x-speakeasy-entity: PluginOauth2
-        CreateOpaPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/OpaPluginConfig'
-            x-speakeasy-entity: PluginOpa
-        CreateOpenidConnectPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/OpenidConnectPluginConfig'
-            x-speakeasy-entity: PluginOpenidConnect
-        CreateOpentelemetryPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/OpentelemetryPluginConfig'
-            x-speakeasy-entity: PluginOpentelemetry
-        CreatePostFunctionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/PostFunctionPluginConfig'
-            x-speakeasy-entity: PluginPostFunction
-        CreatePreFunctionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/PreFunctionPluginConfig'
-            x-speakeasy-entity: PluginPreFunction
-        CreatePrometheusPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/PrometheusPluginConfig'
-            x-speakeasy-entity: PluginPrometheus
-        CreateProxyCacheAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ProxyCacheAdvancedPluginConfig'
-            x-speakeasy-entity: PluginProxyCacheAdvanced
-        CreateProxyCachePlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ProxyCachePluginConfig'
-            x-speakeasy-entity: PluginProxyCache
-        CreateRateLimitingAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RateLimitingAdvancedPluginConfig'
-            x-speakeasy-entity: PluginRateLimitingAdvanced
-        CreateRateLimitingPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RateLimitingPluginConfig'
-            x-speakeasy-entity: PluginRateLimiting
-        CreateRequestSizeLimitingPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RequestSizeLimitingPluginConfig'
-            x-speakeasy-entity: PluginRequestSizeLimiting
-        CreateRequestTerminationPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RequestTerminationPluginConfig'
-            x-speakeasy-entity: PluginRequestTermination
-        CreateRequestTransformerAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RequestTransformerAdvancedPluginConfig'
-            x-speakeasy-entity: PluginRequestTransformerAdvanced
-        CreateRequestTransformerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RequestTransformerPluginConfig'
-            x-speakeasy-entity: PluginRequestTransformer
-        CreateRequestValidatorPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RequestValidatorPluginConfig'
-            x-speakeasy-entity: PluginRequestValidator
-        CreateResponseRatelimitingPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ResponseRatelimitingPluginConfig'
-            x-speakeasy-entity: PluginResponseRatelimiting
-        CreateResponseTransformerAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ResponseTransformerAdvancedPluginConfig'
-            x-speakeasy-entity: PluginResponseTransformerAdvanced
-        CreateResponseTransformerPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ResponseTransformerPluginConfig'
-            x-speakeasy-entity: PluginResponseTransformer
-        CreateRouteByHeaderPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RouteByHeaderPluginConfig'
-            x-speakeasy-entity: PluginRouteByHeader
-        CreateRouteTransformerAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/RouteTransformerAdvancedPluginConfig'
-            x-speakeasy-entity: PluginRouteTransformerAdvanced
-        CreateSamlPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/SamlPluginConfig'
-            x-speakeasy-entity: PluginSaml
-        CreateSessionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/SessionPluginConfig'
-            x-speakeasy-entity: PluginSession
-        CreateStatsdAdvancedPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/StatsdAdvancedPluginConfig'
-            x-speakeasy-entity: PluginStatsdAdvanced
-        CreateStatsdPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/StatsdPluginConfig'
-            x-speakeasy-entity: PluginStatsd
-        CreateSyslogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/SyslogPluginConfig'
-            x-speakeasy-entity: PluginSyslog
-        CreateTcpLogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/TcpLogPluginConfig'
-            x-speakeasy-entity: PluginTcpLog
-        CreateTlsHandshakeModifierPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/TlsHandshakeModifierPluginConfig'
-            x-speakeasy-entity: PluginTlsHandshakeModifier
-        CreateTlsMetadataHeadersPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/TlsMetadataHeadersPluginConfig'
-            x-speakeasy-entity: PluginTlsMetadataHeaders
-        CreateUdpLogPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/UdpLogPluginConfig'
-            x-speakeasy-entity: PluginUdpLog
-        CreateUpstreamTimeoutPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/UpstreamTimeoutPluginConfig'
-            x-speakeasy-entity: PluginUpstreamTimeout
-        CreateVaultAuthPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/VaultAuthPluginConfig'
-            x-speakeasy-entity: PluginVaultAuth
-        CreateWebsocketSizeLimitPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/WebsocketSizeLimitPluginConfig'
-            x-speakeasy-entity: PluginWebsocketSizeLimit
-        CreateWebsocketValidatorPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/WebsocketValidatorPluginConfig'
-            x-speakeasy-entity: PluginWebsocketValidator
-        CreateXmlThreatProtectionPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/XmlThreatProtectionPluginConfig'
-            x-speakeasy-entity: PluginXmlThreatProtection
-        CreateZipkinPlugin:
-            allOf:
-                - $ref: '#/components/schemas/Plugin'
-                - $ref: '#/components/schemas/ZipkinPluginConfig'
-            x-speakeasy-entity: PluginZipkin
         DatadogPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -2970,28 +2688,31 @@ components:
                     const: grpc-web
                     type: string
         HMACAuth:
-            allOf:
-                - $ref: '#/components/schemas/HMACAuthWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: HMACAuth
-        HMACAuthWithoutParents:
+            additionalProperties: false
+            example:
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                id: 75695322-e8a0-4109-aed4-5416b0308d85
+                secret: wQazJ304DW5huJklHgUfjfiSyCyTAEDZ
+                username: xerxes
             properties:
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 secret:
+                    nullable: true
                     type: string
                 tags:
                     items:
@@ -2999,6 +2720,35 @@ components:
                     type: array
                 username:
                     type: string
+            required:
+                - username
+            type: object
+            x-speakeasy-entity: HMACAuth
+        HMACAuthWithoutParents:
+            additionalProperties: false
+            example:
+                id: 75695322-e8a0-4109-aed4-5416b0308d85
+                secret: wQazJ304DW5huJklHgUfjfiSyCyTAEDZ
+                username: xerxes
+            properties:
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                secret:
+                    nullable: true
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+                username:
+                    type: string
+            required:
+                - username
             type: object
             x-speakeasy-entity: HMACAuth
         HmacAuthPlugin:
@@ -3189,19 +2939,14 @@ components:
                     const: ip-restriction
                     type: string
         JWT:
-            allOf:
-                - $ref: '#/components/schemas/JWTWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: JWT
-        JWTWithoutParents:
+            additionalProperties: false
+            example:
+                algorithm: HS256
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                id: 75695322-e8a0-4109-aed4-5416b0308d85
+                key: YJdmaDvVTJxtcWRCvkMikc8oELgAVNcz
+                secret: C50k0bcahDhLNhLKSUBSR1OMiFGzNZ7X
             properties:
                 algorithm:
                     default: HS256
@@ -3219,19 +2964,79 @@ components:
                         - PS384
                         - PS512
                         - EdDSA
+                    nullable: true
+                    type: string
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                key:
+                    nullable: true
+                    type: string
+                rsa_public_key:
+                    nullable: true
+                    type: string
+                secret:
+                    nullable: true
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+            type: object
+            x-speakeasy-entity: JWT
+        JWTWithoutParents:
+            additionalProperties: false
+            example:
+                algorithm: HS256
+                id: 75695322-e8a0-4109-aed4-5416b0308d85
+                key: YJdmaDvVTJxtcWRCvkMikc8oELgAVNcz
+                secret: C50k0bcahDhLNhLKSUBSR1OMiFGzNZ7X
+            properties:
+                algorithm:
+                    default: HS256
+                    enum:
+                        - HS256
+                        - HS384
+                        - HS512
+                        - RS256
+                        - RS384
+                        - RS512
+                        - ES256
+                        - ES384
+                        - ES512
+                        - PS256
+                        - PS384
+                        - PS512
+                        - EdDSA
+                    nullable: true
                     type: string
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 key:
+                    nullable: true
                     type: string
                 rsa_public_key:
+                    nullable: true
                     type: string
                 secret:
+                    nullable: true
                     type: string
                 tags:
                     items:
@@ -4115,25 +3920,40 @@ components:
                     const: kafka-upstream
                     type: string
         Key:
+            additionalProperties: false
+            description: A Key object holds a representation of asymmetric keys in various formats. When Kong or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.
+            example:
+                id: d958f66b-8e99-44d2-b0b4-edd5bbf24658
+                jwk: '{"alg":"RSA",  "kid": "42",  ...}'
+                kid: "42"
+                name: a-key
+                pem:
+                    private_key: '-----BEGIN'
+                    public_key: '-----BEGIN'
+                set:
+                    id: b86b331c-dcd0-4b3e-97ce-47c5a9543031
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 jwk:
                     description: A JSON Web Key represented as a string.
+                    nullable: true
                     type: string
                 kid:
                     description: A unique identifier for a key.
                     type: string
                 name:
                     description: The name to associate with the given keys.
+                    nullable: true
                     type: string
                 pem:
                     description: A keypair in PEM format.
+                    nullable: true
                     properties:
                         private_key:
                             type: string
@@ -4143,6 +3963,7 @@ components:
                 set:
                     additionalProperties: false
                     description: The id (an UUID) of the key-set with which to associate the key.
+                    nullable: true
                     properties:
                         id:
                             type: string
@@ -4157,21 +3978,43 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - kid
             type: object
             x-speakeasy-entity: Key
         KeyAuth:
-            allOf:
-                - $ref: '#/components/schemas/KeyAuthWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: KeyAuth
+            additionalProperties: false
+            example:
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                key: IL1deIyHyQA40WpeLeA1bIUXuvTwlGjo
+            properties:
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                key:
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - key
+            type: object
+            x-speakeasy-entity: KeyAuth
         KeyAuthEncPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -4267,13 +4110,17 @@ components:
                     const: key-auth
                     type: string
         KeyAuthWithoutParents:
+            additionalProperties: false
+            example:
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                key: IL1deIyHyQA40WpeLeA1bIUXuvTwlGjo
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 key:
                     type: string
@@ -4281,18 +4128,27 @@ components:
                     items:
                         type: string
                     type: array
+            required:
+                - key
             type: object
             x-speakeasy-entity: KeyAuth
         KeySet:
+            additionalProperties: false
+            example:
+                id: b58c7d9d-e54f-444c-b24d-cdfc4159f61e
+                name: example-key-set
+                tags:
+                    - idp-keys
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
+                    nullable: true
                     type: string
                 tags:
                     items:
@@ -4304,6 +4160,69 @@ components:
                     type: integer
             type: object
             x-speakeasy-entity: KeySet
+        KeyWithoutParents:
+            additionalProperties: false
+            description: A Key object holds a representation of asymmetric keys in various formats. When Kong or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.
+            example:
+                id: d958f66b-8e99-44d2-b0b4-edd5bbf24658
+                jwk: '{"alg":"RSA",  "kid": "42",  ...}'
+                kid: "42"
+                name: a-key
+                pem:
+                    private_key: '-----BEGIN'
+                    public_key: '-----BEGIN'
+                set:
+                    id: b86b331c-dcd0-4b3e-97ce-47c5a9543031
+            properties:
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                jwk:
+                    description: A JSON Web Key represented as a string.
+                    nullable: true
+                    type: string
+                kid:
+                    description: A unique identifier for a key.
+                    type: string
+                name:
+                    description: The name to associate with the given keys.
+                    nullable: true
+                    type: string
+                pem:
+                    description: A keypair in PEM format.
+                    nullable: true
+                    properties:
+                        private_key:
+                            type: string
+                        public_key:
+                            type: string
+                    type: object
+                set:
+                    additionalProperties: false
+                    description: The id (an UUID) of the key-set with which to associate the key.
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                tags:
+                    description: An optional set of strings associated with the Key for grouping and filtering.
+                    items:
+                        type: string
+                    type: array
+                updated_at:
+                    description: Unix epoch when the resource was last updated.
+                    readOnly: true
+                    type: integer
+            required:
+                - kid
+            type: object
+            x-speakeasy-entity: Key
         KonnectApplicationAuthPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -6114,6 +6033,82 @@ components:
                 name:
                     const: loggly
                     type: string
+        MTLSAuth:
+            additionalProperties: false
+            example:
+                ca_certificate:
+                    id: b2f34145-0343-41a4-9602-4c69dec2f260
+                consumer:
+                    id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                subject_name: CA_Subject_Name
+            properties:
+                ca_certificate:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                consumer:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                subject_name:
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - subject_name
+            type: object
+            x-speakeasy-entity: MTLSAuth
+        MTLSAuthWithoutParents:
+            additionalProperties: false
+            example:
+                ca_certificate:
+                    id: b2f34145-0343-41a4-9602-4c69dec2f260
+                id: b2f34145-0343-41a4-9602-4c69dec2f269
+                subject_name: CA_Subject_Name
+            properties:
+                ca_certificate:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                subject_name:
+                    type: string
+                tags:
+                    items:
+                        type: string
+                    type: array
+            required:
+                - subject_name
+            type: object
+            x-speakeasy-entity: MTLSAuth
         MockingPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -8327,47 +8322,48 @@ components:
             description: Offset is used to paginate through the API. Provide this value to the next list operation to fetch the next page
             type: string
         Plugin:
-            allOf:
-                - $ref: '#/components/schemas/PluginWithoutParents'
-                - properties:
-                    consumer:
-                        additionalProperties: false
-                        description: If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                    consumer_group:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                    route:
-                        additionalProperties: false
-                        description: If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                    service:
-                        additionalProperties: false
-                        description: If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-        PluginWithoutParents:
+            additionalProperties: false
+            description: A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+            example:
+                config:
+                    anonymous: null
+                    hide_credentials: false
+                    key_in_body: false
+                    key_in_header: true
+                    key_in_query: true
+                    key_names:
+                        - apikey
+                    run_on_preflight: true
+                enabled: true
+                id: 3fd1eea1-885a-4011-b986-289943ff8177
+                name: key-auth
+                protocols:
+                    - grpc
+                    - grpcs
+                    - http
+                    - https
             properties:
                 config:
                     additionalProperties: true
                     description: The configuration properties for the Plugin which can be found on the plugins documentation page in the [Kong Hub](https://docs.konghq.com/hub/).
                     type: object
+                consumer:
+                    additionalProperties: false
+                    description: If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                consumer_group:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
@@ -8375,16 +8371,19 @@ components:
                 enabled:
                     default: true
                     description: Whether the plugin is applied.
+                    nullable: true
                     type: boolean
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 instance_name:
+                    nullable: true
                     type: string
                 name:
                     description: The name of the Plugin that's going to be added. Currently, the Plugin must be installed in every Kong instance separately.
                     type: string
                 ordering:
+                    nullable: true
                     properties:
                         after:
                             properties:
@@ -8421,6 +8420,122 @@ components:
                             - ws
                             - wss
                         type: string
+                    nullable: true
+                    type: array
+                route:
+                    additionalProperties: false
+                    description: If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                service:
+                    additionalProperties: false
+                    description: If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                tags:
+                    description: An optional set of strings associated with the Plugin for grouping and filtering.
+                    items:
+                        type: string
+                    type: array
+                updated_at:
+                    description: Unix epoch when the resource was last updated.
+                    readOnly: true
+                    type: integer
+            required:
+                - name
+                - config
+            type: object
+        PluginWithoutParents:
+            additionalProperties: false
+            description: A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
+            example:
+                config:
+                    anonymous: null
+                    hide_credentials: false
+                    key_in_body: false
+                    key_in_header: true
+                    key_in_query: true
+                    key_names:
+                        - apikey
+                    run_on_preflight: true
+                enabled: true
+                id: 3fd1eea1-885a-4011-b986-289943ff8177
+                name: key-auth
+                protocols:
+                    - grpc
+                    - grpcs
+                    - http
+                    - https
+            properties:
+                config:
+                    additionalProperties: true
+                    description: The configuration properties for the Plugin which can be found on the plugins documentation page in the [Kong Hub](https://docs.konghq.com/hub/).
+                    type: object
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                enabled:
+                    default: true
+                    description: Whether the plugin is applied.
+                    nullable: true
+                    type: boolean
+                id:
+                    nullable: true
+                    type: string
+                instance_name:
+                    nullable: true
+                    type: string
+                name:
+                    description: The name of the Plugin that's going to be added. Currently, the Plugin must be installed in every Kong instance separately.
+                    type: string
+                ordering:
+                    nullable: true
+                    properties:
+                        after:
+                            properties:
+                                access:
+                                    items:
+                                        type: string
+                                    type: array
+                            type: object
+                        before:
+                            properties:
+                                access:
+                                    items:
+                                        type: string
+                                    type: array
+                            type: object
+                    type: object
+                protocols:
+                    default:
+                        - grpc
+                        - grpcs
+                        - http
+                        - https
+                    description: A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
+                    items:
+                        enum:
+                            - grpc
+                            - grpcs
+                            - http
+                            - https
+                            - tcp
+                            - tls
+                            - tls_passthrough
+                            - udp
+                            - ws
+                            - wss
+                        type: string
+                    nullable: true
                     type: array
                 tags:
                     description: An optional set of strings associated with the Plugin for grouping and filtering.
@@ -8431,6 +8546,9 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - name
+                - config
             type: object
         PostFunctionPlugin:
             allOf:
@@ -10154,19 +10272,167 @@ components:
                     const: response-transformer
                     type: string
         Route:
-            allOf:
-                - $ref: '#/components/schemas/RouteWithoutParents'
-                - properties:
-                    service:
-                        additionalProperties: false
-                        description: The Service this Route is associated to. This is where the Route proxies traffic to.
+            additionalProperties: false
+            description: Route entities define rules to match client requests. Each Route is associated with a Service, and a Service may have multiple Routes associated to it. Every request matching a given Route will be proxied to its associated Service. The combination of Routes and Services (and the separation of concerns between them) offers a powerful routing mechanism with which it is possible to define fine-grained entry-points in Kong leading to different upstream services of your infrastructure. You need at least one matching rule that applies to the protocol being matched by the Route.
+            example:
+                hosts:
+                    - foo.example.com
+                    - foo.example.us
+                id: 56c4566c-14cc-4132-9011-4139fcbbe50a
+                name: example-route
+                paths:
+                    - /v1
+                    - /v2
+                service:
+                    id: bd380f99-659d-415e-b0e7-72ea05df3218
+            properties:
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                destinations:
+                    description: A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
+                    items:
                         properties:
-                            id:
+                            ip:
                                 type: string
+                            port:
+                                type: integer
                         type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: Route
+                    nullable: true
+                    type: array
+                headers:
+                    additionalProperties:
+                        type: string
+                    description: 'One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.'
+                    nullable: true
+                    type: object
+                hosts:
+                    description: A list of domain names that match this Route. Note that the hosts value is case sensitive.
+                    items:
+                        type: string
+                    nullable: true
+                    type: array
+                https_redirect_status_code:
+                    default: 426
+                    description: 'The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.'
+                    enum:
+                        - 426
+                        - 301
+                        - 302
+                        - 307
+                        - 308
+                    nullable: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                methods:
+                    description: A list of HTTP methods that match this Route.
+                    items:
+                        type: string
+                    nullable: true
+                    type: array
+                name:
+                    description: The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".
+                    nullable: true
+                    type: string
+                path_handling:
+                    default: v0
+                    description: Controls how the Service path, Route path and requested path are combined when sending a request to the upstream. See above for a detailed description of each behavior.
+                    enum:
+                        - v0
+                        - v1
+                    nullable: true
+                    type: string
+                paths:
+                    description: A list of paths that match this Route.
+                    items:
+                        type: string
+                    nullable: true
+                    type: array
+                preserve_host:
+                    default: false
+                    description: When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
+                    nullable: true
+                    type: boolean
+                protocols:
+                    default:
+                        - http
+                        - https
+                    description: An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.
+                    items:
+                        enum:
+                            - grpc
+                            - grpcs
+                            - http
+                            - https
+                            - tcp
+                            - tls
+                            - tls_passthrough
+                            - udp
+                            - ws
+                            - wss
+                        type: string
+                    nullable: true
+                    type: array
+                regex_priority:
+                    default: 0
+                    description: A number used to choose which route resolves a given request when several routes match it using regexes simultaneously. When two routes match the path and have the same `regex_priority`, the older one (lowest `created_at`) is used. Note that the priority for non-regex routes is different (longer non-regex routes are matched before shorter ones).
+                    nullable: true
+                    type: integer
+                request_buffering:
+                    default: true
+                    description: Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
+                    nullable: true
+                    type: boolean
+                response_buffering:
+                    default: true
+                    description: Whether to enable response body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that send data with chunked transfer encoding.
+                    nullable: true
+                    type: boolean
+                service:
+                    additionalProperties: false
+                    description: The Service this Route is associated to. This is where the Route proxies traffic to.
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                snis:
+                    description: A list of SNIs that match this Route when using stream routing.
+                    items:
+                        type: string
+                    nullable: true
+                    type: array
+                sources:
+                    description: A list of IP sources of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
+                    items:
+                        properties:
+                            ip:
+                                type: string
+                            port:
+                                type: integer
+                        type: object
+                    nullable: true
+                    type: array
+                strip_path:
+                    default: true
+                    description: When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.
+                    nullable: true
+                    type: boolean
+                tags:
+                    description: An optional set of strings associated with the Route for grouping and filtering.
+                    items:
+                        type: string
+                    type: array
+                updated_at:
+                    description: Unix epoch when the resource was last updated.
+                    readOnly: true
+                    type: integer
+            type: object
+            x-speakeasy-entity: Route
         RouteByHeaderPlugin:
             allOf:
                 - $ref: '#/components/schemas/Plugin'
@@ -10219,6 +10485,17 @@ components:
                     const: route-transformer-advanced
                     type: string
         RouteWithoutParents:
+            additionalProperties: false
+            description: Route entities define rules to match client requests. Each Route is associated with a Service, and a Service may have multiple Routes associated to it. Every request matching a given Route will be proxied to its associated Service. The combination of Routes and Services (and the separation of concerns between them) offers a powerful routing mechanism with which it is possible to define fine-grained entry-points in Kong leading to different upstream services of your infrastructure. You need at least one matching rule that applies to the protocol being matched by the Route.
+            example:
+                hosts:
+                    - foo.example.com
+                    - foo.example.us
+                id: 56c4566c-14cc-4132-9011-4139fcbbe50a
+                name: example-route
+                paths:
+                    - /v1
+                    - /v2
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
@@ -10233,15 +10510,19 @@ components:
                             port:
                                 type: integer
                         type: object
+                    nullable: true
                     type: array
                 headers:
-                    additionalProperties: true
+                    additionalProperties:
+                        type: string
                     description: 'One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.'
+                    nullable: true
                     type: object
                 hosts:
                     description: A list of domain names that match this Route. Note that the hosts value is case sensitive.
                     items:
                         type: string
+                    nullable: true
                     type: array
                 https_redirect_status_code:
                     default: 426
@@ -10252,17 +10533,20 @@ components:
                         - 302
                         - 307
                         - 308
+                    nullable: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 methods:
                     description: A list of HTTP methods that match this Route.
                     items:
                         type: string
+                    nullable: true
                     type: array
                 name:
                     description: The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".
+                    nullable: true
                     type: string
                 path_handling:
                     default: v0
@@ -10270,15 +10554,18 @@ components:
                     enum:
                         - v0
                         - v1
+                    nullable: true
                     type: string
                 paths:
                     description: A list of paths that match this Route.
                     items:
                         type: string
+                    nullable: true
                     type: array
                 preserve_host:
                     default: false
                     description: When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
+                    nullable: true
                     type: boolean
                 protocols:
                     default:
@@ -10298,23 +10585,28 @@ components:
                             - ws
                             - wss
                         type: string
+                    nullable: true
                     type: array
                 regex_priority:
                     default: 0
                     description: A number used to choose which route resolves a given request when several routes match it using regexes simultaneously. When two routes match the path and have the same `regex_priority`, the older one (lowest `created_at`) is used. Note that the priority for non-regex routes is different (longer non-regex routes are matched before shorter ones).
+                    nullable: true
                     type: integer
                 request_buffering:
                     default: true
                     description: Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
+                    nullable: true
                     type: boolean
                 response_buffering:
                     default: true
                     description: Whether to enable response body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that send data with chunked transfer encoding.
+                    nullable: true
                     type: boolean
                 snis:
                     description: A list of SNIs that match this Route when using stream routing.
                     items:
                         type: string
+                    nullable: true
                     type: array
                 sources:
                     description: A list of IP sources of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
@@ -10325,10 +10617,12 @@ components:
                             port:
                                 type: integer
                         type: object
+                    nullable: true
                     type: array
                 strip_path:
                     default: true
                     description: When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.
+                    nullable: true
                     type: boolean
                 tags:
                     description: An optional set of strings associated with the Route for grouping and filtering.
@@ -10342,27 +10636,28 @@ components:
             type: object
             x-speakeasy-entity: Route
         SNI:
-            allOf:
-                - $ref: '#/components/schemas/SNIWithoutParents'
-                - properties:
-                    certificate:
-                        additionalProperties: false
-                        description: The id (a UUID) of the certificate with which to associate the SNI hostname. The Certificate must have a valid private key associated with it to be used by the SNI object.
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: SNI
-        SNIWithoutParents:
+            additionalProperties: false
+            description: An SNI object represents a many-to-one mapping of hostnames to a certificate. That is, a certificate object can have many hostnames associated with it; when Kong receives an SSL request, it uses the SNI field in the Client Hello to lookup the certificate object based on the SNI associated with the certificate.
+            example:
+                certificate:
+                    id: bd380f99-659d-415e-b0e7-72ea05df3218
+                id: 36c4566c-14cc-4132-9011-4139fcbbe50a
+                name: some.example.org
             properties:
+                certificate:
+                    additionalProperties: false
+                    description: The id (a UUID) of the certificate with which to associate the SNI hostname. The Certificate must have a valid private key associated with it to be used by the SNI object.
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: integer
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
                     description: The SNI name to associate with the given certificate.
@@ -10376,6 +10671,39 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - name
+                - certificate
+            type: object
+            x-speakeasy-entity: SNI
+        SNIWithoutParents:
+            additionalProperties: false
+            description: An SNI object represents a many-to-one mapping of hostnames to a certificate. That is, a certificate object can have many hostnames associated with it; when Kong receives an SSL request, it uses the SNI field in the Client Hello to lookup the certificate object based on the SNI associated with the certificate.
+            example:
+                id: 36c4566c-14cc-4132-9011-4139fcbbe50a
+                name: some.example.org
+            properties:
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: integer
+                id:
+                    nullable: true
+                    type: string
+                name:
+                    description: The SNI name to associate with the given certificate.
+                    type: string
+                tags:
+                    description: An optional set of strings associated with the SNIs for grouping and filtering.
+                    items:
+                        type: string
+                    type: array
+                updated_at:
+                    description: Unix epoch when the resource was last updated.
+                    readOnly: true
+                    type: integer
+            required:
+                - name
             type: object
             x-speakeasy-entity: SNI
         SamlPlugin:
@@ -10846,15 +11174,26 @@ components:
                     const: saml
                     type: string
         Service:
+            additionalProperties: false
+            description: Service entities, as the name implies, are abstractions of each of your own upstream services. Examples of Services would be a data transformation microservice, a billing API, etc. The main attribute of a Service is its URL (where Kong should proxy traffic to), which can be set as a single string or by specifying its `protocol`, `host`, `port` and `path` individually. Services are associated to Routes (a Service can have many Routes associated with it). Routes are entry-points in Kong and define rules to match client requests. Once a Route is matched, Kong proxies the request to its associated Service. See the [Proxy Reference][proxy-reference] for a detailed explanation of how Kong proxies traffic.
+            example:
+                host: example.internal
+                id: 49fd316e-c457-481c-9fc7-8079153e4f3c
+                name: example-service
+                path: /
+                port: 80
+                protocol: http
             properties:
                 ca_certificates:
                     description: Array of `CA Certificate` object UUIDs that are used to build the trust store while verifying upstream server's TLS certificate. If set to `null` when Nginx default is respected. If default CA list in Nginx are not specified and TLS verification is enabled, then handshake with upstream server will always fail (because no CA are trusted).
                     items:
                         type: string
+                    nullable: true
                     type: array
                 client_certificate:
                     additionalProperties: false
                     description: Certificate to be used as client certificate while TLS handshaking to the upstream server.
+                    nullable: true
                     properties:
                         id:
                             type: string
@@ -10863,6 +11202,7 @@ components:
                 connect_timeout:
                     default: 60000
                     description: The timeout in milliseconds for establishing a connection to the upstream server.
+                    nullable: true
                     type: integer
                 created_at:
                     description: Unix epoch when the resource was created.
@@ -10871,18 +11211,21 @@ components:
                 enabled:
                     default: true
                     description: 'Whether the Service is active. If set to `false`, the proxy behavior will be as if any routes attached to it do not exist (404). Default: `true`.'
+                    nullable: true
                     type: boolean
                 host:
                     description: The host of the upstream server. Note that the host value is case sensitive.
                     type: string
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
                     description: The Service name.
+                    nullable: true
                     type: string
                 path:
                     description: The path to be used in requests to the upstream server.
+                    nullable: true
                     type: string
                 port:
                     default: 80
@@ -10906,10 +11249,12 @@ components:
                 read_timeout:
                     default: 60000
                     description: The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server.
+                    nullable: true
                     type: integer
                 retries:
                     default: 5
                     description: The number of retries to execute upon failure to proxy.
+                    nullable: true
                     type: integer
                 tags:
                     description: An optional set of strings associated with the Service for grouping and filtering.
@@ -10918,9 +11263,11 @@ components:
                     type: array
                 tls_verify:
                     description: Whether to enable verification of upstream server TLS certificate. If set to `null`, then the Nginx default is respected.
+                    nullable: true
                     type: boolean
                 tls_verify_depth:
                     description: Maximum depth of chain while verifying Upstream server's TLS certificate. If set to `null`, then the Nginx default is respected.
+                    nullable: true
                     type: integer
                 updated_at:
                     description: Unix epoch when the resource was last updated.
@@ -10933,7 +11280,12 @@ components:
                 write_timeout:
                     default: 60000
                     description: The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.
+                    nullable: true
                     type: integer
+            required:
+                - protocol
+                - host
+                - port
             type: object
             x-speakeasy-entity: Service
         SessionPlugin:
@@ -11546,26 +11898,21 @@ components:
                     const: syslog
                     type: string
         Target:
-            allOf:
-                - $ref: '#/components/schemas/TargetWithoutParents'
-                - properties:
-                    upstream:
-                        additionalProperties: false
-                        properties:
-                            id:
-                                type: string
-                        type: object
-                        x-foreign: true
-                  type: object
-                  x-speakeasy-entity: Target
-        TargetWithoutParents:
+            additionalProperties: false
+            description: A target is an ip address/hostname with a port that identifies an instance of a backend service. Every upstream can have many targets, and the targets can be dynamically added, modified, or deleted. Changes take effect on the fly. To disable a target, post a new one with `weight=0`; alternatively, use the `DELETE` convenience method to accomplish the same. The current target object definition is the one with the latest `created_at`.
+            example:
+                id: 089292a7-ba3d-4d88-acf0-97b4b2e2621a
+                target: 203.0.113.42
+                upstream:
+                    id: 5f1d7e76-2fed-4806-a6af-869984f025cb
+                weight: 100
             properties:
                 created_at:
                     description: Unix epoch when the resource was created.
                     readOnly: true
                     type: number
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 tags:
                     description: An optional set of strings associated with the Target for grouping and filtering.
@@ -11574,6 +11921,50 @@ components:
                     type: array
                 target:
                     description: The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the `port` value will be overridden by the value from the DNS record.
+                    nullable: true
+                    type: string
+                updated_at:
+                    description: Unix epoch when the resource was last updated.
+                    readOnly: true
+                    type: number
+                upstream:
+                    additionalProperties: false
+                    nullable: true
+                    properties:
+                        id:
+                            type: string
+                    type: object
+                    x-foreign: true
+                weight:
+                    default: 100
+                    description: The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.
+                    nullable: true
+                    type: integer
+            type: object
+            x-speakeasy-entity: Target
+        TargetWithoutParents:
+            additionalProperties: false
+            description: A target is an ip address/hostname with a port that identifies an instance of a backend service. Every upstream can have many targets, and the targets can be dynamically added, modified, or deleted. Changes take effect on the fly. To disable a target, post a new one with `weight=0`; alternatively, use the `DELETE` convenience method to accomplish the same. The current target object definition is the one with the latest `created_at`.
+            example:
+                id: 089292a7-ba3d-4d88-acf0-97b4b2e2621a
+                target: 203.0.113.42
+                weight: 100
+            properties:
+                created_at:
+                    description: Unix epoch when the resource was created.
+                    readOnly: true
+                    type: number
+                id:
+                    nullable: true
+                    type: string
+                tags:
+                    description: An optional set of strings associated with the Target for grouping and filtering.
+                    items:
+                        type: string
+                    type: array
+                target:
+                    description: The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the `port` value will be overridden by the value from the DNS record.
+                    nullable: true
                     type: string
                 updated_at:
                     description: Unix epoch when the resource was last updated.
@@ -11582,6 +11973,7 @@ components:
                 weight:
                     default: 100
                     description: The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.
+                    nullable: true
                     type: integer
             type: object
             x-speakeasy-entity: Target
@@ -11711,6 +12103,76 @@ components:
                     const: udp-log
                     type: string
         Upstream:
+            additionalProperties: false
+            description: The upstream object represents a virtual hostname and can be used to loadbalance incoming requests over multiple services (targets). So for example an upstream named `service.v1.xyz` for a Service object whose `host` is `service.v1.xyz`. Requests for this Service would be proxied to the targets defined within the upstream. An upstream also includes a [health checker][healthchecks], which is able to enable and disable targets based on their ability or inability to serve requests. The configuration for the health checker is stored in the upstream object, and applies to all of its targets.
+            example:
+                algorithm: round-robin
+                hash_fallback: none
+                hash_on: none
+                hash_on_cookie_path: /
+                healthchecks:
+                    active:
+                        concurrency: 10
+                        healthy:
+                            http_statuses:
+                                - 200
+                                - 302
+                            interval: 0
+                            successes: 0
+                        http_path: /
+                        https_verify_certificate: true
+                        timeout: 1
+                        type: http
+                        unhealthy:
+                            http_failures: 0
+                            http_statuses:
+                                - 429
+                                - 404
+                                - 500
+                                - 501
+                                - 502
+                                - 503
+                                - 504
+                                - 505
+                            interval: 0
+                            tcp_failures: 0
+                            timeouts: 0
+                    passive:
+                        healthy:
+                            http_statuses:
+                                - 200
+                                - 201
+                                - 202
+                                - 203
+                                - 204
+                                - 205
+                                - 206
+                                - 207
+                                - 208
+                                - 226
+                                - 300
+                                - 301
+                                - 302
+                                - 303
+                                - 304
+                                - 305
+                                - 306
+                                - 307
+                                - 308
+                            successes: 0
+                        type: http
+                        unhealthy:
+                            http_failures: 0
+                            http_statuses:
+                                - 429
+                                - 500
+                                - 503
+                            tcp_failures: 0
+                            timeouts: 0
+                    threshold: 0
+                id: 6eed5e9c-5398-4026-9a4c-d48f18a2431e
+                name: api.example.internal
+                slots: 10000
             properties:
                 algorithm:
                     default: round-robin
@@ -11720,10 +12182,12 @@ components:
                         - least-connections
                         - round-robin
                         - latency
+                    nullable: true
                     type: string
                 client_certificate:
                     additionalProperties: false
                     description: If set, the certificate to be used as client certificate while TLS handshaking to the upstream server.
+                    nullable: true
                     properties:
                         id:
                             type: string
@@ -11745,15 +12209,19 @@ components:
                         - path
                         - query_arg
                         - uri_capture
+                    nullable: true
                     type: string
                 hash_fallback_header:
                     description: The header name to take the value from as hash input. Only required when `hash_fallback` is set to `header`.
+                    nullable: true
                     type: string
                 hash_fallback_query_arg:
                     description: The name of the query string argument to take the value from as hash input. Only required when `hash_fallback` is set to `query_arg`.
+                    nullable: true
                     type: string
                 hash_fallback_uri_capture:
                     description: The name of the route URI capture to take the value from as hash input. Only required when `hash_fallback` is set to `uri_capture`.
+                    nullable: true
                     type: string
                 hash_on:
                     default: none
@@ -11767,24 +12235,31 @@ components:
                         - path
                         - query_arg
                         - uri_capture
+                    nullable: true
                     type: string
                 hash_on_cookie:
                     description: The cookie name to take the value from as hash input. Only required when `hash_on` or `hash_fallback` is set to `cookie`. If the specified cookie is not in the request, Kong will generate a value and set the cookie in the response.
+                    nullable: true
                     type: string
                 hash_on_cookie_path:
                     default: /
                     description: The cookie path to set in the response headers. Only required when `hash_on` or `hash_fallback` is set to `cookie`.
+                    nullable: true
                     type: string
                 hash_on_header:
                     description: The header name to take the value from as hash input. Only required when `hash_on` is set to `header`.
+                    nullable: true
                     type: string
                 hash_on_query_arg:
                     description: The name of the query string argument to take the value from as hash input. Only required when `hash_on` is set to `query_arg`.
+                    nullable: true
                     type: string
                 hash_on_uri_capture:
                     description: The name of the route URI capture to take the value from as hash input. Only required when `hash_on` is set to `uri_capture`.
+                    nullable: true
                     type: string
                 healthchecks:
+                    nullable: true
                     properties:
                         active:
                             properties:
@@ -11792,7 +12267,8 @@ components:
                                     default: 10
                                     type: integer
                                 headers:
-                                    additionalProperties: true
+                                    additionalProperties:
+                                        type: string
                                     type: object
                                 healthy:
                                     properties:
@@ -11927,9 +12403,10 @@ components:
                     type: object
                 host_header:
                     description: The hostname to be used as `Host` header when proxying requests through Kong.
+                    nullable: true
                     type: string
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
                     description: This is a hostname, which must be equal to the `host` of a Service.
@@ -11937,6 +12414,7 @@ components:
                 slots:
                     default: 10000
                     description: The number of slots in the load balancer algorithm. If `algorithm` is set to `round-robin`, this setting determines the maximum number of slots. If `algorithm` is set to `consistent-hashing`, this setting determines the actual number of slots in the algorithm. Accepts an integer in the range `10`-`65536`.
+                    nullable: true
                     type: integer
                 tags:
                     description: An optional set of strings associated with the Upstream for grouping and filtering.
@@ -11950,7 +12428,10 @@ components:
                 use_srv_name:
                     default: false
                     description: If set, the balancer will use SRV hostname(if DNS Answer has SRV record) as the proxy upstream `Host`.
+                    nullable: true
                     type: boolean
+            required:
+                - name
             type: object
             x-speakeasy-entity: Upstream
         UpstreamTimeoutPlugin:
@@ -11982,8 +12463,21 @@ components:
                     const: upstream-timeout
                     type: string
         Vault:
+            additionalProperties: false
+            description: Vault entities are used to configure different Vault connectors. Examples of Vaults are Environment Variables, Hashicorp Vault and AWS Secrets Manager. Configuring a Vault allows referencing the secrets with other entities. For example a certificate entity can store a reference to a certificate and key, stored in a vault, instead of storing the certificate and key within the entity. This allows a proper separation of secrets and configuration and prevents secret sprawl.
+            example:
+                config:
+                    prefix: ENV_PREFIX
+                description: environment variable based vault
+                id: 2747d1e5-8246-4f65-a939-b392f1ee17f8
+                name: env
+                prefix: env
+                tags:
+                    - foo
+                    - bar
             properties:
                 config:
+                    additionalProperties: true
                     description: The configuration properties for the Vault which can be found on the vaults' documentation page.
                     type: object
                 created_at:
@@ -11992,9 +12486,10 @@ components:
                     type: integer
                 description:
                     description: The description of the Vault entity.
+                    nullable: true
                     type: string
                 id:
-                    readOnly: true
+                    nullable: true
                     type: string
                 name:
                     description: The name of the Vault that's going to be added. Currently, the Vault implementation must be installed in every Kong instance.
@@ -12011,6 +12506,10 @@ components:
                     description: Unix epoch when the resource was last updated.
                     readOnly: true
                     type: integer
+            required:
+                - name
+                - prefix
+                - config
             type: object
             x-speakeasy-entity: Vault
         VaultAuthPlugin:
@@ -13208,6 +13707,44 @@ paths:
                 - Consumer Groups
             x-speakeasy-entity-operation: ConsumerGroup#update
     /consumer_groups/{ConsumerGroupId}/consumers:
+        delete:
+            description: Removes all consumers from a consumer groups. This operation does not delete the consumer group.
+            operationId: remove-all-consumers-from-consumer-group
+            responses:
+                "204":
+                    description: Consumers removed from group
+                "404":
+                    description: Consumer group or consumer association does not exist
+            summary: Remove consumers from consumer group
+            tags:
+                - Consumer Groups
+            x-unstable: true
+        get:
+            description: List all consumers in a consumer group
+            operationId: list-consumers-for-consumer-group
+            parameters:
+                - $ref: '#/components/parameters/PaginationSize'
+                - $ref: '#/components/parameters/PaginationOffset'
+                - $ref: '#/components/parameters/PaginationTagsFilter'
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    data:
+                                        items:
+                                            $ref: '#/components/schemas/Consumer'
+                                        type: array
+                                    next:
+                                        $ref: '#/components/schemas/PaginationNextResponse'
+                                    offset:
+                                        $ref: '#/components/schemas/PaginationOffsetResponse'
+                                type: object
+                    description: A successful response listing of consumers
+            summary: List all Consumers in a Consumer Group
+            tags:
+                - Consumer Groups
         parameters:
             - $ref: '#/components/parameters/ConsumerGroupIdManageConsumers'
         post:
@@ -13241,7 +13778,7 @@ paths:
             tags:
                 - Consumer Groups
             x-speakeasy-entity-operation: GatewayConsumerGroupMember#create
-    /consumer_groups/{ConsumerGroupId}/consumers/{ConsumerId}:
+    /consumer_groups/{ConsumerGroupId}/consumers/{ConsumerIdOrUsername}:
         delete:
             description: Remove a consumer from a consumer group
             operationId: remove-consumer-from-group
@@ -13255,7 +13792,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/ConsumerGroupIdManageConsumers'
             - in: path
-              name: ConsumerId
+              name: ConsumerIdOrUsername
               required: true
               schema:
                 type: string
@@ -13393,6 +13930,92 @@ paths:
             tags:
                 - Consumers
             x-speakeasy-entity-operation: Consumer#update
+    /consumers/{ConsumerIdOrUsername}/consumer_groups:
+        delete:
+            description: Removes a consumer from all consumer groups. This operation does not delete the consumer group.
+            operationId: remove-consumer-from-all-consumer-groups
+            parameters:
+                - $ref: '#/components/parameters/ConsumerIdOrUsername'
+            responses:
+                "204":
+                    description: Consumer removed from all groups
+                "404":
+                    description: Consumer does not exist
+            summary: Remove consumer from consumer group
+            tags:
+                - Consumer Groups
+        get:
+            description: List all Consumer Groups a Consumer belongs to
+            operationId: list-consumer-groups-for-consumer
+            parameters:
+                - $ref: '#/components/parameters/ConsumerIdOrUsername'
+                - $ref: '#/components/parameters/PaginationSize'
+                - $ref: '#/components/parameters/PaginationOffset'
+                - $ref: '#/components/parameters/PaginationTagsFilter'
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    data:
+                                        items:
+                                            $ref: '#/components/schemas/ConsumerGroup'
+                                        type: array
+                                    next:
+                                        $ref: '#/components/schemas/PaginationNextResponse'
+                                    offset:
+                                        $ref: '#/components/schemas/PaginationOffsetResponse'
+                                type: object
+                    description: A successful response listing consumer groups
+            summary: List all Consumer Groups a Consumer belongs to
+            tags:
+                - Consumer Groups
+        post:
+            description: Add a consumer to a consumer group
+            operationId: add-consumer-to-specific-consumer-group
+            parameters:
+                - $ref: '#/components/parameters/ConsumerIdOrUsername'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                group:
+                                    example: fedee695-2ae2-4e45-877a-776d9b2fc793
+                                    type: string
+                                    x-speakeasy-name-override: group
+                            type: object
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    consumer:
+                                        $ref: '#/components/schemas/Consumer'
+                                    consumer_groups:
+                                        items:
+                                            $ref: '#/components/schemas/ConsumerGroup'
+                                        type: array
+                                type: object
+                    description: Consumer added to a specific group
+            summary: Add consumer to a specific consumer group
+            tags:
+                - Consumer Groups
+    /consumers/{ConsumerIdOrUsername}/consumer_groups/{ConsumerGroupId}:
+        delete:
+            description: Removes a consumer from a consumer group. This operation does not delete the consumer group.
+            operationId: remove-consumer-from-consumer-group
+            parameters:
+                - $ref: '#/components/parameters/ConsumerIdOrUsername'
+                - $ref: '#/components/parameters/ConsumerGroupId'
+            responses:
+                "204":
+                    description: Consumer removed from group
+            summary: Remove consumer from consumer group
+            tags:
+                - Consumer Groups
     /hmac-auths:
         get:
             description: List all HMAC-auth credentials
@@ -13929,6 +14552,32 @@ paths:
             tags:
                 - KeySets
             x-speakeasy-entity-operation: KeySet#update
+    /keyring/remove:
+        post:
+            description: Remove a key from the keyring.
+            operationId: post-keyring-remove
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                key:
+                                    description: The key ID
+                                    example: 3Rwvk223
+                                    type: string
+                            type: object
+                            x-examples:
+                                Example 1:
+                                    key: 3Rwvk223
+                description: The request body contains a key ID that can be generated from the `/keyring/generate` endpoint.
+            responses:
+                "204":
+                    description: No Content
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+            summary: Remove key
+            tags:
+                - Keyring
     /keys:
         get:
             description: List all Keys
@@ -14063,6 +14712,140 @@ paths:
             tags:
                 - Keys
             x-speakeasy-entity-operation: Key#update
+    /mtls-auths:
+        get:
+            description: List all MTLS-auth credentials
+            operationId: list-mtls-auth
+            parameters:
+                - $ref: '#/components/parameters/PaginationSize'
+                - $ref: '#/components/parameters/PaginationOffset'
+                - $ref: '#/components/parameters/PaginationTagsFilter'
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    data:
+                                        items:
+                                            $ref: '#/components/schemas/MTLSAuth'
+                                        type: array
+                                    next:
+                                        $ref: '#/components/schemas/PaginationNextResponse'
+                                    offset:
+                                        $ref: '#/components/schemas/PaginationOffsetResponse'
+                                type: object
+                    description: A successful response listing MTLS-auth credentials
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+            summary: List all MTLS-auth credentials
+            tags:
+                - MTLS-auth credentials
+        post:
+            description: Create a new MTLS-auth credential
+            operationId: create-mtls-auth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MTLSAuth'
+                description: Description of the new MTLS-auth credential for creation
+                required: true
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MTLSAuth'
+                    description: Successfully created MTLS-auth credential
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+            summary: Create a new MTLS-auth credential
+            tags:
+                - MTLS-auth credentials
+            x-speakeasy-entity-operation: MTLSAuth#create
+    /mtls-auths/{MTLSAuthId}:
+        delete:
+            description: Delete a MTLS-auth credential
+            operationId: delete-mtls-auth
+            parameters:
+                - $ref: '#/components/parameters/MTLSAuthId'
+            responses:
+                "204":
+                    description: Successfully deleted MTLS-auth credential or the resource didn't exist
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+            summary: Delete a MTLS-auth credential
+            tags:
+                - MTLS-auth credentials
+            x-speakeasy-entity-operation: MTLSAuth#delete
+        get:
+            description: Get a MTLS-auth credential using ID.
+            operationId: get-mtls-auth
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MTLSAuth'
+                    description: Successfully fetched MTLS-auth credential
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+                "404":
+                    description: Resource does not exist
+            summary: Fetch a MTLS-auth credential
+            tags:
+                - MTLS-auth credentials
+            x-speakeasy-entity-operation: MTLSAuth#read
+        parameters:
+            - $ref: '#/components/parameters/MTLSAuthId'
+        patch:
+            description: Update a MTLS-auth credential
+            operationId: update-mtls-auth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MTLSAuth'
+                description: Fields of the MTLS-auth credential that need to be updated
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MTLSAuth'
+                    description: Successfully updated MTLS-auth credential
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+                "404":
+                    description: Resource does not exist
+            summary: Update a MTLS-auth credential
+            tags:
+                - MTLS-auth credentials
+        put:
+            description: Create or Update MTLS-auth credential using ID.
+            operationId: upsert-mtls-auth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MTLSAuth'
+                description: Description of the MTLS-auth credential
+                required: true
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MTLSAuth'
+                    description: Successfully upserted MTLS-auth credential
+                "401":
+                    $ref: '#/components/responses/HTTP401Error'
+            summary: Upsert a MTLS-auth credential
+            tags:
+                - MTLS-auth credentials
+            x-speakeasy-entity-operation: MTLSAuth#update
     /plugins:
         get:
             description: List all Plugins
@@ -14122,7 +14905,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateACLPlugin'
+                            $ref: '#/components/schemas/ACLPlugin'
             responses:
                 "201":
                     content:
@@ -14144,7 +14927,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAcmePlugin'
+                            $ref: '#/components/schemas/AcmePlugin'
             responses:
                 "201":
                     content:
@@ -14166,7 +14949,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptDecoratorPlugin'
+                            $ref: '#/components/schemas/AiPromptDecoratorPlugin'
             responses:
                 "201":
                     content:
@@ -14188,7 +14971,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptGuardPlugin'
+                            $ref: '#/components/schemas/AiPromptGuardPlugin'
             responses:
                 "201":
                     content:
@@ -14210,7 +14993,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptTemplatePlugin'
+                            $ref: '#/components/schemas/AiPromptTemplatePlugin'
             responses:
                 "201":
                     content:
@@ -14232,7 +15015,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiProxyPlugin'
+                            $ref: '#/components/schemas/AiProxyPlugin'
             responses:
                 "201":
                     content:
@@ -14254,7 +15037,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiRequestTransformerPlugin'
+                            $ref: '#/components/schemas/AiRequestTransformerPlugin'
             responses:
                 "201":
                     content:
@@ -14276,7 +15059,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiResponseTransformerPlugin'
+                            $ref: '#/components/schemas/AiResponseTransformerPlugin'
             responses:
                 "201":
                     content:
@@ -14298,7 +15081,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAwsLambdaPlugin'
+                            $ref: '#/components/schemas/AwsLambdaPlugin'
             responses:
                 "201":
                     content:
@@ -14320,7 +15103,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAzureFunctionsPlugin'
+                            $ref: '#/components/schemas/AzureFunctionsPlugin'
             responses:
                 "201":
                     content:
@@ -14342,7 +15125,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateBasicAuthPlugin'
+                            $ref: '#/components/schemas/BasicAuthPlugin'
             responses:
                 "201":
                     content:
@@ -14364,7 +15147,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateBotDetectionPlugin'
+                            $ref: '#/components/schemas/BotDetectionPlugin'
             responses:
                 "201":
                     content:
@@ -14386,7 +15169,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCanaryPlugin'
+                            $ref: '#/components/schemas/CanaryPlugin'
             responses:
                 "201":
                     content:
@@ -14408,7 +15191,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCorrelationIdPlugin'
+                            $ref: '#/components/schemas/CorrelationIdPlugin'
             responses:
                 "201":
                     content:
@@ -14430,7 +15213,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCorsPlugin'
+                            $ref: '#/components/schemas/CorsPlugin'
             responses:
                 "201":
                     content:
@@ -14452,7 +15235,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateDatadogPlugin'
+                            $ref: '#/components/schemas/DatadogPlugin'
             responses:
                 "201":
                     content:
@@ -14474,7 +15257,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateDegraphqlPlugin'
+                            $ref: '#/components/schemas/DegraphqlPlugin'
             responses:
                 "201":
                     content:
@@ -14496,7 +15279,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateExitTransformerPlugin'
+                            $ref: '#/components/schemas/ExitTransformerPlugin'
             responses:
                 "201":
                     content:
@@ -14518,7 +15301,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateFileLogPlugin'
+                            $ref: '#/components/schemas/FileLogPlugin'
             responses:
                 "201":
                     content:
@@ -14540,7 +15323,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateForwardProxyPlugin'
+                            $ref: '#/components/schemas/ForwardProxyPlugin'
             responses:
                 "201":
                     content:
@@ -14562,7 +15345,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGraphqlProxyCacheAdvancedPlugin'
+                            $ref: '#/components/schemas/GraphqlProxyCacheAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -14584,7 +15367,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGraphqlRateLimitingAdvancedPlugin'
+                            $ref: '#/components/schemas/GraphqlRateLimitingAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -14606,7 +15389,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGrpcGatewayPlugin'
+                            $ref: '#/components/schemas/GrpcGatewayPlugin'
             responses:
                 "201":
                     content:
@@ -14628,7 +15411,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGrpcWebPlugin'
+                            $ref: '#/components/schemas/GrpcWebPlugin'
             responses:
                 "201":
                     content:
@@ -14650,7 +15433,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateHmacAuthPlugin'
+                            $ref: '#/components/schemas/HmacAuthPlugin'
             responses:
                 "201":
                     content:
@@ -14672,7 +15455,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateHttpLogPlugin'
+                            $ref: '#/components/schemas/HttpLogPlugin'
             responses:
                 "201":
                     content:
@@ -14694,7 +15477,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateIpRestrictionPlugin'
+                            $ref: '#/components/schemas/IpRestrictionPlugin'
             responses:
                 "201":
                     content:
@@ -14716,7 +15499,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJqPlugin'
+                            $ref: '#/components/schemas/JqPlugin'
             responses:
                 "201":
                     content:
@@ -14738,7 +15521,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJweDecryptPlugin'
+                            $ref: '#/components/schemas/JweDecryptPlugin'
             responses:
                 "201":
                     content:
@@ -14760,7 +15543,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJwtPlugin'
+                            $ref: '#/components/schemas/JwtPlugin'
             responses:
                 "201":
                     content:
@@ -14782,7 +15565,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJwtSignerPlugin'
+                            $ref: '#/components/schemas/JwtSignerPlugin'
             responses:
                 "201":
                     content:
@@ -14804,7 +15587,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKafkaLogPlugin'
+                            $ref: '#/components/schemas/KafkaLogPlugin'
             responses:
                 "201":
                     content:
@@ -14826,7 +15609,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKafkaUpstreamPlugin'
+                            $ref: '#/components/schemas/KafkaUpstreamPlugin'
             responses:
                 "201":
                     content:
@@ -14848,7 +15631,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKeyAuthPlugin'
+                            $ref: '#/components/schemas/KeyAuthPlugin'
             responses:
                 "201":
                     content:
@@ -14870,7 +15653,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKeyAuthEncPlugin'
+                            $ref: '#/components/schemas/KeyAuthEncPlugin'
             responses:
                 "201":
                     content:
@@ -14892,7 +15675,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKonnectApplicationAuthPlugin'
+                            $ref: '#/components/schemas/KonnectApplicationAuthPlugin'
             responses:
                 "201":
                     content:
@@ -14914,7 +15697,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLdapAuthPlugin'
+                            $ref: '#/components/schemas/LdapAuthPlugin'
             responses:
                 "201":
                     content:
@@ -14936,7 +15719,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLdapAuthAdvancedPlugin'
+                            $ref: '#/components/schemas/LdapAuthAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -14958,7 +15741,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLogglyPlugin'
+                            $ref: '#/components/schemas/LogglyPlugin'
             responses:
                 "201":
                     content:
@@ -14980,7 +15763,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateMockingPlugin'
+                            $ref: '#/components/schemas/MockingPlugin'
             responses:
                 "201":
                     content:
@@ -15002,7 +15785,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateMtlsAuthPlugin'
+                            $ref: '#/components/schemas/MtlsAuthPlugin'
             responses:
                 "201":
                     content:
@@ -15024,7 +15807,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOasValidationPlugin'
+                            $ref: '#/components/schemas/OasValidationPlugin'
             responses:
                 "201":
                     content:
@@ -15046,7 +15829,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOauth2Plugin'
+                            $ref: '#/components/schemas/Oauth2Plugin'
             responses:
                 "201":
                     content:
@@ -15068,7 +15851,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOauth2IntrospectionPlugin'
+                            $ref: '#/components/schemas/Oauth2IntrospectionPlugin'
             responses:
                 "201":
                     content:
@@ -15090,7 +15873,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpaPlugin'
+                            $ref: '#/components/schemas/OpaPlugin'
             responses:
                 "201":
                     content:
@@ -15112,7 +15895,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpenidConnectPlugin'
+                            $ref: '#/components/schemas/OpenidConnectPlugin'
             responses:
                 "201":
                     content:
@@ -15134,7 +15917,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpentelemetryPlugin'
+                            $ref: '#/components/schemas/OpentelemetryPlugin'
             responses:
                 "201":
                     content:
@@ -15156,7 +15939,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePostFunctionPlugin'
+                            $ref: '#/components/schemas/PostFunctionPlugin'
             responses:
                 "201":
                     content:
@@ -15178,7 +15961,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePreFunctionPlugin'
+                            $ref: '#/components/schemas/PreFunctionPlugin'
             responses:
                 "201":
                     content:
@@ -15200,7 +15983,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePrometheusPlugin'
+                            $ref: '#/components/schemas/PrometheusPlugin'
             responses:
                 "201":
                     content:
@@ -15222,7 +16005,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateProxyCachePlugin'
+                            $ref: '#/components/schemas/ProxyCachePlugin'
             responses:
                 "201":
                     content:
@@ -15244,7 +16027,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateProxyCacheAdvancedPlugin'
+                            $ref: '#/components/schemas/ProxyCacheAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15266,7 +16049,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRateLimitingPlugin'
+                            $ref: '#/components/schemas/RateLimitingPlugin'
             responses:
                 "201":
                     content:
@@ -15288,7 +16071,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRateLimitingAdvancedPlugin'
+                            $ref: '#/components/schemas/RateLimitingAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15310,7 +16093,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestSizeLimitingPlugin'
+                            $ref: '#/components/schemas/RequestSizeLimitingPlugin'
             responses:
                 "201":
                     content:
@@ -15332,7 +16115,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTerminationPlugin'
+                            $ref: '#/components/schemas/RequestTerminationPlugin'
             responses:
                 "201":
                     content:
@@ -15354,7 +16137,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTransformerPlugin'
+                            $ref: '#/components/schemas/RequestTransformerPlugin'
             responses:
                 "201":
                     content:
@@ -15376,7 +16159,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/RequestTransformerAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15398,7 +16181,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestValidatorPlugin'
+                            $ref: '#/components/schemas/RequestValidatorPlugin'
             responses:
                 "201":
                     content:
@@ -15420,7 +16203,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseRatelimitingPlugin'
+                            $ref: '#/components/schemas/ResponseRatelimitingPlugin'
             responses:
                 "201":
                     content:
@@ -15442,7 +16225,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseTransformerPlugin'
+                            $ref: '#/components/schemas/ResponseTransformerPlugin'
             responses:
                 "201":
                     content:
@@ -15464,7 +16247,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/ResponseTransformerAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15486,7 +16269,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRouteByHeaderPlugin'
+                            $ref: '#/components/schemas/RouteByHeaderPlugin'
             responses:
                 "201":
                     content:
@@ -15508,7 +16291,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRouteTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/RouteTransformerAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15530,7 +16313,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSamlPlugin'
+                            $ref: '#/components/schemas/SamlPlugin'
             responses:
                 "201":
                     content:
@@ -15552,7 +16335,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSessionPlugin'
+                            $ref: '#/components/schemas/SessionPlugin'
             responses:
                 "201":
                     content:
@@ -15574,7 +16357,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateStatsdPlugin'
+                            $ref: '#/components/schemas/StatsdPlugin'
             responses:
                 "201":
                     content:
@@ -15596,7 +16379,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateStatsdAdvancedPlugin'
+                            $ref: '#/components/schemas/StatsdAdvancedPlugin'
             responses:
                 "201":
                     content:
@@ -15618,7 +16401,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSyslogPlugin'
+                            $ref: '#/components/schemas/SyslogPlugin'
             responses:
                 "201":
                     content:
@@ -15640,7 +16423,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTcpLogPlugin'
+                            $ref: '#/components/schemas/TcpLogPlugin'
             responses:
                 "201":
                     content:
@@ -15662,7 +16445,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTlsHandshakeModifierPlugin'
+                            $ref: '#/components/schemas/TlsHandshakeModifierPlugin'
             responses:
                 "201":
                     content:
@@ -15684,7 +16467,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTlsMetadataHeadersPlugin'
+                            $ref: '#/components/schemas/TlsMetadataHeadersPlugin'
             responses:
                 "201":
                     content:
@@ -15706,7 +16489,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateUdpLogPlugin'
+                            $ref: '#/components/schemas/UdpLogPlugin'
             responses:
                 "201":
                     content:
@@ -15728,7 +16511,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateUpstreamTimeoutPlugin'
+                            $ref: '#/components/schemas/UpstreamTimeoutPlugin'
             responses:
                 "201":
                     content:
@@ -15750,7 +16533,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateVaultAuthPlugin'
+                            $ref: '#/components/schemas/VaultAuthPlugin'
             responses:
                 "201":
                     content:
@@ -15772,7 +16555,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateWebsocketSizeLimitPlugin'
+                            $ref: '#/components/schemas/WebsocketSizeLimitPlugin'
             responses:
                 "201":
                     content:
@@ -15794,7 +16577,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateWebsocketValidatorPlugin'
+                            $ref: '#/components/schemas/WebsocketValidatorPlugin'
             responses:
                 "201":
                     content:
@@ -15816,7 +16599,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateXmlThreatProtectionPlugin'
+                            $ref: '#/components/schemas/XmlThreatProtectionPlugin'
             responses:
                 "201":
                     content:
@@ -15838,7 +16621,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateZipkinPlugin'
+                            $ref: '#/components/schemas/ZipkinPlugin'
             responses:
                 "201":
                     content:
@@ -15971,7 +16754,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateACLPlugin'
+                            $ref: '#/components/schemas/ACLPlugin'
             responses:
                 "200":
                     content:
@@ -16025,7 +16808,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAcmePlugin'
+                            $ref: '#/components/schemas/AcmePlugin'
             responses:
                 "200":
                     content:
@@ -16079,7 +16862,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptDecoratorPlugin'
+                            $ref: '#/components/schemas/AiPromptDecoratorPlugin'
             responses:
                 "200":
                     content:
@@ -16133,7 +16916,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptGuardPlugin'
+                            $ref: '#/components/schemas/AiPromptGuardPlugin'
             responses:
                 "200":
                     content:
@@ -16187,7 +16970,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiPromptTemplatePlugin'
+                            $ref: '#/components/schemas/AiPromptTemplatePlugin'
             responses:
                 "200":
                     content:
@@ -16241,7 +17024,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiProxyPlugin'
+                            $ref: '#/components/schemas/AiProxyPlugin'
             responses:
                 "200":
                     content:
@@ -16295,7 +17078,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiRequestTransformerPlugin'
+                            $ref: '#/components/schemas/AiRequestTransformerPlugin'
             responses:
                 "200":
                     content:
@@ -16349,7 +17132,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAiResponseTransformerPlugin'
+                            $ref: '#/components/schemas/AiResponseTransformerPlugin'
             responses:
                 "200":
                     content:
@@ -16403,7 +17186,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAwsLambdaPlugin'
+                            $ref: '#/components/schemas/AwsLambdaPlugin'
             responses:
                 "200":
                     content:
@@ -16457,7 +17240,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateAzureFunctionsPlugin'
+                            $ref: '#/components/schemas/AzureFunctionsPlugin'
             responses:
                 "200":
                     content:
@@ -16511,7 +17294,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateBasicAuthPlugin'
+                            $ref: '#/components/schemas/BasicAuthPlugin'
             responses:
                 "200":
                     content:
@@ -16565,7 +17348,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateBotDetectionPlugin'
+                            $ref: '#/components/schemas/BotDetectionPlugin'
             responses:
                 "200":
                     content:
@@ -16619,7 +17402,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCanaryPlugin'
+                            $ref: '#/components/schemas/CanaryPlugin'
             responses:
                 "200":
                     content:
@@ -16673,7 +17456,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCorrelationIdPlugin'
+                            $ref: '#/components/schemas/CorrelationIdPlugin'
             responses:
                 "200":
                     content:
@@ -16727,7 +17510,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateCorsPlugin'
+                            $ref: '#/components/schemas/CorsPlugin'
             responses:
                 "200":
                     content:
@@ -16781,7 +17564,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateDatadogPlugin'
+                            $ref: '#/components/schemas/DatadogPlugin'
             responses:
                 "200":
                     content:
@@ -16835,7 +17618,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateDegraphqlPlugin'
+                            $ref: '#/components/schemas/DegraphqlPlugin'
             responses:
                 "200":
                     content:
@@ -16889,7 +17672,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateExitTransformerPlugin'
+                            $ref: '#/components/schemas/ExitTransformerPlugin'
             responses:
                 "200":
                     content:
@@ -16943,7 +17726,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateFileLogPlugin'
+                            $ref: '#/components/schemas/FileLogPlugin'
             responses:
                 "200":
                     content:
@@ -16997,7 +17780,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateForwardProxyPlugin'
+                            $ref: '#/components/schemas/ForwardProxyPlugin'
             responses:
                 "200":
                     content:
@@ -17051,7 +17834,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGraphqlProxyCacheAdvancedPlugin'
+                            $ref: '#/components/schemas/GraphqlProxyCacheAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -17105,7 +17888,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGraphqlRateLimitingAdvancedPlugin'
+                            $ref: '#/components/schemas/GraphqlRateLimitingAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -17159,7 +17942,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGrpcGatewayPlugin'
+                            $ref: '#/components/schemas/GrpcGatewayPlugin'
             responses:
                 "200":
                     content:
@@ -17213,7 +17996,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateGrpcWebPlugin'
+                            $ref: '#/components/schemas/GrpcWebPlugin'
             responses:
                 "200":
                     content:
@@ -17267,7 +18050,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateHmacAuthPlugin'
+                            $ref: '#/components/schemas/HmacAuthPlugin'
             responses:
                 "200":
                     content:
@@ -17321,7 +18104,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateHttpLogPlugin'
+                            $ref: '#/components/schemas/HttpLogPlugin'
             responses:
                 "200":
                     content:
@@ -17375,7 +18158,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateIpRestrictionPlugin'
+                            $ref: '#/components/schemas/IpRestrictionPlugin'
             responses:
                 "200":
                     content:
@@ -17429,7 +18212,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJqPlugin'
+                            $ref: '#/components/schemas/JqPlugin'
             responses:
                 "200":
                     content:
@@ -17483,7 +18266,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJweDecryptPlugin'
+                            $ref: '#/components/schemas/JweDecryptPlugin'
             responses:
                 "200":
                     content:
@@ -17537,7 +18320,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJwtPlugin'
+                            $ref: '#/components/schemas/JwtPlugin'
             responses:
                 "200":
                     content:
@@ -17591,7 +18374,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateJwtSignerPlugin'
+                            $ref: '#/components/schemas/JwtSignerPlugin'
             responses:
                 "200":
                     content:
@@ -17645,7 +18428,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKafkaLogPlugin'
+                            $ref: '#/components/schemas/KafkaLogPlugin'
             responses:
                 "200":
                     content:
@@ -17699,7 +18482,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKafkaUpstreamPlugin'
+                            $ref: '#/components/schemas/KafkaUpstreamPlugin'
             responses:
                 "200":
                     content:
@@ -17753,7 +18536,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKeyAuthPlugin'
+                            $ref: '#/components/schemas/KeyAuthPlugin'
             responses:
                 "200":
                     content:
@@ -17807,7 +18590,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKeyAuthEncPlugin'
+                            $ref: '#/components/schemas/KeyAuthEncPlugin'
             responses:
                 "200":
                     content:
@@ -17861,7 +18644,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateKonnectApplicationAuthPlugin'
+                            $ref: '#/components/schemas/KonnectApplicationAuthPlugin'
             responses:
                 "200":
                     content:
@@ -17915,7 +18698,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLdapAuthPlugin'
+                            $ref: '#/components/schemas/LdapAuthPlugin'
             responses:
                 "200":
                     content:
@@ -17969,7 +18752,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLdapAuthAdvancedPlugin'
+                            $ref: '#/components/schemas/LdapAuthAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -18023,7 +18806,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateLogglyPlugin'
+                            $ref: '#/components/schemas/LogglyPlugin'
             responses:
                 "200":
                     content:
@@ -18077,7 +18860,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateMockingPlugin'
+                            $ref: '#/components/schemas/MockingPlugin'
             responses:
                 "200":
                     content:
@@ -18131,7 +18914,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateMtlsAuthPlugin'
+                            $ref: '#/components/schemas/MtlsAuthPlugin'
             responses:
                 "200":
                     content:
@@ -18185,7 +18968,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOasValidationPlugin'
+                            $ref: '#/components/schemas/OasValidationPlugin'
             responses:
                 "200":
                     content:
@@ -18239,7 +19022,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOauth2Plugin'
+                            $ref: '#/components/schemas/Oauth2Plugin'
             responses:
                 "200":
                     content:
@@ -18293,7 +19076,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOauth2IntrospectionPlugin'
+                            $ref: '#/components/schemas/Oauth2IntrospectionPlugin'
             responses:
                 "200":
                     content:
@@ -18347,7 +19130,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpaPlugin'
+                            $ref: '#/components/schemas/OpaPlugin'
             responses:
                 "200":
                     content:
@@ -18401,7 +19184,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpenidConnectPlugin'
+                            $ref: '#/components/schemas/OpenidConnectPlugin'
             responses:
                 "200":
                     content:
@@ -18455,7 +19238,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateOpentelemetryPlugin'
+                            $ref: '#/components/schemas/OpentelemetryPlugin'
             responses:
                 "200":
                     content:
@@ -18509,7 +19292,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePostFunctionPlugin'
+                            $ref: '#/components/schemas/PostFunctionPlugin'
             responses:
                 "200":
                     content:
@@ -18563,7 +19346,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePreFunctionPlugin'
+                            $ref: '#/components/schemas/PreFunctionPlugin'
             responses:
                 "200":
                     content:
@@ -18617,7 +19400,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePrometheusPlugin'
+                            $ref: '#/components/schemas/PrometheusPlugin'
             responses:
                 "200":
                     content:
@@ -18671,7 +19454,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateProxyCachePlugin'
+                            $ref: '#/components/schemas/ProxyCachePlugin'
             responses:
                 "200":
                     content:
@@ -18725,7 +19508,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateProxyCacheAdvancedPlugin'
+                            $ref: '#/components/schemas/ProxyCacheAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -18779,7 +19562,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRateLimitingPlugin'
+                            $ref: '#/components/schemas/RateLimitingPlugin'
             responses:
                 "200":
                     content:
@@ -18833,7 +19616,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRateLimitingAdvancedPlugin'
+                            $ref: '#/components/schemas/RateLimitingAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -18887,7 +19670,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestSizeLimitingPlugin'
+                            $ref: '#/components/schemas/RequestSizeLimitingPlugin'
             responses:
                 "200":
                     content:
@@ -18941,7 +19724,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTerminationPlugin'
+                            $ref: '#/components/schemas/RequestTerminationPlugin'
             responses:
                 "200":
                     content:
@@ -18995,7 +19778,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTransformerPlugin'
+                            $ref: '#/components/schemas/RequestTransformerPlugin'
             responses:
                 "200":
                     content:
@@ -19049,7 +19832,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/RequestTransformerAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -19103,7 +19886,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestValidatorPlugin'
+                            $ref: '#/components/schemas/RequestValidatorPlugin'
             responses:
                 "200":
                     content:
@@ -19157,7 +19940,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseRatelimitingPlugin'
+                            $ref: '#/components/schemas/ResponseRatelimitingPlugin'
             responses:
                 "200":
                     content:
@@ -19211,7 +19994,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseTransformerPlugin'
+                            $ref: '#/components/schemas/ResponseTransformerPlugin'
             responses:
                 "200":
                     content:
@@ -19265,7 +20048,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateResponseTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/ResponseTransformerAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -19319,7 +20102,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRouteByHeaderPlugin'
+                            $ref: '#/components/schemas/RouteByHeaderPlugin'
             responses:
                 "200":
                     content:
@@ -19373,7 +20156,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRouteTransformerAdvancedPlugin'
+                            $ref: '#/components/schemas/RouteTransformerAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -19427,7 +20210,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSamlPlugin'
+                            $ref: '#/components/schemas/SamlPlugin'
             responses:
                 "200":
                     content:
@@ -19481,7 +20264,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSessionPlugin'
+                            $ref: '#/components/schemas/SessionPlugin'
             responses:
                 "200":
                     content:
@@ -19535,7 +20318,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateStatsdPlugin'
+                            $ref: '#/components/schemas/StatsdPlugin'
             responses:
                 "200":
                     content:
@@ -19589,7 +20372,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateStatsdAdvancedPlugin'
+                            $ref: '#/components/schemas/StatsdAdvancedPlugin'
             responses:
                 "200":
                     content:
@@ -19643,7 +20426,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateSyslogPlugin'
+                            $ref: '#/components/schemas/SyslogPlugin'
             responses:
                 "200":
                     content:
@@ -19697,7 +20480,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTcpLogPlugin'
+                            $ref: '#/components/schemas/TcpLogPlugin'
             responses:
                 "200":
                     content:
@@ -19751,7 +20534,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTlsHandshakeModifierPlugin'
+                            $ref: '#/components/schemas/TlsHandshakeModifierPlugin'
             responses:
                 "200":
                     content:
@@ -19805,7 +20588,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateTlsMetadataHeadersPlugin'
+                            $ref: '#/components/schemas/TlsMetadataHeadersPlugin'
             responses:
                 "200":
                     content:
@@ -19859,7 +20642,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateUdpLogPlugin'
+                            $ref: '#/components/schemas/UdpLogPlugin'
             responses:
                 "200":
                     content:
@@ -19913,7 +20696,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateUpstreamTimeoutPlugin'
+                            $ref: '#/components/schemas/UpstreamTimeoutPlugin'
             responses:
                 "200":
                     content:
@@ -19967,7 +20750,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateVaultAuthPlugin'
+                            $ref: '#/components/schemas/VaultAuthPlugin'
             responses:
                 "200":
                     content:
@@ -20021,7 +20804,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateWebsocketSizeLimitPlugin'
+                            $ref: '#/components/schemas/WebsocketSizeLimitPlugin'
             responses:
                 "200":
                     content:
@@ -20075,7 +20858,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateWebsocketValidatorPlugin'
+                            $ref: '#/components/schemas/WebsocketValidatorPlugin'
             responses:
                 "200":
                     content:
@@ -20129,7 +20912,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateXmlThreatProtectionPlugin'
+                            $ref: '#/components/schemas/XmlThreatProtectionPlugin'
             responses:
                 "200":
                     content:
@@ -20183,7 +20966,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateZipkinPlugin'
+                            $ref: '#/components/schemas/ZipkinPlugin'
             responses:
                 "200":
                     content:
@@ -21174,4 +21957,5 @@ tags:
     - name: Basic-auth credentials
     - name: JWTs
     - name: HMAC-auth credentials
+    - name: MTLS-auth credentials
     - name: ACLs

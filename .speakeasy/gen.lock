@@ -3,15 +3,15 @@ id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
   docChecksum: 19e5099f48063052be5f5d7e230d3847
   docVersion: 0.0.1
-  speakeasyVersion: 1.447.0
-  generationVersion: 2.463.0
+  speakeasyVersion: 1.396.10
+  generationVersion: 2.415.7
   releaseVersion: 0.2.1
-  configChecksum: 0d8d8bfb1c24d65a41078516b02aa9ef
+  configChecksum: f4d3b8085011e3a7a3e1f83108023c77
 features:
   terraform:
     additionalDependencies: 0.1.0
-    constsAndDefaults: 0.2.0
-    core: 3.26.4
+    constsAndDefaults: 0.1.4
+    core: 3.24.11
     envVarSecurityUsage: 0.1.0
     globalServerURLs: 2.82.1
     inputOutputModels: 2.83.0
@@ -876,7 +876,6 @@ generatedFiles:
   - internal/sdk/hmacauthcredentials.go
   - internal/sdk/internal/hooks/hooks.go
   - internal/sdk/internal/utils/contenttype.go
-  - internal/sdk/internal/utils/env.go
   - internal/sdk/internal/utils/form.go
   - internal/sdk/internal/utils/headers.go
   - internal/sdk/internal/utils/json.go
@@ -12395,4 +12394,3 @@ examples:
       parameters:
         path:
           groups: "<value>"
-generatedTests: {}

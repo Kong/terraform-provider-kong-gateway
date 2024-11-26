@@ -15,7 +15,7 @@ PluginAiPromptGuard Resource
 ```terraform
 resource "kong-gateway_plugin_ai_prompt_guard" "my_pluginaipromptguard" {
   config = {
-    allow_all_conversation_history = false
+    allow_all_conversation_history = true
     allow_patterns = [
       "..."
     ]

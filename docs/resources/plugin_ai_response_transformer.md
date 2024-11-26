@@ -23,7 +23,7 @@ resource "kong-gateway_plugin_ai_response_transformer" "my_pluginairesponsetrans
     https_verify     = false
     llm = {
       auth = {
-        allow_override             = false
+        allow_override             = true
         aws_access_key_id          = "...my_aws_access_key_id..."
         aws_secret_access_key      = "...my_aws_secret_access_key..."
         azure_client_id            = "...my_azure_client_id..."
@@ -31,7 +31,7 @@ resource "kong-gateway_plugin_ai_response_transformer" "my_pluginairesponsetrans
         azure_tenant_id            = "...my_azure_tenant_id..."
         azure_use_managed_identity = false
         gcp_service_account_json   = "...my_gcp_service_account_json..."
-        gcp_use_service_account    = true
+        gcp_use_service_account    = false
         header_name                = "...my_header_name..."
         header_value               = "...my_header_value..."
         param_location             = "query"
@@ -39,7 +39,7 @@ resource "kong-gateway_plugin_ai_response_transformer" "my_pluginairesponsetrans
         param_value                = "...my_param_value..."
       }
       logging = {
-        log_payloads   = false
+        log_payloads   = true
         log_statistics = false
       }
       model = {
@@ -83,7 +83,7 @@ resource "kong-gateway_plugin_ai_response_transformer" "my_pluginairesponsetrans
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

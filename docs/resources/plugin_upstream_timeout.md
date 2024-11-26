@@ -15,9 +15,9 @@ PluginUpstreamTimeout Resource
 ```terraform
 resource "kong-gateway_plugin_upstream_timeout" "my_pluginupstreamtimeout" {
   config = {
-    connect_timeout = 1708271437
-    read_timeout    = 1931855620
-    send_timeout    = 1139545234
+    connect_timeout = 1708271431
+    read_timeout    = 1931855615
+    send_timeout    = 1139545232
   }
   consumer = {
     id = "...my_id..."
@@ -25,7 +25,7 @@ resource "kong-gateway_plugin_upstream_timeout" "my_pluginupstreamtimeout" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -34,8 +34,8 @@ resource "kong-gateway_plugin_rate_limiting" "my_pluginratelimiting" {
       port        = 51015
       server_name = "...my_server_name..."
       ssl         = true
-      ssl_verify  = false
-      timeout     = 1674606665
+      ssl_verify  = true
+      timeout     = 1674606661
       username    = "...my_username..."
     }
     second    = 0.81

@@ -17,7 +17,7 @@ resource "kong-gateway_plugin_loggly" "my_pluginloggly" {
   config = {
     client_errors_severity = "emerg"
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     host                   = "...my_host..."
     key                    = "...my_key..."
@@ -36,7 +36,7 @@ resource "kong-gateway_plugin_loggly" "my_pluginloggly" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

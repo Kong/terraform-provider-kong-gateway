@@ -24,9 +24,9 @@ resource "kong-gateway_plugin_ldap_auth" "my_pluginldapauth" {
     keepalive        = 3.87
     ldap_host        = "...my_ldap_host..."
     ldap_port        = 37816
-    ldaps            = true
+    ldaps            = false
     realm            = "...my_realm..."
-    start_tls        = false
+    start_tls        = true
     timeout          = 4.96
     verify_ldap_host = false
   }

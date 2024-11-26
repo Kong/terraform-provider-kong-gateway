@@ -42,7 +42,7 @@ resource "kong-gateway_plugin_websocket_validator" "my_pluginwebsocketvalidator"
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

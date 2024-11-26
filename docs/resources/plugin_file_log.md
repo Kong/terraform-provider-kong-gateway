@@ -16,10 +16,10 @@ PluginFileLog Resource
 resource "kong-gateway_plugin_file_log" "my_pluginfilelog" {
   config = {
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     path   = "...my_path..."
-    reopen = false
+    reopen = true
   }
   consumer = {
     id = "...my_id..."

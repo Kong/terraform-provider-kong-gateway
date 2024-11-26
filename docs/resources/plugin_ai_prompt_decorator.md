@@ -37,7 +37,7 @@ resource "kong-gateway_plugin_ai_prompt_decorator" "my_pluginaipromptdecorator" 
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

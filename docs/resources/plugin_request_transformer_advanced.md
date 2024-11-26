@@ -48,7 +48,7 @@ resource "kong-gateway_plugin_request_transformer_advanced" "my_pluginrequesttra
         "..."
       ]
     }
-    dots_in_keys = true
+    dots_in_keys = false
     http_method  = "...my_http_method..."
     remove = {
       body = [
@@ -94,7 +94,7 @@ resource "kong-gateway_plugin_request_transformer_advanced" "my_pluginrequesttra
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

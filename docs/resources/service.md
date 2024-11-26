@@ -32,7 +32,7 @@ resource "kong-gateway_service" "my_service" {
   tags = [
     "..."
   ]
-  tls_verify       = true
+  tls_verify       = false
   tls_verify_depth = 0
   url              = "...my_url..."
   write_timeout    = 4

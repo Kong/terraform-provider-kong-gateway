@@ -20,18 +20,18 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
     http_timeout     = 2
     https_proxy_host = "...my_https_proxy_host..."
     https_proxy_port = 63994
-    https_verify     = false
+    https_verify     = true
     llm = {
       auth = {
-        allow_override             = true
+        allow_override             = false
         aws_access_key_id          = "...my_aws_access_key_id..."
         aws_secret_access_key      = "...my_aws_secret_access_key..."
         azure_client_id            = "...my_azure_client_id..."
         azure_client_secret        = "...my_azure_client_secret..."
         azure_tenant_id            = "...my_azure_tenant_id..."
-        azure_use_managed_identity = false
+        azure_use_managed_identity = true
         gcp_service_account_json   = "...my_gcp_service_account_json..."
-        gcp_use_service_account    = true
+        gcp_use_service_account    = false
         header_name                = "...my_header_name..."
         header_value               = "...my_header_value..."
         param_location             = "body"
@@ -39,7 +39,7 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
         param_value                = "...my_param_value..."
       }
       logging = {
-        log_payloads   = true
+        log_payloads   = false
         log_statistics = false
       }
       model = {
@@ -82,7 +82,7 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

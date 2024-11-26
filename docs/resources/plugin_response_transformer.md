@@ -71,7 +71,7 @@ resource "kong-gateway_plugin_response_transformer" "my_pluginresponsetransforme
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

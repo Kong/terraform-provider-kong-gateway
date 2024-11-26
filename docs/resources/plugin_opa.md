@@ -18,14 +18,14 @@ resource "kong-gateway_plugin_opa" "my_pluginopa" {
     include_body_in_opa_input             = true
     include_consumer_in_opa_input         = false
     include_parsed_json_body_in_opa_input = true
-    include_route_in_opa_input            = true
-    include_service_in_opa_input          = false
+    include_route_in_opa_input            = false
+    include_service_in_opa_input          = true
     include_uri_captures_in_opa_input     = true
     opa_host                              = "...my_opa_host..."
     opa_path                              = "...my_opa_path..."
     opa_port                              = 42562
     opa_protocol                          = "https"
-    ssl_verify                            = true
+    ssl_verify                            = false
   }
   consumer = {
     id = "...my_id..."
@@ -33,7 +33,7 @@ resource "kong-gateway_plugin_opa" "my_pluginopa" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

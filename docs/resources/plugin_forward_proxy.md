@@ -21,7 +21,7 @@ resource "kong-gateway_plugin_forward_proxy" "my_pluginforwardproxy" {
     http_proxy_port  = 59229
     https_proxy_host = "...my_https_proxy_host..."
     https_proxy_port = 32773
-    https_verify     = true
+    https_verify     = false
     proxy_scheme     = "http"
     x_headers        = "transparent"
   }

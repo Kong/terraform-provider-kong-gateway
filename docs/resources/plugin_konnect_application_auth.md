@@ -72,8 +72,8 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
               "header"
             ]
             by_username_ignore_case = false
-            cache_introspection     = true
-            cache_token_exchange    = true
+            cache_introspection     = false
+            cache_token_exchange    = false
             cache_tokens            = false
             cache_tokens_salt       = "...my_cache_tokens_salt..."
             cache_ttl               = 6.08
@@ -81,7 +81,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             cache_ttl_min           = 6.24
             cache_ttl_neg           = 5.49
             cache_ttl_resurrect     = 9.64
-            cache_user_info         = false
+            cache_user_info         = true
             claims_forbidden = [
               "..."
             ]
@@ -142,16 +142,16 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
                   port = 31689
                 }
               ]
-              connect_timeout       = 862332456
-              connection_is_proxied = false
+              connect_timeout       = 862332455
+              connection_is_proxied = true
               database              = 5
               host                  = "...my_host..."
-              keepalive_backlog     = 960554930
-              keepalive_pool_size   = 1795067991
+              keepalive_backlog     = 960554938
+              keepalive_pool_size   = 1795067998
               password              = "...my_password..."
               port                  = 36390
-              read_timeout          = 377752680
-              send_timeout          = 486017918
+              read_timeout          = 377752684
+              send_timeout          = 486017913
               sentinel_master       = "...my_sentinel_master..."
               sentinel_nodes = [
                 {
@@ -163,7 +163,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
               sentinel_role     = "any"
               sentinel_username = "...my_sentinel_username..."
               server_name       = "...my_server_name..."
-              ssl               = false
+              ssl               = true
               ssl_verify        = false
               username          = "...my_username..."
             }
@@ -174,7 +174,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             consumer_claim = [
               "..."
             ]
-            consumer_optional = false
+            consumer_optional = true
             credential_claim = [
               "..."
             ]
@@ -208,14 +208,14 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             downstream_user_info_header         = "...my_downstream_user_info_header..."
             downstream_user_info_jwt_header     = "...my_downstream_user_info_jwt_header..."
             dpop_proof_lifetime                 = 6.25
-            dpop_use_nonce                      = false
+            dpop_use_nonce                      = true
             enable_hs_signatures                = true
             end_session_endpoint                = "...my_end_session_endpoint..."
             expose_error_code                   = true
             extra_jwks_uris = [
               "..."
             ]
-            forbidden_destroy_session = false
+            forbidden_destroy_session = true
             forbidden_error_message   = "...my_forbidden_error_message..."
             forbidden_redirect_uri = [
               "..."
@@ -239,7 +239,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             ignore_signature = [
               "session"
             ]
-            introspect_jwt_tokens              = false
+            introspect_jwt_tokens              = true
             introspection_accept               = "application/jwt"
             introspection_check_active         = true
             introspection_endpoint             = "...my_introspection_endpoint..."
@@ -292,7 +292,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
               "..."
             ]
             logout_revoke               = false
-            logout_revoke_access_token  = true
+            logout_revoke_access_token  = false
             logout_revoke_refresh_token = false
             logout_uri_suffix           = "...my_logout_uri_suffix..."
             max_age                     = 5.71
@@ -303,8 +303,8 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             password_param_type = [
               "body"
             ]
-            preserve_query_args                               = false
-            proof_of_possession_auth_methods_validation       = true
+            preserve_query_args                               = true
+            proof_of_possession_auth_methods_validation       = false
             proof_of_possession_dpop                          = "strict"
             proof_of_possession_mtls                          = "off"
             pushed_authorization_request_endpoint             = "...my_pushed_authorization_request_endpoint..."
@@ -320,7 +320,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
                   port = 7604
                 }
               ]
-              connect_timeout       = 1722237524
+              connect_timeout       = 1722237519
               connection_is_proxied = false
               database              = 2
               host                  = "...my_host..."
@@ -330,7 +330,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
               port                  = 56614
               prefix                = "...my_prefix..."
               read_timeout          = 1033359551
-              send_timeout          = 2005930227
+              send_timeout          = 2005930224
               sentinel_master       = "...my_sentinel_master..."
               sentinel_nodes = [
                 {
@@ -344,7 +344,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
               server_name       = "...my_server_name..."
               socket            = "...my_socket..."
               ssl               = true
-              ssl_verify        = false
+              ssl_verify        = true
               username          = "...my_username..."
             }
             rediscovery_lifetime     = 4.48
@@ -354,14 +354,14 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             ]
             refresh_tokens                        = false
             require_proof_key_for_code_exchange   = false
-            require_pushed_authorization_requests = false
-            require_signed_request_object         = true
+            require_pushed_authorization_requests = true
+            require_signed_request_object         = false
             resolve_distributed_claims            = true
             response_mode                         = "fragment.jwt"
             response_type = [
               "..."
             ]
-            reverify                        = false
+            reverify                        = true
             revocation_endpoint             = "...my_revocation_endpoint..."
             revocation_endpoint_auth_method = "client_secret_post"
             revocation_token_param_name     = "...my_revocation_token_param_name..."
@@ -389,16 +389,16 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             session_cookie_name               = "...my_session_cookie_name..."
             session_cookie_path               = "...my_session_cookie_path..."
             session_cookie_same_site          = "None"
-            session_cookie_secure             = false
-            session_enforce_same_subject      = false
-            session_hash_storage_key          = false
-            session_hash_subject              = false
+            session_cookie_secure             = true
+            session_enforce_same_subject      = true
+            session_hash_storage_key          = true
+            session_hash_subject              = true
             session_idling_timeout            = 3.77
             session_memcached_host            = "...my_session_memcached_host..."
             session_memcached_port            = 6737
             session_memcached_prefix          = "...my_session_memcached_prefix..."
             session_memcached_socket          = "...my_session_memcached_socket..."
-            session_remember                  = false
+            session_remember                  = true
             session_remember_absolute_timeout = 8.34
             session_remember_cookie_name      = "...my_session_remember_cookie_name..."
             session_remember_rolling_timeout  = 9.93
@@ -415,7 +415,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             ssl_verify                    = true
             timeout                       = 2.75
             tls_client_auth_cert_id       = "...my_tls_client_auth_cert_id..."
-            tls_client_auth_ssl_verify    = true
+            tls_client_auth_ssl_verify    = false
             token_cache_key_include_scope = true
             token_endpoint                = "...my_token_endpoint..."
             token_endpoint_auth_method    = "client_secret_post"
@@ -489,11 +489,11 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
             userinfo_query_args_values = [
               "..."
             ]
-            using_pseudo_issuer = false
-            verify_claims       = false
-            verify_nonce        = true
-            verify_parameters   = true
-            verify_signature    = true
+            using_pseudo_issuer = true
+            verify_claims       = true
+            verify_nonce        = false
+            verify_parameters   = false
+            verify_signature    = false
           }
           strategy_id = "...my_strategy_id..."
         }
@@ -506,7 +506,7 @@ resource "kong-gateway_plugin_konnect_application_auth" "my_pluginkonnectapplica
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -16,7 +16,7 @@ PluginBasicAuth Resource
 resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
   config = {
     anonymous        = "...my_anonymous..."
-    hide_credentials = false
+    hide_credentials = true
     realm            = "...my_realm..."
   }
   consumer = {

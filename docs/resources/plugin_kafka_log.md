@@ -19,7 +19,7 @@ resource "kong-gateway_plugin_kafka_log" "my_pluginkafkalog" {
       mechanism = "SCRAM-SHA-256"
       password  = "...my_password..."
       strategy  = "sasl"
-      tokenauth = false
+      tokenauth = true
       user      = "...my_user..."
     }
     bootstrap_servers = [
@@ -30,7 +30,7 @@ resource "kong-gateway_plugin_kafka_log" "my_pluginkafkalog" {
     ]
     cluster_name = "...my_cluster_name..."
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     keepalive                                          = 5
     keepalive_enabled                                  = false

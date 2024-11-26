@@ -304,8 +304,8 @@ func New(opts ...SDKOption) *KongGateway {
 			Language:          "go",
 			OpenAPIDocVersion: "0.0.1",
 			SDKVersion:        "0.0.1",
-			GenVersion:        "2.415.7",
-			UserAgent:         "speakeasy-sdk/go 0.0.1 2.415.7 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			GenVersion:        "2.463.0",
+			UserAgent:         "speakeasy-sdk/go 0.0.1 2.463.0 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerDefaults: []map[string]string{
 				{
 					"hostname": "localhost",

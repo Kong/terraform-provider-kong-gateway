@@ -15,13 +15,13 @@ PluginResponseRatelimiting Resource
 ```terraform
 resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimiting" {
   config = {
-    block_on_first_violation = false
-    fault_tolerant           = true
+    block_on_first_violation = true
+    fault_tolerant           = false
     header_name              = "...my_header_name..."
-    hide_client_headers      = true
+    hide_client_headers      = false
     limit_by                 = "consumer"
     limits = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     policy = "redis"
     redis = {
@@ -30,9 +30,9 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
       password    = "...my_password..."
       port        = 22322
       server_name = "...my_server_name..."
-      ssl         = true
+      ssl         = false
       ssl_verify  = false
-      timeout     = 320380033
+      timeout     = 320380038
       username    = "...my_username..."
     }
   }
@@ -42,7 +42,7 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

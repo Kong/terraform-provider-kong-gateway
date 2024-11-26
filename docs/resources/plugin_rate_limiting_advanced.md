@@ -19,12 +19,12 @@ resource "kong-gateway_plugin_rate_limiting_advanced" "my_pluginratelimitingadva
       "..."
     ]
     dictionary_name         = "...my_dictionary_name..."
-    disable_penalty         = false
-    enforce_consumer_groups = true
+    disable_penalty         = true
+    enforce_consumer_groups = false
     error_code              = 8.45
     error_message           = "...my_error_message..."
     header_name             = "...my_header_name..."
-    hide_client_headers     = false
+    hide_client_headers     = true
     identifier              = "credential"
     limit = [
       7.11
@@ -43,12 +43,12 @@ resource "kong-gateway_plugin_rate_limiting_advanced" "my_pluginratelimitingadva
       connection_is_proxied = true
       database              = 9
       host                  = "...my_host..."
-      keepalive_backlog     = 675439009
-      keepalive_pool_size   = 1391352986
+      keepalive_backlog     = 675439018
+      keepalive_pool_size   = 1391352988
       password              = "...my_password..."
       port                  = 59829
-      read_timeout          = 532082316
-      send_timeout          = 1287354672
+      read_timeout          = 532082307
+      send_timeout          = 1287354674
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -61,7 +61,7 @@ resource "kong-gateway_plugin_rate_limiting_advanced" "my_pluginratelimitingadva
       sentinel_username = "...my_sentinel_username..."
       server_name       = "...my_server_name..."
       ssl               = true
-      ssl_verify        = false
+      ssl_verify        = true
       username          = "...my_username..."
     }
     retry_after_jitter_max = 5.83

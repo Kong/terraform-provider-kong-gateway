@@ -23,7 +23,7 @@ resource "kong-gateway_plugin_grpc_gateway" "my_plugingrpcgateway" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

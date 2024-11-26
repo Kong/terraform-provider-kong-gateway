@@ -16,15 +16,15 @@ PluginKeyAuth Resource
 resource "kong-gateway_plugin_key_auth" "my_pluginkeyauth" {
   config = {
     anonymous        = "...my_anonymous..."
-    hide_credentials = true
+    hide_credentials = false
     key_in_body      = false
     key_in_header    = false
-    key_in_query     = false
+    key_in_query     = true
     key_names = [
       "..."
     ]
     realm            = "...my_realm..."
-    run_on_preflight = true
+    run_on_preflight = false
   }
   consumer = {
     id = "...my_id..."

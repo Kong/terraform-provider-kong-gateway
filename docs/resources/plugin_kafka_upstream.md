@@ -31,11 +31,11 @@ resource "kong-gateway_plugin_kafka_upstream" "my_pluginkafkaupstream" {
     cluster_name                                       = "...my_cluster_name..."
     forward_body                                       = false
     forward_headers                                    = false
-    forward_method                                     = false
+    forward_method                                     = true
     forward_uri                                        = false
     keepalive                                          = 3
     keepalive_enabled                                  = true
-    producer_async                                     = true
+    producer_async                                     = false
     producer_async_buffering_limits_messages_in_memory = 3
     producer_async_flush_timeout                       = 0
     producer_request_acks                              = 0
@@ -57,7 +57,7 @@ resource "kong-gateway_plugin_kafka_upstream" "my_pluginkafkaupstream" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

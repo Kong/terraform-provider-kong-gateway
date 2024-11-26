@@ -22,13 +22,13 @@ resource "kong-gateway_plugin_oauth2_introspection" "my_pluginoauth2introspectio
       "..."
     ]
     custom_introspection_headers = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     hide_credentials   = true
-    introspect_request = false
+    introspect_request = true
     introspection_url  = "...my_introspection_url..."
     keepalive          = 9
-    run_on_preflight   = false
+    run_on_preflight   = true
     timeout            = 4
     token_type_hint    = "...my_token_type_hint..."
     ttl                = 7.64
@@ -39,7 +39,7 @@ resource "kong-gateway_plugin_oauth2_introspection" "my_pluginoauth2introspectio
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

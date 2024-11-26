@@ -11,6 +11,7 @@ generation:
     requestResponseComponentNamesFeb2024: true
   auth:
     oAuth2ClientCredentialsEnabled: false
+    oAuth2PasswordEnabled: false
 terraform:
   version: 0.2.1
   additionalDataSources: []
@@ -18,5 +19,6 @@ terraform:
   additionalResources: []
   allowUnknownFieldsInWeakUnions: false
   author: kong
+  defaultErrorName: SDKError
   environmentVariables: []
   packageName: kong-gateway

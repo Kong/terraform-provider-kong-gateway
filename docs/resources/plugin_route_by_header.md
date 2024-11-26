@@ -18,7 +18,7 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
     rules = [
       {
         condition = {
-          "see" : jsonencode("documentation"),
+          key = jsonencode("value"),
         }
         upstream_name = "...my_upstream_name..."
       }
@@ -30,7 +30,7 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

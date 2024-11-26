@@ -38,7 +38,7 @@ resource "kong-gateway_plugin_datadog" "my_plugindatadog" {
       max_bytes            = 5
       max_coalescing_delay = 2243.83
       max_entries          = 308545
-      max_retry_delay      = 245761.9
+      max_retry_delay      = 245761.91
       max_retry_time       = 0.14
     }
     queue_size       = 9

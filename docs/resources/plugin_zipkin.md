@@ -15,14 +15,14 @@ PluginZipkin Resource
 ```terraform
 resource "kong-gateway_plugin_zipkin" "my_pluginzipkin" {
   config = {
-    connect_timeout                  = 193954419
+    connect_timeout                  = 193954425
     default_header_type              = "w3c"
     default_service_name             = "...my_default_service_name..."
     header_type                      = "datadog"
     http_endpoint                    = "...my_http_endpoint..."
     http_response_header_for_traceid = "...my_http_response_header_for_traceid..."
     http_span_name                   = "method"
-    include_credential               = false
+    include_credential               = true
     local_service_name               = "...my_local_service_name..."
     phase_duration_flavor            = "tags"
     propagation = {
@@ -39,17 +39,17 @@ resource "kong-gateway_plugin_zipkin" "my_pluginzipkin" {
     }
     queue = {
       concurrency_limit    = 1
-      initial_retry_delay  = 272764.46
+      initial_retry_delay  = 272764.47
       max_batch_size       = 152161
       max_bytes            = 2
       max_coalescing_delay = 1358.03
       max_entries          = 902225
-      max_retry_delay      = 187703.11
+      max_retry_delay      = 187703.12
       max_retry_time       = 0.31
     }
-    read_timeout = 1720678037
+    read_timeout = 1720678031
     sample_ratio = 0.38
-    send_timeout = 668408518
+    send_timeout = 668408524
     static_tags = [
       {
         name  = "...my_name..."

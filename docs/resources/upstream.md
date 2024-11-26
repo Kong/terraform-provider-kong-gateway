@@ -32,7 +32,7 @@ resource "kong-gateway_upstream" "my_upstream" {
     active = {
       concurrency = 4
       headers = {
-        "see" : jsonencode("documentation"),
+        key = jsonencode("value"),
       }
       healthy = {
         http_statuses = [
@@ -43,7 +43,7 @@ resource "kong-gateway_upstream" "my_upstream" {
       }
       http_path                = "...my_http_path..."
       https_sni                = "...my_https_sni..."
-      https_verify_certificate = false
+      https_verify_certificate = true
       timeout                  = 1.98
       type                     = "grpc"
       unhealthy = {
@@ -81,7 +81,7 @@ resource "kong-gateway_upstream" "my_upstream" {
   tags = [
     "..."
   ]
-  use_srv_name = true
+  use_srv_name = false
 }
 ```
 

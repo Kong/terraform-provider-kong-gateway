@@ -20,7 +20,7 @@ resource "kong-gateway_plugin_tls_metadata_headers" "my_plugintlsmetadataheaders
     client_cert_issuer_dn_header_name   = "...my_client_cert_issuer_dn_header_name..."
     client_cert_subject_dn_header_name  = "...my_client_cert_subject_dn_header_name..."
     client_serial_header_name           = "...my_client_serial_header_name..."
-    inject_client_cert_details          = false
+    inject_client_cert_details          = true
   }
   consumer = {
     id = "...my_id..."

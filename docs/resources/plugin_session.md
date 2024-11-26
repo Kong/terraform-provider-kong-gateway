@@ -22,7 +22,7 @@ resource "kong-gateway_plugin_session" "my_pluginsession" {
     cookie_name      = "...my_cookie_name..."
     cookie_path      = "...my_cookie_path..."
     cookie_same_site = "Default"
-    cookie_secure    = true
+    cookie_secure    = false
     idling_timeout   = 0.19
     logout_methods = [
       "POST"
@@ -51,7 +51,7 @@ resource "kong-gateway_plugin_session" "my_pluginsession" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -18,7 +18,7 @@ resource "kong-gateway_plugin_vault_auth" "my_pluginvaultauth" {
     access_token_name = "...my_access_token_name..."
     anonymous         = "...my_anonymous..."
     hide_credentials  = true
-    run_on_preflight  = true
+    run_on_preflight  = false
     secret_token_name = "...my_secret_token_name..."
     tokens_in_body    = false
     vault             = "...my_vault..."

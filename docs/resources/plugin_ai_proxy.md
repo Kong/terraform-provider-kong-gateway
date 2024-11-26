@@ -16,7 +16,7 @@ PluginAiProxy Resource
 resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
   config = {
     auth = {
-      allow_override             = false
+      allow_override             = true
       aws_access_key_id          = "...my_aws_access_key_id..."
       aws_secret_access_key      = "...my_aws_secret_access_key..."
       azure_client_id            = "...my_azure_client_id..."
@@ -74,7 +74,7 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -21,10 +21,10 @@ resource "kong-gateway_plugin_jq" "my_pluginjq" {
     request_jq_program = "...my_request_jq_program..."
     request_jq_program_options = {
       ascii_output   = false
-      compact_output = false
-      join_output    = false
-      raw_output     = true
-      sort_keys      = false
+      compact_output = true
+      join_output    = true
+      raw_output     = false
+      sort_keys      = true
     }
     response_if_media_type = [
       "..."
@@ -36,9 +36,9 @@ resource "kong-gateway_plugin_jq" "my_pluginjq" {
     response_jq_program_options = {
       ascii_output   = true
       compact_output = false
-      join_output    = false
-      raw_output     = false
-      sort_keys      = true
+      join_output    = true
+      raw_output     = true
+      sort_keys      = false
     }
   }
   consumer = {
@@ -47,7 +47,7 @@ resource "kong-gateway_plugin_jq" "my_pluginjq" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

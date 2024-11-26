@@ -19,17 +19,17 @@ resource "kong-gateway_plugin_oauth2" "my_pluginoauth2" {
     anonymous                         = "...my_anonymous..."
     auth_header_name                  = "...my_auth_header_name..."
     enable_authorization_code         = false
-    enable_client_credentials         = true
+    enable_client_credentials         = false
     enable_implicit_grant             = false
-    enable_password_grant             = false
+    enable_password_grant             = true
     global_credentials                = false
     hide_credentials                  = false
-    mandatory_scope                   = false
-    persistent_refresh_token          = true
+    mandatory_scope                   = true
+    persistent_refresh_token          = false
     pkce                              = "none"
     provision_key                     = "...my_provision_key..."
     realm                             = "...my_realm..."
-    refresh_token_ttl                 = 88185236.37
+    refresh_token_ttl                 = 88185235.96
     reuse_refresh_token               = false
     scopes = [
       "..."
@@ -42,7 +42,7 @@ resource "kong-gateway_plugin_oauth2" "my_pluginoauth2" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

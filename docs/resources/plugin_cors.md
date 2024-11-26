@@ -15,7 +15,7 @@ PluginCors Resource
 ```terraform
 resource "kong-gateway_plugin_cors" "my_plugincors" {
   config = {
-    credentials = true
+    credentials = false
     exposed_headers = [
       "..."
     ]

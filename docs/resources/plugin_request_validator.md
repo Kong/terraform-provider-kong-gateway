@@ -19,13 +19,13 @@ resource "kong-gateway_plugin_request_validator" "my_pluginrequestvalidator" {
       "..."
     ]
     body_schema                       = "...my_body_schema..."
-    content_type_parameter_validation = false
+    content_type_parameter_validation = true
     parameter_schema = [
       {
-        explode  = false
+        explode  = true
         in       = "path"
         name     = "...my_name..."
-        required = true
+        required = false
         schema   = "...my_schema..."
         style    = "form"
       }

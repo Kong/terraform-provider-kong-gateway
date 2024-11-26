@@ -15,8 +15,8 @@ PluginAiPromptTemplate Resource
 ```terraform
 resource "kong-gateway_plugin_ai_prompt_template" "my_pluginaiprompttemplate" {
   config = {
-    allow_untemplated_requests = true
-    log_original_request       = true
+    allow_untemplated_requests = false
+    log_original_request       = false
     max_request_body_size      = 3
     templates = [
       {

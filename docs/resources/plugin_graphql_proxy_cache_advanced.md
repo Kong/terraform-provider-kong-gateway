@@ -28,16 +28,16 @@ resource "kong-gateway_plugin_graphql_proxy_cache_advanced" "my_plugingraphqlpro
           port = 32412
         }
       ]
-      connect_timeout       = 2012534235
+      connect_timeout       = 2012534229
       connection_is_proxied = true
       database              = 10
       host                  = "...my_host..."
-      keepalive_backlog     = 1623005255
+      keepalive_backlog     = 1623005263
       keepalive_pool_size   = 80538716
       password              = "...my_password..."
       port                  = 5869
-      read_timeout          = 413317159
-      send_timeout          = 706362535
+      read_timeout          = 413317165
+      send_timeout          = 706362539
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -50,7 +50,7 @@ resource "kong-gateway_plugin_graphql_proxy_cache_advanced" "my_plugingraphqlpro
       sentinel_username = "...my_sentinel_username..."
       server_name       = "...my_server_name..."
       ssl               = false
-      ssl_verify        = true
+      ssl_verify        = false
       username          = "...my_username..."
     }
     strategy = "memory"
@@ -64,7 +64,7 @@ resource "kong-gateway_plugin_graphql_proxy_cache_advanced" "my_plugingraphqlpro
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

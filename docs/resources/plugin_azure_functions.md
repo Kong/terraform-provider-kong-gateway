@@ -21,7 +21,7 @@ resource "kong-gateway_plugin_azure_functions" "my_pluginazurefunctions" {
     functionname = "...my_functionname..."
     hostdomain   = "...my_hostdomain..."
     https        = true
-    https_verify = false
+    https_verify = true
     keepalive    = 9.43
     routeprefix  = "...my_routeprefix..."
     timeout      = 4.56
@@ -32,7 +32,7 @@ resource "kong-gateway_plugin_azure_functions" "my_pluginazurefunctions" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

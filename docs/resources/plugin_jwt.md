@@ -26,7 +26,7 @@ resource "kong-gateway_plugin_jwt" "my_pluginjwt" {
       "..."
     ]
     key_claim_name     = "...my_key_claim_name..."
-    maximum_expiration = 8041591.1
+    maximum_expiration = 8041591.04
     realm              = "...my_realm..."
     run_on_preflight   = false
     secret_is_base64   = true

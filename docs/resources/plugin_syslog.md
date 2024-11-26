@@ -17,7 +17,7 @@ resource "kong-gateway_plugin_syslog" "my_pluginsyslog" {
   config = {
     client_errors_severity = "info"
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     facility               = "local6"
     log_level              = "crit"

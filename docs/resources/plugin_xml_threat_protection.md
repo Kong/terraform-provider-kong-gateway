@@ -36,7 +36,7 @@ resource "kong-gateway_plugin_xml_threat_protection" "my_pluginxmlthreatprotecti
     max_children    = 3
     max_depth       = 5
     max_namespaces  = 4
-    namespace_aware = false
+    namespace_aware = true
     namespaceuri    = 9
     pidata          = 8
     pitarget        = 6
@@ -49,7 +49,7 @@ resource "kong-gateway_plugin_xml_threat_protection" "my_pluginxmlthreatprotecti
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

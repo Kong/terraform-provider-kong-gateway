@@ -20,7 +20,7 @@ resource "kong-gateway_plugin_statsd_advanced" "my_pluginstatsdadvanced" {
     ]
     consumer_identifier_default = "username"
     host                        = "...my_host..."
-    hostname_in_prefix          = true
+    hostname_in_prefix          = false
     metrics = [
       {
         consumer_identifier  = "custom_id"
@@ -40,12 +40,12 @@ resource "kong-gateway_plugin_statsd_advanced" "my_pluginstatsdadvanced" {
       max_bytes            = 2
       max_coalescing_delay = 1508.81
       max_entries          = 558736
-      max_retry_delay      = 818553.9
+      max_retry_delay      = 818553.89
       max_retry_time       = 4.4
     }
     service_identifier_default   = "service_name_or_host"
     udp_packet_size              = 21502.96
-    use_tcp                      = false
+    use_tcp                      = true
     workspace_identifier_default = "workspace_name"
   }
   consumer = {

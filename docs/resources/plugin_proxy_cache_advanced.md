@@ -15,8 +15,8 @@ PluginProxyCacheAdvanced Resource
 ```terraform
 resource "kong-gateway_plugin_proxy_cache_advanced" "my_pluginproxycacheadvanced" {
   config = {
-    bypass_on_err = false
-    cache_control = true
+    bypass_on_err = true
+    cache_control = false
     cache_ttl     = 8
     content_type = [
       "..."
@@ -33,16 +33,16 @@ resource "kong-gateway_plugin_proxy_cache_advanced" "my_pluginproxycacheadvanced
           port = 13001
         }
       ]
-      connect_timeout       = 1026198031
-      connection_is_proxied = false
+      connect_timeout       = 1026198025
+      connection_is_proxied = true
       database              = 6
       host                  = "...my_host..."
-      keepalive_backlog     = 1706411380
-      keepalive_pool_size   = 1943414159
+      keepalive_backlog     = 1706411375
+      keepalive_pool_size   = 1943414170
       password              = "...my_password..."
       port                  = 14256
-      read_timeout          = 1093988769
-      send_timeout          = 799635209
+      read_timeout          = 1093988774
+      send_timeout          = 799635205
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -55,7 +55,7 @@ resource "kong-gateway_plugin_proxy_cache_advanced" "my_pluginproxycacheadvanced
       sentinel_username = "...my_sentinel_username..."
       server_name       = "...my_server_name..."
       ssl               = true
-      ssl_verify        = true
+      ssl_verify        = false
       username          = "...my_username..."
     }
     request_method = [
@@ -65,7 +65,7 @@ resource "kong-gateway_plugin_proxy_cache_advanced" "my_pluginproxycacheadvanced
       487
     ]
     response_headers = {
-      age            = true
+      age            = false
       x_cache_key    = false
       x_cache_status = true
     }
@@ -84,7 +84,7 @@ resource "kong-gateway_plugin_proxy_cache_advanced" "my_pluginproxycacheadvanced
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

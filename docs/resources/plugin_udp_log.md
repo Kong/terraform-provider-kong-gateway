@@ -16,7 +16,7 @@ PluginUDPLog Resource
 resource "kong-gateway_plugin_udp_log" "my_pluginudplog" {
   config = {
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     host    = "...my_host..."
     port    = 6547
@@ -28,7 +28,7 @@ resource "kong-gateway_plugin_udp_log" "my_pluginudplog" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -15,12 +15,12 @@ PluginPrometheus Resource
 ```terraform
 resource "kong-gateway_plugin_prometheus" "my_pluginprometheus" {
   config = {
-    ai_metrics              = false
+    ai_metrics              = true
     bandwidth_metrics       = true
-    latency_metrics         = false
+    latency_metrics         = true
     per_consumer            = false
-    status_code_metrics     = false
-    upstream_health_metrics = false
+    status_code_metrics     = true
+    upstream_health_metrics = true
   }
   consumer = {
     id = "...my_id..."

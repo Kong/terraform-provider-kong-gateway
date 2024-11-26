@@ -66,13 +66,13 @@ resource "kong-gateway_plugin_jwt_signer" "my_pluginjwtsigner" {
     access_token_upstream_header   = "...my_access_token_upstream_header..."
     access_token_upstream_leeway   = 7.45
     add_access_token_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     add_channel_token_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     add_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     cache_access_token_introspection  = true
     cache_channel_token_introspection = false
@@ -127,8 +127,8 @@ resource "kong-gateway_plugin_jwt_signer" "my_pluginjwtsigner" {
     channel_token_upstream_header          = "...my_channel_token_upstream_header..."
     channel_token_upstream_leeway          = 3.03
     enable_access_token_introspection      = true
-    enable_channel_token_introspection     = false
-    enable_hs_signatures                   = true
+    enable_channel_token_introspection     = true
+    enable_hs_signatures                   = false
     enable_instrumentation                 = false
     original_access_token_upstream_header  = "...my_original_access_token_upstream_header..."
     original_channel_token_upstream_header = "...my_original_channel_token_upstream_header..."
@@ -140,25 +140,25 @@ resource "kong-gateway_plugin_jwt_signer" "my_pluginjwtsigner" {
       "..."
     ]
     set_access_token_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     set_channel_token_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     set_claims = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     trust_access_token_introspection          = true
     trust_channel_token_introspection         = false
     verify_access_token_expiry                = true
-    verify_access_token_introspection_expiry  = false
+    verify_access_token_introspection_expiry  = true
     verify_access_token_introspection_scopes  = true
     verify_access_token_scopes                = true
     verify_access_token_signature             = true
     verify_channel_token_expiry               = false
-    verify_channel_token_introspection_expiry = false
+    verify_channel_token_introspection_expiry = true
     verify_channel_token_introspection_scopes = true
-    verify_channel_token_scopes               = false
+    verify_channel_token_scopes               = true
     verify_channel_token_signature            = false
   }
   consumer = {
@@ -167,7 +167,7 @@ resource "kong-gateway_plugin_jwt_signer" "my_pluginjwtsigner" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

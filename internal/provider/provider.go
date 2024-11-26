@@ -63,9 +63,12 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		ServerURL = "{protocol}://{hostname}:{port}{path}"
 	}
 
+	httpClient := http.DefaultClient
+	httpClient.Transport = NewLoggingHTTPTransport(http.DefaultTransport)
+
 	opts := []sdk.SDKOption{
 		sdk.WithServerURL(ServerURL),
-		sdk.WithClient(http.DefaultClient),
+		sdk.WithClient(httpClient),
 	}
 	client := sdk.New(opts...)
 

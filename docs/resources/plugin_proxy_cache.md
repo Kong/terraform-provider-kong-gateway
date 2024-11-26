@@ -20,7 +20,7 @@ resource "kong-gateway_plugin_proxy_cache" "my_pluginproxycache" {
     content_type = [
       "..."
     ]
-    ignore_uri_case = false
+    ignore_uri_case = true
     memory = {
       dictionary_name = "...my_dictionary_name..."
     }

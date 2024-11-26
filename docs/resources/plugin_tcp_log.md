@@ -16,13 +16,13 @@ PluginTCPLog Resource
 resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
   config = {
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     host      = "...my_host..."
     keepalive = 5.51
     port      = 64594
     timeout   = 6.84
-    tls       = true
+    tls       = false
     tls_sni   = "...my_tls_sni..."
   }
   consumer = {

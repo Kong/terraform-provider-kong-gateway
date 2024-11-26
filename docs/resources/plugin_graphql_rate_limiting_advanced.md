@@ -17,7 +17,7 @@ resource "kong-gateway_plugin_graphql_rate_limiting_advanced" "my_plugingraphqlr
   config = {
     cost_strategy       = "node_quantifier"
     dictionary_name     = "...my_dictionary_name..."
-    hide_client_headers = false
+    hide_client_headers = true
     identifier          = "credential"
     limit = [
       2.08
@@ -36,11 +36,11 @@ resource "kong-gateway_plugin_graphql_rate_limiting_advanced" "my_plugingraphqlr
       connection_is_proxied = false
       database              = 0
       host                  = "...my_host..."
-      keepalive_backlog     = 320511940
-      keepalive_pool_size   = 411631550
+      keepalive_backlog     = 320511937
+      keepalive_pool_size   = 411631542
       password              = "...my_password..."
       port                  = 42064
-      read_timeout          = 179232807
+      read_timeout          = 179232803
       send_timeout          = 1620823428
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [

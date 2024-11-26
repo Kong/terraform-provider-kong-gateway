@@ -23,7 +23,7 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
     consumer_by = [
       "custom_id"
     ]
-    consumer_optional      = false
+    consumer_optional      = true
     group_base_dn          = "...my_group_base_dn..."
     group_member_attribute = "...my_group_member_attribute..."
     group_name_attribute   = "...my_group_name_attribute..."
@@ -31,17 +31,17 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
       "..."
     ]
     header_type        = "...my_header_type..."
-    hide_credentials   = true
+    hide_credentials   = false
     keepalive          = 2.34
     ldap_host          = "...my_ldap_host..."
     ldap_password      = "...my_ldap_password..."
     ldap_port          = 3.71
     ldaps              = true
-    log_search_results = true
+    log_search_results = false
     realm              = "...my_realm..."
-    start_tls          = true
+    start_tls          = false
     timeout            = 0.12
-    verify_ldap_host   = false
+    verify_ldap_host   = true
   }
   consumer = {
     id = "...my_id..."
@@ -49,7 +49,7 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

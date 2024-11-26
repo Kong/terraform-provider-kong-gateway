@@ -17,10 +17,10 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
   config = {
     batch_flush_delay = 10
     batch_span_count  = 3
-    connect_timeout   = 989336315
+    connect_timeout   = 989336304
     header_type       = "w3c"
     headers = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     http_response_header_for_traceid = "...my_http_response_header_for_traceid..."
     logs_endpoint                    = "...my_logs_endpoint..."
@@ -46,12 +46,12 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
       max_retry_delay      = 376586.38
       max_retry_time       = 7.35
     }
-    read_timeout = 225003719
+    read_timeout = 225003718
     resource_attributes = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     sampling_rate   = 0.04
-    send_timeout    = 1663136650
+    send_timeout    = 1663136653
     traces_endpoint = "...my_traces_endpoint..."
   }
   consumer = {

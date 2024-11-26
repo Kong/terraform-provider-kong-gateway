@@ -37,14 +37,14 @@ resource "kong-gateway_plugin_acme" "my_pluginacme" {
     storage_config = {
       consul = {
         host    = "...my_host..."
-        https   = false
+        https   = true
         kv_path = "...my_kv_path..."
         port    = 14637
         timeout = 7.48
         token   = "...my_token..."
       }
       kong = {
-        "see" : jsonencode("documentation"),
+        key = jsonencode("value"),
       }
       redis = {
         database = 9
@@ -58,7 +58,7 @@ resource "kong-gateway_plugin_acme" "my_pluginacme" {
         server_name = "...my_server_name..."
         ssl         = false
         ssl_verify  = true
-        timeout     = 1180626317
+        timeout     = 1180626308
         username    = "...my_username..."
       }
       shm = {
@@ -87,7 +87,7 @@ resource "kong-gateway_plugin_acme" "my_pluginacme" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

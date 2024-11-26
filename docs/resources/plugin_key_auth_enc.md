@@ -17,9 +17,9 @@ resource "kong-gateway_plugin_key_auth_enc" "my_pluginkeyauthenc" {
   config = {
     anonymous        = "...my_anonymous..."
     hide_credentials = true
-    key_in_body      = true
-    key_in_header    = false
-    key_in_query     = false
+    key_in_body      = false
+    key_in_header    = true
+    key_in_query     = true
     key_names = [
       "..."
     ]
@@ -32,7 +32,7 @@ resource "kong-gateway_plugin_key_auth_enc" "my_pluginkeyauthenc" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

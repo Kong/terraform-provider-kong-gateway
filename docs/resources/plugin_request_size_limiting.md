@@ -16,7 +16,7 @@ PluginRequestSizeLimiting Resource
 resource "kong-gateway_plugin_request_size_limiting" "my_pluginrequestsizelimiting" {
   config = {
     allowed_payload_size   = 0
-    require_content_length = false
+    require_content_length = true
     size_unit              = "bytes"
   }
   consumer = {
@@ -25,7 +25,7 @@ resource "kong-gateway_plugin_request_size_limiting" "my_pluginrequestsizelimiti
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

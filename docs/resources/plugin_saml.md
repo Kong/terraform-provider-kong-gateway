@@ -29,17 +29,17 @@ resource "kong-gateway_plugin_saml" "my_pluginsaml" {
           port = 7648
         }
       ]
-      connect_timeout       = 65070334
+      connect_timeout       = 65070321
       connection_is_proxied = false
       database              = 6
       host                  = "...my_host..."
-      keepalive_backlog     = 94467676
-      keepalive_pool_size   = 217828043
+      keepalive_backlog     = 94467675
+      keepalive_pool_size   = 217828035
       password              = "...my_password..."
       port                  = 26967
       prefix                = "...my_prefix..."
-      read_timeout          = 1347794723
-      send_timeout          = 881927300
+      read_timeout          = 1347794726
+      send_timeout          = 881927296
       sentinel_master       = "...my_sentinel_master..."
       sentinel_nodes = [
         {
@@ -71,9 +71,9 @@ resource "kong-gateway_plugin_saml" "my_pluginsaml" {
     session_cookie_path               = "...my_session_cookie_path..."
     session_cookie_same_site          = "Default"
     session_cookie_secure             = true
-    session_enforce_same_subject      = false
-    session_hash_storage_key          = true
-    session_hash_subject              = false
+    session_enforce_same_subject      = true
+    session_hash_storage_key          = false
+    session_hash_subject              = true
     session_idling_timeout            = 9.29
     session_memcached_host            = "...my_session_memcached_host..."
     session_memcached_port            = 27249
@@ -92,8 +92,8 @@ resource "kong-gateway_plugin_saml" "my_pluginsaml" {
     session_rolling_timeout      = 0.1
     session_secret               = "...my_session_secret..."
     session_storage              = "cookie"
-    session_store_metadata       = true
-    validate_assertion_signature = true
+    session_store_metadata       = false
+    validate_assertion_signature = false
   }
   consumer = {
     id = "...my_id..."
@@ -101,7 +101,7 @@ resource "kong-gateway_plugin_saml" "my_pluginsaml" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

@@ -18,11 +18,11 @@ resource "kong-gateway_plugin_acl" "my_pluginacl" {
     allow = [
       "..."
     ]
-    always_use_authenticated_groups = false
+    always_use_authenticated_groups = true
     deny = [
       "..."
     ]
-    hide_groups_header      = false
+    hide_groups_header      = true
     include_consumer_groups = false
   }
   consumer = {

@@ -21,7 +21,7 @@ resource "kong-gateway_plugin_statsd" "my_pluginstatsd" {
     consumer_identifier_default = "custom_id"
     flush_timeout               = 9.44
     host                        = "...my_host..."
-    hostname_in_prefix          = false
+    hostname_in_prefix          = true
     metrics = [
       {
         consumer_identifier  = "consumer_id"
@@ -58,7 +58,7 @@ resource "kong-gateway_plugin_statsd" "my_pluginstatsd" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

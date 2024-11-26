@@ -15,7 +15,7 @@ PluginCorrelationID Resource
 ```terraform
 resource "kong-gateway_plugin_correlation_id" "my_plugincorrelationid" {
   config = {
-    echo_downstream = false
+    echo_downstream = true
     generator       = "uuid"
     header_name     = "...my_header_name..."
   }

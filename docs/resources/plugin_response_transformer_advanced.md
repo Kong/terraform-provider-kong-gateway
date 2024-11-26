@@ -48,7 +48,7 @@ resource "kong-gateway_plugin_response_transformer_advanced" "my_pluginresponset
         "boolean"
       ]
     }
-    dots_in_keys = false
+    dots_in_keys = true
     remove = {
       headers = [
         "..."
@@ -101,7 +101,7 @@ resource "kong-gateway_plugin_response_transformer_advanced" "my_pluginresponset
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

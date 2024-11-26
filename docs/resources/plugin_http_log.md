@@ -17,23 +17,23 @@ resource "kong-gateway_plugin_http_log" "my_pluginhttplog" {
   config = {
     content_type = "application/json"
     custom_fields_by_lua = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     flush_timeout = 8.6
     headers = {
-      "see" : jsonencode("documentation"),
+      key = jsonencode("value"),
     }
     http_endpoint = "...my_http_endpoint..."
     keepalive     = 4.44
     method        = "PATCH"
     queue = {
       concurrency_limit    = 1
-      initial_retry_delay  = 273110.24
+      initial_retry_delay  = 273110.25
       max_batch_size       = 635763
       max_bytes            = 9
       max_coalescing_delay = 553.65
       max_entries          = 735326
-      max_retry_delay      = 445848.88
+      max_retry_delay      = 445848.89
       max_retry_time       = 5.62
     }
     queue_size  = 8

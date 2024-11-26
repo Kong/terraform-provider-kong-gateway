@@ -18,13 +18,13 @@ resource "kong-gateway_plugin_mocking" "my_pluginmocking" {
     api_specification          = "...my_api_specification..."
     api_specification_filename = "...my_api_specification_filename..."
     custom_base_path           = "...my_custom_base_path..."
-    include_base_path          = true
+    include_base_path          = false
     included_status_codes = [
       1
     ]
     max_delay_time     = 8.63
     min_delay_time     = 6.83
-    random_delay       = false
+    random_delay       = true
     random_examples    = false
     random_status_code = false
   }
@@ -34,7 +34,7 @@ resource "kong-gateway_plugin_mocking" "my_pluginmocking" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = true
+  enabled       = false
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

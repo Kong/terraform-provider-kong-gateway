@@ -20,7 +20,7 @@ resource "kong-gateway_plugin_jwe_decrypt" "my_pluginjwedecrypt" {
       "..."
     ]
     lookup_header_name = "...my_lookup_header_name..."
-    strict             = true
+    strict             = false
   }
   consumer = {
     id = "...my_id..."

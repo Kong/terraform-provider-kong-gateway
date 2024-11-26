@@ -15,7 +15,7 @@ PluginMtlsAuth Resource
 ```terraform
 resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
   config = {
-    allow_partial_chain    = true
+    allow_partial_chain    = false
     anonymous              = "...my_anonymous..."
     authenticated_group_by = "CN"
     ca_certificates = [
@@ -33,7 +33,7 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
     https_proxy_host      = "...my_https_proxy_host..."
     https_proxy_port      = 35718
     revocation_check_mode = "SKIP"
-    send_ca_dn            = false
+    send_ca_dn            = true
     skip_consumer_lookup  = true
   }
   consumer = {
@@ -42,7 +42,7 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
   consumer_group = {
     id = "...my_id..."
   }
-  enabled       = false
+  enabled       = true
   instance_name = "...my_instance_name..."
   ordering      = "{ \"see\": \"documentation\" }"
   protocols = [

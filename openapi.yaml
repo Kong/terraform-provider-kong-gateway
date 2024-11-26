@@ -13016,6 +13016,11 @@ components:
                 name:
                     const: zipkin
                     type: string
+    securitySchemes:
+        adminToken:
+            in: header
+            name: Kong-Admin-Token
+            type: apiKey
 externalDocs:
     description: Documentation for Kong Gateway and its APIs
     url: https://docs.konghq.com
@@ -21858,6 +21863,8 @@ paths:
             summary: Associate a role with a group
             tags:
                 - Workspaces
+security:
+    - adminToken: []
 servers:
     - description: Default Admin API URL
       url: '{protocol}://{hostname}:{port}{path}'

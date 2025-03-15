@@ -28,10 +28,13 @@ func (r *RouteResourceModel) ToSharedRouteInput() *shared.RouteInput {
 			Port: port,
 		})
 	}
-	headers := make(map[string]string)
+	headers := make(map[string][]string)
 	for headersKey, headersValue := range r.Headers {
-		var headersInst string
-		headersInst = headersValue.ValueString()
+		var headersInst = make([]string, len(headersValue), len(headersValue))
+
+		for i, original := range headersValue {
+			headersInst[i] = original.ValueString()
+		}
 
 		headers[headersKey] = headersInst
 	}
@@ -187,9 +190,13 @@ func (r *RouteResourceModel) RefreshFromSharedRoute(resp *shared.Route) {
 			}
 		}
 		if len(resp.Headers) > 0 {
-			r.Headers = make(map[string]types.String)
+			r.Headers = make(map[string][]types.String)
 			for key, value := range resp.Headers {
-				r.Headers[key] = types.StringValue(value)
+				newArray := make([]types.String, len(value), len(value))
+				for i, original := range value {
+					newArray[i] = types.StringValue(original)
+				}
+				r.Headers[key] = newArray
 			}
 		}
 		r.Hosts = []types.String{}

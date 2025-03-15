@@ -27,9 +27,14 @@ func (r *RouteDataSourceModel) RefreshFromSharedRoute(resp *shared.Route) {
 			}
 		}
 		if len(resp.Headers) > 0 {
-			r.Headers = make(map[string]types.String)
+			r.Headers = make(map[string][]types.String)
 			for key, value := range resp.Headers {
-				r.Headers[key] = types.StringValue(value)
+				newArray := make([]types.String, len(value), len(value))
+
+				for i, original := range value {
+					newArray[i] = types.StringValue(original)
+				}
+				r.Headers[key] = newArray
 			}
 		}
 		r.Hosts = []types.String{}

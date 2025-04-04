@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.0
+> Released on 2025/04/??
+
+### Features
+* Add support for `route_expression` `oidc_jwk`, `partial` and `target` resouces
+* Add support for the following plugins
+  * AI Azure Content Safety
+  * AI Proxy Advanced
+  * AI Rate Limiting Advanced
+  * AI Semantic Cache
+  * AI Semantic Prompt Guard
+  * Confluent
+  * Datadog Tracing
+  * Header Cert Auth
+  * Injection Protection
+  * JSON Threat Protection
+  * Redirect
+  * Service Protection
+  * Standard Webhooks
+  * Upstream OAuth
+
+
 ## 0.3.0
 > Released on 2024/11/26
 

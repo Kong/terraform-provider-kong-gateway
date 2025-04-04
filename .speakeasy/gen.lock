@@ -5,8 +5,8 @@ management:
   docVersion: 0.0.1
   speakeasyVersion: 1.529.1
   generationVersion: 2.566.5
-  releaseVersion: 0.3.0
-  configChecksum: 16224a5b7396208d74215864af90a412
+  releaseVersion: 0.4.0
+  configChecksum: e4b08c6e3078f6af4cfe4998d84a29a7
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -1606,7 +1606,7 @@ generatedFiles:
   - internal/sdk/models/shared/routetransformeradvancedplugin.go
   - internal/sdk/models/shared/samlplugin.go
   - internal/sdk/models/shared/security.go
-  - internal/sdk/models/shared/serviceoutput.go
+  - internal/sdk/models/shared/service.go
   - internal/sdk/models/shared/serviceprotectionplugin.go
   - internal/sdk/models/shared/sessionplugin.go
   - internal/sdk/models/shared/sni.go

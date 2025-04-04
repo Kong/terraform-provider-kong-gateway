@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "oas-toolkit": "^0.15.1",
+    "openapi-format": "^1.25.2"
+  }
+}

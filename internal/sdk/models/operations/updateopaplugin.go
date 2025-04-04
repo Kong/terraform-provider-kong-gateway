@@ -9,8 +9,8 @@ import (
 
 type UpdateOpaPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID  string                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	OpaPlugin *shared.OpaPluginInput `request:"mediaType=application/json"`
+	PluginID  string           `pathParam:"style=simple,explode=false,name=PluginId"`
+	OpaPlugin shared.OpaPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOpaPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateOpaPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOpaPluginRequest) GetOpaPlugin() *shared.OpaPluginInput {
+func (o *UpdateOpaPluginRequest) GetOpaPlugin() shared.OpaPlugin {
 	if o == nil {
-		return nil
+		return shared.OpaPlugin{}
 	}
 	return o.OpaPlugin
 }

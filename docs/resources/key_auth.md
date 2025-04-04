@@ -17,8 +17,10 @@ resource "kong-gateway_key_auth" "my_keyauth" {
   consumer = {
     id = "...my_id..."
   }
-  id  = "...my_id..."
-  key = "...my_key..."
+  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  created_at  = 1
+  id          = "...my_id..."
+  key         = "...my_key..."
   tags = [
     "..."
   ]
@@ -30,16 +32,17 @@ resource "kong-gateway_key_auth" "my_keyauth" {
 
 ### Required
 
+- `consumer_id` (String) Consumer ID for nested entities
 - `key` (String)
 
 ### Optional
 
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--consumer"></a>
@@ -54,5 +57,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_key_auth.my_kong-gateway_key_auth ""
+terraform import kong-gateway_key_auth.my_kong-gateway_key_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"key_auth_id\": \"\"}"
 ```

@@ -14,10 +14,11 @@ Key Resource
 
 ```terraform
 resource "kong-gateway_key" "my_key" {
-  id   = "...my_id..."
-  jwk  = "...my_jwk..."
-  kid  = "...my_kid..."
-  name = "...my_name..."
+  created_at = 0
+  id         = "...my_id..."
+  jwk        = "...my_jwk..."
+  kid        = "...my_kid..."
+  name       = "...my_name..."
   pem = {
     private_key = "...my_private_key..."
     public_key  = "...my_public_key..."
@@ -28,6 +29,8 @@ resource "kong-gateway_key" "my_key" {
   tags = [
     "..."
   ]
+  updated_at = 9
+  x5t        = "...my_x5t..."
 }
 ```
 
@@ -40,17 +43,18 @@ resource "kong-gateway_key" "my_key" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `jwk` (String) A JSON Web Key represented as a string.
 - `name` (String) The name to associate with the given keys.
 - `pem` (Attributes) A keypair in PEM format. (see [below for nested schema](#nestedatt--pem))
 - `set` (Attributes) The id (an UUID) of the key-set with which to associate the key. (see [below for nested schema](#nestedatt--set))
 - `tags` (List of String) An optional set of strings associated with the Key for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
+- `x5t` (String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 <a id="nestedatt--pem"></a>
 ### Nested Schema for `pem`

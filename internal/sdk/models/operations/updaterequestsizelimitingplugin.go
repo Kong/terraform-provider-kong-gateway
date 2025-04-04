@@ -9,8 +9,8 @@ import (
 
 type UpdateRequestsizelimitingPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	RequestSizeLimitingPlugin *shared.RequestSizeLimitingPluginInput `request:"mediaType=application/json"`
+	PluginID                  string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	RequestSizeLimitingPlugin shared.RequestSizeLimitingPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRequestsizelimitingPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRequestsizelimitingPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRequestsizelimitingPluginRequest) GetRequestSizeLimitingPlugin() *shared.RequestSizeLimitingPluginInput {
+func (o *UpdateRequestsizelimitingPluginRequest) GetRequestSizeLimitingPlugin() shared.RequestSizeLimitingPlugin {
 	if o == nil {
-		return nil
+		return shared.RequestSizeLimitingPlugin{}
 	}
 	return o.RequestSizeLimitingPlugin
 }

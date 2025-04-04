@@ -9,8 +9,8 @@ import (
 
 type UpdateRatelimitingadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                   string                                  `pathParam:"style=simple,explode=false,name=PluginId"`
-	RateLimitingAdvancedPlugin *shared.RateLimitingAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID                   string                            `pathParam:"style=simple,explode=false,name=PluginId"`
+	RateLimitingAdvancedPlugin shared.RateLimitingAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRatelimitingadvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRatelimitingadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRatelimitingadvancedPluginRequest) GetRateLimitingAdvancedPlugin() *shared.RateLimitingAdvancedPluginInput {
+func (o *UpdateRatelimitingadvancedPluginRequest) GetRateLimitingAdvancedPlugin() shared.RateLimitingAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.RateLimitingAdvancedPlugin{}
 	}
 	return o.RateLimitingAdvancedPlugin
 }

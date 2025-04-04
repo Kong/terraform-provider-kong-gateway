@@ -30,12 +30,12 @@ type SniResource struct {
 
 // SniResourceModel describes the resource data model.
 type SniResourceModel struct {
-	Certificate tfTypes.ACLConsumer `tfsdk:"certificate"`
-	CreatedAt   types.Int64         `tfsdk:"created_at"`
-	ID          types.String        `tfsdk:"id"`
-	Name        types.String        `tfsdk:"name"`
-	Tags        []types.String      `tfsdk:"tags"`
-	UpdatedAt   types.Int64         `tfsdk:"updated_at"`
+	Certificate tfTypes.ACLWithoutParentsConsumer `tfsdk:"certificate"`
+	CreatedAt   types.Int64                       `tfsdk:"created_at"`
+	ID          types.String                      `tfsdk:"id"`
+	Name        types.String                      `tfsdk:"name"`
+	Tags        []types.String                    `tfsdk:"tags"`
+	UpdatedAt   types.Int64                       `tfsdk:"updated_at"`
 }
 
 func (r *SniResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,6 +58,7 @@ func (r *SniResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -76,6 +77,7 @@ func (r *SniResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -120,7 +122,7 @@ func (r *SniResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedSNIInput()
+	request := *data.ToSharedSni()
 	res, err := r.client.SNIs.CreateSni(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -219,7 +221,7 @@ func (r *SniResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	var sniIDOrName string
 	sniIDOrName = data.ID.ValueString()
 
-	sni := *data.ToSharedSNIInput()
+	sni := *data.ToSharedSni()
 	request := operations.UpsertSniRequest{
 		SNIIDOrName: sniIDOrName,
 		Sni:         sni,

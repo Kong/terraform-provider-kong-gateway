@@ -8,6 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type HmacAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *HmacAuthPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type HmacAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *HmacAuthPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type HmacAuthPluginOrdering struct {
+	After  *HmacAuthPluginAfter  `json:"after,omitempty"`
+	Before *HmacAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (o *HmacAuthPluginOrdering) GetAfter() *HmacAuthPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *HmacAuthPluginOrdering) GetBefore() *HmacAuthPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type HmacAuthPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *HmacAuthPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *HmacAuthPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *HmacAuthPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type Algorithms string
 
 const (
@@ -106,83 +174,15 @@ func (o *HmacAuthPluginConfig) GetValidateRequestBody() *bool {
 	return o.ValidateRequestBody
 }
 
-// HmacAuthPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type HmacAuthPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *HmacAuthPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type HmacAuthPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *HmacAuthPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type HmacAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *HmacAuthPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type HmacAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *HmacAuthPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type HmacAuthPluginOrdering struct {
-	After  *HmacAuthPluginAfter  `json:"after,omitempty"`
-	Before *HmacAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (o *HmacAuthPluginOrdering) GetAfter() *HmacAuthPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *HmacAuthPluginOrdering) GetBefore() *HmacAuthPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
 type HmacAuthPluginProtocols string
 
 const (
-	HmacAuthPluginProtocolsGrpc           HmacAuthPluginProtocols = "grpc"
-	HmacAuthPluginProtocolsGrpcs          HmacAuthPluginProtocols = "grpcs"
-	HmacAuthPluginProtocolsHTTP           HmacAuthPluginProtocols = "http"
-	HmacAuthPluginProtocolsHTTPS          HmacAuthPluginProtocols = "https"
-	HmacAuthPluginProtocolsTCP            HmacAuthPluginProtocols = "tcp"
-	HmacAuthPluginProtocolsTLS            HmacAuthPluginProtocols = "tls"
-	HmacAuthPluginProtocolsTLSPassthrough HmacAuthPluginProtocols = "tls_passthrough"
-	HmacAuthPluginProtocolsUDP            HmacAuthPluginProtocols = "udp"
-	HmacAuthPluginProtocolsWs             HmacAuthPluginProtocols = "ws"
-	HmacAuthPluginProtocolsWss            HmacAuthPluginProtocols = "wss"
+	HmacAuthPluginProtocolsGrpc  HmacAuthPluginProtocols = "grpc"
+	HmacAuthPluginProtocolsGrpcs HmacAuthPluginProtocols = "grpcs"
+	HmacAuthPluginProtocolsHTTP  HmacAuthPluginProtocols = "http"
+	HmacAuthPluginProtocolsHTTPS HmacAuthPluginProtocols = "https"
+	HmacAuthPluginProtocolsWs    HmacAuthPluginProtocols = "ws"
+	HmacAuthPluginProtocolsWss   HmacAuthPluginProtocols = "wss"
 )
 
 func (e HmacAuthPluginProtocols) ToPointer() *HmacAuthPluginProtocols {
@@ -202,14 +202,6 @@ func (e *HmacAuthPluginProtocols) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "https":
 		fallthrough
-	case "tcp":
-		fallthrough
-	case "tls":
-		fallthrough
-	case "tls_passthrough":
-		fallthrough
-	case "udp":
-		fallthrough
 	case "ws":
 		fallthrough
 	case "wss":
@@ -220,7 +212,7 @@ func (e *HmacAuthPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// HmacAuthPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// HmacAuthPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type HmacAuthPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -246,28 +238,26 @@ func (o *HmacAuthPluginService) GetID() *string {
 
 // HmacAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HmacAuthPlugin struct {
-	Config HmacAuthPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *HmacAuthPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *HmacAuthPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"hmac-auth" json:"name"`
-	Ordering     *HmacAuthPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []HmacAuthPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *HmacAuthPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *HmacAuthPluginService `json:"service,omitempty"`
+	Enabled      *bool                    `json:"enabled,omitempty"`
+	ID           *string                  `json:"id,omitempty"`
+	InstanceName *string                  `json:"instance_name,omitempty"`
+	name         string                   `const:"hmac-auth" json:"name"`
+	Ordering     *HmacAuthPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []HmacAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64                `json:"updated_at,omitempty"`
+	Config    *HmacAuthPluginConfig `json:"config,omitempty"`
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
+	Protocols []HmacAuthPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *HmacAuthPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *HmacAuthPluginService `json:"service,omitempty"`
 }
 
 func (h HmacAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -279,27 +269,6 @@ func (h *HmacAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *HmacAuthPlugin) GetConfig() HmacAuthPluginConfig {
-	if o == nil {
-		return HmacAuthPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *HmacAuthPlugin) GetConsumer() *HmacAuthPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *HmacAuthPlugin) GetConsumerGroup() *HmacAuthPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *HmacAuthPlugin) GetCreatedAt() *int64 {
@@ -341,6 +310,34 @@ func (o *HmacAuthPlugin) GetOrdering() *HmacAuthPluginOrdering {
 	return o.Ordering
 }
 
+func (o *HmacAuthPlugin) GetPartials() []HmacAuthPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *HmacAuthPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *HmacAuthPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *HmacAuthPlugin) GetConfig() *HmacAuthPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
 func (o *HmacAuthPlugin) GetProtocols() []HmacAuthPluginProtocols {
 	if o == nil {
 		return nil
@@ -360,132 +357,4 @@ func (o *HmacAuthPlugin) GetService() *HmacAuthPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *HmacAuthPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *HmacAuthPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// HmacAuthPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type HmacAuthPluginInput struct {
-	Config HmacAuthPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *HmacAuthPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *HmacAuthPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"hmac-auth" json:"name"`
-	Ordering     *HmacAuthPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []HmacAuthPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *HmacAuthPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *HmacAuthPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (h HmacAuthPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(h, "", false)
-}
-
-func (h *HmacAuthPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *HmacAuthPluginInput) GetConfig() HmacAuthPluginConfig {
-	if o == nil {
-		return HmacAuthPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *HmacAuthPluginInput) GetConsumer() *HmacAuthPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *HmacAuthPluginInput) GetConsumerGroup() *HmacAuthPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *HmacAuthPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *HmacAuthPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *HmacAuthPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *HmacAuthPluginInput) GetName() string {
-	return "hmac-auth"
-}
-
-func (o *HmacAuthPluginInput) GetOrdering() *HmacAuthPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *HmacAuthPluginInput) GetProtocols() []HmacAuthPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *HmacAuthPluginInput) GetRoute() *HmacAuthPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *HmacAuthPluginInput) GetService() *HmacAuthPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *HmacAuthPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

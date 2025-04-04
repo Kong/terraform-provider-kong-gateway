@@ -47,6 +47,7 @@ func (r *ConsumerResource) Schema(ctx context.Context, req resource.SchemaReques
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"custom_id": schema.StringAttribute{
@@ -66,6 +67,7 @@ func (r *ConsumerResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 			"username": schema.StringAttribute{
@@ -115,7 +117,7 @@ func (r *ConsumerResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedConsumerInput()
+	request := *data.ToSharedConsumer()
 	res, err := r.client.Consumers.CreateConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -214,7 +216,7 @@ func (r *ConsumerResource) Update(ctx context.Context, req resource.UpdateReques
 	var consumerIDOrUsername string
 	consumerIDOrUsername = data.ID.ValueString()
 
-	consumer := *data.ToSharedConsumerInput()
+	consumer := *data.ToSharedConsumer()
 	request := operations.UpsertConsumerRequest{
 		ConsumerIDOrUsername: consumerIDOrUsername,
 		Consumer:             consumer,

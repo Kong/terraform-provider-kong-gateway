@@ -11,7 +11,7 @@ type UpsertRouteRequest struct {
 	// ID or name of the Route to lookup
 	RouteIDOrName string `pathParam:"style=simple,explode=false,name=RouteIdOrName"`
 	// Description of the Route
-	Route shared.RouteInput `request:"mediaType=application/json"`
+	RouteJSON shared.RouteJSON `request:"mediaType=application/json"`
 }
 
 func (o *UpsertRouteRequest) GetRouteIDOrName() string {
@@ -21,11 +21,11 @@ func (o *UpsertRouteRequest) GetRouteIDOrName() string {
 	return o.RouteIDOrName
 }
 
-func (o *UpsertRouteRequest) GetRoute() shared.RouteInput {
+func (o *UpsertRouteRequest) GetRouteJSON() shared.RouteJSON {
 	if o == nil {
-		return shared.RouteInput{}
+		return shared.RouteJSON{}
 	}
-	return o.Route
+	return o.RouteJSON
 }
 
 type UpsertRouteResponse struct {
@@ -36,7 +36,7 @@ type UpsertRouteResponse struct {
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
 	// Successfully upserted Route
-	Route *shared.Route
+	RouteJSON *shared.RouteJSON
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
@@ -62,11 +62,11 @@ func (o *UpsertRouteResponse) GetRawResponse() *http.Response {
 	return o.RawResponse
 }
 
-func (o *UpsertRouteResponse) GetRoute() *shared.Route {
+func (o *UpsertRouteResponse) GetRouteJSON() *shared.RouteJSON {
 	if o == nil {
 		return nil
 	}
-	return o.Route
+	return o.RouteJSON
 }
 
 func (o *UpsertRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {

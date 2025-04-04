@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,12 +32,13 @@ type HMACAuthResource struct {
 
 // HMACAuthResourceModel describes the resource data model.
 type HMACAuthResourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Secret    types.String         `tfsdk:"secret"`
-	Tags      []types.String       `tfsdk:"tags"`
-	Username  types.String         `tfsdk:"username"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Secret     types.String                       `tfsdk:"secret"`
+	Tags       []types.String                     `tfsdk:"tags"`
+	Username   types.String                       `tfsdk:"username"`
 }
 
 func (r *HMACAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -56,8 +59,13 @@ func (r *HMACAuthResource) Schema(ctx context.Context, req resource.SchemaReques
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -118,8 +126,15 @@ func (r *HMACAuthResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedHMACAuthInput()
-	res, err := r.client.HMACAuthCredentials.CreateHmacAuth(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	hmacAuthWithoutParents := *data.ToSharedHMACAuthWithoutParents()
+	request := operations.CreateHmacAuthWithConsumerRequest{
+		ConsumerID:             consumerID,
+		HMACAuthWithoutParents: hmacAuthWithoutParents,
+	}
+	res, err := r.client.HMACAuthCredentials.CreateHmacAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -164,13 +179,17 @@ func (r *HMACAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var hmacAuthID string
 	hmacAuthID = data.ID.ValueString()
 
-	request := operations.GetHmacAuthRequest{
+	request := operations.GetHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		HMACAuthID: hmacAuthID,
 	}
-	res, err := r.client.HMACAuthCredentials.GetHmacAuth(ctx, request)
+	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -214,15 +233,19 @@ func (r *HMACAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var hmacAuthID string
 	hmacAuthID = data.ID.ValueString()
 
-	hmacAuth := *data.ToSharedHMACAuthInput()
-	request := operations.UpsertHmacAuthRequest{
+	hmacAuth := *data.ToSharedHMACAuth()
+	request := operations.UpdateHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		HMACAuthID: hmacAuthID,
 		HMACAuth:   hmacAuth,
 	}
-	res, err := r.client.HMACAuthCredentials.UpsertHmacAuth(ctx, request)
+	res, err := r.client.HMACAuthCredentials.UpdateHmacAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -267,13 +290,17 @@ func (r *HMACAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var hmacAuthID string
 	hmacAuthID = data.ID.ValueString()
 
-	request := operations.DeleteHmacAuthRequest{
+	request := operations.DeleteHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		HMACAuthID: hmacAuthID,
 	}
-	res, err := r.client.HMACAuthCredentials.DeleteHmacAuth(ctx, request)
+	res, err := r.client.HMACAuthCredentials.DeleteHmacAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -293,5 +320,27 @@ func (r *HMACAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ConsumerID string `json:"consumer_id"`
+		ID         string `json:"id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "hmac_auth_id": "70e7b00b-72f2-471b-a5ce-9c4171775360"}': `+err.Error())
+		return
+	}
+
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"70e7b00b-72f2-471b-a5ce-9c4171775360"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+
 }

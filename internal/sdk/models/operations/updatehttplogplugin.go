@@ -9,8 +9,8 @@ import (
 
 type UpdateHttplogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	HTTPLogPlugin *shared.HTTPLogPluginInput `request:"mediaType=application/json"`
+	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	HTTPLogPlugin shared.HTTPLogPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateHttplogPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateHttplogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateHttplogPluginRequest) GetHTTPLogPlugin() *shared.HTTPLogPluginInput {
+func (o *UpdateHttplogPluginRequest) GetHTTPLogPlugin() shared.HTTPLogPlugin {
 	if o == nil {
-		return nil
+		return shared.HTTPLogPlugin{}
 	}
 	return o.HTTPLogPlugin
 }

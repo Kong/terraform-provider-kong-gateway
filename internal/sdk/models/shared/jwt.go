@@ -7,28 +7,28 @@ import (
 	"fmt"
 )
 
-type Algorithm string
+type JWTAlgorithm string
 
 const (
-	AlgorithmHs256 Algorithm = "HS256"
-	AlgorithmHs384 Algorithm = "HS384"
-	AlgorithmHs512 Algorithm = "HS512"
-	AlgorithmRs256 Algorithm = "RS256"
-	AlgorithmRs384 Algorithm = "RS384"
-	AlgorithmRs512 Algorithm = "RS512"
-	AlgorithmEs256 Algorithm = "ES256"
-	AlgorithmEs384 Algorithm = "ES384"
-	AlgorithmEs512 Algorithm = "ES512"
-	AlgorithmPs256 Algorithm = "PS256"
-	AlgorithmPs384 Algorithm = "PS384"
-	AlgorithmPs512 Algorithm = "PS512"
-	AlgorithmEdDsa Algorithm = "EdDSA"
+	JWTAlgorithmHs256 JWTAlgorithm = "HS256"
+	JWTAlgorithmHs384 JWTAlgorithm = "HS384"
+	JWTAlgorithmHs512 JWTAlgorithm = "HS512"
+	JWTAlgorithmRs256 JWTAlgorithm = "RS256"
+	JWTAlgorithmRs384 JWTAlgorithm = "RS384"
+	JWTAlgorithmRs512 JWTAlgorithm = "RS512"
+	JWTAlgorithmEs256 JWTAlgorithm = "ES256"
+	JWTAlgorithmEs384 JWTAlgorithm = "ES384"
+	JWTAlgorithmEs512 JWTAlgorithm = "ES512"
+	JWTAlgorithmPs256 JWTAlgorithm = "PS256"
+	JWTAlgorithmPs384 JWTAlgorithm = "PS384"
+	JWTAlgorithmPs512 JWTAlgorithm = "PS512"
+	JWTAlgorithmEdDsa JWTAlgorithm = "EdDSA"
 )
 
-func (e Algorithm) ToPointer() *Algorithm {
+func (e JWTAlgorithm) ToPointer() *JWTAlgorithm {
 	return &e
 }
-func (e *Algorithm) UnmarshalJSON(data []byte) error {
+func (e *JWTAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -59,10 +59,10 @@ func (e *Algorithm) UnmarshalJSON(data []byte) error {
 	case "PS512":
 		fallthrough
 	case "EdDSA":
-		*e = Algorithm(v)
+		*e = JWTAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Algorithm: %v", v)
+		return fmt.Errorf("invalid value for JWTAlgorithm: %v", v)
 	}
 }
 
@@ -78,8 +78,8 @@ func (o *JWTConsumer) GetID() *string {
 }
 
 type Jwt struct {
-	Algorithm *Algorithm   `json:"algorithm,omitempty"`
-	Consumer  *JWTConsumer `json:"consumer,omitempty"`
+	Algorithm *JWTAlgorithm `json:"algorithm,omitempty"`
+	Consumer  *JWTConsumer  `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt    *int64   `json:"created_at,omitempty"`
 	ID           *string  `json:"id,omitempty"`
@@ -89,7 +89,7 @@ type Jwt struct {
 	Tags         []string `json:"tags,omitempty"`
 }
 
-func (o *Jwt) GetAlgorithm() *Algorithm {
+func (o *Jwt) GetAlgorithm() *JWTAlgorithm {
 	if o == nil {
 		return nil
 	}
@@ -139,65 +139,6 @@ func (o *Jwt) GetSecret() *string {
 }
 
 func (o *Jwt) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-type JWTInput struct {
-	Algorithm    *Algorithm   `json:"algorithm,omitempty"`
-	Consumer     *JWTConsumer `json:"consumer,omitempty"`
-	ID           *string      `json:"id,omitempty"`
-	Key          *string      `json:"key,omitempty"`
-	RsaPublicKey *string      `json:"rsa_public_key,omitempty"`
-	Secret       *string      `json:"secret,omitempty"`
-	Tags         []string     `json:"tags,omitempty"`
-}
-
-func (o *JWTInput) GetAlgorithm() *Algorithm {
-	if o == nil {
-		return nil
-	}
-	return o.Algorithm
-}
-
-func (o *JWTInput) GetConsumer() *JWTConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *JWTInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *JWTInput) GetKey() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Key
-}
-
-func (o *JWTInput) GetRsaPublicKey() *string {
-	if o == nil {
-		return nil
-	}
-	return o.RsaPublicKey
-}
-
-func (o *JWTInput) GetSecret() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Secret
-}
-
-func (o *JWTInput) GetTags() []string {
 	if o == nil {
 		return nil
 	}

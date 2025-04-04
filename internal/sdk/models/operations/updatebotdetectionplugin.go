@@ -9,8 +9,8 @@ import (
 
 type UpdateBotdetectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                          `pathParam:"style=simple,explode=false,name=PluginId"`
-	BotDetectionPlugin *shared.BotDetectionPluginInput `request:"mediaType=application/json"`
+	PluginID           string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	BotDetectionPlugin shared.BotDetectionPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateBotdetectionPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateBotdetectionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateBotdetectionPluginRequest) GetBotDetectionPlugin() *shared.BotDetectionPluginInput {
+func (o *UpdateBotdetectionPluginRequest) GetBotDetectionPlugin() shared.BotDetectionPlugin {
 	if o == nil {
-		return nil
+		return shared.BotDetectionPlugin{}
 	}
 	return o.BotDetectionPlugin
 }

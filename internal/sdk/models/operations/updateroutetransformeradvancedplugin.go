@@ -9,8 +9,8 @@ import (
 
 type UpdateRoutetransformeradvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                       string                                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	RouteTransformerAdvancedPlugin *shared.RouteTransformerAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID                       string                                `pathParam:"style=simple,explode=false,name=PluginId"`
+	RouteTransformerAdvancedPlugin shared.RouteTransformerAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRoutetransformeradvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRoutetransformeradvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRoutetransformeradvancedPluginRequest) GetRouteTransformerAdvancedPlugin() *shared.RouteTransformerAdvancedPluginInput {
+func (o *UpdateRoutetransformeradvancedPluginRequest) GetRouteTransformerAdvancedPlugin() shared.RouteTransformerAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.RouteTransformerAdvancedPlugin{}
 	}
 	return o.RouteTransformerAdvancedPlugin
 }

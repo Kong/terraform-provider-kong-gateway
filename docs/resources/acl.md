@@ -17,8 +17,10 @@ resource "kong-gateway_acl" "my_acl" {
   consumer = {
     id = "...my_id..."
   }
-  group = "...my_group..."
-  id    = "...my_id..."
+  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  created_at  = 9
+  group       = "...my_group..."
+  id          = "...my_id..."
   tags = [
     "..."
   ]
@@ -30,16 +32,17 @@ resource "kong-gateway_acl" "my_acl" {
 
 ### Required
 
+- `consumer_id` (String) Consumer ID for nested entities
 - `group` (String)
 
 ### Optional
 
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--consumer"></a>
@@ -54,5 +57,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_acl.my_kong-gateway_acl ""
+terraform import kong-gateway_acl.my_kong-gateway_acl "{ \"aclid\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
 ```

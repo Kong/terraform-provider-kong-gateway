@@ -14,11 +14,13 @@ ConsumerGroup Resource
 
 ```terraform
 resource "kong-gateway_consumer_group" "my_consumergroup" {
-  id   = "...my_id..."
-  name = "...my_name..."
+  created_at = 6
+  id         = "...my_id..."
+  name       = "...my_name..."
   tags = [
     "..."
   ]
+  updated_at = 4
 }
 ```
 
@@ -31,13 +33,13 @@ resource "kong-gateway_consumer_group" "my_consumergroup" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ## Import
 

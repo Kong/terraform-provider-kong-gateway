@@ -9,8 +9,8 @@ import (
 
 type UpdateCorsPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID   string                  `pathParam:"style=simple,explode=false,name=PluginId"`
-	CorsPlugin *shared.CorsPluginInput `request:"mediaType=application/json"`
+	PluginID   string            `pathParam:"style=simple,explode=false,name=PluginId"`
+	CorsPlugin shared.CorsPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateCorsPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateCorsPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateCorsPluginRequest) GetCorsPlugin() *shared.CorsPluginInput {
+func (o *UpdateCorsPluginRequest) GetCorsPlugin() shared.CorsPlugin {
 	if o == nil {
-		return nil
+		return shared.CorsPlugin{}
 	}
 	return o.CorsPlugin
 }

@@ -9,8 +9,8 @@ import (
 
 type UpdateRequesttransformeradvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                         string                                        `pathParam:"style=simple,explode=false,name=PluginId"`
-	RequestTransformerAdvancedPlugin *shared.RequestTransformerAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID                         string                                  `pathParam:"style=simple,explode=false,name=PluginId"`
+	RequestTransformerAdvancedPlugin shared.RequestTransformerAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRequesttransformeradvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRequesttransformeradvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRequesttransformeradvancedPluginRequest) GetRequestTransformerAdvancedPlugin() *shared.RequestTransformerAdvancedPluginInput {
+func (o *UpdateRequesttransformeradvancedPluginRequest) GetRequestTransformerAdvancedPlugin() shared.RequestTransformerAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.RequestTransformerAdvancedPlugin{}
 	}
 	return o.RequestTransformerAdvancedPlugin
 }

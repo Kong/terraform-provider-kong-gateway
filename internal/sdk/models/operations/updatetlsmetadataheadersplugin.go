@@ -9,8 +9,8 @@ import (
 
 type UpdateTlsmetadataheadersPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                                `pathParam:"style=simple,explode=false,name=PluginId"`
-	TLSMetadataHeadersPlugin *shared.TLSMetadataHeadersPluginInput `request:"mediaType=application/json"`
+	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	TLSMetadataHeadersPlugin shared.TLSMetadataHeadersPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateTlsmetadataheadersPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateTlsmetadataheadersPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateTlsmetadataheadersPluginRequest) GetTLSMetadataHeadersPlugin() *shared.TLSMetadataHeadersPluginInput {
+func (o *UpdateTlsmetadataheadersPluginRequest) GetTLSMetadataHeadersPlugin() shared.TLSMetadataHeadersPlugin {
 	if o == nil {
-		return nil
+		return shared.TLSMetadataHeadersPlugin{}
 	}
 	return o.TLSMetadataHeadersPlugin
 }

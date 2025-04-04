@@ -9,8 +9,8 @@ import (
 
 type UpdateSyslogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
-	SyslogPlugin *shared.SyslogPluginInput `request:"mediaType=application/json"`
+	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	SyslogPlugin shared.SyslogPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateSyslogPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateSyslogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateSyslogPluginRequest) GetSyslogPlugin() *shared.SyslogPluginInput {
+func (o *UpdateSyslogPluginRequest) GetSyslogPlugin() shared.SyslogPlugin {
 	if o == nil {
-		return nil
+		return shared.SyslogPlugin{}
 	}
 	return o.SyslogPlugin
 }

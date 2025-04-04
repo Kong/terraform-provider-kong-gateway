@@ -12,92 +12,91 @@ import (
 
 func (r *PluginHTTPLogDataSourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared.HTTPLogPlugin) {
 	if resp != nil {
-		if resp.Config.ContentType != nil {
-			r.Config.ContentType = types.StringValue(string(*resp.Config.ContentType))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.ContentType = types.StringNull()
-		}
-		if len(resp.Config.CustomFieldsByLua) > 0 {
-			r.Config.CustomFieldsByLua = make(map[string]types.String)
-			for key, value := range resp.Config.CustomFieldsByLua {
-				result, _ := json.Marshal(value)
-				r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
-			}
-		}
-		if resp.Config.FlushTimeout != nil {
-			r.Config.FlushTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.FlushTimeout)))
-		} else {
-			r.Config.FlushTimeout = types.NumberNull()
-		}
-		if len(resp.Config.Headers) > 0 {
-			r.Config.Headers = make(map[string]types.String)
-			for key1, value1 := range resp.Config.Headers {
-				result1, _ := json.Marshal(value1)
-				r.Config.Headers[key1] = types.StringValue(string(result1))
-			}
-		}
-		r.Config.HTTPEndpoint = types.StringPointerValue(resp.Config.HTTPEndpoint)
-		if resp.Config.Keepalive != nil {
-			r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-		} else {
-			r.Config.Keepalive = types.NumberNull()
-		}
-		if resp.Config.Method != nil {
-			r.Config.Method = types.StringValue(string(*resp.Config.Method))
-		} else {
-			r.Config.Method = types.StringNull()
-		}
-		if resp.Config.Queue == nil {
-			r.Config.Queue = nil
-		} else {
-			r.Config.Queue = &tfTypes.Queue{}
-			if resp.Config.Queue.ConcurrencyLimit != nil {
-				r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
+			r.Config = &tfTypes.HTTPLogPluginConfig{}
+			if resp.Config.ContentType != nil {
+				r.Config.ContentType = types.StringValue(string(*resp.Config.ContentType))
 			} else {
-				r.Config.Queue.ConcurrencyLimit = types.Int64Null()
+				r.Config.ContentType = types.StringNull()
 			}
-			if resp.Config.Queue.InitialRetryDelay != nil {
-				r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
+			if len(resp.Config.CustomFieldsByLua) > 0 {
+				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
+				for key, value := range resp.Config.CustomFieldsByLua {
+					result, _ := json.Marshal(value)
+					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
+				}
+			}
+			if resp.Config.FlushTimeout != nil {
+				r.Config.FlushTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.FlushTimeout)))
 			} else {
-				r.Config.Queue.InitialRetryDelay = types.NumberNull()
+				r.Config.FlushTimeout = types.NumberNull()
 			}
-			r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
-			r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-			if resp.Config.Queue.MaxCoalescingDelay != nil {
-				r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
+			if len(resp.Config.Headers) > 0 {
+				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
+				for key1, value1 := range resp.Config.Headers {
+					result1, _ := json.Marshal(value1)
+					r.Config.Headers[key1] = types.StringValue(string(result1))
+				}
+			}
+			r.Config.HTTPEndpoint = types.StringPointerValue(resp.Config.HTTPEndpoint)
+			if resp.Config.Keepalive != nil {
+				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
 			} else {
-				r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
+				r.Config.Keepalive = types.NumberNull()
 			}
-			r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-			if resp.Config.Queue.MaxRetryDelay != nil {
-				r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
+			if resp.Config.Method != nil {
+				r.Config.Method = types.StringValue(string(*resp.Config.Method))
 			} else {
-				r.Config.Queue.MaxRetryDelay = types.NumberNull()
+				r.Config.Method = types.StringNull()
 			}
-			if resp.Config.Queue.MaxRetryTime != nil {
-				r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
+			if resp.Config.Queue == nil {
+				r.Config.Queue = nil
 			} else {
-				r.Config.Queue.MaxRetryTime = types.NumberNull()
+				r.Config.Queue = &tfTypes.Queue{}
+				if resp.Config.Queue.ConcurrencyLimit != nil {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
+				} else {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
+				}
+				if resp.Config.Queue.InitialRetryDelay != nil {
+					r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
+				} else {
+					r.Config.Queue.InitialRetryDelay = types.NumberNull()
+				}
+				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
+				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
+				if resp.Config.Queue.MaxCoalescingDelay != nil {
+					r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
+				} else {
+					r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
+				}
+				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
+				if resp.Config.Queue.MaxRetryDelay != nil {
+					r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
+				} else {
+					r.Config.Queue.MaxRetryDelay = types.NumberNull()
+				}
+				if resp.Config.Queue.MaxRetryTime != nil {
+					r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
+				} else {
+					r.Config.Queue.MaxRetryTime = types.NumberNull()
+				}
 			}
-		}
-		r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
-		r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
-		if resp.Config.Timeout != nil {
-			r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-		} else {
-			r.Config.Timeout = types.NumberNull()
+			r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
+			r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
+			if resp.Config.Timeout != nil {
+				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
+			} else {
+				r.Config.Timeout = types.NumberNull()
+			}
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		if resp.ConsumerGroup == nil {
-			r.ConsumerGroup = nil
-		} else {
-			r.ConsumerGroup = &tfTypes.ACLConsumer{}
-			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -106,12 +105,12 @@ func (r *PluginHTTPLogDataSourceModel) RefreshFromSharedHTTPLogPlugin(resp *shar
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			r.Ordering = &tfTypes.Ordering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.ACLPluginAfter{}
-				r.Ordering.After.Access = []types.String{}
+				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
 				}
@@ -119,30 +118,49 @@ func (r *PluginHTTPLogDataSourceModel) RefreshFromSharedHTTPLogPlugin(resp *shar
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
-				r.Ordering.Before.Access = []types.String{}
+				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Protocols = []types.String{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.Partials{}
+			if len(r.Partials) > len(resp.Partials) {
+				r.Partials = r.Partials[:len(resp.Partials)]
+			}
+			for partialsCount, partialsItem := range resp.Partials {
+				var partials1 tfTypes.Partials
+				partials1.ID = types.StringPointerValue(partialsItem.ID)
+				partials1.Name = types.StringPointerValue(partialsItem.Name)
+				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				if partialsCount+1 > len(r.Partials) {
+					r.Partials = append(r.Partials, partials1)
+				} else {
+					r.Partials[partialsCount].ID = partials1.ID
+					r.Partials[partialsCount].Name = partials1.Name
+					r.Partials[partialsCount].Path = partials1.Path
+				}
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
 			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
 		}
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLConsumer{}
+			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLConsumer{}
+			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

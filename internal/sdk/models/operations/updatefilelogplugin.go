@@ -9,8 +9,8 @@ import (
 
 type UpdateFilelogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	FileLogPlugin *shared.FileLogPluginInput `request:"mediaType=application/json"`
+	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	FileLogPlugin shared.FileLogPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateFilelogPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateFilelogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateFilelogPluginRequest) GetFileLogPlugin() *shared.FileLogPluginInput {
+func (o *UpdateFilelogPluginRequest) GetFileLogPlugin() shared.FileLogPlugin {
 	if o == nil {
-		return nil
+		return shared.FileLogPlugin{}
 	}
 	return o.FileLogPlugin
 }

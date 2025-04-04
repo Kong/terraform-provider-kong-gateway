@@ -9,8 +9,8 @@ import (
 
 type UpdateGraphqlproxycacheadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                        string                                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	GraphqlProxyCacheAdvancedPlugin *shared.GraphqlProxyCacheAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID                        string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	GraphqlProxyCacheAdvancedPlugin shared.GraphqlProxyCacheAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateGraphqlproxycacheadvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateGraphqlproxycacheadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateGraphqlproxycacheadvancedPluginRequest) GetGraphqlProxyCacheAdvancedPlugin() *shared.GraphqlProxyCacheAdvancedPluginInput {
+func (o *UpdateGraphqlproxycacheadvancedPluginRequest) GetGraphqlProxyCacheAdvancedPlugin() shared.GraphqlProxyCacheAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.GraphqlProxyCacheAdvancedPlugin{}
 	}
 	return o.GraphqlProxyCacheAdvancedPlugin
 }

@@ -9,8 +9,8 @@ import (
 
 type UpdateBasicauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	BasicAuthPlugin *shared.BasicAuthPluginInput `request:"mediaType=application/json"`
+	PluginID        string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	BasicAuthPlugin shared.BasicAuthPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateBasicauthPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateBasicauthPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateBasicauthPluginRequest) GetBasicAuthPlugin() *shared.BasicAuthPluginInput {
+func (o *UpdateBasicauthPluginRequest) GetBasicAuthPlugin() shared.BasicAuthPlugin {
 	if o == nil {
-		return nil
+		return shared.BasicAuthPlugin{}
 	}
 	return o.BasicAuthPlugin
 }

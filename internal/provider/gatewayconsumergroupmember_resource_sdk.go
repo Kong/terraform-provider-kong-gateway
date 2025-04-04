@@ -30,7 +30,7 @@ func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsum
 			r.ConsumerGroup.CreatedAt = types.Int64PointerValue(resp.ConsumerGroup.CreatedAt)
 			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
 			r.ConsumerGroup.Name = types.StringValue(resp.ConsumerGroup.Name)
-			r.ConsumerGroup.Tags = []types.String{}
+			r.ConsumerGroup.Tags = make([]types.String, 0, len(resp.ConsumerGroup.Tags))
 			for _, v := range resp.ConsumerGroup.Tags {
 				r.ConsumerGroup.Tags = append(r.ConsumerGroup.Tags, types.StringValue(v))
 			}
@@ -45,7 +45,7 @@ func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsum
 			consumers1.CreatedAt = types.Int64PointerValue(consumersItem.CreatedAt)
 			consumers1.CustomID = types.StringPointerValue(consumersItem.CustomID)
 			consumers1.ID = types.StringPointerValue(consumersItem.ID)
-			consumers1.Tags = []types.String{}
+			consumers1.Tags = make([]types.String, 0, len(consumersItem.Tags))
 			for _, v := range consumersItem.Tags {
 				consumers1.Tags = append(consumers1.Tags, types.StringValue(v))
 			}

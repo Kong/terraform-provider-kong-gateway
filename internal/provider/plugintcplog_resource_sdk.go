@@ -10,81 +10,12 @@ import (
 	"math/big"
 )
 
-func (r *PluginTCPLogResourceModel) ToSharedTCPLogPluginInput() *shared.TCPLogPluginInput {
-	customFieldsByLua := make(map[string]interface{})
-	for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
-		var customFieldsByLuaInst interface{}
-		_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
-		customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
-	}
-	host := new(string)
-	if !r.Config.Host.IsUnknown() && !r.Config.Host.IsNull() {
-		*host = r.Config.Host.ValueString()
+func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
 	} else {
-		host = nil
-	}
-	keepalive := new(float64)
-	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-		*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
-	} else {
-		keepalive = nil
-	}
-	port := new(int64)
-	if !r.Config.Port.IsUnknown() && !r.Config.Port.IsNull() {
-		*port = r.Config.Port.ValueInt64()
-	} else {
-		port = nil
-	}
-	timeout := new(float64)
-	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-		*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
-	} else {
-		timeout = nil
-	}
-	tls := new(bool)
-	if !r.Config.TLS.IsUnknown() && !r.Config.TLS.IsNull() {
-		*tls = r.Config.TLS.ValueBool()
-	} else {
-		tls = nil
-	}
-	tlsSni := new(string)
-	if !r.Config.TLSSni.IsUnknown() && !r.Config.TLSSni.IsNull() {
-		*tlsSni = r.Config.TLSSni.ValueString()
-	} else {
-		tlsSni = nil
-	}
-	config := shared.TCPLogPluginConfig{
-		CustomFieldsByLua: customFieldsByLua,
-		Host:              host,
-		Keepalive:         keepalive,
-		Port:              port,
-		Timeout:           timeout,
-		TLS:               tls,
-		TLSSni:            tlsSni,
-	}
-	var consumer *shared.TCPLogPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.TCPLogPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.TCPLogPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.TCPLogPluginConsumerGroup{
-			ID: id1,
-		}
+		createdAt = nil
 	}
 	enabled := new(bool)
 	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
@@ -92,11 +23,11 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPluginInput() *shared.TCPLogPl
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -131,6 +62,108 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPluginInput() *shared.TCPLogPl
 			Before: before,
 		}
 	}
+	var partials []shared.TCPLogPluginPartials = []shared.TCPLogPluginPartials{}
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.TCPLogPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.TCPLogPluginConfig
+	if r.Config != nil {
+		customFieldsByLua := make(map[string]interface{})
+		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
+			var customFieldsByLuaInst interface{}
+			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
+			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
+		}
+		host := new(string)
+		if !r.Config.Host.IsUnknown() && !r.Config.Host.IsNull() {
+			*host = r.Config.Host.ValueString()
+		} else {
+			host = nil
+		}
+		keepalive := new(float64)
+		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
+			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+		} else {
+			keepalive = nil
+		}
+		port := new(int64)
+		if !r.Config.Port.IsUnknown() && !r.Config.Port.IsNull() {
+			*port = r.Config.Port.ValueInt64()
+		} else {
+			port = nil
+		}
+		timeout := new(float64)
+		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+		} else {
+			timeout = nil
+		}
+		tls := new(bool)
+		if !r.Config.TLS.IsUnknown() && !r.Config.TLS.IsNull() {
+			*tls = r.Config.TLS.ValueBool()
+		} else {
+			tls = nil
+		}
+		tlsSni := new(string)
+		if !r.Config.TLSSni.IsUnknown() && !r.Config.TLSSni.IsNull() {
+			*tlsSni = r.Config.TLSSni.ValueString()
+		} else {
+			tlsSni = nil
+		}
+		config = &shared.TCPLogPluginConfig{
+			CustomFieldsByLua: customFieldsByLua,
+			Host:              host,
+			Keepalive:         keepalive,
+			Port:              port,
+			Timeout:           timeout,
+			TLS:               tls,
+			TLSSni:            tlsSni,
+		}
+	}
+	var consumer *shared.TCPLogPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.TCPLogPluginConsumer{
+			ID: id2,
+		}
+	}
 	var protocols []shared.TCPLogPluginProtocols = []shared.TCPLogPluginProtocols{}
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.TCPLogPluginProtocols(protocolsItem.ValueString()))
@@ -159,60 +192,57 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPluginInput() *shared.TCPLogPl
 			ID: id4,
 		}
 	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	out := shared.TCPLogPluginInput{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
-		Enabled:       enabled,
-		ID:            id2,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Protocols:     protocols,
-		Route:         route,
-		Service:       service,
-		Tags:          tags,
+	out := shared.TCPLogPlugin{
+		CreatedAt:    createdAt,
+		Enabled:      enabled,
+		ID:           id,
+		InstanceName: instanceName,
+		Ordering:     ordering,
+		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
+		Protocols:    protocols,
+		Route:        route,
+		Service:      service,
 	}
 	return &out
 }
 
 func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.TCPLogPlugin) {
 	if resp != nil {
-		if len(resp.Config.CustomFieldsByLua) > 0 {
-			r.Config.CustomFieldsByLua = make(map[string]types.String)
-			for key, value := range resp.Config.CustomFieldsByLua {
-				result, _ := json.Marshal(value)
-				r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.TCPLogPluginConfig{}
+			if len(resp.Config.CustomFieldsByLua) > 0 {
+				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
+				for key, value := range resp.Config.CustomFieldsByLua {
+					result, _ := json.Marshal(value)
+					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
+				}
 			}
+			r.Config.Host = types.StringPointerValue(resp.Config.Host)
+			if resp.Config.Keepalive != nil {
+				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
+			} else {
+				r.Config.Keepalive = types.NumberNull()
+			}
+			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+			if resp.Config.Timeout != nil {
+				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
+			} else {
+				r.Config.Timeout = types.NumberNull()
+			}
+			r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
+			r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
 		}
-		r.Config.Host = types.StringPointerValue(resp.Config.Host)
-		if resp.Config.Keepalive != nil {
-			r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-		} else {
-			r.Config.Keepalive = types.NumberNull()
-		}
-		r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-		if resp.Config.Timeout != nil {
-			r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-		} else {
-			r.Config.Timeout = types.NumberNull()
-		}
-		r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
-		r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		if resp.ConsumerGroup == nil {
-			r.ConsumerGroup = nil
-		} else {
-			r.ConsumerGroup = &tfTypes.ACLConsumer{}
-			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -221,12 +251,12 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.T
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			r.Ordering = &tfTypes.Ordering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.ACLPluginAfter{}
-				r.Ordering.After.Access = []types.String{}
+				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
 				}
@@ -234,30 +264,49 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.T
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
-				r.Ordering.Before.Access = []types.String{}
+				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Protocols = []types.String{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.Partials{}
+			if len(r.Partials) > len(resp.Partials) {
+				r.Partials = r.Partials[:len(resp.Partials)]
+			}
+			for partialsCount, partialsItem := range resp.Partials {
+				var partials1 tfTypes.Partials
+				partials1.ID = types.StringPointerValue(partialsItem.ID)
+				partials1.Name = types.StringPointerValue(partialsItem.Name)
+				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				if partialsCount+1 > len(r.Partials) {
+					r.Partials = append(r.Partials, partials1)
+				} else {
+					r.Partials[partialsCount].ID = partials1.ID
+					r.Partials[partialsCount].Name = partials1.Name
+					r.Partials[partialsCount].Path = partials1.Path
+				}
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
 			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
 		}
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLConsumer{}
+			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLConsumer{}
+			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

@@ -9,8 +9,8 @@ import (
 
 type UpdateDegraphqlPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	DegraphqlPlugin *shared.DegraphqlPluginInput `request:"mediaType=application/json"`
+	PluginID        string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	DegraphqlPlugin shared.DegraphqlPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateDegraphqlPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateDegraphqlPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateDegraphqlPluginRequest) GetDegraphqlPlugin() *shared.DegraphqlPluginInput {
+func (o *UpdateDegraphqlPluginRequest) GetDegraphqlPlugin() shared.DegraphqlPlugin {
 	if o == nil {
-		return nil
+		return shared.DegraphqlPlugin{}
 	}
 	return o.DegraphqlPlugin
 }

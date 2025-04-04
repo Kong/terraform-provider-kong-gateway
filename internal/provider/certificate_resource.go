@@ -59,6 +59,7 @@ func (r *CertificateResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -87,6 +88,7 @@ func (r *CertificateResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -131,7 +133,7 @@ func (r *CertificateResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	request := *data.ToSharedCertificateInput()
+	request := *data.ToSharedCertificate()
 	res, err := r.client.Certificates.CreateCertificate(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -230,7 +232,7 @@ func (r *CertificateResource) Update(ctx context.Context, req resource.UpdateReq
 	var certificateID string
 	certificateID = data.ID.ValueString()
 
-	certificate := *data.ToSharedCertificateInput()
+	certificate := *data.ToSharedCertificate()
 	request := operations.UpsertCertificateRequest{
 		CertificateID: certificateID,
 		Certificate:   certificate,

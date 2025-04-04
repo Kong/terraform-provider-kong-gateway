@@ -25,8 +25,8 @@ type KongGatewayProvider struct {
 
 // KongGatewayProviderModel describes the provider data model.
 type KongGatewayProviderModel struct {
-	ServerURL  types.String `tfsdk:"server_url"`
 	AdminToken types.String `tfsdk:"admin_token"`
+	ServerURL  types.String `tfsdk:"server_url"`
 }
 
 func (p *KongGatewayProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -36,21 +36,20 @@ func (p *KongGatewayProvider) Metadata(ctx context.Context, req provider.Metadat
 
 func (p *KongGatewayProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Kong Gateway Admin API: OpenAPI 3.0 spec for Kong Gateway's Admin API.` + "\n" +
-			`` + "\n" +
-			`You can lean more about Kong Gateway at [docs.konghq.com](https://docs.konghq.com)` + "\n" +
-			`.Give Kong a star at [Kong/kong](https://github.com/kong/kong) repository.`,
 		Attributes: map[string]schema.Attribute{
-			"server_url": schema.StringAttribute{
-				MarkdownDescription: "Server URL (defaults to {protocol}://{hostname}:{port}{path})",
-				Optional:            true,
-				Required:            false,
-			},
 			"admin_token": schema.StringAttribute{
-				Sensitive: true,
 				Optional:  true,
+				Sensitive: true,
+			},
+			"server_url": schema.StringAttribute{
+				Description: `Server URL (defaults to {protocol}://{hostname}:{port}{path})`,
+				Optional:    true,
 			},
 		},
+		MarkdownDescription: `Kong Gateway Admin API: OpenAPI 3.0 spec for Kong Gateway's Admin API.` + "\n" +
+			`` + "\n" +
+			`You can lean more about Kong Gateway at [developer.konghq.com](https://developer.konghq.com)` + "\n" +
+			`.Give Kong a star at [Kong/kong](https://github.com/kong/kong) repository.`,
 	}
 }
 
@@ -79,8 +78,13 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		AdminToken: adminToken,
 	}
 
+	providerHTTPTransportOpts := ProviderHTTPTransportOpts{
+		SetHeaders: make(map[string]string),
+		Transport:  http.DefaultTransport,
+	}
+
 	httpClient := http.DefaultClient
-	httpClient.Transport = NewLoggingHTTPTransport(http.DefaultTransport)
+	httpClient.Transport = NewProviderHTTPTransport(providerHTTPTransportOpts)
 
 	opts := []sdk.SDKOption{
 		sdk.WithServerURL(ServerURL),
@@ -108,22 +112,31 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewKeyAuthResource,
 		NewKeySetResource,
 		NewMTLSAuthResource,
+		NewOidcJwkResource,
+		NewPartialResource,
 		NewPluginACLResource,
 		NewPluginAcmeResource,
+		NewPluginAiAzureContentSafetyResource,
 		NewPluginAiPromptDecoratorResource,
 		NewPluginAiPromptGuardResource,
 		NewPluginAiPromptTemplateResource,
 		NewPluginAiProxyResource,
+		NewPluginAiProxyAdvancedResource,
+		NewPluginAiRateLimitingAdvancedResource,
 		NewPluginAiRequestTransformerResource,
 		NewPluginAiResponseTransformerResource,
+		NewPluginAiSemanticCacheResource,
+		NewPluginAiSemanticPromptGuardResource,
 		NewPluginAwsLambdaResource,
 		NewPluginAzureFunctionsResource,
 		NewPluginBasicAuthResource,
 		NewPluginBotDetectionResource,
 		NewPluginCanaryResource,
+		NewPluginConfluentResource,
 		NewPluginCorrelationIDResource,
 		NewPluginCorsResource,
 		NewPluginDatadogResource,
+		NewPluginDatadogTracingResource,
 		NewPluginDegraphqlResource,
 		NewPluginExitTransformerResource,
 		NewPluginFileLogResource,
@@ -132,10 +145,13 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginGraphqlRateLimitingAdvancedResource,
 		NewPluginGrpcGatewayResource,
 		NewPluginGrpcWebResource,
+		NewPluginHeaderCertAuthResource,
 		NewPluginHmacAuthResource,
 		NewPluginHTTPLogResource,
+		NewPluginInjectionProtectionResource,
 		NewPluginIPRestrictionResource,
 		NewPluginJqResource,
+		NewPluginJSONThreatProtectionResource,
 		NewPluginJweDecryptResource,
 		NewPluginJwtResource,
 		NewPluginJwtSignerResource,
@@ -143,7 +159,6 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginKafkaUpstreamResource,
 		NewPluginKeyAuthResource,
 		NewPluginKeyAuthEncResource,
-		NewPluginKonnectApplicationAuthResource,
 		NewPluginLdapAuthResource,
 		NewPluginLdapAuthAdvancedResource,
 		NewPluginLogglyResource,
@@ -162,6 +177,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginProxyCacheAdvancedResource,
 		NewPluginRateLimitingResource,
 		NewPluginRateLimitingAdvancedResource,
+		NewPluginRedirectResource,
 		NewPluginRequestSizeLimitingResource,
 		NewPluginRequestTerminationResource,
 		NewPluginRequestTransformerResource,
@@ -173,7 +189,9 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginRouteByHeaderResource,
 		NewPluginRouteTransformerAdvancedResource,
 		NewPluginSamlResource,
+		NewPluginServiceProtectionResource,
 		NewPluginSessionResource,
+		NewPluginStandardWebhooksResource,
 		NewPluginStatsdResource,
 		NewPluginStatsdAdvancedResource,
 		NewPluginSyslogResource,
@@ -181,6 +199,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginTLSHandshakeModifierResource,
 		NewPluginTLSMetadataHeadersResource,
 		NewPluginUDPLogResource,
+		NewPluginUpstreamOauthResource,
 		NewPluginUpstreamTimeoutResource,
 		NewPluginVaultAuthResource,
 		NewPluginWebsocketSizeLimitResource,
@@ -188,8 +207,10 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginXMLThreatProtectionResource,
 		NewPluginZipkinResource,
 		NewRouteResource,
+		NewRouteExpressionResource,
 		NewServiceResource,
 		NewSniResource,
+		NewTargetResource,
 		NewUpstreamResource,
 		NewVaultResource,
 	}
@@ -209,22 +230,31 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewKeyAuthDataSource,
 		NewKeySetDataSource,
 		NewMTLSAuthDataSource,
+		NewOidcJwkDataSource,
+		NewPartialDataSource,
 		NewPluginACLDataSource,
 		NewPluginAcmeDataSource,
+		NewPluginAiAzureContentSafetyDataSource,
 		NewPluginAiPromptDecoratorDataSource,
 		NewPluginAiPromptGuardDataSource,
 		NewPluginAiPromptTemplateDataSource,
 		NewPluginAiProxyDataSource,
+		NewPluginAiProxyAdvancedDataSource,
+		NewPluginAiRateLimitingAdvancedDataSource,
 		NewPluginAiRequestTransformerDataSource,
 		NewPluginAiResponseTransformerDataSource,
+		NewPluginAiSemanticCacheDataSource,
+		NewPluginAiSemanticPromptGuardDataSource,
 		NewPluginAwsLambdaDataSource,
 		NewPluginAzureFunctionsDataSource,
 		NewPluginBasicAuthDataSource,
 		NewPluginBotDetectionDataSource,
 		NewPluginCanaryDataSource,
+		NewPluginConfluentDataSource,
 		NewPluginCorrelationIDDataSource,
 		NewPluginCorsDataSource,
 		NewPluginDatadogDataSource,
+		NewPluginDatadogTracingDataSource,
 		NewPluginDegraphqlDataSource,
 		NewPluginExitTransformerDataSource,
 		NewPluginFileLogDataSource,
@@ -233,10 +263,13 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginGraphqlRateLimitingAdvancedDataSource,
 		NewPluginGrpcGatewayDataSource,
 		NewPluginGrpcWebDataSource,
+		NewPluginHeaderCertAuthDataSource,
 		NewPluginHmacAuthDataSource,
 		NewPluginHTTPLogDataSource,
+		NewPluginInjectionProtectionDataSource,
 		NewPluginIPRestrictionDataSource,
 		NewPluginJqDataSource,
+		NewPluginJSONThreatProtectionDataSource,
 		NewPluginJweDecryptDataSource,
 		NewPluginJwtDataSource,
 		NewPluginJwtSignerDataSource,
@@ -244,7 +277,6 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginKafkaUpstreamDataSource,
 		NewPluginKeyAuthDataSource,
 		NewPluginKeyAuthEncDataSource,
-		NewPluginKonnectApplicationAuthDataSource,
 		NewPluginLdapAuthDataSource,
 		NewPluginLdapAuthAdvancedDataSource,
 		NewPluginLogglyDataSource,
@@ -263,6 +295,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginProxyCacheAdvancedDataSource,
 		NewPluginRateLimitingDataSource,
 		NewPluginRateLimitingAdvancedDataSource,
+		NewPluginRedirectDataSource,
 		NewPluginRequestSizeLimitingDataSource,
 		NewPluginRequestTerminationDataSource,
 		NewPluginRequestTransformerDataSource,
@@ -274,7 +307,9 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginRouteByHeaderDataSource,
 		NewPluginRouteTransformerAdvancedDataSource,
 		NewPluginSamlDataSource,
+		NewPluginServiceProtectionDataSource,
 		NewPluginSessionDataSource,
+		NewPluginStandardWebhooksDataSource,
 		NewPluginStatsdDataSource,
 		NewPluginStatsdAdvancedDataSource,
 		NewPluginSyslogDataSource,
@@ -282,6 +317,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginTLSHandshakeModifierDataSource,
 		NewPluginTLSMetadataHeadersDataSource,
 		NewPluginUDPLogDataSource,
+		NewPluginUpstreamOauthDataSource,
 		NewPluginUpstreamTimeoutDataSource,
 		NewPluginVaultAuthDataSource,
 		NewPluginWebsocketSizeLimitDataSource,
@@ -289,8 +325,10 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginXMLThreatProtectionDataSource,
 		NewPluginZipkinDataSource,
 		NewRouteDataSource,
+		NewRouteExpressionDataSource,
 		NewServiceDataSource,
 		NewSniDataSource,
+		NewTargetDataSource,
 		NewUpstreamDataSource,
 		NewVaultDataSource,
 	}

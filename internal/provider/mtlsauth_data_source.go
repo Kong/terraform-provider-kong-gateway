@@ -29,12 +29,13 @@ type MTLSAuthDataSource struct {
 
 // MTLSAuthDataSourceModel describes the data model.
 type MTLSAuthDataSourceModel struct {
-	CaCertificate *tfTypes.ACLConsumer `tfsdk:"ca_certificate"`
-	Consumer      *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt     types.Int64          `tfsdk:"created_at"`
-	ID            types.String         `tfsdk:"id"`
-	SubjectName   types.String         `tfsdk:"subject_name"`
-	Tags          []types.String       `tfsdk:"tags"`
+	CaCertificate *tfTypes.ACLWithoutParentsConsumer `tfsdk:"ca_certificate"`
+	Consumer      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID    types.String                       `tfsdk:"consumer_id"`
+	CreatedAt     types.Int64                        `tfsdk:"created_at"`
+	ID            types.String                       `tfsdk:"id"`
+	SubjectName   types.String                       `tfsdk:"subject_name"`
+	Tags          []types.String                     `tfsdk:"tags"`
 }
 
 // Metadata returns the data source type name.
@@ -63,6 +64,10 @@ func (r *MTLSAuthDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -120,13 +125,17 @@ func (r *MTLSAuthDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var mtlsAuthID string
 	mtlsAuthID = data.ID.ValueString()
 
-	request := operations.GetMtlsAuthRequest{
+	request := operations.GetMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		MTLSAuthID: mtlsAuthID,
 	}
-	res, err := r.client.MTLSAuthCredentials.GetMtlsAuth(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.GetMtlsAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

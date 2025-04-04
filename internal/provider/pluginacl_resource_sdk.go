@@ -8,63 +8,12 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginACLResourceModel) ToSharedACLPluginInput() *shared.ACLPluginInput {
-	var allow []string = []string{}
-	for _, allowItem := range r.Config.Allow {
-		allow = append(allow, allowItem.ValueString())
-	}
-	alwaysUseAuthenticatedGroups := new(bool)
-	if !r.Config.AlwaysUseAuthenticatedGroups.IsUnknown() && !r.Config.AlwaysUseAuthenticatedGroups.IsNull() {
-		*alwaysUseAuthenticatedGroups = r.Config.AlwaysUseAuthenticatedGroups.ValueBool()
+func (r *PluginACLResourceModel) ToSharedACLPlugin() *shared.ACLPlugin {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
 	} else {
-		alwaysUseAuthenticatedGroups = nil
-	}
-	var deny []string = []string{}
-	for _, denyItem := range r.Config.Deny {
-		deny = append(deny, denyItem.ValueString())
-	}
-	hideGroupsHeader := new(bool)
-	if !r.Config.HideGroupsHeader.IsUnknown() && !r.Config.HideGroupsHeader.IsNull() {
-		*hideGroupsHeader = r.Config.HideGroupsHeader.ValueBool()
-	} else {
-		hideGroupsHeader = nil
-	}
-	includeConsumerGroups := new(bool)
-	if !r.Config.IncludeConsumerGroups.IsUnknown() && !r.Config.IncludeConsumerGroups.IsNull() {
-		*includeConsumerGroups = r.Config.IncludeConsumerGroups.ValueBool()
-	} else {
-		includeConsumerGroups = nil
-	}
-	config := shared.Config{
-		Allow:                        allow,
-		AlwaysUseAuthenticatedGroups: alwaysUseAuthenticatedGroups,
-		Deny:                         deny,
-		HideGroupsHeader:             hideGroupsHeader,
-		IncludeConsumerGroups:        includeConsumerGroups,
-	}
-	var consumer *shared.ACLPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.ACLPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.ACLPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.ACLPluginConsumerGroup{
-			ID: id1,
-		}
+		createdAt = nil
 	}
 	enabled := new(bool)
 	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
@@ -72,11 +21,11 @@ func (r *PluginACLResourceModel) ToSharedACLPluginInput() *shared.ACLPluginInput
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -84,105 +33,167 @@ func (r *PluginACLResourceModel) ToSharedACLPluginInput() *shared.ACLPluginInput
 	} else {
 		instanceName = nil
 	}
-	var ordering *shared.ACLPluginOrdering
+	var ordering *shared.Ordering
 	if r.Ordering != nil {
-		var after *shared.ACLPluginAfter
+		var after *shared.After
 		if r.Ordering.After != nil {
 			var access []string = []string{}
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
-			after = &shared.ACLPluginAfter{
+			after = &shared.After{
 				Access: access,
 			}
 		}
-		var before *shared.ACLPluginBefore
+		var before *shared.Before
 		if r.Ordering.Before != nil {
 			var access1 []string = []string{}
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
-			before = &shared.ACLPluginBefore{
+			before = &shared.Before{
 				Access: access1,
 			}
 		}
-		ordering = &shared.ACLPluginOrdering{
+		ordering = &shared.Ordering{
 			After:  after,
 			Before: before,
 		}
 	}
-	var protocols []shared.ACLPluginProtocols = []shared.ACLPluginProtocols{}
-	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.ACLPluginProtocols(protocolsItem.ValueString()))
-	}
-	var route *shared.ACLPluginRoute
-	if r.Route != nil {
-		id3 := new(string)
-		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id3 = r.Route.ID.ValueString()
+	var partials []shared.Partials = []shared.Partials{}
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
 		} else {
-			id3 = nil
+			id1 = nil
 		}
-		route = &shared.ACLPluginRoute{
-			ID: id3,
-		}
-	}
-	var service *shared.ACLPluginService
-	if r.Service != nil {
-		id4 := new(string)
-		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id4 = r.Service.ID.ValueString()
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
 		} else {
-			id4 = nil
+			name = nil
 		}
-		service = &shared.ACLPluginService{
-			ID: id4,
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
 		}
+		partials = append(partials, shared.Partials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	var tags []string = []string{}
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.ACLPluginInput{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
-		Enabled:       enabled,
-		ID:            id2,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Protocols:     protocols,
-		Route:         route,
-		Service:       service,
-		Tags:          tags,
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.Config
+	if r.Config != nil {
+		var allow []string = []string{}
+		for _, allowItem := range r.Config.Allow {
+			allow = append(allow, allowItem.ValueString())
+		}
+		alwaysUseAuthenticatedGroups := new(bool)
+		if !r.Config.AlwaysUseAuthenticatedGroups.IsUnknown() && !r.Config.AlwaysUseAuthenticatedGroups.IsNull() {
+			*alwaysUseAuthenticatedGroups = r.Config.AlwaysUseAuthenticatedGroups.ValueBool()
+		} else {
+			alwaysUseAuthenticatedGroups = nil
+		}
+		var deny []string = []string{}
+		for _, denyItem := range r.Config.Deny {
+			deny = append(deny, denyItem.ValueString())
+		}
+		hideGroupsHeader := new(bool)
+		if !r.Config.HideGroupsHeader.IsUnknown() && !r.Config.HideGroupsHeader.IsNull() {
+			*hideGroupsHeader = r.Config.HideGroupsHeader.ValueBool()
+		} else {
+			hideGroupsHeader = nil
+		}
+		includeConsumerGroups := new(bool)
+		if !r.Config.IncludeConsumerGroups.IsUnknown() && !r.Config.IncludeConsumerGroups.IsNull() {
+			*includeConsumerGroups = r.Config.IncludeConsumerGroups.ValueBool()
+		} else {
+			includeConsumerGroups = nil
+		}
+		config = &shared.Config{
+			Allow:                        allow,
+			AlwaysUseAuthenticatedGroups: alwaysUseAuthenticatedGroups,
+			Deny:                         deny,
+			HideGroupsHeader:             hideGroupsHeader,
+			IncludeConsumerGroups:        includeConsumerGroups,
+		}
+	}
+	var protocols []shared.Protocols = []shared.Protocols{}
+	for _, protocolsItem := range r.Protocols {
+		protocols = append(protocols, shared.Protocols(protocolsItem.ValueString()))
+	}
+	var route *shared.Route
+	if r.Route != nil {
+		id2 := new(string)
+		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
+			*id2 = r.Route.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		route = &shared.Route{
+			ID: id2,
+		}
+	}
+	var service *shared.ACLPluginService
+	if r.Service != nil {
+		id3 := new(string)
+		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
+			*id3 = r.Service.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		service = &shared.ACLPluginService{
+			ID: id3,
+		}
+	}
+	out := shared.ACLPlugin{
+		CreatedAt:    createdAt,
+		Enabled:      enabled,
+		ID:           id,
+		InstanceName: instanceName,
+		Ordering:     ordering,
+		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Protocols:    protocols,
+		Route:        route,
+		Service:      service,
 	}
 	return &out
 }
 
 func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(resp *shared.ACLPlugin) {
 	if resp != nil {
-		r.Config.Allow = []types.String{}
-		for _, v := range resp.Config.Allow {
-			r.Config.Allow = append(r.Config.Allow, types.StringValue(v))
-		}
-		r.Config.AlwaysUseAuthenticatedGroups = types.BoolPointerValue(resp.Config.AlwaysUseAuthenticatedGroups)
-		r.Config.Deny = []types.String{}
-		for _, v := range resp.Config.Deny {
-			r.Config.Deny = append(r.Config.Deny, types.StringValue(v))
-		}
-		r.Config.HideGroupsHeader = types.BoolPointerValue(resp.Config.HideGroupsHeader)
-		r.Config.IncludeConsumerGroups = types.BoolPointerValue(resp.Config.IncludeConsumerGroups)
-		if resp.Consumer == nil {
-			r.Consumer = nil
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		if resp.ConsumerGroup == nil {
-			r.ConsumerGroup = nil
-		} else {
-			r.ConsumerGroup = &tfTypes.ACLConsumer{}
-			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
+			r.Config = &tfTypes.Config{}
+			r.Config.Allow = make([]types.String, 0, len(resp.Config.Allow))
+			for _, v := range resp.Config.Allow {
+				r.Config.Allow = append(r.Config.Allow, types.StringValue(v))
+			}
+			r.Config.AlwaysUseAuthenticatedGroups = types.BoolPointerValue(resp.Config.AlwaysUseAuthenticatedGroups)
+			r.Config.Deny = make([]types.String, 0, len(resp.Config.Deny))
+			for _, v := range resp.Config.Deny {
+				r.Config.Deny = append(r.Config.Deny, types.StringValue(v))
+			}
+			r.Config.HideGroupsHeader = types.BoolPointerValue(resp.Config.HideGroupsHeader)
+			r.Config.IncludeConsumerGroups = types.BoolPointerValue(resp.Config.IncludeConsumerGroups)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -191,12 +202,12 @@ func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(resp *shared.ACLPlug
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			r.Ordering = &tfTypes.Ordering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.ACLPluginAfter{}
-				r.Ordering.After.Access = []types.String{}
+				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
 				}
@@ -204,30 +215,49 @@ func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(resp *shared.ACLPlug
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
-				r.Ordering.Before.Access = []types.String{}
+				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Protocols = []types.String{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.Partials{}
+			if len(r.Partials) > len(resp.Partials) {
+				r.Partials = r.Partials[:len(resp.Partials)]
+			}
+			for partialsCount, partialsItem := range resp.Partials {
+				var partials1 tfTypes.Partials
+				partials1.ID = types.StringPointerValue(partialsItem.ID)
+				partials1.Name = types.StringPointerValue(partialsItem.Name)
+				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				if partialsCount+1 > len(r.Partials) {
+					r.Partials = append(r.Partials, partials1)
+				} else {
+					r.Partials[partialsCount].ID = partials1.ID
+					r.Partials[partialsCount].Name = partials1.Name
+					r.Partials[partialsCount].Path = partials1.Path
+				}
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
 			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
 		}
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLConsumer{}
+			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLConsumer{}
+			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

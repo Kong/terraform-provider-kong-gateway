@@ -17,8 +17,10 @@ resource "kong-gateway_hmac_auth" "my_hmacauth" {
   consumer = {
     id = "...my_id..."
   }
-  id     = "...my_id..."
-  secret = "...my_secret..."
+  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  created_at  = 3
+  id          = "...my_id..."
+  secret      = "...my_secret..."
   tags = [
     "..."
   ]
@@ -31,17 +33,18 @@ resource "kong-gateway_hmac_auth" "my_hmacauth" {
 
 ### Required
 
+- `consumer_id` (String) Consumer ID for nested entities
 - `username` (String)
 
 ### Optional
 
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `secret` (String)
 - `tags` (List of String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--consumer"></a>
@@ -56,5 +59,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth ""
+terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"hmac_auth_id\": \"70e7b00b-72f2-471b-a5ce-9c4171775360\"}"
 ```

@@ -29,27 +29,27 @@ type RouteDataSource struct {
 
 // RouteDataSourceModel describes the data model.
 type RouteDataSourceModel struct {
-	CreatedAt               types.Int64             `tfsdk:"created_at"`
-	Destinations            []tfTypes.ClusterNodes  `tfsdk:"destinations"`
-	Headers                 map[string]types.String `tfsdk:"headers"`
-	Hosts                   []types.String          `tfsdk:"hosts"`
-	HTTPSRedirectStatusCode types.Int64             `tfsdk:"https_redirect_status_code"`
-	ID                      types.String            `tfsdk:"id"`
-	Methods                 []types.String          `tfsdk:"methods"`
-	Name                    types.String            `tfsdk:"name"`
-	PathHandling            types.String            `tfsdk:"path_handling"`
-	Paths                   []types.String          `tfsdk:"paths"`
-	PreserveHost            types.Bool              `tfsdk:"preserve_host"`
-	Protocols               []types.String          `tfsdk:"protocols"`
-	RegexPriority           types.Int64             `tfsdk:"regex_priority"`
-	RequestBuffering        types.Bool              `tfsdk:"request_buffering"`
-	ResponseBuffering       types.Bool              `tfsdk:"response_buffering"`
-	Service                 *tfTypes.ACLConsumer    `tfsdk:"service"`
-	Snis                    []types.String          `tfsdk:"snis"`
-	Sources                 []tfTypes.ClusterNodes  `tfsdk:"sources"`
-	StripPath               types.Bool              `tfsdk:"strip_path"`
-	Tags                    []types.String          `tfsdk:"tags"`
-	UpdatedAt               types.Int64             `tfsdk:"updated_at"`
+	CreatedAt               types.Int64                                 `tfsdk:"created_at"`
+	Destinations            []tfTypes.AiProxyAdvancedPluginClusterNodes `tfsdk:"destinations"`
+	Headers                 map[string][]types.String                   `tfsdk:"headers"`
+	Hosts                   []types.String                              `tfsdk:"hosts"`
+	HTTPSRedirectStatusCode types.Int64                                 `tfsdk:"https_redirect_status_code"`
+	ID                      types.String                                `tfsdk:"id"`
+	Methods                 []types.String                              `tfsdk:"methods"`
+	Name                    types.String                                `tfsdk:"name"`
+	PathHandling            types.String                                `tfsdk:"path_handling"`
+	Paths                   []types.String                              `tfsdk:"paths"`
+	PreserveHost            types.Bool                                  `tfsdk:"preserve_host"`
+	Protocols               []types.String                              `tfsdk:"protocols"`
+	RegexPriority           types.Int64                                 `tfsdk:"regex_priority"`
+	RequestBuffering        types.Bool                                  `tfsdk:"request_buffering"`
+	ResponseBuffering       types.Bool                                  `tfsdk:"response_buffering"`
+	Service                 *tfTypes.ACLWithoutParentsConsumer          `tfsdk:"service"`
+	Snis                    []types.String                              `tfsdk:"snis"`
+	Sources                 []tfTypes.AiProxyAdvancedPluginClusterNodes `tfsdk:"sources"`
+	StripPath               types.Bool                                  `tfsdk:"strip_path"`
+	Tags                    []types.String                              `tfsdk:"tags"`
+	UpdatedAt               types.Int64                                 `tfsdk:"updated_at"`
 }
 
 // Metadata returns the data source type name.
@@ -82,8 +82,10 @@ func (r *RouteDataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Description: `A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".`,
 			},
 			"headers": schema.MapAttribute{
-				Computed:    true,
-				ElementType: types.StringType,
+				Computed: true,
+				ElementType: types.ListType{
+					ElemType: types.StringType,
+				},
 				Description: `One or more lists of values indexed by header name that will cause this Route to match if present in the request. The ` + "`" + `Host` + "`" + ` header cannot be used with this attribute: hosts should be specified using the ` + "`" + `hosts` + "`" + ` attribute. When ` + "`" + `headers` + "`" + ` contains only one value and that value starts with the special prefix ` + "`" + `~*` + "`" + `, the value is interpreted as a regular expression.`,
 			},
 			"hosts": schema.ListAttribute{
@@ -246,11 +248,11 @@ func (r *RouteDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
-	if !(res.Route != nil) {
+	if !(res.RouteJSON != nil) {
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRoute(res.Route)
+	data.RefreshFromSharedRouteJSON(res.RouteJSON)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

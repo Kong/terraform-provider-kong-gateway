@@ -11,7 +11,7 @@ type UpsertSniRequest struct {
 	// ID or name of the SNI to lookup
 	SNIIDOrName string `pathParam:"style=simple,explode=false,name=SNIIdOrName"`
 	// Description of the SNI
-	Sni shared.SNIInput `request:"mediaType=application/json"`
+	Sni shared.Sni `request:"mediaType=application/json"`
 }
 
 func (o *UpsertSniRequest) GetSNIIDOrName() string {
@@ -21,9 +21,9 @@ func (o *UpsertSniRequest) GetSNIIDOrName() string {
 	return o.SNIIDOrName
 }
 
-func (o *UpsertSniRequest) GetSni() shared.SNIInput {
+func (o *UpsertSniRequest) GetSni() shared.Sni {
 	if o == nil {
-		return shared.SNIInput{}
+		return shared.Sni{}
 	}
 	return o.Sni
 }

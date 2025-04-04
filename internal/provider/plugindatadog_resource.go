@@ -35,19 +35,19 @@ type PluginDatadogResource struct {
 
 // PluginDatadogResourceModel describes the resource data model.
 type PluginDatadogResourceModel struct {
-	Config        tfTypes.DatadogPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer        `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer        `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                 `tfsdk:"created_at"`
-	Enabled       types.Bool                  `tfsdk:"enabled"`
-	ID            types.String                `tfsdk:"id"`
-	InstanceName  types.String                `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
-	Protocols     []types.String              `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer        `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer        `tfsdk:"service"`
-	Tags          []types.String              `tfsdk:"tags"`
-	UpdatedAt     types.Int64                 `tfsdk:"updated_at"`
+	Config       *tfTypes.DatadogPluginConfig       `tfsdk:"config"`
+	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
+	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
+	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
 }
 
 func (r *PluginDatadogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,7 +59,8 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "PluginDatadog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"consumer_tag": schema.StringAttribute{
 						Computed:    true,
@@ -120,17 +121,17 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 								"stat_type": schema.StringAttribute{
 									Computed:    true,
 									Optional:    true,
-									Description: `Determines what sort of event the metric represents. Not Null; must be one of ["counter", "gauge", "histogram", "meter", "set", "timer", "distribution"]`,
+									Description: `Determines what sort of event the metric represents. Not Null; must be one of ["counter", "distribution", "gauge", "histogram", "meter", "set", "timer"]`,
 									Validators: []validator.String{
 										speakeasy_stringvalidators.NotNull(),
 										stringvalidator.OneOf(
 											"counter",
+											"distribution",
 											"gauge",
 											"histogram",
 											"meter",
 											"set",
 											"timer",
-											"distribution",
 										),
 									},
 								},
@@ -245,18 +246,9 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 				},
 				Description: `If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.`,
 			},
-			"consumer_group": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -300,11 +292,34 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -315,7 +330,7 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,
@@ -336,6 +351,7 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -380,7 +396,7 @@ func (r *PluginDatadogResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := data.ToSharedDatadogPluginInput()
+	request := *data.ToSharedDatadogPlugin()
 	res, err := r.client.Plugins.CreateDatadogPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -479,7 +495,7 @@ func (r *PluginDatadogResource) Update(ctx context.Context, req resource.UpdateR
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	datadogPlugin := data.ToSharedDatadogPluginInput()
+	datadogPlugin := *data.ToSharedDatadogPlugin()
 	request := operations.UpdateDatadogPluginRequest{
 		PluginID:      pluginID,
 		DatadogPlugin: datadogPlugin,

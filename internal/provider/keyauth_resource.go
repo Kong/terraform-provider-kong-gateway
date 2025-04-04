@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,11 +32,12 @@ type KeyAuthResource struct {
 
 // KeyAuthResourceModel describes the resource data model.
 type KeyAuthResourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Key       types.String         `tfsdk:"key"`
-	Tags      []types.String       `tfsdk:"tags"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Key        types.String                       `tfsdk:"key"`
+	Tags       []types.String                     `tfsdk:"tags"`
 }
 
 func (r *KeyAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -55,8 +58,13 @@ func (r *KeyAuthResource) Schema(ctx context.Context, req resource.SchemaRequest
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -113,8 +121,15 @@ func (r *KeyAuthResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request := *data.ToSharedKeyAuthInput()
-	res, err := r.client.APIKeys.CreateKeyAuth(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	keyAuthWithoutParents := *data.ToSharedKeyAuthWithoutParents()
+	request := operations.CreateKeyAuthWithConsumerRequest{
+		ConsumerID:            consumerID,
+		KeyAuthWithoutParents: keyAuthWithoutParents,
+	}
+	res, err := r.client.APIKeys.CreateKeyAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -159,13 +174,17 @@ func (r *KeyAuthResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var keyAuthID string
 	keyAuthID = data.ID.ValueString()
 
-	request := operations.GetKeyAuthRequest{
-		KeyAuthID: keyAuthID,
+	request := operations.GetKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
 	}
-	res, err := r.client.APIKeys.GetKeyAuth(ctx, request)
+	res, err := r.client.APIKeys.GetKeyAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -209,15 +228,19 @@ func (r *KeyAuthResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var keyAuthID string
 	keyAuthID = data.ID.ValueString()
 
-	keyAuth := *data.ToSharedKeyAuthInput()
-	request := operations.UpsertKeyAuthRequest{
-		KeyAuthID: keyAuthID,
-		KeyAuth:   keyAuth,
+	keyAuth := *data.ToSharedKeyAuth()
+	request := operations.UpdateKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
+		KeyAuth:    keyAuth,
 	}
-	res, err := r.client.APIKeys.UpsertKeyAuth(ctx, request)
+	res, err := r.client.APIKeys.UpdateKeyAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -262,13 +285,17 @@ func (r *KeyAuthResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var keyAuthID string
 	keyAuthID = data.ID.ValueString()
 
-	request := operations.DeleteKeyAuthRequest{
-		KeyAuthID: keyAuthID,
+	request := operations.DeleteKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
 	}
-	res, err := r.client.APIKeys.DeleteKeyAuth(ctx, request)
+	res, err := r.client.APIKeys.DeleteKeyAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -288,5 +315,27 @@ func (r *KeyAuthResource) Delete(ctx context.Context, req resource.DeleteRequest
 }
 
 func (r *KeyAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ConsumerID string `json:"consumer_id"`
+		ID         string `json:"id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "key_auth_id": ""}': `+err.Error())
+		return
+	}
+
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '""`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+
 }

@@ -15,7 +15,7 @@ type CreateRouteResponse struct {
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
 	// Successfully created Route
-	Route *shared.Route
+	RouteJSON *shared.RouteJSON
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
@@ -41,11 +41,11 @@ func (o *CreateRouteResponse) GetRawResponse() *http.Response {
 	return o.RawResponse
 }
 
-func (o *CreateRouteResponse) GetRoute() *shared.Route {
+func (o *CreateRouteResponse) GetRouteJSON() *shared.RouteJSON {
 	if o == nil {
 		return nil
 	}
-	return o.Route
+	return o.RouteJSON
 }
 
 func (o *CreateRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {

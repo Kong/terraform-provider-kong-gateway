@@ -46,6 +46,7 @@ func (r *KeySetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -63,6 +64,7 @@ func (r *KeySetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -107,7 +109,7 @@ func (r *KeySetResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	request := *data.ToSharedKeySetInput()
+	request := *data.ToSharedKeySet()
 	res, err := r.client.KeySets.CreateKeySet(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -206,7 +208,7 @@ func (r *KeySetResource) Update(ctx context.Context, req resource.UpdateRequest,
 	var keySetIDOrName string
 	keySetIDOrName = data.ID.ValueString()
 
-	keySet := *data.ToSharedKeySetInput()
+	keySet := *data.ToSharedKeySet()
 	request := operations.UpsertKeySetRequest{
 		KeySetIDOrName: keySetIDOrName,
 		KeySet:         keySet,

@@ -8,14 +8,82 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type SamlPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *SamlPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type SamlPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *SamlPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type SamlPluginOrdering struct {
+	After  *SamlPluginAfter  `json:"after,omitempty"`
+	Before *SamlPluginBefore `json:"before,omitempty"`
+}
+
+func (o *SamlPluginOrdering) GetAfter() *SamlPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *SamlPluginOrdering) GetBefore() *SamlPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type SamlPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *SamlPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *SamlPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *SamlPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 // NameidFormat - The requested `NameId` format. Options available are: - `Unspecified` - `EmailAddress` - `Persistent` - `Transient`
 type NameidFormat string
 
 const (
-	NameidFormatUnspecified  NameidFormat = "Unspecified"
 	NameidFormatEmailAddress NameidFormat = "EmailAddress"
 	NameidFormatPersistent   NameidFormat = "Persistent"
 	NameidFormatTransient    NameidFormat = "Transient"
+	NameidFormatUnspecified  NameidFormat = "Unspecified"
 )
 
 func (e NameidFormat) ToPointer() *NameidFormat {
@@ -27,13 +95,13 @@ func (e *NameidFormat) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "Unspecified":
-		fallthrough
 	case "EmailAddress":
 		fallthrough
 	case "Persistent":
 		fallthrough
 	case "Transient":
+		fallthrough
+	case "Unspecified":
 		*e = NameidFormat(v)
 		return nil
 	default:
@@ -87,9 +155,9 @@ func (o *SamlPluginSentinelNodes) GetPort() *int64 {
 type SamlPluginSentinelRole string
 
 const (
+	SamlPluginSentinelRoleAny    SamlPluginSentinelRole = "any"
 	SamlPluginSentinelRoleMaster SamlPluginSentinelRole = "master"
 	SamlPluginSentinelRoleSlave  SamlPluginSentinelRole = "slave"
-	SamlPluginSentinelRoleAny    SamlPluginSentinelRole = "any"
 )
 
 func (e SamlPluginSentinelRole) ToPointer() *SamlPluginSentinelRole {
@@ -101,11 +169,11 @@ func (e *SamlPluginSentinelRole) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "any":
+		fallthrough
 	case "master":
 		fallthrough
 	case "slave":
-		fallthrough
-	case "any":
 		*e = SamlPluginSentinelRole(v)
 		return nil
 	default:
@@ -327,8 +395,8 @@ func (o *SamlPluginRedis) GetUsername() *string {
 type RequestDigestAlgorithm string
 
 const (
-	RequestDigestAlgorithmSha256 RequestDigestAlgorithm = "SHA256"
 	RequestDigestAlgorithmSha1   RequestDigestAlgorithm = "SHA1"
+	RequestDigestAlgorithmSha256 RequestDigestAlgorithm = "SHA256"
 )
 
 func (e RequestDigestAlgorithm) ToPointer() *RequestDigestAlgorithm {
@@ -340,9 +408,9 @@ func (e *RequestDigestAlgorithm) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "SHA256":
-		fallthrough
 	case "SHA1":
+		fallthrough
+	case "SHA256":
 		*e = RequestDigestAlgorithm(v)
 		return nil
 	default:
@@ -384,8 +452,8 @@ func (e *RequestSignatureAlgorithm) UnmarshalJSON(data []byte) error {
 type ResponseDigestAlgorithm string
 
 const (
-	ResponseDigestAlgorithmSha256 ResponseDigestAlgorithm = "SHA256"
 	ResponseDigestAlgorithmSha1   ResponseDigestAlgorithm = "SHA1"
+	ResponseDigestAlgorithmSha256 ResponseDigestAlgorithm = "SHA256"
 )
 
 func (e ResponseDigestAlgorithm) ToPointer() *ResponseDigestAlgorithm {
@@ -397,9 +465,9 @@ func (e *ResponseDigestAlgorithm) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "SHA256":
-		fallthrough
 	case "SHA1":
+		fallthrough
+	case "SHA256":
 		*e = ResponseDigestAlgorithm(v)
 		return nil
 	default:
@@ -441,10 +509,10 @@ func (e *ResponseSignatureAlgorithm) UnmarshalJSON(data []byte) error {
 type SamlPluginSessionCookieSameSite string
 
 const (
-	SamlPluginSessionCookieSameSiteStrict  SamlPluginSessionCookieSameSite = "Strict"
+	SamlPluginSessionCookieSameSiteDefault SamlPluginSessionCookieSameSite = "Default"
 	SamlPluginSessionCookieSameSiteLax     SamlPluginSessionCookieSameSite = "Lax"
 	SamlPluginSessionCookieSameSiteNone    SamlPluginSessionCookieSameSite = "None"
-	SamlPluginSessionCookieSameSiteDefault SamlPluginSessionCookieSameSite = "Default"
+	SamlPluginSessionCookieSameSiteStrict  SamlPluginSessionCookieSameSite = "Strict"
 )
 
 func (e SamlPluginSessionCookieSameSite) ToPointer() *SamlPluginSessionCookieSameSite {
@@ -456,13 +524,13 @@ func (e *SamlPluginSessionCookieSameSite) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "Strict":
+	case "Default":
 		fallthrough
 	case "Lax":
 		fallthrough
 	case "None":
 		fallthrough
-	case "Default":
+	case "Strict":
 		*e = SamlPluginSessionCookieSameSite(v)
 		return nil
 	default:
@@ -473,13 +541,13 @@ func (e *SamlPluginSessionCookieSameSite) UnmarshalJSON(data []byte) error {
 type SamlPluginSessionRequestHeaders string
 
 const (
-	SamlPluginSessionRequestHeadersID              SamlPluginSessionRequestHeaders = "id"
+	SamlPluginSessionRequestHeadersAbsoluteTimeout SamlPluginSessionRequestHeaders = "absolute-timeout"
 	SamlPluginSessionRequestHeadersAudience        SamlPluginSessionRequestHeaders = "audience"
-	SamlPluginSessionRequestHeadersSubject         SamlPluginSessionRequestHeaders = "subject"
-	SamlPluginSessionRequestHeadersTimeout         SamlPluginSessionRequestHeaders = "timeout"
+	SamlPluginSessionRequestHeadersID              SamlPluginSessionRequestHeaders = "id"
 	SamlPluginSessionRequestHeadersIdlingTimeout   SamlPluginSessionRequestHeaders = "idling-timeout"
 	SamlPluginSessionRequestHeadersRollingTimeout  SamlPluginSessionRequestHeaders = "rolling-timeout"
-	SamlPluginSessionRequestHeadersAbsoluteTimeout SamlPluginSessionRequestHeaders = "absolute-timeout"
+	SamlPluginSessionRequestHeadersSubject         SamlPluginSessionRequestHeaders = "subject"
+	SamlPluginSessionRequestHeadersTimeout         SamlPluginSessionRequestHeaders = "timeout"
 )
 
 func (e SamlPluginSessionRequestHeaders) ToPointer() *SamlPluginSessionRequestHeaders {
@@ -491,19 +559,19 @@ func (e *SamlPluginSessionRequestHeaders) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "id":
+	case "absolute-timeout":
 		fallthrough
 	case "audience":
 		fallthrough
-	case "subject":
-		fallthrough
-	case "timeout":
+	case "id":
 		fallthrough
 	case "idling-timeout":
 		fallthrough
 	case "rolling-timeout":
 		fallthrough
-	case "absolute-timeout":
+	case "subject":
+		fallthrough
+	case "timeout":
 		*e = SamlPluginSessionRequestHeaders(v)
 		return nil
 	default:
@@ -514,13 +582,13 @@ func (e *SamlPluginSessionRequestHeaders) UnmarshalJSON(data []byte) error {
 type SamlPluginSessionResponseHeaders string
 
 const (
-	SamlPluginSessionResponseHeadersID              SamlPluginSessionResponseHeaders = "id"
+	SamlPluginSessionResponseHeadersAbsoluteTimeout SamlPluginSessionResponseHeaders = "absolute-timeout"
 	SamlPluginSessionResponseHeadersAudience        SamlPluginSessionResponseHeaders = "audience"
-	SamlPluginSessionResponseHeadersSubject         SamlPluginSessionResponseHeaders = "subject"
-	SamlPluginSessionResponseHeadersTimeout         SamlPluginSessionResponseHeaders = "timeout"
+	SamlPluginSessionResponseHeadersID              SamlPluginSessionResponseHeaders = "id"
 	SamlPluginSessionResponseHeadersIdlingTimeout   SamlPluginSessionResponseHeaders = "idling-timeout"
 	SamlPluginSessionResponseHeadersRollingTimeout  SamlPluginSessionResponseHeaders = "rolling-timeout"
-	SamlPluginSessionResponseHeadersAbsoluteTimeout SamlPluginSessionResponseHeaders = "absolute-timeout"
+	SamlPluginSessionResponseHeadersSubject         SamlPluginSessionResponseHeaders = "subject"
+	SamlPluginSessionResponseHeadersTimeout         SamlPluginSessionResponseHeaders = "timeout"
 )
 
 func (e SamlPluginSessionResponseHeaders) ToPointer() *SamlPluginSessionResponseHeaders {
@@ -532,19 +600,19 @@ func (e *SamlPluginSessionResponseHeaders) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "id":
+	case "absolute-timeout":
 		fallthrough
 	case "audience":
 		fallthrough
-	case "subject":
-		fallthrough
-	case "timeout":
+	case "id":
 		fallthrough
 	case "idling-timeout":
 		fallthrough
 	case "rolling-timeout":
 		fallthrough
-	case "absolute-timeout":
+	case "subject":
+		fallthrough
+	case "timeout":
 		*e = SamlPluginSessionResponseHeaders(v)
 		return nil
 	default:
@@ -954,83 +1022,13 @@ func (o *SamlPluginConfig) GetValidateAssertionSignature() *bool {
 	return o.ValidateAssertionSignature
 }
 
-// SamlPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type SamlPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *SamlPluginConsumer) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type SamlPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *SamlPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type SamlPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *SamlPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type SamlPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *SamlPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type SamlPluginOrdering struct {
-	After  *SamlPluginAfter  `json:"after,omitempty"`
-	Before *SamlPluginBefore `json:"before,omitempty"`
-}
-
-func (o *SamlPluginOrdering) GetAfter() *SamlPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *SamlPluginOrdering) GetBefore() *SamlPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
 type SamlPluginProtocols string
 
 const (
-	SamlPluginProtocolsGrpc           SamlPluginProtocols = "grpc"
-	SamlPluginProtocolsGrpcs          SamlPluginProtocols = "grpcs"
-	SamlPluginProtocolsHTTP           SamlPluginProtocols = "http"
-	SamlPluginProtocolsHTTPS          SamlPluginProtocols = "https"
-	SamlPluginProtocolsTCP            SamlPluginProtocols = "tcp"
-	SamlPluginProtocolsTLS            SamlPluginProtocols = "tls"
-	SamlPluginProtocolsTLSPassthrough SamlPluginProtocols = "tls_passthrough"
-	SamlPluginProtocolsUDP            SamlPluginProtocols = "udp"
-	SamlPluginProtocolsWs             SamlPluginProtocols = "ws"
-	SamlPluginProtocolsWss            SamlPluginProtocols = "wss"
+	SamlPluginProtocolsGrpc  SamlPluginProtocols = "grpc"
+	SamlPluginProtocolsGrpcs SamlPluginProtocols = "grpcs"
+	SamlPluginProtocolsHTTP  SamlPluginProtocols = "http"
+	SamlPluginProtocolsHTTPS SamlPluginProtocols = "https"
 )
 
 func (e SamlPluginProtocols) ToPointer() *SamlPluginProtocols {
@@ -1049,18 +1047,6 @@ func (e *SamlPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
-		fallthrough
-	case "tcp":
-		fallthrough
-	case "tls":
-		fallthrough
-	case "tls_passthrough":
-		fallthrough
-	case "udp":
-		fallthrough
-	case "ws":
-		fallthrough
-	case "wss":
 		*e = SamlPluginProtocols(v)
 		return nil
 	default:
@@ -1068,7 +1054,7 @@ func (e *SamlPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// SamlPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// SamlPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type SamlPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -1094,28 +1080,26 @@ func (o *SamlPluginService) GetID() *string {
 
 // SamlPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SamlPlugin struct {
-	Config SamlPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *SamlPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *SamlPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool               `json:"enabled,omitempty"`
-	ID           *string             `json:"id,omitempty"`
-	InstanceName *string             `json:"instance_name,omitempty"`
-	name         string              `const:"saml" json:"name"`
-	Ordering     *SamlPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *SamlPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *SamlPluginService `json:"service,omitempty"`
+	Enabled      *bool                `json:"enabled,omitempty"`
+	ID           *string              `json:"id,omitempty"`
+	InstanceName *string              `json:"instance_name,omitempty"`
+	name         string               `const:"saml" json:"name"`
+	Ordering     *SamlPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []SamlPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64            `json:"updated_at,omitempty"`
+	Config    *SamlPluginConfig `json:"config,omitempty"`
+	// A set of strings representing HTTP protocols.
+	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *SamlPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *SamlPluginService `json:"service,omitempty"`
 }
 
 func (s SamlPlugin) MarshalJSON() ([]byte, error) {
@@ -1127,27 +1111,6 @@ func (s *SamlPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *SamlPlugin) GetConfig() SamlPluginConfig {
-	if o == nil {
-		return SamlPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *SamlPlugin) GetConsumer() *SamlPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *SamlPlugin) GetConsumerGroup() *SamlPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *SamlPlugin) GetCreatedAt() *int64 {
@@ -1189,6 +1152,34 @@ func (o *SamlPlugin) GetOrdering() *SamlPluginOrdering {
 	return o.Ordering
 }
 
+func (o *SamlPlugin) GetPartials() []SamlPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *SamlPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *SamlPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *SamlPlugin) GetConfig() *SamlPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
 func (o *SamlPlugin) GetProtocols() []SamlPluginProtocols {
 	if o == nil {
 		return nil
@@ -1208,132 +1199,4 @@ func (o *SamlPlugin) GetService() *SamlPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *SamlPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *SamlPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// SamlPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type SamlPluginInput struct {
-	Config SamlPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *SamlPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *SamlPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool               `json:"enabled,omitempty"`
-	ID           *string             `json:"id,omitempty"`
-	InstanceName *string             `json:"instance_name,omitempty"`
-	name         string              `const:"saml" json:"name"`
-	Ordering     *SamlPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []SamlPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *SamlPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *SamlPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (s SamlPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(s, "", false)
-}
-
-func (s *SamlPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *SamlPluginInput) GetConfig() SamlPluginConfig {
-	if o == nil {
-		return SamlPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *SamlPluginInput) GetConsumer() *SamlPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *SamlPluginInput) GetConsumerGroup() *SamlPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *SamlPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *SamlPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *SamlPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *SamlPluginInput) GetName() string {
-	return "saml"
-}
-
-func (o *SamlPluginInput) GetOrdering() *SamlPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *SamlPluginInput) GetProtocols() []SamlPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *SamlPluginInput) GetRoute() *SamlPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *SamlPluginInput) GetService() *SamlPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *SamlPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

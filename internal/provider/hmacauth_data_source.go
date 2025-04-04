@@ -29,12 +29,13 @@ type HMACAuthDataSource struct {
 
 // HMACAuthDataSourceModel describes the data model.
 type HMACAuthDataSourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Secret    types.String         `tfsdk:"secret"`
-	Tags      []types.String       `tfsdk:"tags"`
-	Username  types.String         `tfsdk:"username"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Secret     types.String                       `tfsdk:"secret"`
+	Tags       []types.String                     `tfsdk:"tags"`
+	Username   types.String                       `tfsdk:"username"`
 }
 
 // Metadata returns the data source type name.
@@ -55,6 +56,10 @@ func (r *HMACAuthDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -115,13 +120,17 @@ func (r *HMACAuthDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var hmacAuthID string
 	hmacAuthID = data.ID.ValueString()
 
-	request := operations.GetHmacAuthRequest{
+	request := operations.GetHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		HMACAuthID: hmacAuthID,
 	}
-	res, err := r.client.HMACAuthCredentials.GetHmacAuth(ctx, request)
+	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

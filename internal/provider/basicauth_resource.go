@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,12 +32,13 @@ type BasicAuthResource struct {
 
 // BasicAuthResourceModel describes the resource data model.
 type BasicAuthResourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Password  types.String         `tfsdk:"password"`
-	Tags      []types.String       `tfsdk:"tags"`
-	Username  types.String         `tfsdk:"username"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Password   types.String                       `tfsdk:"password"`
+	Tags       []types.String                     `tfsdk:"tags"`
+	Username   types.String                       `tfsdk:"username"`
 }
 
 func (r *BasicAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -56,8 +59,13 @@ func (r *BasicAuthResource) Schema(ctx context.Context, req resource.SchemaReque
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -65,7 +73,8 @@ func (r *BasicAuthResource) Schema(ctx context.Context, req resource.SchemaReque
 				Optional: true,
 			},
 			"password": schema.StringAttribute{
-				Required: true,
+				Required:  true,
+				Sensitive: true,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
@@ -117,8 +126,15 @@ func (r *BasicAuthResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	request := *data.ToSharedBasicAuthInput()
-	res, err := r.client.BasicAuthCredentials.CreateBasicAuth(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	basicAuthWithoutParents := *data.ToSharedBasicAuthWithoutParents()
+	request := operations.CreateBasicAuthWithConsumerRequest{
+		ConsumerID:              consumerID,
+		BasicAuthWithoutParents: basicAuthWithoutParents,
+	}
+	res, err := r.client.BasicAuthCredentials.CreateBasicAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -163,13 +179,17 @@ func (r *BasicAuthResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var basicAuthID string
 	basicAuthID = data.ID.ValueString()
 
-	request := operations.GetBasicAuthRequest{
+	request := operations.GetBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
 		BasicAuthID: basicAuthID,
 	}
-	res, err := r.client.BasicAuthCredentials.GetBasicAuth(ctx, request)
+	res, err := r.client.BasicAuthCredentials.GetBasicAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -213,15 +233,19 @@ func (r *BasicAuthResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var basicAuthID string
 	basicAuthID = data.ID.ValueString()
 
-	basicAuth := *data.ToSharedBasicAuthInput()
-	request := operations.UpsertBasicAuthRequest{
+	basicAuth := *data.ToSharedBasicAuth()
+	request := operations.UpdateBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
 		BasicAuthID: basicAuthID,
 		BasicAuth:   basicAuth,
 	}
-	res, err := r.client.BasicAuthCredentials.UpsertBasicAuth(ctx, request)
+	res, err := r.client.BasicAuthCredentials.UpdateBasicAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -266,13 +290,17 @@ func (r *BasicAuthResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var basicAuthID string
 	basicAuthID = data.ID.ValueString()
 
-	request := operations.DeleteBasicAuthRequest{
+	request := operations.DeleteBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
 		BasicAuthID: basicAuthID,
 	}
-	res, err := r.client.BasicAuthCredentials.DeleteBasicAuth(ctx, request)
+	res, err := r.client.BasicAuthCredentials.DeleteBasicAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -292,5 +320,27 @@ func (r *BasicAuthResource) Delete(ctx context.Context, req resource.DeleteReque
 }
 
 func (r *BasicAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID         string `json:"id"`
+		ConsumerID string `json:"consumer_id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "basic_auth_id": "80db1b58-ca7c-4d21-b92a-64eb07725872",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"80db1b58-ca7c-4d21-b92a-64eb07725872"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+
 }

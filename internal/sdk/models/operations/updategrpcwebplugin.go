@@ -9,8 +9,8 @@ import (
 
 type UpdateGrpcwebPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	GrpcWebPlugin *shared.GrpcWebPluginInput `request:"mediaType=application/json"`
+	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	GrpcWebPlugin shared.GrpcWebPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateGrpcwebPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateGrpcwebPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateGrpcwebPluginRequest) GetGrpcWebPlugin() *shared.GrpcWebPluginInput {
+func (o *UpdateGrpcwebPluginRequest) GetGrpcWebPlugin() shared.GrpcWebPlugin {
 	if o == nil {
-		return nil
+		return shared.GrpcWebPlugin{}
 	}
 	return o.GrpcWebPlugin
 }

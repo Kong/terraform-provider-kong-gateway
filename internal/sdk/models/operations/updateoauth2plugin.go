@@ -9,8 +9,8 @@ import (
 
 type UpdateOauth2PluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
-	Oauth2Plugin *shared.Oauth2PluginInput `request:"mediaType=application/json"`
+	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	Oauth2Plugin shared.Oauth2Plugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOauth2PluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateOauth2PluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOauth2PluginRequest) GetOauth2Plugin() *shared.Oauth2PluginInput {
+func (o *UpdateOauth2PluginRequest) GetOauth2Plugin() shared.Oauth2Plugin {
 	if o == nil {
-		return nil
+		return shared.Oauth2Plugin{}
 	}
 	return o.Oauth2Plugin
 }

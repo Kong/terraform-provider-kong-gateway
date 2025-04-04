@@ -29,15 +29,16 @@ type KeyDataSource struct {
 
 // KeyDataSourceModel describes the data model.
 type KeyDataSourceModel struct {
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Jwk       types.String         `tfsdk:"jwk"`
-	Kid       types.String         `tfsdk:"kid"`
-	Name      types.String         `tfsdk:"name"`
-	Pem       *tfTypes.Pem         `tfsdk:"pem"`
-	Set       *tfTypes.ACLConsumer `tfsdk:"set"`
-	Tags      []types.String       `tfsdk:"tags"`
-	UpdatedAt types.Int64          `tfsdk:"updated_at"`
+	CreatedAt types.Int64                        `tfsdk:"created_at"`
+	ID        types.String                       `tfsdk:"id"`
+	Jwk       types.String                       `tfsdk:"jwk"`
+	Kid       types.String                       `tfsdk:"kid"`
+	Name      types.String                       `tfsdk:"name"`
+	Pem       *tfTypes.Pem                       `tfsdk:"pem"`
+	Set       *tfTypes.ACLWithoutParentsConsumer `tfsdk:"set"`
+	Tags      []types.String                     `tfsdk:"tags"`
+	UpdatedAt types.Int64                        `tfsdk:"updated_at"`
+	X5t       types.String                       `tfsdk:"x5t"`
 }
 
 // Metadata returns the data source type name.
@@ -99,6 +100,9 @@ func (r *KeyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"x5t": schema.StringAttribute{
+				Computed: true,
 			},
 		},
 	}

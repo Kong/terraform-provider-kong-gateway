@@ -11,7 +11,7 @@ type UpsertVaultRequest struct {
 	// ID or prefix of the Vault to lookup
 	VaultIDOrPrefix string `pathParam:"style=simple,explode=false,name=VaultIdOrPrefix"`
 	// Description of the Vault
-	Vault shared.VaultInput `request:"mediaType=application/json"`
+	Vault shared.Vault `request:"mediaType=application/json"`
 }
 
 func (o *UpsertVaultRequest) GetVaultIDOrPrefix() string {
@@ -21,9 +21,9 @@ func (o *UpsertVaultRequest) GetVaultIDOrPrefix() string {
 	return o.VaultIDOrPrefix
 }
 
-func (o *UpsertVaultRequest) GetVault() shared.VaultInput {
+func (o *UpsertVaultRequest) GetVault() shared.Vault {
 	if o == nil {
-		return shared.VaultInput{}
+		return shared.Vault{}
 	}
 	return o.Vault
 }

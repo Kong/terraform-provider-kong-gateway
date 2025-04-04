@@ -9,8 +9,8 @@ import (
 
 type UpdateJqPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID string                `pathParam:"style=simple,explode=false,name=PluginId"`
-	JqPlugin *shared.JqPluginInput `request:"mediaType=application/json"`
+	PluginID string          `pathParam:"style=simple,explode=false,name=PluginId"`
+	JqPlugin shared.JqPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateJqPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateJqPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateJqPluginRequest) GetJqPlugin() *shared.JqPluginInput {
+func (o *UpdateJqPluginRequest) GetJqPlugin() shared.JqPlugin {
 	if o == nil {
-		return nil
+		return shared.JqPlugin{}
 	}
 	return o.JqPlugin
 }

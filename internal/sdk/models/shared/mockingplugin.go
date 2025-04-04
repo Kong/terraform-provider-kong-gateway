@@ -8,6 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type MockingPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *MockingPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type MockingPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *MockingPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type MockingPluginOrdering struct {
+	After  *MockingPluginAfter  `json:"after,omitempty"`
+	Before *MockingPluginBefore `json:"before,omitempty"`
+}
+
+func (o *MockingPluginOrdering) GetAfter() *MockingPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *MockingPluginOrdering) GetBefore() *MockingPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type MockingPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *MockingPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *MockingPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *MockingPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type MockingPluginConfig struct {
 	// The contents of the specification file. You must use this option for hybrid or DB-less mode. You can include the full specification as part of the configuration. In Kong Manager, you can copy and paste the contents of the spec directly into the `Config.Api Specification` text field.
 	APISpecification *string `json:"api_specification,omitempty"`
@@ -113,71 +181,13 @@ func (o *MockingPluginConsumer) GetID() *string {
 	return o.ID
 }
 
-type MockingPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *MockingPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type MockingPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *MockingPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type MockingPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *MockingPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type MockingPluginOrdering struct {
-	After  *MockingPluginAfter  `json:"after,omitempty"`
-	Before *MockingPluginBefore `json:"before,omitempty"`
-}
-
-func (o *MockingPluginOrdering) GetAfter() *MockingPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *MockingPluginOrdering) GetBefore() *MockingPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
 type MockingPluginProtocols string
 
 const (
-	MockingPluginProtocolsGrpc           MockingPluginProtocols = "grpc"
-	MockingPluginProtocolsGrpcs          MockingPluginProtocols = "grpcs"
-	MockingPluginProtocolsHTTP           MockingPluginProtocols = "http"
-	MockingPluginProtocolsHTTPS          MockingPluginProtocols = "https"
-	MockingPluginProtocolsTCP            MockingPluginProtocols = "tcp"
-	MockingPluginProtocolsTLS            MockingPluginProtocols = "tls"
-	MockingPluginProtocolsTLSPassthrough MockingPluginProtocols = "tls_passthrough"
-	MockingPluginProtocolsUDP            MockingPluginProtocols = "udp"
-	MockingPluginProtocolsWs             MockingPluginProtocols = "ws"
-	MockingPluginProtocolsWss            MockingPluginProtocols = "wss"
+	MockingPluginProtocolsGrpc  MockingPluginProtocols = "grpc"
+	MockingPluginProtocolsGrpcs MockingPluginProtocols = "grpcs"
+	MockingPluginProtocolsHTTP  MockingPluginProtocols = "http"
+	MockingPluginProtocolsHTTPS MockingPluginProtocols = "https"
 )
 
 func (e MockingPluginProtocols) ToPointer() *MockingPluginProtocols {
@@ -196,18 +206,6 @@ func (e *MockingPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
-		fallthrough
-	case "tcp":
-		fallthrough
-	case "tls":
-		fallthrough
-	case "tls_passthrough":
-		fallthrough
-	case "udp":
-		fallthrough
-	case "ws":
-		fallthrough
-	case "wss":
 		*e = MockingPluginProtocols(v)
 		return nil
 	default:
@@ -215,7 +213,7 @@ func (e *MockingPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// MockingPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// MockingPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type MockingPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -241,28 +239,28 @@ func (o *MockingPluginService) GetID() *string {
 
 // MockingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type MockingPlugin struct {
-	Config MockingPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *MockingPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *MockingPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                  `json:"enabled,omitempty"`
-	ID           *string                `json:"id,omitempty"`
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"mocking" json:"name"`
-	Ordering     *MockingPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []MockingPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *MockingPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *MockingPluginService `json:"service,omitempty"`
+	Enabled      *bool                   `json:"enabled,omitempty"`
+	ID           *string                 `json:"id,omitempty"`
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"mocking" json:"name"`
+	Ordering     *MockingPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []MockingPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64               `json:"updated_at,omitempty"`
+	Config    *MockingPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *MockingPluginConsumer `json:"consumer,omitempty"`
+	// A set of strings representing HTTP protocols.
+	Protocols []MockingPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *MockingPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *MockingPluginService `json:"service,omitempty"`
 }
 
 func (m MockingPlugin) MarshalJSON() ([]byte, error) {
@@ -274,27 +272,6 @@ func (m *MockingPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *MockingPlugin) GetConfig() MockingPluginConfig {
-	if o == nil {
-		return MockingPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *MockingPlugin) GetConsumer() *MockingPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *MockingPlugin) GetConsumerGroup() *MockingPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *MockingPlugin) GetCreatedAt() *int64 {
@@ -336,6 +313,41 @@ func (o *MockingPlugin) GetOrdering() *MockingPluginOrdering {
 	return o.Ordering
 }
 
+func (o *MockingPlugin) GetPartials() []MockingPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *MockingPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *MockingPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *MockingPlugin) GetConfig() *MockingPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
+func (o *MockingPlugin) GetConsumer() *MockingPluginConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
+}
+
 func (o *MockingPlugin) GetProtocols() []MockingPluginProtocols {
 	if o == nil {
 		return nil
@@ -355,132 +367,4 @@ func (o *MockingPlugin) GetService() *MockingPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *MockingPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *MockingPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// MockingPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type MockingPluginInput struct {
-	Config MockingPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *MockingPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *MockingPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                  `json:"enabled,omitempty"`
-	ID           *string                `json:"id,omitempty"`
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"mocking" json:"name"`
-	Ordering     *MockingPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []MockingPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *MockingPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *MockingPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (m MockingPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(m, "", false)
-}
-
-func (m *MockingPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &m, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *MockingPluginInput) GetConfig() MockingPluginConfig {
-	if o == nil {
-		return MockingPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *MockingPluginInput) GetConsumer() *MockingPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *MockingPluginInput) GetConsumerGroup() *MockingPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *MockingPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *MockingPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *MockingPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *MockingPluginInput) GetName() string {
-	return "mocking"
-}
-
-func (o *MockingPluginInput) GetOrdering() *MockingPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *MockingPluginInput) GetProtocols() []MockingPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *MockingPluginInput) GetRoute() *MockingPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *MockingPluginInput) GetService() *MockingPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *MockingPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

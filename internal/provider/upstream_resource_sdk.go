@@ -9,7 +9,7 @@ import (
 	"math/big"
 )
 
-func (r *UpstreamResourceModel) ToSharedUpstreamInput() *shared.UpstreamInput {
+func (r *UpstreamResourceModel) ToSharedUpstream() *shared.Upstream {
 	algorithm := new(shared.UpstreamAlgorithm)
 	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
 		*algorithm = shared.UpstreamAlgorithm(r.Algorithm.ValueString())
@@ -27,6 +27,12 @@ func (r *UpstreamResourceModel) ToSharedUpstreamInput() *shared.UpstreamInput {
 		clientCertificate = &shared.UpstreamClientCertificate{
 			ID: id,
 		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	hashFallback := new(shared.HashFallback)
 	if !r.HashFallback.IsUnknown() && !r.HashFallback.IsNull() {
@@ -308,15 +314,22 @@ func (r *UpstreamResourceModel) ToSharedUpstreamInput() *shared.UpstreamInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	useSrvName := new(bool)
 	if !r.UseSrvName.IsUnknown() && !r.UseSrvName.IsNull() {
 		*useSrvName = r.UseSrvName.ValueBool()
 	} else {
 		useSrvName = nil
 	}
-	out := shared.UpstreamInput{
+	out := shared.Upstream{
 		Algorithm:              algorithm,
 		ClientCertificate:      clientCertificate,
+		CreatedAt:              createdAt,
 		HashFallback:           hashFallback,
 		HashFallbackHeader:     hashFallbackHeader,
 		HashFallbackQueryArg:   hashFallbackQueryArg,
@@ -333,6 +346,7 @@ func (r *UpstreamResourceModel) ToSharedUpstreamInput() *shared.UpstreamInput {
 		Name:                   name,
 		Slots:                  slots,
 		Tags:                   tags,
+		UpdatedAt:              updatedAt,
 		UseSrvName:             useSrvName,
 	}
 	return &out
@@ -348,7 +362,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 		if resp.ClientCertificate == nil {
 			r.ClientCertificate = nil
 		} else {
-			r.ClientCertificate = &tfTypes.ACLConsumer{}
+			r.ClientCertificate = &tfTypes.ACLWithoutParentsConsumer{}
 			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -380,7 +394,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 				r.Healthchecks.Active = &tfTypes.Active{}
 				r.Healthchecks.Active.Concurrency = types.Int64PointerValue(resp.Healthchecks.Active.Concurrency)
 				if len(resp.Healthchecks.Active.Headers) > 0 {
-					r.Healthchecks.Active.Headers = make(map[string]types.String)
+					r.Healthchecks.Active.Headers = make(map[string]types.String, len(resp.Healthchecks.Active.Headers))
 					for key, value := range resp.Healthchecks.Active.Headers {
 						r.Healthchecks.Active.Headers[key] = types.StringValue(value)
 					}
@@ -389,7 +403,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 					r.Healthchecks.Active.Healthy = nil
 				} else {
 					r.Healthchecks.Active.Healthy = &tfTypes.Healthy{}
-					r.Healthchecks.Active.Healthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Active.Healthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Active.Healthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Active.Healthy.HTTPStatuses {
 						r.Healthchecks.Active.Healthy.HTTPStatuses = append(r.Healthchecks.Active.Healthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -418,7 +432,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 				} else {
 					r.Healthchecks.Active.Unhealthy = &tfTypes.Unhealthy{}
 					r.Healthchecks.Active.Unhealthy.HTTPFailures = types.Int64PointerValue(resp.Healthchecks.Active.Unhealthy.HTTPFailures)
-					r.Healthchecks.Active.Unhealthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Active.Unhealthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Active.Unhealthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Active.Unhealthy.HTTPStatuses {
 						r.Healthchecks.Active.Unhealthy.HTTPStatuses = append(r.Healthchecks.Active.Unhealthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -439,7 +453,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 					r.Healthchecks.Passive.Healthy = nil
 				} else {
 					r.Healthchecks.Passive.Healthy = &tfTypes.UpstreamHealthy{}
-					r.Healthchecks.Passive.Healthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Passive.Healthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Passive.Healthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Passive.Healthy.HTTPStatuses {
 						r.Healthchecks.Passive.Healthy.HTTPStatuses = append(r.Healthchecks.Passive.Healthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -455,7 +469,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 				} else {
 					r.Healthchecks.Passive.Unhealthy = &tfTypes.UpstreamUnhealthy{}
 					r.Healthchecks.Passive.Unhealthy.HTTPFailures = types.Int64PointerValue(resp.Healthchecks.Passive.Unhealthy.HTTPFailures)
-					r.Healthchecks.Passive.Unhealthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Passive.Unhealthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Passive.Unhealthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Passive.Unhealthy.HTTPStatuses {
 						r.Healthchecks.Passive.Unhealthy.HTTPStatuses = append(r.Healthchecks.Passive.Unhealthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -473,7 +487,7 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(resp *shared.Upstream)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringValue(resp.Name)
 		r.Slots = types.Int64PointerValue(resp.Slots)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

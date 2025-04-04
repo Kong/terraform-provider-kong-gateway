@@ -9,8 +9,8 @@ import (
 
 type UpdateRoutebyheaderPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                           `pathParam:"style=simple,explode=false,name=PluginId"`
-	RouteByHeaderPlugin *shared.RouteByHeaderPluginInput `request:"mediaType=application/json"`
+	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	RouteByHeaderPlugin shared.RouteByHeaderPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRoutebyheaderPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRoutebyheaderPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRoutebyheaderPluginRequest) GetRouteByHeaderPlugin() *shared.RouteByHeaderPluginInput {
+func (o *UpdateRoutebyheaderPluginRequest) GetRouteByHeaderPlugin() shared.RouteByHeaderPlugin {
 	if o == nil {
-		return nil
+		return shared.RouteByHeaderPlugin{}
 	}
 	return o.RouteByHeaderPlugin
 }

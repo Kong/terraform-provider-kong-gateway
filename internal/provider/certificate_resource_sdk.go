@@ -7,7 +7,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *CertificateResourceModel) ToSharedCertificateInput() *shared.CertificateInput {
+func (r *CertificateResourceModel) ToSharedCertificate() *shared.Certificate {
 	var cert string
 	cert = r.Cert.ValueString()
 
@@ -16,6 +16,12 @@ func (r *CertificateResourceModel) ToSharedCertificateInput() *shared.Certificat
 		*certAlt = r.CertAlt.ValueString()
 	} else {
 		certAlt = nil
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
@@ -40,14 +46,22 @@ func (r *CertificateResourceModel) ToSharedCertificateInput() *shared.Certificat
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.CertificateInput{
-		Cert:    cert,
-		CertAlt: certAlt,
-		ID:      id,
-		Key:     key,
-		KeyAlt:  keyAlt,
-		Snis:    snis,
-		Tags:    tags,
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.Certificate{
+		Cert:      cert,
+		CertAlt:   certAlt,
+		CreatedAt: createdAt,
+		ID:        id,
+		Key:       key,
+		KeyAlt:    keyAlt,
+		Snis:      snis,
+		Tags:      tags,
+		UpdatedAt: updatedAt,
 	}
 	return &out
 }
@@ -60,11 +74,13 @@ func (r *CertificateResourceModel) RefreshFromSharedCertificate(resp *shared.Cer
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Key = types.StringValue(resp.Key)
 		r.KeyAlt = types.StringPointerValue(resp.KeyAlt)
-		r.Snis = []types.String{}
-		for _, v := range resp.Snis {
-			r.Snis = append(r.Snis, types.StringValue(v))
+		if resp.Snis != nil {
+			r.Snis = make([]types.String, 0, len(resp.Snis))
+			for _, v := range resp.Snis {
+				r.Snis = append(r.Snis, types.StringValue(v))
+			}
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

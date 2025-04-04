@@ -9,8 +9,8 @@ import (
 
 type UpdateAipromptdecoratorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                string                               `pathParam:"style=simple,explode=false,name=PluginId"`
-	AiPromptDecoratorPlugin *shared.AiPromptDecoratorPluginInput `request:"mediaType=application/json"`
+	PluginID                string                         `pathParam:"style=simple,explode=false,name=PluginId"`
+	AiPromptDecoratorPlugin shared.AiPromptDecoratorPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAipromptdecoratorPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateAipromptdecoratorPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAipromptdecoratorPluginRequest) GetAiPromptDecoratorPlugin() *shared.AiPromptDecoratorPluginInput {
+func (o *UpdateAipromptdecoratorPluginRequest) GetAiPromptDecoratorPlugin() shared.AiPromptDecoratorPlugin {
 	if o == nil {
-		return nil
+		return shared.AiPromptDecoratorPlugin{}
 	}
 	return o.AiPromptDecoratorPlugin
 }

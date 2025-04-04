@@ -17,8 +17,10 @@ resource "kong-gateway_basic_auth" "my_basicauth" {
   consumer = {
     id = "...my_id..."
   }
-  id       = "...my_id..."
-  password = "...my_password..."
+  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  created_at  = 7
+  id          = "...my_id..."
+  password    = "...my_password..."
   tags = [
     "..."
   ]
@@ -31,17 +33,18 @@ resource "kong-gateway_basic_auth" "my_basicauth" {
 
 ### Required
 
-- `password` (String)
+- `consumer_id` (String) Consumer ID for nested entities
+- `password` (String, Sensitive)
 - `username` (String)
 
 ### Optional
 
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--consumer"></a>
@@ -56,5 +59,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_basic_auth.my_kong-gateway_basic_auth ""
+terraform import kong-gateway_basic_auth.my_kong-gateway_basic_auth "{ \"basic_auth_id\": \"80db1b58-ca7c-4d21-b92a-64eb07725872\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
 ```

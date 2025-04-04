@@ -9,8 +9,8 @@ import (
 
 type UpdateZipkinPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
-	ZipkinPlugin *shared.ZipkinPluginInput `request:"mediaType=application/json"`
+	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	ZipkinPlugin shared.ZipkinPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateZipkinPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateZipkinPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateZipkinPluginRequest) GetZipkinPlugin() *shared.ZipkinPluginInput {
+func (o *UpdateZipkinPluginRequest) GetZipkinPlugin() shared.ZipkinPlugin {
 	if o == nil {
-		return nil
+		return shared.ZipkinPlugin{}
 	}
 	return o.ZipkinPlugin
 }

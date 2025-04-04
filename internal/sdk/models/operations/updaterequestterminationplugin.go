@@ -9,8 +9,8 @@ import (
 
 type UpdateRequestterminationPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                                `pathParam:"style=simple,explode=false,name=PluginId"`
-	RequestTerminationPlugin *shared.RequestTerminationPluginInput `request:"mediaType=application/json"`
+	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	RequestTerminationPlugin shared.RequestTerminationPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRequestterminationPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRequestterminationPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRequestterminationPluginRequest) GetRequestTerminationPlugin() *shared.RequestTerminationPluginInput {
+func (o *UpdateRequestterminationPluginRequest) GetRequestTerminationPlugin() shared.RequestTerminationPlugin {
 	if o == nil {
-		return nil
+		return shared.RequestTerminationPlugin{}
 	}
 	return o.RequestTerminationPlugin
 }

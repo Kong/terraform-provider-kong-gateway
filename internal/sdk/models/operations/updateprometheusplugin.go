@@ -9,8 +9,8 @@ import (
 
 type UpdatePrometheusPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID         string                        `pathParam:"style=simple,explode=false,name=PluginId"`
-	PrometheusPlugin *shared.PrometheusPluginInput `request:"mediaType=application/json"`
+	PluginID         string                  `pathParam:"style=simple,explode=false,name=PluginId"`
+	PrometheusPlugin shared.PrometheusPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdatePrometheusPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdatePrometheusPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdatePrometheusPluginRequest) GetPrometheusPlugin() *shared.PrometheusPluginInput {
+func (o *UpdatePrometheusPluginRequest) GetPrometheusPlugin() shared.PrometheusPlugin {
 	if o == nil {
-		return nil
+		return shared.PrometheusPlugin{}
 	}
 	return o.PrometheusPlugin
 }

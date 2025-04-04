@@ -32,25 +32,25 @@ type ServiceResource struct {
 
 // ServiceResourceModel describes the resource data model.
 type ServiceResourceModel struct {
-	CaCertificates    []types.String       `tfsdk:"ca_certificates"`
-	ClientCertificate *tfTypes.ACLConsumer `tfsdk:"client_certificate"`
-	ConnectTimeout    types.Int64          `tfsdk:"connect_timeout"`
-	CreatedAt         types.Int64          `tfsdk:"created_at"`
-	Enabled           types.Bool           `tfsdk:"enabled"`
-	Host              types.String         `tfsdk:"host"`
-	ID                types.String         `tfsdk:"id"`
-	Name              types.String         `tfsdk:"name"`
-	Path              types.String         `tfsdk:"path"`
-	Port              types.Int64          `tfsdk:"port"`
-	Protocol          types.String         `tfsdk:"protocol"`
-	ReadTimeout       types.Int64          `tfsdk:"read_timeout"`
-	Retries           types.Int64          `tfsdk:"retries"`
-	Tags              []types.String       `tfsdk:"tags"`
-	TLSVerify         types.Bool           `tfsdk:"tls_verify"`
-	TLSVerifyDepth    types.Int64          `tfsdk:"tls_verify_depth"`
-	UpdatedAt         types.Int64          `tfsdk:"updated_at"`
-	URL               types.String         `tfsdk:"url"`
-	WriteTimeout      types.Int64          `tfsdk:"write_timeout"`
+	CaCertificates    []types.String                     `tfsdk:"ca_certificates"`
+	ClientCertificate *tfTypes.ACLWithoutParentsConsumer `tfsdk:"client_certificate"`
+	ConnectTimeout    types.Int64                        `tfsdk:"connect_timeout"`
+	CreatedAt         types.Int64                        `tfsdk:"created_at"`
+	Enabled           types.Bool                         `tfsdk:"enabled"`
+	Host              types.String                       `tfsdk:"host"`
+	ID                types.String                       `tfsdk:"id"`
+	Name              types.String                       `tfsdk:"name"`
+	Path              types.String                       `tfsdk:"path"`
+	Port              types.Int64                        `tfsdk:"port"`
+	Protocol          types.String                       `tfsdk:"protocol"`
+	ReadTimeout       types.Int64                        `tfsdk:"read_timeout"`
+	Retries           types.Int64                        `tfsdk:"retries"`
+	Tags              []types.String                     `tfsdk:"tags"`
+	TLSVerify         types.Bool                         `tfsdk:"tls_verify"`
+	TLSVerifyDepth    types.Int64                        `tfsdk:"tls_verify_depth"`
+	UpdatedAt         types.Int64                        `tfsdk:"updated_at"`
+	URL               types.String                       `tfsdk:"url"`
+	WriteTimeout      types.Int64                        `tfsdk:"write_timeout"`
 }
 
 func (r *ServiceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -85,6 +85,7 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -111,11 +112,13 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Description: `The path to be used in requests to the upstream server.`,
 			},
 			"port": schema.Int64Attribute{
-				Required:    true,
+				Computed:    true,
+				Optional:    true,
 				Description: `The upstream server port.`,
 			},
 			"protocol": schema.StringAttribute{
-				Required:    true,
+				Computed:    true,
+				Optional:    true,
 				Description: `The protocol used to communicate with the upstream. must be one of ["grpc", "grpcs", "http", "https", "tcp", "tls", "tls_passthrough", "udp", "ws", "wss"]`,
 				Validators: []validator.String{
 					stringvalidator.OneOf(
@@ -160,6 +163,7 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 			"url": schema.StringAttribute{
@@ -213,7 +217,7 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request := *data.ToSharedServiceInput()
+	request := *data.ToSharedService()
 	res, err := r.client.Services.CreateService(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -234,7 +238,7 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res.Service)
+	data.RefreshFromSharedServiceOutput(res.Service)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 	var serviceIDOrName string
 	serviceIDOrName = data.ID.ValueString()
@@ -262,7 +266,7 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res1.Service)
+	data.RefreshFromSharedServiceOutput(res1.Service)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 
 	// Save updated data into Terraform state
@@ -317,7 +321,7 @@ func (r *ServiceResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res.Service)
+	data.RefreshFromSharedServiceOutput(res.Service)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -340,7 +344,7 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 	var serviceIDOrName string
 	serviceIDOrName = data.ID.ValueString()
 
-	service := *data.ToSharedServiceInput()
+	service := *data.ToSharedService()
 	request := operations.UpsertServiceRequest{
 		ServiceIDOrName: serviceIDOrName,
 		Service:         service,
@@ -365,7 +369,7 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res.Service)
+	data.RefreshFromSharedServiceOutput(res.Service)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 	var serviceIDOrName1 string
 	serviceIDOrName1 = data.ID.ValueString()
@@ -393,7 +397,7 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res1.Service)
+	data.RefreshFromSharedServiceOutput(res1.Service)
 	refreshPlan(ctx, plan, &data, resp.Diagnostics)
 
 	// Save updated data into Terraform state

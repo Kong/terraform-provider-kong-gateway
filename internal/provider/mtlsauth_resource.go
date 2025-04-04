@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,12 +32,13 @@ type MTLSAuthResource struct {
 
 // MTLSAuthResourceModel describes the resource data model.
 type MTLSAuthResourceModel struct {
-	CaCertificate *tfTypes.ACLConsumer `tfsdk:"ca_certificate"`
-	Consumer      *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt     types.Int64          `tfsdk:"created_at"`
-	ID            types.String         `tfsdk:"id"`
-	SubjectName   types.String         `tfsdk:"subject_name"`
-	Tags          []types.String       `tfsdk:"tags"`
+	CaCertificate *tfTypes.ACLWithoutParentsConsumer `tfsdk:"ca_certificate"`
+	Consumer      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID    types.String                       `tfsdk:"consumer_id"`
+	CreatedAt     types.Int64                        `tfsdk:"created_at"`
+	ID            types.String                       `tfsdk:"id"`
+	SubjectName   types.String                       `tfsdk:"subject_name"`
+	Tags          []types.String                     `tfsdk:"tags"`
 }
 
 func (r *MTLSAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -66,8 +69,13 @@ func (r *MTLSAuthResource) Schema(ctx context.Context, req resource.SchemaReques
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -124,8 +132,15 @@ func (r *MTLSAuthResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedMTLSAuthInput()
-	res, err := r.client.MTLSAuthCredentials.CreateMtlsAuth(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	mtlsAuthWithoutParents := *data.ToSharedMTLSAuthWithoutParents()
+	request := operations.CreateMtlsAuthWithConsumerRequest{
+		ConsumerID:             consumerID,
+		MTLSAuthWithoutParents: mtlsAuthWithoutParents,
+	}
+	res, err := r.client.MTLSAuthCredentials.CreateMtlsAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -170,13 +185,17 @@ func (r *MTLSAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var mtlsAuthID string
 	mtlsAuthID = data.ID.ValueString()
 
-	request := operations.GetMtlsAuthRequest{
+	request := operations.GetMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		MTLSAuthID: mtlsAuthID,
 	}
-	res, err := r.client.MTLSAuthCredentials.GetMtlsAuth(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.GetMtlsAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -220,15 +239,19 @@ func (r *MTLSAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var mtlsAuthID string
 	mtlsAuthID = data.ID.ValueString()
 
-	mtlsAuth := *data.ToSharedMTLSAuthInput()
-	request := operations.UpsertMtlsAuthRequest{
+	mtlsAuth := *data.ToSharedMTLSAuth()
+	request := operations.UpdateMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		MTLSAuthID: mtlsAuthID,
 		MTLSAuth:   mtlsAuth,
 	}
-	res, err := r.client.MTLSAuthCredentials.UpsertMtlsAuth(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.UpdateMtlsAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -273,13 +296,17 @@ func (r *MTLSAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var mtlsAuthID string
 	mtlsAuthID = data.ID.ValueString()
 
-	request := operations.DeleteMtlsAuthRequest{
+	request := operations.DeleteMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
 		MTLSAuthID: mtlsAuthID,
 	}
-	res, err := r.client.MTLSAuthCredentials.DeleteMtlsAuth(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.DeleteMtlsAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -299,5 +326,27 @@ func (r *MTLSAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *MTLSAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ConsumerID string `json:"consumer_id"`
+		ID         string `json:"id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "mtls_auth_id": ""}': `+err.Error())
+		return
+	}
+
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '""`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+
 }

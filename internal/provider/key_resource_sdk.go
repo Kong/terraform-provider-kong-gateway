@@ -8,7 +8,13 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeyResourceModel) ToSharedKeyInput() *shared.KeyInput {
+func (r *KeyResourceModel) ToSharedKey() *shared.Key {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
 	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
 		*id = r.ID.ValueString()
@@ -65,14 +71,29 @@ func (r *KeyResourceModel) ToSharedKeyInput() *shared.KeyInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.KeyInput{
-		ID:   id,
-		Jwk:  jwk,
-		Kid:  kid,
-		Name: name,
-		Pem:  pem,
-		Set:  set,
-		Tags: tags,
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	x5t := new(string)
+	if !r.X5t.IsUnknown() && !r.X5t.IsNull() {
+		*x5t = r.X5t.ValueString()
+	} else {
+		x5t = nil
+	}
+	out := shared.Key{
+		CreatedAt: createdAt,
+		ID:        id,
+		Jwk:       jwk,
+		Kid:       kid,
+		Name:      name,
+		Pem:       pem,
+		Set:       set,
+		Tags:      tags,
+		UpdatedAt: updatedAt,
+		X5t:       x5t,
 	}
 	return &out
 }
@@ -94,13 +115,14 @@ func (r *KeyResourceModel) RefreshFromSharedKey(resp *shared.Key) {
 		if resp.Set == nil {
 			r.Set = nil
 		} else {
-			r.Set = &tfTypes.ACLConsumer{}
+			r.Set = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Set.ID = types.StringPointerValue(resp.Set.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		r.X5t = types.StringPointerValue(resp.X5t)
 	}
 }

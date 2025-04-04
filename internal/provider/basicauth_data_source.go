@@ -29,12 +29,13 @@ type BasicAuthDataSource struct {
 
 // BasicAuthDataSourceModel describes the data model.
 type BasicAuthDataSourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Password  types.String         `tfsdk:"password"`
-	Tags      []types.String       `tfsdk:"tags"`
-	Username  types.String         `tfsdk:"username"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Password   types.String                       `tfsdk:"password"`
+	Tags       []types.String                     `tfsdk:"tags"`
+	Username   types.String                       `tfsdk:"username"`
 }
 
 // Metadata returns the data source type name.
@@ -55,6 +56,10 @@ func (r *BasicAuthDataSource) Schema(ctx context.Context, req datasource.SchemaR
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -115,13 +120,17 @@ func (r *BasicAuthDataSource) Read(ctx context.Context, req datasource.ReadReque
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var basicAuthID string
 	basicAuthID = data.ID.ValueString()
 
-	request := operations.GetBasicAuthRequest{
+	request := operations.GetBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
 		BasicAuthID: basicAuthID,
 	}
-	res, err := r.client.BasicAuthCredentials.GetBasicAuth(ctx, request)
+	res, err := r.client.BasicAuthCredentials.GetBasicAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

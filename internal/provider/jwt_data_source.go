@@ -29,14 +29,15 @@ type JwtDataSource struct {
 
 // JwtDataSourceModel describes the data model.
 type JwtDataSourceModel struct {
-	Algorithm    types.String         `tfsdk:"algorithm"`
-	Consumer     *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt    types.Int64          `tfsdk:"created_at"`
-	ID           types.String         `tfsdk:"id"`
-	Key          types.String         `tfsdk:"key"`
-	RsaPublicKey types.String         `tfsdk:"rsa_public_key"`
-	Secret       types.String         `tfsdk:"secret"`
-	Tags         []types.String       `tfsdk:"tags"`
+	Algorithm    types.String                       `tfsdk:"algorithm"`
+	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID   types.String                       `tfsdk:"consumer_id"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	ID           types.String                       `tfsdk:"id"`
+	Key          types.String                       `tfsdk:"key"`
+	RsaPublicKey types.String                       `tfsdk:"rsa_public_key"`
+	Secret       types.String                       `tfsdk:"secret"`
+	Tags         []types.String                     `tfsdk:"tags"`
 }
 
 // Metadata returns the data source type name.
@@ -60,6 +61,10 @@ func (r *JwtDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -123,13 +128,17 @@ func (r *JwtDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var jwtID string
 	jwtID = data.ID.ValueString()
 
-	request := operations.GetJwtRequest{
-		JWTID: jwtID,
+	request := operations.GetJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
 	}
-	res, err := r.client.JWTs.GetJwt(ctx, request)
+	res, err := r.client.JWTs.GetJwtWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

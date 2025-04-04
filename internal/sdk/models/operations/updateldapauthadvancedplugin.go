@@ -9,8 +9,8 @@ import (
 
 type UpdateLdapauthadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                              `pathParam:"style=simple,explode=false,name=PluginId"`
-	LdapAuthAdvancedPlugin *shared.LdapAuthAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID               string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	LdapAuthAdvancedPlugin shared.LdapAuthAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateLdapauthadvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateLdapauthadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateLdapauthadvancedPluginRequest) GetLdapAuthAdvancedPlugin() *shared.LdapAuthAdvancedPluginInput {
+func (o *UpdateLdapauthadvancedPluginRequest) GetLdapAuthAdvancedPlugin() shared.LdapAuthAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.LdapAuthAdvancedPlugin{}
 	}
 	return o.LdapAuthAdvancedPlugin
 }

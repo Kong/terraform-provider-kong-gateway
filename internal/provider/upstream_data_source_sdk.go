@@ -19,7 +19,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 		if resp.ClientCertificate == nil {
 			r.ClientCertificate = nil
 		} else {
-			r.ClientCertificate = &tfTypes.ACLConsumer{}
+			r.ClientCertificate = &tfTypes.ACLWithoutParentsConsumer{}
 			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -51,7 +51,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 				r.Healthchecks.Active = &tfTypes.Active{}
 				r.Healthchecks.Active.Concurrency = types.Int64PointerValue(resp.Healthchecks.Active.Concurrency)
 				if len(resp.Healthchecks.Active.Headers) > 0 {
-					r.Healthchecks.Active.Headers = make(map[string]types.String)
+					r.Healthchecks.Active.Headers = make(map[string]types.String, len(resp.Healthchecks.Active.Headers))
 					for key, value := range resp.Healthchecks.Active.Headers {
 						r.Healthchecks.Active.Headers[key] = types.StringValue(value)
 					}
@@ -60,7 +60,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 					r.Healthchecks.Active.Healthy = nil
 				} else {
 					r.Healthchecks.Active.Healthy = &tfTypes.Healthy{}
-					r.Healthchecks.Active.Healthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Active.Healthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Active.Healthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Active.Healthy.HTTPStatuses {
 						r.Healthchecks.Active.Healthy.HTTPStatuses = append(r.Healthchecks.Active.Healthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -89,7 +89,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 				} else {
 					r.Healthchecks.Active.Unhealthy = &tfTypes.Unhealthy{}
 					r.Healthchecks.Active.Unhealthy.HTTPFailures = types.Int64PointerValue(resp.Healthchecks.Active.Unhealthy.HTTPFailures)
-					r.Healthchecks.Active.Unhealthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Active.Unhealthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Active.Unhealthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Active.Unhealthy.HTTPStatuses {
 						r.Healthchecks.Active.Unhealthy.HTTPStatuses = append(r.Healthchecks.Active.Unhealthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -110,7 +110,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 					r.Healthchecks.Passive.Healthy = nil
 				} else {
 					r.Healthchecks.Passive.Healthy = &tfTypes.UpstreamHealthy{}
-					r.Healthchecks.Passive.Healthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Passive.Healthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Passive.Healthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Passive.Healthy.HTTPStatuses {
 						r.Healthchecks.Passive.Healthy.HTTPStatuses = append(r.Healthchecks.Passive.Healthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -126,7 +126,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 				} else {
 					r.Healthchecks.Passive.Unhealthy = &tfTypes.UpstreamUnhealthy{}
 					r.Healthchecks.Passive.Unhealthy.HTTPFailures = types.Int64PointerValue(resp.Healthchecks.Passive.Unhealthy.HTTPFailures)
-					r.Healthchecks.Passive.Unhealthy.HTTPStatuses = []types.Int64{}
+					r.Healthchecks.Passive.Unhealthy.HTTPStatuses = make([]types.Int64, 0, len(resp.Healthchecks.Passive.Unhealthy.HTTPStatuses))
 					for _, v := range resp.Healthchecks.Passive.Unhealthy.HTTPStatuses {
 						r.Healthchecks.Passive.Unhealthy.HTTPStatuses = append(r.Healthchecks.Passive.Unhealthy.HTTPStatuses, types.Int64Value(v))
 					}
@@ -144,7 +144,7 @@ func (r *UpstreamDataSourceModel) RefreshFromSharedUpstream(resp *shared.Upstrea
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringValue(resp.Name)
 		r.Slots = types.Int64PointerValue(resp.Slots)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

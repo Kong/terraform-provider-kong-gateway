@@ -9,8 +9,8 @@ import (
 
 type UpdateVaultauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	VaultAuthPlugin *shared.VaultAuthPluginInput `request:"mediaType=application/json"`
+	PluginID        string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	VaultAuthPlugin shared.VaultAuthPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateVaultauthPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateVaultauthPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateVaultauthPluginRequest) GetVaultAuthPlugin() *shared.VaultAuthPluginInput {
+func (o *UpdateVaultauthPluginRequest) GetVaultAuthPlugin() shared.VaultAuthPlugin {
 	if o == nil {
-		return nil
+		return shared.VaultAuthPlugin{}
 	}
 	return o.VaultAuthPlugin
 }

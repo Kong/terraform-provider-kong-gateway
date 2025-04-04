@@ -35,19 +35,18 @@ type PluginSamlResource struct {
 
 // PluginSamlResourceModel describes the resource data model.
 type PluginSamlResourceModel struct {
-	Config        tfTypes.SamlPluginConfig   `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                `tfsdk:"created_at"`
-	Enabled       types.Bool                 `tfsdk:"enabled"`
-	ID            types.String               `tfsdk:"id"`
-	InstanceName  types.String               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
-	Protocols     []types.String             `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
-	Tags          []types.String             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
+	Config       *tfTypes.SamlPluginConfig          `tfsdk:"config"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
+	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
+	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
 }
 
 func (r *PluginSamlResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,7 +58,8 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 		MarkdownDescription: "PluginSaml Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -89,13 +89,13 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"nameid_format": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The requested ` + "`" + `NameId` + "`" + ` format. Options available are: - ` + "`" + `Unspecified` + "`" + ` - ` + "`" + `EmailAddress` + "`" + ` - ` + "`" + `Persistent` + "`" + ` - ` + "`" + `Transient` + "`" + `. must be one of ["Unspecified", "EmailAddress", "Persistent", "Transient"]`,
+						Description: `The requested ` + "`" + `NameId` + "`" + ` format. Options available are: - ` + "`" + `Unspecified` + "`" + ` - ` + "`" + `EmailAddress` + "`" + ` - ` + "`" + `Persistent` + "`" + ` - ` + "`" + `Transient` + "`" + `. must be one of ["EmailAddress", "Persistent", "Transient", "Unspecified"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"Unspecified",
 								"EmailAddress",
 								"Persistent",
 								"Transient",
+								"Unspecified",
 							),
 						},
 					},
@@ -244,12 +244,12 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 							"sentinel_role": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `Sentinel role to use for Redis connections when the ` + "`" + `redis` + "`" + ` strategy is defined. Defining this value implies using Redis Sentinel. must be one of ["master", "slave", "any"]`,
+								Description: `Sentinel role to use for Redis connections when the ` + "`" + `redis` + "`" + ` strategy is defined. Defining this value implies using Redis Sentinel. must be one of ["any", "master", "slave"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
+										"any",
 										"master",
 										"slave",
-										"any",
 									),
 								},
 							},
@@ -288,11 +288,11 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"request_digest_algorithm": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The digest algorithm for Authn requests: - ` + "`" + `SHA256` + "`" + ` - ` + "`" + `SHA1` + "`" + `. must be one of ["SHA256", "SHA1"]`,
+						Description: `The digest algorithm for Authn requests: - ` + "`" + `SHA256` + "`" + ` - ` + "`" + `SHA1` + "`" + `. must be one of ["SHA1", "SHA256"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"SHA256",
 								"SHA1",
+								"SHA256",
 							),
 						},
 					},
@@ -321,11 +321,11 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"response_digest_algorithm": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The algorithm for verifying digest in SAML responses: - ` + "`" + `SHA256` + "`" + ` - ` + "`" + `SHA1` + "`" + `. must be one of ["SHA256", "SHA1"]`,
+						Description: `The algorithm for verifying digest in SAML responses: - ` + "`" + `SHA256` + "`" + ` - ` + "`" + `SHA1` + "`" + `. must be one of ["SHA1", "SHA256"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"SHA256",
 								"SHA1",
+								"SHA256",
 							),
 						},
 					},
@@ -379,13 +379,13 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"session_cookie_same_site": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Controls whether a cookie is sent with cross-origin requests, providing some protection against cross-site request forgery attacks. must be one of ["Strict", "Lax", "None", "Default"]`,
+						Description: `Controls whether a cookie is sent with cross-origin requests, providing some protection against cross-site request forgery attacks. must be one of ["Default", "Lax", "None", "Strict"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"Strict",
+								"Default",
 								"Lax",
 								"None",
-								"Default",
+								"Strict",
 							),
 						},
 					},
@@ -506,29 +506,9 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 				},
 			},
-			"consumer": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-				Description: `If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.`,
-			},
-			"consumer_group": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -572,11 +552,34 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing HTTP protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -587,7 +590,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Optional: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,
@@ -608,6 +611,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -652,7 +656,7 @@ func (r *PluginSamlResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request := data.ToSharedSamlPluginInput()
+	request := *data.ToSharedSamlPlugin()
 	res, err := r.client.Plugins.CreateSamlPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -751,7 +755,7 @@ func (r *PluginSamlResource) Update(ctx context.Context, req resource.UpdateRequ
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	samlPlugin := data.ToSharedSamlPluginInput()
+	samlPlugin := *data.ToSharedSamlPlugin()
 	request := operations.UpdateSamlPluginRequest{
 		PluginID:   pluginID,
 		SamlPlugin: samlPlugin,

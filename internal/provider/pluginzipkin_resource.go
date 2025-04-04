@@ -35,19 +35,19 @@ type PluginZipkinResource struct {
 
 // PluginZipkinResourceModel describes the resource data model.
 type PluginZipkinResourceModel struct {
-	Config        tfTypes.ZipkinPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                `tfsdk:"created_at"`
-	Enabled       types.Bool                 `tfsdk:"enabled"`
-	ID            types.String               `tfsdk:"id"`
-	InstanceName  types.String               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
-	Protocols     []types.String             `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
-	Tags          []types.String             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
+	Config       *tfTypes.ZipkinPluginConfig        `tfsdk:"config"`
+	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
+	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
+	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
 }
 
 func (r *PluginZipkinResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,7 +59,8 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginZipkin Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"connect_timeout": schema.Int64Attribute{
 						Computed:    true,
@@ -72,17 +73,17 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"default_header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["b3", "b3-single", "w3c", "jaeger", "ot", "aws", "datadog", "gcp"]`,
+						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
+								"aws",
 								"b3",
 								"b3-single",
-								"w3c",
-								"jaeger",
-								"ot",
-								"aws",
 								"datadog",
 								"gcp",
+								"jaeger",
+								"ot",
+								"w3c",
 							),
 						},
 					},
@@ -94,19 +95,19 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["preserve", "ignore", "b3", "b3-single", "w3c", "jaeger", "ot", "aws", "datadog", "gcp"]`,
+						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "jaeger", "ot", "preserve", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"preserve",
-								"ignore",
+								"aws",
 								"b3",
 								"b3-single",
-								"w3c",
-								"jaeger",
-								"ot",
-								"aws",
 								"datadog",
 								"gcp",
+								"ignore",
+								"jaeger",
+								"ot",
+								"preserve",
+								"w3c",
 							),
 						},
 					},
@@ -164,18 +165,18 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 							"default_format": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["w3c", "datadog", "b3", "gcp", "b3-single", "jaeger", "aws", "ot"]`,
+								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
 								Validators: []validator.String{
 									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
-										"w3c",
-										"datadog",
-										"b3",
-										"gcp",
-										"b3-single",
-										"jaeger",
 										"aws",
+										"b3",
+										"b3-single",
+										"datadog",
+										"gcp",
+										"jaeger",
 										"ot",
+										"w3c",
 									),
 								},
 							},
@@ -323,18 +324,9 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 				},
 				Description: `If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.`,
 			},
-			"consumer_group": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -378,11 +370,34 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -393,7 +408,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,
@@ -414,6 +429,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -458,7 +474,7 @@ func (r *PluginZipkinResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := data.ToSharedZipkinPluginInput()
+	request := *data.ToSharedZipkinPlugin()
 	res, err := r.client.Plugins.CreateZipkinPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -557,7 +573,7 @@ func (r *PluginZipkinResource) Update(ctx context.Context, req resource.UpdateRe
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	zipkinPlugin := data.ToSharedZipkinPluginInput()
+	zipkinPlugin := *data.ToSharedZipkinPlugin()
 	request := operations.UpdateZipkinPluginRequest{
 		PluginID:     pluginID,
 		ZipkinPlugin: zipkinPlugin,

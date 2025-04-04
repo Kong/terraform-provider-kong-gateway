@@ -29,11 +29,12 @@ type KeyAuthDataSource struct {
 
 // KeyAuthDataSourceModel describes the data model.
 type KeyAuthDataSourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Key       types.String         `tfsdk:"key"`
-	Tags      []types.String       `tfsdk:"tags"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	ID         types.String                       `tfsdk:"id"`
+	Key        types.String                       `tfsdk:"key"`
+	Tags       []types.String                     `tfsdk:"tags"`
 }
 
 // Metadata returns the data source type name.
@@ -54,6 +55,10 @@ func (r *KeyAuthDataSource) Schema(ctx context.Context, req datasource.SchemaReq
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -111,13 +116,17 @@ func (r *KeyAuthDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var keyAuthID string
 	keyAuthID = data.ID.ValueString()
 
-	request := operations.GetKeyAuthRequest{
-		KeyAuthID: keyAuthID,
+	request := operations.GetKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
 	}
-	res, err := r.client.APIKeys.GetKeyAuth(ctx, request)
+	res, err := r.client.APIKeys.GetKeyAuthWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

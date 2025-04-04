@@ -9,8 +9,8 @@ import (
 
 type UpdatePrefunctionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID          string                         `pathParam:"style=simple,explode=false,name=PluginId"`
-	PreFunctionPlugin *shared.PreFunctionPluginInput `request:"mediaType=application/json"`
+	PluginID          string                   `pathParam:"style=simple,explode=false,name=PluginId"`
+	PreFunctionPlugin shared.PreFunctionPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdatePrefunctionPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdatePrefunctionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdatePrefunctionPluginRequest) GetPreFunctionPlugin() *shared.PreFunctionPluginInput {
+func (o *UpdatePrefunctionPluginRequest) GetPreFunctionPlugin() shared.PreFunctionPlugin {
 	if o == nil {
-		return nil
+		return shared.PreFunctionPlugin{}
 	}
 	return o.PreFunctionPlugin
 }

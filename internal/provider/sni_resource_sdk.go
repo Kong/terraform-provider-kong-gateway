@@ -7,7 +7,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *SniResourceModel) ToSharedSNIInput() *shared.SNIInput {
+func (r *SniResourceModel) ToSharedSni() *shared.Sni {
 	id := new(string)
 	if !r.Certificate.ID.IsUnknown() && !r.Certificate.ID.IsNull() {
 		*id = r.Certificate.ID.ValueString()
@@ -16,6 +16,12 @@ func (r *SniResourceModel) ToSharedSNIInput() *shared.SNIInput {
 	}
 	certificate := shared.SNICertificate{
 		ID: id,
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
@@ -30,11 +36,19 @@ func (r *SniResourceModel) ToSharedSNIInput() *shared.SNIInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.SNIInput{
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.Sni{
 		Certificate: certificate,
+		CreatedAt:   createdAt,
 		ID:          id1,
 		Name:        name,
 		Tags:        tags,
+		UpdatedAt:   updatedAt,
 	}
 	return &out
 }
@@ -45,7 +59,7 @@ func (r *SniResourceModel) RefreshFromSharedSni(resp *shared.Sni) {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringValue(resp.Name)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

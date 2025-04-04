@@ -8,9 +8,15 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *VaultResourceModel) ToSharedVaultInput() *shared.VaultInput {
+func (r *VaultResourceModel) ToSharedVault() *shared.Vault {
 	var config interface{}
 	_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
 	description := new(string)
 	if !r.Description.IsUnknown() && !r.Description.IsNull() {
 		*description = r.Description.ValueString()
@@ -33,13 +39,21 @@ func (r *VaultResourceModel) ToSharedVaultInput() *shared.VaultInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.VaultInput{
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.Vault{
 		Config:      config,
+		CreatedAt:   createdAt,
 		Description: description,
 		ID:          id,
 		Name:        name,
 		Prefix:      prefix,
 		Tags:        tags,
+		UpdatedAt:   updatedAt,
 	}
 	return &out
 }
@@ -53,7 +67,7 @@ func (r *VaultResourceModel) RefreshFromSharedVault(resp *shared.Vault) {
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringValue(resp.Name)
 		r.Prefix = types.StringValue(resp.Prefix)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

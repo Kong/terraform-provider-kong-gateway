@@ -29,19 +29,19 @@ type PluginJqDataSource struct {
 
 // PluginJqDataSourceModel describes the data model.
 type PluginJqDataSourceModel struct {
-	Config        tfTypes.JqPluginConfig     `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                `tfsdk:"created_at"`
-	Enabled       types.Bool                 `tfsdk:"enabled"`
-	ID            types.String               `tfsdk:"id"`
-	InstanceName  types.String               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
-	Protocols     []types.String             `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
-	Tags          []types.String             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
+	Config       *tfTypes.JqPluginConfig            `tfsdk:"config"`
+	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
+	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
+	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
 }
 
 // Metadata returns the data source type name.
@@ -127,14 +127,6 @@ func (r *PluginJqDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 				},
 				Description: `If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.`,
 			},
-			"consumer_group": schema.SingleNestedAttribute{
-				Computed: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-					},
-				},
-			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
 				Description: `Unix epoch when the resource was created.`,
@@ -172,10 +164,26 @@ func (r *PluginJqDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing HTTP protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -184,7 +192,7 @@ func (r *PluginJqDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 						Computed: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,

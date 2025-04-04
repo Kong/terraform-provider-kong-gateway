@@ -9,8 +9,8 @@ import (
 
 type UpdateRequestvalidatorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                              `pathParam:"style=simple,explode=false,name=PluginId"`
-	RequestValidatorPlugin *shared.RequestValidatorPluginInput `request:"mediaType=application/json"`
+	PluginID               string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	RequestValidatorPlugin shared.RequestValidatorPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateRequestvalidatorPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateRequestvalidatorPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateRequestvalidatorPluginRequest) GetRequestValidatorPlugin() *shared.RequestValidatorPluginInput {
+func (o *UpdateRequestvalidatorPluginRequest) GetRequestValidatorPlugin() shared.RequestValidatorPlugin {
 	if o == nil {
-		return nil
+		return shared.RequestValidatorPlugin{}
 	}
 	return o.RequestValidatorPlugin
 }

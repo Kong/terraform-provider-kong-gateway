@@ -11,7 +11,7 @@ type UpsertConsumerRequest struct {
 	// ID or username of the Consumer to lookup
 	ConsumerIDOrUsername string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
 	// Description of the Consumer
-	Consumer shared.ConsumerInput `request:"mediaType=application/json"`
+	Consumer shared.Consumer `request:"mediaType=application/json"`
 }
 
 func (o *UpsertConsumerRequest) GetConsumerIDOrUsername() string {
@@ -21,9 +21,9 @@ func (o *UpsertConsumerRequest) GetConsumerIDOrUsername() string {
 	return o.ConsumerIDOrUsername
 }
 
-func (o *UpsertConsumerRequest) GetConsumer() shared.ConsumerInput {
+func (o *UpsertConsumerRequest) GetConsumer() shared.Consumer {
 	if o == nil {
-		return shared.ConsumerInput{}
+		return shared.Consumer{}
 	}
 	return o.Consumer
 }

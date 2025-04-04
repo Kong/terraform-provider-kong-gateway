@@ -58,6 +58,7 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"description": schema.StringAttribute{
@@ -85,6 +86,7 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -129,7 +131,7 @@ func (r *VaultResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	request := *data.ToSharedVaultInput()
+	request := *data.ToSharedVault()
 	res, err := r.client.Vaults.CreateVault(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -228,7 +230,7 @@ func (r *VaultResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	var vaultIDOrPrefix string
 	vaultIDOrPrefix = data.ID.ValueString()
 
-	vault := *data.ToSharedVaultInput()
+	vault := *data.ToSharedVault()
 	request := operations.UpsertVaultRequest{
 		VaultIDOrPrefix: vaultIDOrPrefix,
 		Vault:           vault,

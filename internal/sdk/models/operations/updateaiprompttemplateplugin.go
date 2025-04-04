@@ -9,8 +9,8 @@ import (
 
 type UpdateAiprompttemplatePluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                              `pathParam:"style=simple,explode=false,name=PluginId"`
-	AiPromptTemplatePlugin *shared.AiPromptTemplatePluginInput `request:"mediaType=application/json"`
+	PluginID               string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	AiPromptTemplatePlugin shared.AiPromptTemplatePlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAiprompttemplatePluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateAiprompttemplatePluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAiprompttemplatePluginRequest) GetAiPromptTemplatePlugin() *shared.AiPromptTemplatePluginInput {
+func (o *UpdateAiprompttemplatePluginRequest) GetAiPromptTemplatePlugin() shared.AiPromptTemplatePlugin {
 	if o == nil {
-		return nil
+		return shared.AiPromptTemplatePlugin{}
 	}
 	return o.AiPromptTemplatePlugin
 }

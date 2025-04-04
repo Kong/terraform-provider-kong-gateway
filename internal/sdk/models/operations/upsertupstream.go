@@ -11,7 +11,7 @@ type UpsertUpstreamRequest struct {
 	// ID or name of the Upstream to lookup
 	UpstreamIDOrName string `pathParam:"style=simple,explode=false,name=UpstreamIdOrName"`
 	// Description of the Upstream
-	Upstream shared.UpstreamInput `request:"mediaType=application/json"`
+	Upstream shared.Upstream `request:"mediaType=application/json"`
 }
 
 func (o *UpsertUpstreamRequest) GetUpstreamIDOrName() string {
@@ -21,9 +21,9 @@ func (o *UpsertUpstreamRequest) GetUpstreamIDOrName() string {
 	return o.UpstreamIDOrName
 }
 
-func (o *UpsertUpstreamRequest) GetUpstream() shared.UpstreamInput {
+func (o *UpsertUpstreamRequest) GetUpstream() shared.Upstream {
 	if o == nil {
-		return shared.UpstreamInput{}
+		return shared.Upstream{}
 	}
 	return o.Upstream
 }

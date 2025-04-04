@@ -9,8 +9,8 @@ import (
 
 type UpdateGrpcgatewayPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID          string                         `pathParam:"style=simple,explode=false,name=PluginId"`
-	GrpcGatewayPlugin *shared.GrpcGatewayPluginInput `request:"mediaType=application/json"`
+	PluginID          string                   `pathParam:"style=simple,explode=false,name=PluginId"`
+	GrpcGatewayPlugin shared.GrpcGatewayPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateGrpcgatewayPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateGrpcgatewayPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateGrpcgatewayPluginRequest) GetGrpcGatewayPlugin() *shared.GrpcGatewayPluginInput {
+func (o *UpdateGrpcgatewayPluginRequest) GetGrpcGatewayPlugin() shared.GrpcGatewayPlugin {
 	if o == nil {
-		return nil
+		return shared.GrpcGatewayPlugin{}
 	}
 	return o.GrpcGatewayPlugin
 }

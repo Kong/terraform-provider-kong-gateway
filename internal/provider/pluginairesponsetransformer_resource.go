@@ -16,6 +16,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
+	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -33,19 +34,20 @@ type PluginAiResponseTransformerResource struct {
 
 // PluginAiResponseTransformerResourceModel describes the resource data model.
 type PluginAiResponseTransformerResourceModel struct {
-	Config        tfTypes.AiResponseTransformerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                      `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                      `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                               `tfsdk:"created_at"`
-	Enabled       types.Bool                                `tfsdk:"enabled"`
-	ID            types.String                              `tfsdk:"id"`
-	InstanceName  types.String                              `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering                `tfsdk:"ordering"`
-	Protocols     []types.String                            `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                      `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                      `tfsdk:"service"`
-	Tags          []types.String                            `tfsdk:"tags"`
-	UpdatedAt     types.Int64                               `tfsdk:"updated_at"`
+	Config        *tfTypes.AiResponseTransformerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLWithoutParentsConsumer         `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer         `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                                `tfsdk:"created_at"`
+	Enabled       types.Bool                                 `tfsdk:"enabled"`
+	ID            types.String                               `tfsdk:"id"`
+	InstanceName  types.String                               `tfsdk:"instance_name"`
+	Ordering      *tfTypes.Ordering                          `tfsdk:"ordering"`
+	Partials      []tfTypes.Partials                         `tfsdk:"partials"`
+	Protocols     []types.String                             `tfsdk:"protocols"`
+	Route         *tfTypes.ACLWithoutParentsConsumer         `tfsdk:"route"`
+	Service       *tfTypes.ACLWithoutParentsConsumer         `tfsdk:"service"`
+	Tags          []types.String                             `tfsdk:"tags"`
+	UpdatedAt     types.Int64                                `tfsdk:"updated_at"`
 }
 
 func (r *PluginAiResponseTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,7 +59,8 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 		MarkdownDescription: "PluginAiResponseTransformer Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"http_proxy_host": schema.StringAttribute{
 						Computed:    true,
@@ -161,11 +164,11 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 									"param_location": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body. must be one of ["query", "body"]`,
+										Description: `Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body. must be one of ["body", "query"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
-												"query",
 												"body",
+												"query",
 											),
 										},
 									},
@@ -262,6 +265,22 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 													},
 												},
 											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
 											"input_cost": schema.NumberAttribute{
 												Computed:    true,
 												Optional:    true,
@@ -270,12 +289,12 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 											"llama2_format": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
-												Description: `If using llama2 provider, select the upstream message format. must be one of ["raw", "openai", "ollama"]`,
+												Description: `If using llama2 provider, select the upstream message format. must be one of ["ollama", "openai", "raw"]`,
 												Validators: []validator.String{
 													stringvalidator.OneOf(
-														"raw",
-														"openai",
 														"ollama",
+														"openai",
+														"raw",
 													),
 												},
 											},
@@ -287,11 +306,11 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 											"mistral_format": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
-												Description: `If using mistral provider, select the upstream message format. must be one of ["openai", "ollama"]`,
+												Description: `If using mistral provider, select the upstream message format. must be one of ["ollama", "openai"]`,
 												Validators: []validator.String{
 													stringvalidator.OneOf(
-														"openai",
 														"ollama",
+														"openai",
 													),
 												},
 											},
@@ -334,17 +353,18 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 									"provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["openai", "azure", "anthropic", "cohere", "mistral", "llama2", "gemini", "bedrock"]`,
+										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
-												"openai",
-												"azure",
 												"anthropic",
-												"cohere",
-												"mistral",
-												"llama2",
-												"gemini",
+												"azure",
 												"bedrock",
+												"cohere",
+												"gemini",
+												"huggingface",
+												"llama2",
+												"mistral",
+												"openai",
 											),
 										},
 									},
@@ -406,9 +426,11 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 						Optional: true,
 					},
 				},
+				Description: `If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -452,11 +474,34 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing HTTP protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -467,7 +512,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 						Optional: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,
@@ -488,6 +533,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -532,7 +578,7 @@ func (r *PluginAiResponseTransformerResource) Create(ctx context.Context, req re
 		return
 	}
 
-	request := data.ToSharedAiResponseTransformerPluginInput()
+	request := *data.ToSharedAiResponseTransformerPlugin()
 	res, err := r.client.Plugins.CreateAiresponsetransformerPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -631,7 +677,7 @@ func (r *PluginAiResponseTransformerResource) Update(ctx context.Context, req re
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	aiResponseTransformerPlugin := data.ToSharedAiResponseTransformerPluginInput()
+	aiResponseTransformerPlugin := *data.ToSharedAiResponseTransformerPlugin()
 	request := operations.UpdateAiresponsetransformerPluginRequest{
 		PluginID:                    pluginID,
 		AiResponseTransformerPlugin: aiResponseTransformerPlugin,

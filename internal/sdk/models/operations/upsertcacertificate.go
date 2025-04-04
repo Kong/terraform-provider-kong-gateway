@@ -11,7 +11,7 @@ type UpsertCaCertificateRequest struct {
 	// ID of the CA Certificate to lookup
 	CACertificateID string `pathParam:"style=simple,explode=false,name=CACertificateId"`
 	// Description of the CA Certificate
-	CACertificate shared.CACertificateInput `request:"mediaType=application/json"`
+	CACertificate shared.CACertificate `request:"mediaType=application/json"`
 }
 
 func (o *UpsertCaCertificateRequest) GetCACertificateID() string {
@@ -21,9 +21,9 @@ func (o *UpsertCaCertificateRequest) GetCACertificateID() string {
 	return o.CACertificateID
 }
 
-func (o *UpsertCaCertificateRequest) GetCACertificate() shared.CACertificateInput {
+func (o *UpsertCaCertificateRequest) GetCACertificate() shared.CACertificate {
 	if o == nil {
-		return shared.CACertificateInput{}
+		return shared.CACertificate{}
 	}
 	return o.CACertificate
 }

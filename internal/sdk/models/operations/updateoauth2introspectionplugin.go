@@ -9,8 +9,8 @@ import (
 
 type UpdateOauth2introspectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	Oauth2IntrospectionPlugin *shared.Oauth2IntrospectionPluginInput `request:"mediaType=application/json"`
+	PluginID                  string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	Oauth2IntrospectionPlugin shared.Oauth2IntrospectionPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateOauth2introspectionPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateOauth2introspectionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPluginInput {
+func (o *UpdateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() shared.Oauth2IntrospectionPlugin {
 	if o == nil {
-		return nil
+		return shared.Oauth2IntrospectionPlugin{}
 	}
 	return o.Oauth2IntrospectionPlugin
 }

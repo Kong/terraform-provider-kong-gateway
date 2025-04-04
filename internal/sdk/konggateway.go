@@ -72,13 +72,11 @@ func (c *sdkConfiguration) GetServerDetails() (string, map[string]string) {
 
 // KongGateway - Kong Gateway Admin API: OpenAPI 3.0 spec for Kong Gateway's Admin API.
 //
-// You can lean more about Kong Gateway at [docs.konghq.com](https://docs.konghq.com)
+// You can lean more about Kong Gateway at [developer.konghq.com](https://developer.konghq.com)
 // .Give Kong a star at [Kong/kong](https://github.com/kong/kong) repository.
 //
-// https://docs.konghq.com - Documentation for Kong Gateway and its APIs
+// https://developer.konghq.com - Documentation for Kong Gateway and its APIs
 type KongGateway struct {
-	ACLs                 *ACLs
-	BasicAuthCredentials *BasicAuthCredentials
 	// A CA certificate object represents a trusted certificate authority.
 	// These objects are used by Kong Gateway to verify the validity of a client or server certificate.
 	CACertificates *CACertificates
@@ -95,18 +93,21 @@ type KongGateway struct {
 	// The consumer object represents a consumer - or a user - of a service.
 	// You can either rely on Kong Gateway as the primary datastore, or you can map the consumer list with your database to keep consistency between Kong Gateway and your existing primary datastore.
 	//
-	Consumers           *Consumers
-	HMACAuthCredentials *HMACAuthCredentials
-	JWTs                *JWTs
-	APIKeys             *APIKeys
+	Consumers            *Consumers
+	ACLs                 *ACLs
+	BasicAuthCredentials *BasicAuthCredentials
+	HMACAuthCredentials  *HMACAuthCredentials
+	JWTs                 *JWTs
+	APIKeys              *APIKeys
+	MTLSAuthCredentials  *MTLSAuthCredentials
 	// A JSON Web key set. Key sets are the preferred way to expose keys to plugins because they tell the plugin where to look for keys or have a scoping mechanism to restrict plugins to specific keys.
 	//
 	KeySets *KeySets
-	Keyring *Keyring
 	// A key object holds a representation of asymmetric keys in various formats. When Kong Gateway or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.
 	//
-	Keys                *Keys
-	MTLSAuthCredentials *MTLSAuthCredentials
+	Keys     *Keys
+	OIDCJWKs *OIDCJWKs
+	Partials *Partials
 	// A plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. Plugins let you add functionality to services that run behind a Kong Gateway instance, like authentication or rate limiting.
 	// You can find more information about available plugins and which values each plugin accepts at the [Plugin Hub](https://docs.konghq.com/hub/).
 	// <br><br>
@@ -157,6 +158,7 @@ type KongGateway struct {
 	// An upstream also includes a [health checker](https://docs.konghq.com/gateway/latest/how-kong-works/health-checks/), which can enable and disable targets based on their ability or inability to serve requests.
 	// The configuration for the health checker is stored in the upstream object, and applies to all of its targets.
 	Upstreams *Upstreams
+	Targets   *Targets
 	// Vault objects are used to configure different vault connectors for [managing secrets](https://docs.konghq.com/gateway/latest/kong-enterprise/secrets-management/).
 	// Configuring a vault lets you reference secrets from other entities.
 	// This allows for a proper separation of secrets and configuration and prevents secret sprawl.
@@ -165,8 +167,7 @@ type KongGateway struct {
 	// <br><br>
 	// Secrets rotation can be managed using [TTLs](https://docs.konghq.com/gateway/latest/kong-enterprise/secrets-management/advanced-usage/).
 	//
-	Vaults     *Vaults
-	Workspaces *Workspaces
+	Vaults *Vaults
 
 	sdkConfiguration sdkConfiguration
 }
@@ -323,9 +324,9 @@ func New(opts ...SDKOption) *KongGateway {
 		sdkConfiguration: sdkConfiguration{
 			Language:          "go",
 			OpenAPIDocVersion: "0.0.1",
-			SDKVersion:        "0.0.1",
-			GenVersion:        "2.463.0",
-			UserAgent:         "speakeasy-sdk/go 0.0.1 2.463.0 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			SDKVersion:        "0.3.0",
+			GenVersion:        "2.566.5",
+			UserAgent:         "speakeasy-sdk/terraform 0.3.0 2.566.5 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerDefaults: []map[string]string{
 				{
 					"hostname": "localhost",
@@ -353,10 +354,6 @@ func New(opts ...SDKOption) *KongGateway {
 		sdk.sdkConfiguration.ServerURL = serverURL
 	}
 
-	sdk.ACLs = newACLs(sdk.sdkConfiguration)
-
-	sdk.BasicAuthCredentials = newBasicAuthCredentials(sdk.sdkConfiguration)
-
 	sdk.CACertificates = newCACertificates(sdk.sdkConfiguration)
 
 	sdk.Certificates = newCertificates(sdk.sdkConfiguration)
@@ -365,19 +362,25 @@ func New(opts ...SDKOption) *KongGateway {
 
 	sdk.Consumers = newConsumers(sdk.sdkConfiguration)
 
+	sdk.ACLs = newACLs(sdk.sdkConfiguration)
+
+	sdk.BasicAuthCredentials = newBasicAuthCredentials(sdk.sdkConfiguration)
+
 	sdk.HMACAuthCredentials = newHMACAuthCredentials(sdk.sdkConfiguration)
 
 	sdk.JWTs = newJWTs(sdk.sdkConfiguration)
 
 	sdk.APIKeys = newAPIKeys(sdk.sdkConfiguration)
 
-	sdk.KeySets = newKeySets(sdk.sdkConfiguration)
+	sdk.MTLSAuthCredentials = newMTLSAuthCredentials(sdk.sdkConfiguration)
 
-	sdk.Keyring = newKeyring(sdk.sdkConfiguration)
+	sdk.KeySets = newKeySets(sdk.sdkConfiguration)
 
 	sdk.Keys = newKeys(sdk.sdkConfiguration)
 
-	sdk.MTLSAuthCredentials = newMTLSAuthCredentials(sdk.sdkConfiguration)
+	sdk.OIDCJWKs = newOIDCJWKs(sdk.sdkConfiguration)
+
+	sdk.Partials = newPartials(sdk.sdkConfiguration)
 
 	sdk.Plugins = newPlugins(sdk.sdkConfiguration)
 
@@ -389,9 +392,9 @@ func New(opts ...SDKOption) *KongGateway {
 
 	sdk.Upstreams = newUpstreams(sdk.sdkConfiguration)
 
-	sdk.Vaults = newVaults(sdk.sdkConfiguration)
+	sdk.Targets = newTargets(sdk.sdkConfiguration)
 
-	sdk.Workspaces = newWorkspaces(sdk.sdkConfiguration)
+	sdk.Vaults = newVaults(sdk.sdkConfiguration)
 
 	return sdk
 }

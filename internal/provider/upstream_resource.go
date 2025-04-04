@@ -32,27 +32,27 @@ type UpstreamResource struct {
 
 // UpstreamResourceModel describes the resource data model.
 type UpstreamResourceModel struct {
-	Algorithm              types.String          `tfsdk:"algorithm"`
-	ClientCertificate      *tfTypes.ACLConsumer  `tfsdk:"client_certificate"`
-	CreatedAt              types.Int64           `tfsdk:"created_at"`
-	HashFallback           types.String          `tfsdk:"hash_fallback"`
-	HashFallbackHeader     types.String          `tfsdk:"hash_fallback_header"`
-	HashFallbackQueryArg   types.String          `tfsdk:"hash_fallback_query_arg"`
-	HashFallbackURICapture types.String          `tfsdk:"hash_fallback_uri_capture"`
-	HashOn                 types.String          `tfsdk:"hash_on"`
-	HashOnCookie           types.String          `tfsdk:"hash_on_cookie"`
-	HashOnCookiePath       types.String          `tfsdk:"hash_on_cookie_path"`
-	HashOnHeader           types.String          `tfsdk:"hash_on_header"`
-	HashOnQueryArg         types.String          `tfsdk:"hash_on_query_arg"`
-	HashOnURICapture       types.String          `tfsdk:"hash_on_uri_capture"`
-	Healthchecks           *tfTypes.Healthchecks `tfsdk:"healthchecks"`
-	HostHeader             types.String          `tfsdk:"host_header"`
-	ID                     types.String          `tfsdk:"id"`
-	Name                   types.String          `tfsdk:"name"`
-	Slots                  types.Int64           `tfsdk:"slots"`
-	Tags                   []types.String        `tfsdk:"tags"`
-	UpdatedAt              types.Int64           `tfsdk:"updated_at"`
-	UseSrvName             types.Bool            `tfsdk:"use_srv_name"`
+	Algorithm              types.String                       `tfsdk:"algorithm"`
+	ClientCertificate      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"client_certificate"`
+	CreatedAt              types.Int64                        `tfsdk:"created_at"`
+	HashFallback           types.String                       `tfsdk:"hash_fallback"`
+	HashFallbackHeader     types.String                       `tfsdk:"hash_fallback_header"`
+	HashFallbackQueryArg   types.String                       `tfsdk:"hash_fallback_query_arg"`
+	HashFallbackURICapture types.String                       `tfsdk:"hash_fallback_uri_capture"`
+	HashOn                 types.String                       `tfsdk:"hash_on"`
+	HashOnCookie           types.String                       `tfsdk:"hash_on_cookie"`
+	HashOnCookiePath       types.String                       `tfsdk:"hash_on_cookie_path"`
+	HashOnHeader           types.String                       `tfsdk:"hash_on_header"`
+	HashOnQueryArg         types.String                       `tfsdk:"hash_on_query_arg"`
+	HashOnURICapture       types.String                       `tfsdk:"hash_on_uri_capture"`
+	Healthchecks           *tfTypes.Healthchecks              `tfsdk:"healthchecks"`
+	HostHeader             types.String                       `tfsdk:"host_header"`
+	ID                     types.String                       `tfsdk:"id"`
+	Name                   types.String                       `tfsdk:"name"`
+	Slots                  types.Int64                        `tfsdk:"slots"`
+	Tags                   []types.String                     `tfsdk:"tags"`
+	UpdatedAt              types.Int64                        `tfsdk:"updated_at"`
+	UseSrvName             types.Bool                         `tfsdk:"use_srv_name"`
 }
 
 func (r *UpstreamResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -89,6 +89,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"hash_fallback": schema.StringAttribute{
@@ -350,6 +351,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 			"use_srv_name": schema.BoolAttribute{
@@ -399,7 +401,7 @@ func (r *UpstreamResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedUpstreamInput()
+	request := *data.ToSharedUpstream()
 	res, err := r.client.Upstreams.CreateUpstream(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -498,7 +500,7 @@ func (r *UpstreamResource) Update(ctx context.Context, req resource.UpdateReques
 	var upstreamIDOrName string
 	upstreamIDOrName = data.ID.ValueString()
 
-	upstream := *data.ToSharedUpstreamInput()
+	upstream := *data.ToSharedUpstream()
 	request := operations.UpsertUpstreamRequest{
 		UpstreamIDOrName: upstreamIDOrName,
 		Upstream:         upstream,

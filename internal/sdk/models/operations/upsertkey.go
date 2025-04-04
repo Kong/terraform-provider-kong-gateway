@@ -11,7 +11,7 @@ type UpsertKeyRequest struct {
 	// ID or name of the Key to lookup
 	KeyIDOrName string `pathParam:"style=simple,explode=false,name=KeyIdOrName"`
 	// Description of the Key
-	Key shared.KeyInput `request:"mediaType=application/json"`
+	Key shared.Key `request:"mediaType=application/json"`
 }
 
 func (o *UpsertKeyRequest) GetKeyIDOrName() string {
@@ -21,9 +21,9 @@ func (o *UpsertKeyRequest) GetKeyIDOrName() string {
 	return o.KeyIDOrName
 }
 
-func (o *UpsertKeyRequest) GetKey() shared.KeyInput {
+func (o *UpsertKeyRequest) GetKey() shared.Key {
 	if o == nil {
-		return shared.KeyInput{}
+		return shared.Key{}
 	}
 	return o.Key
 }

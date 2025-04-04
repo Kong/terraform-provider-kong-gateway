@@ -11,7 +11,7 @@ type UpsertCertificateRequest struct {
 	// ID of the Certificate to lookup
 	CertificateID string `pathParam:"style=simple,explode=false,name=CertificateId"`
 	// Description of the Certificate
-	Certificate shared.CertificateInput `request:"mediaType=application/json"`
+	Certificate shared.Certificate `request:"mediaType=application/json"`
 }
 
 func (o *UpsertCertificateRequest) GetCertificateID() string {
@@ -21,9 +21,9 @@ func (o *UpsertCertificateRequest) GetCertificateID() string {
 	return o.CertificateID
 }
 
-func (o *UpsertCertificateRequest) GetCertificate() shared.CertificateInput {
+func (o *UpsertCertificateRequest) GetCertificate() shared.Certificate {
 	if o == nil {
-		return shared.CertificateInput{}
+		return shared.Certificate{}
 	}
 	return o.Certificate
 }

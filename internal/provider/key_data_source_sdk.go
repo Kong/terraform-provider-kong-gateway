@@ -25,13 +25,14 @@ func (r *KeyDataSourceModel) RefreshFromSharedKey(resp *shared.Key) {
 		if resp.Set == nil {
 			r.Set = nil
 		} else {
-			r.Set = &tfTypes.ACLConsumer{}
+			r.Set = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Set.ID = types.StringPointerValue(resp.Set.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		r.X5t = types.StringPointerValue(resp.X5t)
 	}
 }

@@ -8,6 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type ProxyCachePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *ProxyCachePluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type ProxyCachePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *ProxyCachePluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type ProxyCachePluginOrdering struct {
+	After  *ProxyCachePluginAfter  `json:"after,omitempty"`
+	Before *ProxyCachePluginBefore `json:"before,omitempty"`
+}
+
+func (o *ProxyCachePluginOrdering) GetAfter() *ProxyCachePluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *ProxyCachePluginOrdering) GetBefore() *ProxyCachePluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type ProxyCachePluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *ProxyCachePluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *ProxyCachePluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *ProxyCachePluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type ProxyCachePluginMemory struct {
 	// The name of the shared dictionary in which to hold cache entities when the memory strategy is selected. Note that this dictionary currently must be defined manually in the Kong Nginx template.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
@@ -23,10 +91,10 @@ func (o *ProxyCachePluginMemory) GetDictionaryName() *string {
 type RequestMethod string
 
 const (
-	RequestMethodHead  RequestMethod = "HEAD"
 	RequestMethodGet   RequestMethod = "GET"
-	RequestMethodPost  RequestMethod = "POST"
+	RequestMethodHead  RequestMethod = "HEAD"
 	RequestMethodPatch RequestMethod = "PATCH"
+	RequestMethodPost  RequestMethod = "POST"
 	RequestMethodPut   RequestMethod = "PUT"
 )
 
@@ -39,13 +107,13 @@ func (e *RequestMethod) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "HEAD":
-		fallthrough
 	case "GET":
 		fallthrough
-	case "POST":
+	case "HEAD":
 		fallthrough
 	case "PATCH":
+		fallthrough
+	case "POST":
 		fallthrough
 	case "PUT":
 		*e = RequestMethod(v)
@@ -228,6 +296,7 @@ func (o *ProxyCachePluginConsumer) GetID() *string {
 	return o.ID
 }
 
+// ProxyCachePluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type ProxyCachePluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -239,47 +308,7 @@ func (o *ProxyCachePluginConsumerGroup) GetID() *string {
 	return o.ID
 }
 
-type ProxyCachePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ProxyCachePluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ProxyCachePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ProxyCachePluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ProxyCachePluginOrdering struct {
-	After  *ProxyCachePluginAfter  `json:"after,omitempty"`
-	Before *ProxyCachePluginBefore `json:"before,omitempty"`
-}
-
-func (o *ProxyCachePluginOrdering) GetAfter() *ProxyCachePluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *ProxyCachePluginOrdering) GetBefore() *ProxyCachePluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
+// ProxyCachePluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type ProxyCachePluginProtocols string
 
 const (
@@ -330,7 +359,7 @@ func (e *ProxyCachePluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// ProxyCachePluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// ProxyCachePluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type ProxyCachePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -356,28 +385,30 @@ func (o *ProxyCachePluginService) GetID() *string {
 
 // ProxyCachePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ProxyCachePlugin struct {
-	Config ProxyCachePluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *ProxyCachePluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *ProxyCachePluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                     `json:"enabled,omitempty"`
-	ID           *string                   `json:"id,omitempty"`
-	InstanceName *string                   `json:"instance_name,omitempty"`
-	name         string                    `const:"proxy-cache" json:"name"`
-	Ordering     *ProxyCachePluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []ProxyCachePluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *ProxyCachePluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *ProxyCachePluginService `json:"service,omitempty"`
+	Enabled      *bool                      `json:"enabled,omitempty"`
+	ID           *string                    `json:"id,omitempty"`
+	InstanceName *string                    `json:"instance_name,omitempty"`
+	name         string                     `const:"proxy-cache" json:"name"`
+	Ordering     *ProxyCachePluginOrdering  `json:"ordering,omitempty"`
+	Partials     []ProxyCachePluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64                  `json:"updated_at,omitempty"`
+	Config    *ProxyCachePluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ProxyCachePluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *ProxyCachePluginConsumerGroup `json:"consumer_group,omitempty"`
+	// A set of strings representing protocols.
+	Protocols []ProxyCachePluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *ProxyCachePluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *ProxyCachePluginService `json:"service,omitempty"`
 }
 
 func (p ProxyCachePlugin) MarshalJSON() ([]byte, error) {
@@ -389,27 +420,6 @@ func (p *ProxyCachePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *ProxyCachePlugin) GetConfig() ProxyCachePluginConfig {
-	if o == nil {
-		return ProxyCachePluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *ProxyCachePlugin) GetConsumer() *ProxyCachePluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *ProxyCachePlugin) GetConsumerGroup() *ProxyCachePluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *ProxyCachePlugin) GetCreatedAt() *int64 {
@@ -451,6 +461,48 @@ func (o *ProxyCachePlugin) GetOrdering() *ProxyCachePluginOrdering {
 	return o.Ordering
 }
 
+func (o *ProxyCachePlugin) GetPartials() []ProxyCachePluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *ProxyCachePlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *ProxyCachePlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *ProxyCachePlugin) GetConfig() *ProxyCachePluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
+func (o *ProxyCachePlugin) GetConsumer() *ProxyCachePluginConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
+}
+
+func (o *ProxyCachePlugin) GetConsumerGroup() *ProxyCachePluginConsumerGroup {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroup
+}
+
 func (o *ProxyCachePlugin) GetProtocols() []ProxyCachePluginProtocols {
 	if o == nil {
 		return nil
@@ -470,132 +522,4 @@ func (o *ProxyCachePlugin) GetService() *ProxyCachePluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *ProxyCachePlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *ProxyCachePlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// ProxyCachePluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type ProxyCachePluginInput struct {
-	Config ProxyCachePluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *ProxyCachePluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *ProxyCachePluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                     `json:"enabled,omitempty"`
-	ID           *string                   `json:"id,omitempty"`
-	InstanceName *string                   `json:"instance_name,omitempty"`
-	name         string                    `const:"proxy-cache" json:"name"`
-	Ordering     *ProxyCachePluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []ProxyCachePluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *ProxyCachePluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *ProxyCachePluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (p ProxyCachePluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(p, "", false)
-}
-
-func (p *ProxyCachePluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &p, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *ProxyCachePluginInput) GetConfig() ProxyCachePluginConfig {
-	if o == nil {
-		return ProxyCachePluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *ProxyCachePluginInput) GetConsumer() *ProxyCachePluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *ProxyCachePluginInput) GetConsumerGroup() *ProxyCachePluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *ProxyCachePluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *ProxyCachePluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *ProxyCachePluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *ProxyCachePluginInput) GetName() string {
-	return "proxy-cache"
-}
-
-func (o *ProxyCachePluginInput) GetOrdering() *ProxyCachePluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *ProxyCachePluginInput) GetProtocols() []ProxyCachePluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *ProxyCachePluginInput) GetRoute() *ProxyCachePluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *ProxyCachePluginInput) GetService() *ProxyCachePluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *ProxyCachePluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

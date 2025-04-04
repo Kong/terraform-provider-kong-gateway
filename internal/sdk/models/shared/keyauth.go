@@ -56,38 +56,3 @@ func (o *KeyAuth) GetTags() []string {
 	}
 	return o.Tags
 }
-
-type KeyAuthInput struct {
-	Consumer *KeyAuthConsumer `json:"consumer,omitempty"`
-	ID       *string          `json:"id,omitempty"`
-	Key      string           `json:"key"`
-	Tags     []string         `json:"tags,omitempty"`
-}
-
-func (o *KeyAuthInput) GetConsumer() *KeyAuthConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *KeyAuthInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *KeyAuthInput) GetKey() string {
-	if o == nil {
-		return ""
-	}
-	return o.Key
-}
-
-func (o *KeyAuthInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}

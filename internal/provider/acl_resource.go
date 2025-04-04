@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -30,11 +32,12 @@ type ACLResource struct {
 
 // ACLResourceModel describes the resource data model.
 type ACLResourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	Group     types.String         `tfsdk:"group"`
-	ID        types.String         `tfsdk:"id"`
-	Tags      []types.String       `tfsdk:"tags"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	Group      types.String                       `tfsdk:"group"`
+	ID         types.String                       `tfsdk:"id"`
+	Tags       []types.String                     `tfsdk:"tags"`
 }
 
 func (r *ACLResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -55,8 +58,13 @@ func (r *ACLResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"group": schema.StringAttribute{
@@ -113,8 +121,15 @@ func (r *ACLResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedACLInput()
-	res, err := r.client.ACLs.CreateACL(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	aclWithoutParents := *data.ToSharedACLWithoutParents()
+	request := operations.CreateACLWithConsumerRequest{
+		ConsumerID:        consumerID,
+		ACLWithoutParents: aclWithoutParents,
+	}
+	res, err := r.client.ACLs.CreateACLWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -159,13 +174,17 @@ func (r *ACLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var aclID string
 	aclID = data.ID.ValueString()
 
-	request := operations.GetACLRequest{
-		ACLID: aclID,
+	request := operations.GetACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
 	}
-	res, err := r.client.ACLs.GetACL(ctx, request)
+	res, err := r.client.ACLs.GetACLWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -209,15 +228,19 @@ func (r *ACLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var aclID string
 	aclID = data.ID.ValueString()
 
-	acl := *data.ToSharedACLInput()
-	request := operations.UpsertACLRequest{
-		ACLID: aclID,
-		ACL:   acl,
+	acl := *data.ToSharedACL()
+	request := operations.UpdateACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
+		ACL:        acl,
 	}
-	res, err := r.client.ACLs.UpsertACL(ctx, request)
+	res, err := r.client.ACLs.UpdateACLWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -262,13 +285,17 @@ func (r *ACLResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var aclID string
 	aclID = data.ID.ValueString()
 
-	request := operations.DeleteACLRequest{
-		ACLID: aclID,
+	request := operations.DeleteACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
 	}
-	res, err := r.client.ACLs.DeleteACL(ctx, request)
+	res, err := r.client.ACLs.DeleteACLWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -288,5 +315,27 @@ func (r *ACLResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 }
 
 func (r *ACLResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID         string `json:"id"`
+		ConsumerID string `json:"consumer_id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "aclid": "f28acbfa-c866-4587-b688-0208ac24df21",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+
 }

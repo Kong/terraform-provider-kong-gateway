@@ -8,14 +8,14 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *JwtResourceModel) ToSharedJWTInput() *shared.JWTInput {
+func (r *JwtResourceModel) ToSharedJWTWithoutParents() *shared.JWTWithoutParents {
 	algorithm := new(shared.Algorithm)
 	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
 		*algorithm = shared.Algorithm(r.Algorithm.ValueString())
 	} else {
 		algorithm = nil
 	}
-	var consumer *shared.JWTConsumer
+	var consumer *shared.JWTWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
@@ -23,9 +23,15 @@ func (r *JwtResourceModel) ToSharedJWTInput() *shared.JWTInput {
 		} else {
 			id = nil
 		}
-		consumer = &shared.JWTConsumer{
+		consumer = &shared.JWTWithoutParentsConsumer{
 			ID: id,
 		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
@@ -55,9 +61,10 @@ func (r *JwtResourceModel) ToSharedJWTInput() *shared.JWTInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.JWTInput{
+	out := shared.JWTWithoutParents{
 		Algorithm:    algorithm,
 		Consumer:     consumer,
+		CreatedAt:    createdAt,
 		ID:           id1,
 		Key:          key,
 		RsaPublicKey: rsaPublicKey,
@@ -77,7 +84,7 @@ func (r *JwtResourceModel) RefreshFromSharedJwt(resp *shared.Jwt) {
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -85,9 +92,75 @@ func (r *JwtResourceModel) RefreshFromSharedJwt(resp *shared.Jwt) {
 		r.Key = types.StringPointerValue(resp.Key)
 		r.RsaPublicKey = types.StringPointerValue(resp.RsaPublicKey)
 		r.Secret = types.StringPointerValue(resp.Secret)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 	}
+}
+
+func (r *JwtResourceModel) ToSharedJwt() *shared.Jwt {
+	algorithm := new(shared.JWTAlgorithm)
+	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
+		*algorithm = shared.JWTAlgorithm(r.Algorithm.ValueString())
+	} else {
+		algorithm = nil
+	}
+	var consumer *shared.JWTConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.JWTConsumer{
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	key := new(string)
+	if !r.Key.IsUnknown() && !r.Key.IsNull() {
+		*key = r.Key.ValueString()
+	} else {
+		key = nil
+	}
+	rsaPublicKey := new(string)
+	if !r.RsaPublicKey.IsUnknown() && !r.RsaPublicKey.IsNull() {
+		*rsaPublicKey = r.RsaPublicKey.ValueString()
+	} else {
+		rsaPublicKey = nil
+	}
+	secret := new(string)
+	if !r.Secret.IsUnknown() && !r.Secret.IsNull() {
+		*secret = r.Secret.ValueString()
+	} else {
+		secret = nil
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	out := shared.Jwt{
+		Algorithm:    algorithm,
+		Consumer:     consumer,
+		CreatedAt:    createdAt,
+		ID:           id1,
+		Key:          key,
+		RsaPublicKey: rsaPublicKey,
+		Secret:       secret,
+		Tags:         tags,
+	}
+	return &out
 }

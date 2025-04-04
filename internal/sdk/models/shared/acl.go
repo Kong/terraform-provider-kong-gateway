@@ -56,38 +56,3 @@ func (o *ACL) GetTags() []string {
 	}
 	return o.Tags
 }
-
-type ACLInput struct {
-	Consumer *ACLConsumer `json:"consumer,omitempty"`
-	Group    string       `json:"group"`
-	ID       *string      `json:"id,omitempty"`
-	Tags     []string     `json:"tags,omitempty"`
-}
-
-func (o *ACLInput) GetConsumer() *ACLConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *ACLInput) GetGroup() string {
-	if o == nil {
-		return ""
-	}
-	return o.Group
-}
-
-func (o *ACLInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *ACLInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}

@@ -9,8 +9,8 @@ import (
 
 type UpdateCanaryPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string                    `pathParam:"style=simple,explode=false,name=PluginId"`
-	CanaryPlugin *shared.CanaryPluginInput `request:"mediaType=application/json"`
+	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	CanaryPlugin shared.CanaryPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateCanaryPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateCanaryPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateCanaryPluginRequest) GetCanaryPlugin() *shared.CanaryPluginInput {
+func (o *UpdateCanaryPluginRequest) GetCanaryPlugin() shared.CanaryPlugin {
 	if o == nil {
-		return nil
+		return shared.CanaryPlugin{}
 	}
 	return o.CanaryPlugin
 }

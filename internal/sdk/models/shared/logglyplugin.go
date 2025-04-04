@@ -8,17 +8,85 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type LogglyPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *LogglyPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type LogglyPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *LogglyPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type LogglyPluginOrdering struct {
+	After  *LogglyPluginAfter  `json:"after,omitempty"`
+	Before *LogglyPluginBefore `json:"before,omitempty"`
+}
+
+func (o *LogglyPluginOrdering) GetAfter() *LogglyPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *LogglyPluginOrdering) GetBefore() *LogglyPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type LogglyPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *LogglyPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *LogglyPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *LogglyPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type ClientErrorsSeverity string
 
 const (
+	ClientErrorsSeverityAlert   ClientErrorsSeverity = "alert"
+	ClientErrorsSeverityCrit    ClientErrorsSeverity = "crit"
 	ClientErrorsSeverityDebug   ClientErrorsSeverity = "debug"
+	ClientErrorsSeverityEmerg   ClientErrorsSeverity = "emerg"
+	ClientErrorsSeverityErr     ClientErrorsSeverity = "err"
 	ClientErrorsSeverityInfo    ClientErrorsSeverity = "info"
 	ClientErrorsSeverityNotice  ClientErrorsSeverity = "notice"
 	ClientErrorsSeverityWarning ClientErrorsSeverity = "warning"
-	ClientErrorsSeverityErr     ClientErrorsSeverity = "err"
-	ClientErrorsSeverityCrit    ClientErrorsSeverity = "crit"
-	ClientErrorsSeverityAlert   ClientErrorsSeverity = "alert"
-	ClientErrorsSeverityEmerg   ClientErrorsSeverity = "emerg"
 )
 
 func (e ClientErrorsSeverity) ToPointer() *ClientErrorsSeverity {
@@ -30,21 +98,21 @@ func (e *ClientErrorsSeverity) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "alert":
+		fallthrough
+	case "crit":
+		fallthrough
 	case "debug":
+		fallthrough
+	case "emerg":
+		fallthrough
+	case "err":
 		fallthrough
 	case "info":
 		fallthrough
 	case "notice":
 		fallthrough
 	case "warning":
-		fallthrough
-	case "err":
-		fallthrough
-	case "crit":
-		fallthrough
-	case "alert":
-		fallthrough
-	case "emerg":
 		*e = ClientErrorsSeverity(v)
 		return nil
 	default:
@@ -55,14 +123,14 @@ func (e *ClientErrorsSeverity) UnmarshalJSON(data []byte) error {
 type LogLevel string
 
 const (
+	LogLevelAlert   LogLevel = "alert"
+	LogLevelCrit    LogLevel = "crit"
 	LogLevelDebug   LogLevel = "debug"
+	LogLevelEmerg   LogLevel = "emerg"
+	LogLevelErr     LogLevel = "err"
 	LogLevelInfo    LogLevel = "info"
 	LogLevelNotice  LogLevel = "notice"
 	LogLevelWarning LogLevel = "warning"
-	LogLevelErr     LogLevel = "err"
-	LogLevelCrit    LogLevel = "crit"
-	LogLevelAlert   LogLevel = "alert"
-	LogLevelEmerg   LogLevel = "emerg"
 )
 
 func (e LogLevel) ToPointer() *LogLevel {
@@ -74,21 +142,21 @@ func (e *LogLevel) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "alert":
+		fallthrough
+	case "crit":
+		fallthrough
 	case "debug":
+		fallthrough
+	case "emerg":
+		fallthrough
+	case "err":
 		fallthrough
 	case "info":
 		fallthrough
 	case "notice":
 		fallthrough
 	case "warning":
-		fallthrough
-	case "err":
-		fallthrough
-	case "crit":
-		fallthrough
-	case "alert":
-		fallthrough
-	case "emerg":
 		*e = LogLevel(v)
 		return nil
 	default:
@@ -99,14 +167,14 @@ func (e *LogLevel) UnmarshalJSON(data []byte) error {
 type ServerErrorsSeverity string
 
 const (
+	ServerErrorsSeverityAlert   ServerErrorsSeverity = "alert"
+	ServerErrorsSeverityCrit    ServerErrorsSeverity = "crit"
 	ServerErrorsSeverityDebug   ServerErrorsSeverity = "debug"
+	ServerErrorsSeverityEmerg   ServerErrorsSeverity = "emerg"
+	ServerErrorsSeverityErr     ServerErrorsSeverity = "err"
 	ServerErrorsSeverityInfo    ServerErrorsSeverity = "info"
 	ServerErrorsSeverityNotice  ServerErrorsSeverity = "notice"
 	ServerErrorsSeverityWarning ServerErrorsSeverity = "warning"
-	ServerErrorsSeverityErr     ServerErrorsSeverity = "err"
-	ServerErrorsSeverityCrit    ServerErrorsSeverity = "crit"
-	ServerErrorsSeverityAlert   ServerErrorsSeverity = "alert"
-	ServerErrorsSeverityEmerg   ServerErrorsSeverity = "emerg"
 )
 
 func (e ServerErrorsSeverity) ToPointer() *ServerErrorsSeverity {
@@ -118,21 +186,21 @@ func (e *ServerErrorsSeverity) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "alert":
+		fallthrough
+	case "crit":
+		fallthrough
 	case "debug":
+		fallthrough
+	case "emerg":
+		fallthrough
+	case "err":
 		fallthrough
 	case "info":
 		fallthrough
 	case "notice":
 		fallthrough
 	case "warning":
-		fallthrough
-	case "err":
-		fallthrough
-	case "crit":
-		fallthrough
-	case "alert":
-		fallthrough
-	case "emerg":
 		*e = ServerErrorsSeverity(v)
 		return nil
 	default:
@@ -143,14 +211,14 @@ func (e *ServerErrorsSeverity) UnmarshalJSON(data []byte) error {
 type SuccessfulSeverity string
 
 const (
+	SuccessfulSeverityAlert   SuccessfulSeverity = "alert"
+	SuccessfulSeverityCrit    SuccessfulSeverity = "crit"
 	SuccessfulSeverityDebug   SuccessfulSeverity = "debug"
+	SuccessfulSeverityEmerg   SuccessfulSeverity = "emerg"
+	SuccessfulSeverityErr     SuccessfulSeverity = "err"
 	SuccessfulSeverityInfo    SuccessfulSeverity = "info"
 	SuccessfulSeverityNotice  SuccessfulSeverity = "notice"
 	SuccessfulSeverityWarning SuccessfulSeverity = "warning"
-	SuccessfulSeverityErr     SuccessfulSeverity = "err"
-	SuccessfulSeverityCrit    SuccessfulSeverity = "crit"
-	SuccessfulSeverityAlert   SuccessfulSeverity = "alert"
-	SuccessfulSeverityEmerg   SuccessfulSeverity = "emerg"
 )
 
 func (e SuccessfulSeverity) ToPointer() *SuccessfulSeverity {
@@ -162,21 +230,21 @@ func (e *SuccessfulSeverity) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "alert":
+		fallthrough
+	case "crit":
+		fallthrough
 	case "debug":
+		fallthrough
+	case "emerg":
+		fallthrough
+	case "err":
 		fallthrough
 	case "info":
 		fallthrough
 	case "notice":
 		fallthrough
 	case "warning":
-		fallthrough
-	case "err":
-		fallthrough
-	case "crit":
-		fallthrough
-	case "alert":
-		fallthrough
-	case "emerg":
 		*e = SuccessfulSeverity(v)
 		return nil
 	default:
@@ -282,58 +350,7 @@ func (o *LogglyPluginConsumer) GetID() *string {
 	return o.ID
 }
 
-type LogglyPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *LogglyPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type LogglyPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *LogglyPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type LogglyPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *LogglyPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type LogglyPluginOrdering struct {
-	After  *LogglyPluginAfter  `json:"after,omitempty"`
-	Before *LogglyPluginBefore `json:"before,omitempty"`
-}
-
-func (o *LogglyPluginOrdering) GetAfter() *LogglyPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *LogglyPluginOrdering) GetBefore() *LogglyPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
+// LogglyPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type LogglyPluginProtocols string
 
 const (
@@ -384,7 +401,7 @@ func (e *LogglyPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// LogglyPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// LogglyPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type LogglyPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -410,28 +427,28 @@ func (o *LogglyPluginService) GetID() *string {
 
 // LogglyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type LogglyPlugin struct {
-	Config LogglyPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *LogglyPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *LogglyPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                 `json:"enabled,omitempty"`
-	ID           *string               `json:"id,omitempty"`
-	InstanceName *string               `json:"instance_name,omitempty"`
-	name         string                `const:"loggly" json:"name"`
-	Ordering     *LogglyPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []LogglyPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *LogglyPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *LogglyPluginService `json:"service,omitempty"`
+	Enabled      *bool                  `json:"enabled,omitempty"`
+	ID           *string                `json:"id,omitempty"`
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"loggly" json:"name"`
+	Ordering     *LogglyPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []LogglyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64              `json:"updated_at,omitempty"`
+	Config    *LogglyPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *LogglyPluginConsumer `json:"consumer,omitempty"`
+	// A set of strings representing protocols.
+	Protocols []LogglyPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *LogglyPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *LogglyPluginService `json:"service,omitempty"`
 }
 
 func (l LogglyPlugin) MarshalJSON() ([]byte, error) {
@@ -443,27 +460,6 @@ func (l *LogglyPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *LogglyPlugin) GetConfig() LogglyPluginConfig {
-	if o == nil {
-		return LogglyPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *LogglyPlugin) GetConsumer() *LogglyPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *LogglyPlugin) GetConsumerGroup() *LogglyPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *LogglyPlugin) GetCreatedAt() *int64 {
@@ -505,6 +501,41 @@ func (o *LogglyPlugin) GetOrdering() *LogglyPluginOrdering {
 	return o.Ordering
 }
 
+func (o *LogglyPlugin) GetPartials() []LogglyPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *LogglyPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *LogglyPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *LogglyPlugin) GetConfig() *LogglyPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
+func (o *LogglyPlugin) GetConsumer() *LogglyPluginConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
+}
+
 func (o *LogglyPlugin) GetProtocols() []LogglyPluginProtocols {
 	if o == nil {
 		return nil
@@ -524,132 +555,4 @@ func (o *LogglyPlugin) GetService() *LogglyPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *LogglyPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *LogglyPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// LogglyPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type LogglyPluginInput struct {
-	Config LogglyPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *LogglyPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *LogglyPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                 `json:"enabled,omitempty"`
-	ID           *string               `json:"id,omitempty"`
-	InstanceName *string               `json:"instance_name,omitempty"`
-	name         string                `const:"loggly" json:"name"`
-	Ordering     *LogglyPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []LogglyPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *LogglyPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *LogglyPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (l LogglyPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(l, "", false)
-}
-
-func (l *LogglyPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *LogglyPluginInput) GetConfig() LogglyPluginConfig {
-	if o == nil {
-		return LogglyPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *LogglyPluginInput) GetConsumer() *LogglyPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *LogglyPluginInput) GetConsumerGroup() *LogglyPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *LogglyPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *LogglyPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *LogglyPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *LogglyPluginInput) GetName() string {
-	return "loggly"
-}
-
-func (o *LogglyPluginInput) GetOrdering() *LogglyPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *LogglyPluginInput) GetProtocols() []LogglyPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *LogglyPluginInput) GetRoute() *LogglyPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *LogglyPluginInput) GetService() *LogglyPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *LogglyPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

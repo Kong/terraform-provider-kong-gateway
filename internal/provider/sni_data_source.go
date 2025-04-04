@@ -29,12 +29,12 @@ type SniDataSource struct {
 
 // SniDataSourceModel describes the data model.
 type SniDataSourceModel struct {
-	Certificate tfTypes.ACLConsumer `tfsdk:"certificate"`
-	CreatedAt   types.Int64         `tfsdk:"created_at"`
-	ID          types.String        `tfsdk:"id"`
-	Name        types.String        `tfsdk:"name"`
-	Tags        []types.String      `tfsdk:"tags"`
-	UpdatedAt   types.Int64         `tfsdk:"updated_at"`
+	Certificate tfTypes.ACLWithoutParentsConsumer `tfsdk:"certificate"`
+	CreatedAt   types.Int64                       `tfsdk:"created_at"`
+	ID          types.String                      `tfsdk:"id"`
+	Name        types.String                      `tfsdk:"name"`
+	Tags        []types.String                    `tfsdk:"tags"`
+	UpdatedAt   types.Int64                       `tfsdk:"updated_at"`
 }
 
 // Metadata returns the data source type name.

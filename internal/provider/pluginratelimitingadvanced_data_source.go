@@ -29,19 +29,20 @@ type PluginRateLimitingAdvancedDataSource struct {
 
 // PluginRateLimitingAdvancedDataSourceModel describes the data model.
 type PluginRateLimitingAdvancedDataSourceModel struct {
-	Config        tfTypes.RateLimitingAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                     `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                     `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering               `tfsdk:"ordering"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                     `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                     `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
+	Config        *tfTypes.RateLimitingAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLWithoutParentsConsumer        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                               `tfsdk:"created_at"`
+	Enabled       types.Bool                                `tfsdk:"enabled"`
+	ID            types.String                              `tfsdk:"id"`
+	InstanceName  types.String                              `tfsdk:"instance_name"`
+	Ordering      *tfTypes.Ordering                         `tfsdk:"ordering"`
+	Partials      []tfTypes.Partials                        `tfsdk:"partials"`
+	Protocols     []types.String                            `tfsdk:"protocols"`
+	Route         *tfTypes.ACLWithoutParentsConsumer        `tfsdk:"route"`
+	Service       *tfTypes.ACLWithoutParentsConsumer        `tfsdk:"service"`
+	Tags          []types.String                            `tfsdk:"tags"`
+	UpdatedAt     types.Int64                               `tfsdk:"updated_at"`
 }
 
 // Metadata returns the data source type name.
@@ -58,6 +59,11 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"compound_identifier": schema.ListAttribute{
+						Computed:    true,
+						ElementType: types.StringType,
+						Description: `Similar to ` + "`" + `identifer` + "`" + `, but supports combining multiple items. The priority of ` + "`" + `compound_identifier` + "`" + ` is higher than ` + "`" + `identifier` + "`" + `, which means if ` + "`" + `compound_identifer` + "`" + ` is set, it will be used, otherwise ` + "`" + `identifier` + "`" + ` will be used.`,
+					},
 					"consumer_groups": schema.ListAttribute{
 						Computed:    true,
 						ElementType: types.StringType,
@@ -100,9 +106,13 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 						ElementType: types.NumberType,
 						Description: `One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified.`,
 					},
+					"lock_dictionary_name": schema.StringAttribute{
+						Computed:    true,
+						Description: `The shared dictionary where concurrency control locks are stored. The default shared dictionary is ` + "`" + `kong_locks` + "`" + `. The shared dictionary should be declare in nginx-kong.conf.`,
+					},
 					"namespace": schema.StringAttribute{
 						Computed:    true,
-						Description: `The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. NOTE: For the plugin instances sharing the same namespace, all the configurations that are required for synchronizing counters, e.g. ` + "`" + `strategy` + "`" + `, ` + "`" + `redis` + "`" + `, ` + "`" + `sync_rate` + "`" + `, ` + "`" + `window_size` + "`" + `, ` + "`" + `dictionary_name` + "`" + `, need to be the same.`,
+						Description: `The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. NOTE: For the plugin instances sharing the same namespace, all the configurations that are required for synchronizing counters, e.g. ` + "`" + `strategy` + "`" + `, ` + "`" + `redis` + "`" + `, ` + "`" + `sync_rate` + "`" + `, ` + "`" + `dictionary_name` + "`" + `, need to be the same.`,
 					},
 					"path": schema.StringAttribute{
 						Computed:    true,
@@ -166,6 +176,10 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 							"read_timeout": schema.Int64Attribute{
 								Computed:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
+							},
+							"redis_proxy_type": schema.StringAttribute{
+								Computed:    true,
+								Description: `If the ` + "`" + `connection_is_proxied` + "`" + ` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this optioin when you want authentication between Kong and Envoy proxy.`,
 							},
 							"send_timeout": schema.Int64Attribute{
 								Computed:    true,
@@ -260,6 +274,7 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 						Computed: true,
 					},
 				},
+				Description: `If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -298,10 +313,26 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing HTTP protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -310,7 +341,7 @@ func (r *PluginRateLimitingAdvancedDataSource) Schema(ctx context.Context, req d
 						Computed: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,

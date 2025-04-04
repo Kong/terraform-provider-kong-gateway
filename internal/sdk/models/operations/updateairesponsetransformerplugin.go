@@ -9,8 +9,8 @@ import (
 
 type UpdateAiresponsetransformerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                    string                                   `pathParam:"style=simple,explode=false,name=PluginId"`
-	AiResponseTransformerPlugin *shared.AiResponseTransformerPluginInput `request:"mediaType=application/json"`
+	PluginID                    string                             `pathParam:"style=simple,explode=false,name=PluginId"`
+	AiResponseTransformerPlugin shared.AiResponseTransformerPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAiresponsetransformerPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateAiresponsetransformerPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAiresponsetransformerPluginRequest) GetAiResponseTransformerPlugin() *shared.AiResponseTransformerPluginInput {
+func (o *UpdateAiresponsetransformerPluginRequest) GetAiResponseTransformerPlugin() shared.AiResponseTransformerPlugin {
 	if o == nil {
-		return nil
+		return shared.AiResponseTransformerPlugin{}
 	}
 	return o.AiResponseTransformerPlugin
 }

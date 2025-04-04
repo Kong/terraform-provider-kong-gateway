@@ -7,7 +7,13 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ConsumerGroupResourceModel) ToSharedConsumerGroupInput() *shared.ConsumerGroupInput {
+func (r *ConsumerGroupResourceModel) ToSharedConsumerGroup() *shared.ConsumerGroup {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
 	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
 		*id = r.ID.ValueString()
@@ -21,10 +27,18 @@ func (r *ConsumerGroupResourceModel) ToSharedConsumerGroupInput() *shared.Consum
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.ConsumerGroupInput{
-		ID:   id,
-		Name: name,
-		Tags: tags,
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.ConsumerGroup{
+		CreatedAt: createdAt,
+		ID:        id,
+		Name:      name,
+		Tags:      tags,
+		UpdatedAt: updatedAt,
 	}
 	return &out
 }
@@ -34,7 +48,7 @@ func (r *ConsumerGroupResourceModel) RefreshFromSharedConsumerGroup(resp *shared
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringValue(resp.Name)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

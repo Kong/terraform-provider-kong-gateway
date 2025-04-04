@@ -7,7 +7,13 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeySetResourceModel) ToSharedKeySetInput() *shared.KeySetInput {
+func (r *KeySetResourceModel) ToSharedKeySet() *shared.KeySet {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
 	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
 		*id = r.ID.ValueString()
@@ -24,10 +30,18 @@ func (r *KeySetResourceModel) ToSharedKeySetInput() *shared.KeySetInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.KeySetInput{
-		ID:   id,
-		Name: name,
-		Tags: tags,
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.KeySet{
+		CreatedAt: createdAt,
+		ID:        id,
+		Name:      name,
+		Tags:      tags,
+		UpdatedAt: updatedAt,
 	}
 	return &out
 }
@@ -37,7 +51,7 @@ func (r *KeySetResourceModel) RefreshFromSharedKeySet(resp *shared.KeySet) {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringPointerValue(resp.Name)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

@@ -9,8 +9,8 @@ import (
 
 type UpdateAcmePluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID   string                  `pathParam:"style=simple,explode=false,name=PluginId"`
-	AcmePlugin *shared.AcmePluginInput `request:"mediaType=application/json"`
+	PluginID   string            `pathParam:"style=simple,explode=false,name=PluginId"`
+	AcmePlugin shared.AcmePlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAcmePluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateAcmePluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAcmePluginRequest) GetAcmePlugin() *shared.AcmePluginInput {
+func (o *UpdateAcmePluginRequest) GetAcmePlugin() shared.AcmePlugin {
 	if o == nil {
-		return nil
+		return shared.AcmePlugin{}
 	}
 	return o.AcmePlugin
 }

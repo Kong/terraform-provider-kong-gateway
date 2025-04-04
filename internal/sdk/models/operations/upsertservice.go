@@ -11,7 +11,7 @@ type UpsertServiceRequest struct {
 	// ID or name of the Service to lookup
 	ServiceIDOrName string `pathParam:"style=simple,explode=false,name=ServiceIdOrName"`
 	// Description of the Service
-	Service shared.ServiceInput `request:"mediaType=application/json"`
+	Service shared.Service `request:"mediaType=application/json"`
 }
 
 func (o *UpsertServiceRequest) GetServiceIDOrName() string {
@@ -21,9 +21,9 @@ func (o *UpsertServiceRequest) GetServiceIDOrName() string {
 	return o.ServiceIDOrName
 }
 
-func (o *UpsertServiceRequest) GetService() shared.ServiceInput {
+func (o *UpsertServiceRequest) GetService() shared.Service {
 	if o == nil {
-		return shared.ServiceInput{}
+		return shared.Service{}
 	}
 	return o.Service
 }
@@ -36,7 +36,7 @@ type UpsertServiceResponse struct {
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
 	// Successfully upserted Service
-	Service *shared.Service
+	Service *shared.ServiceOutput
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
@@ -62,7 +62,7 @@ func (o *UpsertServiceResponse) GetRawResponse() *http.Response {
 	return o.RawResponse
 }
 
-func (o *UpsertServiceResponse) GetService() *shared.Service {
+func (o *UpsertServiceResponse) GetService() *shared.ServiceOutput {
 	if o == nil {
 		return nil
 	}

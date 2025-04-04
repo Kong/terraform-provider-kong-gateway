@@ -11,7 +11,7 @@ type UpsertConsumerGroupRequest struct {
 	// ID of the Consumer Group to lookup
 	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
 	// Description of the Consumer Group
-	ConsumerGroup shared.ConsumerGroupInput `request:"mediaType=application/json"`
+	ConsumerGroup shared.ConsumerGroup `request:"mediaType=application/json"`
 }
 
 func (o *UpsertConsumerGroupRequest) GetConsumerGroupID() string {
@@ -21,9 +21,9 @@ func (o *UpsertConsumerGroupRequest) GetConsumerGroupID() string {
 	return o.ConsumerGroupID
 }
 
-func (o *UpsertConsumerGroupRequest) GetConsumerGroup() shared.ConsumerGroupInput {
+func (o *UpsertConsumerGroupRequest) GetConsumerGroup() shared.ConsumerGroup {
 	if o == nil {
-		return shared.ConsumerGroupInput{}
+		return shared.ConsumerGroup{}
 	}
 	return o.ConsumerGroup
 }

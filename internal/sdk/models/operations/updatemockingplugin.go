@@ -9,8 +9,8 @@ import (
 
 type UpdateMockingPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string                     `pathParam:"style=simple,explode=false,name=PluginId"`
-	MockingPlugin *shared.MockingPluginInput `request:"mediaType=application/json"`
+	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	MockingPlugin shared.MockingPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateMockingPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateMockingPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateMockingPluginRequest) GetMockingPlugin() *shared.MockingPluginInput {
+func (o *UpdateMockingPluginRequest) GetMockingPlugin() shared.MockingPlugin {
 	if o == nil {
-		return nil
+		return shared.MockingPlugin{}
 	}
 	return o.MockingPlugin
 }

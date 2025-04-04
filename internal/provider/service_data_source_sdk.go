@@ -8,16 +8,18 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ServiceDataSourceModel) RefreshFromSharedService(resp *shared.Service) {
+func (r *ServiceDataSourceModel) RefreshFromSharedServiceOutput(resp *shared.ServiceOutput) {
 	if resp != nil {
-		r.CaCertificates = []types.String{}
-		for _, v := range resp.CaCertificates {
-			r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
+		if resp.CaCertificates != nil {
+			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
+			for _, v := range resp.CaCertificates {
+				r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
+			}
 		}
 		if resp.ClientCertificate == nil {
 			r.ClientCertificate = nil
 		} else {
-			r.ClientCertificate = &tfTypes.ACLConsumer{}
+			r.ClientCertificate = &tfTypes.ACLWithoutParentsConsumer{}
 			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
 		}
 		r.ConnectTimeout = types.Int64PointerValue(resp.ConnectTimeout)
@@ -27,11 +29,15 @@ func (r *ServiceDataSourceModel) RefreshFromSharedService(resp *shared.Service) 
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringPointerValue(resp.Name)
 		r.Path = types.StringPointerValue(resp.Path)
-		r.Port = types.Int64Value(resp.Port)
-		r.Protocol = types.StringValue(string(resp.Protocol))
+		r.Port = types.Int64PointerValue(resp.Port)
+		if resp.Protocol != nil {
+			r.Protocol = types.StringValue(string(*resp.Protocol))
+		} else {
+			r.Protocol = types.StringNull()
+		}
 		r.ReadTimeout = types.Int64PointerValue(resp.ReadTimeout)
 		r.Retries = types.Int64PointerValue(resp.Retries)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

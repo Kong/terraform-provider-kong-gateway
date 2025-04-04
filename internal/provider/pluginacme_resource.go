@@ -18,6 +18,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
+	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 	"regexp"
 )
@@ -37,19 +38,16 @@ type PluginAcmeResource struct {
 
 // PluginAcmeResourceModel describes the resource data model.
 type PluginAcmeResourceModel struct {
-	Config        tfTypes.AcmePluginConfig   `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                `tfsdk:"created_at"`
-	Enabled       types.Bool                 `tfsdk:"enabled"`
-	ID            types.String               `tfsdk:"id"`
-	InstanceName  types.String               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering `tfsdk:"ordering"`
-	Protocols     []types.String             `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer       `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer       `tfsdk:"service"`
-	Tags          []types.String             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                `tfsdk:"updated_at"`
+	Config       *tfTypes.AcmePluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64               `tfsdk:"created_at"`
+	Enabled      types.Bool                `tfsdk:"enabled"`
+	ID           types.String              `tfsdk:"id"`
+	InstanceName types.String              `tfsdk:"instance_name"`
+	Ordering     *tfTypes.Ordering         `tfsdk:"ordering"`
+	Partials     []tfTypes.Partials        `tfsdk:"partials"`
+	Protocols    []types.String            `tfsdk:"protocols"`
+	Tags         []types.String            `tfsdk:"tags"`
+	UpdatedAt    types.Int64               `tfsdk:"updated_at"`
 }
 
 func (r *PluginAcmeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +59,8 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 		MarkdownDescription: "PluginAcme Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"account_email": schema.StringAttribute{
 						Computed:    true,
@@ -104,11 +103,11 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"cert_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The certificate type to create. The possible values are ` + "`" + `'rsa'` + "`" + ` for RSA certificate or ` + "`" + `'ecc'` + "`" + ` for EC certificate. must be one of ["rsa", "ecc"]`,
+						Description: `The certificate type to create. The possible values are ` + "`" + `rsa` + "`" + ` for RSA certificate or ` + "`" + `ecc` + "`" + ` for EC certificate. must be one of ["ecc", "rsa"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"rsa",
 								"ecc",
+								"rsa",
 							),
 						},
 					},
@@ -164,13 +163,13 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"storage": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The backend storage type to use. The possible values are ` + "`" + `'kong'` + "`" + `, ` + "`" + `'shm'` + "`" + `, ` + "`" + `'redis'` + "`" + `, ` + "`" + `'consul'` + "`" + `, or ` + "`" + `'vault'` + "`" + `. In DB-less mode, ` + "`" + `'kong'` + "`" + ` storage is unavailable. Note that ` + "`" + `'shm'` + "`" + ` storage does not persist during Kong restarts and does not work for Kong running on different machines, so consider using one of ` + "`" + `'kong'` + "`" + `, ` + "`" + `'redis'` + "`" + `, ` + "`" + `'consul'` + "`" + `, or ` + "`" + `'vault'` + "`" + ` in production. Please refer to the Hybrid Mode sections below as well. must be one of ["kong", "shm", "redis", "consul", "vault"]`,
+						Description: `The backend storage type to use. In DB-less mode and Konnect, ` + "`" + `kong` + "`" + ` storage is unavailable. In hybrid mode and Konnect, ` + "`" + `shm` + "`" + ` storage is unavailable. ` + "`" + `shm` + "`" + ` storage does not persist during Kong restarts and does not work for Kong running on different machines, so consider using one of ` + "`" + `kong` + "`" + `, ` + "`" + `redis` + "`" + `, ` + "`" + `consul` + "`" + `, or ` + "`" + `vault` + "`" + ` in production. must be one of ["consul", "kong", "redis", "shm", "vault"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"kong",
-								"shm",
-								"redis",
 								"consul",
+								"kong",
+								"redis",
+								"shm",
 								"vault",
 							),
 						},
@@ -318,11 +317,11 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 									"auth_method": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Auth Method, default to token, can be 'token' or 'kubernetes'. must be one of ["token", "kubernetes"]`,
+										Description: `Auth Method, default to token, can be 'token' or 'kubernetes'. must be one of ["kubernetes", "token"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
-												"token",
 												"kubernetes",
+												"token",
 											),
 										},
 									},
@@ -395,29 +394,9 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 				},
 			},
-			"consumer": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-				Description: `If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.`,
-			},
-			"consumer_group": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -461,33 +440,34 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
-			},
-			"route": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
-			},
-			"service": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-				Description: `If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.`,
+				Description: `A set of strings representing HTTP protocols.`,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
@@ -497,6 +477,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -541,7 +522,7 @@ func (r *PluginAcmeResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request := data.ToSharedAcmePluginInput()
+	request := *data.ToSharedAcmePlugin()
 	res, err := r.client.Plugins.CreateAcmePlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -640,7 +621,7 @@ func (r *PluginAcmeResource) Update(ctx context.Context, req resource.UpdateRequ
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	acmePlugin := data.ToSharedAcmePluginInput()
+	acmePlugin := *data.ToSharedAcmePlugin()
 	request := operations.UpdateAcmePluginRequest{
 		PluginID:   pluginID,
 		AcmePlugin: acmePlugin,

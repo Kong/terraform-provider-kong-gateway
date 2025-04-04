@@ -29,24 +29,24 @@ type ServiceDataSource struct {
 
 // ServiceDataSourceModel describes the data model.
 type ServiceDataSourceModel struct {
-	CaCertificates    []types.String       `tfsdk:"ca_certificates"`
-	ClientCertificate *tfTypes.ACLConsumer `tfsdk:"client_certificate"`
-	ConnectTimeout    types.Int64          `tfsdk:"connect_timeout"`
-	CreatedAt         types.Int64          `tfsdk:"created_at"`
-	Enabled           types.Bool           `tfsdk:"enabled"`
-	Host              types.String         `tfsdk:"host"`
-	ID                types.String         `tfsdk:"id"`
-	Name              types.String         `tfsdk:"name"`
-	Path              types.String         `tfsdk:"path"`
-	Port              types.Int64          `tfsdk:"port"`
-	Protocol          types.String         `tfsdk:"protocol"`
-	ReadTimeout       types.Int64          `tfsdk:"read_timeout"`
-	Retries           types.Int64          `tfsdk:"retries"`
-	Tags              []types.String       `tfsdk:"tags"`
-	TLSVerify         types.Bool           `tfsdk:"tls_verify"`
-	TLSVerifyDepth    types.Int64          `tfsdk:"tls_verify_depth"`
-	UpdatedAt         types.Int64          `tfsdk:"updated_at"`
-	WriteTimeout      types.Int64          `tfsdk:"write_timeout"`
+	CaCertificates    []types.String                     `tfsdk:"ca_certificates"`
+	ClientCertificate *tfTypes.ACLWithoutParentsConsumer `tfsdk:"client_certificate"`
+	ConnectTimeout    types.Int64                        `tfsdk:"connect_timeout"`
+	CreatedAt         types.Int64                        `tfsdk:"created_at"`
+	Enabled           types.Bool                         `tfsdk:"enabled"`
+	Host              types.String                       `tfsdk:"host"`
+	ID                types.String                       `tfsdk:"id"`
+	Name              types.String                       `tfsdk:"name"`
+	Path              types.String                       `tfsdk:"path"`
+	Port              types.Int64                        `tfsdk:"port"`
+	Protocol          types.String                       `tfsdk:"protocol"`
+	ReadTimeout       types.Int64                        `tfsdk:"read_timeout"`
+	Retries           types.Int64                        `tfsdk:"retries"`
+	Tags              []types.String                     `tfsdk:"tags"`
+	TLSVerify         types.Bool                         `tfsdk:"tls_verify"`
+	TLSVerifyDepth    types.Int64                        `tfsdk:"tls_verify_depth"`
+	UpdatedAt         types.Int64                        `tfsdk:"updated_at"`
+	WriteTimeout      types.Int64                        `tfsdk:"write_timeout"`
 }
 
 // Metadata returns the data source type name.
@@ -210,7 +210,7 @@ func (r *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedService(res.Service)
+	data.RefreshFromSharedServiceOutput(res.Service)
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

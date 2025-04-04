@@ -9,8 +9,8 @@ import (
 
 type UpdateKafkalogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID       string                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	KafkaLogPlugin *shared.KafkaLogPluginInput `request:"mediaType=application/json"`
+	PluginID       string                `pathParam:"style=simple,explode=false,name=PluginId"`
+	KafkaLogPlugin shared.KafkaLogPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateKafkalogPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateKafkalogPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateKafkalogPluginRequest) GetKafkaLogPlugin() *shared.KafkaLogPluginInput {
+func (o *UpdateKafkalogPluginRequest) GetKafkaLogPlugin() shared.KafkaLogPlugin {
 	if o == nil {
-		return nil
+		return shared.KafkaLogPlugin{}
 	}
 	return o.KafkaLogPlugin
 }

@@ -9,8 +9,8 @@ import (
 
 type UpdateKeyauthencPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID         string                        `pathParam:"style=simple,explode=false,name=PluginId"`
-	KeyAuthEncPlugin *shared.KeyAuthEncPluginInput `request:"mediaType=application/json"`
+	PluginID         string                  `pathParam:"style=simple,explode=false,name=PluginId"`
+	KeyAuthEncPlugin shared.KeyAuthEncPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateKeyauthencPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateKeyauthencPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateKeyauthencPluginRequest) GetKeyAuthEncPlugin() *shared.KeyAuthEncPluginInput {
+func (o *UpdateKeyauthencPluginRequest) GetKeyAuthEncPlugin() shared.KeyAuthEncPlugin {
 	if o == nil {
-		return nil
+		return shared.KeyAuthEncPlugin{}
 	}
 	return o.KeyAuthEncPlugin
 }

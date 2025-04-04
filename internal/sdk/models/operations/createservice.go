@@ -15,7 +15,7 @@ type CreateServiceResponse struct {
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
 	// Successfully created Service
-	Service *shared.Service
+	Service *shared.ServiceOutput
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
@@ -41,7 +41,7 @@ func (o *CreateServiceResponse) GetRawResponse() *http.Response {
 	return o.RawResponse
 }
 
-func (o *CreateServiceResponse) GetService() *shared.Service {
+func (o *CreateServiceResponse) GetService() *shared.ServiceOutput {
 	if o == nil {
 		return nil
 	}

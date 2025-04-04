@@ -15,6 +15,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
+	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	"regexp"
 )
 
@@ -33,19 +34,20 @@ type PluginRequestTransformerResource struct {
 
 // PluginRequestTransformerResourceModel describes the resource data model.
 type PluginRequestTransformerResourceModel struct {
-	Config        tfTypes.RequestTransformerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLConsumer                   `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLConsumer                   `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                            `tfsdk:"created_at"`
-	Enabled       types.Bool                             `tfsdk:"enabled"`
-	ID            types.String                           `tfsdk:"id"`
-	InstanceName  types.String                           `tfsdk:"instance_name"`
-	Ordering      *tfTypes.ACLPluginOrdering             `tfsdk:"ordering"`
-	Protocols     []types.String                         `tfsdk:"protocols"`
-	Route         *tfTypes.ACLConsumer                   `tfsdk:"route"`
-	Service       *tfTypes.ACLConsumer                   `tfsdk:"service"`
-	Tags          []types.String                         `tfsdk:"tags"`
-	UpdatedAt     types.Int64                            `tfsdk:"updated_at"`
+	Config        *tfTypes.RequestTransformerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                             `tfsdk:"created_at"`
+	Enabled       types.Bool                              `tfsdk:"enabled"`
+	ID            types.String                            `tfsdk:"id"`
+	InstanceName  types.String                            `tfsdk:"instance_name"`
+	Ordering      *tfTypes.Ordering                       `tfsdk:"ordering"`
+	Partials      []tfTypes.Partials                      `tfsdk:"partials"`
+	Protocols     []types.String                          `tfsdk:"protocols"`
+	Route         *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"route"`
+	Service       *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"service"`
+	Tags          []types.String                          `tfsdk:"tags"`
+	UpdatedAt     types.Int64                             `tfsdk:"updated_at"`
 }
 
 func (r *PluginRequestTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,7 +59,8 @@ func (r *PluginRequestTransformerResource) Schema(ctx context.Context, req resou
 		MarkdownDescription: "PluginRequestTransformer Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"add": schema.SingleNestedAttribute{
 						Computed: true,
@@ -198,9 +201,11 @@ func (r *PluginRequestTransformerResource) Schema(ctx context.Context, req resou
 						Optional: true,
 					},
 				},
+				Description: `If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"enabled": schema.BoolAttribute{
@@ -244,11 +249,34 @@ func (r *PluginRequestTransformerResource) Schema(ctx context.Context, req resou
 					},
 				},
 			},
+			"partials": schema.ListNestedAttribute{
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Validators: []validator.Object{
+						speakeasy_objectvalidators.NotNull(),
+					},
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+						"path": schema.StringAttribute{
+							Computed: true,
+							Optional: true,
+						},
+					},
+				},
+			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support ` + "`" + `"tcp"` + "`" + ` and ` + "`" + `"tls"` + "`" + `.`,
+				Description: `A set of strings representing protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -259,7 +287,7 @@ func (r *PluginRequestTransformerResource) Schema(ctx context.Context, req resou
 						Optional: true,
 					},
 				},
-				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.`,
+				Description: `If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.`,
 			},
 			"service": schema.SingleNestedAttribute{
 				Computed: true,
@@ -280,6 +308,7 @@ func (r *PluginRequestTransformerResource) Schema(ctx context.Context, req resou
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -324,7 +353,7 @@ func (r *PluginRequestTransformerResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request := data.ToSharedRequestTransformerPluginInput()
+	request := *data.ToSharedRequestTransformerPlugin()
 	res, err := r.client.Plugins.CreateRequesttransformerPlugin(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -423,7 +452,7 @@ func (r *PluginRequestTransformerResource) Update(ctx context.Context, req resou
 	var pluginID string
 	pluginID = data.ID.ValueString()
 
-	requestTransformerPlugin := data.ToSharedRequestTransformerPluginInput()
+	requestTransformerPlugin := *data.ToSharedRequestTransformerPlugin()
 	request := operations.UpdateRequesttransformerPluginRequest{
 		PluginID:                 pluginID,
 		RequestTransformerPlugin: requestTransformerPlugin,

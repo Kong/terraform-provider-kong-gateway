@@ -8,6 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type ForwardProxyPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *ForwardProxyPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type ForwardProxyPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *ForwardProxyPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type ForwardProxyPluginOrdering struct {
+	After  *ForwardProxyPluginAfter  `json:"after,omitempty"`
+	Before *ForwardProxyPluginBefore `json:"before,omitempty"`
+}
+
+func (o *ForwardProxyPluginOrdering) GetAfter() *ForwardProxyPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *ForwardProxyPluginOrdering) GetBefore() *ForwardProxyPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type ForwardProxyPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *ForwardProxyPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *ForwardProxyPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *ForwardProxyPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 // ProxyScheme - The proxy scheme to use when connecting. Only `http` is supported.
 type ProxyScheme string
 
@@ -37,8 +105,8 @@ type XHeaders string
 
 const (
 	XHeadersAppend      XHeaders = "append"
-	XHeadersTransparent XHeaders = "transparent"
 	XHeadersDelete      XHeaders = "delete"
+	XHeadersTransparent XHeaders = "transparent"
 )
 
 func (e XHeaders) ToPointer() *XHeaders {
@@ -52,9 +120,9 @@ func (e *XHeaders) UnmarshalJSON(data []byte) error {
 	switch v {
 	case "append":
 		fallthrough
-	case "transparent":
-		fallthrough
 	case "delete":
+		fallthrough
+	case "transparent":
 		*e = XHeaders(v)
 		return nil
 	default:
@@ -160,71 +228,13 @@ func (o *ForwardProxyPluginConsumer) GetID() *string {
 	return o.ID
 }
 
-type ForwardProxyPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *ForwardProxyPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type ForwardProxyPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ForwardProxyPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ForwardProxyPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ForwardProxyPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ForwardProxyPluginOrdering struct {
-	After  *ForwardProxyPluginAfter  `json:"after,omitempty"`
-	Before *ForwardProxyPluginBefore `json:"before,omitempty"`
-}
-
-func (o *ForwardProxyPluginOrdering) GetAfter() *ForwardProxyPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *ForwardProxyPluginOrdering) GetBefore() *ForwardProxyPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
 type ForwardProxyPluginProtocols string
 
 const (
-	ForwardProxyPluginProtocolsGrpc           ForwardProxyPluginProtocols = "grpc"
-	ForwardProxyPluginProtocolsGrpcs          ForwardProxyPluginProtocols = "grpcs"
-	ForwardProxyPluginProtocolsHTTP           ForwardProxyPluginProtocols = "http"
-	ForwardProxyPluginProtocolsHTTPS          ForwardProxyPluginProtocols = "https"
-	ForwardProxyPluginProtocolsTCP            ForwardProxyPluginProtocols = "tcp"
-	ForwardProxyPluginProtocolsTLS            ForwardProxyPluginProtocols = "tls"
-	ForwardProxyPluginProtocolsTLSPassthrough ForwardProxyPluginProtocols = "tls_passthrough"
-	ForwardProxyPluginProtocolsUDP            ForwardProxyPluginProtocols = "udp"
-	ForwardProxyPluginProtocolsWs             ForwardProxyPluginProtocols = "ws"
-	ForwardProxyPluginProtocolsWss            ForwardProxyPluginProtocols = "wss"
+	ForwardProxyPluginProtocolsGrpc  ForwardProxyPluginProtocols = "grpc"
+	ForwardProxyPluginProtocolsGrpcs ForwardProxyPluginProtocols = "grpcs"
+	ForwardProxyPluginProtocolsHTTP  ForwardProxyPluginProtocols = "http"
+	ForwardProxyPluginProtocolsHTTPS ForwardProxyPluginProtocols = "https"
 )
 
 func (e ForwardProxyPluginProtocols) ToPointer() *ForwardProxyPluginProtocols {
@@ -243,18 +253,6 @@ func (e *ForwardProxyPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
-		fallthrough
-	case "tcp":
-		fallthrough
-	case "tls":
-		fallthrough
-	case "tls_passthrough":
-		fallthrough
-	case "udp":
-		fallthrough
-	case "ws":
-		fallthrough
-	case "wss":
 		*e = ForwardProxyPluginProtocols(v)
 		return nil
 	default:
@@ -262,7 +260,7 @@ func (e *ForwardProxyPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// ForwardProxyPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// ForwardProxyPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type ForwardProxyPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -288,28 +286,28 @@ func (o *ForwardProxyPluginService) GetID() *string {
 
 // ForwardProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ForwardProxyPlugin struct {
-	Config ForwardProxyPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *ForwardProxyPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *ForwardProxyPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                       `json:"enabled,omitempty"`
-	ID           *string                     `json:"id,omitempty"`
-	InstanceName *string                     `json:"instance_name,omitempty"`
-	name         string                      `const:"forward-proxy" json:"name"`
-	Ordering     *ForwardProxyPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []ForwardProxyPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *ForwardProxyPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *ForwardProxyPluginService `json:"service,omitempty"`
+	Enabled      *bool                        `json:"enabled,omitempty"`
+	ID           *string                      `json:"id,omitempty"`
+	InstanceName *string                      `json:"instance_name,omitempty"`
+	name         string                       `const:"forward-proxy" json:"name"`
+	Ordering     *ForwardProxyPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []ForwardProxyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    *ForwardProxyPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ForwardProxyPluginConsumer `json:"consumer,omitempty"`
+	// A set of strings representing HTTP protocols.
+	Protocols []ForwardProxyPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *ForwardProxyPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *ForwardProxyPluginService `json:"service,omitempty"`
 }
 
 func (f ForwardProxyPlugin) MarshalJSON() ([]byte, error) {
@@ -321,27 +319,6 @@ func (f *ForwardProxyPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *ForwardProxyPlugin) GetConfig() ForwardProxyPluginConfig {
-	if o == nil {
-		return ForwardProxyPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *ForwardProxyPlugin) GetConsumer() *ForwardProxyPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *ForwardProxyPlugin) GetConsumerGroup() *ForwardProxyPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *ForwardProxyPlugin) GetCreatedAt() *int64 {
@@ -383,6 +360,41 @@ func (o *ForwardProxyPlugin) GetOrdering() *ForwardProxyPluginOrdering {
 	return o.Ordering
 }
 
+func (o *ForwardProxyPlugin) GetPartials() []ForwardProxyPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *ForwardProxyPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *ForwardProxyPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *ForwardProxyPlugin) GetConfig() *ForwardProxyPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
+func (o *ForwardProxyPlugin) GetConsumer() *ForwardProxyPluginConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
+}
+
 func (o *ForwardProxyPlugin) GetProtocols() []ForwardProxyPluginProtocols {
 	if o == nil {
 		return nil
@@ -402,132 +414,4 @@ func (o *ForwardProxyPlugin) GetService() *ForwardProxyPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *ForwardProxyPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *ForwardProxyPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// ForwardProxyPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type ForwardProxyPluginInput struct {
-	Config ForwardProxyPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *ForwardProxyPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *ForwardProxyPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                       `json:"enabled,omitempty"`
-	ID           *string                     `json:"id,omitempty"`
-	InstanceName *string                     `json:"instance_name,omitempty"`
-	name         string                      `const:"forward-proxy" json:"name"`
-	Ordering     *ForwardProxyPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []ForwardProxyPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *ForwardProxyPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *ForwardProxyPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (f ForwardProxyPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(f, "", false)
-}
-
-func (f *ForwardProxyPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &f, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *ForwardProxyPluginInput) GetConfig() ForwardProxyPluginConfig {
-	if o == nil {
-		return ForwardProxyPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *ForwardProxyPluginInput) GetConsumer() *ForwardProxyPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *ForwardProxyPluginInput) GetConsumerGroup() *ForwardProxyPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *ForwardProxyPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *ForwardProxyPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *ForwardProxyPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *ForwardProxyPluginInput) GetName() string {
-	return "forward-proxy"
-}
-
-func (o *ForwardProxyPluginInput) GetOrdering() *ForwardProxyPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *ForwardProxyPluginInput) GetProtocols() []ForwardProxyPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *ForwardProxyPluginInput) GetRoute() *ForwardProxyPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *ForwardProxyPluginInput) GetService() *ForwardProxyPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *ForwardProxyPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

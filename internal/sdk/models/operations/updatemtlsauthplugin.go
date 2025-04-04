@@ -9,8 +9,8 @@ import (
 
 type UpdateMtlsauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID       string                      `pathParam:"style=simple,explode=false,name=PluginId"`
-	MtlsAuthPlugin *shared.MtlsAuthPluginInput `request:"mediaType=application/json"`
+	PluginID       string                `pathParam:"style=simple,explode=false,name=PluginId"`
+	MtlsAuthPlugin shared.MtlsAuthPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateMtlsauthPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateMtlsauthPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateMtlsauthPluginRequest) GetMtlsAuthPlugin() *shared.MtlsAuthPluginInput {
+func (o *UpdateMtlsauthPluginRequest) GetMtlsAuthPlugin() shared.MtlsAuthPlugin {
 	if o == nil {
-		return nil
+		return shared.MtlsAuthPlugin{}
 	}
 	return o.MtlsAuthPlugin
 }

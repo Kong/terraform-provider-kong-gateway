@@ -11,7 +11,7 @@ type UpsertKeySetRequest struct {
 	// ID or name of the KeySet to lookup
 	KeySetIDOrName string `pathParam:"style=simple,explode=false,name=KeySetIdOrName"`
 	// Description of the KeySet
-	KeySet shared.KeySetInput `request:"mediaType=application/json"`
+	KeySet shared.KeySet `request:"mediaType=application/json"`
 }
 
 func (o *UpsertKeySetRequest) GetKeySetIDOrName() string {
@@ -21,9 +21,9 @@ func (o *UpsertKeySetRequest) GetKeySetIDOrName() string {
 	return o.KeySetIDOrName
 }
 
-func (o *UpsertKeySetRequest) GetKeySet() shared.KeySetInput {
+func (o *UpsertKeySetRequest) GetKeySet() shared.KeySet {
 	if o == nil {
-		return shared.KeySetInput{}
+		return shared.KeySet{}
 	}
 	return o.KeySet
 }

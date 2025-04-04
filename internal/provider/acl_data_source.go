@@ -29,11 +29,12 @@ type ACLDataSource struct {
 
 // ACLDataSourceModel describes the data model.
 type ACLDataSourceModel struct {
-	Consumer  *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	Group     types.String         `tfsdk:"group"`
-	ID        types.String         `tfsdk:"id"`
-	Tags      []types.String       `tfsdk:"tags"`
+	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID types.String                       `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64                        `tfsdk:"created_at"`
+	Group      types.String                       `tfsdk:"group"`
+	ID         types.String                       `tfsdk:"id"`
+	Tags       []types.String                     `tfsdk:"tags"`
 }
 
 // Metadata returns the data source type name.
@@ -54,6 +55,10 @@ func (r *ACLDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 						Computed: true,
 					},
 				},
+			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -111,13 +116,17 @@ func (r *ACLDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var aclID string
 	aclID = data.ID.ValueString()
 
-	request := operations.GetACLRequest{
-		ACLID: aclID,
+	request := operations.GetACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
 	}
-	res, err := r.client.ACLs.GetACL(ctx, request)
+	res, err := r.client.ACLs.GetACLWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

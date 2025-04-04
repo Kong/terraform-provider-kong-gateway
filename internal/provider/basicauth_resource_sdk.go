@@ -8,8 +8,8 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *BasicAuthResourceModel) ToSharedBasicAuthInput() *shared.BasicAuthInput {
-	var consumer *shared.BasicAuthConsumer
+func (r *BasicAuthResourceModel) ToSharedBasicAuthWithoutParents() *shared.BasicAuthWithoutParents {
+	var consumer *shared.BasicAuthWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
@@ -17,9 +17,15 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuthInput() *shared.BasicAuthInput
 		} else {
 			id = nil
 		}
-		consumer = &shared.BasicAuthConsumer{
+		consumer = &shared.BasicAuthWithoutParentsConsumer{
 			ID: id,
 		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
@@ -37,12 +43,13 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuthInput() *shared.BasicAuthInput
 	var username string
 	username = r.Username.ValueString()
 
-	out := shared.BasicAuthInput{
-		Consumer: consumer,
-		ID:       id1,
-		Password: password,
-		Tags:     tags,
-		Username: username,
+	out := shared.BasicAuthWithoutParents{
+		Consumer:  consumer,
+		CreatedAt: createdAt,
+		ID:        id1,
+		Password:  password,
+		Tags:      tags,
+		Username:  username,
 	}
 	return &out
 }
@@ -52,16 +59,62 @@ func (r *BasicAuthResourceModel) RefreshFromSharedBasicAuth(resp *shared.BasicAu
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Password = types.StringValue(resp.Password)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 		r.Username = types.StringValue(resp.Username)
 	}
+}
+
+func (r *BasicAuthResourceModel) ToSharedBasicAuth() *shared.BasicAuth {
+	var consumer *shared.BasicAuthConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.BasicAuthConsumer{
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	var password string
+	password = r.Password.ValueString()
+
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	var username string
+	username = r.Username.ValueString()
+
+	out := shared.BasicAuth{
+		Consumer:  consumer,
+		CreatedAt: createdAt,
+		ID:        id1,
+		Password:  password,
+		Tags:      tags,
+		Username:  username,
+	}
+	return &out
 }

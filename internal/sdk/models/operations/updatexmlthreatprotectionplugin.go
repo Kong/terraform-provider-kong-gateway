@@ -9,8 +9,8 @@ import (
 
 type UpdateXmlthreatprotectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                                 `pathParam:"style=simple,explode=false,name=PluginId"`
-	XMLThreatProtectionPlugin *shared.XMLThreatProtectionPluginInput `request:"mediaType=application/json"`
+	PluginID                  string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	XMLThreatProtectionPlugin shared.XMLThreatProtectionPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateXmlthreatprotectionPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateXmlthreatprotectionPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateXmlthreatprotectionPluginRequest) GetXMLThreatProtectionPlugin() *shared.XMLThreatProtectionPluginInput {
+func (o *UpdateXmlthreatprotectionPluginRequest) GetXMLThreatProtectionPlugin() shared.XMLThreatProtectionPlugin {
 	if o == nil {
-		return nil
+		return shared.XMLThreatProtectionPlugin{}
 	}
 	return o.XMLThreatProtectionPlugin
 }

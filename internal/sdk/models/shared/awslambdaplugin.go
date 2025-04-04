@@ -8,6 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AwsLambdaPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AwsLambdaPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AwsLambdaPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *AwsLambdaPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type AwsLambdaPluginOrdering struct {
+	After  *AwsLambdaPluginAfter  `json:"after,omitempty"`
+	Before *AwsLambdaPluginBefore `json:"before,omitempty"`
+}
+
+func (o *AwsLambdaPluginOrdering) GetAfter() *AwsLambdaPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *AwsLambdaPluginOrdering) GetBefore() *AwsLambdaPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type AwsLambdaPluginPartials struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *AwsLambdaPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *AwsLambdaPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *AwsLambdaPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 // AwsImdsProtocolVersion - Identifier to select the IMDS protocol version to use: `v1` or `v2`.
 type AwsImdsProtocolVersion string
 
@@ -39,8 +107,8 @@ func (e *AwsImdsProtocolVersion) UnmarshalJSON(data []byte) error {
 type EmptyArraysMode string
 
 const (
-	EmptyArraysModeLegacy  EmptyArraysMode = "legacy"
 	EmptyArraysModeCorrect EmptyArraysMode = "correct"
+	EmptyArraysModeLegacy  EmptyArraysMode = "legacy"
 )
 
 func (e EmptyArraysMode) ToPointer() *EmptyArraysMode {
@@ -52,9 +120,9 @@ func (e *EmptyArraysMode) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "legacy":
-		fallthrough
 	case "correct":
+		fallthrough
+	case "legacy":
 		*e = EmptyArraysMode(v)
 		return nil
 	default:
@@ -66,9 +134,9 @@ func (e *EmptyArraysMode) UnmarshalJSON(data []byte) error {
 type InvocationType string
 
 const (
-	InvocationTypeRequestResponse InvocationType = "RequestResponse"
-	InvocationTypeEvent           InvocationType = "Event"
 	InvocationTypeDryRun          InvocationType = "DryRun"
+	InvocationTypeEvent           InvocationType = "Event"
+	InvocationTypeRequestResponse InvocationType = "RequestResponse"
 )
 
 func (e InvocationType) ToPointer() *InvocationType {
@@ -80,11 +148,11 @@ func (e *InvocationType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "RequestResponse":
+	case "DryRun":
 		fallthrough
 	case "Event":
 		fallthrough
-	case "DryRun":
+	case "RequestResponse":
 		*e = InvocationType(v)
 		return nil
 	default:
@@ -96,8 +164,8 @@ func (e *InvocationType) UnmarshalJSON(data []byte) error {
 type LogType string
 
 const (
-	LogTypeTail LogType = "Tail"
 	LogTypeNone LogType = "None"
+	LogTypeTail LogType = "Tail"
 )
 
 func (e LogType) ToPointer() *LogType {
@@ -109,9 +177,9 @@ func (e *LogType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case "Tail":
-		fallthrough
 	case "None":
+		fallthrough
+	case "Tail":
 		*e = LogType(v)
 		return nil
 	default:
@@ -376,71 +444,13 @@ func (o *AwsLambdaPluginConsumer) GetID() *string {
 	return o.ID
 }
 
-type AwsLambdaPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (o *AwsLambdaPluginConsumerGroup) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-type AwsLambdaPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *AwsLambdaPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type AwsLambdaPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *AwsLambdaPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type AwsLambdaPluginOrdering struct {
-	After  *AwsLambdaPluginAfter  `json:"after,omitempty"`
-	Before *AwsLambdaPluginBefore `json:"before,omitempty"`
-}
-
-func (o *AwsLambdaPluginOrdering) GetAfter() *AwsLambdaPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *AwsLambdaPluginOrdering) GetBefore() *AwsLambdaPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
 type AwsLambdaPluginProtocols string
 
 const (
-	AwsLambdaPluginProtocolsGrpc           AwsLambdaPluginProtocols = "grpc"
-	AwsLambdaPluginProtocolsGrpcs          AwsLambdaPluginProtocols = "grpcs"
-	AwsLambdaPluginProtocolsHTTP           AwsLambdaPluginProtocols = "http"
-	AwsLambdaPluginProtocolsHTTPS          AwsLambdaPluginProtocols = "https"
-	AwsLambdaPluginProtocolsTCP            AwsLambdaPluginProtocols = "tcp"
-	AwsLambdaPluginProtocolsTLS            AwsLambdaPluginProtocols = "tls"
-	AwsLambdaPluginProtocolsTLSPassthrough AwsLambdaPluginProtocols = "tls_passthrough"
-	AwsLambdaPluginProtocolsUDP            AwsLambdaPluginProtocols = "udp"
-	AwsLambdaPluginProtocolsWs             AwsLambdaPluginProtocols = "ws"
-	AwsLambdaPluginProtocolsWss            AwsLambdaPluginProtocols = "wss"
+	AwsLambdaPluginProtocolsGrpc  AwsLambdaPluginProtocols = "grpc"
+	AwsLambdaPluginProtocolsGrpcs AwsLambdaPluginProtocols = "grpcs"
+	AwsLambdaPluginProtocolsHTTP  AwsLambdaPluginProtocols = "http"
+	AwsLambdaPluginProtocolsHTTPS AwsLambdaPluginProtocols = "https"
 )
 
 func (e AwsLambdaPluginProtocols) ToPointer() *AwsLambdaPluginProtocols {
@@ -459,18 +469,6 @@ func (e *AwsLambdaPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
-		fallthrough
-	case "tcp":
-		fallthrough
-	case "tls":
-		fallthrough
-	case "tls_passthrough":
-		fallthrough
-	case "udp":
-		fallthrough
-	case "ws":
-		fallthrough
-	case "wss":
 		*e = AwsLambdaPluginProtocols(v)
 		return nil
 	default:
@@ -478,7 +476,7 @@ func (e *AwsLambdaPluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// AwsLambdaPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+// AwsLambdaPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 type AwsLambdaPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -504,28 +502,28 @@ func (o *AwsLambdaPluginService) GetID() *string {
 
 // AwsLambdaPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AwsLambdaPlugin struct {
-	Config AwsLambdaPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *AwsLambdaPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *AwsLambdaPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                    `json:"enabled,omitempty"`
-	ID           *string                  `json:"id,omitempty"`
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"aws-lambda" json:"name"`
-	Ordering     *AwsLambdaPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []AwsLambdaPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *AwsLambdaPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *AwsLambdaPluginService `json:"service,omitempty"`
+	Enabled      *bool                     `json:"enabled,omitempty"`
+	ID           *string                   `json:"id,omitempty"`
+	InstanceName *string                   `json:"instance_name,omitempty"`
+	name         string                    `const:"aws-lambda" json:"name"`
+	Ordering     *AwsLambdaPluginOrdering  `json:"ordering,omitempty"`
+	Partials     []AwsLambdaPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	UpdatedAt *int64                 `json:"updated_at,omitempty"`
+	Config    *AwsLambdaPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AwsLambdaPluginConsumer `json:"consumer,omitempty"`
+	// A set of strings representing HTTP protocols.
+	Protocols []AwsLambdaPluginProtocols `json:"protocols,omitempty"`
+	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+	Route *AwsLambdaPluginRoute `json:"route,omitempty"`
+	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
+	Service *AwsLambdaPluginService `json:"service,omitempty"`
 }
 
 func (a AwsLambdaPlugin) MarshalJSON() ([]byte, error) {
@@ -537,27 +535,6 @@ func (a *AwsLambdaPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (o *AwsLambdaPlugin) GetConfig() AwsLambdaPluginConfig {
-	if o == nil {
-		return AwsLambdaPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *AwsLambdaPlugin) GetConsumer() *AwsLambdaPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *AwsLambdaPlugin) GetConsumerGroup() *AwsLambdaPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
 }
 
 func (o *AwsLambdaPlugin) GetCreatedAt() *int64 {
@@ -599,6 +576,41 @@ func (o *AwsLambdaPlugin) GetOrdering() *AwsLambdaPluginOrdering {
 	return o.Ordering
 }
 
+func (o *AwsLambdaPlugin) GetPartials() []AwsLambdaPluginPartials {
+	if o == nil {
+		return nil
+	}
+	return o.Partials
+}
+
+func (o *AwsLambdaPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *AwsLambdaPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *AwsLambdaPlugin) GetConfig() *AwsLambdaPluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
+}
+
+func (o *AwsLambdaPlugin) GetConsumer() *AwsLambdaPluginConsumer {
+	if o == nil {
+		return nil
+	}
+	return o.Consumer
+}
+
 func (o *AwsLambdaPlugin) GetProtocols() []AwsLambdaPluginProtocols {
 	if o == nil {
 		return nil
@@ -618,132 +630,4 @@ func (o *AwsLambdaPlugin) GetService() *AwsLambdaPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *AwsLambdaPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *AwsLambdaPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-// AwsLambdaPluginInput - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
-type AwsLambdaPluginInput struct {
-	Config AwsLambdaPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer      *AwsLambdaPluginConsumer      `json:"consumer,omitempty"`
-	ConsumerGroup *AwsLambdaPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                    `json:"enabled,omitempty"`
-	ID           *string                  `json:"id,omitempty"`
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"aws-lambda" json:"name"`
-	Ordering     *AwsLambdaPluginOrdering `json:"ordering,omitempty"`
-	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
-	Protocols []AwsLambdaPluginProtocols `json:"protocols,omitempty"`
-	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *AwsLambdaPluginRoute `json:"route,omitempty"`
-	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
-	Service *AwsLambdaPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-}
-
-func (a AwsLambdaPluginInput) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(a, "", false)
-}
-
-func (a *AwsLambdaPluginInput) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *AwsLambdaPluginInput) GetConfig() AwsLambdaPluginConfig {
-	if o == nil {
-		return AwsLambdaPluginConfig{}
-	}
-	return o.Config
-}
-
-func (o *AwsLambdaPluginInput) GetConsumer() *AwsLambdaPluginConsumer {
-	if o == nil {
-		return nil
-	}
-	return o.Consumer
-}
-
-func (o *AwsLambdaPluginInput) GetConsumerGroup() *AwsLambdaPluginConsumerGroup {
-	if o == nil {
-		return nil
-	}
-	return o.ConsumerGroup
-}
-
-func (o *AwsLambdaPluginInput) GetEnabled() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Enabled
-}
-
-func (o *AwsLambdaPluginInput) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *AwsLambdaPluginInput) GetInstanceName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.InstanceName
-}
-
-func (o *AwsLambdaPluginInput) GetName() string {
-	return "aws-lambda"
-}
-
-func (o *AwsLambdaPluginInput) GetOrdering() *AwsLambdaPluginOrdering {
-	if o == nil {
-		return nil
-	}
-	return o.Ordering
-}
-
-func (o *AwsLambdaPluginInput) GetProtocols() []AwsLambdaPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *AwsLambdaPluginInput) GetRoute() *AwsLambdaPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *AwsLambdaPluginInput) GetService() *AwsLambdaPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
-}
-
-func (o *AwsLambdaPluginInput) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
 }

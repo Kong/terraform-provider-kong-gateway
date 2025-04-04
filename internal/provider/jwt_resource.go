@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -32,14 +34,15 @@ type JwtResource struct {
 
 // JwtResourceModel describes the resource data model.
 type JwtResourceModel struct {
-	Algorithm    types.String         `tfsdk:"algorithm"`
-	Consumer     *tfTypes.ACLConsumer `tfsdk:"consumer"`
-	CreatedAt    types.Int64          `tfsdk:"created_at"`
-	ID           types.String         `tfsdk:"id"`
-	Key          types.String         `tfsdk:"key"`
-	RsaPublicKey types.String         `tfsdk:"rsa_public_key"`
-	Secret       types.String         `tfsdk:"secret"`
-	Tags         []types.String       `tfsdk:"tags"`
+	Algorithm    types.String                       `tfsdk:"algorithm"`
+	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
+	ConsumerID   types.String                       `tfsdk:"consumer_id"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	ID           types.String                       `tfsdk:"id"`
+	Key          types.String                       `tfsdk:"key"`
+	RsaPublicKey types.String                       `tfsdk:"rsa_public_key"`
+	Secret       types.String                       `tfsdk:"secret"`
+	Tags         []types.String                     `tfsdk:"tags"`
 }
 
 func (r *JwtResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -82,8 +85,13 @@ func (r *JwtResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 					},
 				},
 			},
+			"consumer_id": schema.StringAttribute{
+				Required:    true,
+				Description: `Consumer ID for nested entities`,
+			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -149,8 +157,15 @@ func (r *JwtResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedJWTInput()
-	res, err := r.client.JWTs.CreateJwt(ctx, request)
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
+	jwtWithoutParents := *data.ToSharedJWTWithoutParents()
+	request := operations.CreateJwtWithConsumerRequest{
+		ConsumerID:        consumerID,
+		JWTWithoutParents: jwtWithoutParents,
+	}
+	res, err := r.client.JWTs.CreateJwtWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -195,13 +210,17 @@ func (r *JwtResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var jwtID string
 	jwtID = data.ID.ValueString()
 
-	request := operations.GetJwtRequest{
-		JWTID: jwtID,
+	request := operations.GetJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
 	}
-	res, err := r.client.JWTs.GetJwt(ctx, request)
+	res, err := r.client.JWTs.GetJwtWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -245,15 +264,19 @@ func (r *JwtResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var jwtID string
 	jwtID = data.ID.ValueString()
 
-	jwt := *data.ToSharedJWTInput()
-	request := operations.UpsertJwtRequest{
-		JWTID: jwtID,
-		Jwt:   jwt,
+	jwt := *data.ToSharedJwt()
+	request := operations.UpdateJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
+		Jwt:        jwt,
 	}
-	res, err := r.client.JWTs.UpsertJwt(ctx, request)
+	res, err := r.client.JWTs.UpdateJwtWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -298,13 +321,17 @@ func (r *JwtResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
+	var consumerID string
+	consumerID = data.ConsumerID.ValueString()
+
 	var jwtID string
 	jwtID = data.ID.ValueString()
 
-	request := operations.DeleteJwtRequest{
-		JWTID: jwtID,
+	request := operations.DeleteJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
 	}
-	res, err := r.client.JWTs.DeleteJwt(ctx, request)
+	res, err := r.client.JWTs.DeleteJwtWithConsumer(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -324,5 +351,27 @@ func (r *JwtResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 }
 
 func (r *JwtResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ConsumerID string `json:"consumer_id"`
+		ID         string `json:"id"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "jwtid": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}': `+err.Error())
+		return
+	}
+
+	if len(data.ConsumerID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field consumer_id is required but was not found in the json encoded ID. It's expected to be a value alike '"f28acbfa-c866-4587-b688-0208ac24df21"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"4a7f5faa-8c96-46d6-8214-c87573ef2ac4"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+
 }

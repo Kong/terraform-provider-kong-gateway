@@ -8,7 +8,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
+func (r *ServiceResourceModel) ToSharedService() *shared.Service {
 	var caCertificates []string = []string{}
 	for _, caCertificatesItem := range r.CaCertificates {
 		caCertificates = append(caCertificates, caCertificatesItem.ValueString())
@@ -30,6 +30,12 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 		*connectTimeout = r.ConnectTimeout.ValueInt64()
 	} else {
 		connectTimeout = nil
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	enabled := new(bool)
 	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
@@ -58,10 +64,18 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 	} else {
 		path = nil
 	}
-	var port int64
-	port = r.Port.ValueInt64()
-
-	protocol := shared.Protocol(r.Protocol.ValueString())
+	port := new(int64)
+	if !r.Port.IsUnknown() && !r.Port.IsNull() {
+		*port = r.Port.ValueInt64()
+	} else {
+		port = nil
+	}
+	protocol := new(shared.Protocol)
+	if !r.Protocol.IsUnknown() && !r.Protocol.IsNull() {
+		*protocol = shared.Protocol(r.Protocol.ValueString())
+	} else {
+		protocol = nil
+	}
 	readTimeout := new(int64)
 	if !r.ReadTimeout.IsUnknown() && !r.ReadTimeout.IsNull() {
 		*readTimeout = r.ReadTimeout.ValueInt64()
@@ -90,6 +104,12 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 	} else {
 		tlsVerifyDepth = nil
 	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	url := new(string)
 	if !r.URL.IsUnknown() && !r.URL.IsNull() {
 		*url = r.URL.ValueString()
@@ -102,10 +122,11 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 	} else {
 		writeTimeout = nil
 	}
-	out := shared.ServiceInput{
+	out := shared.Service{
 		CaCertificates:    caCertificates,
 		ClientCertificate: clientCertificate,
 		ConnectTimeout:    connectTimeout,
+		CreatedAt:         createdAt,
 		Enabled:           enabled,
 		Host:              host,
 		ID:                id1,
@@ -118,22 +139,25 @@ func (r *ServiceResourceModel) ToSharedServiceInput() *shared.ServiceInput {
 		Tags:              tags,
 		TLSVerify:         tlsVerify,
 		TLSVerifyDepth:    tlsVerifyDepth,
+		UpdatedAt:         updatedAt,
 		URL:               url,
 		WriteTimeout:      writeTimeout,
 	}
 	return &out
 }
 
-func (r *ServiceResourceModel) RefreshFromSharedService(resp *shared.Service) {
+func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(resp *shared.ServiceOutput) {
 	if resp != nil {
-		r.CaCertificates = []types.String{}
-		for _, v := range resp.CaCertificates {
-			r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
+		if resp.CaCertificates != nil {
+			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
+			for _, v := range resp.CaCertificates {
+				r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
+			}
 		}
 		if resp.ClientCertificate == nil {
 			r.ClientCertificate = nil
 		} else {
-			r.ClientCertificate = &tfTypes.ACLConsumer{}
+			r.ClientCertificate = &tfTypes.ACLWithoutParentsConsumer{}
 			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
 		}
 		r.ConnectTimeout = types.Int64PointerValue(resp.ConnectTimeout)
@@ -143,11 +167,15 @@ func (r *ServiceResourceModel) RefreshFromSharedService(resp *shared.Service) {
 		r.ID = types.StringPointerValue(resp.ID)
 		r.Name = types.StringPointerValue(resp.Name)
 		r.Path = types.StringPointerValue(resp.Path)
-		r.Port = types.Int64Value(resp.Port)
-		r.Protocol = types.StringValue(string(resp.Protocol))
+		r.Port = types.Int64PointerValue(resp.Port)
+		if resp.Protocol != nil {
+			r.Protocol = types.StringValue(string(*resp.Protocol))
+		} else {
+			r.Protocol = types.StringNull()
+		}
 		r.ReadTimeout = types.Int64PointerValue(resp.ReadTimeout)
 		r.Retries = types.Int64PointerValue(resp.Retries)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

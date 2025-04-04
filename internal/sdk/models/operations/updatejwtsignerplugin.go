@@ -9,8 +9,8 @@ import (
 
 type UpdateJwtsignerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                       `pathParam:"style=simple,explode=false,name=PluginId"`
-	JwtSignerPlugin *shared.JwtSignerPluginInput `request:"mediaType=application/json"`
+	PluginID        string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	JwtSignerPlugin shared.JwtSignerPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateJwtsignerPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateJwtsignerPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateJwtsignerPluginRequest) GetJwtSignerPlugin() *shared.JwtSignerPluginInput {
+func (o *UpdateJwtsignerPluginRequest) GetJwtSignerPlugin() shared.JwtSignerPlugin {
 	if o == nil {
-		return nil
+		return shared.JwtSignerPlugin{}
 	}
 	return o.JwtSignerPlugin
 }

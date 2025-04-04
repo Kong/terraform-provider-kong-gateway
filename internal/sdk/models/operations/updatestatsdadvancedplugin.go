@@ -9,8 +9,8 @@ import (
 
 type UpdateStatsdadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID             string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	StatsdAdvancedPlugin *shared.StatsdAdvancedPluginInput `request:"mediaType=application/json"`
+	PluginID             string                      `pathParam:"style=simple,explode=false,name=PluginId"`
+	StatsdAdvancedPlugin shared.StatsdAdvancedPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateStatsdadvancedPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateStatsdadvancedPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateStatsdadvancedPluginRequest) GetStatsdAdvancedPlugin() *shared.StatsdAdvancedPluginInput {
+func (o *UpdateStatsdadvancedPluginRequest) GetStatsdAdvancedPlugin() shared.StatsdAdvancedPlugin {
 	if o == nil {
-		return nil
+		return shared.StatsdAdvancedPlugin{}
 	}
 	return o.StatsdAdvancedPlugin
 }

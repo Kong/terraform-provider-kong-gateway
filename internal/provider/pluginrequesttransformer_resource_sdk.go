@@ -8,151 +8,12 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginRequestTransformerResourceModel) ToSharedRequestTransformerPluginInput() *shared.RequestTransformerPluginInput {
-	var add *shared.Add
-	if r.Config.Add != nil {
-		var body []string = []string{}
-		for _, bodyItem := range r.Config.Add.Body {
-			body = append(body, bodyItem.ValueString())
-		}
-		var headers []string = []string{}
-		for _, headersItem := range r.Config.Add.Headers {
-			headers = append(headers, headersItem.ValueString())
-		}
-		var querystring []string = []string{}
-		for _, querystringItem := range r.Config.Add.Querystring {
-			querystring = append(querystring, querystringItem.ValueString())
-		}
-		add = &shared.Add{
-			Body:        body,
-			Headers:     headers,
-			Querystring: querystring,
-		}
-	}
-	var append1 *shared.Append
-	if r.Config.Append != nil {
-		var body1 []string = []string{}
-		for _, bodyItem1 := range r.Config.Append.Body {
-			body1 = append(body1, bodyItem1.ValueString())
-		}
-		var headers1 []string = []string{}
-		for _, headersItem1 := range r.Config.Append.Headers {
-			headers1 = append(headers1, headersItem1.ValueString())
-		}
-		var querystring1 []string = []string{}
-		for _, querystringItem1 := range r.Config.Append.Querystring {
-			querystring1 = append(querystring1, querystringItem1.ValueString())
-		}
-		append1 = &shared.Append{
-			Body:        body1,
-			Headers:     headers1,
-			Querystring: querystring1,
-		}
-	}
-	httpMethod := new(string)
-	if !r.Config.HTTPMethod.IsUnknown() && !r.Config.HTTPMethod.IsNull() {
-		*httpMethod = r.Config.HTTPMethod.ValueString()
+func (r *PluginRequestTransformerResourceModel) ToSharedRequestTransformerPlugin() *shared.RequestTransformerPlugin {
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
 	} else {
-		httpMethod = nil
-	}
-	var remove *shared.Remove
-	if r.Config.Remove != nil {
-		var body2 []string = []string{}
-		for _, bodyItem2 := range r.Config.Remove.Body {
-			body2 = append(body2, bodyItem2.ValueString())
-		}
-		var headers2 []string = []string{}
-		for _, headersItem2 := range r.Config.Remove.Headers {
-			headers2 = append(headers2, headersItem2.ValueString())
-		}
-		var querystring2 []string = []string{}
-		for _, querystringItem2 := range r.Config.Remove.Querystring {
-			querystring2 = append(querystring2, querystringItem2.ValueString())
-		}
-		remove = &shared.Remove{
-			Body:        body2,
-			Headers:     headers2,
-			Querystring: querystring2,
-		}
-	}
-	var rename *shared.Rename
-	if r.Config.Rename != nil {
-		var body3 []string = []string{}
-		for _, bodyItem3 := range r.Config.Rename.Body {
-			body3 = append(body3, bodyItem3.ValueString())
-		}
-		var headers3 []string = []string{}
-		for _, headersItem3 := range r.Config.Rename.Headers {
-			headers3 = append(headers3, headersItem3.ValueString())
-		}
-		var querystring3 []string = []string{}
-		for _, querystringItem3 := range r.Config.Rename.Querystring {
-			querystring3 = append(querystring3, querystringItem3.ValueString())
-		}
-		rename = &shared.Rename{
-			Body:        body3,
-			Headers:     headers3,
-			Querystring: querystring3,
-		}
-	}
-	var replace *shared.Replace
-	if r.Config.Replace != nil {
-		var body4 []string = []string{}
-		for _, bodyItem4 := range r.Config.Replace.Body {
-			body4 = append(body4, bodyItem4.ValueString())
-		}
-		var headers4 []string = []string{}
-		for _, headersItem4 := range r.Config.Replace.Headers {
-			headers4 = append(headers4, headersItem4.ValueString())
-		}
-		var querystring4 []string = []string{}
-		for _, querystringItem4 := range r.Config.Replace.Querystring {
-			querystring4 = append(querystring4, querystringItem4.ValueString())
-		}
-		uri := new(string)
-		if !r.Config.Replace.URI.IsUnknown() && !r.Config.Replace.URI.IsNull() {
-			*uri = r.Config.Replace.URI.ValueString()
-		} else {
-			uri = nil
-		}
-		replace = &shared.Replace{
-			Body:        body4,
-			Headers:     headers4,
-			Querystring: querystring4,
-			URI:         uri,
-		}
-	}
-	config := shared.RequestTransformerPluginConfig{
-		Add:        add,
-		Append:     append1,
-		HTTPMethod: httpMethod,
-		Remove:     remove,
-		Rename:     rename,
-		Replace:    replace,
-	}
-	var consumer *shared.RequestTransformerPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.RequestTransformerPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.RequestTransformerPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.RequestTransformerPluginConsumerGroup{
-			ID: id1,
-		}
+		createdAt = nil
 	}
 	enabled := new(bool)
 	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
@@ -160,11 +21,11 @@ func (r *PluginRequestTransformerResourceModel) ToSharedRequestTransformerPlugin
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -199,153 +60,341 @@ func (r *PluginRequestTransformerResourceModel) ToSharedRequestTransformerPlugin
 			Before: before,
 		}
 	}
+	var partials []shared.RequestTransformerPluginPartials = []shared.RequestTransformerPluginPartials{}
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.RequestTransformerPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.RequestTransformerPluginConfig
+	if r.Config != nil {
+		var add *shared.Add
+		if r.Config.Add != nil {
+			var body []string = []string{}
+			for _, bodyItem := range r.Config.Add.Body {
+				body = append(body, bodyItem.ValueString())
+			}
+			var headers []string = []string{}
+			for _, headersItem := range r.Config.Add.Headers {
+				headers = append(headers, headersItem.ValueString())
+			}
+			var querystring []string = []string{}
+			for _, querystringItem := range r.Config.Add.Querystring {
+				querystring = append(querystring, querystringItem.ValueString())
+			}
+			add = &shared.Add{
+				Body:        body,
+				Headers:     headers,
+				Querystring: querystring,
+			}
+		}
+		var append1 *shared.Append
+		if r.Config.Append != nil {
+			var body1 []string = []string{}
+			for _, bodyItem1 := range r.Config.Append.Body {
+				body1 = append(body1, bodyItem1.ValueString())
+			}
+			var headers1 []string = []string{}
+			for _, headersItem1 := range r.Config.Append.Headers {
+				headers1 = append(headers1, headersItem1.ValueString())
+			}
+			var querystring1 []string = []string{}
+			for _, querystringItem1 := range r.Config.Append.Querystring {
+				querystring1 = append(querystring1, querystringItem1.ValueString())
+			}
+			append1 = &shared.Append{
+				Body:        body1,
+				Headers:     headers1,
+				Querystring: querystring1,
+			}
+		}
+		httpMethod := new(string)
+		if !r.Config.HTTPMethod.IsUnknown() && !r.Config.HTTPMethod.IsNull() {
+			*httpMethod = r.Config.HTTPMethod.ValueString()
+		} else {
+			httpMethod = nil
+		}
+		var remove *shared.Remove
+		if r.Config.Remove != nil {
+			var body2 []string = []string{}
+			for _, bodyItem2 := range r.Config.Remove.Body {
+				body2 = append(body2, bodyItem2.ValueString())
+			}
+			var headers2 []string = []string{}
+			for _, headersItem2 := range r.Config.Remove.Headers {
+				headers2 = append(headers2, headersItem2.ValueString())
+			}
+			var querystring2 []string = []string{}
+			for _, querystringItem2 := range r.Config.Remove.Querystring {
+				querystring2 = append(querystring2, querystringItem2.ValueString())
+			}
+			remove = &shared.Remove{
+				Body:        body2,
+				Headers:     headers2,
+				Querystring: querystring2,
+			}
+		}
+		var rename *shared.Rename
+		if r.Config.Rename != nil {
+			var body3 []string = []string{}
+			for _, bodyItem3 := range r.Config.Rename.Body {
+				body3 = append(body3, bodyItem3.ValueString())
+			}
+			var headers3 []string = []string{}
+			for _, headersItem3 := range r.Config.Rename.Headers {
+				headers3 = append(headers3, headersItem3.ValueString())
+			}
+			var querystring3 []string = []string{}
+			for _, querystringItem3 := range r.Config.Rename.Querystring {
+				querystring3 = append(querystring3, querystringItem3.ValueString())
+			}
+			rename = &shared.Rename{
+				Body:        body3,
+				Headers:     headers3,
+				Querystring: querystring3,
+			}
+		}
+		var replace *shared.Replace
+		if r.Config.Replace != nil {
+			var body4 []string = []string{}
+			for _, bodyItem4 := range r.Config.Replace.Body {
+				body4 = append(body4, bodyItem4.ValueString())
+			}
+			var headers4 []string = []string{}
+			for _, headersItem4 := range r.Config.Replace.Headers {
+				headers4 = append(headers4, headersItem4.ValueString())
+			}
+			var querystring4 []string = []string{}
+			for _, querystringItem4 := range r.Config.Replace.Querystring {
+				querystring4 = append(querystring4, querystringItem4.ValueString())
+			}
+			uri := new(string)
+			if !r.Config.Replace.URI.IsUnknown() && !r.Config.Replace.URI.IsNull() {
+				*uri = r.Config.Replace.URI.ValueString()
+			} else {
+				uri = nil
+			}
+			replace = &shared.Replace{
+				Body:        body4,
+				Headers:     headers4,
+				Querystring: querystring4,
+				URI:         uri,
+			}
+		}
+		config = &shared.RequestTransformerPluginConfig{
+			Add:        add,
+			Append:     append1,
+			HTTPMethod: httpMethod,
+			Remove:     remove,
+			Rename:     rename,
+			Replace:    replace,
+		}
+	}
+	var consumer *shared.RequestTransformerPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.RequestTransformerPluginConsumer{
+			ID: id2,
+		}
+	}
+	var consumerGroup *shared.RequestTransformerPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id3 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id3 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		consumerGroup = &shared.RequestTransformerPluginConsumerGroup{
+			ID: id3,
+		}
+	}
 	var protocols []shared.RequestTransformerPluginProtocols = []shared.RequestTransformerPluginProtocols{}
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.RequestTransformerPluginProtocols(protocolsItem.ValueString()))
 	}
 	var route *shared.RequestTransformerPluginRoute
 	if r.Route != nil {
-		id3 := new(string)
+		id4 := new(string)
 		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id3 = r.Route.ID.ValueString()
+			*id4 = r.Route.ID.ValueString()
 		} else {
-			id3 = nil
+			id4 = nil
 		}
 		route = &shared.RequestTransformerPluginRoute{
-			ID: id3,
+			ID: id4,
 		}
 	}
 	var service *shared.RequestTransformerPluginService
 	if r.Service != nil {
-		id4 := new(string)
+		id5 := new(string)
 		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id4 = r.Service.ID.ValueString()
+			*id5 = r.Service.ID.ValueString()
 		} else {
-			id4 = nil
+			id5 = nil
 		}
 		service = &shared.RequestTransformerPluginService{
-			ID: id4,
+			ID: id5,
 		}
 	}
-	var tags []string = []string{}
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	out := shared.RequestTransformerPluginInput{
+	out := shared.RequestTransformerPlugin{
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
-		Enabled:       enabled,
-		ID:            id2,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
-		Tags:          tags,
 	}
 	return &out
 }
 
 func (r *PluginRequestTransformerResourceModel) RefreshFromSharedRequestTransformerPlugin(resp *shared.RequestTransformerPlugin) {
 	if resp != nil {
-		if resp.Config.Add == nil {
-			r.Config.Add = nil
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.Add = &tfTypes.Add{}
-			r.Config.Add.Body = []types.String{}
-			for _, v := range resp.Config.Add.Body {
-				r.Config.Add.Body = append(r.Config.Add.Body, types.StringValue(v))
+			r.Config = &tfTypes.RequestTransformerPluginConfig{}
+			if resp.Config.Add == nil {
+				r.Config.Add = nil
+			} else {
+				r.Config.Add = &tfTypes.Add{}
+				r.Config.Add.Body = make([]types.String, 0, len(resp.Config.Add.Body))
+				for _, v := range resp.Config.Add.Body {
+					r.Config.Add.Body = append(r.Config.Add.Body, types.StringValue(v))
+				}
+				r.Config.Add.Headers = make([]types.String, 0, len(resp.Config.Add.Headers))
+				for _, v := range resp.Config.Add.Headers {
+					r.Config.Add.Headers = append(r.Config.Add.Headers, types.StringValue(v))
+				}
+				r.Config.Add.Querystring = make([]types.String, 0, len(resp.Config.Add.Querystring))
+				for _, v := range resp.Config.Add.Querystring {
+					r.Config.Add.Querystring = append(r.Config.Add.Querystring, types.StringValue(v))
+				}
 			}
-			r.Config.Add.Headers = []types.String{}
-			for _, v := range resp.Config.Add.Headers {
-				r.Config.Add.Headers = append(r.Config.Add.Headers, types.StringValue(v))
+			if resp.Config.Append == nil {
+				r.Config.Append = nil
+			} else {
+				r.Config.Append = &tfTypes.Add{}
+				r.Config.Append.Body = make([]types.String, 0, len(resp.Config.Append.Body))
+				for _, v := range resp.Config.Append.Body {
+					r.Config.Append.Body = append(r.Config.Append.Body, types.StringValue(v))
+				}
+				r.Config.Append.Headers = make([]types.String, 0, len(resp.Config.Append.Headers))
+				for _, v := range resp.Config.Append.Headers {
+					r.Config.Append.Headers = append(r.Config.Append.Headers, types.StringValue(v))
+				}
+				r.Config.Append.Querystring = make([]types.String, 0, len(resp.Config.Append.Querystring))
+				for _, v := range resp.Config.Append.Querystring {
+					r.Config.Append.Querystring = append(r.Config.Append.Querystring, types.StringValue(v))
+				}
 			}
-			r.Config.Add.Querystring = []types.String{}
-			for _, v := range resp.Config.Add.Querystring {
-				r.Config.Add.Querystring = append(r.Config.Add.Querystring, types.StringValue(v))
+			r.Config.HTTPMethod = types.StringPointerValue(resp.Config.HTTPMethod)
+			if resp.Config.Remove == nil {
+				r.Config.Remove = nil
+			} else {
+				r.Config.Remove = &tfTypes.Add{}
+				r.Config.Remove.Body = make([]types.String, 0, len(resp.Config.Remove.Body))
+				for _, v := range resp.Config.Remove.Body {
+					r.Config.Remove.Body = append(r.Config.Remove.Body, types.StringValue(v))
+				}
+				r.Config.Remove.Headers = make([]types.String, 0, len(resp.Config.Remove.Headers))
+				for _, v := range resp.Config.Remove.Headers {
+					r.Config.Remove.Headers = append(r.Config.Remove.Headers, types.StringValue(v))
+				}
+				r.Config.Remove.Querystring = make([]types.String, 0, len(resp.Config.Remove.Querystring))
+				for _, v := range resp.Config.Remove.Querystring {
+					r.Config.Remove.Querystring = append(r.Config.Remove.Querystring, types.StringValue(v))
+				}
 			}
-		}
-		if resp.Config.Append == nil {
-			r.Config.Append = nil
-		} else {
-			r.Config.Append = &tfTypes.Add{}
-			r.Config.Append.Body = []types.String{}
-			for _, v := range resp.Config.Append.Body {
-				r.Config.Append.Body = append(r.Config.Append.Body, types.StringValue(v))
+			if resp.Config.Rename == nil {
+				r.Config.Rename = nil
+			} else {
+				r.Config.Rename = &tfTypes.Add{}
+				r.Config.Rename.Body = make([]types.String, 0, len(resp.Config.Rename.Body))
+				for _, v := range resp.Config.Rename.Body {
+					r.Config.Rename.Body = append(r.Config.Rename.Body, types.StringValue(v))
+				}
+				r.Config.Rename.Headers = make([]types.String, 0, len(resp.Config.Rename.Headers))
+				for _, v := range resp.Config.Rename.Headers {
+					r.Config.Rename.Headers = append(r.Config.Rename.Headers, types.StringValue(v))
+				}
+				r.Config.Rename.Querystring = make([]types.String, 0, len(resp.Config.Rename.Querystring))
+				for _, v := range resp.Config.Rename.Querystring {
+					r.Config.Rename.Querystring = append(r.Config.Rename.Querystring, types.StringValue(v))
+				}
 			}
-			r.Config.Append.Headers = []types.String{}
-			for _, v := range resp.Config.Append.Headers {
-				r.Config.Append.Headers = append(r.Config.Append.Headers, types.StringValue(v))
+			if resp.Config.Replace == nil {
+				r.Config.Replace = nil
+			} else {
+				r.Config.Replace = &tfTypes.Replace{}
+				r.Config.Replace.Body = make([]types.String, 0, len(resp.Config.Replace.Body))
+				for _, v := range resp.Config.Replace.Body {
+					r.Config.Replace.Body = append(r.Config.Replace.Body, types.StringValue(v))
+				}
+				r.Config.Replace.Headers = make([]types.String, 0, len(resp.Config.Replace.Headers))
+				for _, v := range resp.Config.Replace.Headers {
+					r.Config.Replace.Headers = append(r.Config.Replace.Headers, types.StringValue(v))
+				}
+				r.Config.Replace.Querystring = make([]types.String, 0, len(resp.Config.Replace.Querystring))
+				for _, v := range resp.Config.Replace.Querystring {
+					r.Config.Replace.Querystring = append(r.Config.Replace.Querystring, types.StringValue(v))
+				}
+				r.Config.Replace.URI = types.StringPointerValue(resp.Config.Replace.URI)
 			}
-			r.Config.Append.Querystring = []types.String{}
-			for _, v := range resp.Config.Append.Querystring {
-				r.Config.Append.Querystring = append(r.Config.Append.Querystring, types.StringValue(v))
-			}
-		}
-		r.Config.HTTPMethod = types.StringPointerValue(resp.Config.HTTPMethod)
-		if resp.Config.Remove == nil {
-			r.Config.Remove = nil
-		} else {
-			r.Config.Remove = &tfTypes.Add{}
-			r.Config.Remove.Body = []types.String{}
-			for _, v := range resp.Config.Remove.Body {
-				r.Config.Remove.Body = append(r.Config.Remove.Body, types.StringValue(v))
-			}
-			r.Config.Remove.Headers = []types.String{}
-			for _, v := range resp.Config.Remove.Headers {
-				r.Config.Remove.Headers = append(r.Config.Remove.Headers, types.StringValue(v))
-			}
-			r.Config.Remove.Querystring = []types.String{}
-			for _, v := range resp.Config.Remove.Querystring {
-				r.Config.Remove.Querystring = append(r.Config.Remove.Querystring, types.StringValue(v))
-			}
-		}
-		if resp.Config.Rename == nil {
-			r.Config.Rename = nil
-		} else {
-			r.Config.Rename = &tfTypes.Add{}
-			r.Config.Rename.Body = []types.String{}
-			for _, v := range resp.Config.Rename.Body {
-				r.Config.Rename.Body = append(r.Config.Rename.Body, types.StringValue(v))
-			}
-			r.Config.Rename.Headers = []types.String{}
-			for _, v := range resp.Config.Rename.Headers {
-				r.Config.Rename.Headers = append(r.Config.Rename.Headers, types.StringValue(v))
-			}
-			r.Config.Rename.Querystring = []types.String{}
-			for _, v := range resp.Config.Rename.Querystring {
-				r.Config.Rename.Querystring = append(r.Config.Rename.Querystring, types.StringValue(v))
-			}
-		}
-		if resp.Config.Replace == nil {
-			r.Config.Replace = nil
-		} else {
-			r.Config.Replace = &tfTypes.Replace{}
-			r.Config.Replace.Body = []types.String{}
-			for _, v := range resp.Config.Replace.Body {
-				r.Config.Replace.Body = append(r.Config.Replace.Body, types.StringValue(v))
-			}
-			r.Config.Replace.Headers = []types.String{}
-			for _, v := range resp.Config.Replace.Headers {
-				r.Config.Replace.Headers = append(r.Config.Replace.Headers, types.StringValue(v))
-			}
-			r.Config.Replace.Querystring = []types.String{}
-			for _, v := range resp.Config.Replace.Querystring {
-				r.Config.Replace.Querystring = append(r.Config.Replace.Querystring, types.StringValue(v))
-			}
-			r.Config.Replace.URI = types.StringPointerValue(resp.Config.Replace.URI)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		if resp.ConsumerGroup == nil {
 			r.ConsumerGroup = nil
 		} else {
-			r.ConsumerGroup = &tfTypes.ACLConsumer{}
+			r.ConsumerGroup = &tfTypes.ACLWithoutParentsConsumer{}
 			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -355,12 +404,12 @@ func (r *PluginRequestTransformerResourceModel) RefreshFromSharedRequestTransfor
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.ACLPluginOrdering{}
+			r.Ordering = &tfTypes.Ordering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.ACLPluginAfter{}
-				r.Ordering.After.Access = []types.String{}
+				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
 				}
@@ -368,30 +417,49 @@ func (r *PluginRequestTransformerResourceModel) RefreshFromSharedRequestTransfor
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
-				r.Ordering.Before.Access = []types.String{}
+				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Protocols = []types.String{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.Partials{}
+			if len(r.Partials) > len(resp.Partials) {
+				r.Partials = r.Partials[:len(resp.Partials)]
+			}
+			for partialsCount, partialsItem := range resp.Partials {
+				var partials1 tfTypes.Partials
+				partials1.ID = types.StringPointerValue(partialsItem.ID)
+				partials1.Name = types.StringPointerValue(partialsItem.Name)
+				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				if partialsCount+1 > len(r.Partials) {
+					r.Partials = append(r.Partials, partials1)
+				} else {
+					r.Partials[partialsCount].ID = partials1.ID
+					r.Partials[partialsCount].Name = partials1.Name
+					r.Partials[partialsCount].Path = partials1.Path
+				}
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
 			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
 		}
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLConsumer{}
+			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLConsumer{}
+			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}

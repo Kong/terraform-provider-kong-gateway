@@ -9,8 +9,8 @@ import (
 
 type UpdateTlshandshakemodifierPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                   string                                  `pathParam:"style=simple,explode=false,name=PluginId"`
-	TLSHandshakeModifierPlugin *shared.TLSHandshakeModifierPluginInput `request:"mediaType=application/json"`
+	PluginID                   string                            `pathParam:"style=simple,explode=false,name=PluginId"`
+	TLSHandshakeModifierPlugin shared.TLSHandshakeModifierPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateTlshandshakemodifierPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateTlshandshakemodifierPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateTlshandshakemodifierPluginRequest) GetTLSHandshakeModifierPlugin() *shared.TLSHandshakeModifierPluginInput {
+func (o *UpdateTlshandshakemodifierPluginRequest) GetTLSHandshakeModifierPlugin() shared.TLSHandshakeModifierPlugin {
 	if o == nil {
-		return nil
+		return shared.TLSHandshakeModifierPlugin{}
 	}
 	return o.TLSHandshakeModifierPlugin
 }

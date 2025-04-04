@@ -30,15 +30,16 @@ type KeyResource struct {
 
 // KeyResourceModel describes the resource data model.
 type KeyResourceModel struct {
-	CreatedAt types.Int64          `tfsdk:"created_at"`
-	ID        types.String         `tfsdk:"id"`
-	Jwk       types.String         `tfsdk:"jwk"`
-	Kid       types.String         `tfsdk:"kid"`
-	Name      types.String         `tfsdk:"name"`
-	Pem       *tfTypes.Pem         `tfsdk:"pem"`
-	Set       *tfTypes.ACLConsumer `tfsdk:"set"`
-	Tags      []types.String       `tfsdk:"tags"`
-	UpdatedAt types.Int64          `tfsdk:"updated_at"`
+	CreatedAt types.Int64                        `tfsdk:"created_at"`
+	ID        types.String                       `tfsdk:"id"`
+	Jwk       types.String                       `tfsdk:"jwk"`
+	Kid       types.String                       `tfsdk:"kid"`
+	Name      types.String                       `tfsdk:"name"`
+	Pem       *tfTypes.Pem                       `tfsdk:"pem"`
+	Set       *tfTypes.ACLWithoutParentsConsumer `tfsdk:"set"`
+	Tags      []types.String                     `tfsdk:"tags"`
+	UpdatedAt types.Int64                        `tfsdk:"updated_at"`
+	X5t       types.String                       `tfsdk:"x5t"`
 }
 
 func (r *KeyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -51,6 +52,7 @@ func (r *KeyResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -105,7 +107,12 @@ func (r *KeyResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"x5t": schema.StringAttribute{
+				Computed: true,
+				Optional: true,
 			},
 		},
 	}
@@ -149,7 +156,7 @@ func (r *KeyResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedKeyInput()
+	request := *data.ToSharedKey()
 	res, err := r.client.Keys.CreateKey(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -248,7 +255,7 @@ func (r *KeyResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	var keyIDOrName string
 	keyIDOrName = data.ID.ValueString()
 
-	key := *data.ToSharedKeyInput()
+	key := *data.ToSharedKey()
 	request := operations.UpsertKeyRequest{
 		KeyIDOrName: keyIDOrName,
 		Key:         key,

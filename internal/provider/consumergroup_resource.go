@@ -46,6 +46,7 @@ func (r *ConsumerGroupResource) Schema(ctx context.Context, req resource.SchemaR
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
@@ -62,6 +63,7 @@ func (r *ConsumerGroupResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
+				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 		},
@@ -106,7 +108,7 @@ func (r *ConsumerGroupResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedConsumerGroupInput()
+	request := *data.ToSharedConsumerGroup()
 	res, err := r.client.ConsumerGroups.CreateConsumerGroup(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
@@ -205,7 +207,7 @@ func (r *ConsumerGroupResource) Update(ctx context.Context, req resource.UpdateR
 	var consumerGroupID string
 	consumerGroupID = data.ID.ValueString()
 
-	consumerGroup := *data.ToSharedConsumerGroupInput()
+	consumerGroup := *data.ToSharedConsumerGroup()
 	request := operations.UpsertConsumerGroupRequest{
 		ConsumerGroupID: consumerGroupID,
 		ConsumerGroup:   consumerGroup,

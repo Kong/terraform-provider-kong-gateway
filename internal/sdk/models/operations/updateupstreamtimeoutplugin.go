@@ -9,8 +9,8 @@ import (
 
 type UpdateUpstreamtimeoutPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID              string                             `pathParam:"style=simple,explode=false,name=PluginId"`
-	UpstreamTimeoutPlugin *shared.UpstreamTimeoutPluginInput `request:"mediaType=application/json"`
+	PluginID              string                       `pathParam:"style=simple,explode=false,name=PluginId"`
+	UpstreamTimeoutPlugin shared.UpstreamTimeoutPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateUpstreamtimeoutPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateUpstreamtimeoutPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateUpstreamtimeoutPluginRequest) GetUpstreamTimeoutPlugin() *shared.UpstreamTimeoutPluginInput {
+func (o *UpdateUpstreamtimeoutPluginRequest) GetUpstreamTimeoutPlugin() shared.UpstreamTimeoutPlugin {
 	if o == nil {
-		return nil
+		return shared.UpstreamTimeoutPlugin{}
 	}
 	return o.UpstreamTimeoutPlugin
 }

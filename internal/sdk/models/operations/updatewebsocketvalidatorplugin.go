@@ -9,8 +9,8 @@ import (
 
 type UpdateWebsocketvalidatorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                                `pathParam:"style=simple,explode=false,name=PluginId"`
-	WebsocketValidatorPlugin *shared.WebsocketValidatorPluginInput `request:"mediaType=application/json"`
+	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	WebsocketValidatorPlugin shared.WebsocketValidatorPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateWebsocketvalidatorPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateWebsocketvalidatorPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateWebsocketvalidatorPluginRequest) GetWebsocketValidatorPlugin() *shared.WebsocketValidatorPluginInput {
+func (o *UpdateWebsocketvalidatorPluginRequest) GetWebsocketValidatorPlugin() shared.WebsocketValidatorPlugin {
 	if o == nil {
-		return nil
+		return shared.WebsocketValidatorPlugin{}
 	}
 	return o.WebsocketValidatorPlugin
 }

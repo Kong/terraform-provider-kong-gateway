@@ -8,8 +8,8 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ACLResourceModel) ToSharedACLInput() *shared.ACLInput {
-	var consumer *shared.ACLConsumer
+func (r *ACLResourceModel) ToSharedACLWithoutParents() *shared.ACLWithoutParents {
+	var consumer *shared.ACLWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
@@ -17,9 +17,15 @@ func (r *ACLResourceModel) ToSharedACLInput() *shared.ACLInput {
 		} else {
 			id = nil
 		}
-		consumer = &shared.ACLConsumer{
+		consumer = &shared.ACLWithoutParentsConsumer{
 			ID: id,
 		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
 	var group string
 	group = r.Group.ValueString()
@@ -34,11 +40,12 @@ func (r *ACLResourceModel) ToSharedACLInput() *shared.ACLInput {
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
-	out := shared.ACLInput{
-		Consumer: consumer,
-		Group:    group,
-		ID:       id1,
-		Tags:     tags,
+	out := shared.ACLWithoutParents{
+		Consumer:  consumer,
+		CreatedAt: createdAt,
+		Group:     group,
+		ID:        id1,
+		Tags:      tags,
 	}
 	return &out
 }
@@ -48,15 +55,57 @@ func (r *ACLResourceModel) RefreshFromSharedACL(resp *shared.ACL) {
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLConsumer{}
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Group = types.StringValue(resp.Group)
 		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = []types.String{}
+		r.Tags = make([]types.String, 0, len(resp.Tags))
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 	}
+}
+
+func (r *ACLResourceModel) ToSharedACL() *shared.ACL {
+	var consumer *shared.ACLConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.ACLConsumer{
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	var group string
+	group = r.Group.ValueString()
+
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	var tags []string = []string{}
+	for _, tagsItem := range r.Tags {
+		tags = append(tags, tagsItem.ValueString())
+	}
+	out := shared.ACL{
+		Consumer:  consumer,
+		CreatedAt: createdAt,
+		Group:     group,
+		ID:        id1,
+		Tags:      tags,
+	}
+	return &out
 }

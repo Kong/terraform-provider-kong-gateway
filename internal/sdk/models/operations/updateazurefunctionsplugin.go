@@ -9,8 +9,8 @@ import (
 
 type UpdateAzurefunctionsPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID             string                            `pathParam:"style=simple,explode=false,name=PluginId"`
-	AzureFunctionsPlugin *shared.AzureFunctionsPluginInput `request:"mediaType=application/json"`
+	PluginID             string                      `pathParam:"style=simple,explode=false,name=PluginId"`
+	AzureFunctionsPlugin shared.AzureFunctionsPlugin `request:"mediaType=application/json"`
 }
 
 func (o *UpdateAzurefunctionsPluginRequest) GetPluginID() string {
@@ -20,9 +20,9 @@ func (o *UpdateAzurefunctionsPluginRequest) GetPluginID() string {
 	return o.PluginID
 }
 
-func (o *UpdateAzurefunctionsPluginRequest) GetAzureFunctionsPlugin() *shared.AzureFunctionsPluginInput {
+func (o *UpdateAzurefunctionsPluginRequest) GetAzureFunctionsPlugin() shared.AzureFunctionsPlugin {
 	if o == nil {
-		return nil
+		return shared.AzureFunctionsPlugin{}
 	}
 	return o.AzureFunctionsPlugin
 }

@@ -35,34 +35,6 @@ servers:
           - https
 paths:
   /acls:
-    get:
-      operationId: list-acl
-      summary: List all ACLs
-      description: List all ACLs
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing ACLs
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ACL'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - ACLs
     post:
       x-speakeasy-entity-operation: ACL#create
       operationId: create-acl
@@ -121,30 +93,6 @@ paths:
         - ACLs
     parameters:
       - $ref: '#/components/parameters/ACLId'
-    patch:
-      operationId: update-acl
-      summary: Update an ACL
-      description: Update an ACL
-      requestBody:
-        description: Fields of the ACL that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ACL'
-      responses:
-        '200':
-          description: Successfully updated ACL
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ACL'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - ACLs
     put:
       x-speakeasy-entity-operation: ACL#update
       operationId: upsert-acl
@@ -169,34 +117,6 @@ paths:
       tags:
         - ACLs
   /basic-auths:
-    get:
-      operationId: list-basic-auth
-      summary: List all Basic-auth credentials
-      description: List all Basic-auth credentials
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Basic-auth credentials
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BasicAuth'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Basic-auth credentials
     post:
       x-speakeasy-entity-operation: BasicAuth#create
       operationId: create-basic-auth
@@ -255,30 +175,6 @@ paths:
         - Basic-auth credentials
     parameters:
       - $ref: '#/components/parameters/BasicAuthId'
-    patch:
-      operationId: update-basic-auth
-      summary: Update a Basic-auth credential
-      description: Update a Basic-auth credential
-      requestBody:
-        description: Fields of the Basic-auth credential that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BasicAuth'
-      responses:
-        '200':
-          description: Successfully updated Basic-auth credential
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BasicAuth'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Basic-auth credentials
     put:
       x-speakeasy-entity-operation: BasicAuth#update
       operationId: upsert-basic-auth
@@ -303,34 +199,6 @@ paths:
       tags:
         - Basic-auth credentials
   /ca_certificates:
-    get:
-      operationId: list-ca_certificate
-      summary: List all CA Certificates
-      description: List all CA Certificates
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing CA Certificates
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CACertificate'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - CA Certificates
     post:
       x-speakeasy-entity-operation: CACertificate#create
       operationId: create-ca_certificate
@@ -389,30 +257,6 @@ paths:
         - CA Certificates
     parameters:
       - $ref: '#/components/parameters/CACertificateId'
-    patch:
-      operationId: update-ca_certificate
-      summary: Update a CA Certificate
-      description: Update a CA Certificate
-      requestBody:
-        description: Fields of the CA Certificate that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CACertificate'
-      responses:
-        '200':
-          description: Successfully updated CA Certificate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CACertificate'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - CA Certificates
     put:
       x-speakeasy-entity-operation: CACertificate#update
       operationId: upsert-ca_certificate
@@ -437,34 +281,6 @@ paths:
       tags:
         - CA Certificates
   /certificates:
-    get:
-      operationId: list-certificate
-      summary: List all Certificates
-      description: List all Certificates
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Certificates
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Certificate'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Certificates
     post:
       x-speakeasy-entity-operation: Certificate#create
       operationId: create-certificate
@@ -523,30 +339,6 @@ paths:
         - Certificates
     parameters:
       - $ref: '#/components/parameters/CertificateId'
-    patch:
-      operationId: update-certificate
-      summary: Update a Certificate
-      description: Update a Certificate
-      requestBody:
-        description: Fields of the Certificate that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Certificate'
-      responses:
-        '200':
-          description: Successfully updated Certificate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Certificate'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Certificates
     put:
       x-speakeasy-entity-operation: Certificate#update
       operationId: upsert-certificate
@@ -571,34 +363,6 @@ paths:
       tags:
         - Certificates
   /consumer_groups:
-    get:
-      operationId: list-consumer_group
-      summary: List all Consumer Groups
-      description: List all Consumer Groups
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Consumer Groups
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ConsumerGroup'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Consumer Groups
     post:
       x-speakeasy-entity-operation: ConsumerGroup#create
       operationId: create-consumer_group
@@ -657,30 +421,6 @@ paths:
         - Consumer Groups
     parameters:
       - $ref: '#/components/parameters/ConsumerGroupId'
-    patch:
-      operationId: update-consumer_group
-      summary: Update a Consumer Group
-      description: Update a Consumer Group
-      requestBody:
-        description: Fields of the Consumer Group that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConsumerGroup'
-      responses:
-        '200':
-          description: Successfully updated Consumer Group
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConsumerGroup'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Consumer Groups
     put:
       x-speakeasy-entity-operation: ConsumerGroup#update
       operationId: upsert-consumer_group
@@ -705,44 +445,6 @@ paths:
       tags:
         - Consumer Groups
   '/consumer_groups/{ConsumerGroupId}/consumers':
-    delete:
-      x-unstable: true
-      operationId: remove-all-consumers-from-consumer-group
-      summary: Remove consumers from consumer group
-      description: Removes all consumers from a consumer groups. This operation does not delete the consumer group.
-      responses:
-        '204':
-          description: Consumers removed from group
-        '404':
-          description: Consumer group or consumer association does not exist
-      tags:
-        - Consumer Groups
-    get:
-      operationId: list-consumers-for-consumer-group
-      summary: List all Consumers in a Consumer Group
-      description: List all consumers in a consumer group
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing of consumers
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Consumer'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-      tags:
-        - Consumer Groups
     parameters:
       - $ref: '#/components/parameters/ConsumerGroupIdManageConsumers'
     post:
@@ -795,34 +497,6 @@ paths:
         schema:
           type: string
   /consumers:
-    get:
-      operationId: list-consumer
-      summary: List all Consumers
-      description: List all Consumers
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Consumers
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Consumer'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Consumers
     post:
       x-speakeasy-entity-operation: Consumer#create
       operationId: create-consumer
@@ -881,30 +555,6 @@ paths:
         - Consumers
     parameters:
       - $ref: '#/components/parameters/ConsumerIdOrUsername'
-    patch:
-      operationId: update-consumer
-      summary: Update a Consumer
-      description: Update a Consumer
-      requestBody:
-        description: Fields of the Consumer that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Consumer'
-      responses:
-        '200':
-          description: Successfully updated Consumer
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Consumer'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Consumers
     put:
       x-speakeasy-entity-operation: Consumer#update
       operationId: upsert-consumer
@@ -928,121 +578,7 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Consumers
-  '/consumers/{ConsumerIdOrUsername}/consumer_groups':
-    delete:
-      operationId: remove-consumer-from-all-consumer-groups
-      summary: Remove consumer from consumer group
-      description: Removes a consumer from all consumer groups. This operation does not delete the consumer group.
-      parameters:
-        - $ref: '#/components/parameters/ConsumerIdOrUsername'
-      responses:
-        '204':
-          description: Consumer removed from all groups
-        '404':
-          description: Consumer does not exist
-      tags:
-        - Consumer Groups
-    get:
-      operationId: list-consumer-groups-for-consumer
-      summary: List all Consumer Groups a Consumer belongs to
-      description: List all Consumer Groups a Consumer belongs to
-      parameters:
-        - $ref: '#/components/parameters/ConsumerIdOrUsername'
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing consumer groups
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ConsumerGroup'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-      tags:
-        - Consumer Groups
-    post:
-      operationId: add-consumer-to-specific-consumer-group
-      summary: Add consumer to a specific consumer group
-      description: Add a consumer to a consumer group
-      parameters:
-        - $ref: '#/components/parameters/ConsumerIdOrUsername'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                group:
-                  type: string
-                  example: fedee695-2ae2-4e45-877a-776d9b2fc793
-                  x-speakeasy-name-override: group
-      responses:
-        '201':
-          description: Consumer added to a specific group
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  consumer:
-                    $ref: '#/components/schemas/Consumer'
-                  consumer_groups:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ConsumerGroup'
-      tags:
-        - Consumer Groups
-  '/consumers/{ConsumerIdOrUsername}/consumer_groups/{ConsumerGroupId}':
-    delete:
-      operationId: remove-consumer-from-consumer-group
-      summary: Remove consumer from consumer group
-      description: Removes a consumer from a consumer group. This operation does not delete the consumer group.
-      parameters:
-        - $ref: '#/components/parameters/ConsumerIdOrUsername'
-        - $ref: '#/components/parameters/ConsumerGroupId'
-      responses:
-        '204':
-          description: Consumer removed from group
-      tags:
-        - Consumer Groups
   /hmac-auths:
-    get:
-      operationId: list-hmac-auth
-      summary: List all HMAC-auth credentials
-      description: List all HMAC-auth credentials
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing HMAC-auth credentials
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/HMACAuth'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - HMAC-auth credentials
     post:
       x-speakeasy-entity-operation: HMACAuth#create
       operationId: create-hmac-auth
@@ -1101,30 +637,6 @@ paths:
         - HMAC-auth credentials
     parameters:
       - $ref: '#/components/parameters/HMACAuthId'
-    patch:
-      operationId: update-hmac-auth
-      summary: Update a HMAC-auth credential
-      description: Update a HMAC-auth credential
-      requestBody:
-        description: Fields of the HMAC-auth credential that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/HMACAuth'
-      responses:
-        '200':
-          description: Successfully updated HMAC-auth credential
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HMACAuth'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - HMAC-auth credentials
     put:
       x-speakeasy-entity-operation: HMACAuth#update
       operationId: upsert-hmac-auth
@@ -1149,34 +661,6 @@ paths:
       tags:
         - HMAC-auth credentials
   /jwts:
-    get:
-      operationId: list-jwt
-      summary: List all JWTs
-      description: List all JWTs
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing JWTs
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/JWT'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - JWTs
     post:
       x-speakeasy-entity-operation: JWT#create
       operationId: create-jwt
@@ -1235,30 +719,6 @@ paths:
         - JWTs
     parameters:
       - $ref: '#/components/parameters/JWTId'
-    patch:
-      operationId: update-jwt
-      summary: Update a JWT
-      description: Update a JWT
-      requestBody:
-        description: Fields of the JWT that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JWT'
-      responses:
-        '200':
-          description: Successfully updated JWT
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JWT'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - JWTs
     put:
       x-speakeasy-entity-operation: JWT#update
       operationId: upsert-jwt
@@ -1283,34 +743,6 @@ paths:
       tags:
         - JWTs
   /key-auths:
-    get:
-      operationId: list-key-auth
-      summary: List all API-keys
-      description: List all API-keys
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing API-keys
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/KeyAuth'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - API-keys
     post:
       x-speakeasy-entity-operation: KeyAuth#create
       operationId: create-key-auth
@@ -1369,30 +801,6 @@ paths:
         - API-keys
     parameters:
       - $ref: '#/components/parameters/KeyAuthId'
-    patch:
-      operationId: update-key-auth
-      summary: Update an API-key
-      description: Update an API-key
-      requestBody:
-        description: Fields of the API-key that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/KeyAuth'
-      responses:
-        '200':
-          description: Successfully updated API-key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeyAuth'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - API-keys
     put:
       x-speakeasy-entity-operation: KeyAuth#update
       operationId: upsert-key-auth
@@ -1417,34 +825,6 @@ paths:
       tags:
         - API-keys
   /key-sets:
-    get:
-      operationId: list-key-set
-      summary: List all KeySets
-      description: List all KeySets
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing KeySets
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/KeySet'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - KeySets
     post:
       x-speakeasy-entity-operation: KeySet#create
       operationId: create-key-set
@@ -1503,30 +883,6 @@ paths:
         - KeySets
     parameters:
       - $ref: '#/components/parameters/KeySetIdOrName'
-    patch:
-      operationId: update-key-set
-      summary: Update a KeySet
-      description: Update a KeySet
-      requestBody:
-        description: Fields of the KeySet that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/KeySet'
-      responses:
-        '200':
-          description: Successfully updated KeySet
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KeySet'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - KeySets
     put:
       x-speakeasy-entity-operation: KeySet#update
       operationId: upsert-key-set
@@ -1550,61 +906,7 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - KeySets
-  /keyring/remove:
-    post:
-      operationId: post-keyring-remove
-      summary: Remove key
-      description: Remove a key from the keyring.
-      requestBody:
-        description: The request body contains a key ID that can be generated from the `/keyring/generate` endpoint.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                key:
-                  description: The key ID
-                  type: string
-                  example: 3Rwvk223
-              x-examples:
-                Example 1:
-                  key: 3Rwvk223
-      responses:
-        '204':
-          description: No Content
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Keyring
   /keys:
-    get:
-      operationId: list-key
-      summary: List all Keys
-      description: List all Keys
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Keys
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Key'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Keys
     post:
       x-speakeasy-entity-operation: Key#create
       operationId: create-key
@@ -1663,30 +965,6 @@ paths:
         - Keys
     parameters:
       - $ref: '#/components/parameters/KeyIdOrName'
-    patch:
-      operationId: update-key
-      summary: Update a Key
-      description: Update a Key
-      requestBody:
-        description: Fields of the Key that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Key'
-      responses:
-        '200':
-          description: Successfully updated Key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Key'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Keys
     put:
       x-speakeasy-entity-operation: Key#update
       operationId: upsert-key
@@ -1711,34 +989,6 @@ paths:
       tags:
         - Keys
   /mtls-auths:
-    get:
-      operationId: list-mtls-auth
-      summary: List all MTLS-auth credentials
-      description: List all MTLS-auth credentials
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing MTLS-auth credentials
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/MTLSAuth'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - MTLS-auth credentials
     post:
       x-speakeasy-entity-operation: MTLSAuth#create
       operationId: create-mtls-auth
@@ -1797,30 +1047,6 @@ paths:
         - MTLS-auth credentials
     parameters:
       - $ref: '#/components/parameters/MTLSAuthId'
-    patch:
-      operationId: update-mtls-auth
-      summary: Update a MTLS-auth credential
-      description: Update a MTLS-auth credential
-      requestBody:
-        description: Fields of the MTLS-auth credential that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MTLSAuth'
-      responses:
-        '200':
-          description: Successfully updated MTLS-auth credential
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MTLSAuth'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - MTLS-auth credentials
     put:
       x-speakeasy-entity-operation: MTLSAuth#update
       operationId: upsert-mtls-auth
@@ -1844,57 +1070,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - MTLS-auth credentials
-  /plugins:
-    get:
-      operationId: list-plugin
-      summary: List all Plugins
-      description: List all Plugins
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Plugins
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Plugin'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Plugins
-    post:
-      operationId: create-plugin
-      summary: Create a new Plugin
-      description: Create a new Plugin
-      requestBody:
-        description: Description of the new Plugin for creation
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Plugin'
-      responses:
-        '201':
-          description: Successfully created Plugin
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Plugin'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Plugins
   /plugins#ACL:
     post:
       x-speakeasy-entity-operation: PluginACL#create
@@ -3634,84 +2809,8 @@ paths:
       tags:
         - Plugins
   '/plugins/{PluginId}':
-    delete:
-      operationId: delete-plugin
-      summary: Delete a Plugin
-      description: Delete a Plugin
-      parameters:
-        - $ref: '#/components/parameters/PluginId'
-      responses:
-        '204':
-          description: Successfully deleted Plugin or the resource didn't exist
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Plugins
-    get:
-      operationId: get-plugin
-      summary: Fetch a Plugin
-      description: Get a Plugin using ID.
-      responses:
-        '200':
-          description: Successfully fetched Plugin
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Plugin'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Plugins
     parameters:
       - $ref: '#/components/parameters/PluginId'
-    patch:
-      operationId: update-plugin
-      summary: Update a Plugin
-      description: Update a Plugin
-      requestBody:
-        description: Fields of the Plugin that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Plugin'
-      responses:
-        '200':
-          description: Successfully updated Plugin
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Plugin'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Plugins
-    put:
-      operationId: upsert-plugin
-      summary: Upsert a Plugin
-      description: Create or Update Plugin using ID.
-      requestBody:
-        description: Description of the Plugin
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Plugin'
-      responses:
-        '200':
-          description: Successfully upserted Plugin
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Plugin'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Plugins
   '/plugins/{PluginId}#ACL':
     delete:
       x-speakeasy-entity-operation: PluginACL#delete
@@ -7979,34 +7078,6 @@ paths:
       tags:
         - Plugins
   /routes:
-    get:
-      operationId: list-route
-      summary: List all Routes
-      description: List all Routes
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Routes
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Route'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Routes
     post:
       x-speakeasy-entity-operation: Route#create
       operationId: create-route
@@ -8065,30 +7136,6 @@ paths:
         - Routes
     parameters:
       - $ref: '#/components/parameters/RouteIdOrName'
-    patch:
-      operationId: update-route
-      summary: Update a Route
-      description: Update a Route
-      requestBody:
-        description: Fields of the Route that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Route'
-      responses:
-        '200':
-          description: Successfully updated Route
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Route'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Routes
     put:
       x-speakeasy-entity-operation: Route#update
       operationId: upsert-route
@@ -8113,25 +7160,6 @@ paths:
       tags:
         - Routes
   '/schemas/plugins/{pluginName}':
-    get:
-      operationId: fetch-plugin-schema
-      summary: Fetch plugin schema
-      description: Get the schema for a plugin
-      responses:
-        '200':
-          description: The schema for the plugin
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  fields:
-                    type: array
-                    items:
-                      additionalProperties: true
-                      type: object
-      tags:
-        - Plugins
     parameters:
       - name: pluginName
         in: path
@@ -8140,34 +7168,6 @@ paths:
         schema:
           type: string
   /services:
-    get:
-      operationId: list-service
-      summary: List all Services
-      description: List all Services
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Services
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Service'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Services
     post:
       x-speakeasy-entity-operation: Service#create
       operationId: create-service
@@ -8226,30 +7226,6 @@ paths:
         - Services
     parameters:
       - $ref: '#/components/parameters/ServiceIdOrName'
-    patch:
-      operationId: update-service
-      summary: Update a Service
-      description: Update a Service
-      requestBody:
-        description: Fields of the Service that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Service'
-      responses:
-        '200':
-          description: Successfully updated Service
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Service'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Services
     put:
       x-speakeasy-entity-operation: Service#update
       operationId: upsert-service
@@ -8274,34 +7250,6 @@ paths:
       tags:
         - Services
   /snis:
-    get:
-      operationId: list-sni
-      summary: List all SNIs
-      description: List all SNIs
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing SNIs
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SNI'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - SNIs
     post:
       x-speakeasy-entity-operation: SNI#create
       operationId: create-sni
@@ -8360,30 +7308,6 @@ paths:
         - SNIs
     parameters:
       - $ref: '#/components/parameters/SNIIdOrName'
-    patch:
-      operationId: update-sni
-      summary: Update an SNI
-      description: Update an SNI
-      requestBody:
-        description: Fields of the SNI that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SNI'
-      responses:
-        '200':
-          description: Successfully updated SNI
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SNI'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - SNIs
     put:
       x-speakeasy-entity-operation: SNI#update
       operationId: upsert-sni
@@ -8408,34 +7332,6 @@ paths:
       tags:
         - SNIs
   /upstreams:
-    get:
-      operationId: list-upstream
-      summary: List all Upstreams
-      description: List all Upstreams
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Upstreams
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Upstream'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Upstreams
     post:
       x-speakeasy-entity-operation: Upstream#create
       operationId: create-upstream
@@ -8494,30 +7390,6 @@ paths:
         - Upstreams
     parameters:
       - $ref: '#/components/parameters/UpstreamIdOrName'
-    patch:
-      operationId: update-upstream
-      summary: Update an Upstream
-      description: Update an Upstream
-      requestBody:
-        description: Fields of the Upstream that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Upstream'
-      responses:
-        '200':
-          description: Successfully updated Upstream
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Upstream'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Upstreams
     put:
       x-speakeasy-entity-operation: Upstream#update
       operationId: upsert-upstream
@@ -8542,34 +7414,6 @@ paths:
       tags:
         - Upstreams
   /vaults:
-    get:
-      operationId: list-vault
-      summary: List all Vaults
-      description: List all Vaults
-      parameters:
-        - $ref: '#/components/parameters/PaginationSize'
-        - $ref: '#/components/parameters/PaginationOffset'
-        - $ref: '#/components/parameters/PaginationTagsFilter'
-      responses:
-        '200':
-          description: A successful response listing Vaults
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Vault'
-                  next:
-                    $ref: '#/components/schemas/PaginationNextResponse'
-                  offset:
-                    $ref: '#/components/schemas/PaginationOffsetResponse'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-      tags:
-        - Vaults
     post:
       x-speakeasy-entity-operation: Vault#create
       operationId: create-vault
@@ -8628,30 +7472,6 @@ paths:
         - Vaults
     parameters:
       - $ref: '#/components/parameters/VaultIdOrPrefix'
-    patch:
-      operationId: update-vault
-      summary: Update a Vault
-      description: Update a Vault
-      requestBody:
-        description: Fields of the Vault that need to be updated
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Vault'
-      responses:
-        '200':
-          description: Successfully updated Vault
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Vault'
-        '401':
-          $ref: '#/components/responses/HTTP401Error'
-        '404':
-          description: Resource does not exist
-      tags:
-        - Vaults
     put:
       x-speakeasy-entity-operation: Vault#update
       operationId: upsert-vault
@@ -8675,59 +7495,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Vaults
-  /workspace_/groups:
-    get:
-      operationId: list-groups
-      summary: Retrieve a list of all groups
-      responses:
-        '200':
-          description: Successfully retrieved the list of groups
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  properties:
-                    created_at:
-                      type: string
-                      format: date-time
-                    id:
-                      type: string
-                    name:
-                      type: string
-                  type: object
-      tags:
-        - Workspaces
-    post:
-      operationId: create-group
-      summary: Create a new group
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
-      responses:
-        '201':
-          description: Successfully created the group
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  created_at:
-                    type: string
-                    format: date-time
-                  id:
-                    type: string
-                  name:
-                    type: string
-      tags:
-        - Workspaces
   '/workspace_/groups/{groups}':
     parameters:
       - name: groups
@@ -8735,127 +7502,13 @@ paths:
         required: true
         schema:
           type: string
-    patch:
-      operationId: update-group
-      summary: Update details of a specific group
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-      responses:
-        '200':
-          description: Successfully updated the group
-      tags:
-        - Workspaces
   '/workspace_/groups/{groups}/roles':
-    delete:
-      operationId: remove-role-from-group
-      summary: Remove a role association from a group
-      parameters:
-        - name: rbac_role_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: workspace_id
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Successfully removed the role association
-      tags:
-        - Workspaces
-    get:
-      operationId: list-group-roles
-      summary: Retrieve roles associated with a specific group
-      responses:
-        '200':
-          description: Successfully retrieved the roles
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  properties:
-                    group:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                    rbac_role:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                    workspace:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                  type: object
-      tags:
-        - Workspaces
     parameters:
       - name: groups
         in: path
         required: true
         schema:
           type: string
-    post:
-      operationId: add-role-to-group
-      summary: Associate a role with a group
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                rbac_role_id:
-                  type: string
-                workspace_id:
-                  type: string
-              required:
-                - rbac_role_id
-                - workspace_id
-      responses:
-        '201':
-          description: Successfully associated the role with the group
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  group:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                  rbac_role:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                  workspace:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-      tags:
-        - Workspaces
 components:
   parameters:
     ACLId:
@@ -8973,28 +7626,6 @@ components:
       schema:
         type: string
       x-speakeasy-match: id
-    PaginationOffset:
-      description: Offset from which to return the next set of resources. Use the value of the 'offset' field from the response of a list operation as input here to paginate through all the resources
-      in: query
-      name: offset
-      schema:
-        type: string
-    PaginationSize:
-      description: Number of resources to be returned.
-      in: query
-      name: size
-      schema:
-        type: integer
-        default: 100
-        maximum: 1000
-        minimum: 1
-    PaginationTagsFilter:
-      description: 'A list of tags to filter the list of resources on. Multiple tags can be concatenated using '','' to mean AND or using ''/'' to mean OR.'
-      example: 'tag1,tag2'
-      in: query
-      name: tags
-      schema:
-        type: string
     PluginId:
       description: ID of the Plugin to lookup
       example: 3473c251-5b6c-4f45-b1ff-7ede735a366d
@@ -9117,29 +7748,6 @@ components:
         name:
           type: string
           const: acl
-    ACLWithoutParents:
-      x-speakeasy-entity: ACL
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        group:
-          type: string
-        id:
-          type: string
-          nullable: true
-        tags:
-          type: array
-          items:
-            type: string
-      example:
-        group: foo
-        id: b1f34145-0343-41a4-9602-4c69dec2f269
-      additionalProperties: false
-      required:
-        - group
     AcmePlugin:
       x-speakeasy-entity: PluginAcme
       allOf:
@@ -10418,33 +9026,6 @@ components:
         name:
           type: string
           const: basic-auth
-    BasicAuthWithoutParents:
-      x-speakeasy-entity: BasicAuth
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        password:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
-        username:
-          type: string
-      example:
-        id: b2f34145-0343-41a4-9602-4c69dec2f269
-        password: hashedsoopersecretvalue
-        username: darius
-      additionalProperties: false
-      required:
-        - username
-        - password
     BotDetectionPlugin:
       x-speakeasy-entity: PluginBotDetection
       allOf:
@@ -11559,33 +10140,6 @@ components:
       additionalProperties: false
       required:
         - username
-    HMACAuthWithoutParents:
-      x-speakeasy-entity: HMACAuth
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        secret:
-          type: string
-          nullable: true
-        tags:
-          type: array
-          items:
-            type: string
-        username:
-          type: string
-      example:
-        id: 75695322-e8a0-4109-aed4-5416b0308d85
-        secret: wQazJ304DW5huJklHgUfjfiSyCyTAEDZ
-        username: xerxes
-      additionalProperties: false
-      required:
-        - username
     HmacAuthPlugin:
       x-speakeasy-entity: PluginHmacAuth
       allOf:
@@ -11827,54 +10381,6 @@ components:
         algorithm: HS256
         consumer:
           id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
-        id: 75695322-e8a0-4109-aed4-5416b0308d85
-        key: YJdmaDvVTJxtcWRCvkMikc8oELgAVNcz
-        secret: C50k0bcahDhLNhLKSUBSR1OMiFGzNZ7X
-      additionalProperties: false
-    JWTWithoutParents:
-      x-speakeasy-entity: JWT
-      type: object
-      properties:
-        algorithm:
-          type: string
-          default: HS256
-          enum:
-            - HS256
-            - HS384
-            - HS512
-            - RS256
-            - RS384
-            - RS512
-            - ES256
-            - ES384
-            - ES512
-            - PS256
-            - PS384
-            - PS512
-            - EdDSA
-          nullable: true
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        key:
-          type: string
-          nullable: true
-        rsa_public_key:
-          type: string
-          nullable: true
-        secret:
-          type: string
-          nullable: true
-        tags:
-          type: array
-          items:
-            type: string
-      example:
-        algorithm: HS256
         id: 75695322-e8a0-4109-aed4-5416b0308d85
         key: YJdmaDvVTJxtcWRCvkMikc8oELgAVNcz
         secret: C50k0bcahDhLNhLKSUBSR1OMiFGzNZ7X
@@ -12944,29 +11450,6 @@ components:
         name:
           type: string
           const: key-auth
-    KeyAuthWithoutParents:
-      x-speakeasy-entity: KeyAuth
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        key:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
-      example:
-        id: b2f34145-0343-41a4-9602-4c69dec2f269
-        key: IL1deIyHyQA40WpeLeA1bIUXuvTwlGjo
-      additionalProperties: false
-      required:
-        - key
     KeySet:
       x-speakeasy-entity: KeySet
       type: object
@@ -12995,69 +11478,6 @@ components:
         tags:
           - idp-keys
       additionalProperties: false
-    KeyWithoutParents:
-      x-speakeasy-entity: Key
-      description: 'A Key object holds a representation of asymmetric keys in various formats. When Kong or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.'
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        jwk:
-          description: A JSON Web Key represented as a string.
-          type: string
-          nullable: true
-        kid:
-          description: A unique identifier for a key.
-          type: string
-        name:
-          description: The name to associate with the given keys.
-          type: string
-          nullable: true
-        pem:
-          description: A keypair in PEM format.
-          type: object
-          nullable: true
-          properties:
-            private_key:
-              type: string
-            public_key:
-              type: string
-        set:
-          description: The id (an UUID) of the key-set with which to associate the key.
-          type: object
-          additionalProperties: false
-          nullable: true
-          properties:
-            id:
-              type: string
-          x-foreign: true
-        tags:
-          description: An optional set of strings associated with the Key for grouping and filtering.
-          type: array
-          items:
-            type: string
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: integer
-          readOnly: true
-      example:
-        id: d958f66b-8e99-44d2-b0b4-edd5bbf24658
-        jwk: '{"alg":"RSA",  "kid": "42",  ...}'
-        kid: '42'
-        name: a-key
-        pem:
-          private_key: '-----BEGIN'
-          public_key: '-----BEGIN'
-        set:
-          id: b86b331c-dcd0-4b3e-97ce-47c5a9543031
-      additionalProperties: false
-      required:
-        - kid
     KonnectApplicationAuthPlugin:
       x-speakeasy-entity: PluginKonnectApplicationAuth
       allOf:
@@ -14906,39 +13326,6 @@ components:
           id: b2f34145-0343-41a4-9602-4c69dec2f260
         consumer:
           id: 84a73fb8-50fc-44a7-a4d5-aa17728ee83f
-        id: b2f34145-0343-41a4-9602-4c69dec2f269
-        subject_name: CA_Subject_Name
-      additionalProperties: false
-      required:
-        - subject_name
-    MTLSAuthWithoutParents:
-      x-speakeasy-entity: MTLSAuth
-      type: object
-      properties:
-        ca_certificate:
-          type: object
-          additionalProperties: false
-          nullable: true
-          properties:
-            id:
-              type: string
-          x-foreign: true
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        subject_name:
-          type: string
-        tags:
-          type: array
-          items:
-            type: string
-      example:
-        ca_certificate:
-          id: b2f34145-0343-41a4-9602-4c69dec2f260
         id: b2f34145-0343-41a4-9602-4c69dec2f269
         subject_name: CA_Subject_Name
       additionalProperties: false
@@ -17150,12 +15537,6 @@ components:
         name:
           type: string
           const: opentelemetry
-    PaginationNextResponse:
-      description: URI to the next page (may be null)
-      type: string
-    PaginationOffsetResponse:
-      description: Offset is used to paginate through the API. Provide this value to the next list operation to fetch the next page
-      type: string
     Plugin:
       description: 'A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.'
       type: object
@@ -17257,103 +15638,6 @@ components:
             id:
               type: string
           x-foreign: true
-        tags:
-          description: An optional set of strings associated with the Plugin for grouping and filtering.
-          type: array
-          items:
-            type: string
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: integer
-          readOnly: true
-      example:
-        config:
-          anonymous: null
-          hide_credentials: false
-          key_in_body: false
-          key_in_header: true
-          key_in_query: true
-          key_names:
-            - apikey
-          run_on_preflight: true
-        enabled: true
-        id: 3fd1eea1-885a-4011-b986-289943ff8177
-        name: key-auth
-        protocols:
-          - grpc
-          - grpcs
-          - http
-          - https
-      additionalProperties: false
-      required:
-        - name
-        - config
-    PluginWithoutParents:
-      description: 'A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.'
-      type: object
-      properties:
-        config:
-          description: 'The configuration properties for the Plugin which can be found on the plugins documentation page in the [Kong Hub](https://docs.konghq.com/hub/).'
-          type: object
-          additionalProperties: true
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        enabled:
-          description: Whether the plugin is applied.
-          type: boolean
-          default: true
-          nullable: true
-        id:
-          type: string
-          nullable: true
-        instance_name:
-          type: string
-          nullable: true
-        name:
-          description: 'The name of the Plugin that''s going to be added. Currently, the Plugin must be installed in every Kong instance separately.'
-          type: string
-        ordering:
-          type: object
-          nullable: true
-          properties:
-            after:
-              type: object
-              properties:
-                access:
-                  type: array
-                  items:
-                    type: string
-            before:
-              type: object
-              properties:
-                access:
-                  type: array
-                  items:
-                    type: string
-        protocols:
-          description: 'A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.'
-          type: array
-          items:
-            enum:
-              - grpc
-              - grpcs
-              - http
-              - https
-              - tcp
-              - tls
-              - tls_passthrough
-              - udp
-              - ws
-              - wss
-            type: string
-          default:
-            - grpc
-            - grpcs
-            - http
-            - https
-          nullable: true
         tags:
           description: An optional set of strings associated with the Plugin for grouping and filtering.
           type: array
@@ -19319,157 +17603,6 @@ components:
         name:
           type: string
           const: route-transformer-advanced
-    RouteWithoutParents:
-      x-speakeasy-entity: Route
-      description: 'Route entities define rules to match client requests. Each Route is associated with a Service, and a Service may have multiple Routes associated to it. Every request matching a given Route will be proxied to its associated Service. The combination of Routes and Services (and the separation of concerns between them) offers a powerful routing mechanism with which it is possible to define fine-grained entry-points in Kong leading to different upstream services of your infrastructure. You need at least one matching rule that applies to the protocol being matched by the Route.'
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        destinations:
-          description: A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
-          type: array
-          items:
-            properties:
-              ip:
-                type: string
-              port:
-                type: integer
-            type: object
-          nullable: true
-        headers:
-          description: 'One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.'
-          type: object
-          additionalProperties:
-            type: string
-          nullable: true
-        hosts:
-          description: A list of domain names that match this Route. Note that the hosts value is case sensitive.
-          type: array
-          items:
-            type: string
-          nullable: true
-        https_redirect_status_code:
-          description: 'The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.'
-          type: integer
-          default: 426
-          enum:
-            - 426
-            - 301
-            - 302
-            - 307
-            - 308
-          nullable: true
-        id:
-          type: string
-          nullable: true
-        methods:
-          description: A list of HTTP methods that match this Route.
-          type: array
-          items:
-            type: string
-          nullable: true
-        name:
-          description: 'The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".'
-          type: string
-          nullable: true
-        path_handling:
-          description: 'Controls how the Service path, Route path and requested path are combined when sending a request to the upstream. See above for a detailed description of each behavior.'
-          type: string
-          default: v0
-          enum:
-            - v0
-            - v1
-          nullable: true
-        paths:
-          description: A list of paths that match this Route.
-          type: array
-          items:
-            type: string
-          nullable: true
-        preserve_host:
-          description: 'When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service''s `host`.'
-          type: boolean
-          default: false
-          nullable: true
-        protocols:
-          description: 'An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.'
-          type: array
-          items:
-            enum:
-              - grpc
-              - grpcs
-              - http
-              - https
-              - tcp
-              - tls
-              - tls_passthrough
-              - udp
-              - ws
-              - wss
-            type: string
-          default:
-            - http
-            - https
-          nullable: true
-        regex_priority:
-          description: 'A number used to choose which route resolves a given request when several routes match it using regexes simultaneously. When two routes match the path and have the same `regex_priority`, the older one (lowest `created_at`) is used. Note that the priority for non-regex routes is different (longer non-regex routes are matched before shorter ones).'
-          type: integer
-          default: 0
-          nullable: true
-        request_buffering:
-          description: 'Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.'
-          type: boolean
-          default: true
-          nullable: true
-        response_buffering:
-          description: 'Whether to enable response body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that send data with chunked transfer encoding.'
-          type: boolean
-          default: true
-          nullable: true
-        snis:
-          description: A list of SNIs that match this Route when using stream routing.
-          type: array
-          items:
-            type: string
-          nullable: true
-        sources:
-          description: A list of IP sources of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
-          type: array
-          items:
-            properties:
-              ip:
-                type: string
-              port:
-                type: integer
-            type: object
-          nullable: true
-        strip_path:
-          description: 'When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.'
-          type: boolean
-          default: true
-          nullable: true
-        tags:
-          description: An optional set of strings associated with the Route for grouping and filtering.
-          type: array
-          items:
-            type: string
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: integer
-          readOnly: true
-      example:
-        hosts:
-          - foo.example.com
-          - foo.example.us
-        id: 56c4566c-14cc-4132-9011-4139fcbbe50a
-        name: example-route
-        paths:
-          - /v1
-          - /v2
-      additionalProperties: false
     SNI:
       x-speakeasy-entity: SNI
       description: 'An SNI object represents a many-to-one mapping of hostnames to a certificate. That is, a certificate object can have many hostnames associated with it; when Kong receives an SSL request, it uses the SNI field in the Client Hello to lookup the certificate object based on the SNI associated with the certificate.'
@@ -19511,36 +17644,6 @@ components:
       required:
         - name
         - certificate
-    SNIWithoutParents:
-      x-speakeasy-entity: SNI
-      description: 'An SNI object represents a many-to-one mapping of hostnames to a certificate. That is, a certificate object can have many hostnames associated with it; when Kong receives an SSL request, it uses the SNI field in the Client Hello to lookup the certificate object based on the SNI associated with the certificate.'
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: integer
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        name:
-          description: The SNI name to associate with the given certificate.
-          type: string
-        tags:
-          description: An optional set of strings associated with the SNIs for grouping and filtering.
-          type: array
-          items:
-            type: string
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: integer
-          readOnly: true
-      example:
-        id: 36c4566c-14cc-4132-9011-4139fcbbe50a
-        name: some.example.org
-      additionalProperties: false
-      required:
-        - name
     SamlPlugin:
       x-speakeasy-entity: PluginSaml
       allOf:
@@ -20732,86 +18835,6 @@ components:
         name:
           type: string
           const: syslog
-    Target:
-      x-speakeasy-entity: Target
-      description: 'A target is an ip address/hostname with a port that identifies an instance of a backend service. Every upstream can have many targets, and the targets can be dynamically added, modified, or deleted. Changes take effect on the fly. To disable a target, post a new one with `weight=0`; alternatively, use the `DELETE` convenience method to accomplish the same. The current target object definition is the one with the latest `created_at`.'
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: number
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        tags:
-          description: An optional set of strings associated with the Target for grouping and filtering.
-          type: array
-          items:
-            type: string
-        target:
-          description: 'The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the `port` value will be overridden by the value from the DNS record.'
-          type: string
-          nullable: true
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: number
-          readOnly: true
-        upstream:
-          type: object
-          additionalProperties: false
-          nullable: true
-          properties:
-            id:
-              type: string
-          x-foreign: true
-        weight:
-          description: 'The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.'
-          type: integer
-          default: 100
-          nullable: true
-      example:
-        id: 089292a7-ba3d-4d88-acf0-97b4b2e2621a
-        target: 203.0.113.42
-        upstream:
-          id: 5f1d7e76-2fed-4806-a6af-869984f025cb
-        weight: 100
-      additionalProperties: false
-    TargetWithoutParents:
-      x-speakeasy-entity: Target
-      description: 'A target is an ip address/hostname with a port that identifies an instance of a backend service. Every upstream can have many targets, and the targets can be dynamically added, modified, or deleted. Changes take effect on the fly. To disable a target, post a new one with `weight=0`; alternatively, use the `DELETE` convenience method to accomplish the same. The current target object definition is the one with the latest `created_at`.'
-      type: object
-      properties:
-        created_at:
-          description: Unix epoch when the resource was created.
-          type: number
-          readOnly: true
-        id:
-          type: string
-          nullable: true
-        tags:
-          description: An optional set of strings associated with the Target for grouping and filtering.
-          type: array
-          items:
-            type: string
-        target:
-          description: 'The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the `port` value will be overridden by the value from the DNS record.'
-          type: string
-          nullable: true
-        updated_at:
-          description: Unix epoch when the resource was last updated.
-          type: number
-          readOnly: true
-        weight:
-          description: 'The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.'
-          type: integer
-          default: 100
-          nullable: true
-      example:
-        id: 089292a7-ba3d-4d88-acf0-97b4b2e2621a
-        target: 203.0.113.42
-        weight: 100
-      additionalProperties: false
     TcpLogPlugin:
       x-speakeasy-entity: PluginTcpLog
       allOf:

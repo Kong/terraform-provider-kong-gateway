@@ -14,17 +14,19 @@ Certificate Resource
 
 ```terraform
 resource "kong-gateway_certificate" "my_certificate" {
-  cert     = "...my_cert..."
-  cert_alt = "...my_cert_alt..."
-  id       = "...my_id..."
-  key      = "...my_key..."
-  key_alt  = "...my_key_alt..."
+  cert       = "...my_cert..."
+  cert_alt   = "...my_cert_alt..."
+  created_at = 7
+  id         = "...my_id..."
+  key        = "...my_key..."
+  key_alt    = "...my_key_alt..."
   snis = [
     "..."
   ]
   tags = [
     "..."
   ]
+  updated_at = 2
 }
 ```
 
@@ -39,15 +41,15 @@ resource "kong-gateway_certificate" "my_certificate" {
 ### Optional
 
 - `cert_alt` (String) PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+- `created_at` (Number) Unix epoch when the resource was created.
 - `key_alt` (String) PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
 - `snis` (List of String)
 - `tags` (List of String) An optional set of strings associated with the Certificate for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ## Import
 

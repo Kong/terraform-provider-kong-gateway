@@ -14,6 +14,7 @@ Route Resource
 
 ```terraform
 resource "kong-gateway_route" "my_route" {
+  created_at = 5
   destinations = [
     {
       ip   = "...my_ip..."
@@ -21,7 +22,9 @@ resource "kong-gateway_route" "my_route" {
     }
   ]
   headers = {
-    key = "value",
+    key = [
+      # ...
+    ]
   }
   hosts = [
     "..."
@@ -59,6 +62,7 @@ resource "kong-gateway_route" "my_route" {
   tags = [
     "..."
   ]
+  updated_at = 2
 }
 ```
 
@@ -67,8 +71,9 @@ resource "kong-gateway_route" "my_route" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `destinations` (Attributes List) A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port". (see [below for nested schema](#nestedatt--destinations))
-- `headers` (Map of String) One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.
+- `headers` (Map of List of String) One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.
 - `hosts` (List of String) A list of domain names that match this Route. Note that the hosts value is case sensitive.
 - `https_redirect_status_code` (Number) The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol. must be one of ["426", "301", "302", "307", "308"]
 - `methods` (List of String) A list of HTTP methods that match this Route.
@@ -85,12 +90,11 @@ resource "kong-gateway_route" "my_route" {
 - `sources` (Attributes List) A list of IP sources of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port". (see [below for nested schema](#nestedatt--sources))
 - `strip_path` (Boolean) When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.
 - `tags` (List of String) An optional set of strings associated with the Route for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 <a id="nestedatt--destinations"></a>
 ### Nested Schema for `destinations`

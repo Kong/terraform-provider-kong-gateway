@@ -20,6 +20,8 @@ resource "kong-gateway_mtls_auth" "my_mtlsauth" {
   consumer = {
     id = "...my_id..."
   }
+  consumer_id  = "f28acbfa-c866-4587-b688-0208ac24df21"
+  created_at   = 7
   id           = "...my_id..."
   subject_name = "...my_subject_name..."
   tags = [
@@ -33,17 +35,18 @@ resource "kong-gateway_mtls_auth" "my_mtlsauth" {
 
 ### Required
 
+- `consumer_id` (String) Consumer ID for nested entities
 - `subject_name` (String)
 
 ### Optional
 
 - `ca_certificate` (Attributes) (see [below for nested schema](#nestedatt--ca_certificate))
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--ca_certificate"></a>
@@ -66,5 +69,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_mtls_auth.my_kong-gateway_mtls_auth ""
+terraform import kong-gateway_mtls_auth.my_kong-gateway_mtls_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"mtls_auth_id\": \"\"}"
 ```

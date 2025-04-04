@@ -18,6 +18,7 @@ resource "kong-gateway_upstream" "my_upstream" {
   client_certificate = {
     id = "...my_id..."
   }
+  created_at                = 1
   hash_fallback             = "query_arg"
   hash_fallback_header      = "...my_hash_fallback_header..."
   hash_fallback_query_arg   = "...my_hash_fallback_query_arg..."
@@ -32,7 +33,7 @@ resource "kong-gateway_upstream" "my_upstream" {
     active = {
       concurrency = 4
       headers = {
-        key = "value",
+        key = "value"
       }
       healthy = {
         http_statuses = [
@@ -82,6 +83,7 @@ resource "kong-gateway_upstream" "my_upstream" {
   tags = [
     "..."
   ]
+  updated_at   = 7
   use_srv_name = false
 }
 ```
@@ -97,6 +99,7 @@ resource "kong-gateway_upstream" "my_upstream" {
 
 - `algorithm` (String) Which load balancing algorithm to use. must be one of ["consistent-hashing", "least-connections", "round-robin", "latency"]
 - `client_certificate` (Attributes) If set, the certificate to be used as client certificate while TLS handshaking to the upstream server. (see [below for nested schema](#nestedatt--client_certificate))
+- `created_at` (Number) Unix epoch when the resource was created.
 - `hash_fallback` (String) What to use as hashing input if the primary `hash_on` does not return a hash (eg. header is missing, or no Consumer identified). Not available if `hash_on` is set to `cookie`. must be one of ["none", "consumer", "ip", "header", "cookie", "path", "query_arg", "uri_capture"]
 - `hash_fallback_header` (String) The header name to take the value from as hash input. Only required when `hash_fallback` is set to `header`.
 - `hash_fallback_query_arg` (String) The name of the query string argument to take the value from as hash input. Only required when `hash_fallback` is set to `query_arg`.
@@ -111,13 +114,12 @@ resource "kong-gateway_upstream" "my_upstream" {
 - `host_header` (String) The hostname to be used as `Host` header when proxying requests through Kong.
 - `slots` (Number) The number of slots in the load balancer algorithm. If `algorithm` is set to `round-robin`, this setting determines the maximum number of slots. If `algorithm` is set to `consistent-hashing`, this setting determines the actual number of slots in the algorithm. Accepts an integer in the range `10`-`65536`.
 - `tags` (List of String) An optional set of strings associated with the Upstream for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 - `use_srv_name` (Boolean) If set, the balancer will use SRV hostname(if DNS Answer has SRV record) as the proxy upstream `Host`.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 <a id="nestedatt--client_certificate"></a>
 ### Nested Schema for `client_certificate`

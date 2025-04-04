@@ -15,6 +15,7 @@ Vault Resource
 ```terraform
 resource "kong-gateway_vault" "my_vault" {
   config      = "{ \"see\": \"documentation\" }"
+  created_at  = 3
   description = "...my_description..."
   id          = "...my_id..."
   name        = "...my_name..."
@@ -22,6 +23,7 @@ resource "kong-gateway_vault" "my_vault" {
   tags = [
     "..."
   ]
+  updated_at = 10
 }
 ```
 
@@ -36,14 +38,14 @@ resource "kong-gateway_vault" "my_vault" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `description` (String) The description of the Vault entity.
 - `tags` (List of String) An optional set of strings associated with the Vault for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ## Import
 

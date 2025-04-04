@@ -17,11 +17,13 @@ resource "kong-gateway_sni" "my_sni" {
   certificate = {
     id = "...my_id..."
   }
-  id   = "...my_id..."
-  name = "...my_name..."
+  created_at = 1
+  id         = "...my_id..."
+  name       = "...my_name..."
   tags = [
     "..."
   ]
+  updated_at = 3
 }
 ```
 
@@ -35,13 +37,13 @@ resource "kong-gateway_sni" "my_sni" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String) An optional set of strings associated with the SNIs for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 <a id="nestedatt--certificate"></a>
 ### Nested Schema for `certificate`

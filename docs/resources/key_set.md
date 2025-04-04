@@ -14,11 +14,13 @@ KeySet Resource
 
 ```terraform
 resource "kong-gateway_key_set" "my_keyset" {
-  id   = "...my_id..."
-  name = "...my_name..."
+  created_at = 0
+  id         = "...my_id..."
+  name       = "...my_name..."
   tags = [
     "..."
   ]
+  updated_at = 4
 }
 ```
 
@@ -27,14 +29,14 @@ resource "kong-gateway_key_set" "my_keyset" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `name` (String)
 - `tags` (List of String)
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ## Import
 

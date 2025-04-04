@@ -14,12 +14,14 @@ Consumer Resource
 
 ```terraform
 resource "kong-gateway_consumer" "my_consumer" {
-  custom_id = "...my_custom_id..."
-  id        = "...my_id..."
+  created_at = 7
+  custom_id  = "...my_custom_id..."
+  id         = "...my_id..."
   tags = [
     "..."
   ]
-  username = "...my_username..."
+  updated_at = 1
+  username   = "...my_username..."
 }
 ```
 
@@ -28,15 +30,15 @@ resource "kong-gateway_consumer" "my_consumer" {
 
 ### Optional
 
+- `created_at` (Number) Unix epoch when the resource was created.
 - `custom_id` (String) Field for storing an existing unique ID for the Consumer - useful for mapping Kong with users in your existing database. You must send either this field or `username` with the request.
 - `tags` (List of String) An optional set of strings associated with the Consumer for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
 - `username` (String) The unique username of the Consumer. You must send either this field or `custom_id` with the request.
 
 ### Read-Only
 
-- `created_at` (Number) Unix epoch when the resource was created.
 - `id` (String) The ID of this resource.
-- `updated_at` (Number) Unix epoch when the resource was last updated.
 
 ## Import
 

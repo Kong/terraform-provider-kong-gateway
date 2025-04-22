@@ -2,6 +2,8 @@
 
 This repository contains a Terraform provider for [Kong Gateway](https://docs.konghq.com/gateway/?utm_source=github&utm_campaign=terraform-provider-kong-gateway).
 
+This is a **BETA** provider and Kong provides no guarantees around stability or issue response times. This provider will graduate to GA status in the future, and all normal Kong SLAs will apply.
+
 ## Capabilities
 
 This provider can manage the following resources:

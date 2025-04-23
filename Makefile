@@ -15,5 +15,8 @@ speakeasy: check-speakeasy
 	@git checkout -- README.md examples/README.md
 	@rm USAGE.md
 
+acceptance:
+	@TF_ACC=1 go test -v ./tests -count 1
+
 check-speakeasy:
 	@command -v speakeasy >/dev/null 2>&1 || { echo >&2 "speakeasy CLI is not installed. Please install before continuing."; exit 1; }

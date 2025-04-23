@@ -34,26 +34,6 @@ servers:
           - http
           - https
 paths:
-  '/acls/{ACLId}':
-    parameters:
-      - $ref: '#/components/parameters/ACLId'
-  '/admins/{name_or_id}/workspaces/{workspace_name_or_id}':
-    parameters:
-      - name: name_or_id
-        in: path
-        description: The admin’s username or ID
-        required: true
-        schema:
-          type: string
-      - name: workspace_name_or_id
-        in: path
-        description: The name or ID of the admin's new workspace.
-        required: true
-        schema:
-          type: string
-  '/basic-auths/{BasicAuthId}':
-    parameters:
-      - $ref: '#/components/parameters/BasicAuthId'
   /ca_certificates:
     post:
       x-speakeasy-entity-operation: CACertificate#create
@@ -932,18 +912,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Consumers
-  '/custom-plugins/{CustomPluginIdOrName}':
-    parameters:
-      - $ref: '#/components/parameters/CustomPluginIdOrName'
-  '/hmac-auths/{HMACAuthId}':
-    parameters:
-      - $ref: '#/components/parameters/HMACAuthId'
-  '/jwts/{JWTId}':
-    parameters:
-      - $ref: '#/components/parameters/JWTId'
-  '/key-auths/{KeyAuthId}':
-    parameters:
-      - $ref: '#/components/parameters/KeyAuthId'
   /key-sets:
     post:
       x-speakeasy-entity-operation: KeySet#create
@@ -1108,9 +1076,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Keys
-  '/mtls-auths/{MTLSAuthId}':
-    parameters:
-      - $ref: '#/components/parameters/MTLSAuthId'
   /oic_jwks:
     post:
       x-speakeasy-entity-operation: OidcJwk#create
@@ -3399,9 +3364,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Plugins
-  '/plugins/{PluginId}':
-    parameters:
-      - $ref: '#/components/parameters/PluginId'
   '/plugins/{PluginId}#ACL':
     delete:
       x-speakeasy-entity-operation: PluginACL#delete
@@ -8626,14 +8588,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Routes
-  '/schemas/plugins/{pluginName}':
-    parameters:
-      - name: pluginName
-        in: path
-        description: The name of the plugin
-        required: true
-        schema:
-          type: string
   /services:
     post:
       x-speakeasy-entity-operation: Service#create
@@ -9045,20 +8999,6 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Vaults
-  '/workspace_/groups/{groups}':
-    parameters:
-      - name: groups
-        in: path
-        required: true
-        schema:
-          type: string
-  '/workspace_/groups/{groups}/roles':
-    parameters:
-      - name: groups
-        in: path
-        required: true
-        schema:
-          type: string
 components:
   parameters:
     ACLId:
@@ -9127,15 +9067,6 @@ components:
       example: c1059869-6fa7-4329-a5f5-5946d14ca2c5
       in: path
       name: ConsumerIdOrUsername
-      required: true
-      schema:
-        type: string
-      x-speakeasy-match: id
-    CustomPluginIdOrName:
-      description: ID or name of the CustomPlugin to lookup
-      example: ''
-      in: path
-      name: CustomPluginIdOrName
       required: true
       schema:
         type: string

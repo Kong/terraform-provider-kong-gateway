@@ -3,14 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlugin {
+func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) (*shared.HTTPLogPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -39,7 +43,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 	if r.Ordering != nil {
 		var after *shared.HTTPLogPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -49,7 +53,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 		}
 		var before *shared.HTTPLogPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -62,33 +66,36 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 			Before: before,
 		}
 	}
-	var partials []shared.HTTPLogPluginPartials = []shared.HTTPLogPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.HTTPLogPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.HTTPLogPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.HTTPLogPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.HTTPLogPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -114,7 +121,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 		}
 		flushTimeout := new(float64)
 		if !r.Config.FlushTimeout.IsUnknown() && !r.Config.FlushTimeout.IsNull() {
-			*flushTimeout, _ = r.Config.FlushTimeout.ValueBigFloat().Float64()
+			*flushTimeout = r.Config.FlushTimeout.ValueFloat64()
 		} else {
 			flushTimeout = nil
 		}
@@ -132,7 +139,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 		}
 		keepalive := new(float64)
 		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+			*keepalive = r.Config.Keepalive.ValueFloat64()
 		} else {
 			keepalive = nil
 		}
@@ -152,7 +159,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 			}
 			initialRetryDelay := new(float64)
 			if !r.Config.Queue.InitialRetryDelay.IsUnknown() && !r.Config.Queue.InitialRetryDelay.IsNull() {
-				*initialRetryDelay, _ = r.Config.Queue.InitialRetryDelay.ValueBigFloat().Float64()
+				*initialRetryDelay = r.Config.Queue.InitialRetryDelay.ValueFloat64()
 			} else {
 				initialRetryDelay = nil
 			}
@@ -170,7 +177,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 			}
 			maxCoalescingDelay := new(float64)
 			if !r.Config.Queue.MaxCoalescingDelay.IsUnknown() && !r.Config.Queue.MaxCoalescingDelay.IsNull() {
-				*maxCoalescingDelay, _ = r.Config.Queue.MaxCoalescingDelay.ValueBigFloat().Float64()
+				*maxCoalescingDelay = r.Config.Queue.MaxCoalescingDelay.ValueFloat64()
 			} else {
 				maxCoalescingDelay = nil
 			}
@@ -182,13 +189,13 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 			}
 			maxRetryDelay := new(float64)
 			if !r.Config.Queue.MaxRetryDelay.IsUnknown() && !r.Config.Queue.MaxRetryDelay.IsNull() {
-				*maxRetryDelay, _ = r.Config.Queue.MaxRetryDelay.ValueBigFloat().Float64()
+				*maxRetryDelay = r.Config.Queue.MaxRetryDelay.ValueFloat64()
 			} else {
 				maxRetryDelay = nil
 			}
 			maxRetryTime := new(float64)
 			if !r.Config.Queue.MaxRetryTime.IsUnknown() && !r.Config.Queue.MaxRetryTime.IsNull() {
-				*maxRetryTime, _ = r.Config.Queue.MaxRetryTime.ValueBigFloat().Float64()
+				*maxRetryTime = r.Config.Queue.MaxRetryTime.ValueFloat64()
 			} else {
 				maxRetryTime = nil
 			}
@@ -217,7 +224,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -247,7 +254,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 			ID: id2,
 		}
 	}
-	var protocols []shared.HTTPLogPluginProtocols = []shared.HTTPLogPluginProtocols{}
+	protocols := make([]shared.HTTPLogPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.HTTPLogPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -290,10 +297,60 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin() *shared.HTTPLogPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared.HTTPLogPlugin) {
+func (r *PluginHTTPLogResourceModel) ToOperationsUpdateHttplogPluginRequest(ctx context.Context) (*operations.UpdateHttplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	httpLogPlugin, httpLogPluginDiags := r.ToSharedHTTPLogPlugin(ctx)
+	diags.Append(httpLogPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateHttplogPluginRequest{
+		PluginID:      pluginID,
+		HTTPLogPlugin: *httpLogPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHTTPLogResourceModel) ToOperationsGetHttplogPluginRequest(ctx context.Context) (*operations.GetHttplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetHttplogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHTTPLogResourceModel) ToOperationsDeleteHttplogPluginRequest(ctx context.Context) (*operations.DeleteHttplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteHttplogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(ctx context.Context, resp *shared.HTTPLogPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -311,11 +368,7 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared
 					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
 				}
 			}
-			if resp.Config.FlushTimeout != nil {
-				r.Config.FlushTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.FlushTimeout)))
-			} else {
-				r.Config.FlushTimeout = types.NumberNull()
-			}
+			r.Config.FlushTimeout = types.Float64PointerValue(resp.Config.FlushTimeout)
 			if len(resp.Config.Headers) > 0 {
 				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
 				for key1, value1 := range resp.Config.Headers {
@@ -324,11 +377,7 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared
 				}
 			}
 			r.Config.HTTPEndpoint = types.StringPointerValue(resp.Config.HTTPEndpoint)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			if resp.Config.Method != nil {
 				r.Config.Method = types.StringValue(string(*resp.Config.Method))
 			} else {
@@ -343,37 +392,17 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared
 				} else {
 					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
 				}
-				if resp.Config.Queue.InitialRetryDelay != nil {
-					r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
-				} else {
-					r.Config.Queue.InitialRetryDelay = types.NumberNull()
-				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
 				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
 				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				if resp.Config.Queue.MaxCoalescingDelay != nil {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
-				} else {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
-				}
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
 				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				if resp.Config.Queue.MaxRetryDelay != nil {
-					r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
-				} else {
-					r.Config.Queue.MaxRetryDelay = types.NumberNull()
-				}
-				if resp.Config.Queue.MaxRetryTime != nil {
-					r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
-				} else {
-					r.Config.Queue.MaxRetryTime = types.NumberNull()
-				}
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
 			}
 			r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
 			r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -414,16 +443,16 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -449,4 +478,6 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

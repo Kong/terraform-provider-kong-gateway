@@ -3,11 +3,29 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *SniDataSourceModel) RefreshFromSharedSni(resp *shared.Sni) {
+func (r *SniDataSourceModel) ToOperationsGetSniRequest(ctx context.Context) (*operations.GetSniRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var sniIDOrName string
+	sniIDOrName = r.ID.ValueString()
+
+	out := operations.GetSniRequest{
+		SNIIDOrName: sniIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *SniDataSourceModel) RefreshFromSharedSni(ctx context.Context, resp *shared.Sni) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.Certificate.ID = types.StringPointerValue(resp.Certificate.ID)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -19,4 +37,6 @@ func (r *SniDataSourceModel) RefreshFromSharedSni(resp *shared.Sni) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

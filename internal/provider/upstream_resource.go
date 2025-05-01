@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -192,7 +191,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Optional:    true,
 										ElementType: types.Int64Type,
 									},
-									"interval": schema.NumberAttribute{
+									"interval": schema.Float64Attribute{
 										Computed: true,
 										Optional: true,
 									},
@@ -214,7 +213,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 								Computed: true,
 								Optional: true,
 							},
-							"timeout": schema.NumberAttribute{
+							"timeout": schema.Float64Attribute{
 								Computed: true,
 								Optional: true,
 							},
@@ -245,7 +244,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Optional:    true,
 										ElementType: types.Int64Type,
 									},
-									"interval": schema.NumberAttribute{
+									"interval": schema.Float64Attribute{
 										Computed: true,
 										Optional: true,
 									},
@@ -319,7 +318,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 							},
 						},
 					},
-					"threshold": schema.NumberAttribute{
+					"threshold": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
 					},
@@ -401,8 +400,13 @@ func (r *UpstreamResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedUpstream()
-	res, err := r.client.Upstreams.CreateUpstream(ctx, request)
+	request, requestDiags := data.ToSharedUpstream(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Upstreams.CreateUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -422,8 +426,17 @@ func (r *UpstreamResource) Create(ctx context.Context, req resource.CreateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstream(res.Upstream)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstream(ctx, res.Upstream)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -447,13 +460,13 @@ func (r *UpstreamResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	var upstreamIDOrName string
-	upstreamIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetUpstreamRequest{
-		UpstreamIDOrName: upstreamIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Upstreams.GetUpstream(ctx, request)
+	res, err := r.client.Upstreams.GetUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -477,7 +490,11 @@ func (r *UpstreamResource) Read(ctx context.Context, req resource.ReadRequest, r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstream(res.Upstream)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstream(ctx, res.Upstream)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -497,15 +514,13 @@ func (r *UpstreamResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	var upstreamIDOrName string
-	upstreamIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	upstream := *data.ToSharedUpstream()
-	request := operations.UpsertUpstreamRequest{
-		UpstreamIDOrName: upstreamIDOrName,
-		Upstream:         upstream,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Upstreams.UpsertUpstream(ctx, request)
+	res, err := r.client.Upstreams.UpsertUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -525,8 +540,17 @@ func (r *UpstreamResource) Update(ctx context.Context, req resource.UpdateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstream(res.Upstream)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstream(ctx, res.Upstream)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -550,13 +574,13 @@ func (r *UpstreamResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	var upstreamIDOrName string
-	upstreamIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteUpstreamRequest{
-		UpstreamIDOrName: upstreamIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Upstreams.DeleteUpstream(ctx, request)
+	res, err := r.client.Upstreams.DeleteUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

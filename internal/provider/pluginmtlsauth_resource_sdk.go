@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthPlugin {
+func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context) (*shared.MtlsAuthPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 	if r.Ordering != nil {
 		var after *shared.MtlsAuthPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 		}
 		var before *shared.MtlsAuthPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 			Before: before,
 		}
 	}
-	var partials []shared.MtlsAuthPluginPartials = []shared.MtlsAuthPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.MtlsAuthPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.MtlsAuthPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.MtlsAuthPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.MtlsAuthPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -117,23 +124,23 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 		} else {
 			authenticatedGroupBy = nil
 		}
-		var caCertificates []string = []string{}
+		caCertificates := make([]string, 0, len(r.Config.CaCertificates))
 		for _, caCertificatesItem := range r.Config.CaCertificates {
 			caCertificates = append(caCertificates, caCertificatesItem.ValueString())
 		}
 		cacheTTL := new(float64)
 		if !r.Config.CacheTTL.IsUnknown() && !r.Config.CacheTTL.IsNull() {
-			*cacheTTL, _ = r.Config.CacheTTL.ValueBigFloat().Float64()
+			*cacheTTL = r.Config.CacheTTL.ValueFloat64()
 		} else {
 			cacheTTL = nil
 		}
 		certCacheTTL := new(float64)
 		if !r.Config.CertCacheTTL.IsUnknown() && !r.Config.CertCacheTTL.IsNull() {
-			*certCacheTTL, _ = r.Config.CertCacheTTL.ValueBigFloat().Float64()
+			*certCacheTTL = r.Config.CertCacheTTL.ValueFloat64()
 		} else {
 			certCacheTTL = nil
 		}
-		var consumerBy []shared.MtlsAuthPluginConsumerBy = []shared.MtlsAuthPluginConsumerBy{}
+		consumerBy := make([]shared.MtlsAuthPluginConsumerBy, 0, len(r.Config.ConsumerBy))
 		for _, consumerByItem := range r.Config.ConsumerBy {
 			consumerBy = append(consumerBy, shared.MtlsAuthPluginConsumerBy(consumerByItem.ValueString()))
 		}
@@ -157,7 +164,7 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 		}
 		httpTimeout := new(float64)
 		if !r.Config.HTTPTimeout.IsUnknown() && !r.Config.HTTPTimeout.IsNull() {
-			*httpTimeout, _ = r.Config.HTTPTimeout.ValueBigFloat().Float64()
+			*httpTimeout = r.Config.HTTPTimeout.ValueFloat64()
 		} else {
 			httpTimeout = nil
 		}
@@ -210,7 +217,7 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 			SkipConsumerLookup:   skipConsumerLookup,
 		}
 	}
-	var protocols []shared.MtlsAuthPluginProtocols = []shared.MtlsAuthPluginProtocols{}
+	protocols := make([]shared.MtlsAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.MtlsAuthPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -252,10 +259,60 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin() *shared.MtlsAuthP
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(resp *shared.MtlsAuthPlugin) {
+func (r *PluginMtlsAuthResourceModel) ToOperationsUpdateMtlsauthPluginRequest(ctx context.Context) (*operations.UpdateMtlsauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	mtlsAuthPlugin, mtlsAuthPluginDiags := r.ToSharedMtlsAuthPlugin(ctx)
+	diags.Append(mtlsAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateMtlsauthPluginRequest{
+		PluginID:       pluginID,
+		MtlsAuthPlugin: *mtlsAuthPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMtlsAuthResourceModel) ToOperationsGetMtlsauthPluginRequest(ctx context.Context) (*operations.GetMtlsauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetMtlsauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMtlsAuthResourceModel) ToOperationsDeleteMtlsauthPluginRequest(ctx context.Context) (*operations.DeleteMtlsauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteMtlsauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(ctx context.Context, resp *shared.MtlsAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -272,16 +329,8 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(resp *shar
 			for _, v := range resp.Config.CaCertificates {
 				r.Config.CaCertificates = append(r.Config.CaCertificates, types.StringValue(v))
 			}
-			if resp.Config.CacheTTL != nil {
-				r.Config.CacheTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTL)))
-			} else {
-				r.Config.CacheTTL = types.NumberNull()
-			}
-			if resp.Config.CertCacheTTL != nil {
-				r.Config.CertCacheTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.CertCacheTTL)))
-			} else {
-				r.Config.CertCacheTTL = types.NumberNull()
-			}
+			r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
+			r.Config.CertCacheTTL = types.Float64PointerValue(resp.Config.CertCacheTTL)
 			r.Config.ConsumerBy = make([]types.String, 0, len(resp.Config.ConsumerBy))
 			for _, v := range resp.Config.ConsumerBy {
 				r.Config.ConsumerBy = append(r.Config.ConsumerBy, types.StringValue(string(v)))
@@ -289,11 +338,7 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(resp *shar
 			r.Config.DefaultConsumer = types.StringPointerValue(resp.Config.DefaultConsumer)
 			r.Config.HTTPProxyHost = types.StringPointerValue(resp.Config.HTTPProxyHost)
 			r.Config.HTTPProxyPort = types.Int64PointerValue(resp.Config.HTTPProxyPort)
-			if resp.Config.HTTPTimeout != nil {
-				r.Config.HTTPTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.HTTPTimeout)))
-			} else {
-				r.Config.HTTPTimeout = types.NumberNull()
-			}
+			r.Config.HTTPTimeout = types.Float64PointerValue(resp.Config.HTTPTimeout)
 			r.Config.HTTPSProxyHost = types.StringPointerValue(resp.Config.HTTPSProxyHost)
 			r.Config.HTTPSProxyPort = types.Int64PointerValue(resp.Config.HTTPSProxyPort)
 			if resp.Config.RevocationCheckMode != nil {
@@ -337,16 +382,16 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(resp *shar
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -372,4 +417,6 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

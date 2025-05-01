@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -108,8 +107,13 @@ func (r *ConsumerGroupResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedConsumerGroup()
-	res, err := r.client.ConsumerGroups.CreateConsumerGroup(ctx, request)
+	request, requestDiags := data.ToSharedConsumerGroup(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.ConsumerGroups.CreateConsumerGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -129,8 +133,17 @@ func (r *ConsumerGroupResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumerGroup(res.ConsumerGroup)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumerGroup(ctx, res.ConsumerGroup)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -154,13 +167,13 @@ func (r *ConsumerGroupResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var consumerGroupID string
-	consumerGroupID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetConsumerGroupRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ConsumerGroups.GetConsumerGroup(ctx, request)
+	res, err := r.client.ConsumerGroups.GetConsumerGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -184,7 +197,11 @@ func (r *ConsumerGroupResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumerGroup(res.ConsumerGroupInsideWrapper.ConsumerGroup)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumerGroup(ctx, res.ConsumerGroupInsideWrapper.ConsumerGroup)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -204,15 +221,13 @@ func (r *ConsumerGroupResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var consumerGroupID string
-	consumerGroupID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertConsumerGroupRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	consumerGroup := *data.ToSharedConsumerGroup()
-	request := operations.UpsertConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-		ConsumerGroup:   consumerGroup,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ConsumerGroups.UpsertConsumerGroup(ctx, request)
+	res, err := r.client.ConsumerGroups.UpsertConsumerGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -232,8 +247,17 @@ func (r *ConsumerGroupResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumerGroup(res.ConsumerGroup)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumerGroup(ctx, res.ConsumerGroup)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -257,13 +281,13 @@ func (r *ConsumerGroupResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var consumerGroupID string
-	consumerGroupID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteConsumerGroupRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ConsumerGroups.DeleteConsumerGroup(ctx, request)
+	res, err := r.client.ConsumerGroups.DeleteConsumerGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

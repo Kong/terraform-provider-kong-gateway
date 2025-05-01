@@ -3,23 +3,36 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shared.SessionPlugin) {
+func (r *PluginSessionDataSourceModel) ToOperationsGetSessionPluginRequest(ctx context.Context) (*operations.GetSessionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetSessionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(ctx context.Context, resp *shared.SessionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.SessionPluginConfig{}
-			if resp.Config.AbsoluteTimeout != nil {
-				r.Config.AbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.AbsoluteTimeout)))
-			} else {
-				r.Config.AbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.AbsoluteTimeout = types.Float64PointerValue(resp.Config.AbsoluteTimeout)
 			r.Config.Audience = types.StringPointerValue(resp.Config.Audience)
 			r.Config.CookieDomain = types.StringPointerValue(resp.Config.CookieDomain)
 			r.Config.CookieHTTPOnly = types.BoolPointerValue(resp.Config.CookieHTTPOnly)
@@ -31,11 +44,7 @@ func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shar
 				r.Config.CookieSameSite = types.StringNull()
 			}
 			r.Config.CookieSecure = types.BoolPointerValue(resp.Config.CookieSecure)
-			if resp.Config.IdlingTimeout != nil {
-				r.Config.IdlingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.IdlingTimeout)))
-			} else {
-				r.Config.IdlingTimeout = types.NumberNull()
-			}
+			r.Config.IdlingTimeout = types.Float64PointerValue(resp.Config.IdlingTimeout)
 			r.Config.LogoutMethods = make([]types.String, 0, len(resp.Config.LogoutMethods))
 			for _, v := range resp.Config.LogoutMethods {
 				r.Config.LogoutMethods = append(r.Config.LogoutMethods, types.StringValue(string(v)))
@@ -44,17 +53,9 @@ func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shar
 			r.Config.LogoutQueryArg = types.StringPointerValue(resp.Config.LogoutQueryArg)
 			r.Config.ReadBodyForLogout = types.BoolPointerValue(resp.Config.ReadBodyForLogout)
 			r.Config.Remember = types.BoolPointerValue(resp.Config.Remember)
-			if resp.Config.RememberAbsoluteTimeout != nil {
-				r.Config.RememberAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RememberAbsoluteTimeout)))
-			} else {
-				r.Config.RememberAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.RememberAbsoluteTimeout = types.Float64PointerValue(resp.Config.RememberAbsoluteTimeout)
 			r.Config.RememberCookieName = types.StringPointerValue(resp.Config.RememberCookieName)
-			if resp.Config.RememberRollingTimeout != nil {
-				r.Config.RememberRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RememberRollingTimeout)))
-			} else {
-				r.Config.RememberRollingTimeout = types.NumberNull()
-			}
+			r.Config.RememberRollingTimeout = types.Float64PointerValue(resp.Config.RememberRollingTimeout)
 			r.Config.RequestHeaders = make([]types.String, 0, len(resp.Config.RequestHeaders))
 			for _, v := range resp.Config.RequestHeaders {
 				r.Config.RequestHeaders = append(r.Config.RequestHeaders, types.StringValue(string(v)))
@@ -63,17 +64,9 @@ func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shar
 			for _, v := range resp.Config.ResponseHeaders {
 				r.Config.ResponseHeaders = append(r.Config.ResponseHeaders, types.StringValue(string(v)))
 			}
-			if resp.Config.RollingTimeout != nil {
-				r.Config.RollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RollingTimeout)))
-			} else {
-				r.Config.RollingTimeout = types.NumberNull()
-			}
+			r.Config.RollingTimeout = types.Float64PointerValue(resp.Config.RollingTimeout)
 			r.Config.Secret = types.StringPointerValue(resp.Config.Secret)
-			if resp.Config.StaleTTL != nil {
-				r.Config.StaleTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.StaleTTL)))
-			} else {
-				r.Config.StaleTTL = types.NumberNull()
-			}
+			r.Config.StaleTTL = types.Float64PointerValue(resp.Config.StaleTTL)
 			if resp.Config.Storage != nil {
 				r.Config.Storage = types.StringValue(string(*resp.Config.Storage))
 			} else {
@@ -113,16 +106,16 @@ func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shar
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -148,4 +141,6 @@ func (r *PluginSessionDataSourceModel) RefreshFromSharedSessionPlugin(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

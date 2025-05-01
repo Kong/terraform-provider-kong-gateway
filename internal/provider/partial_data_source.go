@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -115,13 +114,13 @@ func (r *PartialDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	var partialID string
-	partialID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetPartialRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetPartialRequest{
-		PartialID: partialID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Partials.GetPartial(ctx, request)
+	res, err := r.client.Partials.GetPartial(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -133,10 +132,6 @@ func (r *PartialDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -145,7 +140,11 @@ func (r *PartialDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPartial(res.Partial)
+	resp.Diagnostics.Append(data.RefreshFromSharedPartial(ctx, res.Partial)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

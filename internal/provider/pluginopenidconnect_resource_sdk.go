@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared.OpenidConnectPlugin {
+func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx context.Context) (*shared.OpenidConnectPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 	if r.Ordering != nil {
 		var after *shared.OpenidConnectPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		var before *shared.OpenidConnectPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			Before: before,
 		}
 	}
-	var partials []shared.OpenidConnectPluginPartials = []shared.OpenidConnectPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.OpenidConnectPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.OpenidConnectPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.OpenidConnectPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.OpenidConnectPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -105,23 +112,23 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			anonymous = nil
 		}
-		var audience []string = []string{}
+		audience := make([]string, 0, len(r.Config.Audience))
 		for _, audienceItem := range r.Config.Audience {
 			audience = append(audience, audienceItem.ValueString())
 		}
-		var audienceClaim []string = []string{}
+		audienceClaim := make([]string, 0, len(r.Config.AudienceClaim))
 		for _, audienceClaimItem := range r.Config.AudienceClaim {
 			audienceClaim = append(audienceClaim, audienceClaimItem.ValueString())
 		}
-		var audienceRequired []string = []string{}
+		audienceRequired := make([]string, 0, len(r.Config.AudienceRequired))
 		for _, audienceRequiredItem := range r.Config.AudienceRequired {
 			audienceRequired = append(audienceRequired, audienceRequiredItem.ValueString())
 		}
-		var authMethods []shared.AuthMethods = []shared.AuthMethods{}
+		authMethods := make([]shared.AuthMethods, 0, len(r.Config.AuthMethods))
 		for _, authMethodsItem := range r.Config.AuthMethods {
 			authMethods = append(authMethods, shared.AuthMethods(authMethodsItem.ValueString()))
 		}
-		var authenticatedGroupsClaim []string = []string{}
+		authenticatedGroupsClaim := make([]string, 0, len(r.Config.AuthenticatedGroupsClaim))
 		for _, authenticatedGroupsClaimItem := range r.Config.AuthenticatedGroupsClaim {
 			authenticatedGroupsClaim = append(authenticatedGroupsClaim, authenticatedGroupsClaimItem.ValueString())
 		}
@@ -167,21 +174,21 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			authorizationEndpoint = nil
 		}
-		var authorizationQueryArgsClient []string = []string{}
+		authorizationQueryArgsClient := make([]string, 0, len(r.Config.AuthorizationQueryArgsClient))
 		for _, authorizationQueryArgsClientItem := range r.Config.AuthorizationQueryArgsClient {
 			authorizationQueryArgsClient = append(authorizationQueryArgsClient, authorizationQueryArgsClientItem.ValueString())
 		}
-		var authorizationQueryArgsNames []string = []string{}
+		authorizationQueryArgsNames := make([]string, 0, len(r.Config.AuthorizationQueryArgsNames))
 		for _, authorizationQueryArgsNamesItem := range r.Config.AuthorizationQueryArgsNames {
 			authorizationQueryArgsNames = append(authorizationQueryArgsNames, authorizationQueryArgsNamesItem.ValueString())
 		}
-		var authorizationQueryArgsValues []string = []string{}
+		authorizationQueryArgsValues := make([]string, 0, len(r.Config.AuthorizationQueryArgsValues))
 		for _, authorizationQueryArgsValuesItem := range r.Config.AuthorizationQueryArgsValues {
 			authorizationQueryArgsValues = append(authorizationQueryArgsValues, authorizationQueryArgsValuesItem.ValueString())
 		}
 		authorizationRollingTimeout := new(float64)
 		if !r.Config.AuthorizationRollingTimeout.IsUnknown() && !r.Config.AuthorizationRollingTimeout.IsNull() {
-			*authorizationRollingTimeout, _ = r.Config.AuthorizationRollingTimeout.ValueBigFloat().Float64()
+			*authorizationRollingTimeout = r.Config.AuthorizationRollingTimeout.ValueFloat64()
 		} else {
 			authorizationRollingTimeout = nil
 		}
@@ -191,7 +198,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			bearerTokenCookieName = nil
 		}
-		var bearerTokenParamType []shared.BearerTokenParamType = []shared.BearerTokenParamType{}
+		bearerTokenParamType := make([]shared.BearerTokenParamType, 0, len(r.Config.BearerTokenParamType))
 		for _, bearerTokenParamTypeItem := range r.Config.BearerTokenParamType {
 			bearerTokenParamType = append(bearerTokenParamType, shared.BearerTokenParamType(bearerTokenParamTypeItem.ValueString()))
 		}
@@ -227,31 +234,31 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		cacheTTL := new(float64)
 		if !r.Config.CacheTTL.IsUnknown() && !r.Config.CacheTTL.IsNull() {
-			*cacheTTL, _ = r.Config.CacheTTL.ValueBigFloat().Float64()
+			*cacheTTL = r.Config.CacheTTL.ValueFloat64()
 		} else {
 			cacheTTL = nil
 		}
 		cacheTTLMax := new(float64)
 		if !r.Config.CacheTTLMax.IsUnknown() && !r.Config.CacheTTLMax.IsNull() {
-			*cacheTTLMax, _ = r.Config.CacheTTLMax.ValueBigFloat().Float64()
+			*cacheTTLMax = r.Config.CacheTTLMax.ValueFloat64()
 		} else {
 			cacheTTLMax = nil
 		}
 		cacheTTLMin := new(float64)
 		if !r.Config.CacheTTLMin.IsUnknown() && !r.Config.CacheTTLMin.IsNull() {
-			*cacheTTLMin, _ = r.Config.CacheTTLMin.ValueBigFloat().Float64()
+			*cacheTTLMin = r.Config.CacheTTLMin.ValueFloat64()
 		} else {
 			cacheTTLMin = nil
 		}
 		cacheTTLNeg := new(float64)
 		if !r.Config.CacheTTLNeg.IsUnknown() && !r.Config.CacheTTLNeg.IsNull() {
-			*cacheTTLNeg, _ = r.Config.CacheTTLNeg.ValueBigFloat().Float64()
+			*cacheTTLNeg = r.Config.CacheTTLNeg.ValueFloat64()
 		} else {
 			cacheTTLNeg = nil
 		}
 		cacheTTLResurrect := new(float64)
 		if !r.Config.CacheTTLResurrect.IsUnknown() && !r.Config.CacheTTLResurrect.IsNull() {
-			*cacheTTLResurrect, _ = r.Config.CacheTTLResurrect.ValueBigFloat().Float64()
+			*cacheTTLResurrect = r.Config.CacheTTLResurrect.ValueFloat64()
 		} else {
 			cacheTTLResurrect = nil
 		}
@@ -261,11 +268,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			cacheUserInfo = nil
 		}
-		var claimsForbidden []string = []string{}
+		claimsForbidden := make([]string, 0, len(r.Config.ClaimsForbidden))
 		for _, claimsForbiddenItem := range r.Config.ClaimsForbidden {
 			claimsForbidden = append(claimsForbidden, claimsForbiddenItem.ValueString())
 		}
-		var clientAlg []shared.ClientAlg = []shared.ClientAlg{}
+		clientAlg := make([]shared.ClientAlg, 0, len(r.Config.ClientAlg))
 		for _, clientAlgItem := range r.Config.ClientAlg {
 			clientAlg = append(clientAlg, shared.ClientAlg(clientAlgItem.ValueString()))
 		}
@@ -275,19 +282,19 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			clientArg = nil
 		}
-		var clientAuth []shared.ClientAuth = []shared.ClientAuth{}
+		clientAuth := make([]shared.ClientAuth, 0, len(r.Config.ClientAuth))
 		for _, clientAuthItem := range r.Config.ClientAuth {
 			clientAuth = append(clientAuth, shared.ClientAuth(clientAuthItem.ValueString()))
 		}
-		var clientCredentialsParamType []shared.ClientCredentialsParamType = []shared.ClientCredentialsParamType{}
+		clientCredentialsParamType := make([]shared.ClientCredentialsParamType, 0, len(r.Config.ClientCredentialsParamType))
 		for _, clientCredentialsParamTypeItem := range r.Config.ClientCredentialsParamType {
 			clientCredentialsParamType = append(clientCredentialsParamType, shared.ClientCredentialsParamType(clientCredentialsParamTypeItem.ValueString()))
 		}
-		var clientID []string = []string{}
+		clientID := make([]string, 0, len(r.Config.ClientID))
 		for _, clientIDItem := range r.Config.ClientID {
 			clientID = append(clientID, clientIDItem.ValueString())
 		}
-		var clientJwk []shared.ClientJwk = []shared.ClientJwk{}
+		clientJwk := make([]shared.ClientJwk, 0, len(r.Config.ClientJwk))
 		for _, clientJwkItem := range r.Config.ClientJwk {
 			alg := new(string)
 			if !clientJwkItem.Alg.IsUnknown() && !clientJwkItem.Alg.IsNull() {
@@ -337,7 +344,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				k = nil
 			}
-			var keyOps []string = []string{}
+			keyOps := make([]string, 0, len(clientJwkItem.KeyOps))
 			for _, keyOpsItem := range clientJwkItem.KeyOps {
 				keyOps = append(keyOps, keyOpsItem.ValueString())
 			}
@@ -407,7 +414,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				x = nil
 			}
-			var x5c []string = []string{}
+			x5c := make([]string, 0, len(clientJwkItem.X5c))
 			for _, x5cItem := range clientJwkItem.X5c {
 				x5c = append(x5c, x5cItem.ValueString())
 			}
@@ -463,7 +470,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 				Y:             y,
 			})
 		}
-		var clientSecret []string = []string{}
+		clientSecret := make([]string, 0, len(r.Config.ClientSecret))
 		for _, clientSecretItem := range r.Config.ClientSecret {
 			clientSecret = append(clientSecret, clientSecretItem.ValueString())
 		}
@@ -475,7 +482,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				clusterMaxRedirections = nil
 			}
-			var clusterNodes []shared.OpenidConnectPluginClusterNodes = []shared.OpenidConnectPluginClusterNodes{}
+			clusterNodes := make([]shared.OpenidConnectPluginClusterNodes, 0, len(r.Config.ClusterCacheRedis.ClusterNodes))
 			for _, clusterNodesItem := range r.Config.ClusterCacheRedis.ClusterNodes {
 				ip := new(string)
 				if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -560,7 +567,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				sentinelMaster = nil
 			}
-			var sentinelNodes []shared.OpenidConnectPluginSentinelNodes = []shared.OpenidConnectPluginSentinelNodes{}
+			sentinelNodes := make([]shared.OpenidConnectPluginSentinelNodes, 0, len(r.Config.ClusterCacheRedis.SentinelNodes))
 			for _, sentinelNodesItem := range r.Config.ClusterCacheRedis.SentinelNodes {
 				host1 := new(string)
 				if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -651,11 +658,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			clusterCacheStrategy = nil
 		}
-		var consumerBy []shared.OpenidConnectPluginConsumerBy = []shared.OpenidConnectPluginConsumerBy{}
+		consumerBy := make([]shared.OpenidConnectPluginConsumerBy, 0, len(r.Config.ConsumerBy))
 		for _, consumerByItem := range r.Config.ConsumerBy {
 			consumerBy = append(consumerBy, shared.OpenidConnectPluginConsumerBy(consumerByItem.ValueString()))
 		}
-		var consumerClaim []string = []string{}
+		consumerClaim := make([]string, 0, len(r.Config.ConsumerClaim))
 		for _, consumerClaimItem := range r.Config.ConsumerClaim {
 			consumerClaim = append(consumerClaim, consumerClaimItem.ValueString())
 		}
@@ -665,19 +672,19 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			consumerOptional = nil
 		}
-		var credentialClaim []string = []string{}
+		credentialClaim := make([]string, 0, len(r.Config.CredentialClaim))
 		for _, credentialClaimItem := range r.Config.CredentialClaim {
 			credentialClaim = append(credentialClaim, credentialClaimItem.ValueString())
 		}
-		var disableSession []shared.DisableSession = []shared.DisableSession{}
+		disableSession := make([]shared.DisableSession, 0, len(r.Config.DisableSession))
 		for _, disableSessionItem := range r.Config.DisableSession {
 			disableSession = append(disableSession, shared.DisableSession(disableSessionItem.ValueString()))
 		}
-		var discoveryHeadersNames []string = []string{}
+		discoveryHeadersNames := make([]string, 0, len(r.Config.DiscoveryHeadersNames))
 		for _, discoveryHeadersNamesItem := range r.Config.DiscoveryHeadersNames {
 			discoveryHeadersNames = append(discoveryHeadersNames, discoveryHeadersNamesItem.ValueString())
 		}
-		var discoveryHeadersValues []string = []string{}
+		discoveryHeadersValues := make([]string, 0, len(r.Config.DiscoveryHeadersValues))
 		for _, discoveryHeadersValuesItem := range r.Config.DiscoveryHeadersValues {
 			discoveryHeadersValues = append(discoveryHeadersValues, discoveryHeadersValuesItem.ValueString())
 		}
@@ -687,7 +694,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			displayErrors = nil
 		}
-		var domains []string = []string{}
+		domains := make([]string, 0, len(r.Config.Domains))
 		for _, domainsItem := range r.Config.Domains {
 			domains = append(domains, domainsItem.ValueString())
 		}
@@ -703,11 +710,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			downstreamAccessTokenJwkHeader = nil
 		}
-		var downstreamHeadersClaims []string = []string{}
+		downstreamHeadersClaims := make([]string, 0, len(r.Config.DownstreamHeadersClaims))
 		for _, downstreamHeadersClaimsItem := range r.Config.DownstreamHeadersClaims {
 			downstreamHeadersClaims = append(downstreamHeadersClaims, downstreamHeadersClaimsItem.ValueString())
 		}
-		var downstreamHeadersNames []string = []string{}
+		downstreamHeadersNames := make([]string, 0, len(r.Config.DownstreamHeadersNames))
 		for _, downstreamHeadersNamesItem := range r.Config.DownstreamHeadersNames {
 			downstreamHeadersNames = append(downstreamHeadersNames, downstreamHeadersNamesItem.ValueString())
 		}
@@ -761,7 +768,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		dpopProofLifetime := new(float64)
 		if !r.Config.DpopProofLifetime.IsUnknown() && !r.Config.DpopProofLifetime.IsNull() {
-			*dpopProofLifetime, _ = r.Config.DpopProofLifetime.ValueBigFloat().Float64()
+			*dpopProofLifetime = r.Config.DpopProofLifetime.ValueFloat64()
 		} else {
 			dpopProofLifetime = nil
 		}
@@ -789,7 +796,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			exposeErrorCode = nil
 		}
-		var extraJwksUris []string = []string{}
+		extraJwksUris := make([]string, 0, len(r.Config.ExtraJwksUris))
 		for _, extraJwksUrisItem := range r.Config.ExtraJwksUris {
 			extraJwksUris = append(extraJwksUris, extraJwksUrisItem.ValueString())
 		}
@@ -805,15 +812,15 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			forbiddenErrorMessage = nil
 		}
-		var forbiddenRedirectURI []string = []string{}
+		forbiddenRedirectURI := make([]string, 0, len(r.Config.ForbiddenRedirectURI))
 		for _, forbiddenRedirectURIItem := range r.Config.ForbiddenRedirectURI {
 			forbiddenRedirectURI = append(forbiddenRedirectURI, forbiddenRedirectURIItem.ValueString())
 		}
-		var groupsClaim []string = []string{}
+		groupsClaim := make([]string, 0, len(r.Config.GroupsClaim))
 		for _, groupsClaimItem := range r.Config.GroupsClaim {
 			groupsClaim = append(groupsClaim, groupsClaimItem.ValueString())
 		}
-		var groupsRequired []string = []string{}
+		groupsRequired := make([]string, 0, len(r.Config.GroupsRequired))
 		for _, groupsRequiredItem := range r.Config.GroupsRequired {
 			groupsRequired = append(groupsRequired, groupsRequiredItem.ValueString())
 		}
@@ -837,7 +844,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		httpVersion := new(float64)
 		if !r.Config.HTTPVersion.IsUnknown() && !r.Config.HTTPVersion.IsNull() {
-			*httpVersion, _ = r.Config.HTTPVersion.ValueBigFloat().Float64()
+			*httpVersion = r.Config.HTTPVersion.ValueFloat64()
 		} else {
 			httpVersion = nil
 		}
@@ -859,11 +866,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			idTokenParamName = nil
 		}
-		var idTokenParamType []shared.IDTokenParamType = []shared.IDTokenParamType{}
+		idTokenParamType := make([]shared.IDTokenParamType, 0, len(r.Config.IDTokenParamType))
 		for _, idTokenParamTypeItem := range r.Config.IDTokenParamType {
 			idTokenParamType = append(idTokenParamType, shared.IDTokenParamType(idTokenParamTypeItem.ValueString()))
 		}
-		var ignoreSignature []shared.IgnoreSignature = []shared.IgnoreSignature{}
+		ignoreSignature := make([]shared.IgnoreSignature, 0, len(r.Config.IgnoreSignature))
 		for _, ignoreSignatureItem := range r.Config.IgnoreSignature {
 			ignoreSignature = append(ignoreSignature, shared.IgnoreSignature(ignoreSignatureItem.ValueString()))
 		}
@@ -897,15 +904,15 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			introspectionEndpointAuthMethod = nil
 		}
-		var introspectionHeadersClient []string = []string{}
+		introspectionHeadersClient := make([]string, 0, len(r.Config.IntrospectionHeadersClient))
 		for _, introspectionHeadersClientItem := range r.Config.IntrospectionHeadersClient {
 			introspectionHeadersClient = append(introspectionHeadersClient, introspectionHeadersClientItem.ValueString())
 		}
-		var introspectionHeadersNames []string = []string{}
+		introspectionHeadersNames := make([]string, 0, len(r.Config.IntrospectionHeadersNames))
 		for _, introspectionHeadersNamesItem := range r.Config.IntrospectionHeadersNames {
 			introspectionHeadersNames = append(introspectionHeadersNames, introspectionHeadersNamesItem.ValueString())
 		}
-		var introspectionHeadersValues []string = []string{}
+		introspectionHeadersValues := make([]string, 0, len(r.Config.IntrospectionHeadersValues))
 		for _, introspectionHeadersValuesItem := range r.Config.IntrospectionHeadersValues {
 			introspectionHeadersValues = append(introspectionHeadersValues, introspectionHeadersValuesItem.ValueString())
 		}
@@ -915,19 +922,19 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			introspectionHint = nil
 		}
-		var introspectionPostArgsClient []string = []string{}
+		introspectionPostArgsClient := make([]string, 0, len(r.Config.IntrospectionPostArgsClient))
 		for _, introspectionPostArgsClientItem := range r.Config.IntrospectionPostArgsClient {
 			introspectionPostArgsClient = append(introspectionPostArgsClient, introspectionPostArgsClientItem.ValueString())
 		}
-		var introspectionPostArgsClientHeaders []string = []string{}
+		introspectionPostArgsClientHeaders := make([]string, 0, len(r.Config.IntrospectionPostArgsClientHeaders))
 		for _, introspectionPostArgsClientHeadersItem := range r.Config.IntrospectionPostArgsClientHeaders {
 			introspectionPostArgsClientHeaders = append(introspectionPostArgsClientHeaders, introspectionPostArgsClientHeadersItem.ValueString())
 		}
-		var introspectionPostArgsNames []string = []string{}
+		introspectionPostArgsNames := make([]string, 0, len(r.Config.IntrospectionPostArgsNames))
 		for _, introspectionPostArgsNamesItem := range r.Config.IntrospectionPostArgsNames {
 			introspectionPostArgsNames = append(introspectionPostArgsNames, introspectionPostArgsNamesItem.ValueString())
 		}
-		var introspectionPostArgsValues []string = []string{}
+		introspectionPostArgsValues := make([]string, 0, len(r.Config.IntrospectionPostArgsValues))
 		for _, introspectionPostArgsValuesItem := range r.Config.IntrospectionPostArgsValues {
 			introspectionPostArgsValues = append(introspectionPostArgsValues, introspectionPostArgsValuesItem.ValueString())
 		}
@@ -943,7 +950,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			issuer1 = nil
 		}
-		var issuersAllowed []string = []string{}
+		issuersAllowed := make([]string, 0, len(r.Config.IssuersAllowed))
 		for _, issuersAllowedItem := range r.Config.IssuersAllowed {
 			issuersAllowed = append(issuersAllowed, issuersAllowedItem.ValueString())
 		}
@@ -967,7 +974,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		leeway := new(float64)
 		if !r.Config.Leeway.IsUnknown() && !r.Config.Leeway.IsNull() {
-			*leeway, _ = r.Config.Leeway.ValueBigFloat().Float64()
+			*leeway = r.Config.Leeway.ValueFloat64()
 		} else {
 			leeway = nil
 		}
@@ -977,7 +984,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			loginAction = nil
 		}
-		var loginMethods []shared.LoginMethods = []shared.LoginMethods{}
+		loginMethods := make([]shared.LoginMethods, 0, len(r.Config.LoginMethods))
 		for _, loginMethodsItem := range r.Config.LoginMethods {
 			loginMethods = append(loginMethods, shared.LoginMethods(loginMethodsItem.ValueString()))
 		}
@@ -987,15 +994,15 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			loginRedirectMode = nil
 		}
-		var loginRedirectURI []string = []string{}
+		loginRedirectURI := make([]string, 0, len(r.Config.LoginRedirectURI))
 		for _, loginRedirectURIItem := range r.Config.LoginRedirectURI {
 			loginRedirectURI = append(loginRedirectURI, loginRedirectURIItem.ValueString())
 		}
-		var loginTokens []shared.LoginTokens = []shared.LoginTokens{}
+		loginTokens := make([]shared.LoginTokens, 0, len(r.Config.LoginTokens))
 		for _, loginTokensItem := range r.Config.LoginTokens {
 			loginTokens = append(loginTokens, shared.LoginTokens(loginTokensItem.ValueString()))
 		}
-		var logoutMethods []shared.LogoutMethods = []shared.LogoutMethods{}
+		logoutMethods := make([]shared.LogoutMethods, 0, len(r.Config.LogoutMethods))
 		for _, logoutMethodsItem := range r.Config.LogoutMethods {
 			logoutMethods = append(logoutMethods, shared.LogoutMethods(logoutMethodsItem.ValueString()))
 		}
@@ -1011,7 +1018,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			logoutQueryArg = nil
 		}
-		var logoutRedirectURI []string = []string{}
+		logoutRedirectURI := make([]string, 0, len(r.Config.LogoutRedirectURI))
 		for _, logoutRedirectURIItem := range r.Config.LogoutRedirectURI {
 			logoutRedirectURI = append(logoutRedirectURI, logoutRedirectURIItem.ValueString())
 		}
@@ -1041,7 +1048,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		maxAge := new(float64)
 		if !r.Config.MaxAge.IsUnknown() && !r.Config.MaxAge.IsNull() {
-			*maxAge, _ = r.Config.MaxAge.ValueBigFloat().Float64()
+			*maxAge = r.Config.MaxAge.ValueFloat64()
 		} else {
 			maxAge = nil
 		}
@@ -1069,7 +1076,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			noProxy = nil
 		}
-		var passwordParamType []shared.PasswordParamType = []shared.PasswordParamType{}
+		passwordParamType := make([]shared.PasswordParamType, 0, len(r.Config.PasswordParamType))
 		for _, passwordParamTypeItem := range r.Config.PasswordParamType {
 			passwordParamType = append(passwordParamType, shared.PasswordParamType(passwordParamTypeItem.ValueString()))
 		}
@@ -1109,7 +1116,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			pushedAuthorizationRequestEndpointAuthMethod = nil
 		}
-		var redirectURI []string = []string{}
+		redirectURI := make([]string, 0, len(r.Config.RedirectURI))
 		for _, redirectURIItem := range r.Config.RedirectURI {
 			redirectURI = append(redirectURI, redirectURIItem.ValueString())
 		}
@@ -1121,7 +1128,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				clusterMaxRedirections1 = nil
 			}
-			var clusterNodes1 []shared.OpenidConnectPluginConfigClusterNodes = []shared.OpenidConnectPluginConfigClusterNodes{}
+			clusterNodes1 := make([]shared.OpenidConnectPluginConfigClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
 			for _, clusterNodesItem1 := range r.Config.Redis.ClusterNodes {
 				ip1 := new(string)
 				if !clusterNodesItem1.IP.IsUnknown() && !clusterNodesItem1.IP.IsNull() {
@@ -1212,7 +1219,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			} else {
 				sentinelMaster1 = nil
 			}
-			var sentinelNodes1 []shared.OpenidConnectPluginConfigSentinelNodes = []shared.OpenidConnectPluginConfigSentinelNodes{}
+			sentinelNodes1 := make([]shared.OpenidConnectPluginConfigSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
 			for _, sentinelNodesItem1 := range r.Config.Redis.SentinelNodes {
 				host3 := new(string)
 				if !sentinelNodesItem1.Host.IsUnknown() && !sentinelNodesItem1.Host.IsNull() {
@@ -1307,7 +1314,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		rediscoveryLifetime := new(float64)
 		if !r.Config.RediscoveryLifetime.IsUnknown() && !r.Config.RediscoveryLifetime.IsNull() {
-			*rediscoveryLifetime, _ = r.Config.RediscoveryLifetime.ValueBigFloat().Float64()
+			*rediscoveryLifetime = r.Config.RediscoveryLifetime.ValueFloat64()
 		} else {
 			rediscoveryLifetime = nil
 		}
@@ -1317,7 +1324,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			refreshTokenParamName = nil
 		}
-		var refreshTokenParamType []shared.RefreshTokenParamType = []shared.RefreshTokenParamType{}
+		refreshTokenParamType := make([]shared.RefreshTokenParamType, 0, len(r.Config.RefreshTokenParamType))
 		for _, refreshTokenParamTypeItem := range r.Config.RefreshTokenParamType {
 			refreshTokenParamType = append(refreshTokenParamType, shared.RefreshTokenParamType(refreshTokenParamTypeItem.ValueString()))
 		}
@@ -1357,7 +1364,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			responseMode = nil
 		}
-		var responseType []string = []string{}
+		responseType := make([]string, 0, len(r.Config.ResponseType))
 		for _, responseTypeItem := range r.Config.ResponseType {
 			responseType = append(responseType, responseTypeItem.ValueString())
 		}
@@ -1385,11 +1392,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			revocationTokenParamName = nil
 		}
-		var rolesClaim []string = []string{}
+		rolesClaim := make([]string, 0, len(r.Config.RolesClaim))
 		for _, rolesClaimItem := range r.Config.RolesClaim {
 			rolesClaim = append(rolesClaim, rolesClaimItem.ValueString())
 		}
-		var rolesRequired []string = []string{}
+		rolesRequired := make([]string, 0, len(r.Config.RolesRequired))
 		for _, rolesRequiredItem := range r.Config.RolesRequired {
 			rolesRequired = append(rolesRequired, rolesRequiredItem.ValueString())
 		}
@@ -1399,15 +1406,15 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			runOnPreflight = nil
 		}
-		var scopes []string = []string{}
+		scopes := make([]string, 0, len(r.Config.Scopes))
 		for _, scopesItem := range r.Config.Scopes {
 			scopes = append(scopes, scopesItem.ValueString())
 		}
-		var scopesClaim []string = []string{}
+		scopesClaim := make([]string, 0, len(r.Config.ScopesClaim))
 		for _, scopesClaimItem := range r.Config.ScopesClaim {
 			scopesClaim = append(scopesClaim, scopesClaimItem.ValueString())
 		}
-		var scopesRequired []string = []string{}
+		scopesRequired := make([]string, 0, len(r.Config.ScopesRequired))
 		for _, scopesRequiredItem := range r.Config.ScopesRequired {
 			scopesRequired = append(scopesRequired, scopesRequiredItem.ValueString())
 		}
@@ -1419,7 +1426,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		sessionAbsoluteTimeout := new(float64)
 		if !r.Config.SessionAbsoluteTimeout.IsUnknown() && !r.Config.SessionAbsoluteTimeout.IsNull() {
-			*sessionAbsoluteTimeout, _ = r.Config.SessionAbsoluteTimeout.ValueBigFloat().Float64()
+			*sessionAbsoluteTimeout = r.Config.SessionAbsoluteTimeout.ValueFloat64()
 		} else {
 			sessionAbsoluteTimeout = nil
 		}
@@ -1485,7 +1492,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		sessionIdlingTimeout := new(float64)
 		if !r.Config.SessionIdlingTimeout.IsUnknown() && !r.Config.SessionIdlingTimeout.IsNull() {
-			*sessionIdlingTimeout, _ = r.Config.SessionIdlingTimeout.ValueBigFloat().Float64()
+			*sessionIdlingTimeout = r.Config.SessionIdlingTimeout.ValueFloat64()
 		} else {
 			sessionIdlingTimeout = nil
 		}
@@ -1521,7 +1528,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		sessionRememberAbsoluteTimeout := new(float64)
 		if !r.Config.SessionRememberAbsoluteTimeout.IsUnknown() && !r.Config.SessionRememberAbsoluteTimeout.IsNull() {
-			*sessionRememberAbsoluteTimeout, _ = r.Config.SessionRememberAbsoluteTimeout.ValueBigFloat().Float64()
+			*sessionRememberAbsoluteTimeout = r.Config.SessionRememberAbsoluteTimeout.ValueFloat64()
 		} else {
 			sessionRememberAbsoluteTimeout = nil
 		}
@@ -1533,21 +1540,21 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		sessionRememberRollingTimeout := new(float64)
 		if !r.Config.SessionRememberRollingTimeout.IsUnknown() && !r.Config.SessionRememberRollingTimeout.IsNull() {
-			*sessionRememberRollingTimeout, _ = r.Config.SessionRememberRollingTimeout.ValueBigFloat().Float64()
+			*sessionRememberRollingTimeout = r.Config.SessionRememberRollingTimeout.ValueFloat64()
 		} else {
 			sessionRememberRollingTimeout = nil
 		}
-		var sessionRequestHeaders []shared.SessionRequestHeaders = []shared.SessionRequestHeaders{}
+		sessionRequestHeaders := make([]shared.SessionRequestHeaders, 0, len(r.Config.SessionRequestHeaders))
 		for _, sessionRequestHeadersItem := range r.Config.SessionRequestHeaders {
 			sessionRequestHeaders = append(sessionRequestHeaders, shared.SessionRequestHeaders(sessionRequestHeadersItem.ValueString()))
 		}
-		var sessionResponseHeaders []shared.SessionResponseHeaders = []shared.SessionResponseHeaders{}
+		sessionResponseHeaders := make([]shared.SessionResponseHeaders, 0, len(r.Config.SessionResponseHeaders))
 		for _, sessionResponseHeadersItem := range r.Config.SessionResponseHeaders {
 			sessionResponseHeaders = append(sessionResponseHeaders, shared.SessionResponseHeaders(sessionResponseHeadersItem.ValueString()))
 		}
 		sessionRollingTimeout := new(float64)
 		if !r.Config.SessionRollingTimeout.IsUnknown() && !r.Config.SessionRollingTimeout.IsNull() {
-			*sessionRollingTimeout, _ = r.Config.SessionRollingTimeout.ValueBigFloat().Float64()
+			*sessionRollingTimeout = r.Config.SessionRollingTimeout.ValueFloat64()
 		} else {
 			sessionRollingTimeout = nil
 		}
@@ -1577,7 +1584,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -1617,15 +1624,15 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			tokenExchangeEndpoint = nil
 		}
-		var tokenHeadersClient []string = []string{}
+		tokenHeadersClient := make([]string, 0, len(r.Config.TokenHeadersClient))
 		for _, tokenHeadersClientItem := range r.Config.TokenHeadersClient {
 			tokenHeadersClient = append(tokenHeadersClient, tokenHeadersClientItem.ValueString())
 		}
-		var tokenHeadersGrants []shared.TokenHeadersGrants = []shared.TokenHeadersGrants{}
+		tokenHeadersGrants := make([]shared.TokenHeadersGrants, 0, len(r.Config.TokenHeadersGrants))
 		for _, tokenHeadersGrantsItem := range r.Config.TokenHeadersGrants {
 			tokenHeadersGrants = append(tokenHeadersGrants, shared.TokenHeadersGrants(tokenHeadersGrantsItem.ValueString()))
 		}
-		var tokenHeadersNames []string = []string{}
+		tokenHeadersNames := make([]string, 0, len(r.Config.TokenHeadersNames))
 		for _, tokenHeadersNamesItem := range r.Config.TokenHeadersNames {
 			tokenHeadersNames = append(tokenHeadersNames, tokenHeadersNamesItem.ValueString())
 		}
@@ -1635,23 +1642,23 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			tokenHeadersPrefix = nil
 		}
-		var tokenHeadersReplay []string = []string{}
+		tokenHeadersReplay := make([]string, 0, len(r.Config.TokenHeadersReplay))
 		for _, tokenHeadersReplayItem := range r.Config.TokenHeadersReplay {
 			tokenHeadersReplay = append(tokenHeadersReplay, tokenHeadersReplayItem.ValueString())
 		}
-		var tokenHeadersValues []string = []string{}
+		tokenHeadersValues := make([]string, 0, len(r.Config.TokenHeadersValues))
 		for _, tokenHeadersValuesItem := range r.Config.TokenHeadersValues {
 			tokenHeadersValues = append(tokenHeadersValues, tokenHeadersValuesItem.ValueString())
 		}
-		var tokenPostArgsClient []string = []string{}
+		tokenPostArgsClient := make([]string, 0, len(r.Config.TokenPostArgsClient))
 		for _, tokenPostArgsClientItem := range r.Config.TokenPostArgsClient {
 			tokenPostArgsClient = append(tokenPostArgsClient, tokenPostArgsClientItem.ValueString())
 		}
-		var tokenPostArgsNames []string = []string{}
+		tokenPostArgsNames := make([]string, 0, len(r.Config.TokenPostArgsNames))
 		for _, tokenPostArgsNamesItem := range r.Config.TokenPostArgsNames {
 			tokenPostArgsNames = append(tokenPostArgsNames, tokenPostArgsNamesItem.ValueString())
 		}
-		var tokenPostArgsValues []string = []string{}
+		tokenPostArgsValues := make([]string, 0, len(r.Config.TokenPostArgsValues))
 		for _, tokenPostArgsValuesItem := range r.Config.TokenPostArgsValues {
 			tokenPostArgsValues = append(tokenPostArgsValues, tokenPostArgsValuesItem.ValueString())
 		}
@@ -1667,11 +1674,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			unauthorizedErrorMessage = nil
 		}
-		var unauthorizedRedirectURI []string = []string{}
+		unauthorizedRedirectURI := make([]string, 0, len(r.Config.UnauthorizedRedirectURI))
 		for _, unauthorizedRedirectURIItem := range r.Config.UnauthorizedRedirectURI {
 			unauthorizedRedirectURI = append(unauthorizedRedirectURI, unauthorizedRedirectURIItem.ValueString())
 		}
-		var unexpectedRedirectURI []string = []string{}
+		unexpectedRedirectURI := make([]string, 0, len(r.Config.UnexpectedRedirectURI))
 		for _, unexpectedRedirectURIItem := range r.Config.UnexpectedRedirectURI {
 			unexpectedRedirectURI = append(unexpectedRedirectURI, unexpectedRedirectURIItem.ValueString())
 		}
@@ -1687,11 +1694,11 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			upstreamAccessTokenJwkHeader = nil
 		}
-		var upstreamHeadersClaims []string = []string{}
+		upstreamHeadersClaims := make([]string, 0, len(r.Config.UpstreamHeadersClaims))
 		for _, upstreamHeadersClaimsItem := range r.Config.UpstreamHeadersClaims {
 			upstreamHeadersClaims = append(upstreamHeadersClaims, upstreamHeadersClaimsItem.ValueString())
 		}
-		var upstreamHeadersNames []string = []string{}
+		upstreamHeadersNames := make([]string, 0, len(r.Config.UpstreamHeadersNames))
 		for _, upstreamHeadersNamesItem := range r.Config.UpstreamHeadersNames {
 			upstreamHeadersNames = append(upstreamHeadersNames, upstreamHeadersNamesItem.ValueString())
 		}
@@ -1755,27 +1762,27 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		} else {
 			userinfoEndpoint = nil
 		}
-		var userinfoHeadersClient []string = []string{}
+		userinfoHeadersClient := make([]string, 0, len(r.Config.UserinfoHeadersClient))
 		for _, userinfoHeadersClientItem := range r.Config.UserinfoHeadersClient {
 			userinfoHeadersClient = append(userinfoHeadersClient, userinfoHeadersClientItem.ValueString())
 		}
-		var userinfoHeadersNames []string = []string{}
+		userinfoHeadersNames := make([]string, 0, len(r.Config.UserinfoHeadersNames))
 		for _, userinfoHeadersNamesItem := range r.Config.UserinfoHeadersNames {
 			userinfoHeadersNames = append(userinfoHeadersNames, userinfoHeadersNamesItem.ValueString())
 		}
-		var userinfoHeadersValues []string = []string{}
+		userinfoHeadersValues := make([]string, 0, len(r.Config.UserinfoHeadersValues))
 		for _, userinfoHeadersValuesItem := range r.Config.UserinfoHeadersValues {
 			userinfoHeadersValues = append(userinfoHeadersValues, userinfoHeadersValuesItem.ValueString())
 		}
-		var userinfoQueryArgsClient []string = []string{}
+		userinfoQueryArgsClient := make([]string, 0, len(r.Config.UserinfoQueryArgsClient))
 		for _, userinfoQueryArgsClientItem := range r.Config.UserinfoQueryArgsClient {
 			userinfoQueryArgsClient = append(userinfoQueryArgsClient, userinfoQueryArgsClientItem.ValueString())
 		}
-		var userinfoQueryArgsNames []string = []string{}
+		userinfoQueryArgsNames := make([]string, 0, len(r.Config.UserinfoQueryArgsNames))
 		for _, userinfoQueryArgsNamesItem := range r.Config.UserinfoQueryArgsNames {
 			userinfoQueryArgsNames = append(userinfoQueryArgsNames, userinfoQueryArgsNamesItem.ValueString())
 		}
-		var userinfoQueryArgsValues []string = []string{}
+		userinfoQueryArgsValues := make([]string, 0, len(r.Config.UserinfoQueryArgsValues))
 		for _, userinfoQueryArgsValuesItem := range r.Config.UserinfoQueryArgsValues {
 			userinfoQueryArgsValues = append(userinfoQueryArgsValues, userinfoQueryArgsValuesItem.ValueString())
 		}
@@ -2033,7 +2040,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 			VerifySignature:                    verifySignature,
 		}
 	}
-	var protocols []shared.OpenidConnectPluginProtocols = []shared.OpenidConnectPluginProtocols{}
+	protocols := make([]shared.OpenidConnectPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.OpenidConnectPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -2075,10 +2082,60 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin() *shared
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(resp *shared.OpenidConnectPlugin) {
+func (r *PluginOpenidConnectResourceModel) ToOperationsUpdateOpenidconnectPluginRequest(ctx context.Context) (*operations.UpdateOpenidconnectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	openidConnectPlugin, openidConnectPluginDiags := r.ToSharedOpenidConnectPlugin(ctx)
+	diags.Append(openidConnectPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateOpenidconnectPluginRequest{
+		PluginID:            pluginID,
+		OpenidConnectPlugin: *openidConnectPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpenidConnectResourceModel) ToOperationsGetOpenidconnectPluginRequest(ctx context.Context) (*operations.GetOpenidconnectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetOpenidconnectPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpenidConnectResourceModel) ToOperationsDeleteOpenidconnectPluginRequest(ctx context.Context) (*operations.DeleteOpenidconnectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteOpenidconnectPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(ctx context.Context, resp *shared.OpenidConnectPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -2128,11 +2185,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			for _, v := range resp.Config.AuthorizationQueryArgsValues {
 				r.Config.AuthorizationQueryArgsValues = append(r.Config.AuthorizationQueryArgsValues, types.StringValue(v))
 			}
-			if resp.Config.AuthorizationRollingTimeout != nil {
-				r.Config.AuthorizationRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.AuthorizationRollingTimeout)))
-			} else {
-				r.Config.AuthorizationRollingTimeout = types.NumberNull()
-			}
+			r.Config.AuthorizationRollingTimeout = types.Float64PointerValue(resp.Config.AuthorizationRollingTimeout)
 			r.Config.BearerTokenCookieName = types.StringPointerValue(resp.Config.BearerTokenCookieName)
 			r.Config.BearerTokenParamType = make([]types.String, 0, len(resp.Config.BearerTokenParamType))
 			for _, v := range resp.Config.BearerTokenParamType {
@@ -2143,31 +2196,11 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.CacheTokenExchange = types.BoolPointerValue(resp.Config.CacheTokenExchange)
 			r.Config.CacheTokens = types.BoolPointerValue(resp.Config.CacheTokens)
 			r.Config.CacheTokensSalt = types.StringPointerValue(resp.Config.CacheTokensSalt)
-			if resp.Config.CacheTTL != nil {
-				r.Config.CacheTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTL)))
-			} else {
-				r.Config.CacheTTL = types.NumberNull()
-			}
-			if resp.Config.CacheTTLMax != nil {
-				r.Config.CacheTTLMax = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTLMax)))
-			} else {
-				r.Config.CacheTTLMax = types.NumberNull()
-			}
-			if resp.Config.CacheTTLMin != nil {
-				r.Config.CacheTTLMin = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTLMin)))
-			} else {
-				r.Config.CacheTTLMin = types.NumberNull()
-			}
-			if resp.Config.CacheTTLNeg != nil {
-				r.Config.CacheTTLNeg = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTLNeg)))
-			} else {
-				r.Config.CacheTTLNeg = types.NumberNull()
-			}
-			if resp.Config.CacheTTLResurrect != nil {
-				r.Config.CacheTTLResurrect = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTLResurrect)))
-			} else {
-				r.Config.CacheTTLResurrect = types.NumberNull()
-			}
+			r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
+			r.Config.CacheTTLMax = types.Float64PointerValue(resp.Config.CacheTTLMax)
+			r.Config.CacheTTLMin = types.Float64PointerValue(resp.Config.CacheTTLMin)
+			r.Config.CacheTTLNeg = types.Float64PointerValue(resp.Config.CacheTTLNeg)
+			r.Config.CacheTTLResurrect = types.Float64PointerValue(resp.Config.CacheTTLResurrect)
 			r.Config.CacheUserInfo = types.BoolPointerValue(resp.Config.CacheUserInfo)
 			r.Config.ClaimsForbidden = make([]types.String, 0, len(resp.Config.ClaimsForbidden))
 			for _, v := range resp.Config.ClaimsForbidden {
@@ -2195,66 +2228,66 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 				r.Config.ClientJwk = r.Config.ClientJwk[:len(resp.Config.ClientJwk)]
 			}
 			for clientJwkCount, clientJwkItem := range resp.Config.ClientJwk {
-				var clientJwk1 tfTypes.Keys
-				clientJwk1.Alg = types.StringPointerValue(clientJwkItem.Alg)
-				clientJwk1.Crv = types.StringPointerValue(clientJwkItem.Crv)
-				clientJwk1.D = types.StringPointerValue(clientJwkItem.D)
-				clientJwk1.Dp = types.StringPointerValue(clientJwkItem.Dp)
-				clientJwk1.Dq = types.StringPointerValue(clientJwkItem.Dq)
-				clientJwk1.E = types.StringPointerValue(clientJwkItem.E)
-				clientJwk1.Issuer = types.StringPointerValue(clientJwkItem.Issuer)
-				clientJwk1.K = types.StringPointerValue(clientJwkItem.K)
-				clientJwk1.KeyOps = make([]types.String, 0, len(clientJwkItem.KeyOps))
+				var clientJwk tfTypes.Keys
+				clientJwk.Alg = types.StringPointerValue(clientJwkItem.Alg)
+				clientJwk.Crv = types.StringPointerValue(clientJwkItem.Crv)
+				clientJwk.D = types.StringPointerValue(clientJwkItem.D)
+				clientJwk.Dp = types.StringPointerValue(clientJwkItem.Dp)
+				clientJwk.Dq = types.StringPointerValue(clientJwkItem.Dq)
+				clientJwk.E = types.StringPointerValue(clientJwkItem.E)
+				clientJwk.Issuer = types.StringPointerValue(clientJwkItem.Issuer)
+				clientJwk.K = types.StringPointerValue(clientJwkItem.K)
+				clientJwk.KeyOps = make([]types.String, 0, len(clientJwkItem.KeyOps))
 				for _, v := range clientJwkItem.KeyOps {
-					clientJwk1.KeyOps = append(clientJwk1.KeyOps, types.StringValue(v))
+					clientJwk.KeyOps = append(clientJwk.KeyOps, types.StringValue(v))
 				}
-				clientJwk1.Kid = types.StringPointerValue(clientJwkItem.Kid)
-				clientJwk1.Kty = types.StringPointerValue(clientJwkItem.Kty)
-				clientJwk1.N = types.StringPointerValue(clientJwkItem.N)
-				clientJwk1.Oth = types.StringPointerValue(clientJwkItem.Oth)
-				clientJwk1.P = types.StringPointerValue(clientJwkItem.P)
-				clientJwk1.Q = types.StringPointerValue(clientJwkItem.Q)
-				clientJwk1.Qi = types.StringPointerValue(clientJwkItem.Qi)
-				clientJwk1.R = types.StringPointerValue(clientJwkItem.R)
-				clientJwk1.T = types.StringPointerValue(clientJwkItem.T)
-				clientJwk1.Use = types.StringPointerValue(clientJwkItem.Use)
-				clientJwk1.X = types.StringPointerValue(clientJwkItem.X)
-				clientJwk1.X5c = make([]types.String, 0, len(clientJwkItem.X5c))
+				clientJwk.Kid = types.StringPointerValue(clientJwkItem.Kid)
+				clientJwk.Kty = types.StringPointerValue(clientJwkItem.Kty)
+				clientJwk.N = types.StringPointerValue(clientJwkItem.N)
+				clientJwk.Oth = types.StringPointerValue(clientJwkItem.Oth)
+				clientJwk.P = types.StringPointerValue(clientJwkItem.P)
+				clientJwk.Q = types.StringPointerValue(clientJwkItem.Q)
+				clientJwk.Qi = types.StringPointerValue(clientJwkItem.Qi)
+				clientJwk.R = types.StringPointerValue(clientJwkItem.R)
+				clientJwk.T = types.StringPointerValue(clientJwkItem.T)
+				clientJwk.Use = types.StringPointerValue(clientJwkItem.Use)
+				clientJwk.X = types.StringPointerValue(clientJwkItem.X)
+				clientJwk.X5c = make([]types.String, 0, len(clientJwkItem.X5c))
 				for _, v := range clientJwkItem.X5c {
-					clientJwk1.X5c = append(clientJwk1.X5c, types.StringValue(v))
+					clientJwk.X5c = append(clientJwk.X5c, types.StringValue(v))
 				}
-				clientJwk1.X5t = types.StringPointerValue(clientJwkItem.X5t)
-				clientJwk1.X5tNumberS256 = types.StringPointerValue(clientJwkItem.X5tNumberS256)
-				clientJwk1.X5u = types.StringPointerValue(clientJwkItem.X5u)
-				clientJwk1.Y = types.StringPointerValue(clientJwkItem.Y)
+				clientJwk.X5t = types.StringPointerValue(clientJwkItem.X5t)
+				clientJwk.X5tNumberS256 = types.StringPointerValue(clientJwkItem.X5tNumberS256)
+				clientJwk.X5u = types.StringPointerValue(clientJwkItem.X5u)
+				clientJwk.Y = types.StringPointerValue(clientJwkItem.Y)
 				if clientJwkCount+1 > len(r.Config.ClientJwk) {
-					r.Config.ClientJwk = append(r.Config.ClientJwk, clientJwk1)
+					r.Config.ClientJwk = append(r.Config.ClientJwk, clientJwk)
 				} else {
-					r.Config.ClientJwk[clientJwkCount].Alg = clientJwk1.Alg
-					r.Config.ClientJwk[clientJwkCount].Crv = clientJwk1.Crv
-					r.Config.ClientJwk[clientJwkCount].D = clientJwk1.D
-					r.Config.ClientJwk[clientJwkCount].Dp = clientJwk1.Dp
-					r.Config.ClientJwk[clientJwkCount].Dq = clientJwk1.Dq
-					r.Config.ClientJwk[clientJwkCount].E = clientJwk1.E
-					r.Config.ClientJwk[clientJwkCount].Issuer = clientJwk1.Issuer
-					r.Config.ClientJwk[clientJwkCount].K = clientJwk1.K
-					r.Config.ClientJwk[clientJwkCount].KeyOps = clientJwk1.KeyOps
-					r.Config.ClientJwk[clientJwkCount].Kid = clientJwk1.Kid
-					r.Config.ClientJwk[clientJwkCount].Kty = clientJwk1.Kty
-					r.Config.ClientJwk[clientJwkCount].N = clientJwk1.N
-					r.Config.ClientJwk[clientJwkCount].Oth = clientJwk1.Oth
-					r.Config.ClientJwk[clientJwkCount].P = clientJwk1.P
-					r.Config.ClientJwk[clientJwkCount].Q = clientJwk1.Q
-					r.Config.ClientJwk[clientJwkCount].Qi = clientJwk1.Qi
-					r.Config.ClientJwk[clientJwkCount].R = clientJwk1.R
-					r.Config.ClientJwk[clientJwkCount].T = clientJwk1.T
-					r.Config.ClientJwk[clientJwkCount].Use = clientJwk1.Use
-					r.Config.ClientJwk[clientJwkCount].X = clientJwk1.X
-					r.Config.ClientJwk[clientJwkCount].X5c = clientJwk1.X5c
-					r.Config.ClientJwk[clientJwkCount].X5t = clientJwk1.X5t
-					r.Config.ClientJwk[clientJwkCount].X5tNumberS256 = clientJwk1.X5tNumberS256
-					r.Config.ClientJwk[clientJwkCount].X5u = clientJwk1.X5u
-					r.Config.ClientJwk[clientJwkCount].Y = clientJwk1.Y
+					r.Config.ClientJwk[clientJwkCount].Alg = clientJwk.Alg
+					r.Config.ClientJwk[clientJwkCount].Crv = clientJwk.Crv
+					r.Config.ClientJwk[clientJwkCount].D = clientJwk.D
+					r.Config.ClientJwk[clientJwkCount].Dp = clientJwk.Dp
+					r.Config.ClientJwk[clientJwkCount].Dq = clientJwk.Dq
+					r.Config.ClientJwk[clientJwkCount].E = clientJwk.E
+					r.Config.ClientJwk[clientJwkCount].Issuer = clientJwk.Issuer
+					r.Config.ClientJwk[clientJwkCount].K = clientJwk.K
+					r.Config.ClientJwk[clientJwkCount].KeyOps = clientJwk.KeyOps
+					r.Config.ClientJwk[clientJwkCount].Kid = clientJwk.Kid
+					r.Config.ClientJwk[clientJwkCount].Kty = clientJwk.Kty
+					r.Config.ClientJwk[clientJwkCount].N = clientJwk.N
+					r.Config.ClientJwk[clientJwkCount].Oth = clientJwk.Oth
+					r.Config.ClientJwk[clientJwkCount].P = clientJwk.P
+					r.Config.ClientJwk[clientJwkCount].Q = clientJwk.Q
+					r.Config.ClientJwk[clientJwkCount].Qi = clientJwk.Qi
+					r.Config.ClientJwk[clientJwkCount].R = clientJwk.R
+					r.Config.ClientJwk[clientJwkCount].T = clientJwk.T
+					r.Config.ClientJwk[clientJwkCount].Use = clientJwk.Use
+					r.Config.ClientJwk[clientJwkCount].X = clientJwk.X
+					r.Config.ClientJwk[clientJwkCount].X5c = clientJwk.X5c
+					r.Config.ClientJwk[clientJwkCount].X5t = clientJwk.X5t
+					r.Config.ClientJwk[clientJwkCount].X5tNumberS256 = clientJwk.X5tNumberS256
+					r.Config.ClientJwk[clientJwkCount].X5u = clientJwk.X5u
+					r.Config.ClientJwk[clientJwkCount].Y = clientJwk.Y
 				}
 			}
 			r.Config.ClientSecret = make([]types.String, 0, len(resp.Config.ClientSecret))
@@ -2271,14 +2304,14 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 					r.Config.ClusterCacheRedis.ClusterNodes = r.Config.ClusterCacheRedis.ClusterNodes[:len(resp.Config.ClusterCacheRedis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.ClusterCacheRedis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.ClusterCacheRedis.ClusterNodes) {
-						r.Config.ClusterCacheRedis.ClusterNodes = append(r.Config.ClusterCacheRedis.ClusterNodes, clusterNodes1)
+						r.Config.ClusterCacheRedis.ClusterNodes = append(r.Config.ClusterCacheRedis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.ClusterCacheRedis.ConnectTimeout = types.Int64PointerValue(resp.Config.ClusterCacheRedis.ConnectTimeout)
@@ -2297,14 +2330,14 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 					r.Config.ClusterCacheRedis.SentinelNodes = r.Config.ClusterCacheRedis.SentinelNodes[:len(resp.Config.ClusterCacheRedis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.ClusterCacheRedis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.ClusterCacheRedis.SentinelNodes) {
-						r.Config.ClusterCacheRedis.SentinelNodes = append(r.Config.ClusterCacheRedis.SentinelNodes, sentinelNodes1)
+						r.Config.ClusterCacheRedis.SentinelNodes = append(r.Config.ClusterCacheRedis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.ClusterCacheRedis.SentinelPassword = types.StringPointerValue(resp.Config.ClusterCacheRedis.SentinelPassword)
@@ -2372,11 +2405,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.DownstreamSessionIDHeader = types.StringPointerValue(resp.Config.DownstreamSessionIDHeader)
 			r.Config.DownstreamUserInfoHeader = types.StringPointerValue(resp.Config.DownstreamUserInfoHeader)
 			r.Config.DownstreamUserInfoJwtHeader = types.StringPointerValue(resp.Config.DownstreamUserInfoJwtHeader)
-			if resp.Config.DpopProofLifetime != nil {
-				r.Config.DpopProofLifetime = types.NumberValue(big.NewFloat(float64(*resp.Config.DpopProofLifetime)))
-			} else {
-				r.Config.DpopProofLifetime = types.NumberNull()
-			}
+			r.Config.DpopProofLifetime = types.Float64PointerValue(resp.Config.DpopProofLifetime)
 			r.Config.DpopUseNonce = types.BoolPointerValue(resp.Config.DpopUseNonce)
 			r.Config.EnableHsSignatures = types.BoolPointerValue(resp.Config.EnableHsSignatures)
 			r.Config.EndSessionEndpoint = types.StringPointerValue(resp.Config.EndSessionEndpoint)
@@ -2402,11 +2431,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
 			r.Config.HTTPProxy = types.StringPointerValue(resp.Config.HTTPProxy)
 			r.Config.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.HTTPProxyAuthorization)
-			if resp.Config.HTTPVersion != nil {
-				r.Config.HTTPVersion = types.NumberValue(big.NewFloat(float64(*resp.Config.HTTPVersion)))
-			} else {
-				r.Config.HTTPVersion = types.NumberNull()
-			}
+			r.Config.HTTPVersion = types.Float64PointerValue(resp.Config.HTTPVersion)
 			r.Config.HTTPSProxy = types.StringPointerValue(resp.Config.HTTPSProxy)
 			r.Config.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.HTTPSProxyAuthorization)
 			r.Config.IDTokenParamName = types.StringPointerValue(resp.Config.IDTokenParamName)
@@ -2469,11 +2494,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.JwtSessionClaim = types.StringPointerValue(resp.Config.JwtSessionClaim)
 			r.Config.JwtSessionCookie = types.StringPointerValue(resp.Config.JwtSessionCookie)
 			r.Config.Keepalive = types.BoolPointerValue(resp.Config.Keepalive)
-			if resp.Config.Leeway != nil {
-				r.Config.Leeway = types.NumberValue(big.NewFloat(float64(*resp.Config.Leeway)))
-			} else {
-				r.Config.Leeway = types.NumberNull()
-			}
+			r.Config.Leeway = types.Float64PointerValue(resp.Config.Leeway)
 			if resp.Config.LoginAction != nil {
 				r.Config.LoginAction = types.StringValue(string(*resp.Config.LoginAction))
 			} else {
@@ -2510,11 +2531,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.LogoutRevokeAccessToken = types.BoolPointerValue(resp.Config.LogoutRevokeAccessToken)
 			r.Config.LogoutRevokeRefreshToken = types.BoolPointerValue(resp.Config.LogoutRevokeRefreshToken)
 			r.Config.LogoutURISuffix = types.StringPointerValue(resp.Config.LogoutURISuffix)
-			if resp.Config.MaxAge != nil {
-				r.Config.MaxAge = types.NumberValue(big.NewFloat(float64(*resp.Config.MaxAge)))
-			} else {
-				r.Config.MaxAge = types.NumberNull()
-			}
+			r.Config.MaxAge = types.Float64PointerValue(resp.Config.MaxAge)
 			r.Config.MtlsIntrospectionEndpoint = types.StringPointerValue(resp.Config.MtlsIntrospectionEndpoint)
 			r.Config.MtlsRevocationEndpoint = types.StringPointerValue(resp.Config.MtlsRevocationEndpoint)
 			r.Config.MtlsTokenEndpoint = types.StringPointerValue(resp.Config.MtlsTokenEndpoint)
@@ -2555,14 +2572,14 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount1, clusterNodesItem1 := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes3 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes3.IP = types.StringPointerValue(clusterNodesItem1.IP)
-					clusterNodes3.Port = types.Int64PointerValue(clusterNodesItem1.Port)
+					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem1.IP)
+					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem1.Port)
 					if clusterNodesCount1+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes3)
+						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes1)
 					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount1].IP = clusterNodes3.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount1].Port = clusterNodes3.Port
+						r.Config.Redis.ClusterNodes[clusterNodesCount1].IP = clusterNodes1.IP
+						r.Config.Redis.ClusterNodes[clusterNodesCount1].Port = clusterNodes1.Port
 					}
 				}
 				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
@@ -2582,14 +2599,14 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount1, sentinelNodesItem1 := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes3 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes3.Host = types.StringPointerValue(sentinelNodesItem1.Host)
-					sentinelNodes3.Port = types.Int64PointerValue(sentinelNodesItem1.Port)
+					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem1.Host)
+					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem1.Port)
 					if sentinelNodesCount1+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes3)
+						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes1)
 					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount1].Host = sentinelNodes3.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount1].Port = sentinelNodes3.Port
+						r.Config.Redis.SentinelNodes[sentinelNodesCount1].Host = sentinelNodes1.Host
+						r.Config.Redis.SentinelNodes[sentinelNodesCount1].Port = sentinelNodes1.Port
 					}
 				}
 				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
@@ -2605,11 +2622,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 				r.Config.Redis.SslVerify = types.BoolPointerValue(resp.Config.Redis.SslVerify)
 				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
 			}
-			if resp.Config.RediscoveryLifetime != nil {
-				r.Config.RediscoveryLifetime = types.NumberValue(big.NewFloat(float64(*resp.Config.RediscoveryLifetime)))
-			} else {
-				r.Config.RediscoveryLifetime = types.NumberNull()
-			}
+			r.Config.RediscoveryLifetime = types.Float64PointerValue(resp.Config.RediscoveryLifetime)
 			r.Config.RefreshTokenParamName = types.StringPointerValue(resp.Config.RefreshTokenParamName)
 			r.Config.RefreshTokenParamType = make([]types.String, 0, len(resp.Config.RefreshTokenParamType))
 			for _, v := range resp.Config.RefreshTokenParamType {
@@ -2659,11 +2672,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 				r.Config.ScopesRequired = append(r.Config.ScopesRequired, types.StringValue(v))
 			}
 			r.Config.SearchUserInfo = types.BoolPointerValue(resp.Config.SearchUserInfo)
-			if resp.Config.SessionAbsoluteTimeout != nil {
-				r.Config.SessionAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionAbsoluteTimeout)))
-			} else {
-				r.Config.SessionAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.SessionAbsoluteTimeout = types.Float64PointerValue(resp.Config.SessionAbsoluteTimeout)
 			r.Config.SessionAudience = types.StringPointerValue(resp.Config.SessionAudience)
 			r.Config.SessionCookieDomain = types.StringPointerValue(resp.Config.SessionCookieDomain)
 			r.Config.SessionCookieHTTPOnly = types.BoolPointerValue(resp.Config.SessionCookieHTTPOnly)
@@ -2678,27 +2687,15 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.SessionEnforceSameSubject = types.BoolPointerValue(resp.Config.SessionEnforceSameSubject)
 			r.Config.SessionHashStorageKey = types.BoolPointerValue(resp.Config.SessionHashStorageKey)
 			r.Config.SessionHashSubject = types.BoolPointerValue(resp.Config.SessionHashSubject)
-			if resp.Config.SessionIdlingTimeout != nil {
-				r.Config.SessionIdlingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionIdlingTimeout)))
-			} else {
-				r.Config.SessionIdlingTimeout = types.NumberNull()
-			}
+			r.Config.SessionIdlingTimeout = types.Float64PointerValue(resp.Config.SessionIdlingTimeout)
 			r.Config.SessionMemcachedHost = types.StringPointerValue(resp.Config.SessionMemcachedHost)
 			r.Config.SessionMemcachedPort = types.Int64PointerValue(resp.Config.SessionMemcachedPort)
 			r.Config.SessionMemcachedPrefix = types.StringPointerValue(resp.Config.SessionMemcachedPrefix)
 			r.Config.SessionMemcachedSocket = types.StringPointerValue(resp.Config.SessionMemcachedSocket)
 			r.Config.SessionRemember = types.BoolPointerValue(resp.Config.SessionRemember)
-			if resp.Config.SessionRememberAbsoluteTimeout != nil {
-				r.Config.SessionRememberAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRememberAbsoluteTimeout)))
-			} else {
-				r.Config.SessionRememberAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.SessionRememberAbsoluteTimeout = types.Float64PointerValue(resp.Config.SessionRememberAbsoluteTimeout)
 			r.Config.SessionRememberCookieName = types.StringPointerValue(resp.Config.SessionRememberCookieName)
-			if resp.Config.SessionRememberRollingTimeout != nil {
-				r.Config.SessionRememberRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRememberRollingTimeout)))
-			} else {
-				r.Config.SessionRememberRollingTimeout = types.NumberNull()
-			}
+			r.Config.SessionRememberRollingTimeout = types.Float64PointerValue(resp.Config.SessionRememberRollingTimeout)
 			r.Config.SessionRequestHeaders = make([]types.String, 0, len(resp.Config.SessionRequestHeaders))
 			for _, v := range resp.Config.SessionRequestHeaders {
 				r.Config.SessionRequestHeaders = append(r.Config.SessionRequestHeaders, types.StringValue(string(v)))
@@ -2707,11 +2704,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			for _, v := range resp.Config.SessionResponseHeaders {
 				r.Config.SessionResponseHeaders = append(r.Config.SessionResponseHeaders, types.StringValue(string(v)))
 			}
-			if resp.Config.SessionRollingTimeout != nil {
-				r.Config.SessionRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRollingTimeout)))
-			} else {
-				r.Config.SessionRollingTimeout = types.NumberNull()
-			}
+			r.Config.SessionRollingTimeout = types.Float64PointerValue(resp.Config.SessionRollingTimeout)
 			r.Config.SessionSecret = types.StringPointerValue(resp.Config.SessionSecret)
 			if resp.Config.SessionStorage != nil {
 				r.Config.SessionStorage = types.StringValue(string(*resp.Config.SessionStorage))
@@ -2720,11 +2713,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			}
 			r.Config.SessionStoreMetadata = types.BoolPointerValue(resp.Config.SessionStoreMetadata)
 			r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.TLSClientAuthCertID = types.StringPointerValue(resp.Config.TLSClientAuthCertID)
 			r.Config.TLSClientAuthSslVerify = types.BoolPointerValue(resp.Config.TLSClientAuthSslVerify)
 			r.Config.TokenCacheKeyIncludeScope = types.BoolPointerValue(resp.Config.TokenCacheKeyIncludeScope)
@@ -2865,16 +2854,16 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -2900,4 +2889,6 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

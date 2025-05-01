@@ -3,48 +3,59 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
+func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.RouteJSON, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
 	} else {
 		createdAt = nil
 	}
-	var destinations []shared.Destinations = []shared.Destinations{}
-	for _, destinationsItem := range r.Destinations {
-		ip := new(string)
-		if !destinationsItem.IP.IsUnknown() && !destinationsItem.IP.IsNull() {
-			*ip = destinationsItem.IP.ValueString()
-		} else {
-			ip = nil
+	var destinations []shared.Destinations
+	if r.Destinations != nil {
+		destinations = make([]shared.Destinations, 0, len(r.Destinations))
+		for _, destinationsItem := range r.Destinations {
+			ip := new(string)
+			if !destinationsItem.IP.IsUnknown() && !destinationsItem.IP.IsNull() {
+				*ip = destinationsItem.IP.ValueString()
+			} else {
+				ip = nil
+			}
+			port := new(int64)
+			if !destinationsItem.Port.IsUnknown() && !destinationsItem.Port.IsNull() {
+				*port = destinationsItem.Port.ValueInt64()
+			} else {
+				port = nil
+			}
+			destinations = append(destinations, shared.Destinations{
+				IP:   ip,
+				Port: port,
+			})
 		}
-		port := new(int64)
-		if !destinationsItem.Port.IsUnknown() && !destinationsItem.Port.IsNull() {
-			*port = destinationsItem.Port.ValueInt64()
-		} else {
-			port = nil
-		}
-		destinations = append(destinations, shared.Destinations{
-			IP:   ip,
-			Port: port,
-		})
 	}
 	headers := make(map[string][]string)
 	for headersKey, headersValue := range r.Headers {
-		var headersInst []string = []string{}
+		headersInst := make([]string, 0, len(headersValue))
 		for _, item := range headersValue {
 			headersInst = append(headersInst, item.ValueString())
 		}
 		headers[headersKey] = headersInst
 	}
-	var hosts []string = []string{}
-	for _, hostsItem := range r.Hosts {
-		hosts = append(hosts, hostsItem.ValueString())
+	var hosts []string
+	if r.Hosts != nil {
+		hosts = make([]string, 0, len(r.Hosts))
+		for _, hostsItem := range r.Hosts {
+			hosts = append(hosts, hostsItem.ValueString())
+		}
 	}
 	httpsRedirectStatusCode := new(shared.HTTPSRedirectStatusCode)
 	if !r.HTTPSRedirectStatusCode.IsUnknown() && !r.HTTPSRedirectStatusCode.IsNull() {
@@ -58,9 +69,12 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 	} else {
 		id = nil
 	}
-	var methods []string = []string{}
-	for _, methodsItem := range r.Methods {
-		methods = append(methods, methodsItem.ValueString())
+	var methods []string
+	if r.Methods != nil {
+		methods = make([]string, 0, len(r.Methods))
+		for _, methodsItem := range r.Methods {
+			methods = append(methods, methodsItem.ValueString())
+		}
 	}
 	name := new(string)
 	if !r.Name.IsUnknown() && !r.Name.IsNull() {
@@ -74,9 +88,12 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 	} else {
 		pathHandling = nil
 	}
-	var paths []string = []string{}
-	for _, pathsItem := range r.Paths {
-		paths = append(paths, pathsItem.ValueString())
+	var paths []string
+	if r.Paths != nil {
+		paths = make([]string, 0, len(r.Paths))
+		for _, pathsItem := range r.Paths {
+			paths = append(paths, pathsItem.ValueString())
+		}
 	}
 	preserveHost := new(bool)
 	if !r.PreserveHost.IsUnknown() && !r.PreserveHost.IsNull() {
@@ -84,9 +101,12 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 	} else {
 		preserveHost = nil
 	}
-	var protocols []shared.RouteJSONProtocols = []shared.RouteJSONProtocols{}
-	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.RouteJSONProtocols(protocolsItem.ValueString()))
+	var protocols []shared.RouteJSONProtocols
+	if r.Protocols != nil {
+		protocols = make([]shared.RouteJSONProtocols, 0, len(r.Protocols))
+		for _, protocolsItem := range r.Protocols {
+			protocols = append(protocols, shared.RouteJSONProtocols(protocolsItem.ValueString()))
+		}
 	}
 	regexPriority := new(int64)
 	if !r.RegexPriority.IsUnknown() && !r.RegexPriority.IsNull() {
@@ -118,28 +138,34 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 			ID: id1,
 		}
 	}
-	var snis []string = []string{}
-	for _, snisItem := range r.Snis {
-		snis = append(snis, snisItem.ValueString())
+	var snis []string
+	if r.Snis != nil {
+		snis = make([]string, 0, len(r.Snis))
+		for _, snisItem := range r.Snis {
+			snis = append(snis, snisItem.ValueString())
+		}
 	}
-	var sources []shared.Sources = []shared.Sources{}
-	for _, sourcesItem := range r.Sources {
-		ip1 := new(string)
-		if !sourcesItem.IP.IsUnknown() && !sourcesItem.IP.IsNull() {
-			*ip1 = sourcesItem.IP.ValueString()
-		} else {
-			ip1 = nil
+	var sources []shared.Sources
+	if r.Sources != nil {
+		sources = make([]shared.Sources, 0, len(r.Sources))
+		for _, sourcesItem := range r.Sources {
+			ip1 := new(string)
+			if !sourcesItem.IP.IsUnknown() && !sourcesItem.IP.IsNull() {
+				*ip1 = sourcesItem.IP.ValueString()
+			} else {
+				ip1 = nil
+			}
+			port1 := new(int64)
+			if !sourcesItem.Port.IsUnknown() && !sourcesItem.Port.IsNull() {
+				*port1 = sourcesItem.Port.ValueInt64()
+			} else {
+				port1 = nil
+			}
+			sources = append(sources, shared.Sources{
+				IP:   ip1,
+				Port: port1,
+			})
 		}
-		port1 := new(int64)
-		if !sourcesItem.Port.IsUnknown() && !sourcesItem.Port.IsNull() {
-			*port1 = sourcesItem.Port.ValueInt64()
-		} else {
-			port1 = nil
-		}
-		sources = append(sources, shared.Sources{
-			IP:   ip1,
-			Port: port1,
-		})
 	}
 	stripPath := new(bool)
 	if !r.StripPath.IsUnknown() && !r.StripPath.IsNull() {
@@ -147,7 +173,7 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 	} else {
 		stripPath = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -180,10 +206,60 @@ func (r *RouteResourceModel) ToSharedRouteJSON() *shared.RouteJSON {
 		Tags:                    tags,
 		UpdatedAt:               updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *RouteResourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON) {
+func (r *RouteResourceModel) ToOperationsUpsertRouteRequest(ctx context.Context) (*operations.UpsertRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	routeJSON, routeJSONDiags := r.ToSharedRouteJSON(ctx)
+	diags.Append(routeJSONDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertRouteRequest{
+		RouteIDOrName: routeIDOrName,
+		RouteJSON:     *routeJSON,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) ToOperationsGetRouteRequest(ctx context.Context) (*operations.GetRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.GetRouteRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) ToOperationsDeleteRouteRequest(ctx context.Context) (*operations.DeleteRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.DeleteRouteRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, resp *shared.RouteJSON) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		if resp.Destinations != nil {
@@ -192,14 +268,14 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON) 
 				r.Destinations = r.Destinations[:len(resp.Destinations)]
 			}
 			for destinationsCount, destinationsItem := range resp.Destinations {
-				var destinations1 tfTypes.AiProxyAdvancedPluginClusterNodes
-				destinations1.IP = types.StringPointerValue(destinationsItem.IP)
-				destinations1.Port = types.Int64PointerValue(destinationsItem.Port)
+				var destinations tfTypes.AiProxyAdvancedPluginClusterNodes
+				destinations.IP = types.StringPointerValue(destinationsItem.IP)
+				destinations.Port = types.Int64PointerValue(destinationsItem.Port)
 				if destinationsCount+1 > len(r.Destinations) {
-					r.Destinations = append(r.Destinations, destinations1)
+					r.Destinations = append(r.Destinations, destinations)
 				} else {
-					r.Destinations[destinationsCount].IP = destinations1.IP
-					r.Destinations[destinationsCount].Port = destinations1.Port
+					r.Destinations[destinationsCount].IP = destinations.IP
+					r.Destinations[destinationsCount].Port = destinations.Port
 				}
 			}
 		}
@@ -273,14 +349,14 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON) 
 				r.Sources = r.Sources[:len(resp.Sources)]
 			}
 			for sourcesCount, sourcesItem := range resp.Sources {
-				var sources1 tfTypes.AiProxyAdvancedPluginClusterNodes
-				sources1.IP = types.StringPointerValue(sourcesItem.IP)
-				sources1.Port = types.Int64PointerValue(sourcesItem.Port)
+				var sources tfTypes.AiProxyAdvancedPluginClusterNodes
+				sources.IP = types.StringPointerValue(sourcesItem.IP)
+				sources.Port = types.Int64PointerValue(sourcesItem.Port)
 				if sourcesCount+1 > len(r.Sources) {
-					r.Sources = append(r.Sources, sources1)
+					r.Sources = append(r.Sources, sources)
 				} else {
-					r.Sources[sourcesCount].IP = sources1.IP
-					r.Sources[sourcesCount].Port = sources1.Port
+					r.Sources[sourcesCount].IP = sources.IP
+					r.Sources[sourcesCount].Port = sources.Port
 				}
 			}
 		}
@@ -291,4 +367,6 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON) 
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

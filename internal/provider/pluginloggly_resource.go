@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
@@ -162,7 +161,7 @@ func (r *PluginLogglyResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						ElementType: types.StringType,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
 					},
@@ -329,8 +328,13 @@ func (r *PluginLogglyResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := *data.ToSharedLogglyPlugin()
-	res, err := r.client.Plugins.CreateLogglyPlugin(ctx, request)
+	request, requestDiags := data.ToSharedLogglyPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateLogglyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -350,8 +354,17 @@ func (r *PluginLogglyResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLogglyPlugin(res.LogglyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedLogglyPlugin(ctx, res.LogglyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -375,13 +388,13 @@ func (r *PluginLogglyResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetLogglyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetLogglyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetLogglyPlugin(ctx, request)
+	res, err := r.client.Plugins.GetLogglyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -405,7 +418,11 @@ func (r *PluginLogglyResource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLogglyPlugin(res.LogglyPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedLogglyPlugin(ctx, res.LogglyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -425,15 +442,13 @@ func (r *PluginLogglyResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateLogglyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	logglyPlugin := *data.ToSharedLogglyPlugin()
-	request := operations.UpdateLogglyPluginRequest{
-		PluginID:     pluginID,
-		LogglyPlugin: logglyPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateLogglyPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateLogglyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -453,8 +468,17 @@ func (r *PluginLogglyResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLogglyPlugin(res.LogglyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedLogglyPlugin(ctx, res.LogglyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -478,13 +502,13 @@ func (r *PluginLogglyResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteLogglyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteLogglyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteLogglyPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteLogglyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

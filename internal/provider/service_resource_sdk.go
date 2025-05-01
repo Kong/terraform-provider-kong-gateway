@@ -3,15 +3,23 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ServiceResourceModel) ToSharedService() *shared.Service {
-	var caCertificates []string = []string{}
-	for _, caCertificatesItem := range r.CaCertificates {
-		caCertificates = append(caCertificates, caCertificatesItem.ValueString())
+func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Service, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificates []string
+	if r.CaCertificates != nil {
+		caCertificates = make([]string, 0, len(r.CaCertificates))
+		for _, caCertificatesItem := range r.CaCertificates {
+			caCertificates = append(caCertificates, caCertificatesItem.ValueString())
+		}
 	}
 	var clientCertificate *shared.ClientCertificate
 	if r.ClientCertificate != nil {
@@ -88,7 +96,7 @@ func (r *ServiceResourceModel) ToSharedService() *shared.Service {
 	} else {
 		retries = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -143,10 +151,60 @@ func (r *ServiceResourceModel) ToSharedService() *shared.Service {
 		URL:               url,
 		WriteTimeout:      writeTimeout,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(resp *shared.ServiceOutput) {
+func (r *ServiceResourceModel) ToOperationsUpsertServiceRequest(ctx context.Context) (*operations.UpsertServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	service, serviceDiags := r.ToSharedService(ctx)
+	diags.Append(serviceDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+		Service:         *service,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) ToOperationsGetServiceRequest(ctx context.Context) (*operations.GetServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	out := operations.GetServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) ToOperationsDeleteServiceRequest(ctx context.Context) (*operations.DeleteServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	out := operations.DeleteServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(ctx context.Context, resp *shared.ServiceOutput) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.CaCertificates != nil {
 			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
@@ -184,4 +242,6 @@ func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(resp *shared.Servi
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 		r.WriteTimeout = types.Int64PointerValue(resp.WriteTimeout)
 	}
+
+	return diags
 }

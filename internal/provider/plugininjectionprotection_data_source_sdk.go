@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginInjectionProtectionDataSourceModel) RefreshFromSharedInjectionProtectionPlugin(resp *shared.InjectionProtectionPlugin) {
+func (r *PluginInjectionProtectionDataSourceModel) ToOperationsGetInjectionprotectionPluginRequest(ctx context.Context) (*operations.GetInjectionprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetInjectionprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginInjectionProtectionDataSourceModel) RefreshFromSharedInjectionProtectionPlugin(ctx context.Context, resp *shared.InjectionProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -19,14 +37,14 @@ func (r *PluginInjectionProtectionDataSourceModel) RefreshFromSharedInjectionPro
 				r.Config.CustomInjections = r.Config.CustomInjections[:len(resp.Config.CustomInjections)]
 			}
 			for customInjectionsCount, customInjectionsItem := range resp.Config.CustomInjections {
-				var customInjections1 tfTypes.CustomInjections
-				customInjections1.Name = types.StringValue(customInjectionsItem.Name)
-				customInjections1.Regex = types.StringValue(customInjectionsItem.Regex)
+				var customInjections tfTypes.CustomInjections
+				customInjections.Name = types.StringValue(customInjectionsItem.Name)
+				customInjections.Regex = types.StringValue(customInjectionsItem.Regex)
 				if customInjectionsCount+1 > len(r.Config.CustomInjections) {
-					r.Config.CustomInjections = append(r.Config.CustomInjections, customInjections1)
+					r.Config.CustomInjections = append(r.Config.CustomInjections, customInjections)
 				} else {
-					r.Config.CustomInjections[customInjectionsCount].Name = customInjections1.Name
-					r.Config.CustomInjections[customInjectionsCount].Regex = customInjections1.Regex
+					r.Config.CustomInjections[customInjectionsCount].Name = customInjections.Name
+					r.Config.CustomInjections[customInjectionsCount].Regex = customInjections.Regex
 				}
 			}
 			if resp.Config.EnforcementMode != nil {
@@ -78,16 +96,16 @@ func (r *PluginInjectionProtectionDataSourceModel) RefreshFromSharedInjectionPro
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -113,4 +131,6 @@ func (r *PluginInjectionProtectionDataSourceModel) RefreshFromSharedInjectionPro
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

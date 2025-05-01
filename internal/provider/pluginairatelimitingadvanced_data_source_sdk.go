@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLimitingAdvancedPlugin(resp *shared.AiRateLimitingAdvancedPlugin) {
+func (r *PluginAiRateLimitingAdvancedDataSourceModel) ToOperationsGetAiratelimitingadvancedPluginRequest(ctx context.Context) (*operations.GetAiratelimitingadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiratelimitingadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLimitingAdvancedPlugin(ctx context.Context, resp *shared.AiRateLimitingAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -17,11 +34,7 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 			r.Config = &tfTypes.AiRateLimitingAdvancedPluginConfig{}
 			r.Config.DictionaryName = types.StringPointerValue(resp.Config.DictionaryName)
 			r.Config.DisablePenalty = types.BoolPointerValue(resp.Config.DisablePenalty)
-			if resp.Config.ErrorCode != nil {
-				r.Config.ErrorCode = types.NumberValue(big.NewFloat(float64(*resp.Config.ErrorCode)))
-			} else {
-				r.Config.ErrorCode = types.NumberNull()
-			}
+			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
 			r.Config.ErrorHideProviders = types.BoolPointerValue(resp.Config.ErrorHideProviders)
 			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
 			r.Config.HeaderName = types.StringPointerValue(resp.Config.HeaderName)
@@ -36,16 +49,16 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 				r.Config.LlmProviders = r.Config.LlmProviders[:len(resp.Config.LlmProviders)]
 			}
 			for llmProvidersCount, llmProvidersItem := range resp.Config.LlmProviders {
-				var llmProviders1 tfTypes.LlmProviders
-				llmProviders1.Limit = types.NumberValue(big.NewFloat(float64(llmProvidersItem.Limit)))
-				llmProviders1.Name = types.StringValue(string(llmProvidersItem.Name))
-				llmProviders1.WindowSize = types.NumberValue(big.NewFloat(float64(llmProvidersItem.WindowSize)))
+				var llmProviders tfTypes.LlmProviders
+				llmProviders.Limit = types.Float64Value(llmProvidersItem.Limit)
+				llmProviders.Name = types.StringValue(string(llmProvidersItem.Name))
+				llmProviders.WindowSize = types.Float64Value(llmProvidersItem.WindowSize)
 				if llmProvidersCount+1 > len(r.Config.LlmProviders) {
-					r.Config.LlmProviders = append(r.Config.LlmProviders, llmProviders1)
+					r.Config.LlmProviders = append(r.Config.LlmProviders, llmProviders)
 				} else {
-					r.Config.LlmProviders[llmProvidersCount].Limit = llmProviders1.Limit
-					r.Config.LlmProviders[llmProvidersCount].Name = llmProviders1.Name
-					r.Config.LlmProviders[llmProvidersCount].WindowSize = llmProviders1.WindowSize
+					r.Config.LlmProviders[llmProvidersCount].Limit = llmProviders.Limit
+					r.Config.LlmProviders[llmProvidersCount].Name = llmProviders.Name
+					r.Config.LlmProviders[llmProvidersCount].WindowSize = llmProviders.WindowSize
 				}
 			}
 			r.Config.Path = types.StringPointerValue(resp.Config.Path)
@@ -59,14 +72,14 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes1)
+						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
@@ -85,14 +98,14 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes1)
+						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
@@ -108,21 +121,13 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
 			}
 			r.Config.RequestPromptCountFunction = types.StringPointerValue(resp.Config.RequestPromptCountFunction)
-			if resp.Config.RetryAfterJitterMax != nil {
-				r.Config.RetryAfterJitterMax = types.NumberValue(big.NewFloat(float64(*resp.Config.RetryAfterJitterMax)))
-			} else {
-				r.Config.RetryAfterJitterMax = types.NumberNull()
-			}
+			r.Config.RetryAfterJitterMax = types.Float64PointerValue(resp.Config.RetryAfterJitterMax)
 			if resp.Config.Strategy != nil {
 				r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
 			} else {
 				r.Config.Strategy = types.StringNull()
 			}
-			if resp.Config.SyncRate != nil {
-				r.Config.SyncRate = types.NumberValue(big.NewFloat(float64(*resp.Config.SyncRate)))
-			} else {
-				r.Config.SyncRate = types.NumberNull()
-			}
+			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
 			if resp.Config.TokensCountStrategy != nil {
 				r.Config.TokensCountStrategy = types.StringValue(string(*resp.Config.TokensCountStrategy))
 			} else {
@@ -179,16 +184,16 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -214,4 +219,6 @@ func (r *PluginAiRateLimitingAdvancedDataSourceModel) RefreshFromSharedAiRateLim
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

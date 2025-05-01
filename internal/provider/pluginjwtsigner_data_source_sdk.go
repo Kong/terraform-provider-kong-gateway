@@ -3,14 +3,31 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *shared.JwtSignerPlugin) {
+func (r *PluginJwtSignerDataSourceModel) ToOperationsGetJwtsignerPluginRequest(ctx context.Context) (*operations.GetJwtsignerPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetJwtsignerPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(ctx context.Context, resp *shared.JwtSignerPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -40,11 +57,7 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 			for _, v := range resp.Config.AccessTokenIntrospectionJwtClaim {
 				r.Config.AccessTokenIntrospectionJwtClaim = append(r.Config.AccessTokenIntrospectionJwtClaim, types.StringValue(v))
 			}
-			if resp.Config.AccessTokenIntrospectionLeeway != nil {
-				r.Config.AccessTokenIntrospectionLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenIntrospectionLeeway)))
-			} else {
-				r.Config.AccessTokenIntrospectionLeeway = types.NumberNull()
-			}
+			r.Config.AccessTokenIntrospectionLeeway = types.Float64PointerValue(resp.Config.AccessTokenIntrospectionLeeway)
 			r.Config.AccessTokenIntrospectionScopesClaim = make([]types.String, 0, len(resp.Config.AccessTokenIntrospectionScopesClaim))
 			for _, v := range resp.Config.AccessTokenIntrospectionScopesClaim {
 				r.Config.AccessTokenIntrospectionScopesClaim = append(r.Config.AccessTokenIntrospectionScopesClaim, types.StringValue(v))
@@ -53,35 +66,19 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 			for _, v := range resp.Config.AccessTokenIntrospectionScopesRequired {
 				r.Config.AccessTokenIntrospectionScopesRequired = append(r.Config.AccessTokenIntrospectionScopesRequired, types.StringValue(v))
 			}
-			if resp.Config.AccessTokenIntrospectionTimeout != nil {
-				r.Config.AccessTokenIntrospectionTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenIntrospectionTimeout)))
-			} else {
-				r.Config.AccessTokenIntrospectionTimeout = types.NumberNull()
-			}
+			r.Config.AccessTokenIntrospectionTimeout = types.Float64PointerValue(resp.Config.AccessTokenIntrospectionTimeout)
 			r.Config.AccessTokenIssuer = types.StringPointerValue(resp.Config.AccessTokenIssuer)
 			r.Config.AccessTokenJwksURI = types.StringPointerValue(resp.Config.AccessTokenJwksURI)
 			r.Config.AccessTokenJwksURIClientCertificate = types.StringPointerValue(resp.Config.AccessTokenJwksURIClientCertificate)
 			r.Config.AccessTokenJwksURIClientPassword = types.StringPointerValue(resp.Config.AccessTokenJwksURIClientPassword)
 			r.Config.AccessTokenJwksURIClientUsername = types.StringPointerValue(resp.Config.AccessTokenJwksURIClientUsername)
-			if resp.Config.AccessTokenJwksURIRotatePeriod != nil {
-				r.Config.AccessTokenJwksURIRotatePeriod = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenJwksURIRotatePeriod)))
-			} else {
-				r.Config.AccessTokenJwksURIRotatePeriod = types.NumberNull()
-			}
+			r.Config.AccessTokenJwksURIRotatePeriod = types.Float64PointerValue(resp.Config.AccessTokenJwksURIRotatePeriod)
 			r.Config.AccessTokenKeyset = types.StringPointerValue(resp.Config.AccessTokenKeyset)
 			r.Config.AccessTokenKeysetClientCertificate = types.StringPointerValue(resp.Config.AccessTokenKeysetClientCertificate)
 			r.Config.AccessTokenKeysetClientPassword = types.StringPointerValue(resp.Config.AccessTokenKeysetClientPassword)
 			r.Config.AccessTokenKeysetClientUsername = types.StringPointerValue(resp.Config.AccessTokenKeysetClientUsername)
-			if resp.Config.AccessTokenKeysetRotatePeriod != nil {
-				r.Config.AccessTokenKeysetRotatePeriod = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenKeysetRotatePeriod)))
-			} else {
-				r.Config.AccessTokenKeysetRotatePeriod = types.NumberNull()
-			}
-			if resp.Config.AccessTokenLeeway != nil {
-				r.Config.AccessTokenLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenLeeway)))
-			} else {
-				r.Config.AccessTokenLeeway = types.NumberNull()
-			}
+			r.Config.AccessTokenKeysetRotatePeriod = types.Float64PointerValue(resp.Config.AccessTokenKeysetRotatePeriod)
+			r.Config.AccessTokenLeeway = types.Float64PointerValue(resp.Config.AccessTokenLeeway)
 			r.Config.AccessTokenOptional = types.BoolPointerValue(resp.Config.AccessTokenOptional)
 			r.Config.AccessTokenRequestHeader = types.StringPointerValue(resp.Config.AccessTokenRequestHeader)
 			r.Config.AccessTokenScopesClaim = make([]types.String, 0, len(resp.Config.AccessTokenScopesClaim))
@@ -98,11 +95,7 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 				r.Config.AccessTokenSigningAlgorithm = types.StringNull()
 			}
 			r.Config.AccessTokenUpstreamHeader = types.StringPointerValue(resp.Config.AccessTokenUpstreamHeader)
-			if resp.Config.AccessTokenUpstreamLeeway != nil {
-				r.Config.AccessTokenUpstreamLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.AccessTokenUpstreamLeeway)))
-			} else {
-				r.Config.AccessTokenUpstreamLeeway = types.NumberNull()
-			}
+			r.Config.AccessTokenUpstreamLeeway = types.Float64PointerValue(resp.Config.AccessTokenUpstreamLeeway)
 			if len(resp.Config.AddAccessTokenClaims) > 0 {
 				r.Config.AddAccessTokenClaims = make(map[string]types.String, len(resp.Config.AddAccessTokenClaims))
 				for key, value := range resp.Config.AddAccessTokenClaims {
@@ -150,11 +143,7 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 			for _, v := range resp.Config.ChannelTokenIntrospectionJwtClaim {
 				r.Config.ChannelTokenIntrospectionJwtClaim = append(r.Config.ChannelTokenIntrospectionJwtClaim, types.StringValue(v))
 			}
-			if resp.Config.ChannelTokenIntrospectionLeeway != nil {
-				r.Config.ChannelTokenIntrospectionLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenIntrospectionLeeway)))
-			} else {
-				r.Config.ChannelTokenIntrospectionLeeway = types.NumberNull()
-			}
+			r.Config.ChannelTokenIntrospectionLeeway = types.Float64PointerValue(resp.Config.ChannelTokenIntrospectionLeeway)
 			r.Config.ChannelTokenIntrospectionScopesClaim = make([]types.String, 0, len(resp.Config.ChannelTokenIntrospectionScopesClaim))
 			for _, v := range resp.Config.ChannelTokenIntrospectionScopesClaim {
 				r.Config.ChannelTokenIntrospectionScopesClaim = append(r.Config.ChannelTokenIntrospectionScopesClaim, types.StringValue(v))
@@ -163,35 +152,19 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 			for _, v := range resp.Config.ChannelTokenIntrospectionScopesRequired {
 				r.Config.ChannelTokenIntrospectionScopesRequired = append(r.Config.ChannelTokenIntrospectionScopesRequired, types.StringValue(v))
 			}
-			if resp.Config.ChannelTokenIntrospectionTimeout != nil {
-				r.Config.ChannelTokenIntrospectionTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenIntrospectionTimeout)))
-			} else {
-				r.Config.ChannelTokenIntrospectionTimeout = types.NumberNull()
-			}
+			r.Config.ChannelTokenIntrospectionTimeout = types.Float64PointerValue(resp.Config.ChannelTokenIntrospectionTimeout)
 			r.Config.ChannelTokenIssuer = types.StringPointerValue(resp.Config.ChannelTokenIssuer)
 			r.Config.ChannelTokenJwksURI = types.StringPointerValue(resp.Config.ChannelTokenJwksURI)
 			r.Config.ChannelTokenJwksURIClientCertificate = types.StringPointerValue(resp.Config.ChannelTokenJwksURIClientCertificate)
 			r.Config.ChannelTokenJwksURIClientPassword = types.StringPointerValue(resp.Config.ChannelTokenJwksURIClientPassword)
 			r.Config.ChannelTokenJwksURIClientUsername = types.StringPointerValue(resp.Config.ChannelTokenJwksURIClientUsername)
-			if resp.Config.ChannelTokenJwksURIRotatePeriod != nil {
-				r.Config.ChannelTokenJwksURIRotatePeriod = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenJwksURIRotatePeriod)))
-			} else {
-				r.Config.ChannelTokenJwksURIRotatePeriod = types.NumberNull()
-			}
+			r.Config.ChannelTokenJwksURIRotatePeriod = types.Float64PointerValue(resp.Config.ChannelTokenJwksURIRotatePeriod)
 			r.Config.ChannelTokenKeyset = types.StringPointerValue(resp.Config.ChannelTokenKeyset)
 			r.Config.ChannelTokenKeysetClientCertificate = types.StringPointerValue(resp.Config.ChannelTokenKeysetClientCertificate)
 			r.Config.ChannelTokenKeysetClientPassword = types.StringPointerValue(resp.Config.ChannelTokenKeysetClientPassword)
 			r.Config.ChannelTokenKeysetClientUsername = types.StringPointerValue(resp.Config.ChannelTokenKeysetClientUsername)
-			if resp.Config.ChannelTokenKeysetRotatePeriod != nil {
-				r.Config.ChannelTokenKeysetRotatePeriod = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenKeysetRotatePeriod)))
-			} else {
-				r.Config.ChannelTokenKeysetRotatePeriod = types.NumberNull()
-			}
-			if resp.Config.ChannelTokenLeeway != nil {
-				r.Config.ChannelTokenLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenLeeway)))
-			} else {
-				r.Config.ChannelTokenLeeway = types.NumberNull()
-			}
+			r.Config.ChannelTokenKeysetRotatePeriod = types.Float64PointerValue(resp.Config.ChannelTokenKeysetRotatePeriod)
+			r.Config.ChannelTokenLeeway = types.Float64PointerValue(resp.Config.ChannelTokenLeeway)
 			r.Config.ChannelTokenOptional = types.BoolPointerValue(resp.Config.ChannelTokenOptional)
 			r.Config.ChannelTokenRequestHeader = types.StringPointerValue(resp.Config.ChannelTokenRequestHeader)
 			r.Config.ChannelTokenScopesClaim = make([]types.String, 0, len(resp.Config.ChannelTokenScopesClaim))
@@ -208,11 +181,7 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 				r.Config.ChannelTokenSigningAlgorithm = types.StringNull()
 			}
 			r.Config.ChannelTokenUpstreamHeader = types.StringPointerValue(resp.Config.ChannelTokenUpstreamHeader)
-			if resp.Config.ChannelTokenUpstreamLeeway != nil {
-				r.Config.ChannelTokenUpstreamLeeway = types.NumberValue(big.NewFloat(float64(*resp.Config.ChannelTokenUpstreamLeeway)))
-			} else {
-				r.Config.ChannelTokenUpstreamLeeway = types.NumberNull()
-			}
+			r.Config.ChannelTokenUpstreamLeeway = types.Float64PointerValue(resp.Config.ChannelTokenUpstreamLeeway)
 			r.Config.EnableAccessTokenIntrospection = types.BoolPointerValue(resp.Config.EnableAccessTokenIntrospection)
 			r.Config.EnableChannelTokenIntrospection = types.BoolPointerValue(resp.Config.EnableChannelTokenIntrospection)
 			r.Config.EnableHsSignatures = types.BoolPointerValue(resp.Config.EnableHsSignatures)
@@ -295,16 +264,16 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -330,4 +299,6 @@ func (r *PluginJwtSignerDataSourceModel) RefreshFromSharedJwtSignerPlugin(resp *
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

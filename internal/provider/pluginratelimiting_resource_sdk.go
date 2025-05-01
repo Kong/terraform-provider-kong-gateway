@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.RateLimitingPlugin {
+func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin(ctx context.Context) (*shared.RateLimitingPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 	if r.Ordering != nil {
 		var after *shared.RateLimitingPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 		}
 		var before *shared.RateLimitingPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 			Before: before,
 		}
 	}
-	var partials []shared.RateLimitingPluginPartials = []shared.RateLimitingPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.RateLimitingPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RateLimitingPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RateLimitingPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RateLimitingPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -101,13 +108,13 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 	if r.Config != nil {
 		day := new(float64)
 		if !r.Config.Day.IsUnknown() && !r.Config.Day.IsNull() {
-			*day, _ = r.Config.Day.ValueBigFloat().Float64()
+			*day = r.Config.Day.ValueFloat64()
 		} else {
 			day = nil
 		}
 		errorCode := new(float64)
 		if !r.Config.ErrorCode.IsUnknown() && !r.Config.ErrorCode.IsNull() {
-			*errorCode, _ = r.Config.ErrorCode.ValueBigFloat().Float64()
+			*errorCode = r.Config.ErrorCode.ValueFloat64()
 		} else {
 			errorCode = nil
 		}
@@ -137,7 +144,7 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 		}
 		hour := new(float64)
 		if !r.Config.Hour.IsUnknown() && !r.Config.Hour.IsNull() {
-			*hour, _ = r.Config.Hour.ValueBigFloat().Float64()
+			*hour = r.Config.Hour.ValueFloat64()
 		} else {
 			hour = nil
 		}
@@ -149,13 +156,13 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 		}
 		minute := new(float64)
 		if !r.Config.Minute.IsUnknown() && !r.Config.Minute.IsNull() {
-			*minute, _ = r.Config.Minute.ValueBigFloat().Float64()
+			*minute = r.Config.Minute.ValueFloat64()
 		} else {
 			minute = nil
 		}
 		month := new(float64)
 		if !r.Config.Month.IsUnknown() && !r.Config.Month.IsNull() {
-			*month, _ = r.Config.Month.ValueBigFloat().Float64()
+			*month = r.Config.Month.ValueFloat64()
 		} else {
 			month = nil
 		}
@@ -241,19 +248,19 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 		}
 		second := new(float64)
 		if !r.Config.Second.IsUnknown() && !r.Config.Second.IsNull() {
-			*second, _ = r.Config.Second.ValueBigFloat().Float64()
+			*second = r.Config.Second.ValueFloat64()
 		} else {
 			second = nil
 		}
 		syncRate := new(float64)
 		if !r.Config.SyncRate.IsUnknown() && !r.Config.SyncRate.IsNull() {
-			*syncRate, _ = r.Config.SyncRate.ValueBigFloat().Float64()
+			*syncRate = r.Config.SyncRate.ValueFloat64()
 		} else {
 			syncRate = nil
 		}
 		year := new(float64)
 		if !r.Config.Year.IsUnknown() && !r.Config.Year.IsNull() {
-			*year, _ = r.Config.Year.ValueBigFloat().Float64()
+			*year = r.Config.Year.ValueFloat64()
 		} else {
 			year = nil
 		}
@@ -300,7 +307,7 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 			ID: id3,
 		}
 	}
-	var protocols []shared.RateLimitingPluginProtocols = []shared.RateLimitingPluginProtocols{}
+	protocols := make([]shared.RateLimitingPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.RateLimitingPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -344,49 +351,79 @@ func (r *PluginRateLimitingResourceModel) ToSharedRateLimitingPlugin() *shared.R
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginRateLimitingResourceModel) RefreshFromSharedRateLimitingPlugin(resp *shared.RateLimitingPlugin) {
+func (r *PluginRateLimitingResourceModel) ToOperationsUpdateRatelimitingPluginRequest(ctx context.Context) (*operations.UpdateRatelimitingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	rateLimitingPlugin, rateLimitingPluginDiags := r.ToSharedRateLimitingPlugin(ctx)
+	diags.Append(rateLimitingPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRatelimitingPluginRequest{
+		PluginID:           pluginID,
+		RateLimitingPlugin: *rateLimitingPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRateLimitingResourceModel) ToOperationsGetRatelimitingPluginRequest(ctx context.Context) (*operations.GetRatelimitingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRatelimitingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRateLimitingResourceModel) ToOperationsDeleteRatelimitingPluginRequest(ctx context.Context) (*operations.DeleteRatelimitingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteRatelimitingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRateLimitingResourceModel) RefreshFromSharedRateLimitingPlugin(ctx context.Context, resp *shared.RateLimitingPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.RateLimitingPluginConfig{}
-			if resp.Config.Day != nil {
-				r.Config.Day = types.NumberValue(big.NewFloat(float64(*resp.Config.Day)))
-			} else {
-				r.Config.Day = types.NumberNull()
-			}
-			if resp.Config.ErrorCode != nil {
-				r.Config.ErrorCode = types.NumberValue(big.NewFloat(float64(*resp.Config.ErrorCode)))
-			} else {
-				r.Config.ErrorCode = types.NumberNull()
-			}
+			r.Config.Day = types.Float64PointerValue(resp.Config.Day)
+			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
 			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
 			r.Config.FaultTolerant = types.BoolPointerValue(resp.Config.FaultTolerant)
 			r.Config.HeaderName = types.StringPointerValue(resp.Config.HeaderName)
 			r.Config.HideClientHeaders = types.BoolPointerValue(resp.Config.HideClientHeaders)
-			if resp.Config.Hour != nil {
-				r.Config.Hour = types.NumberValue(big.NewFloat(float64(*resp.Config.Hour)))
-			} else {
-				r.Config.Hour = types.NumberNull()
-			}
+			r.Config.Hour = types.Float64PointerValue(resp.Config.Hour)
 			if resp.Config.LimitBy != nil {
 				r.Config.LimitBy = types.StringValue(string(*resp.Config.LimitBy))
 			} else {
 				r.Config.LimitBy = types.StringNull()
 			}
-			if resp.Config.Minute != nil {
-				r.Config.Minute = types.NumberValue(big.NewFloat(float64(*resp.Config.Minute)))
-			} else {
-				r.Config.Minute = types.NumberNull()
-			}
-			if resp.Config.Month != nil {
-				r.Config.Month = types.NumberValue(big.NewFloat(float64(*resp.Config.Month)))
-			} else {
-				r.Config.Month = types.NumberNull()
-			}
+			r.Config.Minute = types.Float64PointerValue(resp.Config.Minute)
+			r.Config.Month = types.Float64PointerValue(resp.Config.Month)
 			r.Config.Path = types.StringPointerValue(resp.Config.Path)
 			if resp.Config.Policy != nil {
 				r.Config.Policy = types.StringValue(string(*resp.Config.Policy))
@@ -407,21 +444,9 @@ func (r *PluginRateLimitingResourceModel) RefreshFromSharedRateLimitingPlugin(re
 				r.Config.Redis.Timeout = types.Int64PointerValue(resp.Config.Redis.Timeout)
 				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
 			}
-			if resp.Config.Second != nil {
-				r.Config.Second = types.NumberValue(big.NewFloat(float64(*resp.Config.Second)))
-			} else {
-				r.Config.Second = types.NumberNull()
-			}
-			if resp.Config.SyncRate != nil {
-				r.Config.SyncRate = types.NumberValue(big.NewFloat(float64(*resp.Config.SyncRate)))
-			} else {
-				r.Config.SyncRate = types.NumberNull()
-			}
-			if resp.Config.Year != nil {
-				r.Config.Year = types.NumberValue(big.NewFloat(float64(*resp.Config.Year)))
-			} else {
-				r.Config.Year = types.NumberNull()
-			}
+			r.Config.Second = types.Float64PointerValue(resp.Config.Second)
+			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
+			r.Config.Year = types.Float64PointerValue(resp.Config.Year)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -468,16 +493,16 @@ func (r *PluginRateLimitingResourceModel) RefreshFromSharedRateLimitingPlugin(re
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -503,4 +528,6 @@ func (r *PluginRateLimitingResourceModel) RefreshFromSharedRateLimitingPlugin(re
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

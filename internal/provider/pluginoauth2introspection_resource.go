@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
@@ -132,7 +131,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						Optional:    true,
 						Description: `The ` + "`" + `token_type_hint` + "`" + ` value to associate to introspection requests.`,
 					},
-					"ttl": schema.NumberAttribute{
+					"ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The TTL in seconds for the introspection response. Set to 0 to disable the expiration.`,
@@ -289,8 +288,13 @@ func (r *PluginOauth2IntrospectionResource) Create(ctx context.Context, req reso
 		return
 	}
 
-	request := *data.ToSharedOauth2IntrospectionPlugin()
-	res, err := r.client.Plugins.CreateOauth2introspectionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedOauth2IntrospectionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateOauth2introspectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -310,8 +314,17 @@ func (r *PluginOauth2IntrospectionResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2IntrospectionPlugin(res.Oauth2IntrospectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2IntrospectionPlugin(ctx, res.Oauth2IntrospectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -335,13 +348,13 @@ func (r *PluginOauth2IntrospectionResource) Read(ctx context.Context, req resour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetOauth2introspectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetOauth2introspectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetOauth2introspectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetOauth2introspectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -365,7 +378,11 @@ func (r *PluginOauth2IntrospectionResource) Read(ctx context.Context, req resour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2IntrospectionPlugin(res.Oauth2IntrospectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2IntrospectionPlugin(ctx, res.Oauth2IntrospectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -385,15 +402,13 @@ func (r *PluginOauth2IntrospectionResource) Update(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateOauth2introspectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	oauth2IntrospectionPlugin := *data.ToSharedOauth2IntrospectionPlugin()
-	request := operations.UpdateOauth2introspectionPluginRequest{
-		PluginID:                  pluginID,
-		Oauth2IntrospectionPlugin: oauth2IntrospectionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateOauth2introspectionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateOauth2introspectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -413,8 +428,17 @@ func (r *PluginOauth2IntrospectionResource) Update(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2IntrospectionPlugin(res.Oauth2IntrospectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2IntrospectionPlugin(ctx, res.Oauth2IntrospectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -438,13 +462,13 @@ func (r *PluginOauth2IntrospectionResource) Delete(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteOauth2introspectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteOauth2introspectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteOauth2introspectionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteOauth2introspectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

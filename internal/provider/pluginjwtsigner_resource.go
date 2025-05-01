@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
@@ -111,7 +110,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `If your introspection endpoint returns an access token in one of the keys (or claims) within the introspection results (` + "`" + `JSON` + "`" + `). If the key cannot be found, the plugin responds with ` + "`" + `401 Unauthorized` + "`" + `. Also if the key is found but cannot be decoded as JWT, it also responds with ` + "`" + `401 Unauthorized` + "`" + `.`,
 					},
-					"access_token_introspection_leeway": schema.NumberAttribute{
+					"access_token_introspection_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Adjusts clock skew between the token issuer introspection results and Kong. The value is added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time in seconds. You can disable access token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_introspection_expiry` + "`" + `.`,
@@ -128,7 +127,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `Specify the required values (or scopes) that are checked by an introspection claim/property specified by ` + "`" + `config.access_token_introspection_scopes_claim` + "`" + `.`,
 					},
-					"access_token_introspection_timeout": schema.NumberAttribute{
+					"access_token_introspection_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Timeout in milliseconds for an introspection request. The plugin tries to introspect twice if the first request fails for some reason. If both requests timeout, then the plugin runs two times the ` + "`" + `config.access_token_introspection_timeout` + "`" + ` on access token introspection.`,
@@ -158,7 +157,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The client username that will be used to authenticate Kong if ` + "`" + `access_token_jwks_uri` + "`" + ` is a uri that requires Basic Auth. Should be configured together with ` + "`" + `access_token_jwks_uri_client_password` + "`" + ``,
 					},
-					"access_token_jwks_uri_rotate_period": schema.NumberAttribute{
+					"access_token_jwks_uri_rotate_period": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Specify the period (in seconds) to auto-rotate the jwks for ` + "`" + `access_token_jwks_uri` + "`" + `. The default value 0 means no auto-rotation.`,
@@ -183,12 +182,12 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The client username that will be used to authenticate Kong if ` + "`" + `access_token_keyset` + "`" + ` is a uri that requires Basic Auth. Should be configured together with ` + "`" + `access_token_keyset_client_password` + "`" + ``,
 					},
-					"access_token_keyset_rotate_period": schema.NumberAttribute{
+					"access_token_keyset_rotate_period": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Specify the period (in seconds) to auto-rotate the jwks for ` + "`" + `access_token_keyset` + "`" + `. The default value 0 means no auto-rotation.`,
 					},
-					"access_token_leeway": schema.NumberAttribute{
+					"access_token_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Adjusts clock skew between the token issuer and Kong. The value is added to the token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers' current time in seconds. You can disable access token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_expiry` + "`" + `.`,
@@ -241,7 +240,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `Removes the ` + "`" + `config.access_token_request_header` + "`" + ` from the request after reading its value. With ` + "`" + `config.access_token_upstream_header` + "`" + `, you can specify the upstream header where the plugin adds the Kong signed token. If you don't specify a value, such as use ` + "`" + `null` + "`" + ` or ` + "`" + `""` + "`" + ` (empty string), the plugin does not even try to sign or re-sign the token.`,
 					},
-					"access_token_upstream_leeway": schema.NumberAttribute{
+					"access_token_upstream_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If you want to add or subtract (using a negative value) expiry time (in seconds) of the original access token, you can specify a value that is added to the original access token's ` + "`" + `exp` + "`" + ` claim.`,
@@ -333,7 +332,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `If your introspection endpoint returns a channel token in one of the keys (or claims) in the introspection results (` + "`" + `JSON` + "`" + `), the plugin can use that value instead of the introspection results when doing expiry verification and signing of the new token issued by Kong.`,
 					},
-					"channel_token_introspection_leeway": schema.NumberAttribute{
+					"channel_token_introspection_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `You can use this parameter to adjust clock skew between the token issuer introspection results and Kong. The value will be added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time (in seconds). You can disable channel token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_introspection_expiry` + "`" + `.`,
@@ -350,7 +349,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `Use this parameter to specify the required values (or scopes) that are checked by an introspection claim/property specified by ` + "`" + `config.channel_token_introspection_scopes_claim` + "`" + `.`,
 					},
-					"channel_token_introspection_timeout": schema.NumberAttribute{
+					"channel_token_introspection_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Timeout in milliseconds for an introspection request. The plugin tries to introspect twice if the first request fails for some reason. If both requests timeout, then the plugin runs two times the ` + "`" + `config.access_token_introspection_timeout` + "`" + ` on channel token introspection.`,
@@ -380,7 +379,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The client username that will be used to authenticate Kong if ` + "`" + `channel_token_jwks_uri` + "`" + ` is a uri that requires Basic Auth. Should be configured together with ` + "`" + `channel_token_jwks_uri_client_password` + "`" + ``,
 					},
-					"channel_token_jwks_uri_rotate_period": schema.NumberAttribute{
+					"channel_token_jwks_uri_rotate_period": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Specify the period (in seconds) to auto-rotate the jwks for ` + "`" + `channel_token_jwks_uri` + "`" + `. The default value 0 means no auto-rotation.`,
@@ -405,12 +404,12 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The client username that will be used to authenticate Kong if ` + "`" + `channel_token_keyset` + "`" + ` is a uri that requires Basic Auth. Should be configured together with ` + "`" + `channel_token_keyset_client_password` + "`" + ``,
 					},
-					"channel_token_keyset_rotate_period": schema.NumberAttribute{
+					"channel_token_keyset_rotate_period": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Specify the period (in seconds) to auto-rotate the jwks for ` + "`" + `channel_token_keyset` + "`" + `. The default value 0 means no auto-rotation.`,
 					},
-					"channel_token_leeway": schema.NumberAttribute{
+					"channel_token_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Adjusts clock skew between the token issuer and Kong. The value will be added to token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers current time in seconds. You can disable channel token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_expiry` + "`" + `.`,
@@ -463,7 +462,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `This plugin removes the ` + "`" + `config.channel_token_request_header` + "`" + ` from the request after reading its value.`,
 					},
-					"channel_token_upstream_leeway": schema.NumberAttribute{
+					"channel_token_upstream_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If you want to add or perhaps subtract (using negative value) expiry time of the original channel token, you can specify a value that is added to the original channel token's ` + "`" + `exp` + "`" + ` claim.`,
@@ -753,8 +752,13 @@ func (r *PluginJwtSignerResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	request := *data.ToSharedJwtSignerPlugin()
-	res, err := r.client.Plugins.CreateJwtsignerPlugin(ctx, request)
+	request, requestDiags := data.ToSharedJwtSignerPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateJwtsignerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -774,8 +778,17 @@ func (r *PluginJwtSignerResource) Create(ctx context.Context, req resource.Creat
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtSignerPlugin(res.JwtSignerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtSignerPlugin(ctx, res.JwtSignerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -799,13 +812,13 @@ func (r *PluginJwtSignerResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetJwtsignerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetJwtsignerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetJwtsignerPlugin(ctx, request)
+	res, err := r.client.Plugins.GetJwtsignerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -829,7 +842,11 @@ func (r *PluginJwtSignerResource) Read(ctx context.Context, req resource.ReadReq
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtSignerPlugin(res.JwtSignerPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtSignerPlugin(ctx, res.JwtSignerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -849,15 +866,13 @@ func (r *PluginJwtSignerResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateJwtsignerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	jwtSignerPlugin := *data.ToSharedJwtSignerPlugin()
-	request := operations.UpdateJwtsignerPluginRequest{
-		PluginID:        pluginID,
-		JwtSignerPlugin: jwtSignerPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateJwtsignerPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateJwtsignerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -877,8 +892,17 @@ func (r *PluginJwtSignerResource) Update(ctx context.Context, req resource.Updat
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtSignerPlugin(res.JwtSignerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtSignerPlugin(ctx, res.JwtSignerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -902,13 +926,13 @@ func (r *PluginJwtSignerResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteJwtsignerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteJwtsignerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteJwtsignerPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteJwtsignerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shared.StatsdAdvancedPlugin {
+func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx context.Context) (*shared.StatsdAdvancedPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 	if r.Ordering != nil {
 		var after *shared.StatsdAdvancedPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 		}
 		var before *shared.StatsdAdvancedPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			Before: before,
 		}
 	}
-	var partials []shared.StatsdAdvancedPluginPartials = []shared.StatsdAdvancedPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.StatsdAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.StatsdAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.StatsdAdvancedPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.StatsdAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -99,7 +106,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 	}
 	var config *shared.StatsdAdvancedPluginConfig
 	if r.Config != nil {
-		var allowStatusCodes []string = []string{}
+		allowStatusCodes := make([]string, 0, len(r.Config.AllowStatusCodes))
 		for _, allowStatusCodesItem := range r.Config.AllowStatusCodes {
 			allowStatusCodes = append(allowStatusCodes, allowStatusCodesItem.ValueString())
 		}
@@ -121,7 +128,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 		} else {
 			hostnameInPrefix = nil
 		}
-		var metrics []shared.StatsdAdvancedPluginMetrics = []shared.StatsdAdvancedPluginMetrics{}
+		metrics := make([]shared.StatsdAdvancedPluginMetrics, 0, len(r.Config.Metrics))
 		for _, metricsItem := range r.Config.Metrics {
 			consumerIdentifier := new(shared.StatsdAdvancedPluginConsumerIdentifier)
 			if !metricsItem.ConsumerIdentifier.IsUnknown() && !metricsItem.ConsumerIdentifier.IsNull() {
@@ -132,7 +139,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			name1 := shared.StatsdAdvancedPluginName(metricsItem.Name.ValueString())
 			sampleRate := new(float64)
 			if !metricsItem.SampleRate.IsUnknown() && !metricsItem.SampleRate.IsNull() {
-				*sampleRate, _ = metricsItem.SampleRate.ValueBigFloat().Float64()
+				*sampleRate = metricsItem.SampleRate.ValueFloat64()
 			} else {
 				sampleRate = nil
 			}
@@ -180,7 +187,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			}
 			initialRetryDelay := new(float64)
 			if !r.Config.Queue.InitialRetryDelay.IsUnknown() && !r.Config.Queue.InitialRetryDelay.IsNull() {
-				*initialRetryDelay, _ = r.Config.Queue.InitialRetryDelay.ValueBigFloat().Float64()
+				*initialRetryDelay = r.Config.Queue.InitialRetryDelay.ValueFloat64()
 			} else {
 				initialRetryDelay = nil
 			}
@@ -198,7 +205,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			}
 			maxCoalescingDelay := new(float64)
 			if !r.Config.Queue.MaxCoalescingDelay.IsUnknown() && !r.Config.Queue.MaxCoalescingDelay.IsNull() {
-				*maxCoalescingDelay, _ = r.Config.Queue.MaxCoalescingDelay.ValueBigFloat().Float64()
+				*maxCoalescingDelay = r.Config.Queue.MaxCoalescingDelay.ValueFloat64()
 			} else {
 				maxCoalescingDelay = nil
 			}
@@ -210,13 +217,13 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			}
 			maxRetryDelay := new(float64)
 			if !r.Config.Queue.MaxRetryDelay.IsUnknown() && !r.Config.Queue.MaxRetryDelay.IsNull() {
-				*maxRetryDelay, _ = r.Config.Queue.MaxRetryDelay.ValueBigFloat().Float64()
+				*maxRetryDelay = r.Config.Queue.MaxRetryDelay.ValueFloat64()
 			} else {
 				maxRetryDelay = nil
 			}
 			maxRetryTime := new(float64)
 			if !r.Config.Queue.MaxRetryTime.IsUnknown() && !r.Config.Queue.MaxRetryTime.IsNull() {
-				*maxRetryTime, _ = r.Config.Queue.MaxRetryTime.ValueBigFloat().Float64()
+				*maxRetryTime = r.Config.Queue.MaxRetryTime.ValueFloat64()
 			} else {
 				maxRetryTime = nil
 			}
@@ -239,7 +246,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 		}
 		udpPacketSize := new(float64)
 		if !r.Config.UDPPacketSize.IsUnknown() && !r.Config.UDPPacketSize.IsNull() {
-			*udpPacketSize, _ = r.Config.UDPPacketSize.ValueBigFloat().Float64()
+			*udpPacketSize = r.Config.UDPPacketSize.ValueFloat64()
 		} else {
 			udpPacketSize = nil
 		}
@@ -282,7 +289,7 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 			ID: id2,
 		}
 	}
-	var protocols []shared.StatsdAdvancedPluginProtocols = []shared.StatsdAdvancedPluginProtocols{}
+	protocols := make([]shared.StatsdAdvancedPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.StatsdAdvancedPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -325,10 +332,60 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin() *shar
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugin(resp *shared.StatsdAdvancedPlugin) {
+func (r *PluginStatsdAdvancedResourceModel) ToOperationsUpdateStatsdadvancedPluginRequest(ctx context.Context) (*operations.UpdateStatsdadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	statsdAdvancedPlugin, statsdAdvancedPluginDiags := r.ToSharedStatsdAdvancedPlugin(ctx)
+	diags.Append(statsdAdvancedPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateStatsdadvancedPluginRequest{
+		PluginID:             pluginID,
+		StatsdAdvancedPlugin: *statsdAdvancedPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdAdvancedResourceModel) ToOperationsGetStatsdadvancedPluginRequest(ctx context.Context) (*operations.GetStatsdadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetStatsdadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdAdvancedResourceModel) ToOperationsDeleteStatsdadvancedPluginRequest(ctx context.Context) (*operations.DeleteStatsdadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteStatsdadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugin(ctx context.Context, resp *shared.StatsdAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -350,38 +407,34 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 				r.Config.Metrics = r.Config.Metrics[:len(resp.Config.Metrics)]
 			}
 			for metricsCount, metricsItem := range resp.Config.Metrics {
-				var metrics1 tfTypes.StatsdPluginMetrics
+				var metrics tfTypes.StatsdPluginMetrics
 				if metricsItem.ConsumerIdentifier != nil {
-					metrics1.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
+					metrics.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
 				} else {
-					metrics1.ConsumerIdentifier = types.StringNull()
+					metrics.ConsumerIdentifier = types.StringNull()
 				}
-				metrics1.Name = types.StringValue(string(metricsItem.Name))
-				if metricsItem.SampleRate != nil {
-					metrics1.SampleRate = types.NumberValue(big.NewFloat(float64(*metricsItem.SampleRate)))
-				} else {
-					metrics1.SampleRate = types.NumberNull()
-				}
+				metrics.Name = types.StringValue(string(metricsItem.Name))
+				metrics.SampleRate = types.Float64PointerValue(metricsItem.SampleRate)
 				if metricsItem.ServiceIdentifier != nil {
-					metrics1.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
+					metrics.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
 				} else {
-					metrics1.ServiceIdentifier = types.StringNull()
+					metrics.ServiceIdentifier = types.StringNull()
 				}
-				metrics1.StatType = types.StringValue(string(metricsItem.StatType))
+				metrics.StatType = types.StringValue(string(metricsItem.StatType))
 				if metricsItem.WorkspaceIdentifier != nil {
-					metrics1.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
+					metrics.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
 				} else {
-					metrics1.WorkspaceIdentifier = types.StringNull()
+					metrics.WorkspaceIdentifier = types.StringNull()
 				}
 				if metricsCount+1 > len(r.Config.Metrics) {
-					r.Config.Metrics = append(r.Config.Metrics, metrics1)
+					r.Config.Metrics = append(r.Config.Metrics, metrics)
 				} else {
-					r.Config.Metrics[metricsCount].ConsumerIdentifier = metrics1.ConsumerIdentifier
-					r.Config.Metrics[metricsCount].Name = metrics1.Name
-					r.Config.Metrics[metricsCount].SampleRate = metrics1.SampleRate
-					r.Config.Metrics[metricsCount].ServiceIdentifier = metrics1.ServiceIdentifier
-					r.Config.Metrics[metricsCount].StatType = metrics1.StatType
-					r.Config.Metrics[metricsCount].WorkspaceIdentifier = metrics1.WorkspaceIdentifier
+					r.Config.Metrics[metricsCount].ConsumerIdentifier = metrics.ConsumerIdentifier
+					r.Config.Metrics[metricsCount].Name = metrics.Name
+					r.Config.Metrics[metricsCount].SampleRate = metrics.SampleRate
+					r.Config.Metrics[metricsCount].ServiceIdentifier = metrics.ServiceIdentifier
+					r.Config.Metrics[metricsCount].StatType = metrics.StatType
+					r.Config.Metrics[metricsCount].WorkspaceIdentifier = metrics.WorkspaceIdentifier
 				}
 			}
 			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
@@ -395,40 +448,20 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 				} else {
 					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
 				}
-				if resp.Config.Queue.InitialRetryDelay != nil {
-					r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
-				} else {
-					r.Config.Queue.InitialRetryDelay = types.NumberNull()
-				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
 				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
 				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				if resp.Config.Queue.MaxCoalescingDelay != nil {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
-				} else {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
-				}
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
 				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				if resp.Config.Queue.MaxRetryDelay != nil {
-					r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
-				} else {
-					r.Config.Queue.MaxRetryDelay = types.NumberNull()
-				}
-				if resp.Config.Queue.MaxRetryTime != nil {
-					r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
-				} else {
-					r.Config.Queue.MaxRetryTime = types.NumberNull()
-				}
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
 			}
 			if resp.Config.ServiceIdentifierDefault != nil {
 				r.Config.ServiceIdentifierDefault = types.StringValue(string(*resp.Config.ServiceIdentifierDefault))
 			} else {
 				r.Config.ServiceIdentifierDefault = types.StringNull()
 			}
-			if resp.Config.UDPPacketSize != nil {
-				r.Config.UDPPacketSize = types.NumberValue(big.NewFloat(float64(*resp.Config.UDPPacketSize)))
-			} else {
-				r.Config.UDPPacketSize = types.NumberNull()
-			}
+			r.Config.UDPPacketSize = types.Float64PointerValue(resp.Config.UDPPacketSize)
 			r.Config.UseTCP = types.BoolPointerValue(resp.Config.UseTCP)
 			if resp.Config.WorkspaceIdentifierDefault != nil {
 				r.Config.WorkspaceIdentifierDefault = types.StringValue(string(*resp.Config.WorkspaceIdentifierDefault))
@@ -475,16 +508,16 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -510,4 +543,6 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

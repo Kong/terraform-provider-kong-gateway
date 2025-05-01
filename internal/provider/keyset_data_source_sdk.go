@@ -3,11 +3,29 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeySetDataSourceModel) RefreshFromSharedKeySet(resp *shared.KeySet) {
+func (r *KeySetDataSourceModel) ToOperationsGetKeySetRequest(ctx context.Context) (*operations.GetKeySetRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keySetIDOrName string
+	keySetIDOrName = r.ID.ValueString()
+
+	out := operations.GetKeySetRequest{
+		KeySetIDOrName: keySetIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *KeySetDataSourceModel) RefreshFromSharedKeySet(ctx context.Context, resp *shared.KeySet) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -18,4 +36,6 @@ func (r *KeySetDataSourceModel) RefreshFromSharedKeySet(resp *shared.KeySet) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

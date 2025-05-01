@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *shared.RequestValidatorPlugin {
+func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin(ctx context.Context) (*shared.RequestValidatorPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 	if r.Ordering != nil {
 		var after *shared.RequestValidatorPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 		}
 		var before *shared.RequestValidatorPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 			Before: before,
 		}
 	}
-	var partials []shared.RequestValidatorPluginPartials = []shared.RequestValidatorPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.RequestValidatorPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RequestValidatorPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RequestValidatorPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RequestValidatorPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -98,7 +106,7 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 	}
 	var config *shared.RequestValidatorPluginConfig
 	if r.Config != nil {
-		var allowedContentTypes []string = []string{}
+		allowedContentTypes := make([]string, 0, len(r.Config.AllowedContentTypes))
 		for _, allowedContentTypesItem := range r.Config.AllowedContentTypes {
 			allowedContentTypes = append(allowedContentTypes, allowedContentTypesItem.ValueString())
 		}
@@ -114,7 +122,7 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 		} else {
 			contentTypeParameterValidation = nil
 		}
-		var parameterSchema []shared.ParameterSchema = []shared.ParameterSchema{}
+		parameterSchema := make([]shared.ParameterSchema, 0, len(r.Config.ParameterSchema))
 		for _, parameterSchemaItem := range r.Config.ParameterSchema {
 			explode := new(bool)
 			if !parameterSchemaItem.Explode.IsUnknown() && !parameterSchemaItem.Explode.IsNull() {
@@ -183,7 +191,7 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 			ID: id2,
 		}
 	}
-	var protocols []shared.RequestValidatorPluginProtocols = []shared.RequestValidatorPluginProtocols{}
+	protocols := make([]shared.RequestValidatorPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.RequestValidatorPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -226,10 +234,60 @@ func (r *PluginRequestValidatorResourceModel) ToSharedRequestValidatorPlugin() *
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginRequestValidatorResourceModel) RefreshFromSharedRequestValidatorPlugin(resp *shared.RequestValidatorPlugin) {
+func (r *PluginRequestValidatorResourceModel) ToOperationsUpdateRequestvalidatorPluginRequest(ctx context.Context) (*operations.UpdateRequestvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	requestValidatorPlugin, requestValidatorPluginDiags := r.ToSharedRequestValidatorPlugin(ctx)
+	diags.Append(requestValidatorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRequestvalidatorPluginRequest{
+		PluginID:               pluginID,
+		RequestValidatorPlugin: *requestValidatorPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRequestValidatorResourceModel) ToOperationsGetRequestvalidatorPluginRequest(ctx context.Context) (*operations.GetRequestvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRequestvalidatorPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRequestValidatorResourceModel) ToOperationsDeleteRequestvalidatorPluginRequest(ctx context.Context) (*operations.DeleteRequestvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteRequestvalidatorPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRequestValidatorResourceModel) RefreshFromSharedRequestValidatorPlugin(ctx context.Context, resp *shared.RequestValidatorPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -246,26 +304,26 @@ func (r *PluginRequestValidatorResourceModel) RefreshFromSharedRequestValidatorP
 				r.Config.ParameterSchema = r.Config.ParameterSchema[:len(resp.Config.ParameterSchema)]
 			}
 			for parameterSchemaCount, parameterSchemaItem := range resp.Config.ParameterSchema {
-				var parameterSchema1 tfTypes.ParameterSchema
-				parameterSchema1.Explode = types.BoolPointerValue(parameterSchemaItem.Explode)
-				parameterSchema1.In = types.StringValue(string(parameterSchemaItem.In))
-				parameterSchema1.Name = types.StringValue(parameterSchemaItem.Name)
-				parameterSchema1.Required = types.BoolValue(parameterSchemaItem.Required)
-				parameterSchema1.Schema = types.StringPointerValue(parameterSchemaItem.Schema)
+				var parameterSchema tfTypes.ParameterSchema
+				parameterSchema.Explode = types.BoolPointerValue(parameterSchemaItem.Explode)
+				parameterSchema.In = types.StringValue(string(parameterSchemaItem.In))
+				parameterSchema.Name = types.StringValue(parameterSchemaItem.Name)
+				parameterSchema.Required = types.BoolValue(parameterSchemaItem.Required)
+				parameterSchema.Schema = types.StringPointerValue(parameterSchemaItem.Schema)
 				if parameterSchemaItem.Style != nil {
-					parameterSchema1.Style = types.StringValue(string(*parameterSchemaItem.Style))
+					parameterSchema.Style = types.StringValue(string(*parameterSchemaItem.Style))
 				} else {
-					parameterSchema1.Style = types.StringNull()
+					parameterSchema.Style = types.StringNull()
 				}
 				if parameterSchemaCount+1 > len(r.Config.ParameterSchema) {
-					r.Config.ParameterSchema = append(r.Config.ParameterSchema, parameterSchema1)
+					r.Config.ParameterSchema = append(r.Config.ParameterSchema, parameterSchema)
 				} else {
-					r.Config.ParameterSchema[parameterSchemaCount].Explode = parameterSchema1.Explode
-					r.Config.ParameterSchema[parameterSchemaCount].In = parameterSchema1.In
-					r.Config.ParameterSchema[parameterSchemaCount].Name = parameterSchema1.Name
-					r.Config.ParameterSchema[parameterSchemaCount].Required = parameterSchema1.Required
-					r.Config.ParameterSchema[parameterSchemaCount].Schema = parameterSchema1.Schema
-					r.Config.ParameterSchema[parameterSchemaCount].Style = parameterSchema1.Style
+					r.Config.ParameterSchema[parameterSchemaCount].Explode = parameterSchema.Explode
+					r.Config.ParameterSchema[parameterSchemaCount].In = parameterSchema.In
+					r.Config.ParameterSchema[parameterSchemaCount].Name = parameterSchema.Name
+					r.Config.ParameterSchema[parameterSchemaCount].Required = parameterSchema.Required
+					r.Config.ParameterSchema[parameterSchemaCount].Schema = parameterSchema.Schema
+					r.Config.ParameterSchema[parameterSchemaCount].Style = parameterSchema.Style
 				}
 			}
 			r.Config.VerboseResponse = types.BoolPointerValue(resp.Config.VerboseResponse)
@@ -314,16 +372,16 @@ func (r *PluginRequestValidatorResourceModel) RefreshFromSharedRequestValidatorP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -349,4 +407,6 @@ func (r *PluginRequestValidatorResourceModel) RefreshFromSharedRequestValidatorP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

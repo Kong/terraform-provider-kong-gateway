@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin {
+func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*shared.ZipkinPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 	if r.Ordering != nil {
 		var after *shared.ZipkinPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 		}
 		var before *shared.ZipkinPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 			Before: before,
 		}
 	}
-	var partials []shared.ZipkinPluginPartials = []shared.ZipkinPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.ZipkinPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ZipkinPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ZipkinPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.ZipkinPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -161,16 +168,16 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 		}
 		var propagation *shared.ZipkinPluginPropagation
 		if r.Config.Propagation != nil {
-			var clear []string = []string{}
+			clear := make([]string, 0, len(r.Config.Propagation.Clear))
 			for _, clearItem := range r.Config.Propagation.Clear {
 				clear = append(clear, clearItem.ValueString())
 			}
 			defaultFormat := shared.ZipkinPluginDefaultFormat(r.Config.Propagation.DefaultFormat.ValueString())
-			var extract []shared.ZipkinPluginExtract = []shared.ZipkinPluginExtract{}
+			extract := make([]shared.ZipkinPluginExtract, 0, len(r.Config.Propagation.Extract))
 			for _, extractItem := range r.Config.Propagation.Extract {
 				extract = append(extract, shared.ZipkinPluginExtract(extractItem.ValueString()))
 			}
-			var inject []shared.ZipkinPluginInject = []shared.ZipkinPluginInject{}
+			inject := make([]shared.ZipkinPluginInject, 0, len(r.Config.Propagation.Inject))
 			for _, injectItem := range r.Config.Propagation.Inject {
 				inject = append(inject, shared.ZipkinPluginInject(injectItem.ValueString()))
 			}
@@ -191,7 +198,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 			}
 			initialRetryDelay := new(float64)
 			if !r.Config.Queue.InitialRetryDelay.IsUnknown() && !r.Config.Queue.InitialRetryDelay.IsNull() {
-				*initialRetryDelay, _ = r.Config.Queue.InitialRetryDelay.ValueBigFloat().Float64()
+				*initialRetryDelay = r.Config.Queue.InitialRetryDelay.ValueFloat64()
 			} else {
 				initialRetryDelay = nil
 			}
@@ -209,7 +216,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 			}
 			maxCoalescingDelay := new(float64)
 			if !r.Config.Queue.MaxCoalescingDelay.IsUnknown() && !r.Config.Queue.MaxCoalescingDelay.IsNull() {
-				*maxCoalescingDelay, _ = r.Config.Queue.MaxCoalescingDelay.ValueBigFloat().Float64()
+				*maxCoalescingDelay = r.Config.Queue.MaxCoalescingDelay.ValueFloat64()
 			} else {
 				maxCoalescingDelay = nil
 			}
@@ -221,13 +228,13 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 			}
 			maxRetryDelay := new(float64)
 			if !r.Config.Queue.MaxRetryDelay.IsUnknown() && !r.Config.Queue.MaxRetryDelay.IsNull() {
-				*maxRetryDelay, _ = r.Config.Queue.MaxRetryDelay.ValueBigFloat().Float64()
+				*maxRetryDelay = r.Config.Queue.MaxRetryDelay.ValueFloat64()
 			} else {
 				maxRetryDelay = nil
 			}
 			maxRetryTime := new(float64)
 			if !r.Config.Queue.MaxRetryTime.IsUnknown() && !r.Config.Queue.MaxRetryTime.IsNull() {
-				*maxRetryTime, _ = r.Config.Queue.MaxRetryTime.ValueBigFloat().Float64()
+				*maxRetryTime = r.Config.Queue.MaxRetryTime.ValueFloat64()
 			} else {
 				maxRetryTime = nil
 			}
@@ -250,7 +257,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 		}
 		sampleRatio := new(float64)
 		if !r.Config.SampleRatio.IsUnknown() && !r.Config.SampleRatio.IsNull() {
-			*sampleRatio, _ = r.Config.SampleRatio.ValueBigFloat().Float64()
+			*sampleRatio = r.Config.SampleRatio.ValueFloat64()
 		} else {
 			sampleRatio = nil
 		}
@@ -260,7 +267,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 		} else {
 			sendTimeout = nil
 		}
-		var staticTags []shared.StaticTags = []shared.StaticTags{}
+		staticTags := make([]shared.StaticTags, 0, len(r.Config.StaticTags))
 		for _, staticTagsItem := range r.Config.StaticTags {
 			var name1 string
 			name1 = staticTagsItem.Name.ValueString()
@@ -318,7 +325,7 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 			ID: id2,
 		}
 	}
-	var protocols []shared.ZipkinPluginProtocols = []shared.ZipkinPluginProtocols{}
+	protocols := make([]shared.ZipkinPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.ZipkinPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -361,10 +368,60 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin() *shared.ZipkinPlugin 
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(resp *shared.ZipkinPlugin) {
+func (r *PluginZipkinResourceModel) ToOperationsUpdateZipkinPluginRequest(ctx context.Context) (*operations.UpdateZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	zipkinPlugin, zipkinPluginDiags := r.ToSharedZipkinPlugin(ctx)
+	diags.Append(zipkinPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateZipkinPluginRequest{
+		PluginID:     pluginID,
+		ZipkinPlugin: *zipkinPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsGetZipkinPluginRequest(ctx context.Context) (*operations.GetZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetZipkinPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsDeleteZipkinPluginRequest(ctx context.Context) (*operations.DeleteZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteZipkinPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Context, resp *shared.ZipkinPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -423,50 +480,30 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(resp *shared.Z
 				} else {
 					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
 				}
-				if resp.Config.Queue.InitialRetryDelay != nil {
-					r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
-				} else {
-					r.Config.Queue.InitialRetryDelay = types.NumberNull()
-				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
 				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
 				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				if resp.Config.Queue.MaxCoalescingDelay != nil {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
-				} else {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
-				}
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
 				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				if resp.Config.Queue.MaxRetryDelay != nil {
-					r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
-				} else {
-					r.Config.Queue.MaxRetryDelay = types.NumberNull()
-				}
-				if resp.Config.Queue.MaxRetryTime != nil {
-					r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
-				} else {
-					r.Config.Queue.MaxRetryTime = types.NumberNull()
-				}
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
 			}
 			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
-			if resp.Config.SampleRatio != nil {
-				r.Config.SampleRatio = types.NumberValue(big.NewFloat(float64(*resp.Config.SampleRatio)))
-			} else {
-				r.Config.SampleRatio = types.NumberNull()
-			}
+			r.Config.SampleRatio = types.Float64PointerValue(resp.Config.SampleRatio)
 			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
 			r.Config.StaticTags = []tfTypes.StaticTags{}
 			if len(r.Config.StaticTags) > len(resp.Config.StaticTags) {
 				r.Config.StaticTags = r.Config.StaticTags[:len(resp.Config.StaticTags)]
 			}
 			for staticTagsCount, staticTagsItem := range resp.Config.StaticTags {
-				var staticTags1 tfTypes.StaticTags
-				staticTags1.Name = types.StringValue(staticTagsItem.Name)
-				staticTags1.Value = types.StringValue(staticTagsItem.Value)
+				var staticTags tfTypes.StaticTags
+				staticTags.Name = types.StringValue(staticTagsItem.Name)
+				staticTags.Value = types.StringValue(staticTagsItem.Value)
 				if staticTagsCount+1 > len(r.Config.StaticTags) {
-					r.Config.StaticTags = append(r.Config.StaticTags, staticTags1)
+					r.Config.StaticTags = append(r.Config.StaticTags, staticTags)
 				} else {
-					r.Config.StaticTags[staticTagsCount].Name = staticTags1.Name
-					r.Config.StaticTags[staticTagsCount].Value = staticTags1.Value
+					r.Config.StaticTags[staticTagsCount].Name = staticTags.Name
+					r.Config.StaticTags[staticTagsCount].Value = staticTags.Value
 				}
 			}
 			r.Config.TagsHeader = types.StringPointerValue(resp.Config.TagsHeader)
@@ -515,16 +552,16 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(resp *shared.Z
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -550,4 +587,6 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(resp *shared.Z
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

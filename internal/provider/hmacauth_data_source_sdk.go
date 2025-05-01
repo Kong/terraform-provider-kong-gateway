@@ -3,12 +3,34 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *HMACAuthDataSourceModel) RefreshFromSharedHMACAuth(resp *shared.HMACAuth) {
+func (r *HMACAuthDataSourceModel) ToOperationsGetHmacAuthWithConsumerRequest(ctx context.Context) (*operations.GetHmacAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var hmacAuthID string
+	hmacAuthID = r.ID.ValueString()
+
+	out := operations.GetHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		HMACAuthID: hmacAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *HMACAuthDataSourceModel) RefreshFromSharedHMACAuth(ctx context.Context, resp *shared.HMACAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -25,4 +47,6 @@ func (r *HMACAuthDataSourceModel) RefreshFromSharedHMACAuth(resp *shared.HMACAut
 		}
 		r.Username = types.StringValue(resp.Username)
 	}
+
+	return diags
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -92,7 +91,7 @@ func (r *PluginUpstreamOauthDataSource) Schema(ctx context.Context, req datasour
 					"cache": schema.SingleNestedAttribute{
 						Computed: true,
 						Attributes: map[string]schema.Attribute{
-							"default_ttl": schema.NumberAttribute{
+							"default_ttl": schema.Float64Attribute{
 								Computed:    true,
 								Description: `The lifetime of a token without an explicit ` + "`" + `expires_in` + "`" + ` value.`,
 							},
@@ -247,7 +246,7 @@ func (r *PluginUpstreamOauthDataSource) Schema(ctx context.Context, req datasour
 								Computed:    true,
 								Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `http_proxy` + "`" + `.`,
 							},
-							"http_version": schema.NumberAttribute{
+							"http_version": schema.Float64Attribute{
 								Computed:    true,
 								Description: `The HTTP version used for requests made by this plugin. Supported values: ` + "`" + `1.1` + "`" + ` for HTTP 1.1 and ` + "`" + `1.0` + "`" + ` for HTTP 1.0.`,
 							},
@@ -473,13 +472,13 @@ func (r *PluginUpstreamOauthDataSource) Read(ctx context.Context, req datasource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetUpstreamoauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetUpstreamoauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetUpstreamoauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetUpstreamoauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -491,10 +490,6 @@ func (r *PluginUpstreamOauthDataSource) Read(ctx context.Context, req datasource
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -503,7 +498,11 @@ func (r *PluginUpstreamOauthDataSource) Read(ctx context.Context, req datasource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamOauthPlugin(res.UpstreamOauthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamOauthPlugin(ctx, res.UpstreamOauthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

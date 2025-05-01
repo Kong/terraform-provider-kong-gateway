@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *VaultResourceModel) ToSharedVault() *shared.Vault {
+func (r *VaultResourceModel) ToSharedVault(ctx context.Context) (*shared.Vault, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var config interface{}
 	_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
 	createdAt := new(int64)
@@ -35,7 +40,7 @@ func (r *VaultResourceModel) ToSharedVault() *shared.Vault {
 	var prefix string
 	prefix = r.Prefix.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -55,10 +60,60 @@ func (r *VaultResourceModel) ToSharedVault() *shared.Vault {
 		Tags:        tags,
 		UpdatedAt:   updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *VaultResourceModel) RefreshFromSharedVault(resp *shared.Vault) {
+func (r *VaultResourceModel) ToOperationsUpsertVaultRequest(ctx context.Context) (*operations.UpsertVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	vault, vaultDiags := r.ToSharedVault(ctx)
+	diags.Append(vaultDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+		Vault:           *vault,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) ToOperationsGetVaultRequest(ctx context.Context) (*operations.GetVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	out := operations.GetVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) ToOperationsDeleteVaultRequest(ctx context.Context) (*operations.DeleteVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	out := operations.DeleteVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) RefreshFromSharedVault(ctx context.Context, resp *shared.Vault) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		configResult, _ := json.Marshal(resp.Config)
 		r.Config = types.StringValue(string(configResult))
@@ -73,4 +128,6 @@ func (r *VaultResourceModel) RefreshFromSharedVault(resp *shared.Vault) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

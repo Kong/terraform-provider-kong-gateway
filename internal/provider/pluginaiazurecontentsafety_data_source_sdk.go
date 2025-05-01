@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginAiAzureContentSafetyDataSourceModel) RefreshFromSharedAiAzureContentSafetyPlugin(resp *shared.AiAzureContentSafetyPlugin) {
+func (r *PluginAiAzureContentSafetyDataSourceModel) ToOperationsGetAiazurecontentsafetyPluginRequest(ctx context.Context) (*operations.GetAiazurecontentsafetyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiazurecontentsafetyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiAzureContentSafetyDataSourceModel) RefreshFromSharedAiAzureContentSafetyPlugin(ctx context.Context, resp *shared.AiAzureContentSafetyPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -28,14 +46,14 @@ func (r *PluginAiAzureContentSafetyDataSourceModel) RefreshFromSharedAiAzureCont
 				r.Config.Categories = r.Config.Categories[:len(resp.Config.Categories)]
 			}
 			for categoriesCount, categoriesItem := range resp.Config.Categories {
-				var categories1 tfTypes.Categories
-				categories1.Name = types.StringValue(categoriesItem.Name)
-				categories1.RejectionLevel = types.Int64Value(categoriesItem.RejectionLevel)
+				var categories tfTypes.Categories
+				categories.Name = types.StringValue(categoriesItem.Name)
+				categories.RejectionLevel = types.Int64Value(categoriesItem.RejectionLevel)
 				if categoriesCount+1 > len(r.Config.Categories) {
-					r.Config.Categories = append(r.Config.Categories, categories1)
+					r.Config.Categories = append(r.Config.Categories, categories)
 				} else {
-					r.Config.Categories[categoriesCount].Name = categories1.Name
-					r.Config.Categories[categoriesCount].RejectionLevel = categories1.RejectionLevel
+					r.Config.Categories[categoriesCount].Name = categories.Name
+					r.Config.Categories[categoriesCount].RejectionLevel = categories.RejectionLevel
 				}
 			}
 			r.Config.ContentSafetyKey = types.StringPointerValue(resp.Config.ContentSafetyKey)
@@ -86,16 +104,16 @@ func (r *PluginAiAzureContentSafetyDataSourceModel) RefreshFromSharedAiAzureCont
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -121,4 +139,6 @@ func (r *PluginAiAzureContentSafetyDataSourceModel) RefreshFromSharedAiAzureCont
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

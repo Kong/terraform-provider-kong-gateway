@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAuthPlugin {
+func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Context) (*shared.BasicAuthPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAu
 	if r.Ordering != nil {
 		var after *shared.BasicAuthPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAu
 		}
 		var before *shared.BasicAuthPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAu
 			Before: before,
 		}
 	}
-	var partials []shared.BasicAuthPluginPartials = []shared.BasicAuthPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.BasicAuthPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.BasicAuthPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.BasicAuthPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.BasicAuthPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -122,7 +130,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAu
 			Realm:           realm,
 		}
 	}
-	var protocols []shared.BasicAuthPluginProtocols = []shared.BasicAuthPluginProtocols{}
+	protocols := make([]shared.BasicAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.BasicAuthPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -164,10 +172,60 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin() *shared.BasicAu
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(resp *shared.BasicAuthPlugin) {
+func (r *PluginBasicAuthResourceModel) ToOperationsUpdateBasicauthPluginRequest(ctx context.Context) (*operations.UpdateBasicauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	basicAuthPlugin, basicAuthPluginDiags := r.ToSharedBasicAuthPlugin(ctx)
+	diags.Append(basicAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateBasicauthPluginRequest{
+		PluginID:        pluginID,
+		BasicAuthPlugin: *basicAuthPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginBasicAuthResourceModel) ToOperationsGetBasicauthPluginRequest(ctx context.Context) (*operations.GetBasicauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetBasicauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginBasicAuthResourceModel) ToOperationsDeleteBasicauthPluginRequest(ctx context.Context) (*operations.DeleteBasicauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteBasicauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx context.Context, resp *shared.BasicAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -210,16 +268,16 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(resp *sh
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -245,4 +303,6 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(resp *sh
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -67,7 +66,7 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Schema(ctx context.Context, req
 						Computed:    true,
 						Description: `If set to ` + "`" + `true` + "`" + `, this doesn't count denied requests (status = ` + "`" + `429` + "`" + `). If set to ` + "`" + `false` + "`" + `, all requests, including denied ones, are counted. This parameter only affects the ` + "`" + `sliding` + "`" + ` window_type and the request prompt provider.`,
 					},
-					"error_code": schema.NumberAttribute{
+					"error_code": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Set a custom error code to return when the rate limit is exceeded.`,
 					},
@@ -95,7 +94,7 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Schema(ctx context.Context, req
 						Computed: true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
-								"limit": schema.NumberAttribute{
+								"limit": schema.Float64Attribute{
 									Computed:    true,
 									Description: `The limit applies to the LLM provider within the defined window size. It used the query cost from the tokens to increment the counter.`,
 								},
@@ -103,7 +102,7 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Schema(ctx context.Context, req
 									Computed:    true,
 									Description: `The LLM provider to which the rate limit applies.`,
 								},
-								"window_size": schema.NumberAttribute{
+								"window_size": schema.Float64Attribute{
 									Computed:    true,
 									Description: `The window size to apply a limit (defined in seconds).`,
 								},
@@ -232,7 +231,7 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Schema(ctx context.Context, req
 						Computed:    true,
 						Description: `If defined, it use custom function to count requests for the request prompt provider`,
 					},
-					"retry_after_jitter_max": schema.NumberAttribute{
+					"retry_after_jitter_max": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The upper bound of a jitter (random delay) in seconds to be added to the ` + "`" + `Retry-After` + "`" + ` header of denied requests (status = ` + "`" + `429` + "`" + `) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is ` + "`" + `0` + "`" + `; in this case, the ` + "`" + `Retry-After` + "`" + ` header is equal to the ` + "`" + `RateLimit-Reset` + "`" + ` header.`,
 					},
@@ -240,7 +239,7 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Schema(ctx context.Context, req
 						Computed:    true,
 						Description: `The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: ` + "`" + `local` + "`" + ` and ` + "`" + `cluster` + "`" + `.`,
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).`,
 					},
@@ -399,13 +398,13 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Read(ctx context.Context, req d
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -417,10 +416,6 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Read(ctx context.Context, req d
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -429,7 +424,11 @@ func (r *PluginAiRateLimitingAdvancedDataSource) Read(ctx context.Context, req d
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiRateLimitingAdvancedPlugin(res.AiRateLimitingAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiRateLimitingAdvancedPlugin(ctx, res.AiRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

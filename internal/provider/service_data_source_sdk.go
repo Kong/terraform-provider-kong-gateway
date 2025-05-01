@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ServiceDataSourceModel) RefreshFromSharedServiceOutput(resp *shared.ServiceOutput) {
+func (r *ServiceDataSourceModel) ToOperationsGetServiceRequest(ctx context.Context) (*operations.GetServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	out := operations.GetServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceDataSourceModel) RefreshFromSharedServiceOutput(ctx context.Context, resp *shared.ServiceOutput) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.CaCertificates != nil {
 			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
@@ -46,4 +64,6 @@ func (r *ServiceDataSourceModel) RefreshFromSharedServiceOutput(resp *shared.Ser
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 		r.WriteTimeout = types.Int64PointerValue(resp.WriteTimeout)
 	}
+
+	return diags
 }

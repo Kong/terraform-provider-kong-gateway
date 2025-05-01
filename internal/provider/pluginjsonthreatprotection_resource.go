@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -284,8 +283,13 @@ func (r *PluginJSONThreatProtectionResource) Create(ctx context.Context, req res
 		return
 	}
 
-	request := *data.ToSharedJSONThreatProtectionPlugin()
-	res, err := r.client.Plugins.CreateJsonthreatprotectionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedJSONThreatProtectionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateJsonthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -305,8 +309,17 @@ func (r *PluginJSONThreatProtectionResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJSONThreatProtectionPlugin(res.JSONThreatProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJSONThreatProtectionPlugin(ctx, res.JSONThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -330,13 +343,13 @@ func (r *PluginJSONThreatProtectionResource) Read(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetJsonthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetJsonthreatprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetJsonthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetJsonthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -360,7 +373,11 @@ func (r *PluginJSONThreatProtectionResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJSONThreatProtectionPlugin(res.JSONThreatProtectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedJSONThreatProtectionPlugin(ctx, res.JSONThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -380,15 +397,13 @@ func (r *PluginJSONThreatProtectionResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateJsonthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	jsonThreatProtectionPlugin := *data.ToSharedJSONThreatProtectionPlugin()
-	request := operations.UpdateJsonthreatprotectionPluginRequest{
-		PluginID:                   pluginID,
-		JSONThreatProtectionPlugin: jsonThreatProtectionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateJsonthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateJsonthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -408,8 +423,17 @@ func (r *PluginJSONThreatProtectionResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJSONThreatProtectionPlugin(res.JSONThreatProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJSONThreatProtectionPlugin(ctx, res.JSONThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -433,13 +457,13 @@ func (r *PluginJSONThreatProtectionResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteJsonthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteJsonthreatprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteJsonthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteJsonthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

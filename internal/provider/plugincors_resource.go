@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -75,7 +74,7 @@ func (r *PluginCorsResource) Schema(ctx context.Context, req resource.SchemaRequ
 						ElementType: types.StringType,
 						Description: `Value for the ` + "`" + `Access-Control-Allow-Headers` + "`" + ` header.`,
 					},
-					"max_age": schema.NumberAttribute{
+					"max_age": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Indicates how long the results of the preflight request can be cached, in ` + "`" + `seconds` + "`" + `.`,
@@ -254,8 +253,13 @@ func (r *PluginCorsResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request := *data.ToSharedCorsPlugin()
-	res, err := r.client.Plugins.CreateCorsPlugin(ctx, request)
+	request, requestDiags := data.ToSharedCorsPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateCorsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -275,8 +279,17 @@ func (r *PluginCorsResource) Create(ctx context.Context, req resource.CreateRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCorsPlugin(res.CorsPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCorsPlugin(ctx, res.CorsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -300,13 +313,13 @@ func (r *PluginCorsResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetCorsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetCorsPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetCorsPlugin(ctx, request)
+	res, err := r.client.Plugins.GetCorsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -330,7 +343,11 @@ func (r *PluginCorsResource) Read(ctx context.Context, req resource.ReadRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCorsPlugin(res.CorsPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedCorsPlugin(ctx, res.CorsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -350,15 +367,13 @@ func (r *PluginCorsResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateCorsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	corsPlugin := *data.ToSharedCorsPlugin()
-	request := operations.UpdateCorsPluginRequest{
-		PluginID:   pluginID,
-		CorsPlugin: corsPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateCorsPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateCorsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -378,8 +393,17 @@ func (r *PluginCorsResource) Update(ctx context.Context, req resource.UpdateRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCorsPlugin(res.CorsPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCorsPlugin(ctx, res.CorsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -403,13 +427,13 @@ func (r *PluginCorsResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteCorsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteCorsPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteCorsPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteCorsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

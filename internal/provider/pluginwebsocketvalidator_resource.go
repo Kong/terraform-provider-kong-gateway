@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -328,8 +327,13 @@ func (r *PluginWebsocketValidatorResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request := *data.ToSharedWebsocketValidatorPlugin()
-	res, err := r.client.Plugins.CreateWebsocketvalidatorPlugin(ctx, request)
+	request, requestDiags := data.ToSharedWebsocketValidatorPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateWebsocketvalidatorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -349,8 +353,17 @@ func (r *PluginWebsocketValidatorResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketValidatorPlugin(res.WebsocketValidatorPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketValidatorPlugin(ctx, res.WebsocketValidatorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -374,13 +387,13 @@ func (r *PluginWebsocketValidatorResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetWebsocketvalidatorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetWebsocketvalidatorPlugin(ctx, request)
+	res, err := r.client.Plugins.GetWebsocketvalidatorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -404,7 +417,11 @@ func (r *PluginWebsocketValidatorResource) Read(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketValidatorPlugin(res.WebsocketValidatorPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketValidatorPlugin(ctx, res.WebsocketValidatorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -424,15 +441,13 @@ func (r *PluginWebsocketValidatorResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateWebsocketvalidatorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	websocketValidatorPlugin := *data.ToSharedWebsocketValidatorPlugin()
-	request := operations.UpdateWebsocketvalidatorPluginRequest{
-		PluginID:                 pluginID,
-		WebsocketValidatorPlugin: websocketValidatorPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateWebsocketvalidatorPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateWebsocketvalidatorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -452,8 +467,17 @@ func (r *PluginWebsocketValidatorResource) Update(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketValidatorPlugin(res.WebsocketValidatorPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketValidatorPlugin(ctx, res.WebsocketValidatorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -477,13 +501,13 @@ func (r *PluginWebsocketValidatorResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteWebsocketvalidatorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteWebsocketvalidatorPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteWebsocketvalidatorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

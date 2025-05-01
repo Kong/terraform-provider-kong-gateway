@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
@@ -124,8 +123,13 @@ func (r *PartialResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request := *data.ToSharedPartial()
-	res, err := r.client.Partials.CreatePartial(ctx, request)
+	request, requestDiags := data.ToSharedPartial(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Partials.CreatePartial(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -145,8 +149,17 @@ func (r *PartialResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPartial(res.Partial)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedPartial(ctx, res.Partial)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -170,13 +183,13 @@ func (r *PartialResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	var partialID string
-	partialID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetPartialRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetPartialRequest{
-		PartialID: partialID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Partials.GetPartial(ctx, request)
+	res, err := r.client.Partials.GetPartial(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -200,7 +213,11 @@ func (r *PartialResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPartial(res.Partial)
+	resp.Diagnostics.Append(data.RefreshFromSharedPartial(ctx, res.Partial)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -220,15 +237,13 @@ func (r *PartialResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	var partialID string
-	partialID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertPartialRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	partial := *data.ToSharedPartial()
-	request := operations.UpsertPartialRequest{
-		PartialID: partialID,
-		Partial:   partial,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Partials.UpsertPartial(ctx, request)
+	res, err := r.client.Partials.UpsertPartial(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -248,8 +263,17 @@ func (r *PartialResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPartial(res.Partial)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedPartial(ctx, res.Partial)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -273,13 +297,13 @@ func (r *PartialResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	var partialID string
-	partialID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeletePartialRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeletePartialRequest{
-		PartialID: partialID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Partials.DeletePartial(ctx, request)
+	res, err := r.client.Partials.DeletePartial(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

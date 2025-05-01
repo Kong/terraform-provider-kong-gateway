@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -71,7 +70,7 @@ func (r *PluginXMLThreatProtectionDataSource) Schema(ctx context.Context, req da
 						Computed:    true,
 						Description: `Maximum size of the attribute value.`,
 					},
-					"bla_max_amplification": schema.NumberAttribute{
+					"bla_max_amplification": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Sets the maximum allowed amplification. This protects against the Billion Laughs Attack.`,
 					},
@@ -290,13 +289,13 @@ func (r *PluginXMLThreatProtectionDataSource) Read(ctx context.Context, req data
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetXmlthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetXmlthreatprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetXmlthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetXmlthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -308,10 +307,6 @@ func (r *PluginXMLThreatProtectionDataSource) Read(ctx context.Context, req data
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -320,7 +315,11 @@ func (r *PluginXMLThreatProtectionDataSource) Read(ctx context.Context, req data
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedXMLThreatProtectionPlugin(res.XMLThreatProtectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedXMLThreatProtectionPlugin(ctx, res.XMLThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

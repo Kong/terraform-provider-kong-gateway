@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -221,7 +220,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Threshold for the similarity score to be considered a match.`,
@@ -432,7 +431,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 									stringvalidator.OneOf("redis"),
 								},
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
@@ -613,8 +612,13 @@ func (r *PluginAiSemanticPromptGuardResource) Create(ctx context.Context, req re
 		return
 	}
 
-	request := *data.ToSharedAiSemanticPromptGuardPlugin()
-	res, err := r.client.Plugins.CreateAisemanticpromptguardPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiSemanticPromptGuardPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAisemanticpromptguardPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -634,8 +638,17 @@ func (r *PluginAiSemanticPromptGuardResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticPromptGuardPlugin(res.AiSemanticPromptGuardPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticPromptGuardPlugin(ctx, res.AiSemanticPromptGuardPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -659,13 +672,13 @@ func (r *PluginAiSemanticPromptGuardResource) Read(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAisemanticpromptguardPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAisemanticpromptguardPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAisemanticpromptguardPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAisemanticpromptguardPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -689,7 +702,11 @@ func (r *PluginAiSemanticPromptGuardResource) Read(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticPromptGuardPlugin(res.AiSemanticPromptGuardPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticPromptGuardPlugin(ctx, res.AiSemanticPromptGuardPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -709,15 +726,13 @@ func (r *PluginAiSemanticPromptGuardResource) Update(ctx context.Context, req re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAisemanticpromptguardPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiSemanticPromptGuardPlugin := *data.ToSharedAiSemanticPromptGuardPlugin()
-	request := operations.UpdateAisemanticpromptguardPluginRequest{
-		PluginID:                    pluginID,
-		AiSemanticPromptGuardPlugin: aiSemanticPromptGuardPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAisemanticpromptguardPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAisemanticpromptguardPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -737,8 +752,17 @@ func (r *PluginAiSemanticPromptGuardResource) Update(ctx context.Context, req re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticPromptGuardPlugin(res.AiSemanticPromptGuardPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticPromptGuardPlugin(ctx, res.AiSemanticPromptGuardPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -762,13 +786,13 @@ func (r *PluginAiSemanticPromptGuardResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAisemanticpromptguardPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAisemanticpromptguardPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAisemanticpromptguardPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAisemanticpromptguardPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

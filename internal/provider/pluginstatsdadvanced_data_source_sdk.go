@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlugin(resp *shared.StatsdAdvancedPlugin) {
+func (r *PluginStatsdAdvancedDataSourceModel) ToOperationsGetStatsdadvancedPluginRequest(ctx context.Context) (*operations.GetStatsdadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetStatsdadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlugin(ctx context.Context, resp *shared.StatsdAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -31,38 +48,34 @@ func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlu
 				r.Config.Metrics = r.Config.Metrics[:len(resp.Config.Metrics)]
 			}
 			for metricsCount, metricsItem := range resp.Config.Metrics {
-				var metrics1 tfTypes.StatsdPluginMetrics
+				var metrics tfTypes.StatsdPluginMetrics
 				if metricsItem.ConsumerIdentifier != nil {
-					metrics1.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
+					metrics.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
 				} else {
-					metrics1.ConsumerIdentifier = types.StringNull()
+					metrics.ConsumerIdentifier = types.StringNull()
 				}
-				metrics1.Name = types.StringValue(string(metricsItem.Name))
-				if metricsItem.SampleRate != nil {
-					metrics1.SampleRate = types.NumberValue(big.NewFloat(float64(*metricsItem.SampleRate)))
-				} else {
-					metrics1.SampleRate = types.NumberNull()
-				}
+				metrics.Name = types.StringValue(string(metricsItem.Name))
+				metrics.SampleRate = types.Float64PointerValue(metricsItem.SampleRate)
 				if metricsItem.ServiceIdentifier != nil {
-					metrics1.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
+					metrics.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
 				} else {
-					metrics1.ServiceIdentifier = types.StringNull()
+					metrics.ServiceIdentifier = types.StringNull()
 				}
-				metrics1.StatType = types.StringValue(string(metricsItem.StatType))
+				metrics.StatType = types.StringValue(string(metricsItem.StatType))
 				if metricsItem.WorkspaceIdentifier != nil {
-					metrics1.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
+					metrics.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
 				} else {
-					metrics1.WorkspaceIdentifier = types.StringNull()
+					metrics.WorkspaceIdentifier = types.StringNull()
 				}
 				if metricsCount+1 > len(r.Config.Metrics) {
-					r.Config.Metrics = append(r.Config.Metrics, metrics1)
+					r.Config.Metrics = append(r.Config.Metrics, metrics)
 				} else {
-					r.Config.Metrics[metricsCount].ConsumerIdentifier = metrics1.ConsumerIdentifier
-					r.Config.Metrics[metricsCount].Name = metrics1.Name
-					r.Config.Metrics[metricsCount].SampleRate = metrics1.SampleRate
-					r.Config.Metrics[metricsCount].ServiceIdentifier = metrics1.ServiceIdentifier
-					r.Config.Metrics[metricsCount].StatType = metrics1.StatType
-					r.Config.Metrics[metricsCount].WorkspaceIdentifier = metrics1.WorkspaceIdentifier
+					r.Config.Metrics[metricsCount].ConsumerIdentifier = metrics.ConsumerIdentifier
+					r.Config.Metrics[metricsCount].Name = metrics.Name
+					r.Config.Metrics[metricsCount].SampleRate = metrics.SampleRate
+					r.Config.Metrics[metricsCount].ServiceIdentifier = metrics.ServiceIdentifier
+					r.Config.Metrics[metricsCount].StatType = metrics.StatType
+					r.Config.Metrics[metricsCount].WorkspaceIdentifier = metrics.WorkspaceIdentifier
 				}
 			}
 			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
@@ -76,40 +89,20 @@ func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlu
 				} else {
 					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
 				}
-				if resp.Config.Queue.InitialRetryDelay != nil {
-					r.Config.Queue.InitialRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.InitialRetryDelay)))
-				} else {
-					r.Config.Queue.InitialRetryDelay = types.NumberNull()
-				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
 				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
 				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				if resp.Config.Queue.MaxCoalescingDelay != nil {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxCoalescingDelay)))
-				} else {
-					r.Config.Queue.MaxCoalescingDelay = types.NumberNull()
-				}
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
 				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				if resp.Config.Queue.MaxRetryDelay != nil {
-					r.Config.Queue.MaxRetryDelay = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryDelay)))
-				} else {
-					r.Config.Queue.MaxRetryDelay = types.NumberNull()
-				}
-				if resp.Config.Queue.MaxRetryTime != nil {
-					r.Config.Queue.MaxRetryTime = types.NumberValue(big.NewFloat(float64(*resp.Config.Queue.MaxRetryTime)))
-				} else {
-					r.Config.Queue.MaxRetryTime = types.NumberNull()
-				}
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
 			}
 			if resp.Config.ServiceIdentifierDefault != nil {
 				r.Config.ServiceIdentifierDefault = types.StringValue(string(*resp.Config.ServiceIdentifierDefault))
 			} else {
 				r.Config.ServiceIdentifierDefault = types.StringNull()
 			}
-			if resp.Config.UDPPacketSize != nil {
-				r.Config.UDPPacketSize = types.NumberValue(big.NewFloat(float64(*resp.Config.UDPPacketSize)))
-			} else {
-				r.Config.UDPPacketSize = types.NumberNull()
-			}
+			r.Config.UDPPacketSize = types.Float64PointerValue(resp.Config.UDPPacketSize)
 			r.Config.UseTCP = types.BoolPointerValue(resp.Config.UseTCP)
 			if resp.Config.WorkspaceIdentifierDefault != nil {
 				r.Config.WorkspaceIdentifierDefault = types.StringValue(string(*resp.Config.WorkspaceIdentifierDefault))
@@ -156,16 +149,16 @@ func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlu
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -191,4 +184,6 @@ func (r *PluginStatsdAdvancedDataSourceModel) RefreshFromSharedStatsdAdvancedPlu
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

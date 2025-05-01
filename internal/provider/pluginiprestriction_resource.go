@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -77,7 +76,7 @@ func (r *PluginIPRestrictionResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `The message to send as a response body to rejected requests.`,
 					},
-					"status": schema.NumberAttribute{
+					"status": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The HTTP status of the requests that will be rejected by the plugin.`,
@@ -256,8 +255,13 @@ func (r *PluginIPRestrictionResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := *data.ToSharedIPRestrictionPlugin()
-	res, err := r.client.Plugins.CreateIprestrictionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedIPRestrictionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateIprestrictionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -277,8 +281,17 @@ func (r *PluginIPRestrictionResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedIPRestrictionPlugin(res.IPRestrictionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedIPRestrictionPlugin(ctx, res.IPRestrictionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -302,13 +315,13 @@ func (r *PluginIPRestrictionResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetIprestrictionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetIprestrictionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetIprestrictionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetIprestrictionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -332,7 +345,11 @@ func (r *PluginIPRestrictionResource) Read(ctx context.Context, req resource.Rea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedIPRestrictionPlugin(res.IPRestrictionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedIPRestrictionPlugin(ctx, res.IPRestrictionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -352,15 +369,13 @@ func (r *PluginIPRestrictionResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateIprestrictionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	ipRestrictionPlugin := *data.ToSharedIPRestrictionPlugin()
-	request := operations.UpdateIprestrictionPluginRequest{
-		PluginID:            pluginID,
-		IPRestrictionPlugin: ipRestrictionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateIprestrictionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateIprestrictionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -380,8 +395,17 @@ func (r *PluginIPRestrictionResource) Update(ctx context.Context, req resource.U
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedIPRestrictionPlugin(res.IPRestrictionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedIPRestrictionPlugin(ctx, res.IPRestrictionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -405,13 +429,13 @@ func (r *PluginIPRestrictionResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteIprestrictionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteIprestrictionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteIprestrictionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteIprestrictionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

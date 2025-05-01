@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -180,13 +179,13 @@ func (r *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	var serviceIDOrName string
-	serviceIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetServiceRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Services.GetService(ctx, request)
+	res, err := r.client.Services.GetService(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -198,10 +197,6 @@ func (r *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -210,7 +205,11 @@ func (r *ServiceDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res.Service)
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res.Service)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

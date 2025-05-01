@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -65,7 +65,7 @@ func (r *PluginCanaryResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `A string representing an HTTP header name.`,
 					},
-					"duration": schema.NumberAttribute{
+					"duration": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The duration of the canary release in seconds.`,
@@ -104,20 +104,26 @@ func (r *PluginCanaryResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `A string representing an HTTP header name.`,
 					},
-					"percentage": schema.NumberAttribute{
+					"percentage": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The percentage of traffic to be routed to the canary release.`,
+						Validators: []validator.Float64{
+							float64validator.AtMost(100),
+						},
 					},
-					"start": schema.NumberAttribute{
+					"start": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Future time in seconds since epoch, when the canary release will start. Ignored when ` + "`" + `percentage` + "`" + ` is set, or when using ` + "`" + `allow` + "`" + ` or ` + "`" + `deny` + "`" + ` in ` + "`" + `hash` + "`" + `.`,
 					},
-					"steps": schema.NumberAttribute{
+					"steps": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The number of steps for the canary release.`,
+						Validators: []validator.Float64{
+							float64validator.AtLeast(1),
+						},
 					},
 					"upstream_fallback": schema.BoolAttribute{
 						Computed:    true,
@@ -297,8 +303,13 @@ func (r *PluginCanaryResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := *data.ToSharedCanaryPlugin()
-	res, err := r.client.Plugins.CreateCanaryPlugin(ctx, request)
+	request, requestDiags := data.ToSharedCanaryPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateCanaryPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -318,8 +329,17 @@ func (r *PluginCanaryResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCanaryPlugin(res.CanaryPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCanaryPlugin(ctx, res.CanaryPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -343,13 +363,13 @@ func (r *PluginCanaryResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetCanaryPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetCanaryPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetCanaryPlugin(ctx, request)
+	res, err := r.client.Plugins.GetCanaryPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -373,7 +393,11 @@ func (r *PluginCanaryResource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCanaryPlugin(res.CanaryPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedCanaryPlugin(ctx, res.CanaryPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -393,15 +417,13 @@ func (r *PluginCanaryResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateCanaryPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	canaryPlugin := *data.ToSharedCanaryPlugin()
-	request := operations.UpdateCanaryPluginRequest{
-		PluginID:     pluginID,
-		CanaryPlugin: canaryPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateCanaryPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateCanaryPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -421,8 +443,17 @@ func (r *PluginCanaryResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCanaryPlugin(res.CanaryPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCanaryPlugin(ctx, res.CanaryPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -446,13 +477,13 @@ func (r *PluginCanaryResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteCanaryPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteCanaryPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteCanaryPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteCanaryPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

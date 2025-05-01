@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,9 +16,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
-	speakeasy_numbervalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/numbervalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -498,7 +498,7 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 														},
 													},
 												},
-												"input_cost": schema.NumberAttribute{
+												"input_cost": schema.Float64Attribute{
 													Computed:    true,
 													Optional:    true,
 													Description: `Defines the cost per 1M tokens in your prompt.`,
@@ -531,15 +531,18 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 														),
 													},
 												},
-												"output_cost": schema.NumberAttribute{
+												"output_cost": schema.Float64Attribute{
 													Computed:    true,
 													Optional:    true,
 													Description: `Defines the cost per 1M tokens in the output of the AI.`,
 												},
-												"temperature": schema.NumberAttribute{
+												"temperature": schema.Float64Attribute{
 													Computed:    true,
 													Optional:    true,
 													Description: `Defines the matching temperature, if using chat or completion models.`,
+													Validators: []validator.Float64{
+														float64validator.AtMost(5),
+													},
 												},
 												"top_k": schema.Int64Attribute{
 													Computed:    true,
@@ -549,10 +552,13 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 														int64validator.AtMost(500),
 													},
 												},
-												"top_p": schema.NumberAttribute{
+												"top_p": schema.Float64Attribute{
 													Computed:    true,
 													Optional:    true,
 													Description: `Defines the top-p probability mass, if supported.`,
+													Validators: []validator.Float64{
+														float64validator.AtMost(1),
+													},
 												},
 												"upstream_path": schema.StringAttribute{
 													Computed:    true,
@@ -829,12 +835,12 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 									stringvalidator.OneOf("redis"),
 								},
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float). Not Null`,
-								Validators: []validator.Number{
-									speakeasy_numbervalidators.NotNull(),
+								Validators: []validator.Float64{
+									speakeasy_float64validators.NotNull(),
 								},
 							},
 						},
@@ -1013,8 +1019,13 @@ func (r *PluginAiProxyAdvancedResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	request := *data.ToSharedAiProxyAdvancedPlugin()
-	res, err := r.client.Plugins.CreateAiproxyadvancedPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiProxyAdvancedPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiproxyadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -1034,8 +1045,17 @@ func (r *PluginAiProxyAdvancedResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyAdvancedPlugin(res.AiProxyAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyAdvancedPlugin(ctx, res.AiProxyAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1059,13 +1079,13 @@ func (r *PluginAiProxyAdvancedResource) Read(ctx context.Context, req resource.R
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiproxyadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiproxyadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiproxyadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiproxyadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -1089,7 +1109,11 @@ func (r *PluginAiProxyAdvancedResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyAdvancedPlugin(res.AiProxyAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyAdvancedPlugin(ctx, res.AiProxyAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1109,15 +1133,13 @@ func (r *PluginAiProxyAdvancedResource) Update(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiproxyadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiProxyAdvancedPlugin := *data.ToSharedAiProxyAdvancedPlugin()
-	request := operations.UpdateAiproxyadvancedPluginRequest{
-		PluginID:              pluginID,
-		AiProxyAdvancedPlugin: aiProxyAdvancedPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiproxyadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiproxyadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -1137,8 +1159,17 @@ func (r *PluginAiProxyAdvancedResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyAdvancedPlugin(res.AiProxyAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyAdvancedPlugin(ctx, res.AiProxyAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -1162,13 +1193,13 @@ func (r *PluginAiProxyAdvancedResource) Delete(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiproxyadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiproxyadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiproxyadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiproxyadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -3,11 +3,16 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *CACertificateResourceModel) ToSharedCACertificate() *shared.CACertificate {
+func (r *CACertificateResourceModel) ToSharedCACertificate(ctx context.Context) (*shared.CACertificate, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var cert string
 	cert = r.Cert.ValueString()
 
@@ -29,7 +34,7 @@ func (r *CACertificateResourceModel) ToSharedCACertificate() *shared.CACertifica
 	} else {
 		id = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -47,10 +52,60 @@ func (r *CACertificateResourceModel) ToSharedCACertificate() *shared.CACertifica
 		Tags:       tags,
 		UpdatedAt:  updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *CACertificateResourceModel) RefreshFromSharedCACertificate(resp *shared.CACertificate) {
+func (r *CACertificateResourceModel) ToOperationsUpsertCaCertificateRequest(ctx context.Context) (*operations.UpsertCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	caCertificate, caCertificateDiags := r.ToSharedCACertificate(ctx)
+	diags.Append(caCertificateDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertCaCertificateRequest{
+		CACertificateID: caCertificateID,
+		CACertificate:   *caCertificate,
+	}
+
+	return &out, diags
+}
+
+func (r *CACertificateResourceModel) ToOperationsGetCaCertificateRequest(ctx context.Context) (*operations.GetCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	out := operations.GetCaCertificateRequest{
+		CACertificateID: caCertificateID,
+	}
+
+	return &out, diags
+}
+
+func (r *CACertificateResourceModel) ToOperationsDeleteCaCertificateRequest(ctx context.Context) (*operations.DeleteCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	out := operations.DeleteCaCertificateRequest{
+		CACertificateID: caCertificateID,
+	}
+
+	return &out, diags
+}
+
+func (r *CACertificateResourceModel) RefreshFromSharedCACertificate(ctx context.Context, resp *shared.CACertificate) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.Cert = types.StringValue(resp.Cert)
 		r.CertDigest = types.StringPointerValue(resp.CertDigest)
@@ -62,4 +117,6 @@ func (r *CACertificateResourceModel) RefreshFromSharedCACertificate(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

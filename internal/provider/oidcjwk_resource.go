@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -209,8 +208,13 @@ func (r *OidcJwkResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request := *data.ToSharedOidcJwk()
-	res, err := r.client.OIDCJWKs.CreateOicJwk(ctx, request)
+	request, requestDiags := data.ToSharedOidcJwk(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.OIDCJWKs.CreateOicJwk(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -230,8 +234,17 @@ func (r *OidcJwkResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOidcJwk(res.OidcJwk)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOidcJwk(ctx, res.OidcJwk)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -255,13 +268,13 @@ func (r *OidcJwkResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	var oidcJwkID string
-	oidcJwkID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetOicJwkRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetOicJwkRequest{
-		OidcJwkID: oidcJwkID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.OIDCJWKs.GetOicJwk(ctx, request)
+	res, err := r.client.OIDCJWKs.GetOicJwk(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -285,7 +298,11 @@ func (r *OidcJwkResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOidcJwk(res.OidcJwk)
+	resp.Diagnostics.Append(data.RefreshFromSharedOidcJwk(ctx, res.OidcJwk)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -305,15 +322,13 @@ func (r *OidcJwkResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	var oidcJwkID string
-	oidcJwkID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertOicJwkRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	oidcJwk := *data.ToSharedOidcJwk()
-	request := operations.UpsertOicJwkRequest{
-		OidcJwkID: oidcJwkID,
-		OidcJwk:   oidcJwk,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.OIDCJWKs.UpsertOicJwk(ctx, request)
+	res, err := r.client.OIDCJWKs.UpsertOicJwk(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -333,8 +348,17 @@ func (r *OidcJwkResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOidcJwk(res.OidcJwk)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOidcJwk(ctx, res.OidcJwk)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -358,13 +382,13 @@ func (r *OidcJwkResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	var oidcJwkID string
-	oidcJwkID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteOicJwkRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteOicJwkRequest{
-		OidcJwkID: oidcJwkID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.OIDCJWKs.DeleteOicJwk(ctx, request)
+	res, err := r.client.OIDCJWKs.DeleteOicJwk(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

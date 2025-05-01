@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthPlugin {
+func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context) (*shared.HmacAuthPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 	if r.Ordering != nil {
 		var after *shared.HmacAuthPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 		}
 		var before *shared.HmacAuthPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 			Before: before,
 		}
 	}
-	var partials []shared.HmacAuthPluginPartials = []shared.HmacAuthPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.HmacAuthPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.HmacAuthPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.HmacAuthPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.HmacAuthPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -99,7 +106,7 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 	}
 	var config *shared.HmacAuthPluginConfig
 	if r.Config != nil {
-		var algorithms []shared.Algorithms = []shared.Algorithms{}
+		algorithms := make([]shared.Algorithms, 0, len(r.Config.Algorithms))
 		for _, algorithmsItem := range r.Config.Algorithms {
 			algorithms = append(algorithms, shared.Algorithms(algorithmsItem.ValueString()))
 		}
@@ -111,11 +118,11 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 		}
 		clockSkew := new(float64)
 		if !r.Config.ClockSkew.IsUnknown() && !r.Config.ClockSkew.IsNull() {
-			*clockSkew, _ = r.Config.ClockSkew.ValueBigFloat().Float64()
+			*clockSkew = r.Config.ClockSkew.ValueFloat64()
 		} else {
 			clockSkew = nil
 		}
-		var enforceHeaders []string = []string{}
+		enforceHeaders := make([]string, 0, len(r.Config.EnforceHeaders))
 		for _, enforceHeadersItem := range r.Config.EnforceHeaders {
 			enforceHeaders = append(enforceHeaders, enforceHeadersItem.ValueString())
 		}
@@ -147,7 +154,7 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 			ValidateRequestBody: validateRequestBody,
 		}
 	}
-	var protocols []shared.HmacAuthPluginProtocols = []shared.HmacAuthPluginProtocols{}
+	protocols := make([]shared.HmacAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.HmacAuthPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -189,10 +196,60 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin() *shared.HmacAuthP
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(resp *shared.HmacAuthPlugin) {
+func (r *PluginHmacAuthResourceModel) ToOperationsUpdateHmacauthPluginRequest(ctx context.Context) (*operations.UpdateHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	hmacAuthPlugin, hmacAuthPluginDiags := r.ToSharedHmacAuthPlugin(ctx)
+	diags.Append(hmacAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateHmacauthPluginRequest{
+		PluginID:       pluginID,
+		HmacAuthPlugin: *hmacAuthPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsGetHmacauthPluginRequest(ctx context.Context) (*operations.GetHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetHmacauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsDeleteHmacauthPluginRequest(ctx context.Context) (*operations.DeleteHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteHmacauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(ctx context.Context, resp *shared.HmacAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -203,11 +260,7 @@ func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(resp *shar
 				r.Config.Algorithms = append(r.Config.Algorithms, types.StringValue(string(v)))
 			}
 			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			if resp.Config.ClockSkew != nil {
-				r.Config.ClockSkew = types.NumberValue(big.NewFloat(float64(*resp.Config.ClockSkew)))
-			} else {
-				r.Config.ClockSkew = types.NumberNull()
-			}
+			r.Config.ClockSkew = types.Float64PointerValue(resp.Config.ClockSkew)
 			r.Config.EnforceHeaders = make([]types.String, 0, len(resp.Config.EnforceHeaders))
 			for _, v := range resp.Config.EnforceHeaders {
 				r.Config.EnforceHeaders = append(r.Config.EnforceHeaders, types.StringValue(v))
@@ -249,16 +302,16 @@ func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(resp *shar
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -284,4 +337,6 @@ func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

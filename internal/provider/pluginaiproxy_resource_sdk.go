@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlugin {
+func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin(ctx context.Context) (*shared.AiProxyPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 	if r.Ordering != nil {
 		var after *shared.AiProxyPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 		}
 		var before *shared.AiProxyPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 			Before: before,
 		}
 	}
-	var partials []shared.AiProxyPluginPartials = []shared.AiProxyPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiProxyPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiProxyPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiProxyPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiProxyPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -320,7 +327,7 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 				}
 				inputCost := new(float64)
 				if !r.Config.Model.Options.InputCost.IsUnknown() && !r.Config.Model.Options.InputCost.IsNull() {
-					*inputCost, _ = r.Config.Model.Options.InputCost.ValueBigFloat().Float64()
+					*inputCost = r.Config.Model.Options.InputCost.ValueFloat64()
 				} else {
 					inputCost = nil
 				}
@@ -344,13 +351,13 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 				}
 				outputCost := new(float64)
 				if !r.Config.Model.Options.OutputCost.IsUnknown() && !r.Config.Model.Options.OutputCost.IsNull() {
-					*outputCost, _ = r.Config.Model.Options.OutputCost.ValueBigFloat().Float64()
+					*outputCost = r.Config.Model.Options.OutputCost.ValueFloat64()
 				} else {
 					outputCost = nil
 				}
 				temperature := new(float64)
 				if !r.Config.Model.Options.Temperature.IsUnknown() && !r.Config.Model.Options.Temperature.IsNull() {
-					*temperature, _ = r.Config.Model.Options.Temperature.ValueBigFloat().Float64()
+					*temperature = r.Config.Model.Options.Temperature.ValueFloat64()
 				} else {
 					temperature = nil
 				}
@@ -362,7 +369,7 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 				}
 				topP := new(float64)
 				if !r.Config.Model.Options.TopP.IsUnknown() && !r.Config.Model.Options.TopP.IsNull() {
-					*topP, _ = r.Config.Model.Options.TopP.ValueBigFloat().Float64()
+					*topP = r.Config.Model.Options.TopP.ValueFloat64()
 				} else {
 					topP = nil
 				}
@@ -462,7 +469,7 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 			ID: id3,
 		}
 	}
-	var protocols []shared.AiProxyPluginProtocols = []shared.AiProxyPluginProtocols{}
+	protocols := make([]shared.AiProxyPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiProxyPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -506,10 +513,60 @@ func (r *PluginAiProxyResourceModel) ToSharedAiProxyPlugin() *shared.AiProxyPlug
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(resp *shared.AiProxyPlugin) {
+func (r *PluginAiProxyResourceModel) ToOperationsUpdateAiproxyPluginRequest(ctx context.Context) (*operations.UpdateAiproxyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiProxyPlugin, aiProxyPluginDiags := r.ToSharedAiProxyPlugin(ctx)
+	diags.Append(aiProxyPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAiproxyPluginRequest{
+		PluginID:      pluginID,
+		AiProxyPlugin: *aiProxyPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyResourceModel) ToOperationsGetAiproxyPluginRequest(ctx context.Context) (*operations.GetAiproxyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiproxyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyResourceModel) ToOperationsDeleteAiproxyPluginRequest(ctx context.Context) (*operations.DeleteAiproxyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAiproxyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(ctx context.Context, resp *shared.AiProxyPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -580,11 +637,7 @@ func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(resp *shared
 						r.Config.Model.Options.Huggingface.UseCache = types.BoolPointerValue(resp.Config.Model.Options.Huggingface.UseCache)
 						r.Config.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(resp.Config.Model.Options.Huggingface.WaitForModel)
 					}
-					if resp.Config.Model.Options.InputCost != nil {
-						r.Config.Model.Options.InputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.InputCost)))
-					} else {
-						r.Config.Model.Options.InputCost = types.NumberNull()
-					}
+					r.Config.Model.Options.InputCost = types.Float64PointerValue(resp.Config.Model.Options.InputCost)
 					if resp.Config.Model.Options.Llama2Format != nil {
 						r.Config.Model.Options.Llama2Format = types.StringValue(string(*resp.Config.Model.Options.Llama2Format))
 					} else {
@@ -596,22 +649,10 @@ func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(resp *shared
 					} else {
 						r.Config.Model.Options.MistralFormat = types.StringNull()
 					}
-					if resp.Config.Model.Options.OutputCost != nil {
-						r.Config.Model.Options.OutputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.OutputCost)))
-					} else {
-						r.Config.Model.Options.OutputCost = types.NumberNull()
-					}
-					if resp.Config.Model.Options.Temperature != nil {
-						r.Config.Model.Options.Temperature = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.Temperature)))
-					} else {
-						r.Config.Model.Options.Temperature = types.NumberNull()
-					}
+					r.Config.Model.Options.OutputCost = types.Float64PointerValue(resp.Config.Model.Options.OutputCost)
+					r.Config.Model.Options.Temperature = types.Float64PointerValue(resp.Config.Model.Options.Temperature)
 					r.Config.Model.Options.TopK = types.Int64PointerValue(resp.Config.Model.Options.TopK)
-					if resp.Config.Model.Options.TopP != nil {
-						r.Config.Model.Options.TopP = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.TopP)))
-					} else {
-						r.Config.Model.Options.TopP = types.NumberNull()
-					}
+					r.Config.Model.Options.TopP = types.Float64PointerValue(resp.Config.Model.Options.TopP)
 					r.Config.Model.Options.UpstreamPath = types.StringPointerValue(resp.Config.Model.Options.UpstreamPath)
 					r.Config.Model.Options.UpstreamURL = types.StringPointerValue(resp.Config.Model.Options.UpstreamURL)
 				}
@@ -678,16 +719,16 @@ func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -713,4 +754,6 @@ func (r *PluginAiProxyResourceModel) RefreshFromSharedAiProxyPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

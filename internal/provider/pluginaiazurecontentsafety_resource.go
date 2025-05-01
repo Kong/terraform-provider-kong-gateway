@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
@@ -317,8 +316,13 @@ func (r *PluginAiAzureContentSafetyResource) Create(ctx context.Context, req res
 		return
 	}
 
-	request := *data.ToSharedAiAzureContentSafetyPlugin()
-	res, err := r.client.Plugins.CreateAiazurecontentsafetyPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiAzureContentSafetyPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -338,8 +342,17 @@ func (r *PluginAiAzureContentSafetyResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiAzureContentSafetyPlugin(res.AiAzureContentSafetyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiAzureContentSafetyPlugin(ctx, res.AiAzureContentSafetyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -363,13 +376,13 @@ func (r *PluginAiAzureContentSafetyResource) Read(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiazurecontentsafetyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiazurecontentsafetyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiazurecontentsafetyPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -393,7 +406,11 @@ func (r *PluginAiAzureContentSafetyResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiAzureContentSafetyPlugin(res.AiAzureContentSafetyPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiAzureContentSafetyPlugin(ctx, res.AiAzureContentSafetyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -413,15 +430,13 @@ func (r *PluginAiAzureContentSafetyResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiazurecontentsafetyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiAzureContentSafetyPlugin := *data.ToSharedAiAzureContentSafetyPlugin()
-	request := operations.UpdateAiazurecontentsafetyPluginRequest{
-		PluginID:                   pluginID,
-		AiAzureContentSafetyPlugin: aiAzureContentSafetyPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiazurecontentsafetyPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -441,8 +456,17 @@ func (r *PluginAiAzureContentSafetyResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiAzureContentSafetyPlugin(res.AiAzureContentSafetyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiAzureContentSafetyPlugin(ctx, res.AiAzureContentSafetyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -466,13 +490,13 @@ func (r *PluginAiAzureContentSafetyResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiazurecontentsafetyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiazurecontentsafetyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiazurecontentsafetyPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

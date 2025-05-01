@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -80,7 +79,7 @@ func (r *PluginJwtDataSource) Schema(ctx context.Context, req datasource.SchemaR
 						Computed:    true,
 						Description: `The name of the claim in which the key identifying the secret must be passed. The plugin will attempt to read this claim from the JWT payload and the header, in that order.`,
 					},
-					"maximum_expiration": schema.NumberAttribute{
+					"maximum_expiration": schema.Float64Attribute{
 						Computed:    true,
 						Description: `A value between 0 and 31536000 (365 days) limiting the lifetime of the JWT to maximum_expiration seconds in the future.`,
 					},
@@ -230,13 +229,13 @@ func (r *PluginJwtDataSource) Read(ctx context.Context, req datasource.ReadReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetJwtPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetJwtPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetJwtPlugin(ctx, request)
+	res, err := r.client.Plugins.GetJwtPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -248,10 +247,6 @@ func (r *PluginJwtDataSource) Read(ctx context.Context, req datasource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -260,7 +255,11 @@ func (r *PluginJwtDataSource) Read(ctx context.Context, req datasource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtPlugin(res.JwtPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtPlugin(ctx, res.JwtPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

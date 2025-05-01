@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.ProxyCachePlugin {
+func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin(ctx context.Context) (*shared.ProxyCachePlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 	if r.Ordering != nil {
 		var after *shared.ProxyCachePluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 		}
 		var before *shared.ProxyCachePluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 			Before: before,
 		}
 	}
-	var partials []shared.ProxyCachePluginPartials = []shared.ProxyCachePluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.ProxyCachePluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ProxyCachePluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ProxyCachePluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.ProxyCachePluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -110,7 +118,7 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 		} else {
 			cacheTTL = nil
 		}
-		var contentType []string = []string{}
+		contentType := make([]string, 0, len(r.Config.ContentType))
 		for _, contentTypeItem := range r.Config.ContentType {
 			contentType = append(contentType, contentTypeItem.ValueString())
 		}
@@ -132,11 +140,11 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 				DictionaryName: dictionaryName,
 			}
 		}
-		var requestMethod []shared.RequestMethod = []shared.RequestMethod{}
+		requestMethod := make([]shared.RequestMethod, 0, len(r.Config.RequestMethod))
 		for _, requestMethodItem := range r.Config.RequestMethod {
 			requestMethod = append(requestMethod, shared.RequestMethod(requestMethodItem.ValueString()))
 		}
-		var responseCode []int64 = []int64{}
+		responseCode := make([]int64, 0, len(r.Config.ResponseCode))
 		for _, responseCodeItem := range r.Config.ResponseCode {
 			responseCode = append(responseCode, responseCodeItem.ValueInt64())
 		}
@@ -178,11 +186,11 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 		} else {
 			strategy = nil
 		}
-		var varyHeaders []string = []string{}
+		varyHeaders := make([]string, 0, len(r.Config.VaryHeaders))
 		for _, varyHeadersItem := range r.Config.VaryHeaders {
 			varyHeaders = append(varyHeaders, varyHeadersItem.ValueString())
 		}
-		var varyQueryParams []string = []string{}
+		varyQueryParams := make([]string, 0, len(r.Config.VaryQueryParams))
 		for _, varyQueryParamsItem := range r.Config.VaryQueryParams {
 			varyQueryParams = append(varyQueryParams, varyQueryParamsItem.ValueString())
 		}
@@ -225,7 +233,7 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 			ID: id3,
 		}
 	}
-	var protocols []shared.ProxyCachePluginProtocols = []shared.ProxyCachePluginProtocols{}
+	protocols := make([]shared.ProxyCachePluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.ProxyCachePluginProtocols(protocolsItem.ValueString()))
 	}
@@ -269,10 +277,60 @@ func (r *PluginProxyCacheResourceModel) ToSharedProxyCachePlugin() *shared.Proxy
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginProxyCacheResourceModel) RefreshFromSharedProxyCachePlugin(resp *shared.ProxyCachePlugin) {
+func (r *PluginProxyCacheResourceModel) ToOperationsUpdateProxycachePluginRequest(ctx context.Context) (*operations.UpdateProxycachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	proxyCachePlugin, proxyCachePluginDiags := r.ToSharedProxyCachePlugin(ctx)
+	diags.Append(proxyCachePluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateProxycachePluginRequest{
+		PluginID:         pluginID,
+		ProxyCachePlugin: *proxyCachePlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginProxyCacheResourceModel) ToOperationsGetProxycachePluginRequest(ctx context.Context) (*operations.GetProxycachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetProxycachePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginProxyCacheResourceModel) ToOperationsDeleteProxycachePluginRequest(ctx context.Context) (*operations.DeleteProxycachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteProxycachePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginProxyCacheResourceModel) RefreshFromSharedProxyCachePlugin(ctx context.Context, resp *shared.ProxyCachePlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -367,16 +425,16 @@ func (r *PluginProxyCacheResourceModel) RefreshFromSharedProxyCachePlugin(resp *
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -402,4 +460,6 @@ func (r *PluginProxyCacheResourceModel) RefreshFromSharedProxyCachePlugin(resp *
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

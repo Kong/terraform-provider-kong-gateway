@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
+func (r *PluginSamlResourceModel) ToSharedSamlPlugin(ctx context.Context) (*shared.SamlPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 	if r.Ordering != nil {
 		var after *shared.SamlPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		}
 		var before *shared.SamlPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 			Before: before,
 		}
 	}
-	var partials []shared.SamlPluginPartials = []shared.SamlPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.SamlPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.SamlPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.SamlPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.SamlPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -143,7 +150,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 			} else {
 				clusterMaxRedirections = nil
 			}
-			var clusterNodes []shared.SamlPluginClusterNodes = []shared.SamlPluginClusterNodes{}
+			clusterNodes := make([]shared.SamlPluginClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
 			for _, clusterNodesItem := range r.Config.Redis.ClusterNodes {
 				ip := new(string)
 				if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -234,7 +241,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 			} else {
 				sentinelMaster = nil
 			}
-			var sentinelNodes []shared.SamlPluginSentinelNodes = []shared.SamlPluginSentinelNodes{}
+			sentinelNodes := make([]shared.SamlPluginSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
 			for _, sentinelNodesItem := range r.Config.Redis.SentinelNodes {
 				host1 := new(string)
 				if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -371,7 +378,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		}
 		sessionAbsoluteTimeout := new(float64)
 		if !r.Config.SessionAbsoluteTimeout.IsUnknown() && !r.Config.SessionAbsoluteTimeout.IsNull() {
-			*sessionAbsoluteTimeout, _ = r.Config.SessionAbsoluteTimeout.ValueBigFloat().Float64()
+			*sessionAbsoluteTimeout = r.Config.SessionAbsoluteTimeout.ValueFloat64()
 		} else {
 			sessionAbsoluteTimeout = nil
 		}
@@ -437,7 +444,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		}
 		sessionIdlingTimeout := new(float64)
 		if !r.Config.SessionIdlingTimeout.IsUnknown() && !r.Config.SessionIdlingTimeout.IsNull() {
-			*sessionIdlingTimeout, _ = r.Config.SessionIdlingTimeout.ValueBigFloat().Float64()
+			*sessionIdlingTimeout = r.Config.SessionIdlingTimeout.ValueFloat64()
 		} else {
 			sessionIdlingTimeout = nil
 		}
@@ -473,7 +480,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		}
 		sessionRememberAbsoluteTimeout := new(float64)
 		if !r.Config.SessionRememberAbsoluteTimeout.IsUnknown() && !r.Config.SessionRememberAbsoluteTimeout.IsNull() {
-			*sessionRememberAbsoluteTimeout, _ = r.Config.SessionRememberAbsoluteTimeout.ValueBigFloat().Float64()
+			*sessionRememberAbsoluteTimeout = r.Config.SessionRememberAbsoluteTimeout.ValueFloat64()
 		} else {
 			sessionRememberAbsoluteTimeout = nil
 		}
@@ -485,21 +492,21 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		}
 		sessionRememberRollingTimeout := new(float64)
 		if !r.Config.SessionRememberRollingTimeout.IsUnknown() && !r.Config.SessionRememberRollingTimeout.IsNull() {
-			*sessionRememberRollingTimeout, _ = r.Config.SessionRememberRollingTimeout.ValueBigFloat().Float64()
+			*sessionRememberRollingTimeout = r.Config.SessionRememberRollingTimeout.ValueFloat64()
 		} else {
 			sessionRememberRollingTimeout = nil
 		}
-		var sessionRequestHeaders []shared.SamlPluginSessionRequestHeaders = []shared.SamlPluginSessionRequestHeaders{}
+		sessionRequestHeaders := make([]shared.SamlPluginSessionRequestHeaders, 0, len(r.Config.SessionRequestHeaders))
 		for _, sessionRequestHeadersItem := range r.Config.SessionRequestHeaders {
 			sessionRequestHeaders = append(sessionRequestHeaders, shared.SamlPluginSessionRequestHeaders(sessionRequestHeadersItem.ValueString()))
 		}
-		var sessionResponseHeaders []shared.SamlPluginSessionResponseHeaders = []shared.SamlPluginSessionResponseHeaders{}
+		sessionResponseHeaders := make([]shared.SamlPluginSessionResponseHeaders, 0, len(r.Config.SessionResponseHeaders))
 		for _, sessionResponseHeadersItem := range r.Config.SessionResponseHeaders {
 			sessionResponseHeaders = append(sessionResponseHeaders, shared.SamlPluginSessionResponseHeaders(sessionResponseHeadersItem.ValueString()))
 		}
 		sessionRollingTimeout := new(float64)
 		if !r.Config.SessionRollingTimeout.IsUnknown() && !r.Config.SessionRollingTimeout.IsNull() {
-			*sessionRollingTimeout, _ = r.Config.SessionRollingTimeout.ValueBigFloat().Float64()
+			*sessionRollingTimeout = r.Config.SessionRollingTimeout.ValueFloat64()
 		} else {
 			sessionRollingTimeout = nil
 		}
@@ -571,7 +578,7 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 			ValidateAssertionSignature:     validateAssertionSignature,
 		}
 	}
-	var protocols []shared.SamlPluginProtocols = []shared.SamlPluginProtocols{}
+	protocols := make([]shared.SamlPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.SamlPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -613,10 +620,60 @@ func (r *PluginSamlResourceModel) ToSharedSamlPlugin() *shared.SamlPlugin {
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlPlugin) {
+func (r *PluginSamlResourceModel) ToOperationsUpdateSamlPluginRequest(ctx context.Context) (*operations.UpdateSamlPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	samlPlugin, samlPluginDiags := r.ToSharedSamlPlugin(ctx)
+	diags.Append(samlPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateSamlPluginRequest{
+		PluginID:   pluginID,
+		SamlPlugin: *samlPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSamlResourceModel) ToOperationsGetSamlPluginRequest(ctx context.Context) (*operations.GetSamlPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetSamlPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSamlResourceModel) ToOperationsDeleteSamlPluginRequest(ctx context.Context) (*operations.DeleteSamlPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteSamlPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(ctx context.Context, resp *shared.SamlPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -642,14 +699,14 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes1)
+						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
@@ -669,14 +726,14 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes1)
+						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
@@ -715,11 +772,7 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 			} else {
 				r.Config.ResponseSignatureAlgorithm = types.StringNull()
 			}
-			if resp.Config.SessionAbsoluteTimeout != nil {
-				r.Config.SessionAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionAbsoluteTimeout)))
-			} else {
-				r.Config.SessionAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.SessionAbsoluteTimeout = types.Float64PointerValue(resp.Config.SessionAbsoluteTimeout)
 			r.Config.SessionAudience = types.StringPointerValue(resp.Config.SessionAudience)
 			r.Config.SessionCookieDomain = types.StringPointerValue(resp.Config.SessionCookieDomain)
 			r.Config.SessionCookieHTTPOnly = types.BoolPointerValue(resp.Config.SessionCookieHTTPOnly)
@@ -734,27 +787,15 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 			r.Config.SessionEnforceSameSubject = types.BoolPointerValue(resp.Config.SessionEnforceSameSubject)
 			r.Config.SessionHashStorageKey = types.BoolPointerValue(resp.Config.SessionHashStorageKey)
 			r.Config.SessionHashSubject = types.BoolPointerValue(resp.Config.SessionHashSubject)
-			if resp.Config.SessionIdlingTimeout != nil {
-				r.Config.SessionIdlingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionIdlingTimeout)))
-			} else {
-				r.Config.SessionIdlingTimeout = types.NumberNull()
-			}
+			r.Config.SessionIdlingTimeout = types.Float64PointerValue(resp.Config.SessionIdlingTimeout)
 			r.Config.SessionMemcachedHost = types.StringPointerValue(resp.Config.SessionMemcachedHost)
 			r.Config.SessionMemcachedPort = types.Int64PointerValue(resp.Config.SessionMemcachedPort)
 			r.Config.SessionMemcachedPrefix = types.StringPointerValue(resp.Config.SessionMemcachedPrefix)
 			r.Config.SessionMemcachedSocket = types.StringPointerValue(resp.Config.SessionMemcachedSocket)
 			r.Config.SessionRemember = types.BoolPointerValue(resp.Config.SessionRemember)
-			if resp.Config.SessionRememberAbsoluteTimeout != nil {
-				r.Config.SessionRememberAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRememberAbsoluteTimeout)))
-			} else {
-				r.Config.SessionRememberAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.SessionRememberAbsoluteTimeout = types.Float64PointerValue(resp.Config.SessionRememberAbsoluteTimeout)
 			r.Config.SessionRememberCookieName = types.StringPointerValue(resp.Config.SessionRememberCookieName)
-			if resp.Config.SessionRememberRollingTimeout != nil {
-				r.Config.SessionRememberRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRememberRollingTimeout)))
-			} else {
-				r.Config.SessionRememberRollingTimeout = types.NumberNull()
-			}
+			r.Config.SessionRememberRollingTimeout = types.Float64PointerValue(resp.Config.SessionRememberRollingTimeout)
 			r.Config.SessionRequestHeaders = make([]types.String, 0, len(resp.Config.SessionRequestHeaders))
 			for _, v := range resp.Config.SessionRequestHeaders {
 				r.Config.SessionRequestHeaders = append(r.Config.SessionRequestHeaders, types.StringValue(string(v)))
@@ -763,11 +804,7 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 			for _, v := range resp.Config.SessionResponseHeaders {
 				r.Config.SessionResponseHeaders = append(r.Config.SessionResponseHeaders, types.StringValue(string(v)))
 			}
-			if resp.Config.SessionRollingTimeout != nil {
-				r.Config.SessionRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.SessionRollingTimeout)))
-			} else {
-				r.Config.SessionRollingTimeout = types.NumberNull()
-			}
+			r.Config.SessionRollingTimeout = types.Float64PointerValue(resp.Config.SessionRollingTimeout)
 			r.Config.SessionSecret = types.StringPointerValue(resp.Config.SessionSecret)
 			if resp.Config.SessionStorage != nil {
 				r.Config.SessionStorage = types.StringValue(string(*resp.Config.SessionStorage))
@@ -810,16 +847,16 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -845,4 +882,6 @@ func (r *PluginSamlResourceModel) RefreshFromSharedSamlPlugin(resp *shared.SamlP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -57,5 +57,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_acl.my_kong-gateway_acl "{ \"aclid\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
+terraform import kong-gateway_acl.my_kong-gateway_acl "{ \"id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
 ```

@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAdvancedPlugin() *shared.RouteTransformerAdvancedPlugin {
+func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAdvancedPlugin(ctx context.Context) (*shared.RouteTransformerAdvancedPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAd
 	if r.Ordering != nil {
 		var after *shared.RouteTransformerAdvancedPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAd
 		}
 		var before *shared.RouteTransformerAdvancedPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAd
 			Before: before,
 		}
 	}
-	var partials []shared.RouteTransformerAdvancedPluginPartials = []shared.RouteTransformerAdvancedPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.RouteTransformerAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RouteTransformerAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RouteTransformerAdvancedPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RouteTransformerAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -141,7 +149,7 @@ func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAd
 			ID: id2,
 		}
 	}
-	var protocols []shared.RouteTransformerAdvancedPluginProtocols = []shared.RouteTransformerAdvancedPluginProtocols{}
+	protocols := make([]shared.RouteTransformerAdvancedPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.RouteTransformerAdvancedPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -184,10 +192,60 @@ func (r *PluginRouteTransformerAdvancedResourceModel) ToSharedRouteTransformerAd
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginRouteTransformerAdvancedResourceModel) RefreshFromSharedRouteTransformerAdvancedPlugin(resp *shared.RouteTransformerAdvancedPlugin) {
+func (r *PluginRouteTransformerAdvancedResourceModel) ToOperationsUpdateRoutetransformeradvancedPluginRequest(ctx context.Context) (*operations.UpdateRoutetransformeradvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	routeTransformerAdvancedPlugin, routeTransformerAdvancedPluginDiags := r.ToSharedRouteTransformerAdvancedPlugin(ctx)
+	diags.Append(routeTransformerAdvancedPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRoutetransformeradvancedPluginRequest{
+		PluginID:                       pluginID,
+		RouteTransformerAdvancedPlugin: *routeTransformerAdvancedPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteTransformerAdvancedResourceModel) ToOperationsGetRoutetransformeradvancedPluginRequest(ctx context.Context) (*operations.GetRoutetransformeradvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRoutetransformeradvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteTransformerAdvancedResourceModel) ToOperationsDeleteRoutetransformeradvancedPluginRequest(ctx context.Context) (*operations.DeleteRoutetransformeradvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteRoutetransformeradvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteTransformerAdvancedResourceModel) RefreshFromSharedRouteTransformerAdvancedPlugin(ctx context.Context, resp *shared.RouteTransformerAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -237,16 +295,16 @@ func (r *PluginRouteTransformerAdvancedResourceModel) RefreshFromSharedRouteTran
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -272,4 +330,6 @@ func (r *PluginRouteTransformerAdvancedResourceModel) RefreshFromSharedRouteTran
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

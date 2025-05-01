@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -157,15 +156,13 @@ func (r *JwtResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateJwtWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	jwtWithoutParents := *data.ToSharedJWTWithoutParents()
-	request := operations.CreateJwtWithConsumerRequest{
-		ConsumerID:        consumerID,
-		JWTWithoutParents: jwtWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.JWTs.CreateJwtWithConsumer(ctx, request)
+	res, err := r.client.JWTs.CreateJwtWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -185,8 +182,17 @@ func (r *JwtResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwt(res.Jwt)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwt(ctx, res.Jwt)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -210,17 +216,13 @@ func (r *JwtResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetJwtWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var jwtID string
-	jwtID = data.ID.ValueString()
-
-	request := operations.GetJwtWithConsumerRequest{
-		ConsumerID: consumerID,
-		JWTID:      jwtID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.JWTs.GetJwtWithConsumer(ctx, request)
+	res, err := r.client.JWTs.GetJwtWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -244,7 +246,11 @@ func (r *JwtResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwt(res.Jwt)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwt(ctx, res.Jwt)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -264,19 +270,13 @@ func (r *JwtResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateJwtWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var jwtID string
-	jwtID = data.ID.ValueString()
-
-	jwt := *data.ToSharedJwt()
-	request := operations.UpdateJwtWithConsumerRequest{
-		ConsumerID: consumerID,
-		JWTID:      jwtID,
-		Jwt:        jwt,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.JWTs.UpdateJwtWithConsumer(ctx, request)
+	res, err := r.client.JWTs.UpdateJwtWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -296,8 +296,17 @@ func (r *JwtResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwt(res.Jwt)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwt(ctx, res.Jwt)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -321,17 +330,13 @@ func (r *JwtResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteJwtWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var jwtID string
-	jwtID = data.ID.ValueString()
-
-	request := operations.DeleteJwtWithConsumerRequest{
-		ConsumerID: consumerID,
-		JWTID:      jwtID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.JWTs.DeleteJwtWithConsumer(ctx, request)
+	res, err := r.client.JWTs.DeleteJwtWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -359,7 +364,7 @@ func (r *JwtResource) ImportState(ctx context.Context, req resource.ImportStateR
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "jwtid": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}': `+err.Error())
 		return
 	}
 

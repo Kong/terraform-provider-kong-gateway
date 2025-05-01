@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -172,7 +171,7 @@ func (r *PluginAiSemanticCacheDataSource) Schema(ctx context.Context, req dataso
 						Computed:    true,
 						Description: `Ignore and discard any tool prompts when Vectorizing the request`,
 					},
-					"message_countback": schema.NumberAttribute{
+					"message_countback": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Number of messages in the chat history to Vectorize/Cache`,
 					},
@@ -308,7 +307,7 @@ func (r *PluginAiSemanticCacheDataSource) Schema(ctx context.Context, req dataso
 								Computed:    true,
 								Description: `which vector database driver to use`,
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
 							},
@@ -461,13 +460,13 @@ func (r *PluginAiSemanticCacheDataSource) Read(ctx context.Context, req datasour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAisemanticcachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -479,10 +478,6 @@ func (r *PluginAiSemanticCacheDataSource) Read(ctx context.Context, req datasour
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -491,7 +486,11 @@ func (r *PluginAiSemanticCacheDataSource) Read(ctx context.Context, req datasour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

@@ -3,12 +3,34 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *JwtDataSourceModel) RefreshFromSharedJwt(resp *shared.Jwt) {
+func (r *JwtDataSourceModel) ToOperationsGetJwtWithConsumerRequest(ctx context.Context) (*operations.GetJwtWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var jwtID string
+	jwtID = r.ID.ValueString()
+
+	out := operations.GetJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
+	}
+
+	return &out, diags
+}
+
+func (r *JwtDataSourceModel) RefreshFromSharedJwt(ctx context.Context, resp *shared.Jwt) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Algorithm != nil {
 			r.Algorithm = types.StringValue(string(*resp.Algorithm))
@@ -31,4 +53,6 @@ func (r *JwtDataSourceModel) RefreshFromSharedJwt(resp *shared.Jwt) {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 	}
+
+	return diags
 }

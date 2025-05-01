@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -232,8 +231,13 @@ func (r *PluginStandardWebhooksResource) Create(ctx context.Context, req resourc
 		return
 	}
 
-	request := *data.ToSharedStandardWebhooksPlugin()
-	res, err := r.client.Plugins.CreateStandardwebhooksPlugin(ctx, request)
+	request, requestDiags := data.ToSharedStandardWebhooksPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateStandardwebhooksPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -253,8 +257,17 @@ func (r *PluginStandardWebhooksResource) Create(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStandardWebhooksPlugin(res.StandardWebhooksPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedStandardWebhooksPlugin(ctx, res.StandardWebhooksPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -278,13 +291,13 @@ func (r *PluginStandardWebhooksResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetStandardwebhooksPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetStandardwebhooksPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetStandardwebhooksPlugin(ctx, request)
+	res, err := r.client.Plugins.GetStandardwebhooksPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -308,7 +321,11 @@ func (r *PluginStandardWebhooksResource) Read(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStandardWebhooksPlugin(res.StandardWebhooksPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedStandardWebhooksPlugin(ctx, res.StandardWebhooksPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -328,15 +345,13 @@ func (r *PluginStandardWebhooksResource) Update(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateStandardwebhooksPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	standardWebhooksPlugin := *data.ToSharedStandardWebhooksPlugin()
-	request := operations.UpdateStandardwebhooksPluginRequest{
-		PluginID:               pluginID,
-		StandardWebhooksPlugin: standardWebhooksPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateStandardwebhooksPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateStandardwebhooksPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -356,8 +371,17 @@ func (r *PluginStandardWebhooksResource) Update(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStandardWebhooksPlugin(res.StandardWebhooksPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedStandardWebhooksPlugin(ctx, res.StandardWebhooksPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -381,13 +405,13 @@ func (r *PluginStandardWebhooksResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteStandardwebhooksPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteStandardwebhooksPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteStandardwebhooksPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteStandardwebhooksPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

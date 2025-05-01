@@ -3,11 +3,29 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *CACertificateDataSourceModel) RefreshFromSharedCACertificate(resp *shared.CACertificate) {
+func (r *CACertificateDataSourceModel) ToOperationsGetCaCertificateRequest(ctx context.Context) (*operations.GetCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	out := operations.GetCaCertificateRequest{
+		CACertificateID: caCertificateID,
+	}
+
+	return &out, diags
+}
+
+func (r *CACertificateDataSourceModel) RefreshFromSharedCACertificate(ctx context.Context, resp *shared.CACertificate) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.Cert = types.StringValue(resp.Cert)
 		r.CertDigest = types.StringPointerValue(resp.CertDigest)
@@ -19,4 +37,6 @@ func (r *CACertificateDataSourceModel) RefreshFromSharedCACertificate(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

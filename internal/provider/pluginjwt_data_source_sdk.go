@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginJwtDataSourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPlugin) {
+func (r *PluginJwtDataSourceModel) ToOperationsGetJwtPluginRequest(ctx context.Context) (*operations.GetJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetJwtPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtDataSourceModel) RefreshFromSharedJwtPlugin(ctx context.Context, resp *shared.JwtPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -29,11 +46,7 @@ func (r *PluginJwtDataSourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPl
 				r.Config.HeaderNames = append(r.Config.HeaderNames, types.StringValue(v))
 			}
 			r.Config.KeyClaimName = types.StringPointerValue(resp.Config.KeyClaimName)
-			if resp.Config.MaximumExpiration != nil {
-				r.Config.MaximumExpiration = types.NumberValue(big.NewFloat(float64(*resp.Config.MaximumExpiration)))
-			} else {
-				r.Config.MaximumExpiration = types.NumberNull()
-			}
+			r.Config.MaximumExpiration = types.Float64PointerValue(resp.Config.MaximumExpiration)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
 			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
 			r.Config.SecretIsBase64 = types.BoolPointerValue(resp.Config.SecretIsBase64)
@@ -75,16 +88,16 @@ func (r *PluginJwtDataSourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPl
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -110,4 +123,6 @@ func (r *PluginJwtDataSourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPl
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

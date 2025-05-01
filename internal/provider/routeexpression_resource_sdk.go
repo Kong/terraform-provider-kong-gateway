@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *RouteExpressionResourceModel) ToSharedRouteExpression() *shared.RouteExpression {
+func (r *RouteExpressionResourceModel) ToSharedRouteExpression(ctx context.Context) (*shared.RouteExpression, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -57,9 +62,12 @@ func (r *RouteExpressionResourceModel) ToSharedRouteExpression() *shared.RouteEx
 	} else {
 		priority = nil
 	}
-	var protocols []shared.RouteExpressionProtocols = []shared.RouteExpressionProtocols{}
-	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.RouteExpressionProtocols(protocolsItem.ValueString()))
+	var protocols []shared.RouteExpressionProtocols
+	if r.Protocols != nil {
+		protocols = make([]shared.RouteExpressionProtocols, 0, len(r.Protocols))
+		for _, protocolsItem := range r.Protocols {
+			protocols = append(protocols, shared.RouteExpressionProtocols(protocolsItem.ValueString()))
+		}
 	}
 	requestBuffering := new(bool)
 	if !r.RequestBuffering.IsUnknown() && !r.RequestBuffering.IsNull() {
@@ -91,7 +99,7 @@ func (r *RouteExpressionResourceModel) ToSharedRouteExpression() *shared.RouteEx
 	} else {
 		stripPath = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -118,10 +126,60 @@ func (r *RouteExpressionResourceModel) ToSharedRouteExpression() *shared.RouteEx
 		Tags:                    tags,
 		UpdatedAt:               updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *RouteExpressionResourceModel) RefreshFromSharedRouteExpression(resp *shared.RouteExpression) {
+func (r *RouteExpressionResourceModel) ToOperationsUpsertRouteRouteExpressionRequest(ctx context.Context) (*operations.UpsertRouteRouteExpressionRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	routeExpression, routeExpressionDiags := r.ToSharedRouteExpression(ctx)
+	diags.Append(routeExpressionDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertRouteRouteExpressionRequest{
+		RouteIDOrName:   routeIDOrName,
+		RouteExpression: *routeExpression,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteExpressionResourceModel) ToOperationsGetRouteRouteExpressionRequest(ctx context.Context) (*operations.GetRouteRouteExpressionRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.GetRouteRouteExpressionRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteExpressionResourceModel) ToOperationsDeleteRouteRouteExpressionRequest(ctx context.Context) (*operations.DeleteRouteRouteExpressionRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.DeleteRouteRouteExpressionRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteExpressionResourceModel) RefreshFromSharedRouteExpression(ctx context.Context, resp *shared.RouteExpression) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Expression = types.StringPointerValue(resp.Expression)
@@ -160,4 +218,6 @@ func (r *RouteExpressionResourceModel) RefreshFromSharedRouteExpression(resp *sh
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

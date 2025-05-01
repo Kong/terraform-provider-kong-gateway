@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -156,8 +155,13 @@ func (r *KeyResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedKey()
-	res, err := r.client.Keys.CreateKey(ctx, request)
+	request, requestDiags := data.ToSharedKey(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Keys.CreateKey(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -177,8 +181,17 @@ func (r *KeyResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKey(res.Key)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKey(ctx, res.Key)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -202,13 +215,13 @@ func (r *KeyResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	var keyIDOrName string
-	keyIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetKeyRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetKeyRequest{
-		KeyIDOrName: keyIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Keys.GetKey(ctx, request)
+	res, err := r.client.Keys.GetKey(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -232,7 +245,11 @@ func (r *KeyResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKey(res.Key)
+	resp.Diagnostics.Append(data.RefreshFromSharedKey(ctx, res.Key)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -252,15 +269,13 @@ func (r *KeyResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	var keyIDOrName string
-	keyIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertKeyRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	key := *data.ToSharedKey()
-	request := operations.UpsertKeyRequest{
-		KeyIDOrName: keyIDOrName,
-		Key:         key,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Keys.UpsertKey(ctx, request)
+	res, err := r.client.Keys.UpsertKey(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -280,8 +295,17 @@ func (r *KeyResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKey(res.Key)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKey(ctx, res.Key)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -305,13 +329,13 @@ func (r *KeyResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	var keyIDOrName string
-	keyIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteKeyRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteKeyRequest{
-		KeyIDOrName: keyIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Keys.DeleteKey(ctx, request)
+	res, err := r.client.Keys.DeleteKey(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

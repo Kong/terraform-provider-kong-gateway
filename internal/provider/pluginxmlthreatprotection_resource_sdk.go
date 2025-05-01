@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlugin() *shared.XMLThreatProtectionPlugin {
+func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlugin(ctx context.Context) (*shared.XMLThreatProtectionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 	if r.Ordering != nil {
 		var after *shared.XMLThreatProtectionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 		}
 		var before *shared.XMLThreatProtectionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.XMLThreatProtectionPluginPartials = []shared.XMLThreatProtectionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.XMLThreatProtectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.XMLThreatProtectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.XMLThreatProtectionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.XMLThreatProtectionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -105,7 +112,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 		} else {
 			allowDtd = nil
 		}
-		var allowedContentTypes []string = []string{}
+		allowedContentTypes := make([]string, 0, len(r.Config.AllowedContentTypes))
 		for _, allowedContentTypesItem := range r.Config.AllowedContentTypes {
 			allowedContentTypes = append(allowedContentTypes, allowedContentTypesItem.ValueString())
 		}
@@ -117,7 +124,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 		}
 		blaMaxAmplification := new(float64)
 		if !r.Config.BlaMaxAmplification.IsUnknown() && !r.Config.BlaMaxAmplification.IsNull() {
-			*blaMaxAmplification, _ = r.Config.BlaMaxAmplification.ValueBigFloat().Float64()
+			*blaMaxAmplification = r.Config.BlaMaxAmplification.ValueFloat64()
 		} else {
 			blaMaxAmplification = nil
 		}
@@ -133,7 +140,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 		} else {
 			buffer = nil
 		}
-		var checkedContentTypes []string = []string{}
+		checkedContentTypes := make([]string, 0, len(r.Config.CheckedContentTypes))
 		for _, checkedContentTypesItem := range r.Config.CheckedContentTypes {
 			checkedContentTypes = append(checkedContentTypes, checkedContentTypesItem.ValueString())
 		}
@@ -271,7 +278,7 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 			ID: id2,
 		}
 	}
-	var protocols []shared.XMLThreatProtectionPluginProtocols = []shared.XMLThreatProtectionPluginProtocols{}
+	protocols := make([]shared.XMLThreatProtectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.XMLThreatProtectionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -314,10 +321,60 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProtectionPlugin(resp *shared.XMLThreatProtectionPlugin) {
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsUpdateXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.UpdateXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	xmlThreatProtectionPlugin, xmlThreatProtectionPluginDiags := r.ToSharedXMLThreatProtectionPlugin(ctx)
+	diags.Append(xmlThreatProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateXmlthreatprotectionPluginRequest{
+		PluginID:                  pluginID,
+		XMLThreatProtectionPlugin: *xmlThreatProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsGetXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.GetXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetXmlthreatprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsDeleteXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.DeleteXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteXmlthreatprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProtectionPlugin(ctx context.Context, resp *shared.XMLThreatProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -329,11 +386,7 @@ func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProte
 				r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
 			}
 			r.Config.Attribute = types.Int64PointerValue(resp.Config.Attribute)
-			if resp.Config.BlaMaxAmplification != nil {
-				r.Config.BlaMaxAmplification = types.NumberValue(big.NewFloat(float64(*resp.Config.BlaMaxAmplification)))
-			} else {
-				r.Config.BlaMaxAmplification = types.NumberNull()
-			}
+			r.Config.BlaMaxAmplification = types.Float64PointerValue(resp.Config.BlaMaxAmplification)
 			r.Config.BlaThreshold = types.Int64PointerValue(resp.Config.BlaThreshold)
 			r.Config.Buffer = types.Int64PointerValue(resp.Config.Buffer)
 			r.Config.CheckedContentTypes = make([]types.String, 0, len(resp.Config.CheckedContentTypes))
@@ -396,16 +449,16 @@ func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProte
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -431,4 +484,6 @@ func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProte
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

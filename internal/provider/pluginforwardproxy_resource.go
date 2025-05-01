@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -287,8 +286,13 @@ func (r *PluginForwardProxyResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 
-	request := *data.ToSharedForwardProxyPlugin()
-	res, err := r.client.Plugins.CreateForwardproxyPlugin(ctx, request)
+	request, requestDiags := data.ToSharedForwardProxyPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateForwardproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -308,8 +312,17 @@ func (r *PluginForwardProxyResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedForwardProxyPlugin(res.ForwardProxyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedForwardProxyPlugin(ctx, res.ForwardProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -333,13 +346,13 @@ func (r *PluginForwardProxyResource) Read(ctx context.Context, req resource.Read
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetForwardproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetForwardproxyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetForwardproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.GetForwardproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -363,7 +376,11 @@ func (r *PluginForwardProxyResource) Read(ctx context.Context, req resource.Read
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedForwardProxyPlugin(res.ForwardProxyPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedForwardProxyPlugin(ctx, res.ForwardProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -383,15 +400,13 @@ func (r *PluginForwardProxyResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateForwardproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	forwardProxyPlugin := *data.ToSharedForwardProxyPlugin()
-	request := operations.UpdateForwardproxyPluginRequest{
-		PluginID:           pluginID,
-		ForwardProxyPlugin: forwardProxyPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateForwardproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateForwardproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -411,8 +426,17 @@ func (r *PluginForwardProxyResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedForwardProxyPlugin(res.ForwardProxyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedForwardProxyPlugin(ctx, res.ForwardProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -436,13 +460,13 @@ func (r *PluginForwardProxyResource) Delete(ctx context.Context, req resource.De
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteForwardproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteForwardproxyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteForwardproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteForwardproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

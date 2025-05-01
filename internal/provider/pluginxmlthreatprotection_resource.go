@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -76,10 +76,13 @@ func (r *PluginXMLThreatProtectionResource) Schema(ctx context.Context, req reso
 						Optional:    true,
 						Description: `Maximum size of the attribute value.`,
 					},
-					"bla_max_amplification": schema.NumberAttribute{
+					"bla_max_amplification": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Sets the maximum allowed amplification. This protects against the Billion Laughs Attack.`,
+						Validators: []validator.Float64{
+							float64validator.AtLeast(1),
+						},
 					},
 					"bla_threshold": schema.Int64Attribute{
 						Computed:    true,
@@ -343,8 +346,13 @@ func (r *PluginXMLThreatProtectionResource) Create(ctx context.Context, req reso
 		return
 	}
 
-	request := *data.ToSharedXMLThreatProtectionPlugin()
-	res, err := r.client.Plugins.CreateXmlthreatprotectionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedXMLThreatProtectionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateXmlthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -364,8 +372,17 @@ func (r *PluginXMLThreatProtectionResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedXMLThreatProtectionPlugin(res.XMLThreatProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedXMLThreatProtectionPlugin(ctx, res.XMLThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -389,13 +406,13 @@ func (r *PluginXMLThreatProtectionResource) Read(ctx context.Context, req resour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetXmlthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetXmlthreatprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetXmlthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetXmlthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -419,7 +436,11 @@ func (r *PluginXMLThreatProtectionResource) Read(ctx context.Context, req resour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedXMLThreatProtectionPlugin(res.XMLThreatProtectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedXMLThreatProtectionPlugin(ctx, res.XMLThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -439,15 +460,13 @@ func (r *PluginXMLThreatProtectionResource) Update(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateXmlthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	xmlThreatProtectionPlugin := *data.ToSharedXMLThreatProtectionPlugin()
-	request := operations.UpdateXmlthreatprotectionPluginRequest{
-		PluginID:                  pluginID,
-		XMLThreatProtectionPlugin: xmlThreatProtectionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateXmlthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateXmlthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -467,8 +486,17 @@ func (r *PluginXMLThreatProtectionResource) Update(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedXMLThreatProtectionPlugin(res.XMLThreatProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedXMLThreatProtectionPlugin(ctx, res.XMLThreatProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -492,13 +520,13 @@ func (r *PluginXMLThreatProtectionResource) Delete(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteXmlthreatprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteXmlthreatprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteXmlthreatprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteXmlthreatprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

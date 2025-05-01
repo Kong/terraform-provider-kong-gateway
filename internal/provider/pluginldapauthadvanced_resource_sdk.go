@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *shared.LdapAuthAdvancedPlugin {
+func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin(ctx context.Context) (*shared.LdapAuthAdvancedPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 	if r.Ordering != nil {
 		var after *shared.LdapAuthAdvancedPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		}
 		var before *shared.LdapAuthAdvancedPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 			Before: before,
 		}
 	}
-	var partials []shared.LdapAuthAdvancedPluginPartials = []shared.LdapAuthAdvancedPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.LdapAuthAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.LdapAuthAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.LdapAuthAdvancedPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.LdapAuthAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -125,11 +132,11 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		}
 		cacheTTL := new(float64)
 		if !r.Config.CacheTTL.IsUnknown() && !r.Config.CacheTTL.IsNull() {
-			*cacheTTL, _ = r.Config.CacheTTL.ValueBigFloat().Float64()
+			*cacheTTL = r.Config.CacheTTL.ValueFloat64()
 		} else {
 			cacheTTL = nil
 		}
-		var consumerBy []shared.LdapAuthAdvancedPluginConsumerBy = []shared.LdapAuthAdvancedPluginConsumerBy{}
+		consumerBy := make([]shared.LdapAuthAdvancedPluginConsumerBy, 0, len(r.Config.ConsumerBy))
 		for _, consumerByItem := range r.Config.ConsumerBy {
 			consumerBy = append(consumerBy, shared.LdapAuthAdvancedPluginConsumerBy(consumerByItem.ValueString()))
 		}
@@ -157,7 +164,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		} else {
 			groupNameAttribute = nil
 		}
-		var groupsRequired []string = []string{}
+		groupsRequired := make([]string, 0, len(r.Config.GroupsRequired))
 		for _, groupsRequiredItem := range r.Config.GroupsRequired {
 			groupsRequired = append(groupsRequired, groupsRequiredItem.ValueString())
 		}
@@ -175,7 +182,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		}
 		keepalive := new(float64)
 		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+			*keepalive = r.Config.Keepalive.ValueFloat64()
 		} else {
 			keepalive = nil
 		}
@@ -193,7 +200,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		}
 		ldapPort := new(float64)
 		if !r.Config.LdapPort.IsUnknown() && !r.Config.LdapPort.IsNull() {
-			*ldapPort, _ = r.Config.LdapPort.ValueBigFloat().Float64()
+			*ldapPort = r.Config.LdapPort.ValueFloat64()
 		} else {
 			ldapPort = nil
 		}
@@ -223,7 +230,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -259,7 +266,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 			VerifyLdapHost:       verifyLdapHost,
 		}
 	}
-	var protocols []shared.LdapAuthAdvancedPluginProtocols = []shared.LdapAuthAdvancedPluginProtocols{}
+	protocols := make([]shared.LdapAuthAdvancedPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.LdapAuthAdvancedPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -301,10 +308,60 @@ func (r *PluginLdapAuthAdvancedResourceModel) ToSharedLdapAuthAdvancedPlugin() *
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedPlugin(resp *shared.LdapAuthAdvancedPlugin) {
+func (r *PluginLdapAuthAdvancedResourceModel) ToOperationsUpdateLdapauthadvancedPluginRequest(ctx context.Context) (*operations.UpdateLdapauthadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	ldapAuthAdvancedPlugin, ldapAuthAdvancedPluginDiags := r.ToSharedLdapAuthAdvancedPlugin(ctx)
+	diags.Append(ldapAuthAdvancedPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateLdapauthadvancedPluginRequest{
+		PluginID:               pluginID,
+		LdapAuthAdvancedPlugin: *ldapAuthAdvancedPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginLdapAuthAdvancedResourceModel) ToOperationsGetLdapauthadvancedPluginRequest(ctx context.Context) (*operations.GetLdapauthadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetLdapauthadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginLdapAuthAdvancedResourceModel) ToOperationsDeleteLdapauthadvancedPluginRequest(ctx context.Context) (*operations.DeleteLdapauthadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteLdapauthadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedPlugin(ctx context.Context, resp *shared.LdapAuthAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -314,11 +371,7 @@ func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedP
 			r.Config.Attribute = types.StringPointerValue(resp.Config.Attribute)
 			r.Config.BaseDn = types.StringPointerValue(resp.Config.BaseDn)
 			r.Config.BindDn = types.StringPointerValue(resp.Config.BindDn)
-			if resp.Config.CacheTTL != nil {
-				r.Config.CacheTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTL)))
-			} else {
-				r.Config.CacheTTL = types.NumberNull()
-			}
+			r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
 			r.Config.ConsumerBy = make([]types.String, 0, len(resp.Config.ConsumerBy))
 			for _, v := range resp.Config.ConsumerBy {
 				r.Config.ConsumerBy = append(r.Config.ConsumerBy, types.StringValue(string(v)))
@@ -333,27 +386,15 @@ func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedP
 			}
 			r.Config.HeaderType = types.StringPointerValue(resp.Config.HeaderType)
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			r.Config.LdapHost = types.StringPointerValue(resp.Config.LdapHost)
 			r.Config.LdapPassword = types.StringPointerValue(resp.Config.LdapPassword)
-			if resp.Config.LdapPort != nil {
-				r.Config.LdapPort = types.NumberValue(big.NewFloat(float64(*resp.Config.LdapPort)))
-			} else {
-				r.Config.LdapPort = types.NumberNull()
-			}
+			r.Config.LdapPort = types.Float64PointerValue(resp.Config.LdapPort)
 			r.Config.Ldaps = types.BoolPointerValue(resp.Config.Ldaps)
 			r.Config.LogSearchResults = types.BoolPointerValue(resp.Config.LogSearchResults)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
 			r.Config.StartTLS = types.BoolPointerValue(resp.Config.StartTLS)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.VerifyLdapHost = types.BoolPointerValue(resp.Config.VerifyLdapHost)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -389,16 +430,16 @@ func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -424,4 +465,6 @@ func (r *PluginLdapAuthAdvancedResourceModel) RefreshFromSharedLdapAuthAdvancedP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

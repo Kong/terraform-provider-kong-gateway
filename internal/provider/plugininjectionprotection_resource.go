@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -277,8 +276,13 @@ func (r *PluginInjectionProtectionResource) Create(ctx context.Context, req reso
 		return
 	}
 
-	request := *data.ToSharedInjectionProtectionPlugin()
-	res, err := r.client.Plugins.CreateInjectionprotectionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedInjectionProtectionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateInjectionprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -298,8 +302,17 @@ func (r *PluginInjectionProtectionResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedInjectionProtectionPlugin(res.InjectionProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedInjectionProtectionPlugin(ctx, res.InjectionProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -323,13 +336,13 @@ func (r *PluginInjectionProtectionResource) Read(ctx context.Context, req resour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetInjectionprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetInjectionprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetInjectionprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetInjectionprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -353,7 +366,11 @@ func (r *PluginInjectionProtectionResource) Read(ctx context.Context, req resour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedInjectionProtectionPlugin(res.InjectionProtectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedInjectionProtectionPlugin(ctx, res.InjectionProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -373,15 +390,13 @@ func (r *PluginInjectionProtectionResource) Update(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateInjectionprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	injectionProtectionPlugin := *data.ToSharedInjectionProtectionPlugin()
-	request := operations.UpdateInjectionprotectionPluginRequest{
-		PluginID:                  pluginID,
-		InjectionProtectionPlugin: injectionProtectionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateInjectionprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateInjectionprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -401,8 +416,17 @@ func (r *PluginInjectionProtectionResource) Update(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedInjectionProtectionPlugin(res.InjectionProtectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedInjectionProtectionPlugin(ctx, res.InjectionProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -426,13 +450,13 @@ func (r *PluginInjectionProtectionResource) Delete(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteInjectionprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteInjectionprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteInjectionprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteInjectionprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

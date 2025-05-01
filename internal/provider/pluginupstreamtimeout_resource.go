@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -247,8 +246,13 @@ func (r *PluginUpstreamTimeoutResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	request := *data.ToSharedUpstreamTimeoutPlugin()
-	res, err := r.client.Plugins.CreateUpstreamtimeoutPlugin(ctx, request)
+	request, requestDiags := data.ToSharedUpstreamTimeoutPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateUpstreamtimeoutPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -268,8 +272,17 @@ func (r *PluginUpstreamTimeoutResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamTimeoutPlugin(res.UpstreamTimeoutPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamTimeoutPlugin(ctx, res.UpstreamTimeoutPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -293,13 +306,13 @@ func (r *PluginUpstreamTimeoutResource) Read(ctx context.Context, req resource.R
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetUpstreamtimeoutPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetUpstreamtimeoutPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetUpstreamtimeoutPlugin(ctx, request)
+	res, err := r.client.Plugins.GetUpstreamtimeoutPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -323,7 +336,11 @@ func (r *PluginUpstreamTimeoutResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamTimeoutPlugin(res.UpstreamTimeoutPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamTimeoutPlugin(ctx, res.UpstreamTimeoutPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -343,15 +360,13 @@ func (r *PluginUpstreamTimeoutResource) Update(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateUpstreamtimeoutPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	upstreamTimeoutPlugin := *data.ToSharedUpstreamTimeoutPlugin()
-	request := operations.UpdateUpstreamtimeoutPluginRequest{
-		PluginID:              pluginID,
-		UpstreamTimeoutPlugin: upstreamTimeoutPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateUpstreamtimeoutPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateUpstreamtimeoutPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -371,8 +386,17 @@ func (r *PluginUpstreamTimeoutResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamTimeoutPlugin(res.UpstreamTimeoutPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamTimeoutPlugin(ctx, res.UpstreamTimeoutPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -396,13 +420,13 @@ func (r *PluginUpstreamTimeoutResource) Delete(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteUpstreamtimeoutPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteUpstreamtimeoutPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteUpstreamtimeoutPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteUpstreamtimeoutPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

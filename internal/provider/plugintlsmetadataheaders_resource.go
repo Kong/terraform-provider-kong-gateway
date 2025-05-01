@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -240,8 +239,13 @@ func (r *PluginTLSMetadataHeadersResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request := *data.ToSharedTLSMetadataHeadersPlugin()
-	res, err := r.client.Plugins.CreateTlsmetadataheadersPlugin(ctx, request)
+	request, requestDiags := data.ToSharedTLSMetadataHeadersPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateTlsmetadataheadersPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -261,8 +265,17 @@ func (r *PluginTLSMetadataHeadersResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSMetadataHeadersPlugin(res.TLSMetadataHeadersPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSMetadataHeadersPlugin(ctx, res.TLSMetadataHeadersPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -286,13 +299,13 @@ func (r *PluginTLSMetadataHeadersResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetTlsmetadataheadersPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetTlsmetadataheadersPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetTlsmetadataheadersPlugin(ctx, request)
+	res, err := r.client.Plugins.GetTlsmetadataheadersPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -316,7 +329,11 @@ func (r *PluginTLSMetadataHeadersResource) Read(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSMetadataHeadersPlugin(res.TLSMetadataHeadersPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSMetadataHeadersPlugin(ctx, res.TLSMetadataHeadersPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -336,15 +353,13 @@ func (r *PluginTLSMetadataHeadersResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateTlsmetadataheadersPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	tlsMetadataHeadersPlugin := *data.ToSharedTLSMetadataHeadersPlugin()
-	request := operations.UpdateTlsmetadataheadersPluginRequest{
-		PluginID:                 pluginID,
-		TLSMetadataHeadersPlugin: tlsMetadataHeadersPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateTlsmetadataheadersPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateTlsmetadataheadersPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -364,8 +379,17 @@ func (r *PluginTLSMetadataHeadersResource) Update(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSMetadataHeadersPlugin(res.TLSMetadataHeadersPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSMetadataHeadersPlugin(ctx, res.TLSMetadataHeadersPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -389,13 +413,13 @@ func (r *PluginTLSMetadataHeadersResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteTlsmetadataheadersPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteTlsmetadataheadersPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteTlsmetadataheadersPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteTlsmetadataheadersPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

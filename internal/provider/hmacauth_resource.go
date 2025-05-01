@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -126,15 +125,13 @@ func (r *HMACAuthResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateHmacAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	hmacAuthWithoutParents := *data.ToSharedHMACAuthWithoutParents()
-	request := operations.CreateHmacAuthWithConsumerRequest{
-		ConsumerID:             consumerID,
-		HMACAuthWithoutParents: hmacAuthWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.HMACAuthCredentials.CreateHmacAuthWithConsumer(ctx, request)
+	res, err := r.client.HMACAuthCredentials.CreateHmacAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -154,8 +151,17 @@ func (r *HMACAuthResource) Create(ctx context.Context, req resource.CreateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHMACAuth(res.HMACAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHMACAuth(ctx, res.HMACAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -179,17 +185,13 @@ func (r *HMACAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetHmacAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var hmacAuthID string
-	hmacAuthID = data.ID.ValueString()
-
-	request := operations.GetHmacAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		HMACAuthID: hmacAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, request)
+	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -213,7 +215,11 @@ func (r *HMACAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHMACAuth(res.HMACAuth)
+	resp.Diagnostics.Append(data.RefreshFromSharedHMACAuth(ctx, res.HMACAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -233,19 +239,13 @@ func (r *HMACAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateHmacAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var hmacAuthID string
-	hmacAuthID = data.ID.ValueString()
-
-	hmacAuth := *data.ToSharedHMACAuth()
-	request := operations.UpdateHmacAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		HMACAuthID: hmacAuthID,
-		HMACAuth:   hmacAuth,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.HMACAuthCredentials.UpdateHmacAuthWithConsumer(ctx, request)
+	res, err := r.client.HMACAuthCredentials.UpdateHmacAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -265,8 +265,17 @@ func (r *HMACAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHMACAuth(res.HMACAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHMACAuth(ctx, res.HMACAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -290,17 +299,13 @@ func (r *HMACAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteHmacAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var hmacAuthID string
-	hmacAuthID = data.ID.ValueString()
-
-	request := operations.DeleteHmacAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		HMACAuthID: hmacAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.HMACAuthCredentials.DeleteHmacAuthWithConsumer(ctx, request)
+	res, err := r.client.HMACAuthCredentials.DeleteHmacAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -328,7 +333,7 @@ func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportS
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "hmac_auth_id": "70e7b00b-72f2-471b-a5ce-9c4171775360"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": "70e7b00b-72f2-471b-a5ce-9c4171775360"}': `+err.Error())
 		return
 	}
 

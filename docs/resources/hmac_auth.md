@@ -59,5 +59,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"hmac_auth_id\": \"70e7b00b-72f2-471b-a5ce-9c4171775360\"}"
+terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"id\": \"70e7b00b-72f2-471b-a5ce-9c4171775360\"}"
 ```

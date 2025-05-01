@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -438,8 +437,13 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Create(ctx context.Context, re
 		return
 	}
 
-	request := *data.ToSharedGraphqlProxyCacheAdvancedPlugin()
-	res, err := r.client.Plugins.CreateGraphqlproxycacheadvancedPlugin(ctx, request)
+	request, requestDiags := data.ToSharedGraphqlProxyCacheAdvancedPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -459,8 +463,17 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Create(ctx context.Context, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(res.GraphqlProxyCacheAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(ctx, res.GraphqlProxyCacheAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -484,13 +497,13 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Read(ctx context.Context, req 
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetGraphqlproxycacheadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetGraphqlproxycacheadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetGraphqlproxycacheadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -514,7 +527,11 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Read(ctx context.Context, req 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(res.GraphqlProxyCacheAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(ctx, res.GraphqlProxyCacheAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -534,15 +551,13 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Update(ctx context.Context, re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateGraphqlproxycacheadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	graphqlProxyCacheAdvancedPlugin := *data.ToSharedGraphqlProxyCacheAdvancedPlugin()
-	request := operations.UpdateGraphqlproxycacheadvancedPluginRequest{
-		PluginID:                        pluginID,
-		GraphqlProxyCacheAdvancedPlugin: graphqlProxyCacheAdvancedPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateGraphqlproxycacheadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -562,8 +577,17 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Update(ctx context.Context, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(res.GraphqlProxyCacheAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(ctx, res.GraphqlProxyCacheAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -587,13 +611,13 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Delete(ctx context.Context, re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteGraphqlproxycacheadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteGraphqlproxycacheadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteGraphqlproxycacheadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

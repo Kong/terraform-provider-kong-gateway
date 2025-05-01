@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -237,8 +236,13 @@ func (r *PluginWebsocketSizeLimitResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request := *data.ToSharedWebsocketSizeLimitPlugin()
-	res, err := r.client.Plugins.CreateWebsocketsizelimitPlugin(ctx, request)
+	request, requestDiags := data.ToSharedWebsocketSizeLimitPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateWebsocketsizelimitPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -258,8 +262,17 @@ func (r *PluginWebsocketSizeLimitResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketSizeLimitPlugin(res.WebsocketSizeLimitPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketSizeLimitPlugin(ctx, res.WebsocketSizeLimitPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -283,13 +296,13 @@ func (r *PluginWebsocketSizeLimitResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetWebsocketsizelimitPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetWebsocketsizelimitPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetWebsocketsizelimitPlugin(ctx, request)
+	res, err := r.client.Plugins.GetWebsocketsizelimitPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -313,7 +326,11 @@ func (r *PluginWebsocketSizeLimitResource) Read(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketSizeLimitPlugin(res.WebsocketSizeLimitPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketSizeLimitPlugin(ctx, res.WebsocketSizeLimitPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -333,15 +350,13 @@ func (r *PluginWebsocketSizeLimitResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateWebsocketsizelimitPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	websocketSizeLimitPlugin := *data.ToSharedWebsocketSizeLimitPlugin()
-	request := operations.UpdateWebsocketsizelimitPluginRequest{
-		PluginID:                 pluginID,
-		WebsocketSizeLimitPlugin: websocketSizeLimitPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateWebsocketsizelimitPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateWebsocketsizelimitPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -361,8 +376,17 @@ func (r *PluginWebsocketSizeLimitResource) Update(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedWebsocketSizeLimitPlugin(res.WebsocketSizeLimitPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedWebsocketSizeLimitPlugin(ctx, res.WebsocketSizeLimitPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -386,13 +410,13 @@ func (r *PluginWebsocketSizeLimitResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteWebsocketsizelimitPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteWebsocketsizelimitPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteWebsocketsizelimitPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteWebsocketsizelimitPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

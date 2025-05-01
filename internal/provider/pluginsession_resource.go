@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -59,7 +58,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
-					"absolute_timeout": schema.NumberAttribute{
+					"absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The session cookie absolute timeout, in seconds. Specifies how long the session can be used until it is no longer valid.`,
@@ -107,7 +106,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `Applies the Secure directive so that the cookie may be sent to the server only with an encrypted request over the HTTPS protocol.`,
 					},
-					"idling_timeout": schema.NumberAttribute{
+					"idling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The session cookie idle time, in seconds.`,
@@ -137,7 +136,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `Enables or disables persistent sessions.`,
 					},
-					"remember_absolute_timeout": schema.NumberAttribute{
+					"remember_absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The persistent session absolute timeout limit, in seconds.`,
@@ -147,7 +146,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `Persistent session cookie name. Use with the ` + "`" + `remember` + "`" + ` configuration parameter.`,
 					},
-					"remember_rolling_timeout": schema.NumberAttribute{
+					"remember_rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The persistent session rolling timeout window, in seconds.`,
@@ -164,7 +163,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 						ElementType: types.StringType,
 						Description: `List of information to include, as headers, in the response to the downstream.`,
 					},
-					"rolling_timeout": schema.NumberAttribute{
+					"rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The session cookie rolling timeout, in seconds. Specifies how long the session can be used until it needs to be renewed.`,
@@ -174,7 +173,7 @@ func (r *PluginSessionResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `The secret that is used in keyed HMAC generation.`,
 					},
-					"stale_ttl": schema.NumberAttribute{
+					"stale_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The duration, in seconds, after which an old cookie is discarded, starting from the moment when the session becomes outdated and is replaced by a new one.`,
@@ -342,8 +341,13 @@ func (r *PluginSessionResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedSessionPlugin()
-	res, err := r.client.Plugins.CreateSessionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedSessionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateSessionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -363,8 +367,17 @@ func (r *PluginSessionResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSessionPlugin(res.SessionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedSessionPlugin(ctx, res.SessionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -388,13 +401,13 @@ func (r *PluginSessionResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetSessionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetSessionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetSessionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetSessionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -418,7 +431,11 @@ func (r *PluginSessionResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSessionPlugin(res.SessionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedSessionPlugin(ctx, res.SessionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -438,15 +455,13 @@ func (r *PluginSessionResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateSessionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	sessionPlugin := *data.ToSharedSessionPlugin()
-	request := operations.UpdateSessionPluginRequest{
-		PluginID:      pluginID,
-		SessionPlugin: sessionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateSessionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateSessionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -466,8 +481,17 @@ func (r *PluginSessionResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSessionPlugin(res.SessionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedSessionPlugin(ctx, res.SessionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -491,13 +515,13 @@ func (r *PluginSessionResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteSessionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteSessionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteSessionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteSessionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -3,14 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPlugin {
+func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlugin(ctx context.Context) (*shared.Oauth2IntrospectionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -39,7 +43,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 	if r.Ordering != nil {
 		var after *shared.Oauth2IntrospectionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -49,7 +53,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 		}
 		var before *shared.Oauth2IntrospectionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -62,33 +66,36 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.Oauth2IntrospectionPluginPartials = []shared.Oauth2IntrospectionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.Oauth2IntrospectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.Oauth2IntrospectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.Oauth2IntrospectionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.Oauth2IntrospectionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -118,7 +125,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 		} else {
 			consumerBy = nil
 		}
-		var customClaimsForward []string = []string{}
+		customClaimsForward := make([]string, 0, len(r.Config.CustomClaimsForward))
 		for _, customClaimsForwardItem := range r.Config.CustomClaimsForward {
 			customClaimsForward = append(customClaimsForward, customClaimsForwardItem.ValueString())
 		}
@@ -172,7 +179,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 		}
 		ttl := new(float64)
 		if !r.Config.TTL.IsUnknown() && !r.Config.TTL.IsNull() {
-			*ttl, _ = r.Config.TTL.ValueBigFloat().Float64()
+			*ttl = r.Config.TTL.ValueFloat64()
 		} else {
 			ttl = nil
 		}
@@ -192,7 +199,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 			TTL:                        ttl,
 		}
 	}
-	var protocols []shared.Oauth2IntrospectionPluginProtocols = []shared.Oauth2IntrospectionPluginProtocols{}
+	protocols := make([]shared.Oauth2IntrospectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.Oauth2IntrospectionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -234,10 +241,60 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2IntrospectionPlugin(resp *shared.Oauth2IntrospectionPlugin) {
+func (r *PluginOauth2IntrospectionResourceModel) ToOperationsUpdateOauth2introspectionPluginRequest(ctx context.Context) (*operations.UpdateOauth2introspectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	oauth2IntrospectionPlugin, oauth2IntrospectionPluginDiags := r.ToSharedOauth2IntrospectionPlugin(ctx)
+	diags.Append(oauth2IntrospectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateOauth2introspectionPluginRequest{
+		PluginID:                  pluginID,
+		Oauth2IntrospectionPlugin: *oauth2IntrospectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2IntrospectionResourceModel) ToOperationsGetOauth2introspectionPluginRequest(ctx context.Context) (*operations.GetOauth2introspectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetOauth2introspectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2IntrospectionResourceModel) ToOperationsDeleteOauth2introspectionPluginRequest(ctx context.Context) (*operations.DeleteOauth2introspectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteOauth2introspectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2IntrospectionPlugin(ctx context.Context, resp *shared.Oauth2IntrospectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -268,11 +325,7 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
 			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 			r.Config.TokenTypeHint = types.StringPointerValue(resp.Config.TokenTypeHint)
-			if resp.Config.TTL != nil {
-				r.Config.TTL = types.NumberValue(big.NewFloat(float64(*resp.Config.TTL)))
-			} else {
-				r.Config.TTL = types.NumberNull()
-			}
+			r.Config.TTL = types.Float64PointerValue(resp.Config.TTL)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -307,16 +360,16 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -342,4 +395,6 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

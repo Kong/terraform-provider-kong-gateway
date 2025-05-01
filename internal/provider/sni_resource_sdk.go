@@ -3,11 +3,16 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *SniResourceModel) ToSharedSni() *shared.Sni {
+func (r *SniResourceModel) ToSharedSni(ctx context.Context) (*shared.Sni, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	id := new(string)
 	if !r.Certificate.ID.IsUnknown() && !r.Certificate.ID.IsNull() {
 		*id = r.Certificate.ID.ValueString()
@@ -32,7 +37,7 @@ func (r *SniResourceModel) ToSharedSni() *shared.Sni {
 	var name string
 	name = r.Name.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -50,10 +55,60 @@ func (r *SniResourceModel) ToSharedSni() *shared.Sni {
 		Tags:        tags,
 		UpdatedAt:   updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *SniResourceModel) RefreshFromSharedSni(resp *shared.Sni) {
+func (r *SniResourceModel) ToOperationsUpsertSniRequest(ctx context.Context) (*operations.UpsertSniRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var sniIDOrName string
+	sniIDOrName = r.ID.ValueString()
+
+	sni, sniDiags := r.ToSharedSni(ctx)
+	diags.Append(sniDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertSniRequest{
+		SNIIDOrName: sniIDOrName,
+		Sni:         *sni,
+	}
+
+	return &out, diags
+}
+
+func (r *SniResourceModel) ToOperationsGetSniRequest(ctx context.Context) (*operations.GetSniRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var sniIDOrName string
+	sniIDOrName = r.ID.ValueString()
+
+	out := operations.GetSniRequest{
+		SNIIDOrName: sniIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *SniResourceModel) ToOperationsDeleteSniRequest(ctx context.Context) (*operations.DeleteSniRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var sniIDOrName string
+	sniIDOrName = r.ID.ValueString()
+
+	out := operations.DeleteSniRequest{
+		SNIIDOrName: sniIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *SniResourceModel) RefreshFromSharedSni(ctx context.Context, resp *shared.Sni) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.Certificate.ID = types.StringPointerValue(resp.Certificate.ID)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -65,4 +120,6 @@ func (r *SniResourceModel) RefreshFromSharedSni(resp *shared.Sni) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

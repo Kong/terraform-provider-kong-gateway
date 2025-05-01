@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin() *shared.ServiceProtectionPlugin {
+func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin(ctx context.Context) (*shared.ServiceProtectionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 	if r.Ordering != nil {
 		var after *shared.ServiceProtectionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		}
 		var before *shared.ServiceProtectionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 			Before: before,
 		}
 	}
-	var partials []shared.ServiceProtectionPluginPartials = []shared.ServiceProtectionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.ServiceProtectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ServiceProtectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ServiceProtectionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.ServiceProtectionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -113,7 +120,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		}
 		errorCode := new(float64)
 		if !r.Config.ErrorCode.IsUnknown() && !r.Config.ErrorCode.IsNull() {
-			*errorCode, _ = r.Config.ErrorCode.ValueBigFloat().Float64()
+			*errorCode = r.Config.ErrorCode.ValueFloat64()
 		} else {
 			errorCode = nil
 		}
@@ -129,10 +136,9 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		} else {
 			hideClientHeaders = nil
 		}
-		var limit []float64 = []float64{}
+		limit := make([]float64, 0, len(r.Config.Limit))
 		for _, limitItem := range r.Config.Limit {
-			limitTmp, _ := limitItem.ValueBigFloat().Float64()
-			limit = append(limit, limitTmp)
+			limit = append(limit, limitItem.ValueFloat64())
 		}
 		lockDictionaryName := new(string)
 		if !r.Config.LockDictionaryName.IsUnknown() && !r.Config.LockDictionaryName.IsNull() {
@@ -154,7 +160,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 			} else {
 				clusterMaxRedirections = nil
 			}
-			var clusterNodes []shared.ServiceProtectionPluginClusterNodes = []shared.ServiceProtectionPluginClusterNodes{}
+			clusterNodes := make([]shared.ServiceProtectionPluginClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
 			for _, clusterNodesItem := range r.Config.Redis.ClusterNodes {
 				ip := new(string)
 				if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -239,7 +245,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 			} else {
 				sentinelMaster = nil
 			}
-			var sentinelNodes []shared.ServiceProtectionPluginSentinelNodes = []shared.ServiceProtectionPluginSentinelNodes{}
+			sentinelNodes := make([]shared.ServiceProtectionPluginSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
 			for _, sentinelNodesItem := range r.Config.Redis.SentinelNodes {
 				host1 := new(string)
 				if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -326,7 +332,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		}
 		retryAfterJitterMax := new(float64)
 		if !r.Config.RetryAfterJitterMax.IsUnknown() && !r.Config.RetryAfterJitterMax.IsNull() {
-			*retryAfterJitterMax, _ = r.Config.RetryAfterJitterMax.ValueBigFloat().Float64()
+			*retryAfterJitterMax = r.Config.RetryAfterJitterMax.ValueFloat64()
 		} else {
 			retryAfterJitterMax = nil
 		}
@@ -338,14 +344,13 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		}
 		syncRate := new(float64)
 		if !r.Config.SyncRate.IsUnknown() && !r.Config.SyncRate.IsNull() {
-			*syncRate, _ = r.Config.SyncRate.ValueBigFloat().Float64()
+			*syncRate = r.Config.SyncRate.ValueFloat64()
 		} else {
 			syncRate = nil
 		}
-		var windowSize []float64 = []float64{}
+		windowSize := make([]float64, 0, len(r.Config.WindowSize))
 		for _, windowSizeItem := range r.Config.WindowSize {
-			windowSizeTmp, _ := windowSizeItem.ValueBigFloat().Float64()
-			windowSize = append(windowSize, windowSizeTmp)
+			windowSize = append(windowSize, windowSizeItem.ValueFloat64())
 		}
 		windowType := new(shared.ServiceProtectionPluginWindowType)
 		if !r.Config.WindowType.IsUnknown() && !r.Config.WindowType.IsNull() {
@@ -370,7 +375,7 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 			WindowType:          windowType,
 		}
 	}
-	var protocols []shared.ServiceProtectionPluginProtocols = []shared.ServiceProtectionPluginProtocols{}
+	protocols := make([]shared.ServiceProtectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.ServiceProtectionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -399,10 +404,60 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin()
 		Protocols:    protocols,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectionPlugin(resp *shared.ServiceProtectionPlugin) {
+func (r *PluginServiceProtectionResourceModel) ToOperationsUpdateServiceprotectionPluginRequest(ctx context.Context) (*operations.UpdateServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	serviceProtectionPlugin, serviceProtectionPluginDiags := r.ToSharedServiceProtectionPlugin(ctx)
+	diags.Append(serviceProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateServiceprotectionPluginRequest{
+		PluginID:                pluginID,
+		ServiceProtectionPlugin: *serviceProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsGetServiceprotectionPluginRequest(ctx context.Context) (*operations.GetServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetServiceprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsDeleteServiceprotectionPluginRequest(ctx context.Context) (*operations.DeleteServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteServiceprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectionPlugin(ctx context.Context, resp *shared.ServiceProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -410,16 +465,12 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 			r.Config = &tfTypes.ServiceProtectionPluginConfig{}
 			r.Config.DictionaryName = types.StringPointerValue(resp.Config.DictionaryName)
 			r.Config.DisablePenalty = types.BoolPointerValue(resp.Config.DisablePenalty)
-			if resp.Config.ErrorCode != nil {
-				r.Config.ErrorCode = types.NumberValue(big.NewFloat(float64(*resp.Config.ErrorCode)))
-			} else {
-				r.Config.ErrorCode = types.NumberNull()
-			}
+			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
 			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
 			r.Config.HideClientHeaders = types.BoolPointerValue(resp.Config.HideClientHeaders)
-			r.Config.Limit = make([]types.Number, 0, len(resp.Config.Limit))
+			r.Config.Limit = make([]types.Float64, 0, len(resp.Config.Limit))
 			for _, v := range resp.Config.Limit {
-				r.Config.Limit = append(r.Config.Limit, types.NumberValue(big.NewFloat(float64(v))))
+				r.Config.Limit = append(r.Config.Limit, types.Float64Value(v))
 			}
 			r.Config.LockDictionaryName = types.StringPointerValue(resp.Config.LockDictionaryName)
 			r.Config.Namespace = types.StringPointerValue(resp.Config.Namespace)
@@ -433,14 +484,14 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes1)
+						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
@@ -459,14 +510,14 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes1)
+						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
@@ -481,24 +532,16 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 				r.Config.Redis.SslVerify = types.BoolPointerValue(resp.Config.Redis.SslVerify)
 				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
 			}
-			if resp.Config.RetryAfterJitterMax != nil {
-				r.Config.RetryAfterJitterMax = types.NumberValue(big.NewFloat(float64(*resp.Config.RetryAfterJitterMax)))
-			} else {
-				r.Config.RetryAfterJitterMax = types.NumberNull()
-			}
+			r.Config.RetryAfterJitterMax = types.Float64PointerValue(resp.Config.RetryAfterJitterMax)
 			if resp.Config.Strategy != nil {
 				r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
 			} else {
 				r.Config.Strategy = types.StringNull()
 			}
-			if resp.Config.SyncRate != nil {
-				r.Config.SyncRate = types.NumberValue(big.NewFloat(float64(*resp.Config.SyncRate)))
-			} else {
-				r.Config.SyncRate = types.NumberNull()
-			}
-			r.Config.WindowSize = make([]types.Number, 0, len(resp.Config.WindowSize))
+			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
+			r.Config.WindowSize = make([]types.Float64, 0, len(resp.Config.WindowSize))
 			for _, v := range resp.Config.WindowSize {
-				r.Config.WindowSize = append(r.Config.WindowSize, types.NumberValue(big.NewFloat(float64(v))))
+				r.Config.WindowSize = append(r.Config.WindowSize, types.Float64Value(v))
 			}
 			if resp.Config.WindowType != nil {
 				r.Config.WindowType = types.StringValue(string(*resp.Config.WindowType))
@@ -539,16 +582,16 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -568,4 +611,6 @@ func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectio
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

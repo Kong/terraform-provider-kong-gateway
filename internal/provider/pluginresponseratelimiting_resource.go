@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
@@ -337,8 +336,13 @@ func (r *PluginResponseRatelimitingResource) Create(ctx context.Context, req res
 		return
 	}
 
-	request := *data.ToSharedResponseRatelimitingPlugin()
-	res, err := r.client.Plugins.CreateResponseratelimitingPlugin(ctx, request)
+	request, requestDiags := data.ToSharedResponseRatelimitingPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateResponseratelimitingPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -358,8 +362,17 @@ func (r *PluginResponseRatelimitingResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedResponseRatelimitingPlugin(res.ResponseRatelimitingPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedResponseRatelimitingPlugin(ctx, res.ResponseRatelimitingPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -383,13 +396,13 @@ func (r *PluginResponseRatelimitingResource) Read(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetResponseratelimitingPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetResponseratelimitingPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetResponseratelimitingPlugin(ctx, request)
+	res, err := r.client.Plugins.GetResponseratelimitingPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -413,7 +426,11 @@ func (r *PluginResponseRatelimitingResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedResponseRatelimitingPlugin(res.ResponseRatelimitingPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedResponseRatelimitingPlugin(ctx, res.ResponseRatelimitingPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -433,15 +450,13 @@ func (r *PluginResponseRatelimitingResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateResponseratelimitingPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	responseRatelimitingPlugin := *data.ToSharedResponseRatelimitingPlugin()
-	request := operations.UpdateResponseratelimitingPluginRequest{
-		PluginID:                   pluginID,
-		ResponseRatelimitingPlugin: responseRatelimitingPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateResponseratelimitingPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateResponseratelimitingPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -461,8 +476,17 @@ func (r *PluginResponseRatelimitingResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedResponseRatelimitingPlugin(res.ResponseRatelimitingPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedResponseRatelimitingPlugin(ctx, res.ResponseRatelimitingPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -486,13 +510,13 @@ func (r *PluginResponseRatelimitingResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteResponseratelimitingPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteResponseratelimitingPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteResponseratelimitingPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteResponseratelimitingPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

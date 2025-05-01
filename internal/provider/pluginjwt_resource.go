@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -13,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -86,10 +86,13 @@ func (r *PluginJwtResource) Schema(ctx context.Context, req resource.SchemaReque
 						Optional:    true,
 						Description: `The name of the claim in which the key identifying the secret must be passed. The plugin will attempt to read this claim from the JWT payload and the header, in that order.`,
 					},
-					"maximum_expiration": schema.NumberAttribute{
+					"maximum_expiration": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `A value between 0 and 31536000 (365 days) limiting the lifetime of the JWT to maximum_expiration seconds in the future.`,
+						Validators: []validator.Float64{
+							float64validator.AtMost(31536000),
+						},
 					},
 					"realm": schema.StringAttribute{
 						Computed:    true,
@@ -264,8 +267,13 @@ func (r *PluginJwtResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	request := *data.ToSharedJwtPlugin()
-	res, err := r.client.Plugins.CreateJwtPlugin(ctx, request)
+	request, requestDiags := data.ToSharedJwtPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateJwtPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -285,8 +293,17 @@ func (r *PluginJwtResource) Create(ctx context.Context, req resource.CreateReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtPlugin(res.JwtPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtPlugin(ctx, res.JwtPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -310,13 +327,13 @@ func (r *PluginJwtResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetJwtPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetJwtPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetJwtPlugin(ctx, request)
+	res, err := r.client.Plugins.GetJwtPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -340,7 +357,11 @@ func (r *PluginJwtResource) Read(ctx context.Context, req resource.ReadRequest, 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtPlugin(res.JwtPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtPlugin(ctx, res.JwtPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -360,15 +381,13 @@ func (r *PluginJwtResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateJwtPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	jwtPlugin := *data.ToSharedJwtPlugin()
-	request := operations.UpdateJwtPluginRequest{
-		PluginID:  pluginID,
-		JwtPlugin: jwtPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateJwtPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateJwtPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -388,8 +407,17 @@ func (r *PluginJwtResource) Update(ctx context.Context, req resource.UpdateReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedJwtPlugin(res.JwtPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedJwtPlugin(ctx, res.JwtPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -413,13 +441,13 @@ func (r *PluginJwtResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteJwtPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteJwtPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteJwtPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteJwtPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *BasicAuthResourceModel) ToSharedBasicAuthWithoutParents() *shared.BasicAuthWithoutParents {
+func (r *BasicAuthResourceModel) ToSharedBasicAuthWithoutParents(ctx context.Context) (*shared.BasicAuthWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.BasicAuthWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -36,7 +41,7 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuthWithoutParents() *shared.Basic
 	var password string
 	password = r.Password.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -51,29 +56,34 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuthWithoutParents() *shared.Basic
 		Tags:      tags,
 		Username:  username,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *BasicAuthResourceModel) RefreshFromSharedBasicAuth(resp *shared.BasicAuth) {
-	if resp != nil {
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Password = types.StringValue(resp.Password)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.Username = types.StringValue(resp.Username)
+func (r *BasicAuthResourceModel) ToOperationsCreateBasicAuthWithConsumerRequest(ctx context.Context) (*operations.CreateBasicAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	basicAuthWithoutParents, basicAuthWithoutParentsDiags := r.ToSharedBasicAuthWithoutParents(ctx)
+	diags.Append(basicAuthWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateBasicAuthWithConsumerRequest{
+		ConsumerID:              consumerID,
+		BasicAuthWithoutParents: *basicAuthWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *BasicAuthResourceModel) ToSharedBasicAuth() *shared.BasicAuth {
+func (r *BasicAuthResourceModel) ToSharedBasicAuth(ctx context.Context) (*shared.BasicAuth, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.BasicAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -101,7 +111,7 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuth() *shared.BasicAuth {
 	var password string
 	password = r.Password.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -116,5 +126,88 @@ func (r *BasicAuthResourceModel) ToSharedBasicAuth() *shared.BasicAuth {
 		Tags:      tags,
 		Username:  username,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *BasicAuthResourceModel) ToOperationsUpdateBasicAuthWithConsumerRequest(ctx context.Context) (*operations.UpdateBasicAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var basicAuthID string
+	basicAuthID = r.ID.ValueString()
+
+	basicAuth, basicAuthDiags := r.ToSharedBasicAuth(ctx)
+	diags.Append(basicAuthDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
+		BasicAuthID: basicAuthID,
+		BasicAuth:   *basicAuth,
+	}
+
+	return &out, diags
+}
+
+func (r *BasicAuthResourceModel) ToOperationsGetBasicAuthWithConsumerRequest(ctx context.Context) (*operations.GetBasicAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var basicAuthID string
+	basicAuthID = r.ID.ValueString()
+
+	out := operations.GetBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
+		BasicAuthID: basicAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *BasicAuthResourceModel) ToOperationsDeleteBasicAuthWithConsumerRequest(ctx context.Context) (*operations.DeleteBasicAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var basicAuthID string
+	basicAuthID = r.ID.ValueString()
+
+	out := operations.DeleteBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
+		BasicAuthID: basicAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *BasicAuthResourceModel) RefreshFromSharedBasicAuth(ctx context.Context, resp *shared.BasicAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Password = types.StringValue(resp.Password)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+		r.Username = types.StringValue(resp.Username)
+	}
+
+	return diags
 }

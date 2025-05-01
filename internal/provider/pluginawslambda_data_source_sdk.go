@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(resp *shared.AwsLambdaPlugin) {
+func (r *PluginAwsLambdaDataSourceModel) ToOperationsGetAwslambdaPluginRequest(ctx context.Context) (*operations.GetAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAwslambdaPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(ctx context.Context, resp *shared.AwsLambdaPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -46,11 +63,7 @@ func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(resp *
 				r.Config.InvocationType = types.StringNull()
 			}
 			r.Config.IsProxyIntegration = types.BoolPointerValue(resp.Config.IsProxyIntegration)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			if resp.Config.LogType != nil {
 				r.Config.LogType = types.StringValue(string(*resp.Config.LogType))
 			} else {
@@ -60,11 +73,7 @@ func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(resp *
 			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
 			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
 			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.UnhandledStatus = types.Int64PointerValue(resp.Config.UnhandledStatus)
 		}
 		if resp.Consumer == nil {
@@ -106,16 +115,16 @@ func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(resp *
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -141,4 +150,6 @@ func (r *PluginAwsLambdaDataSourceModel) RefreshFromSharedAwsLambdaPlugin(resp *
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

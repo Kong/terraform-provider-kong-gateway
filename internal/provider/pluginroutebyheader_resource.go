@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_mapvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/mapvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
@@ -256,8 +255,13 @@ func (r *PluginRouteByHeaderResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := *data.ToSharedRouteByHeaderPlugin()
-	res, err := r.client.Plugins.CreateRoutebyheaderPlugin(ctx, request)
+	request, requestDiags := data.ToSharedRouteByHeaderPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -277,8 +281,17 @@ func (r *PluginRouteByHeaderResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRouteByHeaderPlugin(res.RouteByHeaderPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRouteByHeaderPlugin(ctx, res.RouteByHeaderPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -302,13 +315,13 @@ func (r *PluginRouteByHeaderResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetRoutebyheaderPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetRoutebyheaderPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetRoutebyheaderPlugin(ctx, request)
+	res, err := r.client.Plugins.GetRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -332,7 +345,11 @@ func (r *PluginRouteByHeaderResource) Read(ctx context.Context, req resource.Rea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRouteByHeaderPlugin(res.RouteByHeaderPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedRouteByHeaderPlugin(ctx, res.RouteByHeaderPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -352,15 +369,13 @@ func (r *PluginRouteByHeaderResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateRoutebyheaderPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	routeByHeaderPlugin := *data.ToSharedRouteByHeaderPlugin()
-	request := operations.UpdateRoutebyheaderPluginRequest{
-		PluginID:            pluginID,
-		RouteByHeaderPlugin: routeByHeaderPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateRoutebyheaderPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -380,8 +395,17 @@ func (r *PluginRouteByHeaderResource) Update(ctx context.Context, req resource.U
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRouteByHeaderPlugin(res.RouteByHeaderPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRouteByHeaderPlugin(ctx, res.RouteByHeaderPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -405,13 +429,13 @@ func (r *PluginRouteByHeaderResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteRoutebyheaderPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteRoutebyheaderPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteRoutebyheaderPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

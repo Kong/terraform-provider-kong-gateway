@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLambdaPlugin {
+func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Context) (*shared.AwsLambdaPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 	if r.Ordering != nil {
 		var after *shared.AwsLambdaPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 		}
 		var before *shared.AwsLambdaPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 			Before: before,
 		}
 	}
-	var partials []shared.AwsLambdaPluginPartials = []shared.AwsLambdaPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AwsLambdaPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AwsLambdaPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AwsLambdaPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AwsLambdaPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -215,7 +222,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 		}
 		keepalive := new(float64)
 		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+			*keepalive = r.Config.Keepalive.ValueFloat64()
 		} else {
 			keepalive = nil
 		}
@@ -251,7 +258,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -303,7 +310,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 			ID: id2,
 		}
 	}
-	var protocols []shared.AwsLambdaPluginProtocols = []shared.AwsLambdaPluginProtocols{}
+	protocols := make([]shared.AwsLambdaPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AwsLambdaPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -346,10 +353,60 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin() *shared.AwsLamb
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(resp *shared.AwsLambdaPlugin) {
+func (r *PluginAwsLambdaResourceModel) ToOperationsUpdateAwslambdaPluginRequest(ctx context.Context) (*operations.UpdateAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	awsLambdaPlugin, awsLambdaPluginDiags := r.ToSharedAwsLambdaPlugin(ctx)
+	diags.Append(awsLambdaPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAwslambdaPluginRequest{
+		PluginID:        pluginID,
+		AwsLambdaPlugin: *awsLambdaPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsGetAwslambdaPluginRequest(ctx context.Context) (*operations.GetAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAwslambdaPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsDeleteAwslambdaPluginRequest(ctx context.Context) (*operations.DeleteAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAwslambdaPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx context.Context, resp *shared.AwsLambdaPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -386,11 +443,7 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(resp *sh
 				r.Config.InvocationType = types.StringNull()
 			}
 			r.Config.IsProxyIntegration = types.BoolPointerValue(resp.Config.IsProxyIntegration)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			if resp.Config.LogType != nil {
 				r.Config.LogType = types.StringValue(string(*resp.Config.LogType))
 			} else {
@@ -400,11 +453,7 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(resp *sh
 			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
 			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
 			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.UnhandledStatus = types.Int64PointerValue(resp.Config.UnhandledStatus)
 		}
 		if resp.Consumer == nil {
@@ -446,16 +495,16 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(resp *sh
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -481,4 +530,6 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(resp *sh
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

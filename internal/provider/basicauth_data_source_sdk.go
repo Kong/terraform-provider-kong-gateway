@@ -3,12 +3,34 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *BasicAuthDataSourceModel) RefreshFromSharedBasicAuth(resp *shared.BasicAuth) {
+func (r *BasicAuthDataSourceModel) ToOperationsGetBasicAuthWithConsumerRequest(ctx context.Context) (*operations.GetBasicAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var basicAuthID string
+	basicAuthID = r.ID.ValueString()
+
+	out := operations.GetBasicAuthWithConsumerRequest{
+		ConsumerID:  consumerID,
+		BasicAuthID: basicAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *BasicAuthDataSourceModel) RefreshFromSharedBasicAuth(ctx context.Context, resp *shared.BasicAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -25,4 +47,6 @@ func (r *BasicAuthDataSourceModel) RefreshFromSharedBasicAuth(resp *shared.Basic
 		}
 		r.Username = types.StringValue(resp.Username)
 	}
+
+	return diags
 }

@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginOauth2DataSourceModel) RefreshFromSharedOauth2Plugin(resp *shared.Oauth2Plugin) {
+func (r *PluginOauth2DataSourceModel) ToOperationsGetOauth2PluginRequest(ctx context.Context) (*operations.GetOauth2PluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetOauth2PluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2DataSourceModel) RefreshFromSharedOauth2Plugin(ctx context.Context, resp *shared.Oauth2Plugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -33,21 +50,13 @@ func (r *PluginOauth2DataSourceModel) RefreshFromSharedOauth2Plugin(resp *shared
 			}
 			r.Config.ProvisionKey = types.StringPointerValue(resp.Config.ProvisionKey)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			if resp.Config.RefreshTokenTTL != nil {
-				r.Config.RefreshTokenTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.RefreshTokenTTL)))
-			} else {
-				r.Config.RefreshTokenTTL = types.NumberNull()
-			}
+			r.Config.RefreshTokenTTL = types.Float64PointerValue(resp.Config.RefreshTokenTTL)
 			r.Config.ReuseRefreshToken = types.BoolPointerValue(resp.Config.ReuseRefreshToken)
 			r.Config.Scopes = make([]types.String, 0, len(resp.Config.Scopes))
 			for _, v := range resp.Config.Scopes {
 				r.Config.Scopes = append(r.Config.Scopes, types.StringValue(v))
 			}
-			if resp.Config.TokenExpiration != nil {
-				r.Config.TokenExpiration = types.NumberValue(big.NewFloat(float64(*resp.Config.TokenExpiration)))
-			} else {
-				r.Config.TokenExpiration = types.NumberNull()
-			}
+			r.Config.TokenExpiration = types.Float64PointerValue(resp.Config.TokenExpiration)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -82,16 +91,16 @@ func (r *PluginOauth2DataSourceModel) RefreshFromSharedOauth2Plugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -117,4 +126,6 @@ func (r *PluginOauth2DataSourceModel) RefreshFromSharedOauth2Plugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

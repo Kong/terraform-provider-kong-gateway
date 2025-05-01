@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -69,7 +68,7 @@ func (r *PluginLdapAuthDataSource) Schema(ctx context.Context, req datasource.Sc
 						Computed:    true,
 						Description: `Base DN as the starting point for the search; e.g., dc=example,dc=com`,
 					},
-					"cache_ttl": schema.NumberAttribute{
+					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Cache expiry time in seconds.`,
 					},
@@ -81,7 +80,7 @@ func (r *PluginLdapAuthDataSource) Schema(ctx context.Context, req datasource.Sc
 						Computed:    true,
 						Description: `An optional boolean value telling the plugin to hide the credential to the upstream server. It will be removed by Kong before proxying the request.`,
 					},
-					"keepalive": schema.NumberAttribute{
+					"keepalive": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional value in milliseconds that defines how long an idle connection to LDAP server will live before being closed.`,
 					},
@@ -105,7 +104,7 @@ func (r *PluginLdapAuthDataSource) Schema(ctx context.Context, req datasource.Sc
 						Computed:    true,
 						Description: `Set it to ` + "`" + `true` + "`" + ` to issue StartTLS (Transport Layer Security) extended operation over ` + "`" + `ldap` + "`" + ` connection. If the ` + "`" + `start_tls` + "`" + ` setting is enabled, ensure the ` + "`" + `ldaps` + "`" + ` setting is disabled.`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional timeout in milliseconds when waiting for connection with LDAP server.`,
 					},
@@ -242,13 +241,13 @@ func (r *PluginLdapAuthDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetLdapauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetLdapauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetLdapauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetLdapauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -260,10 +259,6 @@ func (r *PluginLdapAuthDataSource) Read(ctx context.Context, req datasource.Read
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -272,7 +267,11 @@ func (r *PluginLdapAuthDataSource) Read(ctx context.Context, req datasource.Read
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLdapAuthPlugin(res.LdapAuthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedLdapAuthPlugin(ctx, res.LdapAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

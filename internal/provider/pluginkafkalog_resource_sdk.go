@@ -3,13 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogPlugin {
+func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context) (*shared.KafkaLogPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +43,7 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 	if r.Ordering != nil {
 		var after *shared.KafkaLogPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +53,7 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 		}
 		var before *shared.KafkaLogPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +66,36 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 			Before: before,
 		}
 	}
-	var partials []shared.KafkaLogPluginPartials = []shared.KafkaLogPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.KafkaLogPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.KafkaLogPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.KafkaLogPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.KafkaLogPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -139,7 +147,7 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 				User:      user,
 			}
 		}
-		var bootstrapServers []shared.KafkaLogPluginBootstrapServers = []shared.KafkaLogPluginBootstrapServers{}
+		bootstrapServers := make([]shared.KafkaLogPluginBootstrapServers, 0, len(r.Config.BootstrapServers))
 		for _, bootstrapServersItem := range r.Config.BootstrapServers {
 			var host string
 			host = bootstrapServersItem.Host.ValueString()
@@ -294,7 +302,7 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 			ID: id2,
 		}
 	}
-	var protocols []shared.KafkaLogPluginProtocols = []shared.KafkaLogPluginProtocols{}
+	protocols := make([]shared.KafkaLogPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.KafkaLogPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -337,10 +345,60 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin() *shared.KafkaLogP
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(resp *shared.KafkaLogPlugin) {
+func (r *PluginKafkaLogResourceModel) ToOperationsUpdateKafkalogPluginRequest(ctx context.Context) (*operations.UpdateKafkalogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	kafkaLogPlugin, kafkaLogPluginDiags := r.ToSharedKafkaLogPlugin(ctx)
+	diags.Append(kafkaLogPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateKafkalogPluginRequest{
+		PluginID:       pluginID,
+		KafkaLogPlugin: *kafkaLogPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaLogResourceModel) ToOperationsGetKafkalogPluginRequest(ctx context.Context) (*operations.GetKafkalogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetKafkalogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaLogResourceModel) ToOperationsDeleteKafkalogPluginRequest(ctx context.Context) (*operations.DeleteKafkalogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteKafkalogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx context.Context, resp *shared.KafkaLogPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -369,14 +427,14 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(resp *shar
 				r.Config.BootstrapServers = r.Config.BootstrapServers[:len(resp.Config.BootstrapServers)]
 			}
 			for bootstrapServersCount, bootstrapServersItem := range resp.Config.BootstrapServers {
-				var bootstrapServers1 tfTypes.BootstrapServers
-				bootstrapServers1.Host = types.StringValue(bootstrapServersItem.Host)
-				bootstrapServers1.Port = types.Int64Value(bootstrapServersItem.Port)
+				var bootstrapServers tfTypes.BootstrapServers
+				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
+				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
 				if bootstrapServersCount+1 > len(r.Config.BootstrapServers) {
-					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers1)
+					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
 				} else {
-					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers1.Host
-					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers1.Port
+					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers.Host
+					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers.Port
 				}
 			}
 			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
@@ -451,16 +509,16 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(resp *shar
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -486,4 +544,6 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

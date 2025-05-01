@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -71,7 +70,7 @@ func (r *PluginUDPLogDataSource) Schema(ctx context.Context, req datasource.Sche
 						Computed:    true,
 						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional timeout in milliseconds when sending data to the upstream server.`,
 					},
@@ -213,13 +212,13 @@ func (r *PluginUDPLogDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetUdplogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetUdplogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetUdplogPlugin(ctx, request)
+	res, err := r.client.Plugins.GetUdplogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -231,10 +230,6 @@ func (r *PluginUDPLogDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -243,7 +238,11 @@ func (r *PluginUDPLogDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUDPLogPlugin(res.UDPLogPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedUDPLogPlugin(ctx, res.UDPLogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

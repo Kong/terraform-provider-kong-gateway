@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *shared.AiProxyAdvancedPlugin {
+func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx context.Context) (*shared.AiProxyAdvancedPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 	if r.Ordering != nil {
 		var after *shared.AiProxyAdvancedPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 		}
 		var before *shared.AiProxyAdvancedPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 			Before: before,
 		}
 	}
-	var partials []shared.AiProxyAdvancedPluginPartials = []shared.AiProxyAdvancedPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiProxyAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiProxyAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiProxyAdvancedPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiProxyAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -316,7 +323,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 		} else {
 			responseStreaming = nil
 		}
-		var targets []shared.Targets = []shared.Targets{}
+		targets := make([]shared.Targets, 0, len(r.Config.Targets))
 		for _, targetsItem := range r.Config.Targets {
 			var auth1 *shared.AiProxyAdvancedPluginConfigAuth
 			if targetsItem.Auth != nil {
@@ -534,7 +541,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 				}
 				inputCost := new(float64)
 				if !targetsItem.Model.Options.InputCost.IsUnknown() && !targetsItem.Model.Options.InputCost.IsNull() {
-					*inputCost, _ = targetsItem.Model.Options.InputCost.ValueBigFloat().Float64()
+					*inputCost = targetsItem.Model.Options.InputCost.ValueFloat64()
 				} else {
 					inputCost = nil
 				}
@@ -558,13 +565,13 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 				}
 				outputCost := new(float64)
 				if !targetsItem.Model.Options.OutputCost.IsUnknown() && !targetsItem.Model.Options.OutputCost.IsNull() {
-					*outputCost, _ = targetsItem.Model.Options.OutputCost.ValueBigFloat().Float64()
+					*outputCost = targetsItem.Model.Options.OutputCost.ValueFloat64()
 				} else {
 					outputCost = nil
 				}
 				temperature := new(float64)
 				if !targetsItem.Model.Options.Temperature.IsUnknown() && !targetsItem.Model.Options.Temperature.IsNull() {
-					*temperature, _ = targetsItem.Model.Options.Temperature.ValueBigFloat().Float64()
+					*temperature = targetsItem.Model.Options.Temperature.ValueFloat64()
 				} else {
 					temperature = nil
 				}
@@ -576,7 +583,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 				}
 				topP := new(float64)
 				if !targetsItem.Model.Options.TopP.IsUnknown() && !targetsItem.Model.Options.TopP.IsNull() {
-					*topP, _ = targetsItem.Model.Options.TopP.ValueBigFloat().Float64()
+					*topP = targetsItem.Model.Options.TopP.ValueFloat64()
 				} else {
 					topP = nil
 				}
@@ -646,7 +653,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 			} else {
 				clusterMaxRedirections = nil
 			}
-			var clusterNodes []shared.AiProxyAdvancedPluginClusterNodes = []shared.AiProxyAdvancedPluginClusterNodes{}
+			clusterNodes := make([]shared.AiProxyAdvancedPluginClusterNodes, 0, len(r.Config.Vectordb.Redis.ClusterNodes))
 			for _, clusterNodesItem := range r.Config.Vectordb.Redis.ClusterNodes {
 				ip := new(string)
 				if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -731,7 +738,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 			} else {
 				sentinelMaster = nil
 			}
-			var sentinelNodes []shared.AiProxyAdvancedPluginSentinelNodes = []shared.AiProxyAdvancedPluginSentinelNodes{}
+			sentinelNodes := make([]shared.AiProxyAdvancedPluginSentinelNodes, 0, len(r.Config.Vectordb.Redis.SentinelNodes))
 			for _, sentinelNodesItem := range r.Config.Vectordb.Redis.SentinelNodes {
 				host1 := new(string)
 				if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -817,7 +824,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 			}
 			strategy := shared.AiProxyAdvancedPluginStrategy(r.Config.Vectordb.Strategy.ValueString())
 			var threshold float64
-			threshold, _ = r.Config.Vectordb.Threshold.ValueBigFloat().Float64()
+			threshold = r.Config.Vectordb.Threshold.ValueFloat64()
 
 			vectordb = &shared.Vectordb{
 				Dimensions:     dimensions,
@@ -861,7 +868,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 			ID: id3,
 		}
 	}
-	var protocols []shared.AiProxyAdvancedPluginProtocols = []shared.AiProxyAdvancedPluginProtocols{}
+	protocols := make([]shared.AiProxyAdvancedPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiProxyAdvancedPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -905,10 +912,60 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin() *sh
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlugin(resp *shared.AiProxyAdvancedPlugin) {
+func (r *PluginAiProxyAdvancedResourceModel) ToOperationsUpdateAiproxyadvancedPluginRequest(ctx context.Context) (*operations.UpdateAiproxyadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiProxyAdvancedPlugin, aiProxyAdvancedPluginDiags := r.ToSharedAiProxyAdvancedPlugin(ctx)
+	diags.Append(aiProxyAdvancedPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAiproxyadvancedPluginRequest{
+		PluginID:              pluginID,
+		AiProxyAdvancedPlugin: *aiProxyAdvancedPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyAdvancedResourceModel) ToOperationsGetAiproxyadvancedPluginRequest(ctx context.Context) (*operations.GetAiproxyadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiproxyadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyAdvancedResourceModel) ToOperationsDeleteAiproxyadvancedPluginRequest(ctx context.Context) (*operations.DeleteAiproxyadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAiproxyadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlugin(ctx context.Context, resp *shared.AiProxyAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -988,110 +1045,94 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 				r.Config.Targets = r.Config.Targets[:len(resp.Config.Targets)]
 			}
 			for targetsCount, targetsItem := range resp.Config.Targets {
-				var targets1 tfTypes.Targets
+				var targets tfTypes.Targets
 				if targetsItem.Auth == nil {
-					targets1.Auth = nil
+					targets.Auth = nil
 				} else {
-					targets1.Auth = &tfTypes.Auth{}
-					targets1.Auth.AllowOverride = types.BoolPointerValue(targetsItem.Auth.AllowOverride)
-					targets1.Auth.AwsAccessKeyID = types.StringPointerValue(targetsItem.Auth.AwsAccessKeyID)
-					targets1.Auth.AwsSecretAccessKey = types.StringPointerValue(targetsItem.Auth.AwsSecretAccessKey)
-					targets1.Auth.AzureClientID = types.StringPointerValue(targetsItem.Auth.AzureClientID)
-					targets1.Auth.AzureClientSecret = types.StringPointerValue(targetsItem.Auth.AzureClientSecret)
-					targets1.Auth.AzureTenantID = types.StringPointerValue(targetsItem.Auth.AzureTenantID)
-					targets1.Auth.AzureUseManagedIdentity = types.BoolPointerValue(targetsItem.Auth.AzureUseManagedIdentity)
-					targets1.Auth.GcpServiceAccountJSON = types.StringPointerValue(targetsItem.Auth.GcpServiceAccountJSON)
-					targets1.Auth.GcpUseServiceAccount = types.BoolPointerValue(targetsItem.Auth.GcpUseServiceAccount)
-					targets1.Auth.HeaderName = types.StringPointerValue(targetsItem.Auth.HeaderName)
-					targets1.Auth.HeaderValue = types.StringPointerValue(targetsItem.Auth.HeaderValue)
+					targets.Auth = &tfTypes.Auth{}
+					targets.Auth.AllowOverride = types.BoolPointerValue(targetsItem.Auth.AllowOverride)
+					targets.Auth.AwsAccessKeyID = types.StringPointerValue(targetsItem.Auth.AwsAccessKeyID)
+					targets.Auth.AwsSecretAccessKey = types.StringPointerValue(targetsItem.Auth.AwsSecretAccessKey)
+					targets.Auth.AzureClientID = types.StringPointerValue(targetsItem.Auth.AzureClientID)
+					targets.Auth.AzureClientSecret = types.StringPointerValue(targetsItem.Auth.AzureClientSecret)
+					targets.Auth.AzureTenantID = types.StringPointerValue(targetsItem.Auth.AzureTenantID)
+					targets.Auth.AzureUseManagedIdentity = types.BoolPointerValue(targetsItem.Auth.AzureUseManagedIdentity)
+					targets.Auth.GcpServiceAccountJSON = types.StringPointerValue(targetsItem.Auth.GcpServiceAccountJSON)
+					targets.Auth.GcpUseServiceAccount = types.BoolPointerValue(targetsItem.Auth.GcpUseServiceAccount)
+					targets.Auth.HeaderName = types.StringPointerValue(targetsItem.Auth.HeaderName)
+					targets.Auth.HeaderValue = types.StringPointerValue(targetsItem.Auth.HeaderValue)
 					if targetsItem.Auth.ParamLocation != nil {
-						targets1.Auth.ParamLocation = types.StringValue(string(*targetsItem.Auth.ParamLocation))
+						targets.Auth.ParamLocation = types.StringValue(string(*targetsItem.Auth.ParamLocation))
 					} else {
-						targets1.Auth.ParamLocation = types.StringNull()
+						targets.Auth.ParamLocation = types.StringNull()
 					}
-					targets1.Auth.ParamName = types.StringPointerValue(targetsItem.Auth.ParamName)
-					targets1.Auth.ParamValue = types.StringPointerValue(targetsItem.Auth.ParamValue)
+					targets.Auth.ParamName = types.StringPointerValue(targetsItem.Auth.ParamName)
+					targets.Auth.ParamValue = types.StringPointerValue(targetsItem.Auth.ParamValue)
 				}
-				targets1.Description = types.StringPointerValue(targetsItem.Description)
-				targets1.Logging.LogPayloads = types.BoolPointerValue(targetsItem.Logging.LogPayloads)
-				targets1.Logging.LogStatistics = types.BoolPointerValue(targetsItem.Logging.LogStatistics)
-				targets1.Model.Name = types.StringPointerValue(targetsItem.Model.Name)
+				targets.Description = types.StringPointerValue(targetsItem.Description)
+				targets.Logging.LogPayloads = types.BoolPointerValue(targetsItem.Logging.LogPayloads)
+				targets.Logging.LogStatistics = types.BoolPointerValue(targetsItem.Logging.LogStatistics)
+				targets.Model.Name = types.StringPointerValue(targetsItem.Model.Name)
 				if targetsItem.Model.Options == nil {
-					targets1.Model.Options = nil
+					targets.Model.Options = nil
 				} else {
-					targets1.Model.Options = &tfTypes.OptionsObj{}
-					targets1.Model.Options.AnthropicVersion = types.StringPointerValue(targetsItem.Model.Options.AnthropicVersion)
-					targets1.Model.Options.AzureAPIVersion = types.StringPointerValue(targetsItem.Model.Options.AzureAPIVersion)
-					targets1.Model.Options.AzureDeploymentID = types.StringPointerValue(targetsItem.Model.Options.AzureDeploymentID)
-					targets1.Model.Options.AzureInstance = types.StringPointerValue(targetsItem.Model.Options.AzureInstance)
+					targets.Model.Options = &tfTypes.OptionsObj{}
+					targets.Model.Options.AnthropicVersion = types.StringPointerValue(targetsItem.Model.Options.AnthropicVersion)
+					targets.Model.Options.AzureAPIVersion = types.StringPointerValue(targetsItem.Model.Options.AzureAPIVersion)
+					targets.Model.Options.AzureDeploymentID = types.StringPointerValue(targetsItem.Model.Options.AzureDeploymentID)
+					targets.Model.Options.AzureInstance = types.StringPointerValue(targetsItem.Model.Options.AzureInstance)
 					if targetsItem.Model.Options.Bedrock == nil {
-						targets1.Model.Options.Bedrock = nil
+						targets.Model.Options.Bedrock = nil
 					} else {
-						targets1.Model.Options.Bedrock = &tfTypes.Bedrock{}
-						targets1.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(targetsItem.Model.Options.Bedrock.AwsRegion)
+						targets.Model.Options.Bedrock = &tfTypes.Bedrock{}
+						targets.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(targetsItem.Model.Options.Bedrock.AwsRegion)
 					}
 					if targetsItem.Model.Options.Gemini == nil {
-						targets1.Model.Options.Gemini = nil
+						targets.Model.Options.Gemini = nil
 					} else {
-						targets1.Model.Options.Gemini = &tfTypes.Gemini{}
-						targets1.Model.Options.Gemini.APIEndpoint = types.StringPointerValue(targetsItem.Model.Options.Gemini.APIEndpoint)
-						targets1.Model.Options.Gemini.LocationID = types.StringPointerValue(targetsItem.Model.Options.Gemini.LocationID)
-						targets1.Model.Options.Gemini.ProjectID = types.StringPointerValue(targetsItem.Model.Options.Gemini.ProjectID)
+						targets.Model.Options.Gemini = &tfTypes.Gemini{}
+						targets.Model.Options.Gemini.APIEndpoint = types.StringPointerValue(targetsItem.Model.Options.Gemini.APIEndpoint)
+						targets.Model.Options.Gemini.LocationID = types.StringPointerValue(targetsItem.Model.Options.Gemini.LocationID)
+						targets.Model.Options.Gemini.ProjectID = types.StringPointerValue(targetsItem.Model.Options.Gemini.ProjectID)
 					}
 					if targetsItem.Model.Options.Huggingface == nil {
-						targets1.Model.Options.Huggingface = nil
+						targets.Model.Options.Huggingface = nil
 					} else {
-						targets1.Model.Options.Huggingface = &tfTypes.Huggingface{}
-						targets1.Model.Options.Huggingface.UseCache = types.BoolPointerValue(targetsItem.Model.Options.Huggingface.UseCache)
-						targets1.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(targetsItem.Model.Options.Huggingface.WaitForModel)
+						targets.Model.Options.Huggingface = &tfTypes.Huggingface{}
+						targets.Model.Options.Huggingface.UseCache = types.BoolPointerValue(targetsItem.Model.Options.Huggingface.UseCache)
+						targets.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(targetsItem.Model.Options.Huggingface.WaitForModel)
 					}
-					if targetsItem.Model.Options.InputCost != nil {
-						targets1.Model.Options.InputCost = types.NumberValue(big.NewFloat(float64(*targetsItem.Model.Options.InputCost)))
-					} else {
-						targets1.Model.Options.InputCost = types.NumberNull()
-					}
+					targets.Model.Options.InputCost = types.Float64PointerValue(targetsItem.Model.Options.InputCost)
 					if targetsItem.Model.Options.Llama2Format != nil {
-						targets1.Model.Options.Llama2Format = types.StringValue(string(*targetsItem.Model.Options.Llama2Format))
+						targets.Model.Options.Llama2Format = types.StringValue(string(*targetsItem.Model.Options.Llama2Format))
 					} else {
-						targets1.Model.Options.Llama2Format = types.StringNull()
+						targets.Model.Options.Llama2Format = types.StringNull()
 					}
-					targets1.Model.Options.MaxTokens = types.Int64PointerValue(targetsItem.Model.Options.MaxTokens)
+					targets.Model.Options.MaxTokens = types.Int64PointerValue(targetsItem.Model.Options.MaxTokens)
 					if targetsItem.Model.Options.MistralFormat != nil {
-						targets1.Model.Options.MistralFormat = types.StringValue(string(*targetsItem.Model.Options.MistralFormat))
+						targets.Model.Options.MistralFormat = types.StringValue(string(*targetsItem.Model.Options.MistralFormat))
 					} else {
-						targets1.Model.Options.MistralFormat = types.StringNull()
+						targets.Model.Options.MistralFormat = types.StringNull()
 					}
-					if targetsItem.Model.Options.OutputCost != nil {
-						targets1.Model.Options.OutputCost = types.NumberValue(big.NewFloat(float64(*targetsItem.Model.Options.OutputCost)))
-					} else {
-						targets1.Model.Options.OutputCost = types.NumberNull()
-					}
-					if targetsItem.Model.Options.Temperature != nil {
-						targets1.Model.Options.Temperature = types.NumberValue(big.NewFloat(float64(*targetsItem.Model.Options.Temperature)))
-					} else {
-						targets1.Model.Options.Temperature = types.NumberNull()
-					}
-					targets1.Model.Options.TopK = types.Int64PointerValue(targetsItem.Model.Options.TopK)
-					if targetsItem.Model.Options.TopP != nil {
-						targets1.Model.Options.TopP = types.NumberValue(big.NewFloat(float64(*targetsItem.Model.Options.TopP)))
-					} else {
-						targets1.Model.Options.TopP = types.NumberNull()
-					}
-					targets1.Model.Options.UpstreamPath = types.StringPointerValue(targetsItem.Model.Options.UpstreamPath)
-					targets1.Model.Options.UpstreamURL = types.StringPointerValue(targetsItem.Model.Options.UpstreamURL)
+					targets.Model.Options.OutputCost = types.Float64PointerValue(targetsItem.Model.Options.OutputCost)
+					targets.Model.Options.Temperature = types.Float64PointerValue(targetsItem.Model.Options.Temperature)
+					targets.Model.Options.TopK = types.Int64PointerValue(targetsItem.Model.Options.TopK)
+					targets.Model.Options.TopP = types.Float64PointerValue(targetsItem.Model.Options.TopP)
+					targets.Model.Options.UpstreamPath = types.StringPointerValue(targetsItem.Model.Options.UpstreamPath)
+					targets.Model.Options.UpstreamURL = types.StringPointerValue(targetsItem.Model.Options.UpstreamURL)
 				}
-				targets1.Model.Provider = types.StringValue(string(targetsItem.Model.Provider))
-				targets1.RouteType = types.StringValue(string(targetsItem.RouteType))
-				targets1.Weight = types.Int64PointerValue(targetsItem.Weight)
+				targets.Model.Provider = types.StringValue(string(targetsItem.Model.Provider))
+				targets.RouteType = types.StringValue(string(targetsItem.RouteType))
+				targets.Weight = types.Int64PointerValue(targetsItem.Weight)
 				if targetsCount+1 > len(r.Config.Targets) {
-					r.Config.Targets = append(r.Config.Targets, targets1)
+					r.Config.Targets = append(r.Config.Targets, targets)
 				} else {
-					r.Config.Targets[targetsCount].Auth = targets1.Auth
-					r.Config.Targets[targetsCount].Description = targets1.Description
-					r.Config.Targets[targetsCount].Logging = targets1.Logging
-					r.Config.Targets[targetsCount].Model = targets1.Model
-					r.Config.Targets[targetsCount].RouteType = targets1.RouteType
-					r.Config.Targets[targetsCount].Weight = targets1.Weight
+					r.Config.Targets[targetsCount].Auth = targets.Auth
+					r.Config.Targets[targetsCount].Description = targets.Description
+					r.Config.Targets[targetsCount].Logging = targets.Logging
+					r.Config.Targets[targetsCount].Model = targets.Model
+					r.Config.Targets[targetsCount].RouteType = targets.RouteType
+					r.Config.Targets[targetsCount].Weight = targets.Weight
 				}
 			}
 			if resp.Config.Vectordb == nil {
@@ -1106,14 +1147,14 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 					r.Config.Vectordb.Redis.ClusterNodes = r.Config.Vectordb.Redis.ClusterNodes[:len(resp.Config.Vectordb.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.Vectordb.Redis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.Vectordb.Redis.ClusterNodes) {
-						r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes1)
+						r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.Vectordb.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Vectordb.Redis.ConnectTimeout)
@@ -1132,14 +1173,14 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 					r.Config.Vectordb.Redis.SentinelNodes = r.Config.Vectordb.Redis.SentinelNodes[:len(resp.Config.Vectordb.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Vectordb.Redis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.Vectordb.Redis.SentinelNodes) {
-						r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes1)
+						r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.Vectordb.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Vectordb.Redis.SentinelPassword)
@@ -1154,7 +1195,7 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 				r.Config.Vectordb.Redis.SslVerify = types.BoolPointerValue(resp.Config.Vectordb.Redis.SslVerify)
 				r.Config.Vectordb.Redis.Username = types.StringPointerValue(resp.Config.Vectordb.Redis.Username)
 				r.Config.Vectordb.Strategy = types.StringValue(string(resp.Config.Vectordb.Strategy))
-				r.Config.Vectordb.Threshold = types.NumberValue(big.NewFloat(float64(resp.Config.Vectordb.Threshold)))
+				r.Config.Vectordb.Threshold = types.Float64Value(resp.Config.Vectordb.Threshold)
 			}
 		}
 		if resp.Consumer == nil {
@@ -1202,16 +1243,16 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -1237,4 +1278,6 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

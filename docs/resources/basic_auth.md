@@ -59,5 +59,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_basic_auth.my_kong-gateway_basic_auth "{ \"basic_auth_id\": \"80db1b58-ca7c-4d21-b92a-64eb07725872\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
+terraform import kong-gateway_basic_auth.my_kong-gateway_basic_auth "{ \"id\": \"80db1b58-ca7c-4d21-b92a-64eb07725872\",  \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\"}"
 ```

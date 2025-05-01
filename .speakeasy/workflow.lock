@@ -8,8 +8,8 @@ sources:
             - latest
     gateway:
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:befb22f46487f0cc3160a26a94d18cfcebd937f0591d544b801b8f5b99996e6d
-        sourceBlobDigest: sha256:1021b7f4244ac0bdda98584f45d0f74ce6cb17b616cb0bf392240e3617da334e
+        sourceRevisionDigest: sha256:8dc456df30991c35539c0cf8114c1d0854ca51c00c8e6ad2176eb03611ebbb15
+        sourceBlobDigest: sha256:295fe6ca4c9d9fb5b0bcd159e685bfd234ab8405b1183806005b71db33759935
         tags:
             - latest
             - 0.0.1
@@ -22,8 +22,8 @@ targets:
     tf:
         source: gateway
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:befb22f46487f0cc3160a26a94d18cfcebd937f0591d544b801b8f5b99996e6d
-        sourceBlobDigest: sha256:1021b7f4244ac0bdda98584f45d0f74ce6cb17b616cb0bf392240e3617da334e
+        sourceRevisionDigest: sha256:8dc456df30991c35539c0cf8114c1d0854ca51c00c8e6ad2176eb03611ebbb15
+        sourceBlobDigest: sha256:295fe6ca4c9d9fb5b0bcd159e685bfd234ab8405b1183806005b71db33759935
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: 1.541.2

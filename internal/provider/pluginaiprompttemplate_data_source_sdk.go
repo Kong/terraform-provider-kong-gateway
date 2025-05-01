@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplatePlugin(resp *shared.AiPromptTemplatePlugin) {
+func (r *PluginAiPromptTemplateDataSourceModel) ToOperationsGetAiprompttemplatePluginRequest(ctx context.Context) (*operations.GetAiprompttemplatePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiprompttemplatePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplatePlugin(ctx context.Context, resp *shared.AiPromptTemplatePlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -22,14 +40,14 @@ func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplat
 				r.Config.Templates = r.Config.Templates[:len(resp.Config.Templates)]
 			}
 			for templatesCount, templatesItem := range resp.Config.Templates {
-				var templates1 tfTypes.Templates
-				templates1.Name = types.StringValue(templatesItem.Name)
-				templates1.Template = types.StringValue(templatesItem.Template)
+				var templates tfTypes.Templates
+				templates.Name = types.StringValue(templatesItem.Name)
+				templates.Template = types.StringValue(templatesItem.Template)
 				if templatesCount+1 > len(r.Config.Templates) {
-					r.Config.Templates = append(r.Config.Templates, templates1)
+					r.Config.Templates = append(r.Config.Templates, templates)
 				} else {
-					r.Config.Templates[templatesCount].Name = templates1.Name
-					r.Config.Templates[templatesCount].Template = templates1.Template
+					r.Config.Templates[templatesCount].Name = templates.Name
+					r.Config.Templates[templatesCount].Template = templates.Template
 				}
 			}
 		}
@@ -78,16 +96,16 @@ func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplat
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -113,4 +131,6 @@ func (r *PluginAiPromptTemplateDataSourceModel) RefreshFromSharedAiPromptTemplat
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

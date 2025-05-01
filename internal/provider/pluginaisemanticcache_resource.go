@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -214,10 +214,13 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 						Optional:    true,
 						Description: `Ignore and discard any tool prompts when Vectorizing the request`,
 					},
-					"message_countback": schema.NumberAttribute{
+					"message_countback": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Number of messages in the chat history to Vectorize/Cache`,
+						Validators: []validator.Float64{
+							float64validator.Between(1, 1000),
+						},
 					},
 					"stop_on_failure": schema.BoolAttribute{
 						Computed:    true,
@@ -428,7 +431,7 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 									stringvalidator.OneOf("redis"),
 								},
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
@@ -609,8 +612,13 @@ func (r *PluginAiSemanticCacheResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	request := *data.ToSharedAiSemanticCachePlugin()
-	res, err := r.client.Plugins.CreateAisemanticcachePlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiSemanticCachePlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -630,8 +638,17 @@ func (r *PluginAiSemanticCacheResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -655,13 +672,13 @@ func (r *PluginAiSemanticCacheResource) Read(ctx context.Context, req resource.R
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAisemanticcachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -685,7 +702,11 @@ func (r *PluginAiSemanticCacheResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -705,15 +726,13 @@ func (r *PluginAiSemanticCacheResource) Update(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiSemanticCachePlugin := *data.ToSharedAiSemanticCachePlugin()
-	request := operations.UpdateAisemanticcachePluginRequest{
-		PluginID:              pluginID,
-		AiSemanticCachePlugin: aiSemanticCachePlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -733,8 +752,17 @@ func (r *PluginAiSemanticCacheResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -758,13 +786,13 @@ func (r *PluginAiSemanticCacheResource) Delete(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAisemanticcachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

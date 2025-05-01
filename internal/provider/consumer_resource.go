@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -117,8 +116,13 @@ func (r *ConsumerResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request := *data.ToSharedConsumer()
-	res, err := r.client.Consumers.CreateConsumer(ctx, request)
+	request, requestDiags := data.ToSharedConsumer(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Consumers.CreateConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -138,8 +142,17 @@ func (r *ConsumerResource) Create(ctx context.Context, req resource.CreateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumer(res.Consumer)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumer(ctx, res.Consumer)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -163,13 +176,13 @@ func (r *ConsumerResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	var consumerIDOrUsername string
-	consumerIDOrUsername = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Consumers.GetConsumer(ctx, request)
+	res, err := r.client.Consumers.GetConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -193,7 +206,11 @@ func (r *ConsumerResource) Read(ctx context.Context, req resource.ReadRequest, r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumer(res.Consumer)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumer(ctx, res.Consumer)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -213,15 +230,13 @@ func (r *ConsumerResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	var consumerIDOrUsername string
-	consumerIDOrUsername = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	consumer := *data.ToSharedConsumer()
-	request := operations.UpsertConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
-		Consumer:             consumer,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Consumers.UpsertConsumer(ctx, request)
+	res, err := r.client.Consumers.UpsertConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -241,8 +256,17 @@ func (r *ConsumerResource) Update(ctx context.Context, req resource.UpdateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConsumer(res.Consumer)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedConsumer(ctx, res.Consumer)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -266,13 +290,13 @@ func (r *ConsumerResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	var consumerIDOrUsername string
-	consumerIDOrUsername = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Consumers.DeleteConsumer(ctx, request)
+	res, err := r.client.Consumers.DeleteConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -3,24 +3,37 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginCanaryDataSourceModel) RefreshFromSharedCanaryPlugin(resp *shared.CanaryPlugin) {
+func (r *PluginCanaryDataSourceModel) ToOperationsGetCanaryPluginRequest(ctx context.Context) (*operations.GetCanaryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetCanaryPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCanaryDataSourceModel) RefreshFromSharedCanaryPlugin(ctx context.Context, resp *shared.CanaryPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.CanaryPluginConfig{}
 			r.Config.CanaryByHeaderName = types.StringPointerValue(resp.Config.CanaryByHeaderName)
-			if resp.Config.Duration != nil {
-				r.Config.Duration = types.NumberValue(big.NewFloat(float64(*resp.Config.Duration)))
-			} else {
-				r.Config.Duration = types.NumberNull()
-			}
+			r.Config.Duration = types.Float64PointerValue(resp.Config.Duration)
 			r.Config.Groups = make([]types.String, 0, len(resp.Config.Groups))
 			for _, v := range resp.Config.Groups {
 				r.Config.Groups = append(r.Config.Groups, types.StringValue(v))
@@ -31,21 +44,9 @@ func (r *PluginCanaryDataSourceModel) RefreshFromSharedCanaryPlugin(resp *shared
 				r.Config.Hash = types.StringNull()
 			}
 			r.Config.HashHeader = types.StringPointerValue(resp.Config.HashHeader)
-			if resp.Config.Percentage != nil {
-				r.Config.Percentage = types.NumberValue(big.NewFloat(float64(*resp.Config.Percentage)))
-			} else {
-				r.Config.Percentage = types.NumberNull()
-			}
-			if resp.Config.Start != nil {
-				r.Config.Start = types.NumberValue(big.NewFloat(float64(*resp.Config.Start)))
-			} else {
-				r.Config.Start = types.NumberNull()
-			}
-			if resp.Config.Steps != nil {
-				r.Config.Steps = types.NumberValue(big.NewFloat(float64(*resp.Config.Steps)))
-			} else {
-				r.Config.Steps = types.NumberNull()
-			}
+			r.Config.Percentage = types.Float64PointerValue(resp.Config.Percentage)
+			r.Config.Start = types.Float64PointerValue(resp.Config.Start)
+			r.Config.Steps = types.Float64PointerValue(resp.Config.Steps)
 			r.Config.UpstreamFallback = types.BoolPointerValue(resp.Config.UpstreamFallback)
 			r.Config.UpstreamHost = types.StringPointerValue(resp.Config.UpstreamHost)
 			r.Config.UpstreamPort = types.Int64PointerValue(resp.Config.UpstreamPort)
@@ -84,16 +85,16 @@ func (r *PluginCanaryDataSourceModel) RefreshFromSharedCanaryPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -119,4 +120,6 @@ func (r *PluginCanaryDataSourceModel) RefreshFromSharedCanaryPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

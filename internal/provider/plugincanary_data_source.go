@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -61,7 +60,7 @@ func (r *PluginCanaryDataSource) Schema(ctx context.Context, req datasource.Sche
 						Computed:    true,
 						Description: `A string representing an HTTP header name.`,
 					},
-					"duration": schema.NumberAttribute{
+					"duration": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The duration of the canary release in seconds.`,
 					},
@@ -85,15 +84,15 @@ func (r *PluginCanaryDataSource) Schema(ctx context.Context, req datasource.Sche
 						Computed:    true,
 						Description: `A string representing an HTTP header name.`,
 					},
-					"percentage": schema.NumberAttribute{
+					"percentage": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The percentage of traffic to be routed to the canary release.`,
 					},
-					"start": schema.NumberAttribute{
+					"start": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Future time in seconds since epoch, when the canary release will start. Ignored when ` + "`" + `percentage` + "`" + ` is set, or when using ` + "`" + `allow` + "`" + ` or ` + "`" + `deny` + "`" + ` in ` + "`" + `hash` + "`" + `.`,
 					},
-					"steps": schema.NumberAttribute{
+					"steps": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of steps for the canary release.`,
 					},
@@ -242,13 +241,13 @@ func (r *PluginCanaryDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetCanaryPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetCanaryPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetCanaryPlugin(ctx, request)
+	res, err := r.client.Plugins.GetCanaryPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -260,10 +259,6 @@ func (r *PluginCanaryDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -272,7 +267,11 @@ func (r *PluginCanaryDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCanaryPlugin(res.CanaryPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedCanaryPlugin(ctx, res.CanaryPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

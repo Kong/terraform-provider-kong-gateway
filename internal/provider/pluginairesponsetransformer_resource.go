@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -281,7 +281,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 													},
 												},
 											},
-											"input_cost": schema.NumberAttribute{
+											"input_cost": schema.Float64Attribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `Defines the cost per 1M tokens in your prompt.`,
@@ -314,15 +314,18 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 													),
 												},
 											},
-											"output_cost": schema.NumberAttribute{
+											"output_cost": schema.Float64Attribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `Defines the cost per 1M tokens in the output of the AI.`,
 											},
-											"temperature": schema.NumberAttribute{
+											"temperature": schema.Float64Attribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `Defines the matching temperature, if using chat or completion models.`,
+												Validators: []validator.Float64{
+													float64validator.AtMost(5),
+												},
 											},
 											"top_k": schema.Int64Attribute{
 												Computed:    true,
@@ -332,10 +335,13 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 													int64validator.AtMost(500),
 												},
 											},
-											"top_p": schema.NumberAttribute{
+											"top_p": schema.Float64Attribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `Defines the top-p probability mass, if supported.`,
+												Validators: []validator.Float64{
+													float64validator.AtMost(1),
+												},
 											},
 											"upstream_path": schema.StringAttribute{
 												Computed:    true,
@@ -578,8 +584,13 @@ func (r *PluginAiResponseTransformerResource) Create(ctx context.Context, req re
 		return
 	}
 
-	request := *data.ToSharedAiResponseTransformerPlugin()
-	res, err := r.client.Plugins.CreateAiresponsetransformerPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiResponseTransformerPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiresponsetransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -599,8 +610,17 @@ func (r *PluginAiResponseTransformerResource) Create(ctx context.Context, req re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiResponseTransformerPlugin(res.AiResponseTransformerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiResponseTransformerPlugin(ctx, res.AiResponseTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -624,13 +644,13 @@ func (r *PluginAiResponseTransformerResource) Read(ctx context.Context, req reso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiresponsetransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiresponsetransformerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiresponsetransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiresponsetransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -654,7 +674,11 @@ func (r *PluginAiResponseTransformerResource) Read(ctx context.Context, req reso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiResponseTransformerPlugin(res.AiResponseTransformerPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiResponseTransformerPlugin(ctx, res.AiResponseTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -674,15 +698,13 @@ func (r *PluginAiResponseTransformerResource) Update(ctx context.Context, req re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiresponsetransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiResponseTransformerPlugin := *data.ToSharedAiResponseTransformerPlugin()
-	request := operations.UpdateAiresponsetransformerPluginRequest{
-		PluginID:                    pluginID,
-		AiResponseTransformerPlugin: aiResponseTransformerPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiresponsetransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiresponsetransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -702,8 +724,17 @@ func (r *PluginAiResponseTransformerResource) Update(ctx context.Context, req re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiResponseTransformerPlugin(res.AiResponseTransformerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiResponseTransformerPlugin(ctx, res.AiResponseTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -727,13 +758,13 @@ func (r *PluginAiResponseTransformerResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiresponsetransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiresponsetransformerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiresponsetransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiresponsetransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

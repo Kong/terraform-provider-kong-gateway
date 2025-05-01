@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -64,7 +63,7 @@ func (r *PluginServiceProtectionDataSource) Schema(ctx context.Context, req data
 						Computed:    true,
 						Description: `If set to ` + "`" + `true` + "`" + `, this doesn't count denied requests (status = ` + "`" + `429` + "`" + `). If set to ` + "`" + `false` + "`" + `, all requests, including denied ones, are counted. This parameter only affects the ` + "`" + `sliding` + "`" + ` window_type.`,
 					},
-					"error_code": schema.NumberAttribute{
+					"error_code": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Set a custom error code to return when the rate limit is exceeded.`,
 					},
@@ -78,7 +77,7 @@ func (r *PluginServiceProtectionDataSource) Schema(ctx context.Context, req data
 					},
 					"limit": schema.ListAttribute{
 						Computed:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified.`,
 					},
 					"lock_dictionary_name": schema.StringAttribute{
@@ -202,7 +201,7 @@ func (r *PluginServiceProtectionDataSource) Schema(ctx context.Context, req data
 							},
 						},
 					},
-					"retry_after_jitter_max": schema.NumberAttribute{
+					"retry_after_jitter_max": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The upper bound of a jitter (random delay) in seconds to be added to the ` + "`" + `Retry-After` + "`" + ` header of denied requests (status = ` + "`" + `429` + "`" + `) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is ` + "`" + `0` + "`" + `; in this case, the ` + "`" + `Retry-After` + "`" + ` header is equal to the ` + "`" + `RateLimit-Reset` + "`" + ` header.`,
 					},
@@ -210,13 +209,13 @@ func (r *PluginServiceProtectionDataSource) Schema(ctx context.Context, req data
 						Computed:    true,
 						Description: `The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: ` + "`" + `local` + "`" + ` and ` + "`" + `cluster` + "`" + `.`,
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).`,
 					},
 					"window_size": schema.ListAttribute{
 						Computed:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more window sizes to apply a limit to (defined in seconds). There must be a matching number of window limits and sizes specified.`,
 					},
 					"window_type": schema.StringAttribute{
@@ -343,13 +342,13 @@ func (r *PluginServiceProtectionDataSource) Read(ctx context.Context, req dataso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetServiceprotectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetServiceprotectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetServiceprotectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetServiceprotectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -361,10 +360,6 @@ func (r *PluginServiceProtectionDataSource) Read(ctx context.Context, req dataso
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -373,7 +368,11 @@ func (r *PluginServiceProtectionDataSource) Read(ctx context.Context, req dataso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceProtectionPlugin(res.ServiceProtectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceProtectionPlugin(ctx, res.ServiceProtectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

@@ -3,13 +3,31 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginRouteByHeaderDataSourceModel) RefreshFromSharedRouteByHeaderPlugin(resp *shared.RouteByHeaderPlugin) {
+func (r *PluginRouteByHeaderDataSourceModel) ToOperationsGetRoutebyheaderPluginRequest(ctx context.Context) (*operations.GetRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRoutebyheaderPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderDataSourceModel) RefreshFromSharedRouteByHeaderPlugin(ctx context.Context, resp *shared.RouteByHeaderPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -20,20 +38,20 @@ func (r *PluginRouteByHeaderDataSourceModel) RefreshFromSharedRouteByHeaderPlugi
 				r.Config.Rules = r.Config.Rules[:len(resp.Config.Rules)]
 			}
 			for rulesCount, rulesItem := range resp.Config.Rules {
-				var rules1 tfTypes.RouteByHeaderPluginRules
+				var rules tfTypes.RouteByHeaderPluginRules
 				if len(rulesItem.Condition) > 0 {
-					rules1.Condition = make(map[string]types.String, len(rulesItem.Condition))
+					rules.Condition = make(map[string]types.String, len(rulesItem.Condition))
 					for key, value := range rulesItem.Condition {
 						result, _ := json.Marshal(value)
-						rules1.Condition[key] = types.StringValue(string(result))
+						rules.Condition[key] = types.StringValue(string(result))
 					}
 				}
-				rules1.UpstreamName = types.StringValue(rulesItem.UpstreamName)
+				rules.UpstreamName = types.StringValue(rulesItem.UpstreamName)
 				if rulesCount+1 > len(r.Config.Rules) {
-					r.Config.Rules = append(r.Config.Rules, rules1)
+					r.Config.Rules = append(r.Config.Rules, rules)
 				} else {
-					r.Config.Rules[rulesCount].Condition = rules1.Condition
-					r.Config.Rules[rulesCount].UpstreamName = rules1.UpstreamName
+					r.Config.Rules[rulesCount].Condition = rules.Condition
+					r.Config.Rules[rulesCount].UpstreamName = rules.UpstreamName
 				}
 			}
 		}
@@ -76,16 +94,16 @@ func (r *PluginRouteByHeaderDataSourceModel) RefreshFromSharedRouteByHeaderPlugi
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -111,4 +129,6 @@ func (r *PluginRouteByHeaderDataSourceModel) RefreshFromSharedRouteByHeaderPlugi
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

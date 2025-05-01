@@ -3,12 +3,16 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
-func (r *GatewayConsumerGroupMemberResourceModel) ToOperationsAddConsumerToGroupRequestBody() *operations.AddConsumerToGroupRequestBody {
+func (r *GatewayConsumerGroupMemberResourceModel) ToOperationsAddConsumerToGroupRequestBody(ctx context.Context) (*operations.AddConsumerToGroupRequestBody, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	consumerID := new(string)
 	if !r.ConsumerID.IsUnknown() && !r.ConsumerID.IsNull() {
 		*consumerID = r.ConsumerID.ValueString()
@@ -18,10 +22,51 @@ func (r *GatewayConsumerGroupMemberResourceModel) ToOperationsAddConsumerToGroup
 	out := operations.AddConsumerToGroupRequestBody{
 		ConsumerID: consumerID,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsumerToGroupResponseBody(resp *operations.AddConsumerToGroupResponseBody) {
+func (r *GatewayConsumerGroupMemberResourceModel) ToOperationsAddConsumerToGroupRequest(ctx context.Context) (*operations.AddConsumerToGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ConsumerGroupID.ValueString()
+
+	requestBody, requestBodyDiags := r.ToOperationsAddConsumerToGroupRequestBody(ctx)
+	diags.Append(requestBodyDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.AddConsumerToGroupRequest{
+		ConsumerGroupID: consumerGroupID,
+		RequestBody:     requestBody,
+	}
+
+	return &out, diags
+}
+
+func (r *GatewayConsumerGroupMemberResourceModel) ToOperationsRemoveConsumerFromGroupRequest(ctx context.Context) (*operations.RemoveConsumerFromGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ConsumerGroupID.ValueString()
+
+	var consumerIDOrUsername string
+	consumerIDOrUsername = r.ConsumerIDOrUsername.ValueString()
+
+	out := operations.RemoveConsumerFromGroupRequest{
+		ConsumerGroupID:      consumerGroupID,
+		ConsumerIDOrUsername: consumerIDOrUsername,
+	}
+
+	return &out, diags
+}
+
+func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsumerToGroupResponseBody(ctx context.Context, resp *operations.AddConsumerToGroupResponseBody) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.ConsumerGroup == nil {
 			r.ConsumerGroup = nil
@@ -41,26 +86,28 @@ func (r *GatewayConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsum
 			r.Consumers = r.Consumers[:len(resp.Consumers)]
 		}
 		for consumersCount, consumersItem := range resp.Consumers {
-			var consumers1 tfTypes.Consumer
-			consumers1.CreatedAt = types.Int64PointerValue(consumersItem.CreatedAt)
-			consumers1.CustomID = types.StringPointerValue(consumersItem.CustomID)
-			consumers1.ID = types.StringPointerValue(consumersItem.ID)
-			consumers1.Tags = make([]types.String, 0, len(consumersItem.Tags))
+			var consumers tfTypes.Consumer
+			consumers.CreatedAt = types.Int64PointerValue(consumersItem.CreatedAt)
+			consumers.CustomID = types.StringPointerValue(consumersItem.CustomID)
+			consumers.ID = types.StringPointerValue(consumersItem.ID)
+			consumers.Tags = make([]types.String, 0, len(consumersItem.Tags))
 			for _, v := range consumersItem.Tags {
-				consumers1.Tags = append(consumers1.Tags, types.StringValue(v))
+				consumers.Tags = append(consumers.Tags, types.StringValue(v))
 			}
-			consumers1.UpdatedAt = types.Int64PointerValue(consumersItem.UpdatedAt)
-			consumers1.Username = types.StringPointerValue(consumersItem.Username)
+			consumers.UpdatedAt = types.Int64PointerValue(consumersItem.UpdatedAt)
+			consumers.Username = types.StringPointerValue(consumersItem.Username)
 			if consumersCount+1 > len(r.Consumers) {
-				r.Consumers = append(r.Consumers, consumers1)
+				r.Consumers = append(r.Consumers, consumers)
 			} else {
-				r.Consumers[consumersCount].CreatedAt = consumers1.CreatedAt
-				r.Consumers[consumersCount].CustomID = consumers1.CustomID
-				r.Consumers[consumersCount].ID = consumers1.ID
-				r.Consumers[consumersCount].Tags = consumers1.Tags
-				r.Consumers[consumersCount].UpdatedAt = consumers1.UpdatedAt
-				r.Consumers[consumersCount].Username = consumers1.Username
+				r.Consumers[consumersCount].CreatedAt = consumers.CreatedAt
+				r.Consumers[consumersCount].CustomID = consumers.CustomID
+				r.Consumers[consumersCount].ID = consumers.ID
+				r.Consumers[consumersCount].Tags = consumers.Tags
+				r.Consumers[consumersCount].UpdatedAt = consumers.UpdatedAt
+				r.Consumers[consumersCount].Username = consumers.Username
 			}
 		}
 	}
+
+	return diags
 }

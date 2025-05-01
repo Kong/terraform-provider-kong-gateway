@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -230,7 +229,7 @@ func (r *PluginSamlDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `The algorithm for validating signatures in SAML responses. Options available are: - ` + "`" + `SHA256` + "`" + ` - ` + "`" + `SHA384` + "`" + ` - ` + "`" + `SHA512` + "`" + ``,
 					},
-					"session_absolute_timeout": schema.NumberAttribute{
+					"session_absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie absolute timeout in seconds. Specifies how long the session can be used until it is no longer valid.`,
 					},
@@ -274,7 +273,7 @@ func (r *PluginSamlDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `When set to ` + "`" + `true` + "`" + `, the value of subject is hashed before being stored. Only applies when ` + "`" + `session_store_metadata` + "`" + ` is enabled.`,
 					},
-					"session_idling_timeout": schema.NumberAttribute{
+					"session_idling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie idle time in seconds.`,
 					},
@@ -298,7 +297,7 @@ func (r *PluginSamlDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `Enables or disables persistent sessions`,
 					},
-					"session_remember_absolute_timeout": schema.NumberAttribute{
+					"session_remember_absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Persistent session absolute timeout in seconds.`,
 					},
@@ -306,7 +305,7 @@ func (r *PluginSamlDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `Persistent session cookie name`,
 					},
-					"session_remember_rolling_timeout": schema.NumberAttribute{
+					"session_remember_rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Persistent session rolling timeout in seconds.`,
 					},
@@ -318,7 +317,7 @@ func (r *PluginSamlDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						ElementType: types.StringType,
 					},
-					"session_rolling_timeout": schema.NumberAttribute{
+					"session_rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie absolute timeout in seconds. Specifies how long the session can be used until it is no longer valid.`,
 					},
@@ -467,13 +466,13 @@ func (r *PluginSamlDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetSamlPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetSamlPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetSamlPlugin(ctx, request)
+	res, err := r.client.Plugins.GetSamlPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -485,10 +484,6 @@ func (r *PluginSamlDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -497,7 +492,11 @@ func (r *PluginSamlDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSamlPlugin(res.SamlPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedSamlPlugin(ctx, res.SamlPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

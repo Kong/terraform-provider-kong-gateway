@@ -3,11 +3,16 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeySetResourceModel) ToSharedKeySet() *shared.KeySet {
+func (r *KeySetResourceModel) ToSharedKeySet(ctx context.Context) (*shared.KeySet, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -26,7 +31,7 @@ func (r *KeySetResourceModel) ToSharedKeySet() *shared.KeySet {
 	} else {
 		name = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -43,10 +48,60 @@ func (r *KeySetResourceModel) ToSharedKeySet() *shared.KeySet {
 		Tags:      tags,
 		UpdatedAt: updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *KeySetResourceModel) RefreshFromSharedKeySet(resp *shared.KeySet) {
+func (r *KeySetResourceModel) ToOperationsUpsertKeySetRequest(ctx context.Context) (*operations.UpsertKeySetRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keySetIDOrName string
+	keySetIDOrName = r.ID.ValueString()
+
+	keySet, keySetDiags := r.ToSharedKeySet(ctx)
+	diags.Append(keySetDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertKeySetRequest{
+		KeySetIDOrName: keySetIDOrName,
+		KeySet:         *keySet,
+	}
+
+	return &out, diags
+}
+
+func (r *KeySetResourceModel) ToOperationsGetKeySetRequest(ctx context.Context) (*operations.GetKeySetRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keySetIDOrName string
+	keySetIDOrName = r.ID.ValueString()
+
+	out := operations.GetKeySetRequest{
+		KeySetIDOrName: keySetIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *KeySetResourceModel) ToOperationsDeleteKeySetRequest(ctx context.Context) (*operations.DeleteKeySetRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keySetIDOrName string
+	keySetIDOrName = r.ID.ValueString()
+
+	out := operations.DeleteKeySetRequest{
+		KeySetIDOrName: keySetIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *KeySetResourceModel) RefreshFromSharedKeySet(ctx context.Context, resp *shared.KeySet) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -57,4 +112,6 @@ func (r *KeySetResourceModel) RefreshFromSharedKeySet(resp *shared.KeySet) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

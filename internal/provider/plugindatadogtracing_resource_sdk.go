@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shared.DatadogTracingPlugin {
+func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin(ctx context.Context) (*shared.DatadogTracingPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shar
 	if r.Ordering != nil {
 		var after *shared.DatadogTracingPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shar
 		}
 		var before *shared.DatadogTracingPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shar
 			Before: before,
 		}
 	}
-	var partials []shared.DatadogTracingPluginPartials = []shared.DatadogTracingPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.DatadogTracingPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.DatadogTracingPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.DatadogTracingPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.DatadogTracingPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -169,7 +177,7 @@ func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shar
 			ID: id2,
 		}
 	}
-	var protocols []shared.DatadogTracingPluginProtocols = []shared.DatadogTracingPluginProtocols{}
+	protocols := make([]shared.DatadogTracingPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.DatadogTracingPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -212,10 +220,60 @@ func (r *PluginDatadogTracingResourceModel) ToSharedDatadogTracingPlugin() *shar
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginDatadogTracingResourceModel) RefreshFromSharedDatadogTracingPlugin(resp *shared.DatadogTracingPlugin) {
+func (r *PluginDatadogTracingResourceModel) ToOperationsUpdateDatadogtracingPluginRequest(ctx context.Context) (*operations.UpdateDatadogtracingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	datadogTracingPlugin, datadogTracingPluginDiags := r.ToSharedDatadogTracingPlugin(ctx)
+	diags.Append(datadogTracingPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateDatadogtracingPluginRequest{
+		PluginID:             pluginID,
+		DatadogTracingPlugin: *datadogTracingPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginDatadogTracingResourceModel) ToOperationsGetDatadogtracingPluginRequest(ctx context.Context) (*operations.GetDatadogtracingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetDatadogtracingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginDatadogTracingResourceModel) ToOperationsDeleteDatadogtracingPluginRequest(ctx context.Context) (*operations.DeleteDatadogtracingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteDatadogtracingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginDatadogTracingResourceModel) RefreshFromSharedDatadogTracingPlugin(ctx context.Context, resp *shared.DatadogTracingPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -269,16 +327,16 @@ func (r *PluginDatadogTracingResourceModel) RefreshFromSharedDatadogTracingPlugi
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -304,4 +362,6 @@ func (r *PluginDatadogTracingResourceModel) RefreshFromSharedDatadogTracingPlugi
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

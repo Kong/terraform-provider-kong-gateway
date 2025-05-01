@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -74,7 +73,7 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						Description: `Base DN as the starting point for the search; e.g., dc=example,dc=com`,
 					},
-					"cache_ttl": schema.NumberAttribute{
+					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Cache expiry time in seconds.`,
@@ -89,7 +88,7 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						Description: `An optional boolean value telling the plugin to hide the credential to the upstream server. It will be removed by Kong before proxying the request.`,
 					},
-					"keepalive": schema.NumberAttribute{
+					"keepalive": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional value in milliseconds that defines how long an idle connection to LDAP server will live before being closed.`,
@@ -122,7 +121,7 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						Description: `Set it to ` + "`" + `true` + "`" + ` to issue StartTLS (Transport Layer Security) extended operation over ` + "`" + `ldap` + "`" + ` connection. If the ` + "`" + `start_tls` + "`" + ` setting is enabled, ensure the ` + "`" + `ldaps` + "`" + ` setting is disabled.`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional timeout in milliseconds when waiting for connection with LDAP server.`,
@@ -284,8 +283,13 @@ func (r *PluginLdapAuthResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	request := *data.ToSharedLdapAuthPlugin()
-	res, err := r.client.Plugins.CreateLdapauthPlugin(ctx, request)
+	request, requestDiags := data.ToSharedLdapAuthPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateLdapauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -305,8 +309,17 @@ func (r *PluginLdapAuthResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLdapAuthPlugin(res.LdapAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedLdapAuthPlugin(ctx, res.LdapAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -330,13 +343,13 @@ func (r *PluginLdapAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetLdapauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetLdapauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetLdapauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetLdapauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -360,7 +373,11 @@ func (r *PluginLdapAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLdapAuthPlugin(res.LdapAuthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedLdapAuthPlugin(ctx, res.LdapAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -380,15 +397,13 @@ func (r *PluginLdapAuthResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateLdapauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	ldapAuthPlugin := *data.ToSharedLdapAuthPlugin()
-	request := operations.UpdateLdapauthPluginRequest{
-		PluginID:       pluginID,
-		LdapAuthPlugin: ldapAuthPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateLdapauthPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateLdapauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -408,8 +423,17 @@ func (r *PluginLdapAuthResource) Update(ctx context.Context, req resource.Update
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedLdapAuthPlugin(res.LdapAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedLdapAuthPlugin(ctx, res.LdapAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -433,13 +457,13 @@ func (r *PluginLdapAuthResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteLdapauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteLdapauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteLdapauthPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteLdapauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

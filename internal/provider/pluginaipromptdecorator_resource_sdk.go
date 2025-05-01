@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin() *shared.AiPromptDecoratorPlugin {
+func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin(ctx context.Context) (*shared.AiPromptDecoratorPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 	if r.Ordering != nil {
 		var after *shared.AiPromptDecoratorPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 		}
 		var before *shared.AiPromptDecoratorPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 			Before: before,
 		}
 	}
-	var partials []shared.AiPromptDecoratorPluginPartials = []shared.AiPromptDecoratorPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiPromptDecoratorPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiPromptDecoratorPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiPromptDecoratorPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiPromptDecoratorPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -106,7 +114,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 		}
 		var prompts *shared.Prompts
 		if r.Config.Prompts != nil {
-			var append1 []shared.AiPromptDecoratorPluginAppend = []shared.AiPromptDecoratorPluginAppend{}
+			append1 := make([]shared.AiPromptDecoratorPluginAppend, 0, len(r.Config.Prompts.Append))
 			for _, appendItem := range r.Config.Prompts.Append {
 				var content string
 				content = appendItem.Content.ValueString()
@@ -122,7 +130,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 					Role:    role,
 				})
 			}
-			var prepend []shared.Prepend = []shared.Prepend{}
+			prepend := make([]shared.Prepend, 0, len(r.Config.Prompts.Prepend))
 			for _, prependItem := range r.Config.Prompts.Prepend {
 				var content1 string
 				content1 = prependItem.Content.ValueString()
@@ -172,7 +180,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 			ID: id3,
 		}
 	}
-	var protocols []shared.AiPromptDecoratorPluginProtocols = []shared.AiPromptDecoratorPluginProtocols{}
+	protocols := make([]shared.AiPromptDecoratorPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiPromptDecoratorPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -216,10 +224,60 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin()
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecoratorPlugin(resp *shared.AiPromptDecoratorPlugin) {
+func (r *PluginAiPromptDecoratorResourceModel) ToOperationsUpdateAipromptdecoratorPluginRequest(ctx context.Context) (*operations.UpdateAipromptdecoratorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiPromptDecoratorPlugin, aiPromptDecoratorPluginDiags := r.ToSharedAiPromptDecoratorPlugin(ctx)
+	diags.Append(aiPromptDecoratorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAipromptdecoratorPluginRequest{
+		PluginID:                pluginID,
+		AiPromptDecoratorPlugin: *aiPromptDecoratorPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptDecoratorResourceModel) ToOperationsGetAipromptdecoratorPluginRequest(ctx context.Context) (*operations.GetAipromptdecoratorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAipromptdecoratorPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptDecoratorResourceModel) ToOperationsDeleteAipromptdecoratorPluginRequest(ctx context.Context) (*operations.DeleteAipromptdecoratorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAipromptdecoratorPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecoratorPlugin(ctx context.Context, resp *shared.AiPromptDecoratorPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -235,18 +293,18 @@ func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecorato
 					r.Config.Prompts.Append = r.Config.Prompts.Append[:len(resp.Config.Prompts.Append)]
 				}
 				for appendCount, appendItem := range resp.Config.Prompts.Append {
-					var append2 tfTypes.AiPromptDecoratorPluginAppend
-					append2.Content = types.StringValue(appendItem.Content)
+					var append1 tfTypes.AiPromptDecoratorPluginAppend
+					append1.Content = types.StringValue(appendItem.Content)
 					if appendItem.Role != nil {
-						append2.Role = types.StringValue(string(*appendItem.Role))
+						append1.Role = types.StringValue(string(*appendItem.Role))
 					} else {
-						append2.Role = types.StringNull()
+						append1.Role = types.StringNull()
 					}
 					if appendCount+1 > len(r.Config.Prompts.Append) {
-						r.Config.Prompts.Append = append(r.Config.Prompts.Append, append2)
+						r.Config.Prompts.Append = append(r.Config.Prompts.Append, append1)
 					} else {
-						r.Config.Prompts.Append[appendCount].Content = append2.Content
-						r.Config.Prompts.Append[appendCount].Role = append2.Role
+						r.Config.Prompts.Append[appendCount].Content = append1.Content
+						r.Config.Prompts.Append[appendCount].Role = append1.Role
 					}
 				}
 				r.Config.Prompts.Prepend = []tfTypes.AiPromptDecoratorPluginAppend{}
@@ -254,18 +312,18 @@ func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecorato
 					r.Config.Prompts.Prepend = r.Config.Prompts.Prepend[:len(resp.Config.Prompts.Prepend)]
 				}
 				for prependCount, prependItem := range resp.Config.Prompts.Prepend {
-					var prepend1 tfTypes.AiPromptDecoratorPluginAppend
-					prepend1.Content = types.StringValue(prependItem.Content)
+					var prepend tfTypes.AiPromptDecoratorPluginAppend
+					prepend.Content = types.StringValue(prependItem.Content)
 					if prependItem.Role != nil {
-						prepend1.Role = types.StringValue(string(*prependItem.Role))
+						prepend.Role = types.StringValue(string(*prependItem.Role))
 					} else {
-						prepend1.Role = types.StringNull()
+						prepend.Role = types.StringNull()
 					}
 					if prependCount+1 > len(r.Config.Prompts.Prepend) {
-						r.Config.Prompts.Prepend = append(r.Config.Prompts.Prepend, prepend1)
+						r.Config.Prompts.Prepend = append(r.Config.Prompts.Prepend, prepend)
 					} else {
-						r.Config.Prompts.Prepend[prependCount].Content = prepend1.Content
-						r.Config.Prompts.Prepend[prependCount].Role = prepend1.Role
+						r.Config.Prompts.Prepend[prependCount].Content = prepend.Content
+						r.Config.Prompts.Prepend[prependCount].Role = prepend.Role
 					}
 				}
 			}
@@ -315,16 +373,16 @@ func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecorato
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -350,4 +408,6 @@ func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecorato
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

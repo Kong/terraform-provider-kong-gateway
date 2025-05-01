@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *RouteExpressionDataSourceModel) RefreshFromSharedRouteExpression(resp *shared.RouteExpression) {
+func (r *RouteExpressionDataSourceModel) ToOperationsGetRouteRouteExpressionRequest(ctx context.Context) (*operations.GetRouteRouteExpressionRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.GetRouteRouteExpressionRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteExpressionDataSourceModel) RefreshFromSharedRouteExpression(ctx context.Context, resp *shared.RouteExpression) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Expression = types.StringPointerValue(resp.Expression)
@@ -47,4 +65,6 @@ func (r *RouteExpressionDataSourceModel) RefreshFromSharedRouteExpression(resp *
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

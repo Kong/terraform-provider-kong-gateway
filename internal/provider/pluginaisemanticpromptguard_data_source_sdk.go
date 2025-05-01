@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemanticPromptGuardPlugin(resp *shared.AiSemanticPromptGuardPlugin) {
+func (r *PluginAiSemanticPromptGuardDataSourceModel) ToOperationsGetAisemanticpromptguardPluginRequest(ctx context.Context) (*operations.GetAisemanticpromptguardPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAisemanticpromptguardPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemanticPromptGuardPlugin(ctx context.Context, resp *shared.AiSemanticPromptGuardPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -80,11 +97,7 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 				r.Config.Search = nil
 			} else {
 				r.Config.Search = &tfTypes.Search{}
-				if resp.Config.Search.Threshold != nil {
-					r.Config.Search.Threshold = types.NumberValue(big.NewFloat(float64(*resp.Config.Search.Threshold)))
-				} else {
-					r.Config.Search.Threshold = types.NumberNull()
-				}
+				r.Config.Search.Threshold = types.Float64PointerValue(resp.Config.Search.Threshold)
 			}
 			if resp.Config.Vectordb == nil {
 				r.Config.Vectordb = nil
@@ -106,14 +119,14 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 						r.Config.Vectordb.Redis.ClusterNodes = r.Config.Vectordb.Redis.ClusterNodes[:len(resp.Config.Vectordb.Redis.ClusterNodes)]
 					}
 					for clusterNodesCount, clusterNodesItem := range resp.Config.Vectordb.Redis.ClusterNodes {
-						var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-						clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-						clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+						var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+						clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+						clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 						if clusterNodesCount+1 > len(r.Config.Vectordb.Redis.ClusterNodes) {
-							r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes1)
+							r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes)
 						} else {
-							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 						}
 					}
 					r.Config.Vectordb.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Vectordb.Redis.ConnectTimeout)
@@ -132,14 +145,14 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 						r.Config.Vectordb.Redis.SentinelNodes = r.Config.Vectordb.Redis.SentinelNodes[:len(resp.Config.Vectordb.Redis.SentinelNodes)]
 					}
 					for sentinelNodesCount, sentinelNodesItem := range resp.Config.Vectordb.Redis.SentinelNodes {
-						var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-						sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-						sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+						var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+						sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+						sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 						if sentinelNodesCount+1 > len(r.Config.Vectordb.Redis.SentinelNodes) {
-							r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes1)
+							r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes)
 						} else {
-							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 						}
 					}
 					r.Config.Vectordb.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Vectordb.Redis.SentinelPassword)
@@ -159,11 +172,7 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 				} else {
 					r.Config.Vectordb.Strategy = types.StringNull()
 				}
-				if resp.Config.Vectordb.Threshold != nil {
-					r.Config.Vectordb.Threshold = types.NumberValue(big.NewFloat(float64(*resp.Config.Vectordb.Threshold)))
-				} else {
-					r.Config.Vectordb.Threshold = types.NumberNull()
-				}
+				r.Config.Vectordb.Threshold = types.Float64PointerValue(resp.Config.Vectordb.Threshold)
 			}
 		}
 		if resp.Consumer == nil {
@@ -211,16 +220,16 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -246,4 +255,6 @@ func (r *PluginAiSemanticPromptGuardDataSourceModel) RefreshFromSharedAiSemantic
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(resp *shared.AiProxyPlugin) {
+func (r *PluginAiProxyDataSourceModel) ToOperationsGetAiproxyPluginRequest(ctx context.Context) (*operations.GetAiproxyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiproxyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(ctx context.Context, resp *shared.AiProxyPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -80,11 +97,7 @@ func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(resp *shar
 						r.Config.Model.Options.Huggingface.UseCache = types.BoolPointerValue(resp.Config.Model.Options.Huggingface.UseCache)
 						r.Config.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(resp.Config.Model.Options.Huggingface.WaitForModel)
 					}
-					if resp.Config.Model.Options.InputCost != nil {
-						r.Config.Model.Options.InputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.InputCost)))
-					} else {
-						r.Config.Model.Options.InputCost = types.NumberNull()
-					}
+					r.Config.Model.Options.InputCost = types.Float64PointerValue(resp.Config.Model.Options.InputCost)
 					if resp.Config.Model.Options.Llama2Format != nil {
 						r.Config.Model.Options.Llama2Format = types.StringValue(string(*resp.Config.Model.Options.Llama2Format))
 					} else {
@@ -96,22 +109,10 @@ func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(resp *shar
 					} else {
 						r.Config.Model.Options.MistralFormat = types.StringNull()
 					}
-					if resp.Config.Model.Options.OutputCost != nil {
-						r.Config.Model.Options.OutputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.OutputCost)))
-					} else {
-						r.Config.Model.Options.OutputCost = types.NumberNull()
-					}
-					if resp.Config.Model.Options.Temperature != nil {
-						r.Config.Model.Options.Temperature = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.Temperature)))
-					} else {
-						r.Config.Model.Options.Temperature = types.NumberNull()
-					}
+					r.Config.Model.Options.OutputCost = types.Float64PointerValue(resp.Config.Model.Options.OutputCost)
+					r.Config.Model.Options.Temperature = types.Float64PointerValue(resp.Config.Model.Options.Temperature)
 					r.Config.Model.Options.TopK = types.Int64PointerValue(resp.Config.Model.Options.TopK)
-					if resp.Config.Model.Options.TopP != nil {
-						r.Config.Model.Options.TopP = types.NumberValue(big.NewFloat(float64(*resp.Config.Model.Options.TopP)))
-					} else {
-						r.Config.Model.Options.TopP = types.NumberNull()
-					}
+					r.Config.Model.Options.TopP = types.Float64PointerValue(resp.Config.Model.Options.TopP)
 					r.Config.Model.Options.UpstreamPath = types.StringPointerValue(resp.Config.Model.Options.UpstreamPath)
 					r.Config.Model.Options.UpstreamURL = types.StringPointerValue(resp.Config.Model.Options.UpstreamURL)
 				}
@@ -178,16 +179,16 @@ func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(resp *shar
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -213,4 +214,6 @@ func (r *PluginAiProxyDataSourceModel) RefreshFromSharedAiProxyPlugin(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

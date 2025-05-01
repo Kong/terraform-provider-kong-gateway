@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlugin {
+func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) (*shared.SessionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 	if r.Ordering != nil {
 		var after *shared.SessionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		}
 		var before *shared.SessionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.SessionPluginPartials = []shared.SessionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.SessionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.SessionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.SessionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.SessionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -101,7 +108,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 	if r.Config != nil {
 		absoluteTimeout := new(float64)
 		if !r.Config.AbsoluteTimeout.IsUnknown() && !r.Config.AbsoluteTimeout.IsNull() {
-			*absoluteTimeout, _ = r.Config.AbsoluteTimeout.ValueBigFloat().Float64()
+			*absoluteTimeout = r.Config.AbsoluteTimeout.ValueFloat64()
 		} else {
 			absoluteTimeout = nil
 		}
@@ -149,11 +156,11 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		}
 		idlingTimeout := new(float64)
 		if !r.Config.IdlingTimeout.IsUnknown() && !r.Config.IdlingTimeout.IsNull() {
-			*idlingTimeout, _ = r.Config.IdlingTimeout.ValueBigFloat().Float64()
+			*idlingTimeout = r.Config.IdlingTimeout.ValueFloat64()
 		} else {
 			idlingTimeout = nil
 		}
-		var logoutMethods []shared.SessionPluginLogoutMethods = []shared.SessionPluginLogoutMethods{}
+		logoutMethods := make([]shared.SessionPluginLogoutMethods, 0, len(r.Config.LogoutMethods))
 		for _, logoutMethodsItem := range r.Config.LogoutMethods {
 			logoutMethods = append(logoutMethods, shared.SessionPluginLogoutMethods(logoutMethodsItem.ValueString()))
 		}
@@ -183,7 +190,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		}
 		rememberAbsoluteTimeout := new(float64)
 		if !r.Config.RememberAbsoluteTimeout.IsUnknown() && !r.Config.RememberAbsoluteTimeout.IsNull() {
-			*rememberAbsoluteTimeout, _ = r.Config.RememberAbsoluteTimeout.ValueBigFloat().Float64()
+			*rememberAbsoluteTimeout = r.Config.RememberAbsoluteTimeout.ValueFloat64()
 		} else {
 			rememberAbsoluteTimeout = nil
 		}
@@ -195,21 +202,21 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		}
 		rememberRollingTimeout := new(float64)
 		if !r.Config.RememberRollingTimeout.IsUnknown() && !r.Config.RememberRollingTimeout.IsNull() {
-			*rememberRollingTimeout, _ = r.Config.RememberRollingTimeout.ValueBigFloat().Float64()
+			*rememberRollingTimeout = r.Config.RememberRollingTimeout.ValueFloat64()
 		} else {
 			rememberRollingTimeout = nil
 		}
-		var requestHeaders []shared.RequestHeaders = []shared.RequestHeaders{}
+		requestHeaders := make([]shared.RequestHeaders, 0, len(r.Config.RequestHeaders))
 		for _, requestHeadersItem := range r.Config.RequestHeaders {
 			requestHeaders = append(requestHeaders, shared.RequestHeaders(requestHeadersItem.ValueString()))
 		}
-		var responseHeaders []shared.SessionPluginResponseHeaders = []shared.SessionPluginResponseHeaders{}
+		responseHeaders := make([]shared.SessionPluginResponseHeaders, 0, len(r.Config.ResponseHeaders))
 		for _, responseHeadersItem := range r.Config.ResponseHeaders {
 			responseHeaders = append(responseHeaders, shared.SessionPluginResponseHeaders(responseHeadersItem.ValueString()))
 		}
 		rollingTimeout := new(float64)
 		if !r.Config.RollingTimeout.IsUnknown() && !r.Config.RollingTimeout.IsNull() {
-			*rollingTimeout, _ = r.Config.RollingTimeout.ValueBigFloat().Float64()
+			*rollingTimeout = r.Config.RollingTimeout.ValueFloat64()
 		} else {
 			rollingTimeout = nil
 		}
@@ -221,7 +228,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		}
 		staleTTL := new(float64)
 		if !r.Config.StaleTTL.IsUnknown() && !r.Config.StaleTTL.IsNull() {
-			*staleTTL, _ = r.Config.StaleTTL.ValueBigFloat().Float64()
+			*staleTTL = r.Config.StaleTTL.ValueFloat64()
 		} else {
 			staleTTL = nil
 		}
@@ -257,7 +264,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 			Storage:                 storage,
 		}
 	}
-	var protocols []shared.SessionPluginProtocols = []shared.SessionPluginProtocols{}
+	protocols := make([]shared.SessionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.SessionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -299,20 +306,66 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin() *shared.SessionPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared.SessionPlugin) {
+func (r *PluginSessionResourceModel) ToOperationsUpdateSessionPluginRequest(ctx context.Context) (*operations.UpdateSessionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	sessionPlugin, sessionPluginDiags := r.ToSharedSessionPlugin(ctx)
+	diags.Append(sessionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateSessionPluginRequest{
+		PluginID:      pluginID,
+		SessionPlugin: *sessionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSessionResourceModel) ToOperationsGetSessionPluginRequest(ctx context.Context) (*operations.GetSessionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetSessionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSessionResourceModel) ToOperationsDeleteSessionPluginRequest(ctx context.Context) (*operations.DeleteSessionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteSessionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(ctx context.Context, resp *shared.SessionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.SessionPluginConfig{}
-			if resp.Config.AbsoluteTimeout != nil {
-				r.Config.AbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.AbsoluteTimeout)))
-			} else {
-				r.Config.AbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.AbsoluteTimeout = types.Float64PointerValue(resp.Config.AbsoluteTimeout)
 			r.Config.Audience = types.StringPointerValue(resp.Config.Audience)
 			r.Config.CookieDomain = types.StringPointerValue(resp.Config.CookieDomain)
 			r.Config.CookieHTTPOnly = types.BoolPointerValue(resp.Config.CookieHTTPOnly)
@@ -324,11 +377,7 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared
 				r.Config.CookieSameSite = types.StringNull()
 			}
 			r.Config.CookieSecure = types.BoolPointerValue(resp.Config.CookieSecure)
-			if resp.Config.IdlingTimeout != nil {
-				r.Config.IdlingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.IdlingTimeout)))
-			} else {
-				r.Config.IdlingTimeout = types.NumberNull()
-			}
+			r.Config.IdlingTimeout = types.Float64PointerValue(resp.Config.IdlingTimeout)
 			r.Config.LogoutMethods = make([]types.String, 0, len(resp.Config.LogoutMethods))
 			for _, v := range resp.Config.LogoutMethods {
 				r.Config.LogoutMethods = append(r.Config.LogoutMethods, types.StringValue(string(v)))
@@ -337,17 +386,9 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared
 			r.Config.LogoutQueryArg = types.StringPointerValue(resp.Config.LogoutQueryArg)
 			r.Config.ReadBodyForLogout = types.BoolPointerValue(resp.Config.ReadBodyForLogout)
 			r.Config.Remember = types.BoolPointerValue(resp.Config.Remember)
-			if resp.Config.RememberAbsoluteTimeout != nil {
-				r.Config.RememberAbsoluteTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RememberAbsoluteTimeout)))
-			} else {
-				r.Config.RememberAbsoluteTimeout = types.NumberNull()
-			}
+			r.Config.RememberAbsoluteTimeout = types.Float64PointerValue(resp.Config.RememberAbsoluteTimeout)
 			r.Config.RememberCookieName = types.StringPointerValue(resp.Config.RememberCookieName)
-			if resp.Config.RememberRollingTimeout != nil {
-				r.Config.RememberRollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RememberRollingTimeout)))
-			} else {
-				r.Config.RememberRollingTimeout = types.NumberNull()
-			}
+			r.Config.RememberRollingTimeout = types.Float64PointerValue(resp.Config.RememberRollingTimeout)
 			r.Config.RequestHeaders = make([]types.String, 0, len(resp.Config.RequestHeaders))
 			for _, v := range resp.Config.RequestHeaders {
 				r.Config.RequestHeaders = append(r.Config.RequestHeaders, types.StringValue(string(v)))
@@ -356,17 +397,9 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared
 			for _, v := range resp.Config.ResponseHeaders {
 				r.Config.ResponseHeaders = append(r.Config.ResponseHeaders, types.StringValue(string(v)))
 			}
-			if resp.Config.RollingTimeout != nil {
-				r.Config.RollingTimeout = types.NumberValue(big.NewFloat(float64(*resp.Config.RollingTimeout)))
-			} else {
-				r.Config.RollingTimeout = types.NumberNull()
-			}
+			r.Config.RollingTimeout = types.Float64PointerValue(resp.Config.RollingTimeout)
 			r.Config.Secret = types.StringPointerValue(resp.Config.Secret)
-			if resp.Config.StaleTTL != nil {
-				r.Config.StaleTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.StaleTTL)))
-			} else {
-				r.Config.StaleTTL = types.NumberNull()
-			}
+			r.Config.StaleTTL = types.Float64PointerValue(resp.Config.StaleTTL)
 			if resp.Config.Storage != nil {
 				r.Config.Storage = types.StringValue(string(*resp.Config.Storage))
 			} else {
@@ -406,16 +439,16 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -441,4 +474,6 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

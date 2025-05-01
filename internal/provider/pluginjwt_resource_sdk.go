@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
+func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared.JwtPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 	if r.Ordering != nil {
 		var after *shared.JwtPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 		}
 		var before *shared.JwtPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 			Before: before,
 		}
 	}
-	var partials []shared.JwtPluginPartials = []shared.JwtPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.JwtPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.JwtPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.JwtPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.JwtPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -105,15 +112,15 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 		} else {
 			anonymous = nil
 		}
-		var claimsToVerify []shared.ClaimsToVerify = []shared.ClaimsToVerify{}
+		claimsToVerify := make([]shared.ClaimsToVerify, 0, len(r.Config.ClaimsToVerify))
 		for _, claimsToVerifyItem := range r.Config.ClaimsToVerify {
 			claimsToVerify = append(claimsToVerify, shared.ClaimsToVerify(claimsToVerifyItem.ValueString()))
 		}
-		var cookieNames []string = []string{}
+		cookieNames := make([]string, 0, len(r.Config.CookieNames))
 		for _, cookieNamesItem := range r.Config.CookieNames {
 			cookieNames = append(cookieNames, cookieNamesItem.ValueString())
 		}
-		var headerNames []string = []string{}
+		headerNames := make([]string, 0, len(r.Config.HeaderNames))
 		for _, headerNamesItem := range r.Config.HeaderNames {
 			headerNames = append(headerNames, headerNamesItem.ValueString())
 		}
@@ -125,7 +132,7 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 		}
 		maximumExpiration := new(float64)
 		if !r.Config.MaximumExpiration.IsUnknown() && !r.Config.MaximumExpiration.IsNull() {
-			*maximumExpiration, _ = r.Config.MaximumExpiration.ValueBigFloat().Float64()
+			*maximumExpiration = r.Config.MaximumExpiration.ValueFloat64()
 		} else {
 			maximumExpiration = nil
 		}
@@ -147,7 +154,7 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 		} else {
 			secretIsBase64 = nil
 		}
-		var uriParamNames []string = []string{}
+		uriParamNames := make([]string, 0, len(r.Config.URIParamNames))
 		for _, uriParamNamesItem := range r.Config.URIParamNames {
 			uriParamNames = append(uriParamNames, uriParamNamesItem.ValueString())
 		}
@@ -164,7 +171,7 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 			URIParamNames:     uriParamNames,
 		}
 	}
-	var protocols []shared.JwtPluginProtocols = []shared.JwtPluginProtocols{}
+	protocols := make([]shared.JwtPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.JwtPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -206,10 +213,60 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin() *shared.JwtPlugin {
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPlugin) {
+func (r *PluginJwtResourceModel) ToOperationsUpdateJwtPluginRequest(ctx context.Context) (*operations.UpdateJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	jwtPlugin, jwtPluginDiags := r.ToSharedJwtPlugin(ctx)
+	diags.Append(jwtPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateJwtPluginRequest{
+		PluginID:  pluginID,
+		JwtPlugin: *jwtPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsGetJwtPluginRequest(ctx context.Context) (*operations.GetJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetJwtPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsDeleteJwtPluginRequest(ctx context.Context) (*operations.DeleteJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteJwtPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context, resp *shared.JwtPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -229,11 +286,7 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPlug
 				r.Config.HeaderNames = append(r.Config.HeaderNames, types.StringValue(v))
 			}
 			r.Config.KeyClaimName = types.StringPointerValue(resp.Config.KeyClaimName)
-			if resp.Config.MaximumExpiration != nil {
-				r.Config.MaximumExpiration = types.NumberValue(big.NewFloat(float64(*resp.Config.MaximumExpiration)))
-			} else {
-				r.Config.MaximumExpiration = types.NumberNull()
-			}
+			r.Config.MaximumExpiration = types.Float64PointerValue(resp.Config.MaximumExpiration)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
 			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
 			r.Config.SecretIsBase64 = types.BoolPointerValue(resp.Config.SecretIsBase64)
@@ -275,16 +328,16 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPlug
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -310,4 +363,6 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(resp *shared.JwtPlug
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

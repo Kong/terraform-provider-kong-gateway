@@ -3,12 +3,34 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *MTLSAuthDataSourceModel) RefreshFromSharedMTLSAuth(resp *shared.MTLSAuth) {
+func (r *MTLSAuthDataSourceModel) ToOperationsGetMtlsAuthWithConsumerRequest(ctx context.Context) (*operations.GetMtlsAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var mtlsAuthID string
+	mtlsAuthID = r.ID.ValueString()
+
+	out := operations.GetMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		MTLSAuthID: mtlsAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *MTLSAuthDataSourceModel) RefreshFromSharedMTLSAuth(ctx context.Context, resp *shared.MTLSAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.CaCertificate == nil {
 			r.CaCertificate = nil
@@ -30,4 +52,6 @@ func (r *MTLSAuthDataSourceModel) RefreshFromSharedMTLSAuth(resp *shared.MTLSAut
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
 	}
+
+	return diags
 }

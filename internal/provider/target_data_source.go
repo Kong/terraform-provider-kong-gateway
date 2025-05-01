@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -29,11 +28,11 @@ type TargetDataSource struct {
 
 // TargetDataSourceModel describes the data model.
 type TargetDataSourceModel struct {
-	CreatedAt  types.Number                       `tfsdk:"created_at"`
+	CreatedAt  types.Float64                      `tfsdk:"created_at"`
 	ID         types.String                       `tfsdk:"id"`
 	Tags       []types.String                     `tfsdk:"tags"`
 	Target     types.String                       `tfsdk:"target"`
-	UpdatedAt  types.Number                       `tfsdk:"updated_at"`
+	UpdatedAt  types.Float64                      `tfsdk:"updated_at"`
 	Upstream   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"upstream"`
 	UpstreamID types.String                       `tfsdk:"upstream_id"`
 	Weight     types.Int64                        `tfsdk:"weight"`
@@ -50,7 +49,7 @@ func (r *TargetDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 		MarkdownDescription: "Target DataSource",
 
 		Attributes: map[string]schema.Attribute{
-			"created_at": schema.NumberAttribute{
+			"created_at": schema.Float64Attribute{
 				Computed:    true,
 				Description: `Unix epoch when the resource was created.`,
 			},
@@ -66,7 +65,7 @@ func (r *TargetDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				Computed:    true,
 				Description: `The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the ` + "`" + `port` + "`" + ` value will be overridden by the value from the DNS record.`,
 			},
-			"updated_at": schema.NumberAttribute{
+			"updated_at": schema.Float64Attribute{
 				Computed:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
@@ -128,17 +127,13 @@ func (r *TargetDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	var upstreamID string
-	upstreamID = data.UpstreamID.ValueString()
+	request, requestDiags := data.ToOperationsGetTargetWithUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var targetIDOrTarget string
-	targetIDOrTarget = data.ID.ValueString()
-
-	request := operations.GetTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Targets.GetTargetWithUpstream(ctx, request)
+	res, err := r.client.Targets.GetTargetWithUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -150,10 +145,6 @@ func (r *TargetDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -162,7 +153,11 @@ func (r *TargetDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTarget(res.Target)
+	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

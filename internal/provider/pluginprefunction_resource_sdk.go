@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.PreFunctionPlugin {
+func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin(ctx context.Context) (*shared.PreFunctionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 	if r.Ordering != nil {
 		var after *shared.PreFunctionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 		}
 		var before *shared.PreFunctionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 			Before: before,
 		}
 	}
-	var partials []shared.PreFunctionPluginPartials = []shared.PreFunctionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.PreFunctionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.PreFunctionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.PreFunctionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.PreFunctionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -98,43 +106,43 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 	}
 	var config *shared.PreFunctionPluginConfig
 	if r.Config != nil {
-		var access2 []string = []string{}
+		access2 := make([]string, 0, len(r.Config.Access))
 		for _, accessItem2 := range r.Config.Access {
 			access2 = append(access2, accessItem2.ValueString())
 		}
-		var bodyFilter []string = []string{}
+		bodyFilter := make([]string, 0, len(r.Config.BodyFilter))
 		for _, bodyFilterItem := range r.Config.BodyFilter {
 			bodyFilter = append(bodyFilter, bodyFilterItem.ValueString())
 		}
-		var certificate []string = []string{}
+		certificate := make([]string, 0, len(r.Config.Certificate))
 		for _, certificateItem := range r.Config.Certificate {
 			certificate = append(certificate, certificateItem.ValueString())
 		}
-		var headerFilter []string = []string{}
+		headerFilter := make([]string, 0, len(r.Config.HeaderFilter))
 		for _, headerFilterItem := range r.Config.HeaderFilter {
 			headerFilter = append(headerFilter, headerFilterItem.ValueString())
 		}
-		var log []string = []string{}
+		log := make([]string, 0, len(r.Config.Log))
 		for _, logItem := range r.Config.Log {
 			log = append(log, logItem.ValueString())
 		}
-		var rewrite []string = []string{}
+		rewrite := make([]string, 0, len(r.Config.Rewrite))
 		for _, rewriteItem := range r.Config.Rewrite {
 			rewrite = append(rewrite, rewriteItem.ValueString())
 		}
-		var wsClientFrame []string = []string{}
+		wsClientFrame := make([]string, 0, len(r.Config.WsClientFrame))
 		for _, wsClientFrameItem := range r.Config.WsClientFrame {
 			wsClientFrame = append(wsClientFrame, wsClientFrameItem.ValueString())
 		}
-		var wsClose []string = []string{}
+		wsClose := make([]string, 0, len(r.Config.WsClose))
 		for _, wsCloseItem := range r.Config.WsClose {
 			wsClose = append(wsClose, wsCloseItem.ValueString())
 		}
-		var wsHandshake []string = []string{}
+		wsHandshake := make([]string, 0, len(r.Config.WsHandshake))
 		for _, wsHandshakeItem := range r.Config.WsHandshake {
 			wsHandshake = append(wsHandshake, wsHandshakeItem.ValueString())
 		}
-		var wsUpstreamFrame []string = []string{}
+		wsUpstreamFrame := make([]string, 0, len(r.Config.WsUpstreamFrame))
 		for _, wsUpstreamFrameItem := range r.Config.WsUpstreamFrame {
 			wsUpstreamFrame = append(wsUpstreamFrame, wsUpstreamFrameItem.ValueString())
 		}
@@ -151,7 +159,7 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 			WsUpstreamFrame: wsUpstreamFrame,
 		}
 	}
-	var protocols []shared.PreFunctionPluginProtocols = []shared.PreFunctionPluginProtocols{}
+	protocols := make([]shared.PreFunctionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.PreFunctionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -193,10 +201,60 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin() *shared.Pre
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(resp *shared.PreFunctionPlugin) {
+func (r *PluginPreFunctionResourceModel) ToOperationsUpdatePrefunctionPluginRequest(ctx context.Context) (*operations.UpdatePrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	preFunctionPlugin, preFunctionPluginDiags := r.ToSharedPreFunctionPlugin(ctx)
+	diags.Append(preFunctionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdatePrefunctionPluginRequest{
+		PluginID:          pluginID,
+		PreFunctionPlugin: *preFunctionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsGetPrefunctionPluginRequest(ctx context.Context) (*operations.GetPrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetPrefunctionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsDeletePrefunctionPluginRequest(ctx context.Context) (*operations.DeletePrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeletePrefunctionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(ctx context.Context, resp *shared.PreFunctionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -276,16 +334,16 @@ func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(resp
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -311,4 +369,6 @@ func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(resp
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

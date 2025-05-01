@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -84,12 +83,12 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						ElementType: types.StringType,
 						Description: `List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (` + "`" + `id` + "`" + `).`,
 					},
-					"cache_ttl": schema.NumberAttribute{
+					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Cache expiry time in seconds.`,
 					},
-					"cert_cache_ttl": schema.NumberAttribute{
+					"cert_cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The length of time in milliseconds between refreshes of the revocation check status cache.`,
@@ -134,7 +133,7 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 							int64validator.AtMost(65535),
 						},
 					},
-					"http_timeout": schema.NumberAttribute{
+					"http_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `HTTP timeout threshold in milliseconds when communicating with the OCSP server or downloading CRL.`,
@@ -326,8 +325,13 @@ func (r *PluginHeaderCertAuthResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	request := *data.ToSharedHeaderCertAuthPlugin()
-	res, err := r.client.Plugins.CreateHeadercertauthPlugin(ctx, request)
+	request, requestDiags := data.ToSharedHeaderCertAuthPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateHeadercertauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -347,8 +351,17 @@ func (r *PluginHeaderCertAuthResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHeaderCertAuthPlugin(res.HeaderCertAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHeaderCertAuthPlugin(ctx, res.HeaderCertAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -372,13 +385,13 @@ func (r *PluginHeaderCertAuthResource) Read(ctx context.Context, req resource.Re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetHeadercertauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetHeadercertauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetHeadercertauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetHeadercertauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -402,7 +415,11 @@ func (r *PluginHeaderCertAuthResource) Read(ctx context.Context, req resource.Re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHeaderCertAuthPlugin(res.HeaderCertAuthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedHeaderCertAuthPlugin(ctx, res.HeaderCertAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -422,15 +439,13 @@ func (r *PluginHeaderCertAuthResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateHeadercertauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	headerCertAuthPlugin := *data.ToSharedHeaderCertAuthPlugin()
-	request := operations.UpdateHeadercertauthPluginRequest{
-		PluginID:             pluginID,
-		HeaderCertAuthPlugin: headerCertAuthPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateHeadercertauthPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateHeadercertauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -450,8 +465,17 @@ func (r *PluginHeaderCertAuthResource) Update(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHeaderCertAuthPlugin(res.HeaderCertAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHeaderCertAuthPlugin(ctx, res.HeaderCertAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -475,13 +499,13 @@ func (r *PluginHeaderCertAuthResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteHeadercertauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteHeadercertauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteHeadercertauthPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteHeadercertauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

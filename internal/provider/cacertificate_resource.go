@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -116,8 +115,13 @@ func (r *CACertificateResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedCACertificate()
-	res, err := r.client.CACertificates.CreateCaCertificate(ctx, request)
+	request, requestDiags := data.ToSharedCACertificate(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.CACertificates.CreateCaCertificate(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -137,8 +141,17 @@ func (r *CACertificateResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCACertificate(res.CACertificate)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCACertificate(ctx, res.CACertificate)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -162,13 +175,13 @@ func (r *CACertificateResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var caCertificateID string
-	caCertificateID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetCaCertificateRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetCaCertificateRequest{
-		CACertificateID: caCertificateID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.CACertificates.GetCaCertificate(ctx, request)
+	res, err := r.client.CACertificates.GetCaCertificate(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -192,7 +205,11 @@ func (r *CACertificateResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCACertificate(res.CACertificate)
+	resp.Diagnostics.Append(data.RefreshFromSharedCACertificate(ctx, res.CACertificate)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -212,15 +229,13 @@ func (r *CACertificateResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var caCertificateID string
-	caCertificateID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertCaCertificateRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	caCertificate := *data.ToSharedCACertificate()
-	request := operations.UpsertCaCertificateRequest{
-		CACertificateID: caCertificateID,
-		CACertificate:   caCertificate,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.CACertificates.UpsertCaCertificate(ctx, request)
+	res, err := r.client.CACertificates.UpsertCaCertificate(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -240,8 +255,17 @@ func (r *CACertificateResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCACertificate(res.CACertificate)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedCACertificate(ctx, res.CACertificate)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -265,13 +289,13 @@ func (r *CACertificateResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var caCertificateID string
-	caCertificateID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteCaCertificateRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteCaCertificateRequest{
-		CACertificateID: caCertificateID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.CACertificates.DeleteCaCertificate(ctx, request)
+	res, err := r.client.CACertificates.DeleteCaCertificate(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

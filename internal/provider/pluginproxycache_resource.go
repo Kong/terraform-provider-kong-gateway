@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -322,8 +321,13 @@ func (r *PluginProxyCacheResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	request := *data.ToSharedProxyCachePlugin()
-	res, err := r.client.Plugins.CreateProxycachePlugin(ctx, request)
+	request, requestDiags := data.ToSharedProxyCachePlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateProxycachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -343,8 +347,17 @@ func (r *PluginProxyCacheResource) Create(ctx context.Context, req resource.Crea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedProxyCachePlugin(res.ProxyCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedProxyCachePlugin(ctx, res.ProxyCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -368,13 +381,13 @@ func (r *PluginProxyCacheResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetProxycachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetProxycachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetProxycachePlugin(ctx, request)
+	res, err := r.client.Plugins.GetProxycachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -398,7 +411,11 @@ func (r *PluginProxyCacheResource) Read(ctx context.Context, req resource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedProxyCachePlugin(res.ProxyCachePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedProxyCachePlugin(ctx, res.ProxyCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -418,15 +435,13 @@ func (r *PluginProxyCacheResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateProxycachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	proxyCachePlugin := *data.ToSharedProxyCachePlugin()
-	request := operations.UpdateProxycachePluginRequest{
-		PluginID:         pluginID,
-		ProxyCachePlugin: proxyCachePlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateProxycachePlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateProxycachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -446,8 +461,17 @@ func (r *PluginProxyCacheResource) Update(ctx context.Context, req resource.Upda
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedProxyCachePlugin(res.ProxyCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedProxyCachePlugin(ctx, res.ProxyCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -471,13 +495,13 @@ func (r *PluginProxyCacheResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteProxycachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteProxycachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteProxycachePlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteProxycachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

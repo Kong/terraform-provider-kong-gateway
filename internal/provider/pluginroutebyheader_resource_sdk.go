@@ -3,13 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared.RouteByHeaderPlugin {
+func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx context.Context) (*shared.RouteByHeaderPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +43,7 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 	if r.Ordering != nil {
 		var after *shared.RouteByHeaderPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +53,7 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 		}
 		var before *shared.RouteByHeaderPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +66,36 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 			Before: before,
 		}
 	}
-	var partials []shared.RouteByHeaderPluginPartials = []shared.RouteByHeaderPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.RouteByHeaderPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RouteByHeaderPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RouteByHeaderPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RouteByHeaderPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -99,7 +107,7 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 	}
 	var config *shared.RouteByHeaderPluginConfig
 	if r.Config != nil {
-		var rules []shared.RouteByHeaderPluginRules = []shared.RouteByHeaderPluginRules{}
+		rules := make([]shared.RouteByHeaderPluginRules, 0, len(r.Config.Rules))
 		for _, rulesItem := range r.Config.Rules {
 			condition := make(map[string]interface{})
 			for conditionKey, conditionValue := range rulesItem.Condition {
@@ -131,7 +139,7 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 			ID: id2,
 		}
 	}
-	var protocols []shared.RouteByHeaderPluginProtocols = []shared.RouteByHeaderPluginProtocols{}
+	protocols := make([]shared.RouteByHeaderPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.RouteByHeaderPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -174,10 +182,60 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin() *shared
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(resp *shared.RouteByHeaderPlugin) {
+func (r *PluginRouteByHeaderResourceModel) ToOperationsUpdateRoutebyheaderPluginRequest(ctx context.Context) (*operations.UpdateRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	routeByHeaderPlugin, routeByHeaderPluginDiags := r.ToSharedRouteByHeaderPlugin(ctx)
+	diags.Append(routeByHeaderPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRoutebyheaderPluginRequest{
+		PluginID:            pluginID,
+		RouteByHeaderPlugin: *routeByHeaderPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsGetRoutebyheaderPluginRequest(ctx context.Context) (*operations.GetRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRoutebyheaderPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsDeleteRoutebyheaderPluginRequest(ctx context.Context) (*operations.DeleteRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteRoutebyheaderPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(ctx context.Context, resp *shared.RouteByHeaderPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -188,20 +246,20 @@ func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(
 				r.Config.Rules = r.Config.Rules[:len(resp.Config.Rules)]
 			}
 			for rulesCount, rulesItem := range resp.Config.Rules {
-				var rules1 tfTypes.RouteByHeaderPluginRules
+				var rules tfTypes.RouteByHeaderPluginRules
 				if len(rulesItem.Condition) > 0 {
-					rules1.Condition = make(map[string]types.String, len(rulesItem.Condition))
+					rules.Condition = make(map[string]types.String, len(rulesItem.Condition))
 					for key, value := range rulesItem.Condition {
 						result, _ := json.Marshal(value)
-						rules1.Condition[key] = types.StringValue(string(result))
+						rules.Condition[key] = types.StringValue(string(result))
 					}
 				}
-				rules1.UpstreamName = types.StringValue(rulesItem.UpstreamName)
+				rules.UpstreamName = types.StringValue(rulesItem.UpstreamName)
 				if rulesCount+1 > len(r.Config.Rules) {
-					r.Config.Rules = append(r.Config.Rules, rules1)
+					r.Config.Rules = append(r.Config.Rules, rules)
 				} else {
-					r.Config.Rules[rulesCount].Condition = rules1.Condition
-					r.Config.Rules[rulesCount].UpstreamName = rules1.UpstreamName
+					r.Config.Rules[rulesCount].Condition = rules.Condition
+					r.Config.Rules[rulesCount].UpstreamName = rules.UpstreamName
 				}
 			}
 		}
@@ -244,16 +302,16 @@ func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -279,4 +337,6 @@ func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

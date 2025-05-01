@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -112,7 +111,7 @@ func (r *PluginOauth2DataSource) Schema(ctx context.Context, req datasource.Sche
 						Computed:    true,
 						Description: `When authentication fails the plugin sends ` + "`" + `WWW-Authenticate` + "`" + ` header with ` + "`" + `realm` + "`" + ` attribute value.`,
 					},
-					"refresh_token_ttl": schema.NumberAttribute{
+					"refresh_token_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Time-to-live value for data`,
 					},
@@ -125,7 +124,7 @@ func (r *PluginOauth2DataSource) Schema(ctx context.Context, req datasource.Sche
 						ElementType: types.StringType,
 						Description: `Describes an array of scope names that will be available to the end user. If ` + "`" + `mandatory_scope` + "`" + ` is set to ` + "`" + `true` + "`" + `, then ` + "`" + `scopes` + "`" + ` are required.`,
 					},
-					"token_expiration": schema.NumberAttribute{
+					"token_expiration": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional integer value telling the plugin how many seconds a token should last, after which the client will need to refresh the token. Set to ` + "`" + `0` + "`" + ` to disable the expiration.`,
 					},
@@ -258,13 +257,13 @@ func (r *PluginOauth2DataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetOauth2PluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetOauth2PluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetOauth2Plugin(ctx, request)
+	res, err := r.client.Plugins.GetOauth2Plugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -276,10 +275,6 @@ func (r *PluginOauth2DataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -288,7 +283,11 @@ func (r *PluginOauth2DataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2Plugin(res.Oauth2Plugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2Plugin(ctx, res.Oauth2Plugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

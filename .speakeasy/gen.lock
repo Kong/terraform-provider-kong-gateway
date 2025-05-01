@@ -3,20 +3,20 @@ id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
   docChecksum: d77beaef56f8972354a9bf5d2ef85ce1
   docVersion: 0.0.1
-  speakeasyVersion: 1.529.1
-  generationVersion: 2.566.5
+  speakeasyVersion: 1.541.2
+  generationVersion: 2.595.4
   releaseVersion: 0.4.0
-  configChecksum: e4b08c6e3078f6af4cfe4998d84a29a7
+  configChecksum: 6032dc35e6906b559e009bca1bf98a15
 features:
   terraform:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.2.1
-    core: 3.38.1
+    core: 3.41.6
     envVarSecurityUsage: 0.1.0
     globalSecurity: 2.81.10
     globalServerURLs: 2.82.1
     inputOutputModels: 2.83.0
-    nameOverrides: 2.81.2
+    nameOverrides: 2.81.3
     nullables: 0.0.0
     typeOverrides: 2.81.1
 generatedFiles:
@@ -839,6 +839,9 @@ generatedFiles:
   - internal/provider/target_data_source_sdk.go
   - internal/provider/target_resource.go
   - internal/provider/target_resource_sdk.go
+  - internal/provider/typeconvert/date.go
+  - internal/provider/typeconvert/datetime.go
+  - internal/provider/typeconvert/int32.go
   - internal/provider/types/account_key.go
   - internal/provider/types/acl_without_parents_consumer.go
   - internal/provider/types/acme_plugin_config.go
@@ -1606,7 +1609,7 @@ generatedFiles:
   - internal/sdk/models/shared/routetransformeradvancedplugin.go
   - internal/sdk/models/shared/samlplugin.go
   - internal/sdk/models/shared/security.go
-  - internal/sdk/models/shared/service.go
+  - internal/sdk/models/shared/serviceoutput.go
   - internal/sdk/models/shared/serviceprotectionplugin.go
   - internal/sdk/models/shared/sessionplugin.go
   - internal/sdk/models/shared/sni.go

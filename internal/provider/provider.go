@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,8 @@ import (
 	"net/http"
 )
 
-var _ provider.Provider = &KongGatewayProvider{}
+var _ provider.Provider = (*KongGatewayProvider)(nil)
+var _ provider.ProviderWithEphemeralResources = (*KongGatewayProvider)(nil)
 
 type KongGatewayProvider struct {
 	// version is set to the provider version on release, "dev" when the
@@ -94,6 +96,7 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 	client := sdk.New(opts...)
 
 	resp.DataSourceData = client
+	resp.EphemeralResourceData = client
 	resp.ResourceData = client
 }
 
@@ -332,6 +335,10 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewUpstreamDataSource,
 		NewVaultDataSource,
 	}
+}
+
+func (p *KongGatewayProvider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
+	return []func() ephemeral.EphemeralResource{}
 }
 
 func New(version string) func() provider.Provider {

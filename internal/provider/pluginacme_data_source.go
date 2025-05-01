@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -102,7 +101,7 @@ func (r *PluginAcmeDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `A boolean value that controls whether to include the IPv4 address in the common name field of generated certificates.`,
 					},
-					"fail_backoff_minutes": schema.NumberAttribute{
+					"fail_backoff_minutes": schema.Float64Attribute{
 						Computed: true,
 						MarkdownDescription: `Minutes to wait for each domain that fails to create a certificate. This applies to both a` + "\n" +
 							`new certificate and a renewal certificate.`,
@@ -111,7 +110,7 @@ func (r *PluginAcmeDataSource) Schema(ctx context.Context, req datasource.Schema
 						Computed:    true,
 						Description: `A string value that specifies the preferred certificate chain to use when generating certificates.`,
 					},
-					"renew_threshold_days": schema.NumberAttribute{
+					"renew_threshold_days": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Days remaining to renew the certificate before it expires.`,
 					},
@@ -145,7 +144,7 @@ func (r *PluginAcmeDataSource) Schema(ctx context.Context, req datasource.Schema
 										Computed:    true,
 										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 									},
-									"timeout": schema.NumberAttribute{
+									"timeout": schema.Float64Attribute{
 										Computed:    true,
 										Description: `Timeout in milliseconds.`,
 									},
@@ -173,7 +172,7 @@ func (r *PluginAcmeDataSource) Schema(ctx context.Context, req datasource.Schema
 												Computed:    true,
 												Description: `A namespace to prepend to all keys stored in Redis.`,
 											},
-											"scan_count": schema.NumberAttribute{
+											"scan_count": schema.Float64Attribute{
 												Computed:    true,
 												Description: `The number of keys to return in Redis SCAN calls.`,
 											},
@@ -258,7 +257,7 @@ func (r *PluginAcmeDataSource) Schema(ctx context.Context, req datasource.Schema
 										Computed:    true,
 										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 									},
-									"timeout": schema.NumberAttribute{
+									"timeout": schema.Float64Attribute{
 										Computed:    true,
 										Description: `Timeout in milliseconds.`,
 									},
@@ -393,13 +392,13 @@ func (r *PluginAcmeDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAcmePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAcmePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAcmePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAcmePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -411,10 +410,6 @@ func (r *PluginAcmeDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -423,7 +418,11 @@ func (r *PluginAcmeDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAcmePlugin(res.AcmePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAcmePlugin(ctx, res.AcmePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

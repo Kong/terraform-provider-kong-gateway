@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPlugin() *shared.AiAzureContentSafetyPlugin {
+func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPlugin(ctx context.Context) (*shared.AiAzureContentSafetyPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 	if r.Ordering != nil {
 		var after *shared.AiAzureContentSafetyPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		}
 		var before *shared.AiAzureContentSafetyPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 			Before: before,
 		}
 	}
-	var partials []shared.AiAzureContentSafetyPluginPartials = []shared.AiAzureContentSafetyPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiAzureContentSafetyPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiAzureContentSafetyPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiAzureContentSafetyPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiAzureContentSafetyPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -128,11 +136,11 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		} else {
 			azureUseManagedIdentity = nil
 		}
-		var blocklistNames []string = []string{}
+		blocklistNames := make([]string, 0, len(r.Config.BlocklistNames))
 		for _, blocklistNamesItem := range r.Config.BlocklistNames {
 			blocklistNames = append(blocklistNames, blocklistNamesItem.ValueString())
 		}
-		var categories []shared.Categories = []shared.Categories{}
+		categories := make([]shared.Categories, 0, len(r.Config.Categories))
 		for _, categoriesItem := range r.Config.Categories {
 			var name1 string
 			name1 = categoriesItem.Name.ValueString()
@@ -197,7 +205,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 			TextSource:              textSource,
 		}
 	}
-	var protocols []shared.AiAzureContentSafetyPluginProtocols = []shared.AiAzureContentSafetyPluginProtocols{}
+	protocols := make([]shared.AiAzureContentSafetyPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiAzureContentSafetyPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -239,10 +247,60 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureContentSafetyPlugin(resp *shared.AiAzureContentSafetyPlugin) {
+func (r *PluginAiAzureContentSafetyResourceModel) ToOperationsUpdateAiazurecontentsafetyPluginRequest(ctx context.Context) (*operations.UpdateAiazurecontentsafetyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiAzureContentSafetyPlugin, aiAzureContentSafetyPluginDiags := r.ToSharedAiAzureContentSafetyPlugin(ctx)
+	diags.Append(aiAzureContentSafetyPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAiazurecontentsafetyPluginRequest{
+		PluginID:                   pluginID,
+		AiAzureContentSafetyPlugin: *aiAzureContentSafetyPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiAzureContentSafetyResourceModel) ToOperationsGetAiazurecontentsafetyPluginRequest(ctx context.Context) (*operations.GetAiazurecontentsafetyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAiazurecontentsafetyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiAzureContentSafetyResourceModel) ToOperationsDeleteAiazurecontentsafetyPluginRequest(ctx context.Context) (*operations.DeleteAiazurecontentsafetyPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAiazurecontentsafetyPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureContentSafetyPlugin(ctx context.Context, resp *shared.AiAzureContentSafetyPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -262,14 +320,14 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 				r.Config.Categories = r.Config.Categories[:len(resp.Config.Categories)]
 			}
 			for categoriesCount, categoriesItem := range resp.Config.Categories {
-				var categories1 tfTypes.Categories
-				categories1.Name = types.StringValue(categoriesItem.Name)
-				categories1.RejectionLevel = types.Int64Value(categoriesItem.RejectionLevel)
+				var categories tfTypes.Categories
+				categories.Name = types.StringValue(categoriesItem.Name)
+				categories.RejectionLevel = types.Int64Value(categoriesItem.RejectionLevel)
 				if categoriesCount+1 > len(r.Config.Categories) {
-					r.Config.Categories = append(r.Config.Categories, categories1)
+					r.Config.Categories = append(r.Config.Categories, categories)
 				} else {
-					r.Config.Categories[categoriesCount].Name = categories1.Name
-					r.Config.Categories[categoriesCount].RejectionLevel = categories1.RejectionLevel
+					r.Config.Categories[categoriesCount].Name = categories.Name
+					r.Config.Categories[categoriesCount].RejectionLevel = categories.RejectionLevel
 				}
 			}
 			r.Config.ContentSafetyKey = types.StringPointerValue(resp.Config.ContentSafetyKey)
@@ -320,16 +378,16 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -355,4 +413,6 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

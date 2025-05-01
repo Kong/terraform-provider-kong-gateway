@@ -15,8 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
-	speakeasy_numbervalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/numbervalidators"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -74,7 +73,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 						Optional:    true,
 						Description: `If set to ` + "`" + `true` + "`" + `, this doesn't count denied requests (status = ` + "`" + `429` + "`" + `). If set to ` + "`" + `false` + "`" + `, all requests, including denied ones, are counted. This parameter only affects the ` + "`" + `sliding` + "`" + ` window_type and the request prompt provider.`,
 					},
-					"error_code": schema.NumberAttribute{
+					"error_code": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Set a custom error code to return when the rate limit is exceeded.`,
@@ -123,12 +122,12 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 								speakeasy_objectvalidators.NotNull(),
 							},
 							Attributes: map[string]schema.Attribute{
-								"limit": schema.NumberAttribute{
+								"limit": schema.Float64Attribute{
 									Computed:    true,
 									Optional:    true,
 									Description: `The limit applies to the LLM provider within the defined window size. It used the query cost from the tokens to increment the counter. Not Null`,
-									Validators: []validator.Number{
-										speakeasy_numbervalidators.NotNull(),
+									Validators: []validator.Float64{
+										speakeasy_float64validators.NotNull(),
 									},
 								},
 								"name": schema.StringAttribute{
@@ -151,12 +150,12 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 										),
 									},
 								},
-								"window_size": schema.NumberAttribute{
+								"window_size": schema.Float64Attribute{
 									Computed:    true,
 									Optional:    true,
 									Description: `The window size to apply a limit (defined in seconds). Not Null`,
-									Validators: []validator.Number{
-										speakeasy_numbervalidators.NotNull(),
+									Validators: []validator.Float64{
+										speakeasy_float64validators.NotNull(),
 									},
 								},
 							},
@@ -349,7 +348,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 						Optional:    true,
 						Description: `If defined, it use custom function to count requests for the request prompt provider`,
 					},
-					"retry_after_jitter_max": schema.NumberAttribute{
+					"retry_after_jitter_max": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The upper bound of a jitter (random delay) in seconds to be added to the ` + "`" + `Retry-After` + "`" + ` header of denied requests (status = ` + "`" + `429` + "`" + `) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is ` + "`" + `0` + "`" + `; in this case, the ` + "`" + `Retry-After` + "`" + ` header is equal to the ` + "`" + `RateLimit-Reset` + "`" + ` header.`,
@@ -366,7 +365,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 							),
 						},
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).`,
@@ -569,8 +568,13 @@ func (r *PluginAiRateLimitingAdvancedResource) Create(ctx context.Context, req r
 		return
 	}
 
-	request := *data.ToSharedAiRateLimitingAdvancedPlugin()
-	res, err := r.client.Plugins.CreateAiratelimitingadvancedPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiRateLimitingAdvancedPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -590,8 +594,17 @@ func (r *PluginAiRateLimitingAdvancedResource) Create(ctx context.Context, req r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiRateLimitingAdvancedPlugin(res.AiRateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiRateLimitingAdvancedPlugin(ctx, res.AiRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -615,13 +628,13 @@ func (r *PluginAiRateLimitingAdvancedResource) Read(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -645,7 +658,11 @@ func (r *PluginAiRateLimitingAdvancedResource) Read(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiRateLimitingAdvancedPlugin(res.AiRateLimitingAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiRateLimitingAdvancedPlugin(ctx, res.AiRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -665,15 +682,13 @@ func (r *PluginAiRateLimitingAdvancedResource) Update(ctx context.Context, req r
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiRateLimitingAdvancedPlugin := *data.ToSharedAiRateLimitingAdvancedPlugin()
-	request := operations.UpdateAiratelimitingadvancedPluginRequest{
-		PluginID:                     pluginID,
-		AiRateLimitingAdvancedPlugin: aiRateLimitingAdvancedPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -693,8 +708,17 @@ func (r *PluginAiRateLimitingAdvancedResource) Update(ctx context.Context, req r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiRateLimitingAdvancedPlugin(res.AiRateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiRateLimitingAdvancedPlugin(ctx, res.AiRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -718,13 +742,13 @@ func (r *PluginAiRateLimitingAdvancedResource) Delete(ctx context.Context, req r
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

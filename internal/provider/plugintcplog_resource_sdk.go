@@ -3,14 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin {
+func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin(ctx context.Context) (*shared.TCPLogPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -39,7 +43,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 	if r.Ordering != nil {
 		var after *shared.TCPLogPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -49,7 +53,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 		}
 		var before *shared.TCPLogPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -62,33 +66,36 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 			Before: before,
 		}
 	}
-	var partials []shared.TCPLogPluginPartials = []shared.TCPLogPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.TCPLogPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.TCPLogPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.TCPLogPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.TCPLogPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -114,7 +121,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 		}
 		keepalive := new(float64)
 		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+			*keepalive = r.Config.Keepalive.ValueFloat64()
 		} else {
 			keepalive = nil
 		}
@@ -126,7 +133,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -164,7 +171,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 			ID: id2,
 		}
 	}
-	var protocols []shared.TCPLogPluginProtocols = []shared.TCPLogPluginProtocols{}
+	protocols := make([]shared.TCPLogPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.TCPLogPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -207,10 +214,60 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin() *shared.TCPLogPlugin 
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.TCPLogPlugin) {
+func (r *PluginTCPLogResourceModel) ToOperationsUpdateTcplogPluginRequest(ctx context.Context) (*operations.UpdateTcplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	tcpLogPlugin, tcpLogPluginDiags := r.ToSharedTCPLogPlugin(ctx)
+	diags.Append(tcpLogPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateTcplogPluginRequest{
+		PluginID:     pluginID,
+		TCPLogPlugin: *tcpLogPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginTCPLogResourceModel) ToOperationsGetTcplogPluginRequest(ctx context.Context) (*operations.GetTcplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetTcplogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginTCPLogResourceModel) ToOperationsDeleteTcplogPluginRequest(ctx context.Context) (*operations.DeleteTcplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteTcplogPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(ctx context.Context, resp *shared.TCPLogPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -224,17 +281,9 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.T
 				}
 			}
 			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
 			r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
 		}
@@ -277,16 +326,16 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.T
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -312,4 +361,6 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(resp *shared.T
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -222,8 +221,13 @@ func (r *PluginBotDetectionResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 
-	request := *data.ToSharedBotDetectionPlugin()
-	res, err := r.client.Plugins.CreateBotdetectionPlugin(ctx, request)
+	request, requestDiags := data.ToSharedBotDetectionPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateBotdetectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -243,8 +247,17 @@ func (r *PluginBotDetectionResource) Create(ctx context.Context, req resource.Cr
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBotDetectionPlugin(res.BotDetectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedBotDetectionPlugin(ctx, res.BotDetectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -268,13 +281,13 @@ func (r *PluginBotDetectionResource) Read(ctx context.Context, req resource.Read
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetBotdetectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetBotdetectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetBotdetectionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetBotdetectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -298,7 +311,11 @@ func (r *PluginBotDetectionResource) Read(ctx context.Context, req resource.Read
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBotDetectionPlugin(res.BotDetectionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedBotDetectionPlugin(ctx, res.BotDetectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -318,15 +335,13 @@ func (r *PluginBotDetectionResource) Update(ctx context.Context, req resource.Up
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateBotdetectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	botDetectionPlugin := *data.ToSharedBotDetectionPlugin()
-	request := operations.UpdateBotdetectionPluginRequest{
-		PluginID:           pluginID,
-		BotDetectionPlugin: botDetectionPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateBotdetectionPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateBotdetectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -346,8 +361,17 @@ func (r *PluginBotDetectionResource) Update(ctx context.Context, req resource.Up
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBotDetectionPlugin(res.BotDetectionPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedBotDetectionPlugin(ctx, res.BotDetectionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -371,13 +395,13 @@ func (r *PluginBotDetectionResource) Delete(ctx context.Context, req resource.De
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteBotdetectionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteBotdetectionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteBotdetectionPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteBotdetectionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

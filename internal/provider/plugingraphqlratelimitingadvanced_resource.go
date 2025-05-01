@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -97,10 +96,10 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 					"limit": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more requests-per-window limits to apply.`,
 					},
-					"max_cost": schema.NumberAttribute{
+					"max_cost": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `A defined maximum cost per query. 0 means unlimited.`,
@@ -286,7 +285,7 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 							},
 						},
 					},
-					"score_factor": schema.NumberAttribute{
+					"score_factor": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `A scoring factor to multiply (or divide) the cost. The ` + "`" + `score_factor` + "`" + ` must always be greater than 0.`,
@@ -302,7 +301,7 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 							),
 						},
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 syncs the counters in that many number of seconds.`,
@@ -310,7 +309,7 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 					"window_size": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more window sizes to apply a limit to (defined in seconds).`,
 					},
 					"window_type": schema.StringAttribute{
@@ -487,8 +486,13 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Create(ctx context.Context, 
 		return
 	}
 
-	request := *data.ToSharedGraphqlRateLimitingAdvancedPlugin()
-	res, err := r.client.Plugins.CreateGraphqlratelimitingadvancedPlugin(ctx, request)
+	request, requestDiags := data.ToSharedGraphqlRateLimitingAdvancedPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateGraphqlratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -508,8 +512,17 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Create(ctx context.Context, 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(res.GraphqlRateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(ctx, res.GraphqlRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -533,13 +546,13 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Read(ctx context.Context, re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetGraphqlratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetGraphqlratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetGraphqlratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetGraphqlratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -563,7 +576,11 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Read(ctx context.Context, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(res.GraphqlRateLimitingAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(ctx, res.GraphqlRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -583,15 +600,13 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Update(ctx context.Context, 
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateGraphqlratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	graphqlRateLimitingAdvancedPlugin := *data.ToSharedGraphqlRateLimitingAdvancedPlugin()
-	request := operations.UpdateGraphqlratelimitingadvancedPluginRequest{
-		PluginID:                          pluginID,
-		GraphqlRateLimitingAdvancedPlugin: graphqlRateLimitingAdvancedPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateGraphqlratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateGraphqlratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -611,8 +626,17 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Update(ctx context.Context, 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(res.GraphqlRateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(ctx, res.GraphqlRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -636,13 +660,13 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Delete(ctx context.Context, 
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteGraphqlratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteGraphqlratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteGraphqlratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteGraphqlratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

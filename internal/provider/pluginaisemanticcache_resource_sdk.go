@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *shared.AiSemanticCachePlugin {
+func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin(ctx context.Context) (*shared.AiSemanticCachePlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 	if r.Ordering != nil {
 		var after *shared.AiSemanticCachePluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 		}
 		var before *shared.AiSemanticCachePluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 			Before: before,
 		}
 	}
-	var partials []shared.AiSemanticCachePluginPartials = []shared.AiSemanticCachePluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiSemanticCachePluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiSemanticCachePluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiSemanticCachePluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiSemanticCachePluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -279,7 +286,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 		}
 		messageCountback := new(float64)
 		if !r.Config.MessageCountback.IsUnknown() && !r.Config.MessageCountback.IsNull() {
-			*messageCountback, _ = r.Config.MessageCountback.ValueBigFloat().Float64()
+			*messageCountback = r.Config.MessageCountback.ValueFloat64()
 		} else {
 			messageCountback = nil
 		}
@@ -311,7 +318,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 				} else {
 					clusterMaxRedirections = nil
 				}
-				var clusterNodes []shared.AiSemanticCachePluginClusterNodes = []shared.AiSemanticCachePluginClusterNodes{}
+				clusterNodes := make([]shared.AiSemanticCachePluginClusterNodes, 0, len(r.Config.Vectordb.Redis.ClusterNodes))
 				for _, clusterNodesItem := range r.Config.Vectordb.Redis.ClusterNodes {
 					ip := new(string)
 					if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -396,7 +403,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 				} else {
 					sentinelMaster = nil
 				}
-				var sentinelNodes []shared.AiSemanticCachePluginSentinelNodes = []shared.AiSemanticCachePluginSentinelNodes{}
+				sentinelNodes := make([]shared.AiSemanticCachePluginSentinelNodes, 0, len(r.Config.Vectordb.Redis.SentinelNodes))
 				for _, sentinelNodesItem := range r.Config.Vectordb.Redis.SentinelNodes {
 					host1 := new(string)
 					if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -489,7 +496,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 			}
 			threshold := new(float64)
 			if !r.Config.Vectordb.Threshold.IsUnknown() && !r.Config.Vectordb.Threshold.IsNull() {
-				*threshold, _ = r.Config.Vectordb.Threshold.ValueBigFloat().Float64()
+				*threshold = r.Config.Vectordb.Threshold.ValueFloat64()
 			} else {
 				threshold = nil
 			}
@@ -538,7 +545,7 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 			ID: id3,
 		}
 	}
-	var protocols []shared.AiSemanticCachePluginProtocols = []shared.AiSemanticCachePluginProtocols{}
+	protocols := make([]shared.AiSemanticCachePluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiSemanticCachePluginProtocols(protocolsItem.ValueString()))
 	}
@@ -582,10 +589,60 @@ func (r *PluginAiSemanticCacheResourceModel) ToSharedAiSemanticCachePlugin() *sh
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlugin(resp *shared.AiSemanticCachePlugin) {
+func (r *PluginAiSemanticCacheResourceModel) ToOperationsUpdateAisemanticcachePluginRequest(ctx context.Context) (*operations.UpdateAisemanticcachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiSemanticCachePlugin, aiSemanticCachePluginDiags := r.ToSharedAiSemanticCachePlugin(ctx)
+	diags.Append(aiSemanticCachePluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAisemanticcachePluginRequest{
+		PluginID:              pluginID,
+		AiSemanticCachePlugin: *aiSemanticCachePlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiSemanticCacheResourceModel) ToOperationsGetAisemanticcachePluginRequest(ctx context.Context) (*operations.GetAisemanticcachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAisemanticcachePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiSemanticCacheResourceModel) ToOperationsDeleteAisemanticcachePluginRequest(ctx context.Context) (*operations.DeleteAisemanticcachePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAisemanticcachePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlugin(ctx context.Context, resp *shared.AiSemanticCachePlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -642,11 +699,7 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 			r.Config.IgnoreAssistantPrompts = types.BoolPointerValue(resp.Config.IgnoreAssistantPrompts)
 			r.Config.IgnoreSystemPrompts = types.BoolPointerValue(resp.Config.IgnoreSystemPrompts)
 			r.Config.IgnoreToolPrompts = types.BoolPointerValue(resp.Config.IgnoreToolPrompts)
-			if resp.Config.MessageCountback != nil {
-				r.Config.MessageCountback = types.NumberValue(big.NewFloat(float64(*resp.Config.MessageCountback)))
-			} else {
-				r.Config.MessageCountback = types.NumberNull()
-			}
+			r.Config.MessageCountback = types.Float64PointerValue(resp.Config.MessageCountback)
 			r.Config.StopOnFailure = types.BoolPointerValue(resp.Config.StopOnFailure)
 			if resp.Config.Vectordb == nil {
 				r.Config.Vectordb = nil
@@ -668,14 +721,14 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 						r.Config.Vectordb.Redis.ClusterNodes = r.Config.Vectordb.Redis.ClusterNodes[:len(resp.Config.Vectordb.Redis.ClusterNodes)]
 					}
 					for clusterNodesCount, clusterNodesItem := range resp.Config.Vectordb.Redis.ClusterNodes {
-						var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-						clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-						clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+						var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+						clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+						clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 						if clusterNodesCount+1 > len(r.Config.Vectordb.Redis.ClusterNodes) {
-							r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes1)
+							r.Config.Vectordb.Redis.ClusterNodes = append(r.Config.Vectordb.Redis.ClusterNodes, clusterNodes)
 						} else {
-							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+							r.Config.Vectordb.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 						}
 					}
 					r.Config.Vectordb.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Vectordb.Redis.ConnectTimeout)
@@ -694,14 +747,14 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 						r.Config.Vectordb.Redis.SentinelNodes = r.Config.Vectordb.Redis.SentinelNodes[:len(resp.Config.Vectordb.Redis.SentinelNodes)]
 					}
 					for sentinelNodesCount, sentinelNodesItem := range resp.Config.Vectordb.Redis.SentinelNodes {
-						var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-						sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-						sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+						var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+						sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+						sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 						if sentinelNodesCount+1 > len(r.Config.Vectordb.Redis.SentinelNodes) {
-							r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes1)
+							r.Config.Vectordb.Redis.SentinelNodes = append(r.Config.Vectordb.Redis.SentinelNodes, sentinelNodes)
 						} else {
-							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+							r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 						}
 					}
 					r.Config.Vectordb.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Vectordb.Redis.SentinelPassword)
@@ -721,11 +774,7 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 				} else {
 					r.Config.Vectordb.Strategy = types.StringNull()
 				}
-				if resp.Config.Vectordb.Threshold != nil {
-					r.Config.Vectordb.Threshold = types.NumberValue(big.NewFloat(float64(*resp.Config.Vectordb.Threshold)))
-				} else {
-					r.Config.Vectordb.Threshold = types.NumberNull()
-				}
+				r.Config.Vectordb.Threshold = types.Float64PointerValue(resp.Config.Vectordb.Threshold)
 			}
 		}
 		if resp.Consumer == nil {
@@ -773,16 +822,16 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -808,4 +857,6 @@ func (r *PluginAiSemanticCacheResourceModel) RefreshFromSharedAiSemanticCachePlu
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

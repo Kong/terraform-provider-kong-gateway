@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -251,8 +250,13 @@ func (r *PluginKeyAuthEncResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	request := *data.ToSharedKeyAuthEncPlugin()
-	res, err := r.client.Plugins.CreateKeyauthencPlugin(ctx, request)
+	request, requestDiags := data.ToSharedKeyAuthEncPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateKeyauthencPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -272,8 +276,17 @@ func (r *PluginKeyAuthEncResource) Create(ctx context.Context, req resource.Crea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuthEncPlugin(res.KeyAuthEncPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuthEncPlugin(ctx, res.KeyAuthEncPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -297,13 +310,13 @@ func (r *PluginKeyAuthEncResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetKeyauthencPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetKeyauthencPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetKeyauthencPlugin(ctx, request)
+	res, err := r.client.Plugins.GetKeyauthencPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -327,7 +340,11 @@ func (r *PluginKeyAuthEncResource) Read(ctx context.Context, req resource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuthEncPlugin(res.KeyAuthEncPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuthEncPlugin(ctx, res.KeyAuthEncPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -347,15 +364,13 @@ func (r *PluginKeyAuthEncResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateKeyauthencPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	keyAuthEncPlugin := *data.ToSharedKeyAuthEncPlugin()
-	request := operations.UpdateKeyauthencPluginRequest{
-		PluginID:         pluginID,
-		KeyAuthEncPlugin: keyAuthEncPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateKeyauthencPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateKeyauthencPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -375,8 +390,17 @@ func (r *PluginKeyAuthEncResource) Update(ctx context.Context, req resource.Upda
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuthEncPlugin(res.KeyAuthEncPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuthEncPlugin(ctx, res.KeyAuthEncPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -400,13 +424,13 @@ func (r *PluginKeyAuthEncResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteKeyauthencPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteKeyauthencPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteKeyauthencPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteKeyauthencPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

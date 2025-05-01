@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	"regexp"
 )
@@ -353,8 +352,13 @@ func (r *PluginRequestTransformerResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request := *data.ToSharedRequestTransformerPlugin()
-	res, err := r.client.Plugins.CreateRequesttransformerPlugin(ctx, request)
+	request, requestDiags := data.ToSharedRequestTransformerPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateRequesttransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -374,8 +378,17 @@ func (r *PluginRequestTransformerResource) Create(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRequestTransformerPlugin(res.RequestTransformerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRequestTransformerPlugin(ctx, res.RequestTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -399,13 +412,13 @@ func (r *PluginRequestTransformerResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetRequesttransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetRequesttransformerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetRequesttransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.GetRequesttransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -429,7 +442,11 @@ func (r *PluginRequestTransformerResource) Read(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRequestTransformerPlugin(res.RequestTransformerPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedRequestTransformerPlugin(ctx, res.RequestTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -449,15 +466,13 @@ func (r *PluginRequestTransformerResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateRequesttransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	requestTransformerPlugin := *data.ToSharedRequestTransformerPlugin()
-	request := operations.UpdateRequesttransformerPluginRequest{
-		PluginID:                 pluginID,
-		RequestTransformerPlugin: requestTransformerPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateRequesttransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateRequesttransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -477,8 +492,17 @@ func (r *PluginRequestTransformerResource) Update(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRequestTransformerPlugin(res.RequestTransformerPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRequestTransformerPlugin(ctx, res.RequestTransformerPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -502,13 +526,13 @@ func (r *PluginRequestTransformerResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteRequesttransformerPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteRequesttransformerPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteRequesttransformerPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteRequesttransformerPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

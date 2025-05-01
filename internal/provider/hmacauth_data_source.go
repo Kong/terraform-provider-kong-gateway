@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -120,17 +119,13 @@ func (r *HMACAuthDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetHmacAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var hmacAuthID string
-	hmacAuthID = data.ID.ValueString()
-
-	request := operations.GetHmacAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		HMACAuthID: hmacAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, request)
+	res, err := r.client.HMACAuthCredentials.GetHmacAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -142,10 +137,6 @@ func (r *HMACAuthDataSource) Read(ctx context.Context, req datasource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -154,7 +145,11 @@ func (r *HMACAuthDataSource) Read(ctx context.Context, req datasource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHMACAuth(res.HMACAuth)
+	resp.Diagnostics.Append(data.RefreshFromSharedHMACAuth(ctx, res.HMACAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

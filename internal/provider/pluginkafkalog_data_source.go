@@ -62,7 +62,7 @@ func (r *PluginKafkaLogDataSource) Schema(ctx context.Context, req datasource.Sc
 						Attributes: map[string]schema.Attribute{
 							"mechanism": schema.StringAttribute{
 								Computed:    true,
-								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + ` or ` + "`" + `SCRAM-SHA-256` + "`" + `.`,
+								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + `, ` + "`" + `SCRAM-SHA-256` + "`" + ` or ` + "`" + `SCRAM-SHA-512` + "`" + `.`,
 							},
 							"password": schema.StringAttribute{
 								Computed:    true,

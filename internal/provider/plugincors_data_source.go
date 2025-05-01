@@ -56,6 +56,10 @@ func (r *PluginCorsDataSource) Schema(ctx context.Context, req datasource.Schema
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"allow_origin_absent": schema.BoolAttribute{
+						Computed:    true,
+						Description: `A boolean value that skip cors response headers when origin header of request is empty`,
+					},
 					"credentials": schema.BoolAttribute{
 						Computed:    true,
 						Description: `Flag to determine whether the ` + "`" + `Access-Control-Allow-Credentials` + "`" + ` header should be sent with ` + "`" + `true` + "`" + ` as the value.`,

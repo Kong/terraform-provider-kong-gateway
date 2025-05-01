@@ -65,34 +65,31 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) 
 			Before: before,
 		}
 	}
-	var partials []shared.SessionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.SessionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.SessionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.SessionPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.SessionPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -153,6 +150,12 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) 
 			*cookieSecure = r.Config.CookieSecure.ValueBool()
 		} else {
 			cookieSecure = nil
+		}
+		hashSubject := new(bool)
+		if !r.Config.HashSubject.IsUnknown() && !r.Config.HashSubject.IsNull() {
+			*hashSubject = r.Config.HashSubject.ValueBool()
+		} else {
+			hashSubject = nil
 		}
 		idlingTimeout := new(float64)
 		if !r.Config.IdlingTimeout.IsUnknown() && !r.Config.IdlingTimeout.IsNull() {
@@ -238,6 +241,12 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) 
 		} else {
 			storage = nil
 		}
+		storeMetadata := new(bool)
+		if !r.Config.StoreMetadata.IsUnknown() && !r.Config.StoreMetadata.IsNull() {
+			*storeMetadata = r.Config.StoreMetadata.ValueBool()
+		} else {
+			storeMetadata = nil
+		}
 		config = &shared.SessionPluginConfig{
 			AbsoluteTimeout:         absoluteTimeout,
 			Audience:                audience,
@@ -247,6 +256,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) 
 			CookiePath:              cookiePath,
 			CookieSameSite:          cookieSameSite,
 			CookieSecure:            cookieSecure,
+			HashSubject:             hashSubject,
 			IdlingTimeout:           idlingTimeout,
 			LogoutMethods:           logoutMethods,
 			LogoutPostArg:           logoutPostArg,
@@ -262,6 +272,7 @@ func (r *PluginSessionResourceModel) ToSharedSessionPlugin(ctx context.Context) 
 			Secret:                  secret,
 			StaleTTL:                staleTTL,
 			Storage:                 storage,
+			StoreMetadata:           storeMetadata,
 		}
 	}
 	protocols := make([]shared.SessionPluginProtocols, 0, len(r.Protocols))
@@ -377,6 +388,7 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(ctx context.
 				r.Config.CookieSameSite = types.StringNull()
 			}
 			r.Config.CookieSecure = types.BoolPointerValue(resp.Config.CookieSecure)
+			r.Config.HashSubject = types.BoolPointerValue(resp.Config.HashSubject)
 			r.Config.IdlingTimeout = types.Float64PointerValue(resp.Config.IdlingTimeout)
 			r.Config.LogoutMethods = make([]types.String, 0, len(resp.Config.LogoutMethods))
 			for _, v := range resp.Config.LogoutMethods {
@@ -405,6 +417,7 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(ctx context.
 			} else {
 				r.Config.Storage = types.StringNull()
 			}
+			r.Config.StoreMetadata = types.BoolPointerValue(resp.Config.StoreMetadata)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -433,23 +446,21 @@ func (r *PluginSessionResourceModel) RefreshFromSharedSessionPlugin(ctx context.
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

@@ -15,6 +15,7 @@ PluginAiPromptDecorator Resource
 ```terraform
 resource "kong-gateway_plugin_ai_prompt_decorator" "my_pluginaipromptdecorator" {
   config = {
+    llm_format            = "openai"
     max_request_body_size = 6
     prompts = {
       append = [
@@ -104,6 +105,7 @@ resource "kong-gateway_plugin_ai_prompt_decorator" "my_pluginaipromptdecorator" 
 
 Optional:
 
+- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]
 - `max_request_body_size` (Number) max allowed body size allowed to be introspected
 - `prompts` (Attributes) (see [below for nested schema](#nestedatt--config--prompts))
 

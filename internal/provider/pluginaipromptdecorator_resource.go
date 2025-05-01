@@ -61,6 +61,18 @@ func (r *PluginAiPromptDecoratorResource) Schema(ctx context.Context, req resour
 				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"bedrock",
+								"gemini",
+								"openai",
+							),
+						},
+					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,

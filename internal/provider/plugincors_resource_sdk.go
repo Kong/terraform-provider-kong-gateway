@@ -65,34 +65,31 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin(ctx context.Context) (*shar
 			Before: before,
 		}
 	}
-	var partials []shared.CorsPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.CorsPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.CorsPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.CorsPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.CorsPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -106,6 +103,12 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin(ctx context.Context) (*shar
 	}
 	var config *shared.CorsPluginConfig
 	if r.Config != nil {
+		allowOriginAbsent := new(bool)
+		if !r.Config.AllowOriginAbsent.IsUnknown() && !r.Config.AllowOriginAbsent.IsNull() {
+			*allowOriginAbsent = r.Config.AllowOriginAbsent.ValueBool()
+		} else {
+			allowOriginAbsent = nil
+		}
 		credentials := new(bool)
 		if !r.Config.Credentials.IsUnknown() && !r.Config.Credentials.IsNull() {
 			*credentials = r.Config.Credentials.ValueBool()
@@ -147,6 +150,7 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin(ctx context.Context) (*shar
 			privateNetwork = nil
 		}
 		config = &shared.CorsPluginConfig{
+			AllowOriginAbsent: allowOriginAbsent,
 			Credentials:       credentials,
 			ExposedHeaders:    exposedHeaders,
 			Headers:           headers,
@@ -258,6 +262,7 @@ func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(ctx context.Contex
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.CorsPluginConfig{}
+			r.Config.AllowOriginAbsent = types.BoolPointerValue(resp.Config.AllowOriginAbsent)
 			r.Config.Credentials = types.BoolPointerValue(resp.Config.Credentials)
 			r.Config.ExposedHeaders = make([]types.String, 0, len(resp.Config.ExposedHeaders))
 			for _, v := range resp.Config.ExposedHeaders {
@@ -306,23 +311,21 @@ func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(ctx context.Contex
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

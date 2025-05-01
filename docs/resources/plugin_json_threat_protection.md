@@ -15,15 +15,16 @@ PluginJSONThreatProtection Resource
 ```terraform
 resource "kong-gateway_plugin_json_threat_protection" "my_pluginjsonthreatprotection" {
   config = {
-    enforcement_mode             = "block"
-    error_message                = "...my_error_message..."
-    error_status_code            = 422
-    max_array_element_count      = 333817350
-    max_body_size                = 6963462
-    max_container_depth          = 1859170481
-    max_object_entry_count       = 1346643259
-    max_object_entry_name_length = 60000047
-    max_string_value_length      = 64603074
+    allow_duplicate_object_entry_name = false
+    enforcement_mode                  = "block"
+    error_message                     = "...my_error_message..."
+    error_status_code                 = 422
+    max_array_element_count           = 333817350
+    max_body_size                     = 6963462
+    max_container_depth               = 1859170481
+    max_object_entry_count            = 1346643259
+    max_object_entry_name_length      = 60000047
+    max_string_value_length           = 64603074
   }
   created_at    = 4
   enabled       = false
@@ -90,6 +91,7 @@ resource "kong-gateway_plugin_json_threat_protection" "my_pluginjsonthreatprotec
 
 Optional:
 
+- `allow_duplicate_object_entry_name` (Boolean) Allow or disallow duplicate object entry name.
 - `enforcement_mode` (String) Enforcement mode of the security policy. must be one of ["block", "log_only"]
 - `error_message` (String) The response message when validation fails
 - `error_status_code` (Number) The response status code when validation fails.

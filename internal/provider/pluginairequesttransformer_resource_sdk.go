@@ -65,34 +65,31 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 			Before: before,
 		}
 	}
-	var partials []shared.AiRequestTransformerPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiRequestTransformerPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiRequestTransformerPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AiRequestTransformerPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiRequestTransformerPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -302,14 +299,35 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 					}
 					var bedrock *shared.AiRequestTransformerPluginBedrock
 					if r.Config.Llm.Model.Options.Bedrock != nil {
+						awsAssumeRoleArn := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.IsNull() {
+							*awsAssumeRoleArn = r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.ValueString()
+						} else {
+							awsAssumeRoleArn = nil
+						}
 						awsRegion := new(string)
 						if !r.Config.Llm.Model.Options.Bedrock.AwsRegion.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsRegion.IsNull() {
 							*awsRegion = r.Config.Llm.Model.Options.Bedrock.AwsRegion.ValueString()
 						} else {
 							awsRegion = nil
 						}
+						awsRoleSessionName := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.IsNull() {
+							*awsRoleSessionName = r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.ValueString()
+						} else {
+							awsRoleSessionName = nil
+						}
+						awsStsEndpointURL := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.IsNull() {
+							*awsStsEndpointURL = r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.ValueString()
+						} else {
+							awsStsEndpointURL = nil
+						}
 						bedrock = &shared.AiRequestTransformerPluginBedrock{
-							AwsRegion: awsRegion,
+							AwsAssumeRoleArn:   awsAssumeRoleArn,
+							AwsRegion:          awsRegion,
+							AwsRoleSessionName: awsRoleSessionName,
+							AwsStsEndpointURL:  awsStsEndpointURL,
 						}
 					}
 					var gemini *shared.AiRequestTransformerPluginGemini
@@ -664,7 +682,10 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 							r.Config.Llm.Model.Options.Bedrock = nil
 						} else {
 							r.Config.Llm.Model.Options.Bedrock = &tfTypes.Bedrock{}
+							r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn)
 							r.Config.Llm.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRegion)
+							r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName)
+							r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL)
 						}
 						if resp.Config.Llm.Model.Options.Gemini == nil {
 							r.Config.Llm.Model.Options.Gemini = nil
@@ -749,23 +770,21 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

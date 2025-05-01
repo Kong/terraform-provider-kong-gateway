@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -89,7 +88,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Determines if consumer groups are allowed to override the rate limiting settings for the given Route or Service. Flipping ` + "`" + `enforce_consumer_groups` + "`" + ` from ` + "`" + `true` + "`" + ` to ` + "`" + `false` + "`" + ` disables the group override, but does not clear the list of consumer groups. You can then flip ` + "`" + `enforce_consumer_groups` + "`" + ` to ` + "`" + `true` + "`" + ` to re-enforce the groups.`,
 					},
-					"error_code": schema.NumberAttribute{
+					"error_code": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Set a custom error code to return when the rate limit is exceeded.`,
@@ -112,7 +111,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 					"identifier": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Can be ` + "`" + `ip` + "`" + `, ` + "`" + `credential` + "`" + `, ` + "`" + `consumer` + "`" + `, ` + "`" + `service` + "`" + `, ` + "`" + `header` + "`" + `, ` + "`" + `path` + "`" + ` or ` + "`" + `consumer-group` + "`" + `. must be one of ["consumer", "consumer-group", "credential", "header", "ip", "path", "service"]`,
+						Description: `The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Can be ` + "`" + `ip` + "`" + `, ` + "`" + `credential` + "`" + `, ` + "`" + `consumer` + "`" + `, ` + "`" + `service` + "`" + `, ` + "`" + `header` + "`" + `, ` + "`" + `path` + "`" + ` or ` + "`" + `consumer-group` + "`" + `. Note if ` + "`" + `identifier` + "`" + ` is ` + "`" + `consumer-group` + "`" + `, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate. must be one of ["consumer", "consumer-group", "credential", "header", "ip", "path", "service"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"consumer",
@@ -128,7 +127,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 					"limit": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified.`,
 					},
 					"lock_dictionary_name": schema.StringAttribute{
@@ -332,7 +331,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 							},
 						},
 					},
-					"retry_after_jitter_max": schema.NumberAttribute{
+					"retry_after_jitter_max": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The upper bound of a jitter (random delay) in seconds to be added to the ` + "`" + `Retry-After` + "`" + ` header of denied requests (status = ` + "`" + `429` + "`" + `) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is ` + "`" + `0` + "`" + `; in this case, the ` + "`" + `Retry-After` + "`" + ` header is equal to the ` + "`" + `RateLimit-Reset` + "`" + ` header.`,
@@ -349,7 +348,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 							),
 						},
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).`,
@@ -357,7 +356,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 					"window_size": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more window sizes to apply a limit to (defined in seconds). There must be a matching number of window limits and sizes specified.`,
 					},
 					"window_type": schema.StringAttribute{
@@ -545,8 +544,13 @@ func (r *PluginRateLimitingAdvancedResource) Create(ctx context.Context, req res
 		return
 	}
 
-	request := *data.ToSharedRateLimitingAdvancedPlugin()
-	res, err := r.client.Plugins.CreateRatelimitingadvancedPlugin(ctx, request)
+	request, requestDiags := data.ToSharedRateLimitingAdvancedPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateRatelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -566,8 +570,17 @@ func (r *PluginRateLimitingAdvancedResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRateLimitingAdvancedPlugin(res.RateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRateLimitingAdvancedPlugin(ctx, res.RateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -591,13 +604,13 @@ func (r *PluginRateLimitingAdvancedResource) Read(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetRatelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetRatelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetRatelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetRatelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -621,7 +634,11 @@ func (r *PluginRateLimitingAdvancedResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRateLimitingAdvancedPlugin(res.RateLimitingAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedRateLimitingAdvancedPlugin(ctx, res.RateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -641,15 +658,13 @@ func (r *PluginRateLimitingAdvancedResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateRatelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	rateLimitingAdvancedPlugin := *data.ToSharedRateLimitingAdvancedPlugin()
-	request := operations.UpdateRatelimitingadvancedPluginRequest{
-		PluginID:                   pluginID,
-		RateLimitingAdvancedPlugin: rateLimitingAdvancedPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateRatelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateRatelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -669,8 +684,17 @@ func (r *PluginRateLimitingAdvancedResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRateLimitingAdvancedPlugin(res.RateLimitingAdvancedPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedRateLimitingAdvancedPlugin(ctx, res.RateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -694,13 +718,13 @@ func (r *PluginRateLimitingAdvancedResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteRatelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteRatelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteRatelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteRatelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

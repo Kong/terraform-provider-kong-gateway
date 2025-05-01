@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -58,6 +57,11 @@ func (r *PluginConfluentDataSource) Schema(ctx context.Context, req datasource.S
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"allowed_topics": schema.ListAttribute{
+						Computed:    true,
+						ElementType: types.StringType,
+						Description: `The list of allowed topic names to which messages can be sent. The default topic configured in the ` + "`" + `topic` + "`" + ` field is always allowed, regardless of its inclusion in ` + "`" + `allowed_topics` + "`" + `.`,
+					},
 					"bootstrap_servers": schema.ListNestedAttribute{
 						Computed: true,
 						NestedObject: schema.NestedAttributeObject{
@@ -117,6 +121,11 @@ func (r *PluginConfluentDataSource) Schema(ctx context.Context, req datasource.S
 					"keepalive_enabled": schema.BoolAttribute{
 						Computed: true,
 					},
+					"message_by_lua_functions": schema.ListAttribute{
+						Computed:    true,
+						ElementType: types.StringType,
+						Description: `The Lua functions that manipulates the message being sent to the Kafka topic.`,
+					},
 					"producer_async": schema.BoolAttribute{
 						Computed:    true,
 						Description: `Flag to enable asynchronous mode.`,
@@ -159,7 +168,11 @@ func (r *PluginConfluentDataSource) Schema(ctx context.Context, req datasource.S
 					},
 					"topic": schema.StringAttribute{
 						Computed:    true,
-						Description: `The Kafka topic to publish to.`,
+						Description: `The default Kafka topic to publish to if the query parameter defined in the ` + "`" + `topics_query_arg` + "`" + ` does not exist in the request`,
+					},
+					"topics_query_arg": schema.StringAttribute{
+						Computed:    true,
+						Description: `The request query parameter name that contains the topics to publish to`,
 					},
 				},
 			},
@@ -299,13 +312,13 @@ func (r *PluginConfluentDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetConfluentPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetConfluentPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetConfluentPlugin(ctx, request)
+	res, err := r.client.Plugins.GetConfluentPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -317,10 +330,6 @@ func (r *PluginConfluentDataSource) Read(ctx context.Context, req datasource.Rea
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -329,7 +338,11 @@ func (r *PluginConfluentDataSource) Read(ctx context.Context, req datasource.Rea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedConfluentPlugin(res.ConfluentPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedConfluentPlugin(ctx, res.ConfluentPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

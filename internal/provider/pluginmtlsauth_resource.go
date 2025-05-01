@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -84,12 +83,12 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 						ElementType: types.StringType,
 						Description: `List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (` + "`" + `id` + "`" + `).`,
 					},
-					"cache_ttl": schema.NumberAttribute{
+					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Cache expiry time in seconds.`,
 					},
-					"cert_cache_ttl": schema.NumberAttribute{
+					"cert_cache_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The length of time in seconds between refreshes of the revocation check status cache.`,
@@ -118,7 +117,7 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 							int64validator.AtMost(65535),
 						},
 					},
-					"http_timeout": schema.NumberAttribute{
+					"http_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `HTTP timeout threshold in milliseconds when communicating with the OCSP server or downloading CRL.`,
@@ -310,8 +309,13 @@ func (r *PluginMtlsAuthResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	request := *data.ToSharedMtlsAuthPlugin()
-	res, err := r.client.Plugins.CreateMtlsauthPlugin(ctx, request)
+	request, requestDiags := data.ToSharedMtlsAuthPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateMtlsauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -331,8 +335,17 @@ func (r *PluginMtlsAuthResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMtlsAuthPlugin(res.MtlsAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedMtlsAuthPlugin(ctx, res.MtlsAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -356,13 +369,13 @@ func (r *PluginMtlsAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetMtlsauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetMtlsauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetMtlsauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetMtlsauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -386,7 +399,11 @@ func (r *PluginMtlsAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMtlsAuthPlugin(res.MtlsAuthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedMtlsAuthPlugin(ctx, res.MtlsAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -406,15 +423,13 @@ func (r *PluginMtlsAuthResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateMtlsauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	mtlsAuthPlugin := *data.ToSharedMtlsAuthPlugin()
-	request := operations.UpdateMtlsauthPluginRequest{
-		PluginID:       pluginID,
-		MtlsAuthPlugin: mtlsAuthPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateMtlsauthPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateMtlsauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -434,8 +449,17 @@ func (r *PluginMtlsAuthResource) Update(ctx context.Context, req resource.Update
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMtlsAuthPlugin(res.MtlsAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedMtlsAuthPlugin(ctx, res.MtlsAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -459,13 +483,13 @@ func (r *PluginMtlsAuthResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteMtlsauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteMtlsauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteMtlsauthPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteMtlsauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -67,7 +67,7 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `String to be attached as tag of the consumer.`,
 					},
-					"flush_timeout": schema.NumberAttribute{
+					"flush_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Optional time in seconds. If ` + "`" + `queue_size` + "`" + ` > 1, this is the max idle time before sending a log with less than ` + "`" + `queue_size` + "`" + ` records.`,
@@ -113,10 +113,13 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 										),
 									},
 								},
-								"sample_rate": schema.NumberAttribute{
+								"sample_rate": schema.Float64Attribute{
 									Computed:    true,
 									Optional:    true,
 									Description: `Sampling rate`,
+									Validators: []validator.Float64{
+										float64validator.AtMost(1),
+									},
 								},
 								"stat_type": schema.StringAttribute{
 									Computed:    true,
@@ -170,10 +173,13 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 									int64validator.OneOf(-1, 1),
 								},
 							},
-							"initial_retry_delay": schema.NumberAttribute{
+							"initial_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
 							"max_batch_size": schema.Int64Attribute{
 								Computed:    true,
@@ -188,10 +194,13 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 								Optional:    true,
 								Description: `Maximum number of bytes that can be waiting on a queue, requires string content.`,
 							},
-							"max_coalescing_delay": schema.NumberAttribute{
+							"max_coalescing_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(3600),
+								},
 							},
 							"max_entries": schema.Int64Attribute{
 								Computed:    true,
@@ -201,12 +210,15 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 									int64validator.Between(1, 1000000),
 								},
 							},
-							"max_retry_delay": schema.NumberAttribute{
+							"max_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
-							"max_retry_time": schema.NumberAttribute{
+							"max_retry_time": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the queue gives up calling a failed handler for a batch.`,
@@ -396,8 +408,13 @@ func (r *PluginDatadogResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedDatadogPlugin()
-	res, err := r.client.Plugins.CreateDatadogPlugin(ctx, request)
+	request, requestDiags := data.ToSharedDatadogPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateDatadogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -417,8 +434,17 @@ func (r *PluginDatadogResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedDatadogPlugin(res.DatadogPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedDatadogPlugin(ctx, res.DatadogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -442,13 +468,13 @@ func (r *PluginDatadogResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetDatadogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetDatadogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetDatadogPlugin(ctx, request)
+	res, err := r.client.Plugins.GetDatadogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -472,7 +498,11 @@ func (r *PluginDatadogResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedDatadogPlugin(res.DatadogPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedDatadogPlugin(ctx, res.DatadogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -492,15 +522,13 @@ func (r *PluginDatadogResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateDatadogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	datadogPlugin := *data.ToSharedDatadogPlugin()
-	request := operations.UpdateDatadogPluginRequest{
-		PluginID:      pluginID,
-		DatadogPlugin: datadogPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateDatadogPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateDatadogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -520,8 +548,17 @@ func (r *PluginDatadogResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedDatadogPlugin(res.DatadogPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedDatadogPlugin(ctx, res.DatadogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -545,13 +582,13 @@ func (r *PluginDatadogResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteDatadogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteDatadogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteDatadogPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteDatadogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

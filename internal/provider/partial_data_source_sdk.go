@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PartialDataSourceModel) RefreshFromSharedPartial(resp *shared.Partial) {
+func (r *PartialDataSourceModel) ToOperationsGetPartialRequest(ctx context.Context) (*operations.GetPartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	out := operations.GetPartialRequest{
+		PartialID: partialID,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialDataSourceModel) RefreshFromSharedPartial(ctx context.Context, resp *shared.Partial) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if len(resp.Config) > 0 {
 			r.Config = make(map[string]types.String, len(resp.Config))
@@ -27,4 +45,6 @@ func (r *PartialDataSourceModel) RefreshFromSharedPartial(resp *shared.Partial) 
 		r.Type = types.StringValue(resp.Type)
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

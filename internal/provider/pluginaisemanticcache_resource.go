@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -171,6 +171,94 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 										Computed: true,
 										Optional: true,
 										Attributes: map[string]schema.Attribute{
+											"azure": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"api_version": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `'api-version' for Azure OpenAI instances.`,
+													},
+													"deployment_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Deployment ID for Azure OpenAI instances.`,
+													},
+													"instance": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Instance name for Azure OpenAI hosted models.`,
+													},
+												},
+												Description: `Not Null`,
+												Validators: []validator.Object{
+													speakeasy_objectvalidators.NotNull(),
+												},
+											},
+											"bedrock": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"aws_assume_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+													},
+													"aws_region": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+													},
+													"aws_role_session_name": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+													},
+													"aws_sts_endpoint_url": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+												},
+											},
+											"gemini": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"api_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the regional API endpoint (hostname only).`,
+													},
+													"location_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the location ID.`,
+													},
+													"project_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the project ID.`,
+													},
+												},
+											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
 											"upstream_url": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
@@ -182,9 +270,13 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 									"provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `AI provider format to use for embeddings API. must be one of ["mistral", "openai"]`,
+										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
+												"azure",
+												"bedrock",
+												"gemini",
+												"huggingface",
 												"mistral",
 												"openai",
 											),
@@ -214,10 +306,25 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 						Optional:    true,
 						Description: `Ignore and discard any tool prompts when Vectorizing the request`,
 					},
-					"message_countback": schema.NumberAttribute{
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"bedrock",
+								"gemini",
+								"openai",
+							),
+						},
+					},
+					"message_countback": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Number of messages in the chat history to Vectorize/Cache`,
+						Validators: []validator.Float64{
+							float64validator.Between(1, 1000),
+						},
 					},
 					"stop_on_failure": schema.BoolAttribute{
 						Computed:    true,
@@ -242,6 +349,79 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 										"cosine",
 										"euclidean",
 									),
+								},
+							},
+							"pgvector": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"database": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the database of the pgvector database`,
+									},
+									"host": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the host of the pgvector database`,
+									},
+									"password": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the password of the pgvector database`,
+									},
+									"port": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the port of the pgvector database`,
+									},
+									"ssl": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether to use ssl for the pgvector database`,
+									},
+									"ssl_cert": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the path of ssl cert to use for the pgvector database`,
+									},
+									"ssl_cert_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the path of ssl cert key to use for the pgvector database`,
+									},
+									"ssl_required": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether ssl is required for the pgvector database`,
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether to verify ssl for the pgvector database`,
+									},
+									"ssl_version": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the ssl version to use for the pgvector database. must be one of ["any", "tlsv1_2", "tlsv1_3"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"any",
+												"tlsv1_2",
+												"tlsv1_3",
+											),
+										},
+									},
+									"timeout": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the timeout of the pgvector database`,
+									},
+									"user": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the user of the pgvector database`,
+									},
 								},
 							},
 							"redis": schema.SingleNestedAttribute{
@@ -423,12 +603,15 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 							"strategy": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `which vector database driver to use. must be "redis"`,
+								Description: `which vector database driver to use. must be one of ["pgvector", "redis"]`,
 								Validators: []validator.String{
-									stringvalidator.OneOf("redis"),
+									stringvalidator.OneOf(
+										"pgvector",
+										"redis",
+									),
 								},
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
@@ -609,8 +792,13 @@ func (r *PluginAiSemanticCacheResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	request := *data.ToSharedAiSemanticCachePlugin()
-	res, err := r.client.Plugins.CreateAisemanticcachePlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiSemanticCachePlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -630,8 +818,17 @@ func (r *PluginAiSemanticCacheResource) Create(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -655,13 +852,13 @@ func (r *PluginAiSemanticCacheResource) Read(ctx context.Context, req resource.R
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAisemanticcachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -685,7 +882,11 @@ func (r *PluginAiSemanticCacheResource) Read(ctx context.Context, req resource.R
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -705,15 +906,13 @@ func (r *PluginAiSemanticCacheResource) Update(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiSemanticCachePlugin := *data.ToSharedAiSemanticCachePlugin()
-	request := operations.UpdateAisemanticcachePluginRequest{
-		PluginID:              pluginID,
-		AiSemanticCachePlugin: aiSemanticCachePlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -733,8 +932,17 @@ func (r *PluginAiSemanticCacheResource) Update(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticCachePlugin(res.AiSemanticCachePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticCachePlugin(ctx, res.AiSemanticCachePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -758,13 +966,13 @@ func (r *PluginAiSemanticCacheResource) Delete(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAisemanticcachePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAisemanticcachePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAisemanticcachePlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAisemanticcachePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

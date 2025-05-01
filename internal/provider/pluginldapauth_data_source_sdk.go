@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginLdapAuthDataSourceModel) RefreshFromSharedLdapAuthPlugin(resp *shared.LdapAuthPlugin) {
+func (r *PluginLdapAuthDataSourceModel) ToOperationsGetLdapauthPluginRequest(ctx context.Context) (*operations.GetLdapauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetLdapauthPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginLdapAuthDataSourceModel) RefreshFromSharedLdapAuthPlugin(ctx context.Context, resp *shared.LdapAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -18,28 +35,16 @@ func (r *PluginLdapAuthDataSourceModel) RefreshFromSharedLdapAuthPlugin(resp *sh
 			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 			r.Config.Attribute = types.StringPointerValue(resp.Config.Attribute)
 			r.Config.BaseDn = types.StringPointerValue(resp.Config.BaseDn)
-			if resp.Config.CacheTTL != nil {
-				r.Config.CacheTTL = types.NumberValue(big.NewFloat(float64(*resp.Config.CacheTTL)))
-			} else {
-				r.Config.CacheTTL = types.NumberNull()
-			}
+			r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
 			r.Config.HeaderType = types.StringPointerValue(resp.Config.HeaderType)
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			r.Config.LdapHost = types.StringPointerValue(resp.Config.LdapHost)
 			r.Config.LdapPort = types.Int64PointerValue(resp.Config.LdapPort)
 			r.Config.Ldaps = types.BoolPointerValue(resp.Config.Ldaps)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
 			r.Config.StartTLS = types.BoolPointerValue(resp.Config.StartTLS)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.VerifyLdapHost = types.BoolPointerValue(resp.Config.VerifyLdapHost)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -75,16 +80,16 @@ func (r *PluginLdapAuthDataSourceModel) RefreshFromSharedLdapAuthPlugin(resp *sh
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -110,4 +115,6 @@ func (r *PluginLdapAuthDataSourceModel) RefreshFromSharedLdapAuthPlugin(resp *sh
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

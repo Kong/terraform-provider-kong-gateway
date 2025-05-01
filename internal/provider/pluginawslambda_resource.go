@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -171,7 +170,7 @@ func (r *PluginAwsLambdaResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `An optional value that defines whether the response format to receive from the Lambda to this format.`,
 					},
-					"keepalive": schema.NumberAttribute{
+					"keepalive": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional value in milliseconds that defines how long an idle connection lives before being closed.`,
@@ -210,7 +209,7 @@ func (r *PluginAwsLambdaResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `An optional value that defines whether Kong should send large bodies that are buffered to disk`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional timeout in milliseconds when invoking the function.`,
@@ -386,8 +385,13 @@ func (r *PluginAwsLambdaResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	request := *data.ToSharedAwsLambdaPlugin()
-	res, err := r.client.Plugins.CreateAwslambdaPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAwsLambdaPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAwslambdaPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -407,8 +411,17 @@ func (r *PluginAwsLambdaResource) Create(ctx context.Context, req resource.Creat
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAwsLambdaPlugin(res.AwsLambdaPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAwsLambdaPlugin(ctx, res.AwsLambdaPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -432,13 +445,13 @@ func (r *PluginAwsLambdaResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAwslambdaPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAwslambdaPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAwslambdaPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAwslambdaPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -462,7 +475,11 @@ func (r *PluginAwsLambdaResource) Read(ctx context.Context, req resource.ReadReq
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAwsLambdaPlugin(res.AwsLambdaPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAwsLambdaPlugin(ctx, res.AwsLambdaPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -482,15 +499,13 @@ func (r *PluginAwsLambdaResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAwslambdaPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	awsLambdaPlugin := *data.ToSharedAwsLambdaPlugin()
-	request := operations.UpdateAwslambdaPluginRequest{
-		PluginID:        pluginID,
-		AwsLambdaPlugin: awsLambdaPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAwslambdaPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAwslambdaPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -510,8 +525,17 @@ func (r *PluginAwsLambdaResource) Update(ctx context.Context, req resource.Updat
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAwsLambdaPlugin(res.AwsLambdaPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAwsLambdaPlugin(ctx, res.AwsLambdaPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -535,13 +559,13 @@ func (r *PluginAwsLambdaResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAwslambdaPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAwslambdaPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAwslambdaPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAwslambdaPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -135,10 +135,13 @@ func (r *PluginOauth2Resource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `When authentication fails the plugin sends ` + "`" + `WWW-Authenticate` + "`" + ` header with ` + "`" + `realm` + "`" + ` attribute value.`,
 					},
-					"refresh_token_ttl": schema.NumberAttribute{
+					"refresh_token_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Time-to-live value for data`,
+						Validators: []validator.Float64{
+							float64validator.AtMost(100000000),
+						},
 					},
 					"reuse_refresh_token": schema.BoolAttribute{
 						Computed:    true,
@@ -151,7 +154,7 @@ func (r *PluginOauth2Resource) Schema(ctx context.Context, req resource.SchemaRe
 						ElementType: types.StringType,
 						Description: `Describes an array of scope names that will be available to the end user. If ` + "`" + `mandatory_scope` + "`" + ` is set to ` + "`" + `true` + "`" + `, then ` + "`" + `scopes` + "`" + ` are required.`,
 					},
-					"token_expiration": schema.NumberAttribute{
+					"token_expiration": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional integer value telling the plugin how many seconds a token should last, after which the client will need to refresh the token. Set to ` + "`" + `0` + "`" + ` to disable the expiration.`,
@@ -308,8 +311,13 @@ func (r *PluginOauth2Resource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := *data.ToSharedOauth2Plugin()
-	res, err := r.client.Plugins.CreateOauth2Plugin(ctx, request)
+	request, requestDiags := data.ToSharedOauth2Plugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateOauth2Plugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -329,8 +337,17 @@ func (r *PluginOauth2Resource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2Plugin(res.Oauth2Plugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2Plugin(ctx, res.Oauth2Plugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -354,13 +371,13 @@ func (r *PluginOauth2Resource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetOauth2PluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetOauth2PluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetOauth2Plugin(ctx, request)
+	res, err := r.client.Plugins.GetOauth2Plugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -384,7 +401,11 @@ func (r *PluginOauth2Resource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2Plugin(res.Oauth2Plugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2Plugin(ctx, res.Oauth2Plugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -404,15 +425,13 @@ func (r *PluginOauth2Resource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateOauth2PluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	oauth2Plugin := *data.ToSharedOauth2Plugin()
-	request := operations.UpdateOauth2PluginRequest{
-		PluginID:     pluginID,
-		Oauth2Plugin: oauth2Plugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateOauth2Plugin(ctx, request)
+	res, err := r.client.Plugins.UpdateOauth2Plugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -432,8 +451,17 @@ func (r *PluginOauth2Resource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedOauth2Plugin(res.Oauth2Plugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedOauth2Plugin(ctx, res.Oauth2Plugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -457,13 +485,13 @@ func (r *PluginOauth2Resource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteOauth2PluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteOauth2PluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteOauth2Plugin(ctx, request)
+	res, err := r.client.Plugins.DeleteOauth2Plugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

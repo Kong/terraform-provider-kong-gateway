@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -80,7 +80,7 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 							),
 						},
 					},
-					"flush_timeout": schema.NumberAttribute{
+					"flush_timeout": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
 					},
@@ -138,7 +138,7 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 										),
 									},
 								},
-								"sample_rate": schema.NumberAttribute{
+								"sample_rate": schema.Float64Attribute{
 									Computed:    true,
 									Optional:    true,
 									Description: `Sampling rate`,
@@ -212,10 +212,13 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 									int64validator.OneOf(-1, 1),
 								},
 							},
-							"initial_retry_delay": schema.NumberAttribute{
+							"initial_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
 							"max_batch_size": schema.Int64Attribute{
 								Computed:    true,
@@ -230,10 +233,13 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum number of bytes that can be waiting on a queue, requires string content.`,
 							},
-							"max_coalescing_delay": schema.NumberAttribute{
+							"max_coalescing_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(3600),
+								},
 							},
 							"max_entries": schema.Int64Attribute{
 								Computed:    true,
@@ -243,12 +249,15 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 									int64validator.Between(1, 1000000),
 								},
 							},
-							"max_retry_delay": schema.NumberAttribute{
+							"max_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
-							"max_retry_time": schema.NumberAttribute{
+							"max_retry_time": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the queue gives up calling a failed handler for a batch.`,
@@ -289,9 +298,12 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 							),
 						},
 					},
-					"udp_packet_size": schema.NumberAttribute{
+					"udp_packet_size": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
+						Validators: []validator.Float64{
+							float64validator.AtMost(65507),
+						},
 					},
 					"use_tcp": schema.BoolAttribute{
 						Computed: true,
@@ -471,8 +483,13 @@ func (r *PluginStatsdResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := *data.ToSharedStatsdPlugin()
-	res, err := r.client.Plugins.CreateStatsdPlugin(ctx, request)
+	request, requestDiags := data.ToSharedStatsdPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateStatsdPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -492,8 +509,17 @@ func (r *PluginStatsdResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStatsdPlugin(res.StatsdPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedStatsdPlugin(ctx, res.StatsdPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -517,13 +543,13 @@ func (r *PluginStatsdResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetStatsdPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetStatsdPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetStatsdPlugin(ctx, request)
+	res, err := r.client.Plugins.GetStatsdPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -547,7 +573,11 @@ func (r *PluginStatsdResource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStatsdPlugin(res.StatsdPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedStatsdPlugin(ctx, res.StatsdPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -567,15 +597,13 @@ func (r *PluginStatsdResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateStatsdPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	statsdPlugin := *data.ToSharedStatsdPlugin()
-	request := operations.UpdateStatsdPluginRequest{
-		PluginID:     pluginID,
-		StatsdPlugin: statsdPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateStatsdPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateStatsdPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -595,8 +623,17 @@ func (r *PluginStatsdResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedStatsdPlugin(res.StatsdPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedStatsdPlugin(ctx, res.StatsdPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -620,13 +657,13 @@ func (r *PluginStatsdResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteStatsdPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteStatsdPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteStatsdPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteStatsdPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

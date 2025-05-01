@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -122,8 +121,13 @@ func (r *SniResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	request := *data.ToSharedSni()
-	res, err := r.client.SNIs.CreateSni(ctx, request)
+	request, requestDiags := data.ToSharedSni(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.SNIs.CreateSni(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -143,8 +147,17 @@ func (r *SniResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSni(res.Sni)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedSni(ctx, res.Sni)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -168,13 +181,13 @@ func (r *SniResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	var sniIDOrName string
-	sniIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetSniRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetSniRequest{
-		SNIIDOrName: sniIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.SNIs.GetSni(ctx, request)
+	res, err := r.client.SNIs.GetSni(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -198,7 +211,11 @@ func (r *SniResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSni(res.Sni)
+	resp.Diagnostics.Append(data.RefreshFromSharedSni(ctx, res.Sni)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -218,15 +235,13 @@ func (r *SniResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	var sniIDOrName string
-	sniIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertSniRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	sni := *data.ToSharedSni()
-	request := operations.UpsertSniRequest{
-		SNIIDOrName: sniIDOrName,
-		Sni:         sni,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.SNIs.UpsertSni(ctx, request)
+	res, err := r.client.SNIs.UpsertSni(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -246,8 +261,17 @@ func (r *SniResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSni(res.Sni)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedSni(ctx, res.Sni)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -271,13 +295,13 @@ func (r *SniResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	var sniIDOrName string
-	sniIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteSniRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteSniRequest{
-		SNIIDOrName: sniIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.SNIs.DeleteSni(ctx, request)
+	res, err := r.client.SNIs.DeleteSni(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

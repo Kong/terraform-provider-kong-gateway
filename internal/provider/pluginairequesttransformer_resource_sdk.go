@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPlugin() *shared.AiRequestTransformerPlugin {
+func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPlugin(ctx context.Context) (*shared.AiRequestTransformerPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 	if r.Ordering != nil {
 		var after *shared.AiRequestTransformerPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 		}
 		var before *shared.AiRequestTransformerPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 			Before: before,
 		}
 	}
-	var partials []shared.AiRequestTransformerPluginPartials = []shared.AiRequestTransformerPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AiRequestTransformerPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiRequestTransformerPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiRequestTransformerPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiRequestTransformerPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -295,14 +302,35 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 					}
 					var bedrock *shared.AiRequestTransformerPluginBedrock
 					if r.Config.Llm.Model.Options.Bedrock != nil {
+						awsAssumeRoleArn := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.IsNull() {
+							*awsAssumeRoleArn = r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn.ValueString()
+						} else {
+							awsAssumeRoleArn = nil
+						}
 						awsRegion := new(string)
 						if !r.Config.Llm.Model.Options.Bedrock.AwsRegion.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsRegion.IsNull() {
 							*awsRegion = r.Config.Llm.Model.Options.Bedrock.AwsRegion.ValueString()
 						} else {
 							awsRegion = nil
 						}
+						awsRoleSessionName := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.IsNull() {
+							*awsRoleSessionName = r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName.ValueString()
+						} else {
+							awsRoleSessionName = nil
+						}
+						awsStsEndpointURL := new(string)
+						if !r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.IsNull() {
+							*awsStsEndpointURL = r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL.ValueString()
+						} else {
+							awsStsEndpointURL = nil
+						}
 						bedrock = &shared.AiRequestTransformerPluginBedrock{
-							AwsRegion: awsRegion,
+							AwsAssumeRoleArn:   awsAssumeRoleArn,
+							AwsRegion:          awsRegion,
+							AwsRoleSessionName: awsRoleSessionName,
+							AwsStsEndpointURL:  awsStsEndpointURL,
 						}
 					}
 					var gemini *shared.AiRequestTransformerPluginGemini
@@ -352,7 +380,7 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 					}
 					inputCost := new(float64)
 					if !r.Config.Llm.Model.Options.InputCost.IsUnknown() && !r.Config.Llm.Model.Options.InputCost.IsNull() {
-						*inputCost, _ = r.Config.Llm.Model.Options.InputCost.ValueBigFloat().Float64()
+						*inputCost = r.Config.Llm.Model.Options.InputCost.ValueFloat64()
 					} else {
 						inputCost = nil
 					}
@@ -376,13 +404,13 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 					}
 					outputCost := new(float64)
 					if !r.Config.Llm.Model.Options.OutputCost.IsUnknown() && !r.Config.Llm.Model.Options.OutputCost.IsNull() {
-						*outputCost, _ = r.Config.Llm.Model.Options.OutputCost.ValueBigFloat().Float64()
+						*outputCost = r.Config.Llm.Model.Options.OutputCost.ValueFloat64()
 					} else {
 						outputCost = nil
 					}
 					temperature := new(float64)
 					if !r.Config.Llm.Model.Options.Temperature.IsUnknown() && !r.Config.Llm.Model.Options.Temperature.IsNull() {
-						*temperature, _ = r.Config.Llm.Model.Options.Temperature.ValueBigFloat().Float64()
+						*temperature = r.Config.Llm.Model.Options.Temperature.ValueFloat64()
 					} else {
 						temperature = nil
 					}
@@ -394,7 +422,7 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 					}
 					topP := new(float64)
 					if !r.Config.Llm.Model.Options.TopP.IsUnknown() && !r.Config.Llm.Model.Options.TopP.IsNull() {
-						*topP, _ = r.Config.Llm.Model.Options.TopP.ValueBigFloat().Float64()
+						*topP = r.Config.Llm.Model.Options.TopP.ValueFloat64()
 					} else {
 						topP = nil
 					}
@@ -498,7 +526,7 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 			ID: id2,
 		}
 	}
-	var protocols []shared.AiRequestTransformerPluginProtocols = []shared.AiRequestTransformerPluginProtocols{}
+	protocols := make([]shared.AiRequestTransformerPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AiRequestTransformerPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -541,10 +569,60 @@ func (r *PluginAiRequestTransformerResourceModel) ToSharedAiRequestTransformerPl
 		Route:         route,
 		Service:       service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTransformerPlugin(resp *shared.AiRequestTransformerPlugin) {
+func (r *PluginAiRequestTransformerResourceModel) ToOperationsUpdateAirequesttransformerPluginRequest(ctx context.Context) (*operations.UpdateAirequesttransformerPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	aiRequestTransformerPlugin, aiRequestTransformerPluginDiags := r.ToSharedAiRequestTransformerPlugin(ctx)
+	diags.Append(aiRequestTransformerPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAirequesttransformerPluginRequest{
+		PluginID:                   pluginID,
+		AiRequestTransformerPlugin: *aiRequestTransformerPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiRequestTransformerResourceModel) ToOperationsGetAirequesttransformerPluginRequest(ctx context.Context) (*operations.GetAirequesttransformerPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAirequesttransformerPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiRequestTransformerResourceModel) ToOperationsDeleteAirequesttransformerPluginRequest(ctx context.Context) (*operations.DeleteAirequesttransformerPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAirequesttransformerPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTransformerPlugin(ctx context.Context, resp *shared.AiRequestTransformerPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -607,7 +685,10 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 							r.Config.Llm.Model.Options.Bedrock = nil
 						} else {
 							r.Config.Llm.Model.Options.Bedrock = &tfTypes.Bedrock{}
+							r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn)
 							r.Config.Llm.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRegion)
+							r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName)
+							r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL)
 						}
 						if resp.Config.Llm.Model.Options.Gemini == nil {
 							r.Config.Llm.Model.Options.Gemini = nil
@@ -624,11 +705,7 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 							r.Config.Llm.Model.Options.Huggingface.UseCache = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.UseCache)
 							r.Config.Llm.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.WaitForModel)
 						}
-						if resp.Config.Llm.Model.Options.InputCost != nil {
-							r.Config.Llm.Model.Options.InputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.InputCost)))
-						} else {
-							r.Config.Llm.Model.Options.InputCost = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.InputCost = types.Float64PointerValue(resp.Config.Llm.Model.Options.InputCost)
 						if resp.Config.Llm.Model.Options.Llama2Format != nil {
 							r.Config.Llm.Model.Options.Llama2Format = types.StringValue(string(*resp.Config.Llm.Model.Options.Llama2Format))
 						} else {
@@ -640,22 +717,10 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 						} else {
 							r.Config.Llm.Model.Options.MistralFormat = types.StringNull()
 						}
-						if resp.Config.Llm.Model.Options.OutputCost != nil {
-							r.Config.Llm.Model.Options.OutputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.OutputCost)))
-						} else {
-							r.Config.Llm.Model.Options.OutputCost = types.NumberNull()
-						}
-						if resp.Config.Llm.Model.Options.Temperature != nil {
-							r.Config.Llm.Model.Options.Temperature = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.Temperature)))
-						} else {
-							r.Config.Llm.Model.Options.Temperature = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.OutputCost = types.Float64PointerValue(resp.Config.Llm.Model.Options.OutputCost)
+						r.Config.Llm.Model.Options.Temperature = types.Float64PointerValue(resp.Config.Llm.Model.Options.Temperature)
 						r.Config.Llm.Model.Options.TopK = types.Int64PointerValue(resp.Config.Llm.Model.Options.TopK)
-						if resp.Config.Llm.Model.Options.TopP != nil {
-							r.Config.Llm.Model.Options.TopP = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.TopP)))
-						} else {
-							r.Config.Llm.Model.Options.TopP = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.TopP = types.Float64PointerValue(resp.Config.Llm.Model.Options.TopP)
 						r.Config.Llm.Model.Options.UpstreamPath = types.StringPointerValue(resp.Config.Llm.Model.Options.UpstreamPath)
 						r.Config.Llm.Model.Options.UpstreamURL = types.StringPointerValue(resp.Config.Llm.Model.Options.UpstreamURL)
 					}
@@ -714,16 +779,16 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -749,4 +814,6 @@ func (r *PluginAiRequestTransformerResourceModel) RefreshFromSharedAiRequestTran
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

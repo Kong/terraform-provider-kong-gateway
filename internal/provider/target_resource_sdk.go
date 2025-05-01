@@ -3,16 +3,20 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *TargetResourceModel) ToSharedTargetWithoutParents() *shared.TargetWithoutParents {
+func (r *TargetResourceModel) ToSharedTargetWithoutParents(ctx context.Context) (*shared.TargetWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(float64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt, _ = r.CreatedAt.ValueBigFloat().Float64()
+		*createdAt = r.CreatedAt.ValueFloat64()
 	} else {
 		createdAt = nil
 	}
@@ -22,7 +26,7 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents() *shared.TargetWitho
 	} else {
 		id = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -34,7 +38,7 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents() *shared.TargetWitho
 	}
 	updatedAt := new(float64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt, _ = r.UpdatedAt.ValueBigFloat().Float64()
+		*updatedAt = r.UpdatedAt.ValueFloat64()
 	} else {
 		updatedAt = nil
 	}
@@ -65,41 +69,37 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents() *shared.TargetWitho
 		Upstream:  upstream,
 		Weight:    weight,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *TargetResourceModel) RefreshFromSharedTarget(resp *shared.Target) {
-	if resp != nil {
-		if resp.CreatedAt != nil {
-			r.CreatedAt = types.NumberValue(big.NewFloat(float64(*resp.CreatedAt)))
-		} else {
-			r.CreatedAt = types.NumberNull()
-		}
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.Target = types.StringPointerValue(resp.Target)
-		if resp.UpdatedAt != nil {
-			r.UpdatedAt = types.NumberValue(big.NewFloat(float64(*resp.UpdatedAt)))
-		} else {
-			r.UpdatedAt = types.NumberNull()
-		}
-		if resp.Upstream == nil {
-			r.Upstream = nil
-		} else {
-			r.Upstream = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Upstream.ID = types.StringPointerValue(resp.Upstream.ID)
-		}
-		r.Weight = types.Int64PointerValue(resp.Weight)
+func (r *TargetResourceModel) ToOperationsCreateTargetWithUpstreamRequest(ctx context.Context) (*operations.CreateTargetWithUpstreamRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var upstreamID string
+	upstreamID = r.UpstreamID.ValueString()
+
+	targetWithoutParents, targetWithoutParentsDiags := r.ToSharedTargetWithoutParents(ctx)
+	diags.Append(targetWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateTargetWithUpstreamRequest{
+		UpstreamID:           upstreamID,
+		TargetWithoutParents: *targetWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *TargetResourceModel) ToSharedTarget() *shared.Target {
+func (r *TargetResourceModel) ToSharedTarget(ctx context.Context) (*shared.Target, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(float64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt, _ = r.CreatedAt.ValueBigFloat().Float64()
+		*createdAt = r.CreatedAt.ValueFloat64()
 	} else {
 		createdAt = nil
 	}
@@ -109,7 +109,7 @@ func (r *TargetResourceModel) ToSharedTarget() *shared.Target {
 	} else {
 		id = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -121,7 +121,7 @@ func (r *TargetResourceModel) ToSharedTarget() *shared.Target {
 	}
 	updatedAt := new(float64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt, _ = r.UpdatedAt.ValueBigFloat().Float64()
+		*updatedAt = r.UpdatedAt.ValueFloat64()
 	} else {
 		updatedAt = nil
 	}
@@ -152,5 +152,90 @@ func (r *TargetResourceModel) ToSharedTarget() *shared.Target {
 		Upstream:  upstream,
 		Weight:    weight,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *TargetResourceModel) ToOperationsUpdateTargetWithUpstreamRequest(ctx context.Context) (*operations.UpdateTargetWithUpstreamRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var upstreamID string
+	upstreamID = r.UpstreamID.ValueString()
+
+	var targetIDOrTarget string
+	targetIDOrTarget = r.ID.ValueString()
+
+	targetPtr, targetDiags := r.ToSharedTarget(ctx)
+	diags.Append(targetDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	target := *targetPtr
+	out := operations.UpdateTargetWithUpstreamRequest{
+		UpstreamID:       upstreamID,
+		TargetIDOrTarget: targetIDOrTarget,
+		Target:           target,
+	}
+
+	return &out, diags
+}
+
+func (r *TargetResourceModel) ToOperationsGetTargetWithUpstreamRequest(ctx context.Context) (*operations.GetTargetWithUpstreamRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var upstreamID string
+	upstreamID = r.UpstreamID.ValueString()
+
+	var targetIDOrTarget string
+	targetIDOrTarget = r.ID.ValueString()
+
+	out := operations.GetTargetWithUpstreamRequest{
+		UpstreamID:       upstreamID,
+		TargetIDOrTarget: targetIDOrTarget,
+	}
+
+	return &out, diags
+}
+
+func (r *TargetResourceModel) ToOperationsDeleteTargetWithUpstreamRequest(ctx context.Context) (*operations.DeleteTargetWithUpstreamRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var upstreamID string
+	upstreamID = r.UpstreamID.ValueString()
+
+	var targetIDOrTarget string
+	targetIDOrTarget = r.ID.ValueString()
+
+	out := operations.DeleteTargetWithUpstreamRequest{
+		UpstreamID:       upstreamID,
+		TargetIDOrTarget: targetIDOrTarget,
+	}
+
+	return &out, diags
+}
+
+func (r *TargetResourceModel) RefreshFromSharedTarget(ctx context.Context, resp *shared.Target) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Float64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+		r.Target = types.StringPointerValue(resp.Target)
+		r.UpdatedAt = types.Float64PointerValue(resp.UpdatedAt)
+		if resp.Upstream == nil {
+			r.Upstream = nil
+		} else {
+			r.Upstream = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Upstream.ID = types.StringPointerValue(resp.Upstream.ID)
+		}
+		r.Weight = types.Int64PointerValue(resp.Weight)
+	}
+
+	return diags
 }

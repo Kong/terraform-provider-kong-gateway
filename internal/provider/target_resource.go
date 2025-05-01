@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -32,11 +31,11 @@ type TargetResource struct {
 
 // TargetResourceModel describes the resource data model.
 type TargetResourceModel struct {
-	CreatedAt  types.Number                       `tfsdk:"created_at"`
+	CreatedAt  types.Float64                      `tfsdk:"created_at"`
 	ID         types.String                       `tfsdk:"id"`
 	Tags       []types.String                     `tfsdk:"tags"`
 	Target     types.String                       `tfsdk:"target"`
-	UpdatedAt  types.Number                       `tfsdk:"updated_at"`
+	UpdatedAt  types.Float64                      `tfsdk:"updated_at"`
 	Upstream   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"upstream"`
 	UpstreamID types.String                       `tfsdk:"upstream_id"`
 	Weight     types.Int64                        `tfsdk:"weight"`
@@ -50,7 +49,7 @@ func (r *TargetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Target Resource",
 		Attributes: map[string]schema.Attribute{
-			"created_at": schema.NumberAttribute{
+			"created_at": schema.Float64Attribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was created.`,
@@ -70,7 +69,7 @@ func (r *TargetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				Optional:    true,
 				Description: `The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the ` + "`" + `port` + "`" + ` value will be overridden by the value from the DNS record.`,
 			},
-			"updated_at": schema.NumberAttribute{
+			"updated_at": schema.Float64Attribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
@@ -136,15 +135,13 @@ func (r *TargetResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	var upstreamID string
-	upstreamID = data.UpstreamID.ValueString()
+	request, requestDiags := data.ToOperationsCreateTargetWithUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	targetWithoutParents := *data.ToSharedTargetWithoutParents()
-	request := operations.CreateTargetWithUpstreamRequest{
-		UpstreamID:           upstreamID,
-		TargetWithoutParents: targetWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Targets.CreateTargetWithUpstream(ctx, request)
+	res, err := r.client.Targets.CreateTargetWithUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -164,8 +161,17 @@ func (r *TargetResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTarget(res.Target)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -189,17 +195,13 @@ func (r *TargetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	var upstreamID string
-	upstreamID = data.UpstreamID.ValueString()
+	request, requestDiags := data.ToOperationsGetTargetWithUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var targetIDOrTarget string
-	targetIDOrTarget = data.ID.ValueString()
-
-	request := operations.GetTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Targets.GetTargetWithUpstream(ctx, request)
+	res, err := r.client.Targets.GetTargetWithUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -223,7 +225,11 @@ func (r *TargetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTarget(res.Target)
+	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -243,19 +249,13 @@ func (r *TargetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	var upstreamID string
-	upstreamID = data.UpstreamID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateTargetWithUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var targetIDOrTarget string
-	targetIDOrTarget = data.ID.ValueString()
-
-	target := *data.ToSharedTarget()
-	request := operations.UpdateTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
-		Target:           target,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Targets.UpdateTargetWithUpstream(ctx, request)
+	res, err := r.client.Targets.UpdateTargetWithUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -275,8 +275,17 @@ func (r *TargetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTarget(res.Target)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -300,17 +309,13 @@ func (r *TargetResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	var upstreamID string
-	upstreamID = data.UpstreamID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteTargetWithUpstreamRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var targetIDOrTarget string
-	targetIDOrTarget = data.ID.ValueString()
-
-	request := operations.DeleteTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Targets.DeleteTargetWithUpstream(ctx, request)
+	res, err := r.client.Targets.DeleteTargetWithUpstream(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -338,7 +343,7 @@ func (r *TargetResource) ImportState(ctx context.Context, req resource.ImportSta
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "target_id_or_target": "5a078780-5d4c-4aae-984a-bdc6f52113d8",  "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "id": "5a078780-5d4c-4aae-984a-bdc6f52113d8",  "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}': `+err.Error())
 		return
 	}
 

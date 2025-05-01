@@ -3,14 +3,18 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
+func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shared.AcmePlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -39,7 +43,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 	if r.Ordering != nil {
 		var after *shared.AcmePluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -49,7 +53,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 		}
 		var before *shared.AcmePluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -62,33 +66,36 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 			Before: before,
 		}
 	}
-	var partials []shared.AcmePluginPartials = []shared.AcmePluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AcmePluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AcmePluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AcmePluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AcmePluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -140,7 +147,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 		} else {
 			certType = nil
 		}
-		var domains []string = []string{}
+		domains := make([]string, 0, len(r.Config.Domains))
 		for _, domainsItem := range r.Config.Domains {
 			domains = append(domains, domainsItem.ValueString())
 		}
@@ -164,7 +171,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 		}
 		failBackoffMinutes := new(float64)
 		if !r.Config.FailBackoffMinutes.IsUnknown() && !r.Config.FailBackoffMinutes.IsNull() {
-			*failBackoffMinutes, _ = r.Config.FailBackoffMinutes.ValueBigFloat().Float64()
+			*failBackoffMinutes = r.Config.FailBackoffMinutes.ValueFloat64()
 		} else {
 			failBackoffMinutes = nil
 		}
@@ -176,7 +183,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 		}
 		renewThresholdDays := new(float64)
 		if !r.Config.RenewThresholdDays.IsUnknown() && !r.Config.RenewThresholdDays.IsNull() {
-			*renewThresholdDays, _ = r.Config.RenewThresholdDays.ValueBigFloat().Float64()
+			*renewThresholdDays = r.Config.RenewThresholdDays.ValueFloat64()
 		} else {
 			renewThresholdDays = nil
 		}
@@ -222,7 +229,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 				}
 				timeout := new(float64)
 				if !r.Config.StorageConfig.Consul.Timeout.IsUnknown() && !r.Config.StorageConfig.Consul.Timeout.IsNull() {
-					*timeout, _ = r.Config.StorageConfig.Consul.Timeout.ValueBigFloat().Float64()
+					*timeout = r.Config.StorageConfig.Consul.Timeout.ValueFloat64()
 				} else {
 					timeout = nil
 				}
@@ -265,7 +272,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 					}
 					scanCount := new(float64)
 					if !r.Config.StorageConfig.Redis.ExtraOptions.ScanCount.IsUnknown() && !r.Config.StorageConfig.Redis.ExtraOptions.ScanCount.IsNull() {
-						*scanCount, _ = r.Config.StorageConfig.Redis.ExtraOptions.ScanCount.ValueBigFloat().Float64()
+						*scanCount = r.Config.StorageConfig.Redis.ExtraOptions.ScanCount.ValueFloat64()
 					} else {
 						scanCount = nil
 					}
@@ -399,7 +406,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 				}
 				timeout2 := new(float64)
 				if !r.Config.StorageConfig.Vault.Timeout.IsUnknown() && !r.Config.StorageConfig.Vault.Timeout.IsNull() {
-					*timeout2, _ = r.Config.StorageConfig.Vault.Timeout.ValueBigFloat().Float64()
+					*timeout2 = r.Config.StorageConfig.Vault.Timeout.ValueFloat64()
 				} else {
 					timeout2 = nil
 				}
@@ -469,7 +476,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 			TosAccepted:          tosAccepted,
 		}
 	}
-	var protocols []shared.AcmePluginProtocols = []shared.AcmePluginProtocols{}
+	protocols := make([]shared.AcmePluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AcmePluginProtocols(protocolsItem.ValueString()))
 	}
@@ -485,10 +492,60 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin() *shared.AcmePlugin {
 		Config:       config,
 		Protocols:    protocols,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmePlugin) {
+func (r *PluginAcmeResourceModel) ToOperationsUpdateAcmePluginRequest(ctx context.Context) (*operations.UpdateAcmePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	acmePlugin, acmePluginDiags := r.ToSharedAcmePlugin(ctx)
+	diags.Append(acmePluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAcmePluginRequest{
+		PluginID:   pluginID,
+		AcmePlugin: *acmePlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAcmeResourceModel) ToOperationsGetAcmePluginRequest(ctx context.Context) (*operations.GetAcmePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAcmePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAcmeResourceModel) ToOperationsDeleteAcmePluginRequest(ctx context.Context) (*operations.DeleteAcmePluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAcmePluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(ctx context.Context, resp *shared.AcmePlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -516,17 +573,9 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 			r.Config.EabHmacKey = types.StringPointerValue(resp.Config.EabHmacKey)
 			r.Config.EabKid = types.StringPointerValue(resp.Config.EabKid)
 			r.Config.EnableIpv4CommonName = types.BoolPointerValue(resp.Config.EnableIpv4CommonName)
-			if resp.Config.FailBackoffMinutes != nil {
-				r.Config.FailBackoffMinutes = types.NumberValue(big.NewFloat(float64(*resp.Config.FailBackoffMinutes)))
-			} else {
-				r.Config.FailBackoffMinutes = types.NumberNull()
-			}
+			r.Config.FailBackoffMinutes = types.Float64PointerValue(resp.Config.FailBackoffMinutes)
 			r.Config.PreferredChain = types.StringPointerValue(resp.Config.PreferredChain)
-			if resp.Config.RenewThresholdDays != nil {
-				r.Config.RenewThresholdDays = types.NumberValue(big.NewFloat(float64(*resp.Config.RenewThresholdDays)))
-			} else {
-				r.Config.RenewThresholdDays = types.NumberNull()
-			}
+			r.Config.RenewThresholdDays = types.Float64PointerValue(resp.Config.RenewThresholdDays)
 			if resp.Config.RsaKeySize != nil {
 				r.Config.RsaKeySize = types.Int64Value(int64(*resp.Config.RsaKeySize))
 			} else {
@@ -549,11 +598,7 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 					r.Config.StorageConfig.Consul.HTTPS = types.BoolPointerValue(resp.Config.StorageConfig.Consul.HTTPS)
 					r.Config.StorageConfig.Consul.KvPath = types.StringPointerValue(resp.Config.StorageConfig.Consul.KvPath)
 					r.Config.StorageConfig.Consul.Port = types.Int64PointerValue(resp.Config.StorageConfig.Consul.Port)
-					if resp.Config.StorageConfig.Consul.Timeout != nil {
-						r.Config.StorageConfig.Consul.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.StorageConfig.Consul.Timeout)))
-					} else {
-						r.Config.StorageConfig.Consul.Timeout = types.NumberNull()
-					}
+					r.Config.StorageConfig.Consul.Timeout = types.Float64PointerValue(resp.Config.StorageConfig.Consul.Timeout)
 					r.Config.StorageConfig.Consul.Token = types.StringPointerValue(resp.Config.StorageConfig.Consul.Token)
 				}
 				if len(resp.Config.StorageConfig.Kong) > 0 {
@@ -573,11 +618,7 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 					} else {
 						r.Config.StorageConfig.Redis.ExtraOptions = &tfTypes.ExtraOptions{}
 						r.Config.StorageConfig.Redis.ExtraOptions.Namespace = types.StringPointerValue(resp.Config.StorageConfig.Redis.ExtraOptions.Namespace)
-						if resp.Config.StorageConfig.Redis.ExtraOptions.ScanCount != nil {
-							r.Config.StorageConfig.Redis.ExtraOptions.ScanCount = types.NumberValue(big.NewFloat(float64(*resp.Config.StorageConfig.Redis.ExtraOptions.ScanCount)))
-						} else {
-							r.Config.StorageConfig.Redis.ExtraOptions.ScanCount = types.NumberNull()
-						}
+						r.Config.StorageConfig.Redis.ExtraOptions.ScanCount = types.Float64PointerValue(resp.Config.StorageConfig.Redis.ExtraOptions.ScanCount)
 					}
 					r.Config.StorageConfig.Redis.Host = types.StringPointerValue(resp.Config.StorageConfig.Redis.Host)
 					r.Config.StorageConfig.Redis.Password = types.StringPointerValue(resp.Config.StorageConfig.Redis.Password)
@@ -610,11 +651,7 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 					r.Config.StorageConfig.Vault.JwtPath = types.StringPointerValue(resp.Config.StorageConfig.Vault.JwtPath)
 					r.Config.StorageConfig.Vault.KvPath = types.StringPointerValue(resp.Config.StorageConfig.Vault.KvPath)
 					r.Config.StorageConfig.Vault.Port = types.Int64PointerValue(resp.Config.StorageConfig.Vault.Port)
-					if resp.Config.StorageConfig.Vault.Timeout != nil {
-						r.Config.StorageConfig.Vault.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.StorageConfig.Vault.Timeout)))
-					} else {
-						r.Config.StorageConfig.Vault.Timeout = types.NumberNull()
-					}
+					r.Config.StorageConfig.Vault.Timeout = types.Float64PointerValue(resp.Config.StorageConfig.Vault.Timeout)
 					r.Config.StorageConfig.Vault.TLSServerName = types.StringPointerValue(resp.Config.StorageConfig.Vault.TLSServerName)
 					r.Config.StorageConfig.Vault.TLSVerify = types.BoolPointerValue(resp.Config.StorageConfig.Vault.TLSVerify)
 					r.Config.StorageConfig.Vault.Token = types.StringPointerValue(resp.Config.StorageConfig.Vault.Token)
@@ -655,16 +692,16 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -678,4 +715,6 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(resp *shared.AcmeP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

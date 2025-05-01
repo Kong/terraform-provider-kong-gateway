@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -73,7 +73,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"default_header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
+						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"aws",
@@ -81,6 +81,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								"b3-single",
 								"datadog",
 								"gcp",
+								"instana",
 								"jaeger",
 								"ot",
 								"w3c",
@@ -95,7 +96,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "jaeger", "ot", "preserve", "w3c"]`,
+						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "instana", "jaeger", "ot", "preserve", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"aws",
@@ -104,6 +105,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								"datadog",
 								"gcp",
 								"ignore",
+								"instana",
 								"jaeger",
 								"ot",
 								"preserve",
@@ -165,7 +167,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 							"default_format": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
+								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
 								Validators: []validator.String{
 									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
@@ -174,6 +176,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 										"b3-single",
 										"datadog",
 										"gcp",
+										"instana",
 										"jaeger",
 										"ot",
 										"w3c",
@@ -206,10 +209,13 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 									int64validator.OneOf(-1, 1),
 								},
 							},
-							"initial_retry_delay": schema.NumberAttribute{
+							"initial_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
 							"max_batch_size": schema.Int64Attribute{
 								Computed:    true,
@@ -224,10 +230,13 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum number of bytes that can be waiting on a queue, requires string content.`,
 							},
-							"max_coalescing_delay": schema.NumberAttribute{
+							"max_coalescing_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(3600),
+								},
 							},
 							"max_entries": schema.Int64Attribute{
 								Computed:    true,
@@ -237,12 +246,15 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 									int64validator.Between(1, 1000000),
 								},
 							},
-							"max_retry_delay": schema.NumberAttribute{
+							"max_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
+								Validators: []validator.Float64{
+									float64validator.AtMost(1000000),
+								},
 							},
-							"max_retry_time": schema.NumberAttribute{
+							"max_retry_time": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Time in seconds before the queue gives up calling a failed handler for a batch.`,
@@ -257,10 +269,13 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 							int64validator.AtMost(2147483646),
 						},
 					},
-					"sample_ratio": schema.NumberAttribute{
+					"sample_ratio": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `How often to sample requests that do not contain trace IDs. Set to ` + "`" + `0` + "`" + ` to turn sampling off, or to ` + "`" + `1` + "`" + ` to sample **all** requests.`,
+						Validators: []validator.Float64{
+							float64validator.AtMost(1),
+						},
 					},
 					"send_timeout": schema.Int64Attribute{
 						Computed:    true,
@@ -474,8 +489,13 @@ func (r *PluginZipkinResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request := *data.ToSharedZipkinPlugin()
-	res, err := r.client.Plugins.CreateZipkinPlugin(ctx, request)
+	request, requestDiags := data.ToSharedZipkinPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateZipkinPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -495,8 +515,17 @@ func (r *PluginZipkinResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedZipkinPlugin(res.ZipkinPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedZipkinPlugin(ctx, res.ZipkinPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -520,13 +549,13 @@ func (r *PluginZipkinResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetZipkinPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetZipkinPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetZipkinPlugin(ctx, request)
+	res, err := r.client.Plugins.GetZipkinPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -550,7 +579,11 @@ func (r *PluginZipkinResource) Read(ctx context.Context, req resource.ReadReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedZipkinPlugin(res.ZipkinPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedZipkinPlugin(ctx, res.ZipkinPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -570,15 +603,13 @@ func (r *PluginZipkinResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateZipkinPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	zipkinPlugin := *data.ToSharedZipkinPlugin()
-	request := operations.UpdateZipkinPluginRequest{
-		PluginID:     pluginID,
-		ZipkinPlugin: zipkinPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateZipkinPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateZipkinPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -598,8 +629,17 @@ func (r *PluginZipkinResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedZipkinPlugin(res.ZipkinPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedZipkinPlugin(ctx, res.ZipkinPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -623,13 +663,13 @@ func (r *PluginZipkinResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteZipkinPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteZipkinPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteZipkinPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteZipkinPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

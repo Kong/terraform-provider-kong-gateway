@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ACLResourceModel) ToSharedACLWithoutParents() *shared.ACLWithoutParents {
+func (r *ACLResourceModel) ToSharedACLWithoutParents(ctx context.Context) (*shared.ACLWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.ACLWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -36,7 +41,7 @@ func (r *ACLResourceModel) ToSharedACLWithoutParents() *shared.ACLWithoutParents
 	} else {
 		id1 = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -47,28 +52,34 @@ func (r *ACLResourceModel) ToSharedACLWithoutParents() *shared.ACLWithoutParents
 		ID:        id1,
 		Tags:      tags,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *ACLResourceModel) RefreshFromSharedACL(resp *shared.ACL) {
-	if resp != nil {
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Group = types.StringValue(resp.Group)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
+func (r *ACLResourceModel) ToOperationsCreateACLWithConsumerRequest(ctx context.Context) (*operations.CreateACLWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	aclWithoutParents, aclWithoutParentsDiags := r.ToSharedACLWithoutParents(ctx)
+	diags.Append(aclWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateACLWithConsumerRequest{
+		ConsumerID:        consumerID,
+		ACLWithoutParents: *aclWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *ACLResourceModel) ToSharedACL() *shared.ACL {
+func (r *ACLResourceModel) ToSharedACL(ctx context.Context) (*shared.ACL, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.ACLConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -96,7 +107,7 @@ func (r *ACLResourceModel) ToSharedACL() *shared.ACL {
 	} else {
 		id1 = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -107,5 +118,87 @@ func (r *ACLResourceModel) ToSharedACL() *shared.ACL {
 		ID:        id1,
 		Tags:      tags,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *ACLResourceModel) ToOperationsUpdateACLWithConsumerRequest(ctx context.Context) (*operations.UpdateACLWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var aclID string
+	aclID = r.ID.ValueString()
+
+	acl, aclDiags := r.ToSharedACL(ctx)
+	diags.Append(aclDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
+		ACL:        *acl,
+	}
+
+	return &out, diags
+}
+
+func (r *ACLResourceModel) ToOperationsGetACLWithConsumerRequest(ctx context.Context) (*operations.GetACLWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var aclID string
+	aclID = r.ID.ValueString()
+
+	out := operations.GetACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
+	}
+
+	return &out, diags
+}
+
+func (r *ACLResourceModel) ToOperationsDeleteACLWithConsumerRequest(ctx context.Context) (*operations.DeleteACLWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var aclID string
+	aclID = r.ID.ValueString()
+
+	out := operations.DeleteACLWithConsumerRequest{
+		ConsumerID: consumerID,
+		ACLID:      aclID,
+	}
+
+	return &out, diags
+}
+
+func (r *ACLResourceModel) RefreshFromSharedACL(ctx context.Context, resp *shared.ACL) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Group = types.StringValue(resp.Group)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+	}
+
+	return diags
 }

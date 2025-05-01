@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *VaultDataSourceModel) RefreshFromSharedVault(resp *shared.Vault) {
+func (r *VaultDataSourceModel) ToOperationsGetVaultRequest(ctx context.Context) (*operations.GetVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	out := operations.GetVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultDataSourceModel) RefreshFromSharedVault(ctx context.Context, resp *shared.Vault) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		configResult, _ := json.Marshal(resp.Config)
 		r.Config = types.StringValue(string(configResult))
@@ -23,4 +41,6 @@ func (r *VaultDataSourceModel) RefreshFromSharedVault(resp *shared.Vault) {
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

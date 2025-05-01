@@ -3,11 +3,29 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *ConsumerGroupDataSourceModel) RefreshFromSharedConsumerGroup(resp *shared.ConsumerGroup) {
+func (r *ConsumerGroupDataSourceModel) ToOperationsGetConsumerGroupRequest(ctx context.Context) (*operations.GetConsumerGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ID.ValueString()
+
+	out := operations.GetConsumerGroupRequest{
+		ConsumerGroupID: consumerGroupID,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerGroupDataSourceModel) RefreshFromSharedConsumerGroup(ctx context.Context, resp *shared.ConsumerGroup) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -18,4 +36,6 @@ func (r *ConsumerGroupDataSourceModel) RefreshFromSharedConsumerGroup(resp *shar
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

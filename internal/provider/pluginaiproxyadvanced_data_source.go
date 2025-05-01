@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -69,6 +68,11 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 							"connect_timeout": schema.Int64Attribute{
 								Computed: true,
 							},
+							"failover_criteria": schema.ListAttribute{
+								Computed:    true,
+								ElementType: types.StringType,
+								Description: `Specifies in which cases an upstream response should be failover to the next target. Each option in the array is equivalent to the function of http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream`,
+							},
 							"hash_on_header": schema.StringAttribute{
 								Computed:    true,
 								Description: `The header to use for consistent-hashing.`,
@@ -90,7 +94,7 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 							},
 							"tokens_count_strategy": schema.StringAttribute{
 								Computed:    true,
-								Description: `What tokens to use for usage calculation. Available values are: ` + "`" + `total_tokens` + "`" + ` ` + "`" + `prompt_tokens` + "`" + `, and ` + "`" + `completion_tokens` + "`" + `.`,
+								Description: `What tokens to use for usage calculation. Available values are: ` + "`" + `total_tokens` + "`" + ` ` + "`" + `prompt_tokens` + "`" + `, ` + "`" + `completion_tokens` + "`" + ` and ` + "`" + `cost` + "`" + `.`,
 							},
 							"write_timeout": schema.Int64Attribute{
 								Computed: true,
@@ -171,6 +175,74 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 									"options": schema.SingleNestedAttribute{
 										Computed: true,
 										Attributes: map[string]schema.Attribute{
+											"azure": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"api_version": schema.StringAttribute{
+														Computed:    true,
+														Description: `'api-version' for Azure OpenAI instances.`,
+													},
+													"deployment_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `Deployment ID for Azure OpenAI instances.`,
+													},
+													"instance": schema.StringAttribute{
+														Computed:    true,
+														Description: `Instance name for Azure OpenAI hosted models.`,
+													},
+												},
+											},
+											"bedrock": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"aws_assume_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+													},
+													"aws_region": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+													},
+													"aws_role_session_name": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+													},
+													"aws_sts_endpoint_url": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+												},
+											},
+											"gemini": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"api_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the regional API endpoint (hostname only).`,
+													},
+													"location_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the location ID.`,
+													},
+													"project_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the project ID.`,
+													},
+												},
+											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
 											"upstream_url": schema.StringAttribute{
 												Computed:    true,
 												Description: `upstream url for the embeddings`,
@@ -185,6 +257,10 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 								},
 							},
 						},
+					},
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Description: `LLM input and output format and schema to use`,
 					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
@@ -265,7 +341,7 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 								},
 								"description": schema.StringAttribute{
 									Computed:    true,
-									Description: `The semantic description of the target, required if using semantic load balancing.`,
+									Description: `The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold.`,
 								},
 								"logging": schema.SingleNestedAttribute{
 									Computed: true,
@@ -309,9 +385,21 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 												"bedrock": schema.SingleNestedAttribute{
 													Computed: true,
 													Attributes: map[string]schema.Attribute{
+														"aws_assume_role_arn": schema.StringAttribute{
+															Computed:    true,
+															Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+														},
 														"aws_region": schema.StringAttribute{
 															Computed:    true,
 															Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+														},
+														"aws_role_session_name": schema.StringAttribute{
+															Computed:    true,
+															Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+														},
+														"aws_sts_endpoint_url": schema.StringAttribute{
+															Computed:    true,
+															Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
 														},
 													},
 												},
@@ -345,7 +433,7 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 														},
 													},
 												},
-												"input_cost": schema.NumberAttribute{
+												"input_cost": schema.Float64Attribute{
 													Computed:    true,
 													Description: `Defines the cost per 1M tokens in your prompt.`,
 												},
@@ -361,11 +449,11 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 													Computed:    true,
 													Description: `If using mistral provider, select the upstream message format.`,
 												},
-												"output_cost": schema.NumberAttribute{
+												"output_cost": schema.Float64Attribute{
 													Computed:    true,
 													Description: `Defines the cost per 1M tokens in the output of the AI.`,
 												},
-												"temperature": schema.NumberAttribute{
+												"temperature": schema.Float64Attribute{
 													Computed:    true,
 													Description: `Defines the matching temperature, if using chat or completion models.`,
 												},
@@ -373,7 +461,7 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 													Computed:    true,
 													Description: `Defines the top-k most likely tokens, if supported.`,
 												},
-												"top_p": schema.NumberAttribute{
+												"top_p": schema.Float64Attribute{
 													Computed:    true,
 													Description: `Defines the top-p probability mass, if supported.`,
 												},
@@ -415,6 +503,59 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 							"distance_metric": schema.StringAttribute{
 								Computed:    true,
 								Description: `the distance metric to use for vector searches`,
+							},
+							"pgvector": schema.SingleNestedAttribute{
+								Computed: true,
+								Attributes: map[string]schema.Attribute{
+									"database": schema.StringAttribute{
+										Computed:    true,
+										Description: `the database of the pgvector database`,
+									},
+									"host": schema.StringAttribute{
+										Computed:    true,
+										Description: `the host of the pgvector database`,
+									},
+									"password": schema.StringAttribute{
+										Computed:    true,
+										Description: `the password of the pgvector database`,
+									},
+									"port": schema.Int64Attribute{
+										Computed:    true,
+										Description: `the port of the pgvector database`,
+									},
+									"ssl": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether to use ssl for the pgvector database`,
+									},
+									"ssl_cert": schema.StringAttribute{
+										Computed:    true,
+										Description: `the path of ssl cert to use for the pgvector database`,
+									},
+									"ssl_cert_key": schema.StringAttribute{
+										Computed:    true,
+										Description: `the path of ssl cert key to use for the pgvector database`,
+									},
+									"ssl_required": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether ssl is required for the pgvector database`,
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether to verify ssl for the pgvector database`,
+									},
+									"ssl_version": schema.StringAttribute{
+										Computed:    true,
+										Description: `the ssl version to use for the pgvector database`,
+									},
+									"timeout": schema.Float64Attribute{
+										Computed:    true,
+										Description: `the timeout of the pgvector database`,
+									},
+									"user": schema.StringAttribute{
+										Computed:    true,
+										Description: `the user of the pgvector database`,
+									},
+								},
 							},
 							"redis": schema.SingleNestedAttribute{
 								Computed: true,
@@ -533,7 +674,7 @@ func (r *PluginAiProxyAdvancedDataSource) Schema(ctx context.Context, req dataso
 								Computed:    true,
 								Description: `which vector database driver to use`,
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
 							},
@@ -686,13 +827,13 @@ func (r *PluginAiProxyAdvancedDataSource) Read(ctx context.Context, req datasour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiproxyadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiproxyadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiproxyadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiproxyadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -704,10 +845,6 @@ func (r *PluginAiProxyAdvancedDataSource) Read(ctx context.Context, req datasour
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -716,7 +853,11 @@ func (r *PluginAiProxyAdvancedDataSource) Read(ctx context.Context, req datasour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyAdvancedPlugin(res.AiProxyAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyAdvancedPlugin(ctx, res.AiProxyAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

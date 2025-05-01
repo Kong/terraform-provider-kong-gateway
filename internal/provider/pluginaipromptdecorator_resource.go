@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -62,6 +61,18 @@ func (r *PluginAiPromptDecoratorResource) Schema(ctx context.Context, req resour
 				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"bedrock",
+								"gemini",
+								"openai",
+							),
+						},
+					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,
@@ -313,8 +324,13 @@ func (r *PluginAiPromptDecoratorResource) Create(ctx context.Context, req resour
 		return
 	}
 
-	request := *data.ToSharedAiPromptDecoratorPlugin()
-	res, err := r.client.Plugins.CreateAipromptdecoratorPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiPromptDecoratorPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAipromptdecoratorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -334,8 +350,17 @@ func (r *PluginAiPromptDecoratorResource) Create(ctx context.Context, req resour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptDecoratorPlugin(res.AiPromptDecoratorPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptDecoratorPlugin(ctx, res.AiPromptDecoratorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -359,13 +384,13 @@ func (r *PluginAiPromptDecoratorResource) Read(ctx context.Context, req resource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAipromptdecoratorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAipromptdecoratorPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAipromptdecoratorPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAipromptdecoratorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -389,7 +414,11 @@ func (r *PluginAiPromptDecoratorResource) Read(ctx context.Context, req resource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptDecoratorPlugin(res.AiPromptDecoratorPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptDecoratorPlugin(ctx, res.AiPromptDecoratorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -409,15 +438,13 @@ func (r *PluginAiPromptDecoratorResource) Update(ctx context.Context, req resour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAipromptdecoratorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiPromptDecoratorPlugin := *data.ToSharedAiPromptDecoratorPlugin()
-	request := operations.UpdateAipromptdecoratorPluginRequest{
-		PluginID:                pluginID,
-		AiPromptDecoratorPlugin: aiPromptDecoratorPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAipromptdecoratorPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAipromptdecoratorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -437,8 +464,17 @@ func (r *PluginAiPromptDecoratorResource) Update(ctx context.Context, req resour
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptDecoratorPlugin(res.AiPromptDecoratorPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptDecoratorPlugin(ctx, res.AiPromptDecoratorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -462,13 +498,13 @@ func (r *PluginAiPromptDecoratorResource) Delete(ctx context.Context, req resour
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAipromptdecoratorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAipromptdecoratorPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAipromptdecoratorPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAipromptdecoratorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -59,6 +58,10 @@ func (r *PluginAiPromptDecoratorDataSource) Schema(ctx context.Context, req data
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Description: `LLM input and output format and schema to use`,
+					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
 						Description: `max allowed body size allowed to be introspected`,
@@ -243,13 +246,13 @@ func (r *PluginAiPromptDecoratorDataSource) Read(ctx context.Context, req dataso
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAipromptdecoratorPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAipromptdecoratorPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAipromptdecoratorPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAipromptdecoratorPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -261,10 +264,6 @@ func (r *PluginAiPromptDecoratorDataSource) Read(ctx context.Context, req dataso
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -273,7 +272,11 @@ func (r *PluginAiPromptDecoratorDataSource) Read(ctx context.Context, req dataso
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptDecoratorPlugin(res.AiPromptDecoratorPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptDecoratorPlugin(ctx, res.AiPromptDecoratorPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

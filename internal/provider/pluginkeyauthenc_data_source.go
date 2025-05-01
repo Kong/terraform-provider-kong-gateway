@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -29,7 +28,7 @@ type PluginKeyAuthEncDataSource struct {
 
 // PluginKeyAuthEncDataSourceModel describes the data model.
 type PluginKeyAuthEncDataSourceModel struct {
-	Config       *tfTypes.KeyAuthPluginConfig       `tfsdk:"config"`
+	Config       *tfTypes.KeyAuthEncPluginConfig    `tfsdk:"config"`
 	CreatedAt    types.Int64                        `tfsdk:"created_at"`
 	Enabled      types.Bool                         `tfsdk:"enabled"`
 	ID           types.String                       `tfsdk:"id"`
@@ -219,13 +218,13 @@ func (r *PluginKeyAuthEncDataSource) Read(ctx context.Context, req datasource.Re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetKeyauthencPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetKeyauthencPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetKeyauthencPlugin(ctx, request)
+	res, err := r.client.Plugins.GetKeyauthencPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -237,10 +236,6 @@ func (r *PluginKeyAuthEncDataSource) Read(ctx context.Context, req datasource.Re
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -249,7 +244,11 @@ func (r *PluginKeyAuthEncDataSource) Read(ctx context.Context, req datasource.Re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuthEncPlugin(res.KeyAuthEncPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuthEncPlugin(ctx, res.KeyAuthEncPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

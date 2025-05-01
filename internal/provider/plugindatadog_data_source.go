@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -62,7 +61,7 @@ func (r *PluginDatadogDataSource) Schema(ctx context.Context, req datasource.Sch
 						Computed:    true,
 						Description: `String to be attached as tag of the consumer.`,
 					},
-					"flush_timeout": schema.NumberAttribute{
+					"flush_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Optional time in seconds. If ` + "`" + `queue_size` + "`" + ` > 1, this is the max idle time before sending a log with less than ` + "`" + `queue_size` + "`" + ` records.`,
 					},
@@ -82,7 +81,7 @@ func (r *PluginDatadogDataSource) Schema(ctx context.Context, req datasource.Sch
 									Computed:    true,
 									Description: `Datadog metric’s name`,
 								},
-								"sample_rate": schema.NumberAttribute{
+								"sample_rate": schema.Float64Attribute{
 									Computed:    true,
 									Description: `Sampling rate`,
 								},
@@ -114,7 +113,7 @@ func (r *PluginDatadogDataSource) Schema(ctx context.Context, req datasource.Sch
 								Computed:    true,
 								Description: `The number of of queue delivery timers. -1 indicates unlimited.`,
 							},
-							"initial_retry_delay": schema.NumberAttribute{
+							"initial_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
 							},
@@ -126,7 +125,7 @@ func (r *PluginDatadogDataSource) Schema(ctx context.Context, req datasource.Sch
 								Computed:    true,
 								Description: `Maximum number of bytes that can be waiting on a queue, requires string content.`,
 							},
-							"max_coalescing_delay": schema.NumberAttribute{
+							"max_coalescing_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 							},
@@ -134,11 +133,11 @@ func (r *PluginDatadogDataSource) Schema(ctx context.Context, req datasource.Sch
 								Computed:    true,
 								Description: `Maximum number of entries that can be waiting on the queue.`,
 							},
-							"max_retry_delay": schema.NumberAttribute{
+							"max_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
 							},
-							"max_retry_time": schema.NumberAttribute{
+							"max_retry_time": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Time in seconds before the queue gives up calling a failed handler for a batch.`,
 							},
@@ -298,13 +297,13 @@ func (r *PluginDatadogDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetDatadogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetDatadogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetDatadogPlugin(ctx, request)
+	res, err := r.client.Plugins.GetDatadogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -316,10 +315,6 @@ func (r *PluginDatadogDataSource) Read(ctx context.Context, req datasource.ReadR
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -328,7 +323,11 @@ func (r *PluginDatadogDataSource) Read(ctx context.Context, req datasource.ReadR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedDatadogPlugin(res.DatadogPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedDatadogPlugin(ctx, res.DatadogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

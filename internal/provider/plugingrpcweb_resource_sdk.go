@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlugin {
+func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin(ctx context.Context) (*shared.GrpcWebPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlug
 	if r.Ordering != nil {
 		var after *shared.GrpcWebPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlug
 		}
 		var before *shared.GrpcWebPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlug
 			Before: before,
 		}
 	}
-	var partials []shared.GrpcWebPluginPartials = []shared.GrpcWebPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.GrpcWebPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.GrpcWebPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.GrpcWebPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.GrpcWebPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -134,7 +142,7 @@ func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlug
 			ID: id2,
 		}
 	}
-	var protocols []shared.GrpcWebPluginProtocols = []shared.GrpcWebPluginProtocols{}
+	protocols := make([]shared.GrpcWebPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.GrpcWebPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -177,10 +185,60 @@ func (r *PluginGrpcWebResourceModel) ToSharedGrpcWebPlugin() *shared.GrpcWebPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginGrpcWebResourceModel) RefreshFromSharedGrpcWebPlugin(resp *shared.GrpcWebPlugin) {
+func (r *PluginGrpcWebResourceModel) ToOperationsUpdateGrpcwebPluginRequest(ctx context.Context) (*operations.UpdateGrpcwebPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	grpcWebPlugin, grpcWebPluginDiags := r.ToSharedGrpcWebPlugin(ctx)
+	diags.Append(grpcWebPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateGrpcwebPluginRequest{
+		PluginID:      pluginID,
+		GrpcWebPlugin: *grpcWebPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGrpcWebResourceModel) ToOperationsGetGrpcwebPluginRequest(ctx context.Context) (*operations.GetGrpcwebPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetGrpcwebPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGrpcWebResourceModel) ToOperationsDeleteGrpcwebPluginRequest(ctx context.Context) (*operations.DeleteGrpcwebPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteGrpcwebPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGrpcWebResourceModel) RefreshFromSharedGrpcWebPlugin(ctx context.Context, resp *shared.GrpcWebPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -229,16 +287,16 @@ func (r *PluginGrpcWebResourceModel) RefreshFromSharedGrpcWebPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -264,4 +322,6 @@ func (r *PluginGrpcWebResourceModel) RefreshFromSharedGrpcWebPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

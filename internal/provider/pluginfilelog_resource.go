@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	"regexp"
@@ -77,7 +76,7 @@ func (r *PluginFileLogResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `The file path of the output log file. The plugin creates the log file if it doesn't exist yet.`,
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(regexp.MustCompile(`^[^*&%%\`+"`"+`]+$`), "must match pattern "+regexp.MustCompile(`^[^*&%%\`+"`"+`]+$`).String()),
+							stringvalidator.RegexMatches(regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`), "must match pattern "+regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`).String()),
 						},
 					},
 					"reopen": schema.BoolAttribute{
@@ -248,8 +247,13 @@ func (r *PluginFileLogResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedFileLogPlugin()
-	res, err := r.client.Plugins.CreateFilelogPlugin(ctx, request)
+	request, requestDiags := data.ToSharedFileLogPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateFilelogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -269,8 +273,17 @@ func (r *PluginFileLogResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedFileLogPlugin(res.FileLogPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedFileLogPlugin(ctx, res.FileLogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -294,13 +307,13 @@ func (r *PluginFileLogResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetFilelogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetFilelogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetFilelogPlugin(ctx, request)
+	res, err := r.client.Plugins.GetFilelogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -324,7 +337,11 @@ func (r *PluginFileLogResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedFileLogPlugin(res.FileLogPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedFileLogPlugin(ctx, res.FileLogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -344,15 +361,13 @@ func (r *PluginFileLogResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateFilelogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	fileLogPlugin := *data.ToSharedFileLogPlugin()
-	request := operations.UpdateFilelogPluginRequest{
-		PluginID:      pluginID,
-		FileLogPlugin: fileLogPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateFilelogPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateFilelogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -372,8 +387,17 @@ func (r *PluginFileLogResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedFileLogPlugin(res.FileLogPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedFileLogPlugin(ctx, res.FileLogPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -397,13 +421,13 @@ func (r *PluginFileLogResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteFilelogPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteFilelogPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteFilelogPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteFilelogPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

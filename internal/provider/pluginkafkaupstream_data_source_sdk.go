@@ -3,17 +3,39 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugin(resp *shared.KafkaUpstreamPlugin) {
+func (r *PluginKafkaUpstreamDataSourceModel) ToOperationsGetKafkaupstreamPluginRequest(ctx context.Context) (*operations.GetKafkaupstreamPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetKafkaupstreamPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugin(ctx context.Context, resp *shared.KafkaUpstreamPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
+			r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
+			for _, v := range resp.Config.AllowedTopics {
+				r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
+			}
 			if resp.Config.Authentication == nil {
 				r.Config.Authentication = nil
 			} else {
@@ -37,14 +59,14 @@ func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugi
 				r.Config.BootstrapServers = r.Config.BootstrapServers[:len(resp.Config.BootstrapServers)]
 			}
 			for bootstrapServersCount, bootstrapServersItem := range resp.Config.BootstrapServers {
-				var bootstrapServers1 tfTypes.BootstrapServers
-				bootstrapServers1.Host = types.StringValue(bootstrapServersItem.Host)
-				bootstrapServers1.Port = types.Int64Value(bootstrapServersItem.Port)
+				var bootstrapServers tfTypes.BootstrapServers
+				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
+				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
 				if bootstrapServersCount+1 > len(r.Config.BootstrapServers) {
-					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers1)
+					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
 				} else {
-					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers1.Host
-					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers1.Port
+					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers.Host
+					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers.Port
 				}
 			}
 			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
@@ -54,6 +76,10 @@ func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugi
 			r.Config.ForwardURI = types.BoolPointerValue(resp.Config.ForwardURI)
 			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
 			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
+			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
+			for _, v := range resp.Config.MessageByLuaFunctions {
+				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
+			}
 			r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 			r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 			r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
@@ -70,12 +96,13 @@ func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugi
 			if resp.Config.Security == nil {
 				r.Config.Security = nil
 			} else {
-				r.Config.Security = &tfTypes.KafkaLogPluginSecurity{}
+				r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
 				r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
 				r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
 			}
 			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 			r.Config.Topic = types.StringPointerValue(resp.Config.Topic)
+			r.Config.TopicsQueryArg = types.StringPointerValue(resp.Config.TopicsQueryArg)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -116,16 +143,16 @@ func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugi
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -151,4 +178,6 @@ func (r *PluginKafkaUpstreamDataSourceModel) RefreshFromSharedKafkaUpstreamPlugi
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

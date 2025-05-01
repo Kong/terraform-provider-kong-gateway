@@ -5,10 +5,11 @@ package types
 import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type CorsPluginConfig struct {
+	AllowOriginAbsent types.Bool     `tfsdk:"allow_origin_absent"`
 	Credentials       types.Bool     `tfsdk:"credentials"`
 	ExposedHeaders    []types.String `tfsdk:"exposed_headers"`
 	Headers           []types.String `tfsdk:"headers"`
-	MaxAge            types.Number   `tfsdk:"max_age"`
+	MaxAge            types.Float64  `tfsdk:"max_age"`
 	Methods           []types.String `tfsdk:"methods"`
 	Origins           []types.String `tfsdk:"origins"`
 	PreflightContinue types.Bool     `tfsdk:"preflight_continue"`

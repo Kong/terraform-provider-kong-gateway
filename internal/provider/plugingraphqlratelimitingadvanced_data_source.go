@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -76,10 +75,10 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Schema(ctx context.Context
 					},
 					"limit": schema.ListAttribute{
 						Computed:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more requests-per-window limits to apply.`,
 					},
-					"max_cost": schema.NumberAttribute{
+					"max_cost": schema.Float64Attribute{
 						Computed:    true,
 						Description: `A defined maximum cost per query. 0 means unlimited.`,
 					},
@@ -200,7 +199,7 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Schema(ctx context.Context
 							},
 						},
 					},
-					"score_factor": schema.NumberAttribute{
+					"score_factor": schema.Float64Attribute{
 						Computed:    true,
 						Description: `A scoring factor to multiply (or divide) the cost. The ` + "`" + `score_factor` + "`" + ` must always be greater than 0.`,
 					},
@@ -208,13 +207,13 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Schema(ctx context.Context
 						Computed:    true,
 						Description: `The rate-limiting strategy to use for retrieving and incrementing the limits.`,
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 syncs the counters in that many number of seconds.`,
 					},
 					"window_size": schema.ListAttribute{
 						Computed:    true,
-						ElementType: types.NumberType,
+						ElementType: types.Float64Type,
 						Description: `One or more window sizes to apply a limit to (defined in seconds).`,
 					},
 					"window_type": schema.StringAttribute{
@@ -359,13 +358,13 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Read(ctx context.Context, 
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetGraphqlratelimitingadvancedPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetGraphqlratelimitingadvancedPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetGraphqlratelimitingadvancedPlugin(ctx, request)
+	res, err := r.client.Plugins.GetGraphqlratelimitingadvancedPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -377,10 +376,6 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Read(ctx context.Context, 
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -389,7 +384,11 @@ func (r *PluginGraphqlRateLimitingAdvancedDataSource) Read(ctx context.Context, 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(res.GraphqlRateLimitingAdvancedPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedGraphqlRateLimitingAdvancedPlugin(ctx, res.GraphqlRateLimitingAdvancedPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

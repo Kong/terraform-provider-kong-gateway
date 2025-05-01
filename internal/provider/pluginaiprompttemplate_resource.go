@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -278,8 +277,13 @@ func (r *PluginAiPromptTemplateResource) Create(ctx context.Context, req resourc
 		return
 	}
 
-	request := *data.ToSharedAiPromptTemplatePlugin()
-	res, err := r.client.Plugins.CreateAiprompttemplatePlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiPromptTemplatePlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiprompttemplatePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -299,8 +303,17 @@ func (r *PluginAiPromptTemplateResource) Create(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptTemplatePlugin(res.AiPromptTemplatePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptTemplatePlugin(ctx, res.AiPromptTemplatePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -324,13 +337,13 @@ func (r *PluginAiPromptTemplateResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiprompttemplatePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiprompttemplatePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiprompttemplatePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiprompttemplatePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -354,7 +367,11 @@ func (r *PluginAiPromptTemplateResource) Read(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptTemplatePlugin(res.AiPromptTemplatePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptTemplatePlugin(ctx, res.AiPromptTemplatePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -374,15 +391,13 @@ func (r *PluginAiPromptTemplateResource) Update(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiprompttemplatePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiPromptTemplatePlugin := *data.ToSharedAiPromptTemplatePlugin()
-	request := operations.UpdateAiprompttemplatePluginRequest{
-		PluginID:               pluginID,
-		AiPromptTemplatePlugin: aiPromptTemplatePlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiprompttemplatePlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiprompttemplatePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -402,8 +417,17 @@ func (r *PluginAiPromptTemplateResource) Update(ctx context.Context, req resourc
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiPromptTemplatePlugin(res.AiPromptTemplatePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiPromptTemplatePlugin(ctx, res.AiPromptTemplatePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -427,13 +451,13 @@ func (r *PluginAiPromptTemplateResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiprompttemplatePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiprompttemplatePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiprompttemplatePlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiprompttemplatePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

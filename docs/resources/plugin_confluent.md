@@ -15,23 +15,29 @@ PluginConfluent Resource
 ```terraform
 resource "kong-gateway_plugin_confluent" "my_pluginconfluent" {
   config = {
+    allowed_topics = [
+      "..."
+    ]
     bootstrap_servers = [
       {
         host = "...my_host..."
         port = 31248
       }
     ]
-    cluster_api_key                                    = "...my_cluster_api_key..."
-    cluster_api_secret                                 = "...my_cluster_api_secret..."
-    cluster_name                                       = "...my_cluster_name..."
-    confluent_cloud_api_key                            = "...my_confluent_cloud_api_key..."
-    confluent_cloud_api_secret                         = "...my_confluent_cloud_api_secret..."
-    forward_body                                       = true
-    forward_headers                                    = true
-    forward_method                                     = true
-    forward_uri                                        = true
-    keepalive                                          = 8
-    keepalive_enabled                                  = false
+    cluster_api_key            = "...my_cluster_api_key..."
+    cluster_api_secret         = "...my_cluster_api_secret..."
+    cluster_name               = "...my_cluster_name..."
+    confluent_cloud_api_key    = "...my_confluent_cloud_api_key..."
+    confluent_cloud_api_secret = "...my_confluent_cloud_api_secret..."
+    forward_body               = true
+    forward_headers            = true
+    forward_method             = true
+    forward_uri                = true
+    keepalive                  = 8
+    keepalive_enabled          = false
+    message_by_lua_functions = [
+      "..."
+    ]
     producer_async                                     = false
     producer_async_buffering_limits_messages_in_memory = 6
     producer_async_flush_timeout                       = 3
@@ -43,6 +49,7 @@ resource "kong-gateway_plugin_confluent" "my_pluginconfluent" {
     producer_request_timeout                           = 4
     timeout                                            = 6
     topic                                              = "...my_topic..."
+    topics_query_arg                                   = "...my_topics_query_arg..."
   }
   consumer = {
     id = "...my_id..."
@@ -113,6 +120,7 @@ resource "kong-gateway_plugin_confluent" "my_pluginconfluent" {
 
 Optional:
 
+- `allowed_topics` (List of String) The list of allowed topic names to which messages can be sent. The default topic configured in the `topic` field is always allowed, regardless of its inclusion in `allowed_topics`.
 - `bootstrap_servers` (Attributes List) Set of bootstrap brokers in a `{host: host, port: port}` list format. (see [below for nested schema](#nestedatt--config--bootstrap_servers))
 - `cluster_api_key` (String) Username/Apikey for SASL authentication.
 - `cluster_api_secret` (String) Password/ApiSecret for SASL authentication.
@@ -125,6 +133,7 @@ Optional:
 - `forward_uri` (Boolean) Include the request URI and URI arguments (as in, query arguments) in the message. At least one of these must be true: `forward_method`, `forward_uri`, `forward_headers`, `forward_body`.
 - `keepalive` (Number) Keepalive timeout in milliseconds.
 - `keepalive_enabled` (Boolean)
+- `message_by_lua_functions` (List of String) The Lua functions that manipulates the message being sent to the Kafka topic.
 - `producer_async` (Boolean) Flag to enable asynchronous mode.
 - `producer_async_buffering_limits_messages_in_memory` (Number) Maximum number of messages that can be buffered in memory in asynchronous mode.
 - `producer_async_flush_timeout` (Number) Maximum time interval in milliseconds between buffer flushes in asynchronous mode.
@@ -135,7 +144,8 @@ Optional:
 - `producer_request_retries_max_attempts` (Number) Maximum number of retry attempts per single Produce request.
 - `producer_request_timeout` (Number) Time to wait for a Produce response in milliseconds.
 - `timeout` (Number) Socket timeout in milliseconds.
-- `topic` (String) The Kafka topic to publish to.
+- `topic` (String) The default Kafka topic to publish to if the query parameter defined in the `topics_query_arg` does not exist in the request
+- `topics_query_arg` (String) The request query parameter name that contains the topics to publish to
 
 <a id="nestedatt--config--bootstrap_servers"></a>
 ### Nested Schema for `config.bootstrap_servers`

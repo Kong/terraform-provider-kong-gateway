@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *HMACAuthResourceModel) ToSharedHMACAuthWithoutParents() *shared.HMACAuthWithoutParents {
+func (r *HMACAuthResourceModel) ToSharedHMACAuthWithoutParents(ctx context.Context) (*shared.HMACAuthWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.HMACAuthWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -39,7 +44,7 @@ func (r *HMACAuthResourceModel) ToSharedHMACAuthWithoutParents() *shared.HMACAut
 	} else {
 		secret = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -54,29 +59,34 @@ func (r *HMACAuthResourceModel) ToSharedHMACAuthWithoutParents() *shared.HMACAut
 		Tags:      tags,
 		Username:  username,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *HMACAuthResourceModel) RefreshFromSharedHMACAuth(resp *shared.HMACAuth) {
-	if resp != nil {
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Secret = types.StringPointerValue(resp.Secret)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.Username = types.StringValue(resp.Username)
+func (r *HMACAuthResourceModel) ToOperationsCreateHmacAuthWithConsumerRequest(ctx context.Context) (*operations.CreateHmacAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	hmacAuthWithoutParents, hmacAuthWithoutParentsDiags := r.ToSharedHMACAuthWithoutParents(ctx)
+	diags.Append(hmacAuthWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateHmacAuthWithConsumerRequest{
+		ConsumerID:             consumerID,
+		HMACAuthWithoutParents: *hmacAuthWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *HMACAuthResourceModel) ToSharedHMACAuth() *shared.HMACAuth {
+func (r *HMACAuthResourceModel) ToSharedHMACAuth(ctx context.Context) (*shared.HMACAuth, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.HMACAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -107,7 +117,7 @@ func (r *HMACAuthResourceModel) ToSharedHMACAuth() *shared.HMACAuth {
 	} else {
 		secret = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -122,5 +132,88 @@ func (r *HMACAuthResourceModel) ToSharedHMACAuth() *shared.HMACAuth {
 		Tags:      tags,
 		Username:  username,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *HMACAuthResourceModel) ToOperationsUpdateHmacAuthWithConsumerRequest(ctx context.Context) (*operations.UpdateHmacAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var hmacAuthID string
+	hmacAuthID = r.ID.ValueString()
+
+	hmacAuth, hmacAuthDiags := r.ToSharedHMACAuth(ctx)
+	diags.Append(hmacAuthDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		HMACAuthID: hmacAuthID,
+		HMACAuth:   *hmacAuth,
+	}
+
+	return &out, diags
+}
+
+func (r *HMACAuthResourceModel) ToOperationsGetHmacAuthWithConsumerRequest(ctx context.Context) (*operations.GetHmacAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var hmacAuthID string
+	hmacAuthID = r.ID.ValueString()
+
+	out := operations.GetHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		HMACAuthID: hmacAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *HMACAuthResourceModel) ToOperationsDeleteHmacAuthWithConsumerRequest(ctx context.Context) (*operations.DeleteHmacAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var hmacAuthID string
+	hmacAuthID = r.ID.ValueString()
+
+	out := operations.DeleteHmacAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		HMACAuthID: hmacAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *HMACAuthResourceModel) RefreshFromSharedHMACAuth(ctx context.Context, resp *shared.HMACAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Secret = types.StringPointerValue(resp.Secret)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+		r.Username = types.StringValue(resp.Username)
+	}
+
+	return diags
 }

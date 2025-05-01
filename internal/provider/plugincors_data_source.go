@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -57,6 +56,10 @@ func (r *PluginCorsDataSource) Schema(ctx context.Context, req datasource.Schema
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"allow_origin_absent": schema.BoolAttribute{
+						Computed:    true,
+						Description: `A boolean value that skip cors response headers when origin header of request is empty`,
+					},
 					"credentials": schema.BoolAttribute{
 						Computed:    true,
 						Description: `Flag to determine whether the ` + "`" + `Access-Control-Allow-Credentials` + "`" + ` header should be sent with ` + "`" + `true` + "`" + ` as the value.`,
@@ -71,7 +74,7 @@ func (r *PluginCorsDataSource) Schema(ctx context.Context, req datasource.Schema
 						ElementType: types.StringType,
 						Description: `Value for the ` + "`" + `Access-Control-Allow-Headers` + "`" + ` header.`,
 					},
-					"max_age": schema.NumberAttribute{
+					"max_age": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Indicates how long the results of the preflight request can be cached, in ` + "`" + `seconds` + "`" + `.`,
 					},
@@ -222,13 +225,13 @@ func (r *PluginCorsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetCorsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetCorsPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetCorsPlugin(ctx, request)
+	res, err := r.client.Plugins.GetCorsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -240,10 +243,6 @@ func (r *PluginCorsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -252,7 +251,11 @@ func (r *PluginCorsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedCorsPlugin(res.CorsPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedCorsPlugin(ctx, res.CorsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

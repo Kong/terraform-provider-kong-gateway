@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlugin {
+func (r *PluginMockingResourceModel) ToSharedMockingPlugin(ctx context.Context) (*shared.MockingPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 	if r.Ordering != nil {
 		var after *shared.MockingPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 		}
 		var before *shared.MockingPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 			Before: before,
 		}
 	}
-	var partials []shared.MockingPluginPartials = []shared.MockingPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.MockingPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.MockingPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.MockingPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.MockingPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -123,19 +130,19 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 		} else {
 			includeBasePath = nil
 		}
-		var includedStatusCodes []int64 = []int64{}
+		includedStatusCodes := make([]int64, 0, len(r.Config.IncludedStatusCodes))
 		for _, includedStatusCodesItem := range r.Config.IncludedStatusCodes {
 			includedStatusCodes = append(includedStatusCodes, includedStatusCodesItem.ValueInt64())
 		}
 		maxDelayTime := new(float64)
 		if !r.Config.MaxDelayTime.IsUnknown() && !r.Config.MaxDelayTime.IsNull() {
-			*maxDelayTime, _ = r.Config.MaxDelayTime.ValueBigFloat().Float64()
+			*maxDelayTime = r.Config.MaxDelayTime.ValueFloat64()
 		} else {
 			maxDelayTime = nil
 		}
 		minDelayTime := new(float64)
 		if !r.Config.MinDelayTime.IsUnknown() && !r.Config.MinDelayTime.IsNull() {
-			*minDelayTime, _ = r.Config.MinDelayTime.ValueBigFloat().Float64()
+			*minDelayTime = r.Config.MinDelayTime.ValueFloat64()
 		} else {
 			minDelayTime = nil
 		}
@@ -182,7 +189,7 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 			ID: id2,
 		}
 	}
-	var protocols []shared.MockingPluginProtocols = []shared.MockingPluginProtocols{}
+	protocols := make([]shared.MockingPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.MockingPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -225,10 +232,60 @@ func (r *PluginMockingResourceModel) ToSharedMockingPlugin() *shared.MockingPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginMockingResourceModel) RefreshFromSharedMockingPlugin(resp *shared.MockingPlugin) {
+func (r *PluginMockingResourceModel) ToOperationsUpdateMockingPluginRequest(ctx context.Context) (*operations.UpdateMockingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	mockingPlugin, mockingPluginDiags := r.ToSharedMockingPlugin(ctx)
+	diags.Append(mockingPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateMockingPluginRequest{
+		PluginID:      pluginID,
+		MockingPlugin: *mockingPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMockingResourceModel) ToOperationsGetMockingPluginRequest(ctx context.Context) (*operations.GetMockingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetMockingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMockingResourceModel) ToOperationsDeleteMockingPluginRequest(ctx context.Context) (*operations.DeleteMockingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteMockingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginMockingResourceModel) RefreshFromSharedMockingPlugin(ctx context.Context, resp *shared.MockingPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -242,16 +299,8 @@ func (r *PluginMockingResourceModel) RefreshFromSharedMockingPlugin(resp *shared
 			for _, v := range resp.Config.IncludedStatusCodes {
 				r.Config.IncludedStatusCodes = append(r.Config.IncludedStatusCodes, types.Int64Value(v))
 			}
-			if resp.Config.MaxDelayTime != nil {
-				r.Config.MaxDelayTime = types.NumberValue(big.NewFloat(float64(*resp.Config.MaxDelayTime)))
-			} else {
-				r.Config.MaxDelayTime = types.NumberNull()
-			}
-			if resp.Config.MinDelayTime != nil {
-				r.Config.MinDelayTime = types.NumberValue(big.NewFloat(float64(*resp.Config.MinDelayTime)))
-			} else {
-				r.Config.MinDelayTime = types.NumberNull()
-			}
+			r.Config.MaxDelayTime = types.Float64PointerValue(resp.Config.MaxDelayTime)
+			r.Config.MinDelayTime = types.Float64PointerValue(resp.Config.MinDelayTime)
 			r.Config.RandomDelay = types.BoolPointerValue(resp.Config.RandomDelay)
 			r.Config.RandomExamples = types.BoolPointerValue(resp.Config.RandomExamples)
 			r.Config.RandomStatusCode = types.BoolPointerValue(resp.Config.RandomStatusCode)
@@ -295,16 +344,16 @@ func (r *PluginMockingResourceModel) RefreshFromSharedMockingPlugin(resp *shared
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -330,4 +379,6 @@ func (r *PluginMockingResourceModel) RefreshFromSharedMockingPlugin(resp *shared
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

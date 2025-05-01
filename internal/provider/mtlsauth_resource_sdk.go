@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *MTLSAuthResourceModel) ToSharedMTLSAuthWithoutParents() *shared.MTLSAuthWithoutParents {
+func (r *MTLSAuthResourceModel) ToSharedMTLSAuthWithoutParents(ctx context.Context) (*shared.MTLSAuthWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var caCertificate *shared.MTLSAuthWithoutParentsCaCertificate
 	if r.CaCertificate != nil {
 		id := new(string)
@@ -48,7 +53,7 @@ func (r *MTLSAuthResourceModel) ToSharedMTLSAuthWithoutParents() *shared.MTLSAut
 	var subjectName string
 	subjectName = r.SubjectName.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -60,34 +65,34 @@ func (r *MTLSAuthResourceModel) ToSharedMTLSAuthWithoutParents() *shared.MTLSAut
 		SubjectName:   subjectName,
 		Tags:          tags,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *MTLSAuthResourceModel) RefreshFromSharedMTLSAuth(resp *shared.MTLSAuth) {
-	if resp != nil {
-		if resp.CaCertificate == nil {
-			r.CaCertificate = nil
-		} else {
-			r.CaCertificate = &tfTypes.ACLWithoutParentsConsumer{}
-			r.CaCertificate.ID = types.StringPointerValue(resp.CaCertificate.ID)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.SubjectName = types.StringValue(resp.SubjectName)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
+func (r *MTLSAuthResourceModel) ToOperationsCreateMtlsAuthWithConsumerRequest(ctx context.Context) (*operations.CreateMtlsAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	mtlsAuthWithoutParents, mtlsAuthWithoutParentsDiags := r.ToSharedMTLSAuthWithoutParents(ctx)
+	diags.Append(mtlsAuthWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateMtlsAuthWithConsumerRequest{
+		ConsumerID:             consumerID,
+		MTLSAuthWithoutParents: *mtlsAuthWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *MTLSAuthResourceModel) ToSharedMTLSAuth() *shared.MTLSAuth {
+func (r *MTLSAuthResourceModel) ToSharedMTLSAuth(ctx context.Context) (*shared.MTLSAuth, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var caCertificate *shared.MTLSAuthCaCertificate
 	if r.CaCertificate != nil {
 		id := new(string)
@@ -127,7 +132,7 @@ func (r *MTLSAuthResourceModel) ToSharedMTLSAuth() *shared.MTLSAuth {
 	var subjectName string
 	subjectName = r.SubjectName.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -139,5 +144,93 @@ func (r *MTLSAuthResourceModel) ToSharedMTLSAuth() *shared.MTLSAuth {
 		SubjectName:   subjectName,
 		Tags:          tags,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *MTLSAuthResourceModel) ToOperationsUpdateMtlsAuthWithConsumerRequest(ctx context.Context) (*operations.UpdateMtlsAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var mtlsAuthID string
+	mtlsAuthID = r.ID.ValueString()
+
+	mtlsAuth, mtlsAuthDiags := r.ToSharedMTLSAuth(ctx)
+	diags.Append(mtlsAuthDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		MTLSAuthID: mtlsAuthID,
+		MTLSAuth:   *mtlsAuth,
+	}
+
+	return &out, diags
+}
+
+func (r *MTLSAuthResourceModel) ToOperationsGetMtlsAuthWithConsumerRequest(ctx context.Context) (*operations.GetMtlsAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var mtlsAuthID string
+	mtlsAuthID = r.ID.ValueString()
+
+	out := operations.GetMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		MTLSAuthID: mtlsAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *MTLSAuthResourceModel) ToOperationsDeleteMtlsAuthWithConsumerRequest(ctx context.Context) (*operations.DeleteMtlsAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var mtlsAuthID string
+	mtlsAuthID = r.ID.ValueString()
+
+	out := operations.DeleteMtlsAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		MTLSAuthID: mtlsAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *MTLSAuthResourceModel) RefreshFromSharedMTLSAuth(ctx context.Context, resp *shared.MTLSAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.CaCertificate == nil {
+			r.CaCertificate = nil
+		} else {
+			r.CaCertificate = &tfTypes.ACLWithoutParentsConsumer{}
+			r.CaCertificate.ID = types.StringPointerValue(resp.CaCertificate.ID)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.SubjectName = types.StringValue(resp.SubjectName)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+	}
+
+	return diags
 }

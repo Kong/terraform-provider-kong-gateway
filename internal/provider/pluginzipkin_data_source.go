@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -128,7 +127,7 @@ func (r *PluginZipkinDataSource) Schema(ctx context.Context, req datasource.Sche
 								Computed:    true,
 								Description: `The number of of queue delivery timers. -1 indicates unlimited.`,
 							},
-							"initial_retry_delay": schema.NumberAttribute{
+							"initial_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
 							},
@@ -140,7 +139,7 @@ func (r *PluginZipkinDataSource) Schema(ctx context.Context, req datasource.Sche
 								Computed:    true,
 								Description: `Maximum number of bytes that can be waiting on a queue, requires string content.`,
 							},
-							"max_coalescing_delay": schema.NumberAttribute{
+							"max_coalescing_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 							},
@@ -148,11 +147,11 @@ func (r *PluginZipkinDataSource) Schema(ctx context.Context, req datasource.Sche
 								Computed:    true,
 								Description: `Maximum number of entries that can be waiting on the queue.`,
 							},
-							"max_retry_delay": schema.NumberAttribute{
+							"max_retry_delay": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
 							},
-							"max_retry_time": schema.NumberAttribute{
+							"max_retry_time": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Time in seconds before the queue gives up calling a failed handler for a batch.`,
 							},
@@ -162,7 +161,7 @@ func (r *PluginZipkinDataSource) Schema(ctx context.Context, req datasource.Sche
 						Computed:    true,
 						Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 					},
-					"sample_ratio": schema.NumberAttribute{
+					"sample_ratio": schema.Float64Attribute{
 						Computed:    true,
 						Description: `How often to sample requests that do not contain trace IDs. Set to ` + "`" + `0` + "`" + ` to turn sampling off, or to ` + "`" + `1` + "`" + ` to sample **all** requests.`,
 					},
@@ -330,13 +329,13 @@ func (r *PluginZipkinDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetZipkinPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetZipkinPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetZipkinPlugin(ctx, request)
+	res, err := r.client.Plugins.GetZipkinPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -348,10 +347,6 @@ func (r *PluginZipkinDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -360,7 +355,11 @@ func (r *PluginZipkinDataSource) Read(ctx context.Context, req datasource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedZipkinPlugin(res.ZipkinPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedZipkinPlugin(ctx, res.ZipkinPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

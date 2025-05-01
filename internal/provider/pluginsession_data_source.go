@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -57,7 +56,7 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
-					"absolute_timeout": schema.NumberAttribute{
+					"absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie absolute timeout, in seconds. Specifies how long the session can be used until it is no longer valid.`,
 					},
@@ -89,7 +88,11 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 						Computed:    true,
 						Description: `Applies the Secure directive so that the cookie may be sent to the server only with an encrypted request over the HTTPS protocol.`,
 					},
-					"idling_timeout": schema.NumberAttribute{
+					"hash_subject": schema.BoolAttribute{
+						Computed:    true,
+						Description: `Whether to hash or not the subject when store_metadata is enabled.`,
+					},
+					"idling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie idle time, in seconds.`,
 					},
@@ -113,7 +116,7 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 						Computed:    true,
 						Description: `Enables or disables persistent sessions.`,
 					},
-					"remember_absolute_timeout": schema.NumberAttribute{
+					"remember_absolute_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The persistent session absolute timeout limit, in seconds.`,
 					},
@@ -121,7 +124,7 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 						Computed:    true,
 						Description: `Persistent session cookie name. Use with the ` + "`" + `remember` + "`" + ` configuration parameter.`,
 					},
-					"remember_rolling_timeout": schema.NumberAttribute{
+					"remember_rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The persistent session rolling timeout window, in seconds.`,
 					},
@@ -135,7 +138,7 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 						ElementType: types.StringType,
 						Description: `List of information to include, as headers, in the response to the downstream.`,
 					},
-					"rolling_timeout": schema.NumberAttribute{
+					"rolling_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The session cookie rolling timeout, in seconds. Specifies how long the session can be used until it needs to be renewed.`,
 					},
@@ -143,13 +146,17 @@ func (r *PluginSessionDataSource) Schema(ctx context.Context, req datasource.Sch
 						Computed:    true,
 						Description: `The secret that is used in keyed HMAC generation.`,
 					},
-					"stale_ttl": schema.NumberAttribute{
+					"stale_ttl": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The duration, in seconds, after which an old cookie is discarded, starting from the moment when the session becomes outdated and is replaced by a new one.`,
 					},
 					"storage": schema.StringAttribute{
 						Computed:    true,
 						Description: `Determines where the session data is stored. ` + "`" + `kong` + "`" + `: Stores encrypted session data into Kong's current database strategy; the cookie will not contain any session data. ` + "`" + `cookie` + "`" + `: Stores encrypted session data within the cookie itself.`,
+					},
+					"store_metadata": schema.BoolAttribute{
+						Computed:    true,
+						Description: `Whether to also store metadata of sessions, such as collecting data of sessions for a specific audience belonging to a specific subject.`,
 					},
 				},
 			},
@@ -280,13 +287,13 @@ func (r *PluginSessionDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetSessionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetSessionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetSessionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetSessionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -298,10 +305,6 @@ func (r *PluginSessionDataSource) Read(ctx context.Context, req datasource.ReadR
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -310,7 +313,11 @@ func (r *PluginSessionDataSource) Read(ctx context.Context, req datasource.ReadR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSessionPlugin(res.SessionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedSessionPlugin(ctx, res.SessionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

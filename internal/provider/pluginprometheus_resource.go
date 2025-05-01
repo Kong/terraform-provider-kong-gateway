@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -88,6 +87,11 @@ func (r *PluginPrometheusResource) Schema(ctx context.Context, req resource.Sche
 						Computed:    true,
 						Optional:    true,
 						Description: `A boolean value that determines if upstream metrics should be collected. If enabled, ` + "`" + `upstream_target_health` + "`" + ` metric will be exported.`,
+					},
+					"wasm_metrics": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A boolean value that determines if Wasm metrics should be collected.`,
 					},
 				},
 			},
@@ -252,8 +256,13 @@ func (r *PluginPrometheusResource) Create(ctx context.Context, req resource.Crea
 		return
 	}
 
-	request := *data.ToSharedPrometheusPlugin()
-	res, err := r.client.Plugins.CreatePrometheusPlugin(ctx, request)
+	request, requestDiags := data.ToSharedPrometheusPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreatePrometheusPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -273,8 +282,17 @@ func (r *PluginPrometheusResource) Create(ctx context.Context, req resource.Crea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPrometheusPlugin(res.PrometheusPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedPrometheusPlugin(ctx, res.PrometheusPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -298,13 +316,13 @@ func (r *PluginPrometheusResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetPrometheusPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetPrometheusPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetPrometheusPlugin(ctx, request)
+	res, err := r.client.Plugins.GetPrometheusPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -328,7 +346,11 @@ func (r *PluginPrometheusResource) Read(ctx context.Context, req resource.ReadRe
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPrometheusPlugin(res.PrometheusPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedPrometheusPlugin(ctx, res.PrometheusPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -348,15 +370,13 @@ func (r *PluginPrometheusResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdatePrometheusPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	prometheusPlugin := *data.ToSharedPrometheusPlugin()
-	request := operations.UpdatePrometheusPluginRequest{
-		PluginID:         pluginID,
-		PrometheusPlugin: prometheusPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdatePrometheusPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdatePrometheusPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -376,8 +396,17 @@ func (r *PluginPrometheusResource) Update(ctx context.Context, req resource.Upda
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedPrometheusPlugin(res.PrometheusPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedPrometheusPlugin(ctx, res.PrometheusPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -401,13 +430,13 @@ func (r *PluginPrometheusResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeletePrometheusPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeletePrometheusPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeletePrometheusPlugin(ctx, request)
+	res, err := r.client.Plugins.DeletePrometheusPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

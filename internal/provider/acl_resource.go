@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -121,15 +120,13 @@ func (r *ACLResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateACLWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aclWithoutParents := *data.ToSharedACLWithoutParents()
-	request := operations.CreateACLWithConsumerRequest{
-		ConsumerID:        consumerID,
-		ACLWithoutParents: aclWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ACLs.CreateACLWithConsumer(ctx, request)
+	res, err := r.client.ACLs.CreateACLWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -149,8 +146,17 @@ func (r *ACLResource) Create(ctx context.Context, req resource.CreateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedACL(res.ACL)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedACL(ctx, res.ACL)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -174,17 +180,13 @@ func (r *ACLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetACLWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var aclID string
-	aclID = data.ID.ValueString()
-
-	request := operations.GetACLWithConsumerRequest{
-		ConsumerID: consumerID,
-		ACLID:      aclID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ACLs.GetACLWithConsumer(ctx, request)
+	res, err := r.client.ACLs.GetACLWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -208,7 +210,11 @@ func (r *ACLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedACL(res.ACL)
+	resp.Diagnostics.Append(data.RefreshFromSharedACL(ctx, res.ACL)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -228,19 +234,13 @@ func (r *ACLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateACLWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var aclID string
-	aclID = data.ID.ValueString()
-
-	acl := *data.ToSharedACL()
-	request := operations.UpdateACLWithConsumerRequest{
-		ConsumerID: consumerID,
-		ACLID:      aclID,
-		ACL:        acl,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ACLs.UpdateACLWithConsumer(ctx, request)
+	res, err := r.client.ACLs.UpdateACLWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -260,8 +260,17 @@ func (r *ACLResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedACL(res.ACL)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedACL(ctx, res.ACL)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -285,17 +294,13 @@ func (r *ACLResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteACLWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var aclID string
-	aclID = data.ID.ValueString()
-
-	request := operations.DeleteACLWithConsumerRequest{
-		ConsumerID: consumerID,
-		ACLID:      aclID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ACLs.DeleteACLWithConsumer(ctx, request)
+	res, err := r.client.ACLs.DeleteACLWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -323,7 +328,7 @@ func (r *ACLResource) ImportState(ctx context.Context, req resource.ImportStateR
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "aclid": "f28acbfa-c866-4587-b688-0208ac24df21",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "id": "f28acbfa-c866-4587-b688-0208ac24df21",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
 		return
 	}
 

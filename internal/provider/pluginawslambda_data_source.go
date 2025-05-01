@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -133,7 +132,7 @@ func (r *PluginAwsLambdaDataSource) Schema(ctx context.Context, req datasource.S
 						Computed:    true,
 						Description: `An optional value that defines whether the response format to receive from the Lambda to this format.`,
 					},
-					"keepalive": schema.NumberAttribute{
+					"keepalive": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional value in milliseconds that defines how long an idle connection lives before being closed.`,
 					},
@@ -157,7 +156,7 @@ func (r *PluginAwsLambdaDataSource) Schema(ctx context.Context, req datasource.S
 						Computed:    true,
 						Description: `An optional value that defines whether Kong should send large bodies that are buffered to disk`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Description: `An optional timeout in milliseconds when invoking the function.`,
 					},
@@ -303,13 +302,13 @@ func (r *PluginAwsLambdaDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAwslambdaPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAwslambdaPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAwslambdaPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAwslambdaPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -321,10 +320,6 @@ func (r *PluginAwsLambdaDataSource) Read(ctx context.Context, req datasource.Rea
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -333,7 +328,11 @@ func (r *PluginAwsLambdaDataSource) Read(ctx context.Context, req datasource.Rea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAwsLambdaPlugin(res.AwsLambdaPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAwsLambdaPlugin(ctx, res.AwsLambdaPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

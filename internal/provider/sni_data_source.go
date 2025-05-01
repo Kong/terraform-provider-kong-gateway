@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -119,13 +118,13 @@ func (r *SniDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
-	var sniIDOrName string
-	sniIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetSniRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetSniRequest{
-		SNIIDOrName: sniIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.SNIs.GetSni(ctx, request)
+	res, err := r.client.SNIs.GetSni(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -137,10 +136,6 @@ func (r *SniDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -149,7 +144,11 @@ func (r *SniDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedSni(res.Sni)
+	resp.Diagnostics.Append(data.RefreshFromSharedSni(ctx, res.Sni)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

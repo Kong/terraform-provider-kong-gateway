@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -59,11 +58,11 @@ func (r *PluginRateLimitingDataSource) Schema(ctx context.Context, req datasourc
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
-					"day": schema.NumberAttribute{
+					"day": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per day.`,
 					},
-					"error_code": schema.NumberAttribute{
+					"error_code": schema.Float64Attribute{
 						Computed:    true,
 						Description: `Set a custom error code to return when the rate limit is exceeded.`,
 					},
@@ -83,7 +82,7 @@ func (r *PluginRateLimitingDataSource) Schema(ctx context.Context, req datasourc
 						Computed:    true,
 						Description: `Optionally hide informative response headers.`,
 					},
-					"hour": schema.NumberAttribute{
+					"hour": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per hour.`,
 					},
@@ -91,11 +90,11 @@ func (r *PluginRateLimitingDataSource) Schema(ctx context.Context, req datasourc
 						Computed:    true,
 						Description: `The entity that is used when aggregating the limits.`,
 					},
-					"minute": schema.NumberAttribute{
+					"minute": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per minute.`,
 					},
-					"month": schema.NumberAttribute{
+					"month": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per month.`,
 					},
@@ -149,15 +148,15 @@ func (r *PluginRateLimitingDataSource) Schema(ctx context.Context, req datasourc
 						},
 						Description: `Redis configuration`,
 					},
-					"second": schema.NumberAttribute{
+					"second": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per second.`,
 					},
-					"sync_rate": schema.NumberAttribute{
+					"sync_rate": schema.Float64Attribute{
 						Computed:    true,
 						Description: `How often to sync counter data to the central data store. A value of -1 results in synchronous behavior.`,
 					},
-					"year": schema.NumberAttribute{
+					"year": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The number of HTTP requests that can be made per year.`,
 					},
@@ -308,13 +307,13 @@ func (r *PluginRateLimitingDataSource) Read(ctx context.Context, req datasource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetRatelimitingPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetRatelimitingPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetRatelimitingPlugin(ctx, request)
+	res, err := r.client.Plugins.GetRatelimitingPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -326,10 +325,6 @@ func (r *PluginRateLimitingDataSource) Read(ctx context.Context, req datasource.
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -338,7 +333,11 @@ func (r *PluginRateLimitingDataSource) Read(ctx context.Context, req datasource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedRateLimitingPlugin(res.RateLimitingPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedRateLimitingPlugin(ctx, res.RateLimitingPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

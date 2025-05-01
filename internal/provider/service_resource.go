@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -217,8 +216,13 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request := *data.ToSharedService()
-	res, err := r.client.Services.CreateService(ctx, request)
+	request, requestDiags := data.ToSharedService(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Services.CreateService(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -238,15 +242,24 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res.Service)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
-	var serviceIDOrName string
-	serviceIDOrName = data.ID.ValueString()
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res.Service)...)
 
-	request1 := operations.GetServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res1, err := r.client.Services.GetService(ctx, request1)
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	request1, request1Diags := data.ToOperationsGetServiceRequest(ctx)
+	resp.Diagnostics.Append(request1Diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res1, err := r.client.Services.GetService(ctx, *request1)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res1 != nil && res1.RawResponse != nil {
@@ -266,8 +279,17 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res1.Service)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res1.Service)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -291,13 +313,13 @@ func (r *ServiceResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	var serviceIDOrName string
-	serviceIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetServiceRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Services.GetService(ctx, request)
+	res, err := r.client.Services.GetService(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -321,7 +343,11 @@ func (r *ServiceResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res.Service)
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res.Service)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -341,15 +367,13 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	var serviceIDOrName string
-	serviceIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertServiceRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	service := *data.ToSharedService()
-	request := operations.UpsertServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
-		Service:         service,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Services.UpsertService(ctx, request)
+	res, err := r.client.Services.UpsertService(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -369,15 +393,24 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res.Service)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
-	var serviceIDOrName1 string
-	serviceIDOrName1 = data.ID.ValueString()
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res.Service)...)
 
-	request1 := operations.GetServiceRequest{
-		ServiceIDOrName: serviceIDOrName1,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res1, err := r.client.Services.GetService(ctx, request1)
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	request1, request1Diags := data.ToOperationsGetServiceRequest(ctx)
+	resp.Diagnostics.Append(request1Diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res1, err := r.client.Services.GetService(ctx, *request1)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res1 != nil && res1.RawResponse != nil {
@@ -397,8 +430,17 @@ func (r *ServiceResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res1.RawResponse))
 		return
 	}
-	data.RefreshFromSharedServiceOutput(res1.Service)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedServiceOutput(ctx, res1.Service)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -422,13 +464,13 @@ func (r *ServiceResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	var serviceIDOrName string
-	serviceIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteServiceRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Services.DeleteService(ctx, request)
+	res, err := r.client.Services.DeleteService(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

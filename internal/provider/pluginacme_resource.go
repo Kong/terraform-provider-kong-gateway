@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
@@ -132,7 +131,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Optional:    true,
 						Description: `A boolean value that controls whether to include the IPv4 address in the common name field of generated certificates.`,
 					},
-					"fail_backoff_minutes": schema.NumberAttribute{
+					"fail_backoff_minutes": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
 						MarkdownDescription: `Minutes to wait for each domain that fails to create a certificate. This applies to both a` + "\n" +
@@ -143,7 +142,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Optional:    true,
 						Description: `A string value that specifies the preferred certificate chain to use when generating certificates.`,
 					},
-					"renew_threshold_days": schema.NumberAttribute{
+					"renew_threshold_days": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Days remaining to renew the certificate before it expires.`,
@@ -205,7 +204,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 											int64validator.AtMost(65535),
 										},
 									},
-									"timeout": schema.NumberAttribute{
+									"timeout": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Timeout in milliseconds.`,
@@ -243,7 +242,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 												Optional:    true,
 												Description: `A namespace to prepend to all keys stored in Redis.`,
 											},
-											"scan_count": schema.NumberAttribute{
+											"scan_count": schema.Float64Attribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `The number of keys to return in Redis SCAN calls.`,
@@ -363,7 +362,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 											int64validator.AtMost(65535),
 										},
 									},
-									"timeout": schema.NumberAttribute{
+									"timeout": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Timeout in milliseconds.`,
@@ -522,8 +521,13 @@ func (r *PluginAcmeResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request := *data.ToSharedAcmePlugin()
-	res, err := r.client.Plugins.CreateAcmePlugin(ctx, request)
+	request, requestDiags := data.ToSharedAcmePlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAcmePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -543,8 +547,17 @@ func (r *PluginAcmeResource) Create(ctx context.Context, req resource.CreateRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAcmePlugin(res.AcmePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAcmePlugin(ctx, res.AcmePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -568,13 +581,13 @@ func (r *PluginAcmeResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAcmePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAcmePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAcmePlugin(ctx, request)
+	res, err := r.client.Plugins.GetAcmePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -598,7 +611,11 @@ func (r *PluginAcmeResource) Read(ctx context.Context, req resource.ReadRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAcmePlugin(res.AcmePlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAcmePlugin(ctx, res.AcmePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -618,15 +635,13 @@ func (r *PluginAcmeResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAcmePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	acmePlugin := *data.ToSharedAcmePlugin()
-	request := operations.UpdateAcmePluginRequest{
-		PluginID:   pluginID,
-		AcmePlugin: acmePlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAcmePlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAcmePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -646,8 +661,17 @@ func (r *PluginAcmeResource) Update(ctx context.Context, req resource.UpdateRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAcmePlugin(res.AcmePlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAcmePlugin(ctx, res.AcmePlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -671,13 +695,13 @@ func (r *PluginAcmeResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAcmePluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAcmePluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAcmePlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAcmePlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

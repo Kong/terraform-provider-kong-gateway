@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -219,8 +218,13 @@ func (r *PluginTLSHandshakeModifierResource) Create(ctx context.Context, req res
 		return
 	}
 
-	request := *data.ToSharedTLSHandshakeModifierPlugin()
-	res, err := r.client.Plugins.CreateTlshandshakemodifierPlugin(ctx, request)
+	request, requestDiags := data.ToSharedTLSHandshakeModifierPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -240,8 +244,17 @@ func (r *PluginTLSHandshakeModifierResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSHandshakeModifierPlugin(res.TLSHandshakeModifierPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSHandshakeModifierPlugin(ctx, res.TLSHandshakeModifierPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -265,13 +278,13 @@ func (r *PluginTLSHandshakeModifierResource) Read(ctx context.Context, req resou
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetTlshandshakemodifierPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetTlshandshakemodifierPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetTlshandshakemodifierPlugin(ctx, request)
+	res, err := r.client.Plugins.GetTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -295,7 +308,11 @@ func (r *PluginTLSHandshakeModifierResource) Read(ctx context.Context, req resou
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSHandshakeModifierPlugin(res.TLSHandshakeModifierPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSHandshakeModifierPlugin(ctx, res.TLSHandshakeModifierPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -315,15 +332,13 @@ func (r *PluginTLSHandshakeModifierResource) Update(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateTlshandshakemodifierPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	tlsHandshakeModifierPlugin := *data.ToSharedTLSHandshakeModifierPlugin()
-	request := operations.UpdateTlshandshakemodifierPluginRequest{
-		PluginID:                   pluginID,
-		TLSHandshakeModifierPlugin: tlsHandshakeModifierPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateTlshandshakemodifierPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -343,8 +358,17 @@ func (r *PluginTLSHandshakeModifierResource) Update(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedTLSHandshakeModifierPlugin(res.TLSHandshakeModifierPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedTLSHandshakeModifierPlugin(ctx, res.TLSHandshakeModifierPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -368,13 +392,13 @@ func (r *PluginTLSHandshakeModifierResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteTlshandshakemodifierPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteTlshandshakemodifierPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteTlshandshakemodifierPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

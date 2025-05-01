@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents() *shared.KeyAuthWithoutParents {
+func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents(ctx context.Context) (*shared.KeyAuthWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.KeyAuthWithoutParentsConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -36,9 +41,15 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents() *shared.KeyAuthWi
 	var key string
 	key = r.Key.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
+	}
+	ttl := new(int64)
+	if !r.TTL.IsUnknown() && !r.TTL.IsNull() {
+		*ttl = r.TTL.ValueInt64()
+	} else {
+		ttl = nil
 	}
 	out := shared.KeyAuthWithoutParents{
 		Consumer:  consumer,
@@ -46,29 +57,36 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents() *shared.KeyAuthWi
 		ID:        id1,
 		Key:       key,
 		Tags:      tags,
+		TTL:       ttl,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *KeyAuthResourceModel) RefreshFromSharedKeyAuth(resp *shared.KeyAuth) {
-	if resp != nil {
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Key = types.StringValue(resp.Key)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
+func (r *KeyAuthResourceModel) ToOperationsCreateKeyAuthWithConsumerRequest(ctx context.Context) (*operations.CreateKeyAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	keyAuthWithoutParents, keyAuthWithoutParentsDiags := r.ToSharedKeyAuthWithoutParents(ctx)
+	diags.Append(keyAuthWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateKeyAuthWithConsumerRequest{
+		ConsumerID:            consumerID,
+		KeyAuthWithoutParents: *keyAuthWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *KeyAuthResourceModel) ToSharedKeyAuth() *shared.KeyAuth {
+func (r *KeyAuthResourceModel) ToSharedKeyAuth(ctx context.Context) (*shared.KeyAuth, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	var consumer *shared.KeyAuthConsumer
 	if r.Consumer != nil {
 		id := new(string)
@@ -96,9 +114,15 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuth() *shared.KeyAuth {
 	var key string
 	key = r.Key.ValueString()
 
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
+	}
+	ttl := new(int64)
+	if !r.TTL.IsUnknown() && !r.TTL.IsNull() {
+		*ttl = r.TTL.ValueInt64()
+	} else {
+		ttl = nil
 	}
 	out := shared.KeyAuth{
 		Consumer:  consumer,
@@ -106,6 +130,90 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuth() *shared.KeyAuth {
 		ID:        id1,
 		Key:       key,
 		Tags:      tags,
+		TTL:       ttl,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *KeyAuthResourceModel) ToOperationsUpdateKeyAuthWithConsumerRequest(ctx context.Context) (*operations.UpdateKeyAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var keyAuthID string
+	keyAuthID = r.ID.ValueString()
+
+	keyAuth, keyAuthDiags := r.ToSharedKeyAuth(ctx)
+	diags.Append(keyAuthDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
+		KeyAuth:    *keyAuth,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyAuthResourceModel) ToOperationsGetKeyAuthWithConsumerRequest(ctx context.Context) (*operations.GetKeyAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var keyAuthID string
+	keyAuthID = r.ID.ValueString()
+
+	out := operations.GetKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyAuthResourceModel) ToOperationsDeleteKeyAuthWithConsumerRequest(ctx context.Context) (*operations.DeleteKeyAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var keyAuthID string
+	keyAuthID = r.ID.ValueString()
+
+	out := operations.DeleteKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyAuthResourceModel) RefreshFromSharedKeyAuth(ctx context.Context, resp *shared.KeyAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Key = types.StringValue(resp.Key)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+		r.TTL = types.Int64PointerValue(resp.TTL)
+	}
+
+	return diags
 }

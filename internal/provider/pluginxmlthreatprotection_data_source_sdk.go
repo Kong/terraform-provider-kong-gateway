@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginXMLThreatProtectionDataSourceModel) RefreshFromSharedXMLThreatProtectionPlugin(resp *shared.XMLThreatProtectionPlugin) {
+func (r *PluginXMLThreatProtectionDataSourceModel) ToOperationsGetXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.GetXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetXmlthreatprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionDataSourceModel) RefreshFromSharedXMLThreatProtectionPlugin(ctx context.Context, resp *shared.XMLThreatProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -21,11 +38,7 @@ func (r *PluginXMLThreatProtectionDataSourceModel) RefreshFromSharedXMLThreatPro
 				r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
 			}
 			r.Config.Attribute = types.Int64PointerValue(resp.Config.Attribute)
-			if resp.Config.BlaMaxAmplification != nil {
-				r.Config.BlaMaxAmplification = types.NumberValue(big.NewFloat(float64(*resp.Config.BlaMaxAmplification)))
-			} else {
-				r.Config.BlaMaxAmplification = types.NumberNull()
-			}
+			r.Config.BlaMaxAmplification = types.Float64PointerValue(resp.Config.BlaMaxAmplification)
 			r.Config.BlaThreshold = types.Int64PointerValue(resp.Config.BlaThreshold)
 			r.Config.Buffer = types.Int64PointerValue(resp.Config.Buffer)
 			r.Config.CheckedContentTypes = make([]types.String, 0, len(resp.Config.CheckedContentTypes))
@@ -88,16 +101,16 @@ func (r *PluginXMLThreatProtectionDataSourceModel) RefreshFromSharedXMLThreatPro
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -123,4 +136,6 @@ func (r *PluginXMLThreatProtectionDataSourceModel) RefreshFromSharedXMLThreatPro
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

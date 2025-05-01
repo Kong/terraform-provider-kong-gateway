@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
+func (r *PluginCorsResourceModel) ToSharedCorsPlugin(ctx context.Context) (*shared.CorsPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 	if r.Ordering != nil {
 		var after *shared.CorsPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 		}
 		var before *shared.CorsPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 			Before: before,
 		}
 	}
-	var partials []shared.CorsPluginPartials = []shared.CorsPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.CorsPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.CorsPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.CorsPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.CorsPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -99,31 +106,37 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 	}
 	var config *shared.CorsPluginConfig
 	if r.Config != nil {
+		allowOriginAbsent := new(bool)
+		if !r.Config.AllowOriginAbsent.IsUnknown() && !r.Config.AllowOriginAbsent.IsNull() {
+			*allowOriginAbsent = r.Config.AllowOriginAbsent.ValueBool()
+		} else {
+			allowOriginAbsent = nil
+		}
 		credentials := new(bool)
 		if !r.Config.Credentials.IsUnknown() && !r.Config.Credentials.IsNull() {
 			*credentials = r.Config.Credentials.ValueBool()
 		} else {
 			credentials = nil
 		}
-		var exposedHeaders []string = []string{}
+		exposedHeaders := make([]string, 0, len(r.Config.ExposedHeaders))
 		for _, exposedHeadersItem := range r.Config.ExposedHeaders {
 			exposedHeaders = append(exposedHeaders, exposedHeadersItem.ValueString())
 		}
-		var headers []string = []string{}
+		headers := make([]string, 0, len(r.Config.Headers))
 		for _, headersItem := range r.Config.Headers {
 			headers = append(headers, headersItem.ValueString())
 		}
 		maxAge := new(float64)
 		if !r.Config.MaxAge.IsUnknown() && !r.Config.MaxAge.IsNull() {
-			*maxAge, _ = r.Config.MaxAge.ValueBigFloat().Float64()
+			*maxAge = r.Config.MaxAge.ValueFloat64()
 		} else {
 			maxAge = nil
 		}
-		var methods []shared.Methods = []shared.Methods{}
+		methods := make([]shared.Methods, 0, len(r.Config.Methods))
 		for _, methodsItem := range r.Config.Methods {
 			methods = append(methods, shared.Methods(methodsItem.ValueString()))
 		}
-		var origins []string = []string{}
+		origins := make([]string, 0, len(r.Config.Origins))
 		for _, originsItem := range r.Config.Origins {
 			origins = append(origins, originsItem.ValueString())
 		}
@@ -140,6 +153,7 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 			privateNetwork = nil
 		}
 		config = &shared.CorsPluginConfig{
+			AllowOriginAbsent: allowOriginAbsent,
 			Credentials:       credentials,
 			ExposedHeaders:    exposedHeaders,
 			Headers:           headers,
@@ -150,7 +164,7 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 			PrivateNetwork:    privateNetwork,
 		}
 	}
-	var protocols []shared.CorsPluginProtocols = []shared.CorsPluginProtocols{}
+	protocols := make([]shared.CorsPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.CorsPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -192,15 +206,66 @@ func (r *PluginCorsResourceModel) ToSharedCorsPlugin() *shared.CorsPlugin {
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(resp *shared.CorsPlugin) {
+func (r *PluginCorsResourceModel) ToOperationsUpdateCorsPluginRequest(ctx context.Context) (*operations.UpdateCorsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	corsPlugin, corsPluginDiags := r.ToSharedCorsPlugin(ctx)
+	diags.Append(corsPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateCorsPluginRequest{
+		PluginID:   pluginID,
+		CorsPlugin: *corsPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCorsResourceModel) ToOperationsGetCorsPluginRequest(ctx context.Context) (*operations.GetCorsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetCorsPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCorsResourceModel) ToOperationsDeleteCorsPluginRequest(ctx context.Context) (*operations.DeleteCorsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteCorsPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(ctx context.Context, resp *shared.CorsPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.CorsPluginConfig{}
+			r.Config.AllowOriginAbsent = types.BoolPointerValue(resp.Config.AllowOriginAbsent)
 			r.Config.Credentials = types.BoolPointerValue(resp.Config.Credentials)
 			r.Config.ExposedHeaders = make([]types.String, 0, len(resp.Config.ExposedHeaders))
 			for _, v := range resp.Config.ExposedHeaders {
@@ -210,11 +275,7 @@ func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(resp *shared.CorsP
 			for _, v := range resp.Config.Headers {
 				r.Config.Headers = append(r.Config.Headers, types.StringValue(v))
 			}
-			if resp.Config.MaxAge != nil {
-				r.Config.MaxAge = types.NumberValue(big.NewFloat(float64(*resp.Config.MaxAge)))
-			} else {
-				r.Config.MaxAge = types.NumberNull()
-			}
+			r.Config.MaxAge = types.Float64PointerValue(resp.Config.MaxAge)
 			r.Config.Methods = make([]types.String, 0, len(resp.Config.Methods))
 			for _, v := range resp.Config.Methods {
 				r.Config.Methods = append(r.Config.Methods, types.StringValue(string(v)))
@@ -259,16 +320,16 @@ func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(resp *shared.CorsP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -294,4 +355,6 @@ func (r *PluginCorsResourceModel) RefreshFromSharedCorsPlugin(resp *shared.CorsP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

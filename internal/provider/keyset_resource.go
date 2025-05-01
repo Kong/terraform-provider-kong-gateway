@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -109,8 +108,13 @@ func (r *KeySetResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	request := *data.ToSharedKeySet()
-	res, err := r.client.KeySets.CreateKeySet(ctx, request)
+	request, requestDiags := data.ToSharedKeySet(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.KeySets.CreateKeySet(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -130,8 +134,17 @@ func (r *KeySetResource) Create(ctx context.Context, req resource.CreateRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeySet(res.KeySet)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeySet(ctx, res.KeySet)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -155,13 +168,13 @@ func (r *KeySetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	var keySetIDOrName string
-	keySetIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetKeySetRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetKeySetRequest{
-		KeySetIDOrName: keySetIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.KeySets.GetKeySet(ctx, request)
+	res, err := r.client.KeySets.GetKeySet(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -185,7 +198,11 @@ func (r *KeySetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeySet(res.KeySet)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeySet(ctx, res.KeySet)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -205,15 +222,13 @@ func (r *KeySetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	var keySetIDOrName string
-	keySetIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpsertKeySetRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	keySet := *data.ToSharedKeySet()
-	request := operations.UpsertKeySetRequest{
-		KeySetIDOrName: keySetIDOrName,
-		KeySet:         keySet,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.KeySets.UpsertKeySet(ctx, request)
+	res, err := r.client.KeySets.UpsertKeySet(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -233,8 +248,17 @@ func (r *KeySetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeySet(res.KeySet)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeySet(ctx, res.KeySet)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -258,13 +282,13 @@ func (r *KeySetResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	var keySetIDOrName string
-	keySetIDOrName = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteKeySetRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteKeySetRequest{
-		KeySetIDOrName: keySetIDOrName,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.KeySets.DeleteKeySet(ctx, request)
+	res, err := r.client.KeySets.DeleteKeySet(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

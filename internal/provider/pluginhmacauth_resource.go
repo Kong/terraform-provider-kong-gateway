@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -69,7 +68,7 @@ func (r *PluginHmacAuthResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						Description: `An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails.`,
 					},
-					"clock_skew": schema.NumberAttribute{
+					"clock_skew": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Clock skew in seconds to prevent replay attacks.`,
@@ -247,8 +246,13 @@ func (r *PluginHmacAuthResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	request := *data.ToSharedHmacAuthPlugin()
-	res, err := r.client.Plugins.CreateHmacauthPlugin(ctx, request)
+	request, requestDiags := data.ToSharedHmacAuthPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateHmacauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -268,8 +272,17 @@ func (r *PluginHmacAuthResource) Create(ctx context.Context, req resource.Create
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHmacAuthPlugin(res.HmacAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHmacAuthPlugin(ctx, res.HmacAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -293,13 +306,13 @@ func (r *PluginHmacAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetHmacauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetHmacauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetHmacauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetHmacauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -323,7 +336,11 @@ func (r *PluginHmacAuthResource) Read(ctx context.Context, req resource.ReadRequ
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHmacAuthPlugin(res.HmacAuthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedHmacAuthPlugin(ctx, res.HmacAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -343,15 +360,13 @@ func (r *PluginHmacAuthResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateHmacauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	hmacAuthPlugin := *data.ToSharedHmacAuthPlugin()
-	request := operations.UpdateHmacauthPluginRequest{
-		PluginID:       pluginID,
-		HmacAuthPlugin: hmacAuthPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateHmacauthPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateHmacauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -371,8 +386,17 @@ func (r *PluginHmacAuthResource) Update(ctx context.Context, req resource.Update
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedHmacAuthPlugin(res.HmacAuthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedHmacAuthPlugin(ctx, res.HmacAuthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -396,13 +420,13 @@ func (r *PluginHmacAuthResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteHmacauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteHmacauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteHmacauthPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteHmacauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

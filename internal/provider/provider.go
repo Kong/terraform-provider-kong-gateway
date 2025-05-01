@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,8 @@ import (
 	"net/http"
 )
 
-var _ provider.Provider = &KongGatewayProvider{}
+var _ provider.Provider = (*KongGatewayProvider)(nil)
+var _ provider.ProviderWithEphemeralResources = (*KongGatewayProvider)(nil)
 
 type KongGatewayProvider struct {
 	// version is set to the provider version on release, "dev" when the
@@ -94,6 +96,7 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 	client := sdk.New(opts...)
 
 	resp.DataSourceData = client
+	resp.EphemeralResourceData = client
 	resp.ResourceData = client
 }
 
@@ -122,9 +125,11 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginAiPromptTemplateResource,
 		NewPluginAiProxyResource,
 		NewPluginAiProxyAdvancedResource,
+		NewPluginAiRagInjectorResource,
 		NewPluginAiRateLimitingAdvancedResource,
 		NewPluginAiRequestTransformerResource,
 		NewPluginAiResponseTransformerResource,
+		NewPluginAiSanitizerResource,
 		NewPluginAiSemanticCacheResource,
 		NewPluginAiSemanticPromptGuardResource,
 		NewPluginAwsLambdaResource,
@@ -133,6 +138,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginBotDetectionResource,
 		NewPluginCanaryResource,
 		NewPluginConfluentResource,
+		NewPluginConfluentConsumeResource,
 		NewPluginCorrelationIDResource,
 		NewPluginCorsResource,
 		NewPluginDatadogResource,
@@ -155,6 +161,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginJweDecryptResource,
 		NewPluginJwtResource,
 		NewPluginJwtSignerResource,
+		NewPluginKafkaConsumeResource,
 		NewPluginKafkaLogResource,
 		NewPluginKafkaUpstreamResource,
 		NewPluginKeyAuthResource,
@@ -178,6 +185,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginRateLimitingResource,
 		NewPluginRateLimitingAdvancedResource,
 		NewPluginRedirectResource,
+		NewPluginRequestCalloutResource,
 		NewPluginRequestSizeLimitingResource,
 		NewPluginRequestTerminationResource,
 		NewPluginRequestTransformerResource,
@@ -240,9 +248,11 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginAiPromptTemplateDataSource,
 		NewPluginAiProxyDataSource,
 		NewPluginAiProxyAdvancedDataSource,
+		NewPluginAiRagInjectorDataSource,
 		NewPluginAiRateLimitingAdvancedDataSource,
 		NewPluginAiRequestTransformerDataSource,
 		NewPluginAiResponseTransformerDataSource,
+		NewPluginAiSanitizerDataSource,
 		NewPluginAiSemanticCacheDataSource,
 		NewPluginAiSemanticPromptGuardDataSource,
 		NewPluginAwsLambdaDataSource,
@@ -251,6 +261,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginBotDetectionDataSource,
 		NewPluginCanaryDataSource,
 		NewPluginConfluentDataSource,
+		NewPluginConfluentConsumeDataSource,
 		NewPluginCorrelationIDDataSource,
 		NewPluginCorsDataSource,
 		NewPluginDatadogDataSource,
@@ -273,6 +284,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginJweDecryptDataSource,
 		NewPluginJwtDataSource,
 		NewPluginJwtSignerDataSource,
+		NewPluginKafkaConsumeDataSource,
 		NewPluginKafkaLogDataSource,
 		NewPluginKafkaUpstreamDataSource,
 		NewPluginKeyAuthDataSource,
@@ -296,6 +308,7 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewPluginRateLimitingDataSource,
 		NewPluginRateLimitingAdvancedDataSource,
 		NewPluginRedirectDataSource,
+		NewPluginRequestCalloutDataSource,
 		NewPluginRequestSizeLimitingDataSource,
 		NewPluginRequestTerminationDataSource,
 		NewPluginRequestTransformerDataSource,
@@ -332,6 +345,10 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 		NewUpstreamDataSource,
 		NewVaultDataSource,
 	}
+}
+
+func (p *KongGatewayProvider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
+	return []func() ephemeral.EphemeralResource{}
 }
 
 func New(version string) func() provider.Provider {

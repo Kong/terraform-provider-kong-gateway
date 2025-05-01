@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -94,7 +93,7 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 						Optional:    true,
 						Description: `Set to ` + "`" + `true` + "`" + ` to authenticate the Azure Functions server.`,
 					},
-					"keepalive": schema.NumberAttribute{
+					"keepalive": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Time in milliseconds during which an idle connection to the Azure Functions server lives before being closed.`,
@@ -104,7 +103,7 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 						Optional:    true,
 						Description: `Route prefix to use.`,
 					},
-					"timeout": schema.NumberAttribute{
+					"timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Timeout in milliseconds before closing a connection to the Azure Functions server.`,
@@ -272,8 +271,13 @@ func (r *PluginAzureFunctionsResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	request := *data.ToSharedAzureFunctionsPlugin()
-	res, err := r.client.Plugins.CreateAzurefunctionsPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAzureFunctionsPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAzurefunctionsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -293,8 +297,17 @@ func (r *PluginAzureFunctionsResource) Create(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAzureFunctionsPlugin(res.AzureFunctionsPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAzureFunctionsPlugin(ctx, res.AzureFunctionsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -318,13 +331,13 @@ func (r *PluginAzureFunctionsResource) Read(ctx context.Context, req resource.Re
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAzurefunctionsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAzurefunctionsPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAzurefunctionsPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAzurefunctionsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -348,7 +361,11 @@ func (r *PluginAzureFunctionsResource) Read(ctx context.Context, req resource.Re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAzureFunctionsPlugin(res.AzureFunctionsPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAzureFunctionsPlugin(ctx, res.AzureFunctionsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -368,15 +385,13 @@ func (r *PluginAzureFunctionsResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAzurefunctionsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	azureFunctionsPlugin := *data.ToSharedAzureFunctionsPlugin()
-	request := operations.UpdateAzurefunctionsPluginRequest{
-		PluginID:             pluginID,
-		AzureFunctionsPlugin: azureFunctionsPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAzurefunctionsPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAzurefunctionsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -396,8 +411,17 @@ func (r *PluginAzureFunctionsResource) Update(ctx context.Context, req resource.
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAzureFunctionsPlugin(res.AzureFunctionsPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAzureFunctionsPlugin(ctx, res.AzureFunctionsPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -421,13 +445,13 @@ func (r *PluginAzureFunctionsResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAzurefunctionsPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAzurefunctionsPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAzurefunctionsPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAzurefunctionsPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -132,15 +131,13 @@ func (r *MTLSAuthResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateMtlsAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	mtlsAuthWithoutParents := *data.ToSharedMTLSAuthWithoutParents()
-	request := operations.CreateMtlsAuthWithConsumerRequest{
-		ConsumerID:             consumerID,
-		MTLSAuthWithoutParents: mtlsAuthWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.MTLSAuthCredentials.CreateMtlsAuthWithConsumer(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.CreateMtlsAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -160,8 +157,17 @@ func (r *MTLSAuthResource) Create(ctx context.Context, req resource.CreateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMTLSAuth(res.MTLSAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedMTLSAuth(ctx, res.MTLSAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -185,17 +191,13 @@ func (r *MTLSAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetMtlsAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var mtlsAuthID string
-	mtlsAuthID = data.ID.ValueString()
-
-	request := operations.GetMtlsAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		MTLSAuthID: mtlsAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.MTLSAuthCredentials.GetMtlsAuthWithConsumer(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.GetMtlsAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -219,7 +221,11 @@ func (r *MTLSAuthResource) Read(ctx context.Context, req resource.ReadRequest, r
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMTLSAuth(res.MTLSAuth)
+	resp.Diagnostics.Append(data.RefreshFromSharedMTLSAuth(ctx, res.MTLSAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -239,19 +245,13 @@ func (r *MTLSAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateMtlsAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var mtlsAuthID string
-	mtlsAuthID = data.ID.ValueString()
-
-	mtlsAuth := *data.ToSharedMTLSAuth()
-	request := operations.UpdateMtlsAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		MTLSAuthID: mtlsAuthID,
-		MTLSAuth:   mtlsAuth,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.MTLSAuthCredentials.UpdateMtlsAuthWithConsumer(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.UpdateMtlsAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -271,8 +271,17 @@ func (r *MTLSAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedMTLSAuth(res.MTLSAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedMTLSAuth(ctx, res.MTLSAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -296,17 +305,13 @@ func (r *MTLSAuthResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteMtlsAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var mtlsAuthID string
-	mtlsAuthID = data.ID.ValueString()
-
-	request := operations.DeleteMtlsAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		MTLSAuthID: mtlsAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.MTLSAuthCredentials.DeleteMtlsAuthWithConsumer(ctx, request)
+	res, err := r.client.MTLSAuthCredentials.DeleteMtlsAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -334,7 +339,7 @@ func (r *MTLSAuthResource) ImportState(ctx context.Context, req resource.ImportS
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "mtls_auth_id": ""}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": ""}': `+err.Error())
 		return
 	}
 

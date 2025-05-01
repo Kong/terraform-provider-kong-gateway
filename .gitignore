@@ -1,3 +1,5 @@
+**/.speakeasy/temp/
+**/.speakeasy/logs/
 .terraform
 .terraform*
 *.tfstate*

@@ -1,5 +1,5 @@
 workflowVersion: 1.0.0
-speakeasyVersion: 1.529.1
+speakeasyVersion: 1.541.2
 sources:
   gateway:
     inputs:

@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCacheAdvancedPlugin() *shared.GraphqlProxyCacheAdvancedPlugin {
+func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCacheAdvancedPlugin(ctx context.Context) (*shared.GraphqlProxyCacheAdvancedPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 	if r.Ordering != nil {
 		var after *shared.GraphqlProxyCacheAdvancedPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 		}
 		var before *shared.GraphqlProxyCacheAdvancedPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 			Before: before,
 		}
 	}
-	var partials []shared.GraphqlProxyCacheAdvancedPluginPartials = []shared.GraphqlProxyCacheAdvancedPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.GraphqlProxyCacheAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.GraphqlProxyCacheAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.GraphqlProxyCacheAdvancedPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.GraphqlProxyCacheAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -130,7 +138,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 			} else {
 				clusterMaxRedirections = nil
 			}
-			var clusterNodes []shared.GraphqlProxyCacheAdvancedPluginClusterNodes = []shared.GraphqlProxyCacheAdvancedPluginClusterNodes{}
+			clusterNodes := make([]shared.GraphqlProxyCacheAdvancedPluginClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
 			for _, clusterNodesItem := range r.Config.Redis.ClusterNodes {
 				ip := new(string)
 				if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
@@ -215,7 +223,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 			} else {
 				sentinelMaster = nil
 			}
-			var sentinelNodes []shared.GraphqlProxyCacheAdvancedPluginSentinelNodes = []shared.GraphqlProxyCacheAdvancedPluginSentinelNodes{}
+			sentinelNodes := make([]shared.GraphqlProxyCacheAdvancedPluginSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
 			for _, sentinelNodesItem := range r.Config.Redis.SentinelNodes {
 				host1 := new(string)
 				if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
@@ -306,7 +314,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 		} else {
 			strategy = nil
 		}
-		var varyHeaders []string = []string{}
+		varyHeaders := make([]string, 0, len(r.Config.VaryHeaders))
 		for _, varyHeadersItem := range r.Config.VaryHeaders {
 			varyHeaders = append(varyHeaders, varyHeadersItem.ValueString())
 		}
@@ -331,7 +339,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 			ID: id2,
 		}
 	}
-	var protocols []shared.GraphqlProxyCacheAdvancedPluginProtocols = []shared.GraphqlProxyCacheAdvancedPluginProtocols{}
+	protocols := make([]shared.GraphqlProxyCacheAdvancedPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.GraphqlProxyCacheAdvancedPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -374,10 +382,60 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToSharedGraphqlProxyCache
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(resp *shared.GraphqlProxyCacheAdvancedPlugin) {
+func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToOperationsUpdateGraphqlproxycacheadvancedPluginRequest(ctx context.Context) (*operations.UpdateGraphqlproxycacheadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	graphqlProxyCacheAdvancedPlugin, graphqlProxyCacheAdvancedPluginDiags := r.ToSharedGraphqlProxyCacheAdvancedPlugin(ctx)
+	diags.Append(graphqlProxyCacheAdvancedPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateGraphqlproxycacheadvancedPluginRequest{
+		PluginID:                        pluginID,
+		GraphqlProxyCacheAdvancedPlugin: *graphqlProxyCacheAdvancedPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToOperationsGetGraphqlproxycacheadvancedPluginRequest(ctx context.Context) (*operations.GetGraphqlproxycacheadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetGraphqlproxycacheadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGraphqlProxyCacheAdvancedResourceModel) ToOperationsDeleteGraphqlproxycacheadvancedPluginRequest(ctx context.Context) (*operations.DeleteGraphqlproxycacheadvancedPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteGraphqlproxycacheadvancedPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlProxyCacheAdvancedPlugin(ctx context.Context, resp *shared.GraphqlProxyCacheAdvancedPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -401,14 +459,14 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlP
 					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
 				}
 				for clusterNodesCount, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes1 tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes1.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes1.Port = types.Int64PointerValue(clusterNodesItem.Port)
+					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
 					if clusterNodesCount+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes1)
+						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
 					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes1.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes1.Port
+						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
+						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
 					}
 				}
 				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
@@ -427,14 +485,14 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlP
 					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
 				}
 				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes1 tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes1.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes1.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
 					if sentinelNodesCount+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes1)
+						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
 					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes1.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes1.Port
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
+						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
 					}
 				}
 				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
@@ -498,16 +556,16 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlP
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -533,4 +591,6 @@ func (r *PluginGraphqlProxyCacheAdvancedResourceModel) RefreshFromSharedGraphqlP
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

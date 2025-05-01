@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -159,15 +158,13 @@ func (r *GatewayConsumerGroupMemberResource) Create(ctx context.Context, req res
 		return
 	}
 
-	var consumerGroupID string
-	consumerGroupID = data.ConsumerGroupID.ValueString()
+	request, requestDiags := data.ToOperationsAddConsumerToGroupRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	requestBody := data.ToOperationsAddConsumerToGroupRequestBody()
-	request := operations.AddConsumerToGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-		RequestBody:     requestBody,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ConsumerGroups.AddConsumerToGroup(ctx, request)
+	res, err := r.client.ConsumerGroups.AddConsumerToGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -187,8 +184,17 @@ func (r *GatewayConsumerGroupMemberResource) Create(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromOperationsAddConsumerToGroupResponseBody(res.Object)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromOperationsAddConsumerToGroupResponseBody(ctx, res.Object)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -256,17 +262,13 @@ func (r *GatewayConsumerGroupMemberResource) Delete(ctx context.Context, req res
 		return
 	}
 
-	var consumerGroupID string
-	consumerGroupID = data.ConsumerGroupID.ValueString()
+	request, requestDiags := data.ToOperationsRemoveConsumerFromGroupRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var consumerIDOrUsername string
-	consumerIDOrUsername = data.ConsumerIDOrUsername.ValueString()
-
-	request := operations.RemoveConsumerFromGroupRequest{
-		ConsumerGroupID:      consumerGroupID,
-		ConsumerIDOrUsername: consumerIDOrUsername,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.ConsumerGroups.RemoveConsumerFromGroup(ctx, request)
+	res, err := r.client.ConsumerGroups.RemoveConsumerFromGroup(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

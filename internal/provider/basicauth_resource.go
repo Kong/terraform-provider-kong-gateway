@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -126,15 +125,13 @@ func (r *BasicAuthResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateBasicAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	basicAuthWithoutParents := *data.ToSharedBasicAuthWithoutParents()
-	request := operations.CreateBasicAuthWithConsumerRequest{
-		ConsumerID:              consumerID,
-		BasicAuthWithoutParents: basicAuthWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.BasicAuthCredentials.CreateBasicAuthWithConsumer(ctx, request)
+	res, err := r.client.BasicAuthCredentials.CreateBasicAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -154,8 +151,17 @@ func (r *BasicAuthResource) Create(ctx context.Context, req resource.CreateReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBasicAuth(res.BasicAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedBasicAuth(ctx, res.BasicAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -179,17 +185,13 @@ func (r *BasicAuthResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetBasicAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var basicAuthID string
-	basicAuthID = data.ID.ValueString()
-
-	request := operations.GetBasicAuthWithConsumerRequest{
-		ConsumerID:  consumerID,
-		BasicAuthID: basicAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.BasicAuthCredentials.GetBasicAuthWithConsumer(ctx, request)
+	res, err := r.client.BasicAuthCredentials.GetBasicAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -213,7 +215,11 @@ func (r *BasicAuthResource) Read(ctx context.Context, req resource.ReadRequest, 
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBasicAuth(res.BasicAuth)
+	resp.Diagnostics.Append(data.RefreshFromSharedBasicAuth(ctx, res.BasicAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -233,19 +239,13 @@ func (r *BasicAuthResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateBasicAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var basicAuthID string
-	basicAuthID = data.ID.ValueString()
-
-	basicAuth := *data.ToSharedBasicAuth()
-	request := operations.UpdateBasicAuthWithConsumerRequest{
-		ConsumerID:  consumerID,
-		BasicAuthID: basicAuthID,
-		BasicAuth:   basicAuth,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.BasicAuthCredentials.UpdateBasicAuthWithConsumer(ctx, request)
+	res, err := r.client.BasicAuthCredentials.UpdateBasicAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -265,8 +265,17 @@ func (r *BasicAuthResource) Update(ctx context.Context, req resource.UpdateReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedBasicAuth(res.BasicAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedBasicAuth(ctx, res.BasicAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -290,17 +299,13 @@ func (r *BasicAuthResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteBasicAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var basicAuthID string
-	basicAuthID = data.ID.ValueString()
-
-	request := operations.DeleteBasicAuthWithConsumerRequest{
-		ConsumerID:  consumerID,
-		BasicAuthID: basicAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.BasicAuthCredentials.DeleteBasicAuthWithConsumer(ctx, request)
+	res, err := r.client.BasicAuthCredentials.DeleteBasicAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -328,7 +333,7 @@ func (r *BasicAuthResource) ImportState(ctx context.Context, req resource.Import
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "basic_auth_id": "80db1b58-ca7c-4d21-b92a-64eb07725872",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "id": "80db1b58-ca7c-4d21-b92a-64eb07725872",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
 		return
 	}
 

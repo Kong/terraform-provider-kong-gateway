@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PartialResourceModel) ToSharedPartial() *shared.Partial {
+func (r *PartialResourceModel) ToSharedPartial(ctx context.Context) (*shared.Partial, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	config := make(map[string]interface{})
 	for configKey, configValue := range r.Config {
 		var configInst interface{}
@@ -33,7 +38,7 @@ func (r *PartialResourceModel) ToSharedPartial() *shared.Partial {
 	} else {
 		name = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -55,10 +60,60 @@ func (r *PartialResourceModel) ToSharedPartial() *shared.Partial {
 		Type:      typeVar,
 		UpdatedAt: updatedAt,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PartialResourceModel) RefreshFromSharedPartial(resp *shared.Partial) {
+func (r *PartialResourceModel) ToOperationsUpsertPartialRequest(ctx context.Context) (*operations.UpsertPartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	partial, partialDiags := r.ToSharedPartial(ctx)
+	diags.Append(partialDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertPartialRequest{
+		PartialID: partialID,
+		Partial:   *partial,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialResourceModel) ToOperationsGetPartialRequest(ctx context.Context) (*operations.GetPartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	out := operations.GetPartialRequest{
+		PartialID: partialID,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialResourceModel) ToOperationsDeletePartialRequest(ctx context.Context) (*operations.DeletePartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	out := operations.DeletePartialRequest{
+		PartialID: partialID,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialResourceModel) RefreshFromSharedPartial(ctx context.Context, resp *shared.Partial) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if len(resp.Config) > 0 {
 			r.Config = make(map[string]types.String, len(resp.Config))
@@ -77,4 +132,6 @@ func (r *PartialResourceModel) RefreshFromSharedPartial(resp *shared.Partial) {
 		r.Type = types.StringValue(resp.Type)
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

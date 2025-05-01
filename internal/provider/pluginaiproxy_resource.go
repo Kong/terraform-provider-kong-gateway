@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -144,6 +144,18 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 							},
 						},
 					},
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"bedrock",
+								"gemini",
+								"openai",
+							),
+						},
+					},
 					"logging": schema.SingleNestedAttribute{
 						Computed: true,
 						Optional: true,
@@ -202,10 +214,25 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 										Computed: true,
 										Optional: true,
 										Attributes: map[string]schema.Attribute{
+											"aws_assume_role_arn": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+											},
 											"aws_region": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
 												Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+											},
+											"aws_role_session_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+											},
+											"aws_sts_endpoint_url": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
 											},
 										},
 									},
@@ -246,7 +273,7 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 											},
 										},
 									},
-									"input_cost": schema.NumberAttribute{
+									"input_cost": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Defines the cost per 1M tokens in your prompt.`,
@@ -279,15 +306,18 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 											),
 										},
 									},
-									"output_cost": schema.NumberAttribute{
+									"output_cost": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Defines the cost per 1M tokens in the output of the AI.`,
 									},
-									"temperature": schema.NumberAttribute{
+									"temperature": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Defines the matching temperature, if using chat or completion models.`,
+										Validators: []validator.Float64{
+											float64validator.AtMost(5),
+										},
 									},
 									"top_k": schema.Int64Attribute{
 										Computed:    true,
@@ -297,10 +327,13 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 											int64validator.AtMost(500),
 										},
 									},
-									"top_p": schema.NumberAttribute{
+									"top_p": schema.Float64Attribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Defines the top-p probability mass, if supported.`,
+										Validators: []validator.Float64{
+											float64validator.AtMost(1),
+										},
 									},
 									"upstream_path": schema.StringAttribute{
 										Computed:    true,
@@ -538,8 +571,13 @@ func (r *PluginAiProxyResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	request := *data.ToSharedAiProxyPlugin()
-	res, err := r.client.Plugins.CreateAiproxyPlugin(ctx, request)
+	request, requestDiags := data.ToSharedAiProxyPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateAiproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -559,8 +597,17 @@ func (r *PluginAiProxyResource) Create(ctx context.Context, req resource.CreateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyPlugin(res.AiProxyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyPlugin(ctx, res.AiProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -584,13 +631,13 @@ func (r *PluginAiProxyResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAiproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAiproxyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAiproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAiproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -614,7 +661,11 @@ func (r *PluginAiProxyResource) Read(ctx context.Context, req resource.ReadReque
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyPlugin(res.AiProxyPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyPlugin(ctx, res.AiProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -634,15 +685,13 @@ func (r *PluginAiProxyResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateAiproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	aiProxyPlugin := *data.ToSharedAiProxyPlugin()
-	request := operations.UpdateAiproxyPluginRequest{
-		PluginID:      pluginID,
-		AiProxyPlugin: aiProxyPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateAiproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateAiproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -662,8 +711,17 @@ func (r *PluginAiProxyResource) Update(ctx context.Context, req resource.UpdateR
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiProxyPlugin(res.AiProxyPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiProxyPlugin(ctx, res.AiProxyPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -687,13 +745,13 @@ func (r *PluginAiProxyResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteAiproxyPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteAiproxyPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteAiproxyPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteAiproxyPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

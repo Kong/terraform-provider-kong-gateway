@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlugin() *shared.InjectionProtectionPlugin {
+func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlugin(ctx context.Context) (*shared.InjectionProtectionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 	if r.Ordering != nil {
 		var after *shared.InjectionProtectionPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 		}
 		var before *shared.InjectionProtectionPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.InjectionProtectionPluginPartials = []shared.InjectionProtectionPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.InjectionProtectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.InjectionProtectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.InjectionProtectionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.InjectionProtectionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -98,7 +106,7 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 	}
 	var config *shared.InjectionProtectionPluginConfig
 	if r.Config != nil {
-		var customInjections []shared.CustomInjections = []shared.CustomInjections{}
+		customInjections := make([]shared.CustomInjections, 0, len(r.Config.CustomInjections))
 		for _, customInjectionsItem := range r.Config.CustomInjections {
 			var name1 string
 			name1 = customInjectionsItem.Name.ValueString()
@@ -129,11 +137,11 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 		} else {
 			errorStatusCode = nil
 		}
-		var injectionTypes []shared.InjectionTypes = []shared.InjectionTypes{}
+		injectionTypes := make([]shared.InjectionTypes, 0, len(r.Config.InjectionTypes))
 		for _, injectionTypesItem := range r.Config.InjectionTypes {
 			injectionTypes = append(injectionTypes, shared.InjectionTypes(injectionTypesItem.ValueString()))
 		}
-		var locations []shared.Locations = []shared.Locations{}
+		locations := make([]shared.Locations, 0, len(r.Config.Locations))
 		for _, locationsItem := range r.Config.Locations {
 			locations = append(locations, shared.Locations(locationsItem.ValueString()))
 		}
@@ -146,7 +154,7 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 			Locations:        locations,
 		}
 	}
-	var protocols []shared.InjectionProtectionPluginProtocols = []shared.InjectionProtectionPluginProtocols{}
+	protocols := make([]shared.InjectionProtectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.InjectionProtectionPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -188,10 +196,60 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProtectionPlugin(resp *shared.InjectionProtectionPlugin) {
+func (r *PluginInjectionProtectionResourceModel) ToOperationsUpdateInjectionprotectionPluginRequest(ctx context.Context) (*operations.UpdateInjectionprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	injectionProtectionPlugin, injectionProtectionPluginDiags := r.ToSharedInjectionProtectionPlugin(ctx)
+	diags.Append(injectionProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateInjectionprotectionPluginRequest{
+		PluginID:                  pluginID,
+		InjectionProtectionPlugin: *injectionProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginInjectionProtectionResourceModel) ToOperationsGetInjectionprotectionPluginRequest(ctx context.Context) (*operations.GetInjectionprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetInjectionprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginInjectionProtectionResourceModel) ToOperationsDeleteInjectionprotectionPluginRequest(ctx context.Context) (*operations.DeleteInjectionprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteInjectionprotectionPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProtectionPlugin(ctx context.Context, resp *shared.InjectionProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -202,14 +260,14 @@ func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProte
 				r.Config.CustomInjections = r.Config.CustomInjections[:len(resp.Config.CustomInjections)]
 			}
 			for customInjectionsCount, customInjectionsItem := range resp.Config.CustomInjections {
-				var customInjections1 tfTypes.CustomInjections
-				customInjections1.Name = types.StringValue(customInjectionsItem.Name)
-				customInjections1.Regex = types.StringValue(customInjectionsItem.Regex)
+				var customInjections tfTypes.CustomInjections
+				customInjections.Name = types.StringValue(customInjectionsItem.Name)
+				customInjections.Regex = types.StringValue(customInjectionsItem.Regex)
 				if customInjectionsCount+1 > len(r.Config.CustomInjections) {
-					r.Config.CustomInjections = append(r.Config.CustomInjections, customInjections1)
+					r.Config.CustomInjections = append(r.Config.CustomInjections, customInjections)
 				} else {
-					r.Config.CustomInjections[customInjectionsCount].Name = customInjections1.Name
-					r.Config.CustomInjections[customInjectionsCount].Regex = customInjections1.Regex
+					r.Config.CustomInjections[customInjectionsCount].Name = customInjections.Name
+					r.Config.CustomInjections[customInjectionsCount].Regex = customInjections.Regex
 				}
 			}
 			if resp.Config.EnforcementMode != nil {
@@ -261,16 +319,16 @@ func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProte
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -296,4 +354,6 @@ func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProte
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.ConfluentPlugin {
+func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Context) (*shared.ConfluentPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -37,7 +42,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 	if r.Ordering != nil {
 		var after *shared.ConfluentPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -47,7 +52,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 		}
 		var before *shared.ConfluentPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -60,33 +65,36 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 			Before: before,
 		}
 	}
-	var partials []shared.ConfluentPluginPartials = []shared.ConfluentPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.ConfluentPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ConfluentPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ConfluentPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.ConfluentPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -98,7 +106,11 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 	}
 	var config *shared.ConfluentPluginConfig
 	if r.Config != nil {
-		var bootstrapServers []shared.BootstrapServers = []shared.BootstrapServers{}
+		allowedTopics := make([]string, 0, len(r.Config.AllowedTopics))
+		for _, allowedTopicsItem := range r.Config.AllowedTopics {
+			allowedTopics = append(allowedTopics, allowedTopicsItem.ValueString())
+		}
+		bootstrapServers := make([]shared.BootstrapServers, 0, len(r.Config.BootstrapServers))
 		for _, bootstrapServersItem := range r.Config.BootstrapServers {
 			var host string
 			host = bootstrapServersItem.Host.ValueString()
@@ -177,6 +189,10 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 		} else {
 			keepaliveEnabled = nil
 		}
+		messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
+		for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
+			messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
+		}
 		producerAsync := new(bool)
 		if !r.Config.ProducerAsync.IsUnknown() && !r.Config.ProducerAsync.IsNull() {
 			*producerAsync = r.Config.ProducerAsync.ValueBool()
@@ -243,7 +259,14 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 		} else {
 			topic = nil
 		}
+		topicsQueryArg := new(string)
+		if !r.Config.TopicsQueryArg.IsUnknown() && !r.Config.TopicsQueryArg.IsNull() {
+			*topicsQueryArg = r.Config.TopicsQueryArg.ValueString()
+		} else {
+			topicsQueryArg = nil
+		}
 		config = &shared.ConfluentPluginConfig{
+			AllowedTopics:           allowedTopics,
 			BootstrapServers:        bootstrapServers,
 			ClusterAPIKey:           clusterAPIKey,
 			ClusterAPISecret:        clusterAPISecret,
@@ -256,6 +279,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 			ForwardURI:              forwardURI,
 			Keepalive:               keepalive,
 			KeepaliveEnabled:        keepaliveEnabled,
+			MessageByLuaFunctions:   messageByLuaFunctions,
 			ProducerAsync:           producerAsync,
 			ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
 			ProducerAsyncFlushTimeout:                    producerAsyncFlushTimeout,
@@ -267,6 +291,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 			ProducerRequestTimeout:                       producerRequestTimeout,
 			Timeout:                                      timeout,
 			Topic:                                        topic,
+			TopicsQueryArg:                               topicsQueryArg,
 		}
 	}
 	var consumer *shared.ConfluentPluginConsumer
@@ -281,7 +306,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 			ID: id2,
 		}
 	}
-	var protocols []shared.ConfluentPluginProtocols = []shared.ConfluentPluginProtocols{}
+	protocols := make([]shared.ConfluentPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.ConfluentPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -324,28 +349,82 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin() *shared.Conflue
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(resp *shared.ConfluentPlugin) {
+func (r *PluginConfluentResourceModel) ToOperationsUpdateConfluentPluginRequest(ctx context.Context) (*operations.UpdateConfluentPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	confluentPlugin, confluentPluginDiags := r.ToSharedConfluentPlugin(ctx)
+	diags.Append(confluentPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateConfluentPluginRequest{
+		PluginID:        pluginID,
+		ConfluentPlugin: *confluentPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginConfluentResourceModel) ToOperationsGetConfluentPluginRequest(ctx context.Context) (*operations.GetConfluentPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetConfluentPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginConfluentResourceModel) ToOperationsDeleteConfluentPluginRequest(ctx context.Context) (*operations.DeleteConfluentPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteConfluentPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx context.Context, resp *shared.ConfluentPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.ConfluentPluginConfig{}
+			r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
+			for _, v := range resp.Config.AllowedTopics {
+				r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
+			}
 			r.Config.BootstrapServers = []tfTypes.BootstrapServers{}
 			if len(r.Config.BootstrapServers) > len(resp.Config.BootstrapServers) {
 				r.Config.BootstrapServers = r.Config.BootstrapServers[:len(resp.Config.BootstrapServers)]
 			}
 			for bootstrapServersCount, bootstrapServersItem := range resp.Config.BootstrapServers {
-				var bootstrapServers1 tfTypes.BootstrapServers
-				bootstrapServers1.Host = types.StringValue(bootstrapServersItem.Host)
-				bootstrapServers1.Port = types.Int64Value(bootstrapServersItem.Port)
+				var bootstrapServers tfTypes.BootstrapServers
+				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
+				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
 				if bootstrapServersCount+1 > len(r.Config.BootstrapServers) {
-					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers1)
+					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
 				} else {
-					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers1.Host
-					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers1.Port
+					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers.Host
+					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers.Port
 				}
 			}
 			r.Config.ClusterAPIKey = types.StringPointerValue(resp.Config.ClusterAPIKey)
@@ -359,6 +438,10 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(resp *sh
 			r.Config.ForwardURI = types.BoolPointerValue(resp.Config.ForwardURI)
 			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
 			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
+			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
+			for _, v := range resp.Config.MessageByLuaFunctions {
+				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
+			}
 			r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 			r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 			r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
@@ -374,6 +457,7 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(resp *sh
 			r.Config.ProducerRequestTimeout = types.Int64PointerValue(resp.Config.ProducerRequestTimeout)
 			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 			r.Config.Topic = types.StringPointerValue(resp.Config.Topic)
+			r.Config.TopicsQueryArg = types.StringPointerValue(resp.Config.TopicsQueryArg)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -414,16 +498,16 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(resp *sh
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -449,4 +533,6 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(resp *sh
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

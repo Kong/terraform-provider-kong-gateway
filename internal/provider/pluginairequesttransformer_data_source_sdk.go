@@ -3,13 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTransformerPlugin(resp *shared.AiRequestTransformerPlugin) {
+func (r *PluginAiRequestTransformerDataSourceModel) ToOperationsGetAirequesttransformerPluginRequest(ctx context.Context) (*operations.GetAirequesttransformerPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAirequesttransformerPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTransformerPlugin(ctx context.Context, resp *shared.AiRequestTransformerPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -72,7 +89,10 @@ func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTr
 							r.Config.Llm.Model.Options.Bedrock = nil
 						} else {
 							r.Config.Llm.Model.Options.Bedrock = &tfTypes.Bedrock{}
+							r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn)
 							r.Config.Llm.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRegion)
+							r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName)
+							r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL)
 						}
 						if resp.Config.Llm.Model.Options.Gemini == nil {
 							r.Config.Llm.Model.Options.Gemini = nil
@@ -89,11 +109,7 @@ func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTr
 							r.Config.Llm.Model.Options.Huggingface.UseCache = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.UseCache)
 							r.Config.Llm.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.WaitForModel)
 						}
-						if resp.Config.Llm.Model.Options.InputCost != nil {
-							r.Config.Llm.Model.Options.InputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.InputCost)))
-						} else {
-							r.Config.Llm.Model.Options.InputCost = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.InputCost = types.Float64PointerValue(resp.Config.Llm.Model.Options.InputCost)
 						if resp.Config.Llm.Model.Options.Llama2Format != nil {
 							r.Config.Llm.Model.Options.Llama2Format = types.StringValue(string(*resp.Config.Llm.Model.Options.Llama2Format))
 						} else {
@@ -105,22 +121,10 @@ func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTr
 						} else {
 							r.Config.Llm.Model.Options.MistralFormat = types.StringNull()
 						}
-						if resp.Config.Llm.Model.Options.OutputCost != nil {
-							r.Config.Llm.Model.Options.OutputCost = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.OutputCost)))
-						} else {
-							r.Config.Llm.Model.Options.OutputCost = types.NumberNull()
-						}
-						if resp.Config.Llm.Model.Options.Temperature != nil {
-							r.Config.Llm.Model.Options.Temperature = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.Temperature)))
-						} else {
-							r.Config.Llm.Model.Options.Temperature = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.OutputCost = types.Float64PointerValue(resp.Config.Llm.Model.Options.OutputCost)
+						r.Config.Llm.Model.Options.Temperature = types.Float64PointerValue(resp.Config.Llm.Model.Options.Temperature)
 						r.Config.Llm.Model.Options.TopK = types.Int64PointerValue(resp.Config.Llm.Model.Options.TopK)
-						if resp.Config.Llm.Model.Options.TopP != nil {
-							r.Config.Llm.Model.Options.TopP = types.NumberValue(big.NewFloat(float64(*resp.Config.Llm.Model.Options.TopP)))
-						} else {
-							r.Config.Llm.Model.Options.TopP = types.NumberNull()
-						}
+						r.Config.Llm.Model.Options.TopP = types.Float64PointerValue(resp.Config.Llm.Model.Options.TopP)
 						r.Config.Llm.Model.Options.UpstreamPath = types.StringPointerValue(resp.Config.Llm.Model.Options.UpstreamPath)
 						r.Config.Llm.Model.Options.UpstreamURL = types.StringPointerValue(resp.Config.Llm.Model.Options.UpstreamURL)
 					}
@@ -179,16 +183,16 @@ func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTr
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -214,4 +218,6 @@ func (r *PluginAiRequestTransformerDataSourceModel) RefreshFromSharedAiRequestTr
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -3,52 +3,49 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginRateLimitingDataSourceModel) RefreshFromSharedRateLimitingPlugin(resp *shared.RateLimitingPlugin) {
+func (r *PluginRateLimitingDataSourceModel) ToOperationsGetRatelimitingPluginRequest(ctx context.Context) (*operations.GetRatelimitingPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetRatelimitingPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRateLimitingDataSourceModel) RefreshFromSharedRateLimitingPlugin(ctx context.Context, resp *shared.RateLimitingPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.RateLimitingPluginConfig{}
-			if resp.Config.Day != nil {
-				r.Config.Day = types.NumberValue(big.NewFloat(float64(*resp.Config.Day)))
-			} else {
-				r.Config.Day = types.NumberNull()
-			}
-			if resp.Config.ErrorCode != nil {
-				r.Config.ErrorCode = types.NumberValue(big.NewFloat(float64(*resp.Config.ErrorCode)))
-			} else {
-				r.Config.ErrorCode = types.NumberNull()
-			}
+			r.Config.Day = types.Float64PointerValue(resp.Config.Day)
+			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
 			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
 			r.Config.FaultTolerant = types.BoolPointerValue(resp.Config.FaultTolerant)
 			r.Config.HeaderName = types.StringPointerValue(resp.Config.HeaderName)
 			r.Config.HideClientHeaders = types.BoolPointerValue(resp.Config.HideClientHeaders)
-			if resp.Config.Hour != nil {
-				r.Config.Hour = types.NumberValue(big.NewFloat(float64(*resp.Config.Hour)))
-			} else {
-				r.Config.Hour = types.NumberNull()
-			}
+			r.Config.Hour = types.Float64PointerValue(resp.Config.Hour)
 			if resp.Config.LimitBy != nil {
 				r.Config.LimitBy = types.StringValue(string(*resp.Config.LimitBy))
 			} else {
 				r.Config.LimitBy = types.StringNull()
 			}
-			if resp.Config.Minute != nil {
-				r.Config.Minute = types.NumberValue(big.NewFloat(float64(*resp.Config.Minute)))
-			} else {
-				r.Config.Minute = types.NumberNull()
-			}
-			if resp.Config.Month != nil {
-				r.Config.Month = types.NumberValue(big.NewFloat(float64(*resp.Config.Month)))
-			} else {
-				r.Config.Month = types.NumberNull()
-			}
+			r.Config.Minute = types.Float64PointerValue(resp.Config.Minute)
+			r.Config.Month = types.Float64PointerValue(resp.Config.Month)
 			r.Config.Path = types.StringPointerValue(resp.Config.Path)
 			if resp.Config.Policy != nil {
 				r.Config.Policy = types.StringValue(string(*resp.Config.Policy))
@@ -69,21 +66,9 @@ func (r *PluginRateLimitingDataSourceModel) RefreshFromSharedRateLimitingPlugin(
 				r.Config.Redis.Timeout = types.Int64PointerValue(resp.Config.Redis.Timeout)
 				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
 			}
-			if resp.Config.Second != nil {
-				r.Config.Second = types.NumberValue(big.NewFloat(float64(*resp.Config.Second)))
-			} else {
-				r.Config.Second = types.NumberNull()
-			}
-			if resp.Config.SyncRate != nil {
-				r.Config.SyncRate = types.NumberValue(big.NewFloat(float64(*resp.Config.SyncRate)))
-			} else {
-				r.Config.SyncRate = types.NumberNull()
-			}
-			if resp.Config.Year != nil {
-				r.Config.Year = types.NumberValue(big.NewFloat(float64(*resp.Config.Year)))
-			} else {
-				r.Config.Year = types.NumberNull()
-			}
+			r.Config.Second = types.Float64PointerValue(resp.Config.Second)
+			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
+			r.Config.Year = types.Float64PointerValue(resp.Config.Year)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -130,16 +115,16 @@ func (r *PluginRateLimitingDataSourceModel) RefreshFromSharedRateLimitingPlugin(
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -165,4 +150,6 @@ func (r *PluginRateLimitingDataSourceModel) RefreshFromSharedRateLimitingPlugin(
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

@@ -11,13 +11,15 @@ generation:
     parameterOrderingFeb2024: true
     requestResponseComponentNamesFeb2024: true
     securityFeb2025: false
+    sharedErrorComponentsApr2025: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
 terraform:
-  version: 0.4.0
+  version: 0.5.0
   additionalDataSources: []
   additionalDependencies: {}
+  additionalEphemeralResources: []
   additionalProviderAttributes:
     httpHeaders: ""
     tlsSkipVerify: ""

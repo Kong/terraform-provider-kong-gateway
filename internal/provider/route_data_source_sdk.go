@@ -3,12 +3,30 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *RouteDataSourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON) {
+func (r *RouteDataSourceModel) ToOperationsGetRouteRequest(ctx context.Context) (*operations.GetRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	out := operations.GetRouteRequest{
+		RouteIDOrName: routeIDOrName,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteDataSourceModel) RefreshFromSharedRouteJSON(ctx context.Context, resp *shared.RouteJSON) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		if resp.Destinations != nil {
@@ -17,14 +35,14 @@ func (r *RouteDataSourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON
 				r.Destinations = r.Destinations[:len(resp.Destinations)]
 			}
 			for destinationsCount, destinationsItem := range resp.Destinations {
-				var destinations1 tfTypes.AiProxyAdvancedPluginClusterNodes
-				destinations1.IP = types.StringPointerValue(destinationsItem.IP)
-				destinations1.Port = types.Int64PointerValue(destinationsItem.Port)
+				var destinations tfTypes.AiProxyAdvancedPluginClusterNodes
+				destinations.IP = types.StringPointerValue(destinationsItem.IP)
+				destinations.Port = types.Int64PointerValue(destinationsItem.Port)
 				if destinationsCount+1 > len(r.Destinations) {
-					r.Destinations = append(r.Destinations, destinations1)
+					r.Destinations = append(r.Destinations, destinations)
 				} else {
-					r.Destinations[destinationsCount].IP = destinations1.IP
-					r.Destinations[destinationsCount].Port = destinations1.Port
+					r.Destinations[destinationsCount].IP = destinations.IP
+					r.Destinations[destinationsCount].Port = destinations.Port
 				}
 			}
 		}
@@ -98,14 +116,14 @@ func (r *RouteDataSourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON
 				r.Sources = r.Sources[:len(resp.Sources)]
 			}
 			for sourcesCount, sourcesItem := range resp.Sources {
-				var sources1 tfTypes.AiProxyAdvancedPluginClusterNodes
-				sources1.IP = types.StringPointerValue(sourcesItem.IP)
-				sources1.Port = types.Int64PointerValue(sourcesItem.Port)
+				var sources tfTypes.AiProxyAdvancedPluginClusterNodes
+				sources.IP = types.StringPointerValue(sourcesItem.IP)
+				sources.Port = types.Int64PointerValue(sourcesItem.Port)
 				if sourcesCount+1 > len(r.Sources) {
-					r.Sources = append(r.Sources, sources1)
+					r.Sources = append(r.Sources, sources)
 				} else {
-					r.Sources[sourcesCount].IP = sources1.IP
-					r.Sources[sourcesCount].Port = sources1.Port
+					r.Sources[sourcesCount].IP = sources.IP
+					r.Sources[sourcesCount].Port = sources.Port
 				}
 			}
 		}
@@ -116,4 +134,6 @@ func (r *RouteDataSourceModel) RefreshFromSharedRouteJSON(resp *shared.RouteJSON
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

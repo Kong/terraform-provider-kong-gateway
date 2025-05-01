@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *JwtResourceModel) ToSharedJWTWithoutParents() *shared.JWTWithoutParents {
+func (r *JwtResourceModel) ToSharedJWTWithoutParents(ctx context.Context) (*shared.JWTWithoutParents, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	algorithm := new(shared.Algorithm)
 	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
 		*algorithm = shared.Algorithm(r.Algorithm.ValueString())
@@ -57,7 +62,7 @@ func (r *JwtResourceModel) ToSharedJWTWithoutParents() *shared.JWTWithoutParents
 	} else {
 		secret = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -71,35 +76,34 @@ func (r *JwtResourceModel) ToSharedJWTWithoutParents() *shared.JWTWithoutParents
 		Secret:       secret,
 		Tags:         tags,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *JwtResourceModel) RefreshFromSharedJwt(resp *shared.Jwt) {
-	if resp != nil {
-		if resp.Algorithm != nil {
-			r.Algorithm = types.StringValue(string(*resp.Algorithm))
-		} else {
-			r.Algorithm = types.StringNull()
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Key = types.StringPointerValue(resp.Key)
-		r.RsaPublicKey = types.StringPointerValue(resp.RsaPublicKey)
-		r.Secret = types.StringPointerValue(resp.Secret)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
+func (r *JwtResourceModel) ToOperationsCreateJwtWithConsumerRequest(ctx context.Context) (*operations.CreateJwtWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	jwtWithoutParents, jwtWithoutParentsDiags := r.ToSharedJWTWithoutParents(ctx)
+	diags.Append(jwtWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
 	}
+
+	out := operations.CreateJwtWithConsumerRequest{
+		ConsumerID:        consumerID,
+		JWTWithoutParents: *jwtWithoutParents,
+	}
+
+	return &out, diags
 }
 
-func (r *JwtResourceModel) ToSharedJwt() *shared.Jwt {
+func (r *JwtResourceModel) ToSharedJwt(ctx context.Context) (*shared.Jwt, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	algorithm := new(shared.JWTAlgorithm)
 	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
 		*algorithm = shared.JWTAlgorithm(r.Algorithm.ValueString())
@@ -148,7 +152,7 @@ func (r *JwtResourceModel) ToSharedJwt() *shared.Jwt {
 	} else {
 		secret = nil
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -162,5 +166,94 @@ func (r *JwtResourceModel) ToSharedJwt() *shared.Jwt {
 		Secret:       secret,
 		Tags:         tags,
 	}
-	return &out
+
+	return &out, diags
+}
+
+func (r *JwtResourceModel) ToOperationsUpdateJwtWithConsumerRequest(ctx context.Context) (*operations.UpdateJwtWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var jwtID string
+	jwtID = r.ID.ValueString()
+
+	jwt, jwtDiags := r.ToSharedJwt(ctx)
+	diags.Append(jwtDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
+		Jwt:        *jwt,
+	}
+
+	return &out, diags
+}
+
+func (r *JwtResourceModel) ToOperationsGetJwtWithConsumerRequest(ctx context.Context) (*operations.GetJwtWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var jwtID string
+	jwtID = r.ID.ValueString()
+
+	out := operations.GetJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
+	}
+
+	return &out, diags
+}
+
+func (r *JwtResourceModel) ToOperationsDeleteJwtWithConsumerRequest(ctx context.Context) (*operations.DeleteJwtWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var jwtID string
+	jwtID = r.ID.ValueString()
+
+	out := operations.DeleteJwtWithConsumerRequest{
+		ConsumerID: consumerID,
+		JWTID:      jwtID,
+	}
+
+	return &out, diags
+}
+
+func (r *JwtResourceModel) RefreshFromSharedJwt(ctx context.Context, resp *shared.Jwt) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Algorithm != nil {
+			r.Algorithm = types.StringValue(string(*resp.Algorithm))
+		} else {
+			r.Algorithm = types.StringNull()
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Key = types.StringPointerValue(resp.Key)
+		r.RsaPublicKey = types.StringPointerValue(resp.RsaPublicKey)
+		r.Secret = types.StringPointerValue(resp.Secret)
+		r.Tags = make([]types.String, 0, len(resp.Tags))
+		for _, v := range resp.Tags {
+			r.Tags = append(r.Tags, types.StringValue(v))
+		}
+	}
+
+	return diags
 }

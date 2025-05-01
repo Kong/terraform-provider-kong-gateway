@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
@@ -108,7 +107,7 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
-							"default_ttl": schema.NumberAttribute{
+							"default_ttl": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `The lifetime of a token without an explicit ` + "`" + `expires_in` + "`" + ` value.`,
@@ -356,7 +355,7 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 								Optional:    true,
 								Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `http_proxy` + "`" + `.`,
 							},
-							"http_version": schema.NumberAttribute{
+							"http_version": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `The HTTP version used for requests made by this plugin. Supported values: ` + "`" + `1.1` + "`" + ` for HTTP 1.1 and ` + "`" + `1.0` + "`" + ` for HTTP 1.0.`,
@@ -642,8 +641,13 @@ func (r *PluginUpstreamOauthResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	request := *data.ToSharedUpstreamOauthPlugin()
-	res, err := r.client.Plugins.CreateUpstreamoauthPlugin(ctx, request)
+	request, requestDiags := data.ToSharedUpstreamOauthPlugin(ctx)
+	resp.Diagnostics.Append(requestDiags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	res, err := r.client.Plugins.CreateUpstreamoauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -663,8 +667,17 @@ func (r *PluginUpstreamOauthResource) Create(ctx context.Context, req resource.C
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamOauthPlugin(res.UpstreamOauthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamOauthPlugin(ctx, res.UpstreamOauthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -688,13 +701,13 @@ func (r *PluginUpstreamOauthResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetUpstreamoauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetUpstreamoauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetUpstreamoauthPlugin(ctx, request)
+	res, err := r.client.Plugins.GetUpstreamoauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -718,7 +731,11 @@ func (r *PluginUpstreamOauthResource) Read(ctx context.Context, req resource.Rea
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamOauthPlugin(res.UpstreamOauthPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamOauthPlugin(ctx, res.UpstreamOauthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -738,15 +755,13 @@ func (r *PluginUpstreamOauthResource) Update(ctx context.Context, req resource.U
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateUpstreamoauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	upstreamOauthPlugin := *data.ToSharedUpstreamOauthPlugin()
-	request := operations.UpdateUpstreamoauthPluginRequest{
-		PluginID:            pluginID,
-		UpstreamOauthPlugin: upstreamOauthPlugin,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.UpdateUpstreamoauthPlugin(ctx, request)
+	res, err := r.client.Plugins.UpdateUpstreamoauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -766,8 +781,17 @@ func (r *PluginUpstreamOauthResource) Update(ctx context.Context, req resource.U
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedUpstreamOauthPlugin(res.UpstreamOauthPlugin)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedUpstreamOauthPlugin(ctx, res.UpstreamOauthPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -791,13 +815,13 @@ func (r *PluginUpstreamOauthResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteUpstreamoauthPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.DeleteUpstreamoauthPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.DeleteUpstreamoauthPlugin(ctx, request)
+	res, err := r.client.Plugins.DeleteUpstreamoauthPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {

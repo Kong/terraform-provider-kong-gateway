@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -73,7 +72,7 @@ func (r *PluginIPRestrictionDataSource) Schema(ctx context.Context, req datasour
 						Computed:    true,
 						Description: `The message to send as a response body to rejected requests.`,
 					},
-					"status": schema.NumberAttribute{
+					"status": schema.Float64Attribute{
 						Computed:    true,
 						Description: `The HTTP status of the requests that will be rejected by the plugin.`,
 					},
@@ -224,13 +223,13 @@ func (r *PluginIPRestrictionDataSource) Read(ctx context.Context, req datasource
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetIprestrictionPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetIprestrictionPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetIprestrictionPlugin(ctx, request)
+	res, err := r.client.Plugins.GetIprestrictionPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -242,10 +241,6 @@ func (r *PluginIPRestrictionDataSource) Read(ctx context.Context, req datasource
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -254,7 +249,11 @@ func (r *PluginIPRestrictionDataSource) Read(ctx context.Context, req datasource
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedIPRestrictionPlugin(res.IPRestrictionPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedIPRestrictionPlugin(ctx, res.IPRestrictionPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

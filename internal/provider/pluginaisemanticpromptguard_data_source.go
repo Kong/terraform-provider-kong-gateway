@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -133,6 +132,74 @@ func (r *PluginAiSemanticPromptGuardDataSource) Schema(ctx context.Context, req 
 									"options": schema.SingleNestedAttribute{
 										Computed: true,
 										Attributes: map[string]schema.Attribute{
+											"azure": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"api_version": schema.StringAttribute{
+														Computed:    true,
+														Description: `'api-version' for Azure OpenAI instances.`,
+													},
+													"deployment_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `Deployment ID for Azure OpenAI instances.`,
+													},
+													"instance": schema.StringAttribute{
+														Computed:    true,
+														Description: `Instance name for Azure OpenAI hosted models.`,
+													},
+												},
+											},
+											"bedrock": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"aws_assume_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+													},
+													"aws_region": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+													},
+													"aws_role_session_name": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+													},
+													"aws_sts_endpoint_url": schema.StringAttribute{
+														Computed:    true,
+														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+												},
+											},
+											"gemini": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"api_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the regional API endpoint (hostname only).`,
+													},
+													"location_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the location ID.`,
+													},
+													"project_id": schema.StringAttribute{
+														Computed:    true,
+														Description: `If running Gemini on Vertex, specify the project ID.`,
+													},
+												},
+											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
 											"upstream_url": schema.StringAttribute{
 												Computed:    true,
 												Description: `upstream url for the embeddings`,
@@ -147,6 +214,10 @@ func (r *PluginAiSemanticPromptGuardDataSource) Schema(ctx context.Context, req 
 								},
 							},
 						},
+					},
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Description: `LLM input and output format and schema to use`,
 					},
 					"rules": schema.SingleNestedAttribute{
 						Computed: true,
@@ -178,7 +249,7 @@ func (r *PluginAiSemanticPromptGuardDataSource) Schema(ctx context.Context, req 
 					"search": schema.SingleNestedAttribute{
 						Computed: true,
 						Attributes: map[string]schema.Attribute{
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Description: `Threshold for the similarity score to be considered a match.`,
 							},
@@ -194,6 +265,59 @@ func (r *PluginAiSemanticPromptGuardDataSource) Schema(ctx context.Context, req 
 							"distance_metric": schema.StringAttribute{
 								Computed:    true,
 								Description: `the distance metric to use for vector searches`,
+							},
+							"pgvector": schema.SingleNestedAttribute{
+								Computed: true,
+								Attributes: map[string]schema.Attribute{
+									"database": schema.StringAttribute{
+										Computed:    true,
+										Description: `the database of the pgvector database`,
+									},
+									"host": schema.StringAttribute{
+										Computed:    true,
+										Description: `the host of the pgvector database`,
+									},
+									"password": schema.StringAttribute{
+										Computed:    true,
+										Description: `the password of the pgvector database`,
+									},
+									"port": schema.Int64Attribute{
+										Computed:    true,
+										Description: `the port of the pgvector database`,
+									},
+									"ssl": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether to use ssl for the pgvector database`,
+									},
+									"ssl_cert": schema.StringAttribute{
+										Computed:    true,
+										Description: `the path of ssl cert to use for the pgvector database`,
+									},
+									"ssl_cert_key": schema.StringAttribute{
+										Computed:    true,
+										Description: `the path of ssl cert key to use for the pgvector database`,
+									},
+									"ssl_required": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether ssl is required for the pgvector database`,
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Description: `whether to verify ssl for the pgvector database`,
+									},
+									"ssl_version": schema.StringAttribute{
+										Computed:    true,
+										Description: `the ssl version to use for the pgvector database`,
+									},
+									"timeout": schema.Float64Attribute{
+										Computed:    true,
+										Description: `the timeout of the pgvector database`,
+									},
+									"user": schema.StringAttribute{
+										Computed:    true,
+										Description: `the user of the pgvector database`,
+									},
+								},
 							},
 							"redis": schema.SingleNestedAttribute{
 								Computed: true,
@@ -312,7 +436,7 @@ func (r *PluginAiSemanticPromptGuardDataSource) Schema(ctx context.Context, req 
 								Computed:    true,
 								Description: `which vector database driver to use`,
 							},
-							"threshold": schema.NumberAttribute{
+							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Description: `the default similarity threshold for accepting semantic search results (float)`,
 							},
@@ -465,13 +589,13 @@ func (r *PluginAiSemanticPromptGuardDataSource) Read(ctx context.Context, req da
 		return
 	}
 
-	var pluginID string
-	pluginID = data.ID.ValueString()
+	request, requestDiags := data.ToOperationsGetAisemanticpromptguardPluginRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	request := operations.GetAisemanticpromptguardPluginRequest{
-		PluginID: pluginID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.Plugins.GetAisemanticpromptguardPlugin(ctx, request)
+	res, err := r.client.Plugins.GetAisemanticpromptguardPlugin(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -483,10 +607,6 @@ func (r *PluginAiSemanticPromptGuardDataSource) Read(ctx context.Context, req da
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
 	if res.StatusCode != 200 {
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
@@ -495,7 +615,11 @@ func (r *PluginAiSemanticPromptGuardDataSource) Read(ctx context.Context, req da
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedAiSemanticPromptGuardPlugin(res.AiSemanticPromptGuardPlugin)
+	resp.Diagnostics.Append(data.RefreshFromSharedAiSemanticPromptGuardPlugin(ctx, res.AiSemanticPromptGuardPlugin)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

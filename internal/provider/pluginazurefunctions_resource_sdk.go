@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"math/big"
 )
 
-func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shared.AzureFunctionsPlugin {
+func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin(ctx context.Context) (*shared.AzureFunctionsPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -38,7 +42,7 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 	if r.Ordering != nil {
 		var after *shared.AzureFunctionsPluginAfter
 		if r.Ordering.After != nil {
-			var access []string = []string{}
+			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
@@ -48,7 +52,7 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 		}
 		var before *shared.AzureFunctionsPluginBefore
 		if r.Ordering.Before != nil {
-			var access1 []string = []string{}
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
@@ -61,33 +65,36 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 			Before: before,
 		}
 	}
-	var partials []shared.AzureFunctionsPluginPartials = []shared.AzureFunctionsPluginPartials{}
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.AzureFunctionsPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AzureFunctionsPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AzureFunctionsPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AzureFunctionsPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
-	var tags []string = []string{}
+	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
@@ -143,7 +150,7 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 		}
 		keepalive := new(float64)
 		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive, _ = r.Config.Keepalive.ValueBigFloat().Float64()
+			*keepalive = r.Config.Keepalive.ValueFloat64()
 		} else {
 			keepalive = nil
 		}
@@ -155,7 +162,7 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout, _ = r.Config.Timeout.ValueBigFloat().Float64()
+			*timeout = r.Config.Timeout.ValueFloat64()
 		} else {
 			timeout = nil
 		}
@@ -184,7 +191,7 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 			ID: id2,
 		}
 	}
-	var protocols []shared.AzureFunctionsPluginProtocols = []shared.AzureFunctionsPluginProtocols{}
+	protocols := make([]shared.AzureFunctionsPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.AzureFunctionsPluginProtocols(protocolsItem.ValueString()))
 	}
@@ -227,10 +234,60 @@ func (r *PluginAzureFunctionsResourceModel) ToSharedAzureFunctionsPlugin() *shar
 		Route:        route,
 		Service:      service,
 	}
-	return &out
+
+	return &out, diags
 }
 
-func (r *PluginAzureFunctionsResourceModel) RefreshFromSharedAzureFunctionsPlugin(resp *shared.AzureFunctionsPlugin) {
+func (r *PluginAzureFunctionsResourceModel) ToOperationsUpdateAzurefunctionsPluginRequest(ctx context.Context) (*operations.UpdateAzurefunctionsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	azureFunctionsPlugin, azureFunctionsPluginDiags := r.ToSharedAzureFunctionsPlugin(ctx)
+	diags.Append(azureFunctionsPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAzurefunctionsPluginRequest{
+		PluginID:             pluginID,
+		AzureFunctionsPlugin: *azureFunctionsPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAzureFunctionsResourceModel) ToOperationsGetAzurefunctionsPluginRequest(ctx context.Context) (*operations.GetAzurefunctionsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.GetAzurefunctionsPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAzureFunctionsResourceModel) ToOperationsDeleteAzurefunctionsPluginRequest(ctx context.Context) (*operations.DeleteAzurefunctionsPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	out := operations.DeleteAzurefunctionsPluginRequest{
+		PluginID: pluginID,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAzureFunctionsResourceModel) RefreshFromSharedAzureFunctionsPlugin(ctx context.Context, resp *shared.AzureFunctionsPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Config == nil {
 			r.Config = nil
@@ -243,17 +300,9 @@ func (r *PluginAzureFunctionsResourceModel) RefreshFromSharedAzureFunctionsPlugi
 			r.Config.Hostdomain = types.StringPointerValue(resp.Config.Hostdomain)
 			r.Config.HTTPS = types.BoolPointerValue(resp.Config.HTTPS)
 			r.Config.HTTPSVerify = types.BoolPointerValue(resp.Config.HTTPSVerify)
-			if resp.Config.Keepalive != nil {
-				r.Config.Keepalive = types.NumberValue(big.NewFloat(float64(*resp.Config.Keepalive)))
-			} else {
-				r.Config.Keepalive = types.NumberNull()
-			}
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 			r.Config.Routeprefix = types.StringPointerValue(resp.Config.Routeprefix)
-			if resp.Config.Timeout != nil {
-				r.Config.Timeout = types.NumberValue(big.NewFloat(float64(*resp.Config.Timeout)))
-			} else {
-				r.Config.Timeout = types.NumberNull()
-			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -294,16 +343,16 @@ func (r *PluginAzureFunctionsResourceModel) RefreshFromSharedAzureFunctionsPlugi
 				r.Partials = r.Partials[:len(resp.Partials)]
 			}
 			for partialsCount, partialsItem := range resp.Partials {
-				var partials1 tfTypes.Partials
-				partials1.ID = types.StringPointerValue(partialsItem.ID)
-				partials1.Name = types.StringPointerValue(partialsItem.Name)
-				partials1.Path = types.StringPointerValue(partialsItem.Path)
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials1)
+					r.Partials = append(r.Partials, partials)
 				} else {
-					r.Partials[partialsCount].ID = partials1.ID
-					r.Partials[partialsCount].Name = partials1.Name
-					r.Partials[partialsCount].Path = partials1.Path
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
 				}
 			}
 		}
@@ -329,4 +378,6 @@ func (r *PluginAzureFunctionsResourceModel) RefreshFromSharedAzureFunctionsPlugi
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
+
+	return diags
 }

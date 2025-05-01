@@ -3,12 +3,34 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *KeyAuthDataSourceModel) RefreshFromSharedKeyAuth(resp *shared.KeyAuth) {
+func (r *KeyAuthDataSourceModel) ToOperationsGetKeyAuthWithConsumerRequest(ctx context.Context) (*operations.GetKeyAuthWithConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerID string
+	consumerID = r.ConsumerID.ValueString()
+
+	var keyAuthID string
+	keyAuthID = r.ID.ValueString()
+
+	out := operations.GetKeyAuthWithConsumerRequest{
+		ConsumerID: consumerID,
+		KeyAuthID:  keyAuthID,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyAuthDataSourceModel) RefreshFromSharedKeyAuth(ctx context.Context, resp *shared.KeyAuth) diag.Diagnostics {
+	var diags diag.Diagnostics
+
 	if resp != nil {
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -23,5 +45,8 @@ func (r *KeyAuthDataSourceModel) RefreshFromSharedKeyAuth(resp *shared.KeyAuth) 
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
+		r.TTL = types.Int64PointerValue(resp.TTL)
 	}
+
+	return diags
 }

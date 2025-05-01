@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,6 +37,7 @@ type KeyAuthResourceModel struct {
 	ID         types.String                       `tfsdk:"id"`
 	Key        types.String                       `tfsdk:"key"`
 	Tags       []types.String                     `tfsdk:"tags"`
+	TTL        types.Int64                        `tfsdk:"ttl"`
 }
 
 func (r *KeyAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -78,6 +78,11 @@ func (r *KeyAuthResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
+			},
+			"ttl": schema.Int64Attribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `key-auth ttl in seconds`,
 			},
 		},
 	}
@@ -121,15 +126,13 @@ func (r *KeyAuthResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsCreateKeyAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	keyAuthWithoutParents := *data.ToSharedKeyAuthWithoutParents()
-	request := operations.CreateKeyAuthWithConsumerRequest{
-		ConsumerID:            consumerID,
-		KeyAuthWithoutParents: keyAuthWithoutParents,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.APIKeys.CreateKeyAuthWithConsumer(ctx, request)
+	res, err := r.client.APIKeys.CreateKeyAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -149,8 +152,17 @@ func (r *KeyAuthResource) Create(ctx context.Context, req resource.CreateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuth(res.KeyAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuth(ctx, res.KeyAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -174,17 +186,13 @@ func (r *KeyAuthResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsGetKeyAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var keyAuthID string
-	keyAuthID = data.ID.ValueString()
-
-	request := operations.GetKeyAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		KeyAuthID:  keyAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.APIKeys.GetKeyAuthWithConsumer(ctx, request)
+	res, err := r.client.APIKeys.GetKeyAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -208,7 +216,11 @@ func (r *KeyAuthResource) Read(ctx context.Context, req resource.ReadRequest, re
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuth(res.KeyAuth)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuth(ctx, res.KeyAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -228,19 +240,13 @@ func (r *KeyAuthResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsUpdateKeyAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var keyAuthID string
-	keyAuthID = data.ID.ValueString()
-
-	keyAuth := *data.ToSharedKeyAuth()
-	request := operations.UpdateKeyAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		KeyAuthID:  keyAuthID,
-		KeyAuth:    keyAuth,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.APIKeys.UpdateKeyAuthWithConsumer(ctx, request)
+	res, err := r.client.APIKeys.UpdateKeyAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -260,8 +266,17 @@ func (r *KeyAuthResource) Update(ctx context.Context, req resource.UpdateRequest
 		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
 		return
 	}
-	data.RefreshFromSharedKeyAuth(res.KeyAuth)
-	refreshPlan(ctx, plan, &data, resp.Diagnostics)
+	resp.Diagnostics.Append(data.RefreshFromSharedKeyAuth(ctx, res.KeyAuth)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -285,17 +300,13 @@ func (r *KeyAuthResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
-	var consumerID string
-	consumerID = data.ConsumerID.ValueString()
+	request, requestDiags := data.ToOperationsDeleteKeyAuthWithConsumerRequest(ctx)
+	resp.Diagnostics.Append(requestDiags...)
 
-	var keyAuthID string
-	keyAuthID = data.ID.ValueString()
-
-	request := operations.DeleteKeyAuthWithConsumerRequest{
-		ConsumerID: consumerID,
-		KeyAuthID:  keyAuthID,
+	if resp.Diagnostics.HasError() {
+		return
 	}
-	res, err := r.client.APIKeys.DeleteKeyAuthWithConsumer(ctx, request)
+	res, err := r.client.APIKeys.DeleteKeyAuthWithConsumer(ctx, *request)
 	if err != nil {
 		resp.Diagnostics.AddError("failure to invoke API", err.Error())
 		if res != nil && res.RawResponse != nil {
@@ -323,7 +334,7 @@ func (r *KeyAuthResource) ImportState(ctx context.Context, req resource.ImportSt
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The ID is not valid. It's expected to be a JSON object alike '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "key_auth_id": ""}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": ""}': `+err.Error())
 		return
 	}
 

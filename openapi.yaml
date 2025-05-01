@@ -21374,6 +21374,7 @@ components:
               path:
                 type: string
             type: object
+          nullable: true
         tags:
           description: An optional set of strings associated with the Plugin for grouping and filtering.
           type: array

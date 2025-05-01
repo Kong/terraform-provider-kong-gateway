@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.5.0
-> Released on 2025/??/??
+> Released on 2025/05/01
 
 ### BREAKING CHANGES
 
@@ -15,6 +15,10 @@
   * `gateway_plugin_confluent_consume`
   * `gateway_plugin_kafka_consume`
   * `gateway_plugin_request_callout`
+
+### Bug Fixes
+
+* The `partials` field on Plugins is no longer sent by default, enabling support for versions of Gateway < 3.10
 
 ## 0.4.0
 > Released on 2025/04/11

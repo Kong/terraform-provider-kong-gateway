@@ -65,31 +65,34 @@ func (r *PluginRequestTransformerResourceModel) ToSharedRequestTransformerPlugin
 			Before: before,
 		}
 	}
-	partials := make([]shared.RequestTransformerPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.RequestTransformerPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RequestTransformerPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RequestTransformerPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RequestTransformerPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -479,21 +482,23 @@ func (r *PluginRequestTransformerResourceModel) RefreshFromSharedRequestTransfor
 				}
 			}
 		}
-		r.Partials = []tfTypes.Partials{}
-		if len(r.Partials) > len(resp.Partials) {
-			r.Partials = r.Partials[:len(resp.Partials)]
-		}
-		for partialsCount, partialsItem := range resp.Partials {
-			var partials tfTypes.Partials
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
-			if partialsCount+1 > len(r.Partials) {
-				r.Partials = append(r.Partials, partials)
-			} else {
-				r.Partials[partialsCount].ID = partials.ID
-				r.Partials[partialsCount].Name = partials.Name
-				r.Partials[partialsCount].Path = partials.Path
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.Partials{}
+			if len(r.Partials) > len(resp.Partials) {
+				r.Partials = r.Partials[:len(resp.Partials)]
+			}
+			for partialsCount, partialsItem := range resp.Partials {
+				var partials tfTypes.Partials
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+				if partialsCount+1 > len(r.Partials) {
+					r.Partials = append(r.Partials, partials)
+				} else {
+					r.Partials[partialsCount].ID = partials.ID
+					r.Partials[partialsCount].Name = partials.Name
+					r.Partials[partialsCount].Path = partials.Path
+				}
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

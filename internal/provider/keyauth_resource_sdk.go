@@ -45,12 +45,19 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents(ctx context.Context
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
+	ttl := new(int64)
+	if !r.TTL.IsUnknown() && !r.TTL.IsNull() {
+		*ttl = r.TTL.ValueInt64()
+	} else {
+		ttl = nil
+	}
 	out := shared.KeyAuthWithoutParents{
 		Consumer:  consumer,
 		CreatedAt: createdAt,
 		ID:        id1,
 		Key:       key,
 		Tags:      tags,
+		TTL:       ttl,
 	}
 
 	return &out, diags
@@ -111,12 +118,19 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuth(ctx context.Context) (*shared.Key
 	for _, tagsItem := range r.Tags {
 		tags = append(tags, tagsItem.ValueString())
 	}
+	ttl := new(int64)
+	if !r.TTL.IsUnknown() && !r.TTL.IsNull() {
+		*ttl = r.TTL.ValueInt64()
+	} else {
+		ttl = nil
+	}
 	out := shared.KeyAuth{
 		Consumer:  consumer,
 		CreatedAt: createdAt,
 		ID:        id1,
 		Key:       key,
 		Tags:      tags,
+		TTL:       ttl,
 	}
 
 	return &out, diags
@@ -198,6 +212,7 @@ func (r *KeyAuthResourceModel) RefreshFromSharedKeyAuth(ctx context.Context, res
 		for _, v := range resp.Tags {
 			r.Tags = append(r.Tags, types.StringValue(v))
 		}
+		r.TTL = types.Int64PointerValue(resp.TTL)
 	}
 
 	return diags

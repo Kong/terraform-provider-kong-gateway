@@ -73,7 +73,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"default_header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
+						Description: `Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when ` + "`" + `config.header_type` + "`" + ` is set to ` + "`" + `"preserve"` + "`" + `. When ` + "`" + `header_type` + "`" + ` is set to any other value, ` + "`" + `default_header_type` + "`" + ` is ignored. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"aws",
@@ -81,6 +81,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								"b3-single",
 								"datadog",
 								"gcp",
+								"instana",
 								"jaeger",
 								"ot",
 								"w3c",
@@ -95,7 +96,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					"header_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "jaeger", "ot", "preserve", "w3c"]`,
+						Description: `All HTTP requests going through the plugin are tagged with a tracing HTTP request. This property codifies what kind of tracing header the plugin expects on incoming requests. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "instana", "jaeger", "ot", "preserve", "w3c"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"aws",
@@ -104,6 +105,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								"datadog",
 								"gcp",
 								"ignore",
+								"instana",
 								"jaeger",
 								"ot",
 								"preserve",
@@ -165,7 +167,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 							"default_format": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "jaeger", "ot", "w3c"]`,
+								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
 								Validators: []validator.String{
 									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
@@ -174,6 +176,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 										"b3-single",
 										"datadog",
 										"gcp",
+										"instana",
 										"jaeger",
 										"ot",
 										"w3c",

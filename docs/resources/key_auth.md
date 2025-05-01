@@ -24,6 +24,7 @@ resource "kong-gateway_key_auth" "my_keyauth" {
   tags = [
     "..."
   ]
+  ttl = 6
 }
 ```
 
@@ -40,6 +41,7 @@ resource "kong-gateway_key_auth" "my_keyauth" {
 - `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `tags` (List of String)
+- `ttl` (Number) key-auth ttl in seconds
 
 ### Read-Only
 

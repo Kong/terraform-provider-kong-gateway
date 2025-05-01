@@ -65,34 +65,31 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			Before: before,
 		}
 	}
-	var partials []shared.KafkaUpstreamPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.KafkaUpstreamPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.KafkaUpstreamPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.KafkaUpstreamPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.KafkaUpstreamPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -106,6 +103,10 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 	}
 	var config *shared.KafkaUpstreamPluginConfig
 	if r.Config != nil {
+		allowedTopics := make([]string, 0, len(r.Config.AllowedTopics))
+		for _, allowedTopicsItem := range r.Config.AllowedTopics {
+			allowedTopics = append(allowedTopics, allowedTopicsItem.ValueString())
+		}
 		var authentication *shared.KafkaUpstreamPluginAuthentication
 		if r.Config.Authentication != nil {
 			mechanism := new(shared.KafkaUpstreamPluginMechanism)
@@ -201,6 +202,10 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		} else {
 			keepaliveEnabled = nil
 		}
+		messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
+		for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
+			messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
+		}
 		producerAsync := new(bool)
 		if !r.Config.ProducerAsync.IsUnknown() && !r.Config.ProducerAsync.IsNull() {
 			*producerAsync = r.Config.ProducerAsync.ValueBool()
@@ -286,17 +291,25 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		} else {
 			topic = nil
 		}
+		topicsQueryArg := new(string)
+		if !r.Config.TopicsQueryArg.IsUnknown() && !r.Config.TopicsQueryArg.IsNull() {
+			*topicsQueryArg = r.Config.TopicsQueryArg.ValueString()
+		} else {
+			topicsQueryArg = nil
+		}
 		config = &shared.KafkaUpstreamPluginConfig{
-			Authentication:   authentication,
-			BootstrapServers: bootstrapServers,
-			ClusterName:      clusterName,
-			ForwardBody:      forwardBody,
-			ForwardHeaders:   forwardHeaders,
-			ForwardMethod:    forwardMethod,
-			ForwardURI:       forwardURI,
-			Keepalive:        keepalive,
-			KeepaliveEnabled: keepaliveEnabled,
-			ProducerAsync:    producerAsync,
+			AllowedTopics:         allowedTopics,
+			Authentication:        authentication,
+			BootstrapServers:      bootstrapServers,
+			ClusterName:           clusterName,
+			ForwardBody:           forwardBody,
+			ForwardHeaders:        forwardHeaders,
+			ForwardMethod:         forwardMethod,
+			ForwardURI:            forwardURI,
+			Keepalive:             keepalive,
+			KeepaliveEnabled:      keepaliveEnabled,
+			MessageByLuaFunctions: messageByLuaFunctions,
+			ProducerAsync:         producerAsync,
 			ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
 			ProducerAsyncFlushTimeout:                    producerAsyncFlushTimeout,
 			ProducerRequestAcks:                          producerRequestAcks,
@@ -308,6 +321,7 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			Security:                                     security,
 			Timeout:                                      timeout,
 			Topic:                                        topic,
+			TopicsQueryArg:                               topicsQueryArg,
 		}
 	}
 	var consumer *shared.KafkaUpstreamPluginConsumer
@@ -424,6 +438,10 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
+			r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
+			for _, v := range resp.Config.AllowedTopics {
+				r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
+			}
 			if resp.Config.Authentication == nil {
 				r.Config.Authentication = nil
 			} else {
@@ -464,6 +482,10 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			r.Config.ForwardURI = types.BoolPointerValue(resp.Config.ForwardURI)
 			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
 			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
+			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
+			for _, v := range resp.Config.MessageByLuaFunctions {
+				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
+			}
 			r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 			r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 			r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
@@ -480,12 +502,13 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			if resp.Config.Security == nil {
 				r.Config.Security = nil
 			} else {
-				r.Config.Security = &tfTypes.KafkaLogPluginSecurity{}
+				r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
 				r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
 				r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
 			}
 			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 			r.Config.Topic = types.StringPointerValue(resp.Config.Topic)
+			r.Config.TopicsQueryArg = types.StringPointerValue(resp.Config.TopicsQueryArg)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -520,23 +543,21 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

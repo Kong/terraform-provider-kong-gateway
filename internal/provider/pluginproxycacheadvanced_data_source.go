@@ -242,7 +242,7 @@ func (r *PluginProxyCacheAdvancedDataSource) Schema(ctx context.Context, req dat
 					"vary_query_params": schema.ListAttribute{
 						Computed:    true,
 						ElementType: types.StringType,
-						Description: `Relevant query parameters considered for the cache key. If undefined, all params are taken into consideration.`,
+						Description: `Relevant query parameters considered for the cache key. If undefined, all params are taken into consideration. By default, the max number of params accepted is 100. You can change this value via the ` + "`" + `lua_max_post_args` + "`" + ` in ` + "`" + `kong.conf` + "`" + `.`,
 					},
 				},
 			},

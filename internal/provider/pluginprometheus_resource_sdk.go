@@ -65,34 +65,31 @@ func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Con
 			Before: before,
 		}
 	}
-	var partials []shared.PrometheusPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.PrometheusPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.PrometheusPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.PrometheusPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.PrometheusPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -142,6 +139,12 @@ func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Con
 		} else {
 			upstreamHealthMetrics = nil
 		}
+		wasmMetrics := new(bool)
+		if !r.Config.WasmMetrics.IsUnknown() && !r.Config.WasmMetrics.IsNull() {
+			*wasmMetrics = r.Config.WasmMetrics.ValueBool()
+		} else {
+			wasmMetrics = nil
+		}
 		config = &shared.PrometheusPluginConfig{
 			AiMetrics:             aiMetrics,
 			BandwidthMetrics:      bandwidthMetrics,
@@ -149,6 +152,7 @@ func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Con
 			PerConsumer:           perConsumer,
 			StatusCodeMetrics:     statusCodeMetrics,
 			UpstreamHealthMetrics: upstreamHealthMetrics,
+			WasmMetrics:           wasmMetrics,
 		}
 	}
 	var consumer *shared.PrometheusPluginConsumer
@@ -271,6 +275,7 @@ func (r *PluginPrometheusResourceModel) RefreshFromSharedPrometheusPlugin(ctx co
 			r.Config.PerConsumer = types.BoolPointerValue(resp.Config.PerConsumer)
 			r.Config.StatusCodeMetrics = types.BoolPointerValue(resp.Config.StatusCodeMetrics)
 			r.Config.UpstreamHealthMetrics = types.BoolPointerValue(resp.Config.UpstreamHealthMetrics)
+			r.Config.WasmMetrics = types.BoolPointerValue(resp.Config.WasmMetrics)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -305,23 +310,21 @@ func (r *PluginPrometheusResourceModel) RefreshFromSharedPrometheusPlugin(ctx co
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

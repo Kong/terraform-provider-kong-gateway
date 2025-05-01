@@ -65,34 +65,31 @@ func (r *PluginAiRateLimitingAdvancedResourceModel) ToSharedAiRateLimitingAdvanc
 			Before: before,
 		}
 	}
-	var partials []shared.AiRateLimitingAdvancedPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiRateLimitingAdvancedPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiRateLimitingAdvancedPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AiRateLimitingAdvancedPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiRateLimitingAdvancedPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -154,15 +151,23 @@ func (r *PluginAiRateLimitingAdvancedResourceModel) ToSharedAiRateLimitingAdvanc
 		} else {
 			identifier = nil
 		}
+		llmFormat := new(shared.AiRateLimitingAdvancedPluginLlmFormat)
+		if !r.Config.LlmFormat.IsUnknown() && !r.Config.LlmFormat.IsNull() {
+			*llmFormat = shared.AiRateLimitingAdvancedPluginLlmFormat(r.Config.LlmFormat.ValueString())
+		} else {
+			llmFormat = nil
+		}
 		llmProviders := make([]shared.LlmProviders, 0, len(r.Config.LlmProviders))
 		for _, llmProvidersItem := range r.Config.LlmProviders {
-			var limit float64
-			limit = llmProvidersItem.Limit.ValueFloat64()
-
+			limit := make([]float64, 0, len(llmProvidersItem.Limit))
+			for _, limitItem := range llmProvidersItem.Limit {
+				limit = append(limit, limitItem.ValueFloat64())
+			}
 			name1 := shared.Name(llmProvidersItem.Name.ValueString())
-			var windowSize float64
-			windowSize = llmProvidersItem.WindowSize.ValueFloat64()
-
+			windowSize := make([]float64, 0, len(llmProvidersItem.WindowSize))
+			for _, windowSizeItem := range llmProvidersItem.WindowSize {
+				windowSize = append(windowSize, windowSizeItem.ValueFloat64())
+			}
 			llmProviders = append(llmProviders, shared.LlmProviders{
 				Limit:      limit,
 				Name:       name1,
@@ -398,6 +403,7 @@ func (r *PluginAiRateLimitingAdvancedResourceModel) ToSharedAiRateLimitingAdvanc
 			HeaderName:                 headerName,
 			HideClientHeaders:          hideClientHeaders,
 			Identifier:                 identifier,
+			LlmFormat:                  llmFormat,
 			LlmProviders:               llmProviders,
 			Path:                       path1,
 			Redis:                      redis,
@@ -548,15 +554,26 @@ func (r *PluginAiRateLimitingAdvancedResourceModel) RefreshFromSharedAiRateLimit
 			} else {
 				r.Config.Identifier = types.StringNull()
 			}
+			if resp.Config.LlmFormat != nil {
+				r.Config.LlmFormat = types.StringValue(string(*resp.Config.LlmFormat))
+			} else {
+				r.Config.LlmFormat = types.StringNull()
+			}
 			r.Config.LlmProviders = []tfTypes.LlmProviders{}
 			if len(r.Config.LlmProviders) > len(resp.Config.LlmProviders) {
 				r.Config.LlmProviders = r.Config.LlmProviders[:len(resp.Config.LlmProviders)]
 			}
 			for llmProvidersCount, llmProvidersItem := range resp.Config.LlmProviders {
 				var llmProviders tfTypes.LlmProviders
-				llmProviders.Limit = types.Float64Value(llmProvidersItem.Limit)
+				llmProviders.Limit = make([]types.Float64, 0, len(llmProvidersItem.Limit))
+				for _, v := range llmProvidersItem.Limit {
+					llmProviders.Limit = append(llmProviders.Limit, types.Float64Value(v))
+				}
 				llmProviders.Name = types.StringValue(string(llmProvidersItem.Name))
-				llmProviders.WindowSize = types.Float64Value(llmProvidersItem.WindowSize)
+				llmProviders.WindowSize = make([]types.Float64, 0, len(llmProvidersItem.WindowSize))
+				for _, v := range llmProvidersItem.WindowSize {
+					llmProviders.WindowSize = append(llmProviders.WindowSize, types.Float64Value(v))
+				}
 				if llmProvidersCount+1 > len(r.Config.LlmProviders) {
 					r.Config.LlmProviders = append(r.Config.LlmProviders, llmProviders)
 				} else {
@@ -682,23 +699,21 @@ func (r *PluginAiRateLimitingAdvancedResourceModel) RefreshFromSharedAiRateLimit
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

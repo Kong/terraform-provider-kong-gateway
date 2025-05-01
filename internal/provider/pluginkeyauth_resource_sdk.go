@@ -65,34 +65,31 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 			Before: before,
 		}
 	}
-	var partials []shared.KeyAuthPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.KeyAuthPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.KeyAuthPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.KeyAuthPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.KeyAuthPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -117,6 +114,32 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 			*hideCredentials = r.Config.HideCredentials.ValueBool()
 		} else {
 			hideCredentials = nil
+		}
+		identityRealms := make([]shared.IdentityRealms, 0, len(r.Config.IdentityRealms))
+		for _, identityRealmsItem := range r.Config.IdentityRealms {
+			id2 := new(string)
+			if !identityRealmsItem.ID.IsUnknown() && !identityRealmsItem.ID.IsNull() {
+				*id2 = identityRealmsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			region := new(string)
+			if !identityRealmsItem.Region.IsUnknown() && !identityRealmsItem.Region.IsNull() {
+				*region = identityRealmsItem.Region.ValueString()
+			} else {
+				region = nil
+			}
+			scope := new(shared.Scope)
+			if !identityRealmsItem.Scope.IsUnknown() && !identityRealmsItem.Scope.IsNull() {
+				*scope = shared.Scope(identityRealmsItem.Scope.ValueString())
+			} else {
+				scope = nil
+			}
+			identityRealms = append(identityRealms, shared.IdentityRealms{
+				ID:     id2,
+				Region: region,
+				Scope:  scope,
+			})
 		}
 		keyInBody := new(bool)
 		if !r.Config.KeyInBody.IsUnknown() && !r.Config.KeyInBody.IsNull() {
@@ -155,6 +178,7 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 		config = &shared.KeyAuthPluginConfig{
 			Anonymous:       anonymous,
 			HideCredentials: hideCredentials,
+			IdentityRealms:  identityRealms,
 			KeyInBody:       keyInBody,
 			KeyInHeader:     keyInHeader,
 			KeyInQuery:      keyInQuery,
@@ -169,26 +193,26 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 	}
 	var route *shared.KeyAuthPluginRoute
 	if r.Route != nil {
-		id2 := new(string)
+		id3 := new(string)
 		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id2 = r.Route.ID.ValueString()
+			*id3 = r.Route.ID.ValueString()
 		} else {
-			id2 = nil
+			id3 = nil
 		}
 		route = &shared.KeyAuthPluginRoute{
-			ID: id2,
+			ID: id3,
 		}
 	}
 	var service *shared.KeyAuthPluginService
 	if r.Service != nil {
-		id3 := new(string)
+		id4 := new(string)
 		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id3 = r.Service.ID.ValueString()
+			*id4 = r.Service.ID.ValueString()
 		} else {
-			id3 = nil
+			id4 = nil
 		}
 		service = &shared.KeyAuthPluginService{
-			ID: id3,
+			ID: id4,
 		}
 	}
 	out := shared.KeyAuthPlugin{
@@ -266,6 +290,27 @@ func (r *PluginKeyAuthResourceModel) RefreshFromSharedKeyAuthPlugin(ctx context.
 			r.Config = &tfTypes.KeyAuthPluginConfig{}
 			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+			r.Config.IdentityRealms = []tfTypes.IdentityRealms{}
+			if len(r.Config.IdentityRealms) > len(resp.Config.IdentityRealms) {
+				r.Config.IdentityRealms = r.Config.IdentityRealms[:len(resp.Config.IdentityRealms)]
+			}
+			for identityRealmsCount, identityRealmsItem := range resp.Config.IdentityRealms {
+				var identityRealms tfTypes.IdentityRealms
+				identityRealms.ID = types.StringPointerValue(identityRealmsItem.ID)
+				identityRealms.Region = types.StringPointerValue(identityRealmsItem.Region)
+				if identityRealmsItem.Scope != nil {
+					identityRealms.Scope = types.StringValue(string(*identityRealmsItem.Scope))
+				} else {
+					identityRealms.Scope = types.StringNull()
+				}
+				if identityRealmsCount+1 > len(r.Config.IdentityRealms) {
+					r.Config.IdentityRealms = append(r.Config.IdentityRealms, identityRealms)
+				} else {
+					r.Config.IdentityRealms[identityRealmsCount].ID = identityRealms.ID
+					r.Config.IdentityRealms[identityRealmsCount].Region = identityRealms.Region
+					r.Config.IdentityRealms[identityRealmsCount].Scope = identityRealms.Scope
+				}
+			}
 			r.Config.KeyInBody = types.BoolPointerValue(resp.Config.KeyInBody)
 			r.Config.KeyInHeader = types.BoolPointerValue(resp.Config.KeyInHeader)
 			r.Config.KeyInQuery = types.BoolPointerValue(resp.Config.KeyInQuery)
@@ -303,23 +348,21 @@ func (r *PluginKeyAuthResourceModel) RefreshFromSharedKeyAuthPlugin(ctx context.
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

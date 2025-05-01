@@ -81,6 +81,10 @@ func (r *PluginPrometheusDataSource) Schema(ctx context.Context, req datasource.
 						Computed:    true,
 						Description: `A boolean value that determines if upstream metrics should be collected. If enabled, ` + "`" + `upstream_target_health` + "`" + ` metric will be exported.`,
 					},
+					"wasm_metrics": schema.BoolAttribute{
+						Computed:    true,
+						Description: `A boolean value that determines if Wasm metrics should be collected.`,
+					},
 				},
 			},
 			"consumer": schema.SingleNestedAttribute{

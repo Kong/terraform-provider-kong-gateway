@@ -58,6 +58,10 @@ func (r *PluginAiPromptDecoratorDataSource) Schema(ctx context.Context, req data
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Attributes: map[string]schema.Attribute{
+					"llm_format": schema.StringAttribute{
+						Computed:    true,
+						Description: `LLM input and output format and schema to use`,
+					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
 						Description: `max allowed body size allowed to be introspected`,

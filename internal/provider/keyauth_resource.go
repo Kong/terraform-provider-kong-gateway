@@ -37,6 +37,7 @@ type KeyAuthResourceModel struct {
 	ID         types.String                       `tfsdk:"id"`
 	Key        types.String                       `tfsdk:"key"`
 	Tags       []types.String                     `tfsdk:"tags"`
+	TTL        types.Int64                        `tfsdk:"ttl"`
 }
 
 func (r *KeyAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -77,6 +78,11 @@ func (r *KeyAuthResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
+			},
+			"ttl": schema.Int64Attribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `key-auth ttl in seconds`,
 			},
 		},
 	}

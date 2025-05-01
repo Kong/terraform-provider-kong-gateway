@@ -65,34 +65,31 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 			Before: before,
 		}
 	}
-	var partials []shared.AiPromptGuardPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiPromptGuardPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiPromptGuardPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AiPromptGuardPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiPromptGuardPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
 	tags := make([]string, 0, len(r.Tags))
 	for _, tagsItem := range r.Tags {
@@ -120,6 +117,12 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 		for _, denyPatternsItem := range r.Config.DenyPatterns {
 			denyPatterns = append(denyPatterns, denyPatternsItem.ValueString())
 		}
+		llmFormat := new(shared.AiPromptGuardPluginLlmFormat)
+		if !r.Config.LlmFormat.IsUnknown() && !r.Config.LlmFormat.IsNull() {
+			*llmFormat = shared.AiPromptGuardPluginLlmFormat(r.Config.LlmFormat.ValueString())
+		} else {
+			llmFormat = nil
+		}
 		matchAllRoles := new(bool)
 		if !r.Config.MatchAllRoles.IsUnknown() && !r.Config.MatchAllRoles.IsNull() {
 			*matchAllRoles = r.Config.MatchAllRoles.ValueBool()
@@ -136,6 +139,7 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 			AllowAllConversationHistory: allowAllConversationHistory,
 			AllowPatterns:               allowPatterns,
 			DenyPatterns:                denyPatterns,
+			LlmFormat:                   llmFormat,
 			MatchAllRoles:               matchAllRoles,
 			MaxRequestBodySize:          maxRequestBodySize,
 		}
@@ -276,6 +280,11 @@ func (r *PluginAiPromptGuardResourceModel) RefreshFromSharedAiPromptGuardPlugin(
 			for _, v := range resp.Config.DenyPatterns {
 				r.Config.DenyPatterns = append(r.Config.DenyPatterns, types.StringValue(v))
 			}
+			if resp.Config.LlmFormat != nil {
+				r.Config.LlmFormat = types.StringValue(string(*resp.Config.LlmFormat))
+			} else {
+				r.Config.LlmFormat = types.StringNull()
+			}
 			r.Config.MatchAllRoles = types.BoolPointerValue(resp.Config.MatchAllRoles)
 			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
 		}
@@ -318,23 +327,21 @@ func (r *PluginAiPromptGuardResourceModel) RefreshFromSharedAiPromptGuardPlugin(
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+		r.Partials = []tfTypes.Partials{}
+		if len(r.Partials) > len(resp.Partials) {
+			r.Partials = r.Partials[:len(resp.Partials)]
+		}
+		for partialsCount, partialsItem := range resp.Partials {
+			var partials tfTypes.Partials
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+			if partialsCount+1 > len(r.Partials) {
+				r.Partials = append(r.Partials, partials)
+			} else {
+				r.Partials[partialsCount].ID = partials.ID
+				r.Partials[partialsCount].Name = partials.Name
+				r.Partials[partialsCount].Path = partials.Path
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))

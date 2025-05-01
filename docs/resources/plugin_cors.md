@@ -15,7 +15,8 @@ PluginCors Resource
 ```terraform
 resource "kong-gateway_plugin_cors" "my_plugincors" {
   config = {
-    credentials = false
+    allow_origin_absent = true
+    credentials         = false
     exposed_headers = [
       "..."
     ]
@@ -97,6 +98,7 @@ resource "kong-gateway_plugin_cors" "my_plugincors" {
 
 Optional:
 
+- `allow_origin_absent` (Boolean) A boolean value that skip cors response headers when origin header of request is empty
 - `credentials` (Boolean) Flag to determine whether the `Access-Control-Allow-Credentials` header should be sent with `true` as the value.
 - `exposed_headers` (List of String) Value for the `Access-Control-Expose-Headers` header. If not specified, no custom headers are exposed.
 - `headers` (List of String) Value for the `Access-Control-Allow-Headers` header.

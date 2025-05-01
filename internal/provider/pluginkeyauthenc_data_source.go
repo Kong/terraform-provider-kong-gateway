@@ -28,7 +28,7 @@ type PluginKeyAuthEncDataSource struct {
 
 // PluginKeyAuthEncDataSourceModel describes the data model.
 type PluginKeyAuthEncDataSourceModel struct {
-	Config       *tfTypes.KeyAuthPluginConfig       `tfsdk:"config"`
+	Config       *tfTypes.KeyAuthEncPluginConfig    `tfsdk:"config"`
 	CreatedAt    types.Int64                        `tfsdk:"created_at"`
 	Enabled      types.Bool                         `tfsdk:"enabled"`
 	ID           types.String                       `tfsdk:"id"`

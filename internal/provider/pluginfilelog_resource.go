@@ -76,7 +76,7 @@ func (r *PluginFileLogResource) Schema(ctx context.Context, req resource.SchemaR
 						Optional:    true,
 						Description: `The file path of the output log file. The plugin creates the log file if it doesn't exist yet.`,
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`), "must match pattern "+regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`).String()),
+							stringvalidator.RegexMatches(regexp.MustCompile(`^[^*&%%\`+"`"+`]+$`), "must match pattern "+regexp.MustCompile(`^[^*&%%\`+"`"+`]+$`).String()),
 						},
 					},
 					"reopen": schema.BoolAttribute{

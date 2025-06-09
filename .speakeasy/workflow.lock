@@ -8,7 +8,7 @@ sources:
             - latest
     gateway:
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:f61325fc6726f19c9fe5b6e994e0c97147a1aaa807b00dd384b41ae4d8044c6d
+        sourceRevisionDigest: sha256:7c55618e9a291fb8acaa2f04b7e1cdbf78df50dc906d0aee76074f52f9ffee44
         sourceBlobDigest: sha256:71870faa2bb81e8daec4d5492d78114c4dded6f9cb9611ca54de7a63f5ff32e4
         tags:
             - latest
@@ -22,7 +22,7 @@ targets:
     tf:
         source: gateway
         sourceNamespace: gateway
-        sourceRevisionDigest: sha256:f61325fc6726f19c9fe5b6e994e0c97147a1aaa807b00dd384b41ae4d8044c6d
+        sourceRevisionDigest: sha256:7c55618e9a291fb8acaa2f04b7e1cdbf78df50dc906d0aee76074f52f9ffee44
         sourceBlobDigest: sha256:71870faa2bb81e8daec4d5492d78114c4dded6f9cb9611ca54de7a63f5ff32e4
 workflow:
     workflowVersion: 1.0.0

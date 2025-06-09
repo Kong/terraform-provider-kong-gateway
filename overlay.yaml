@@ -23,3 +23,7 @@ actions:
     update:
       writeOnly: true
       x-speakeasy-param-sensitive: true
+
+  # File Log Plugin
+  - target: $["components"]["schemas"]["FileLogPluginConfig"]["properties"]["config"]["properties"]["path"]["pattern"]
+    remove: true

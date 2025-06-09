@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1
+> Released on 2025/06/09
+
+### Bug Fixes
+
+* Fixed a bug in the `file_log` plugin `path` validation that disallowed `/dev/stdout` as a path
+
 ## 0.5.0
 > Released on 2025/05/01
 

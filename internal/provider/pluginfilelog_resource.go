@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -17,7 +16,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	"regexp"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -75,9 +73,6 @@ func (r *PluginFileLogResource) Schema(ctx context.Context, req resource.SchemaR
 						Computed:    true,
 						Optional:    true,
 						Description: `The file path of the output log file. The plugin creates the log file if it doesn't exist yet.`,
-						Validators: []validator.String{
-							stringvalidator.RegexMatches(regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`), "must match pattern "+regexp.MustCompile(`^[^[\t\n\v\f\r ]*&%%\`+"`"+`][^*&%%\`+"`"+`]*[^[\t\n\v\f\r ]*&%%\`+"`"+`]$`).String()),
-						},
 					},
 					"reopen": schema.BoolAttribute{
 						Computed:    true,

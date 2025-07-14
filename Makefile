@@ -12,6 +12,7 @@ format:
 speakeasy: check-speakeasy
 	speakeasy run -o console --skip-versioning
 	@go generate .
+	@git clean -fd docs/data-sources examples > /dev/null
 	@git checkout -- README.md examples/README.md
 	@rm USAGE.md
 

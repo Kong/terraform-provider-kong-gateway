@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2
+> Released on ?
+
+### Bug Fixes
+
+* The provider now works with terraform v1.12.1
+
 ## 0.5.1
 > Released on 2025/06/09
 

@@ -28,6 +28,7 @@ func NewPluginJSONThreatProtectionResource() resource.Resource {
 
 // PluginJSONThreatProtectionResource defines the resource implementation.
 type PluginJSONThreatProtectionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

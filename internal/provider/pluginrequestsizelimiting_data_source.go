@@ -23,6 +23,7 @@ func NewPluginRequestSizeLimitingDataSource() datasource.DataSource {
 
 // PluginRequestSizeLimitingDataSource is the data source implementation.
 type PluginRequestSizeLimitingDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

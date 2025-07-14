@@ -23,6 +23,7 @@ func NewPluginOpentelemetryDataSource() datasource.DataSource {
 
 // PluginOpentelemetryDataSource is the data source implementation.
 type PluginOpentelemetryDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

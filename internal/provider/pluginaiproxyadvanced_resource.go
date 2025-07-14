@@ -32,6 +32,7 @@ func NewPluginAiProxyAdvancedResource() resource.Resource {
 
 // PluginAiProxyAdvancedResource defines the resource implementation.
 type PluginAiProxyAdvancedResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

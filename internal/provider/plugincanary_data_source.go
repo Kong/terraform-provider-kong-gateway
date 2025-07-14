@@ -23,6 +23,7 @@ func NewPluginCanaryDataSource() datasource.DataSource {
 
 // PluginCanaryDataSource is the data source implementation.
 type PluginCanaryDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginProxyCacheAdvancedDataSource() datasource.DataSource {
 
 // PluginProxyCacheAdvancedDataSource is the data source implementation.
 type PluginProxyCacheAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

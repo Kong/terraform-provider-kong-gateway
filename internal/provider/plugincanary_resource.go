@@ -29,6 +29,7 @@ func NewPluginCanaryResource() resource.Resource {
 
 // PluginCanaryResource defines the resource implementation.
 type PluginCanaryResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

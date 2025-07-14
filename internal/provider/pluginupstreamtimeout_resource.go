@@ -27,6 +27,7 @@ func NewPluginUpstreamTimeoutResource() resource.Resource {
 
 // PluginUpstreamTimeoutResource defines the resource implementation.
 type PluginUpstreamTimeoutResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -32,6 +32,7 @@ func NewPluginAcmeResource() resource.Resource {
 
 // PluginAcmeResource defines the resource implementation.
 type PluginAcmeResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

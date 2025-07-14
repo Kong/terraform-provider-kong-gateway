@@ -23,6 +23,7 @@ func NewMTLSAuthDataSource() datasource.DataSource {
 
 // MTLSAuthDataSource is the data source implementation.
 type MTLSAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -28,6 +28,7 @@ func NewPluginRateLimitingAdvancedResource() resource.Resource {
 
 // PluginRateLimitingAdvancedResource defines the resource implementation.
 type PluginRateLimitingAdvancedResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

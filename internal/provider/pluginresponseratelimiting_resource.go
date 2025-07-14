@@ -30,6 +30,7 @@ func NewPluginResponseRatelimitingResource() resource.Resource {
 
 // PluginResponseRatelimitingResource defines the resource implementation.
 type PluginResponseRatelimitingResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -29,6 +29,7 @@ func NewPluginAiRequestTransformerResource() resource.Resource {
 
 // PluginAiRequestTransformerResource defines the resource implementation.
 type PluginAiRequestTransformerResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

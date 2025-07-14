@@ -23,6 +23,7 @@ func NewPluginPrometheusDataSource() datasource.DataSource {
 
 // PluginPrometheusDataSource is the data source implementation.
 type PluginPrometheusDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -27,6 +27,7 @@ func NewPluginSessionResource() resource.Resource {
 
 // PluginSessionResource defines the resource implementation.
 type PluginSessionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

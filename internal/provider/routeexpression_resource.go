@@ -27,6 +27,7 @@ func NewRouteExpressionResource() resource.Resource {
 
 // RouteExpressionResource defines the resource implementation.
 type RouteExpressionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

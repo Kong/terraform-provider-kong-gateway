@@ -28,6 +28,7 @@ func NewPluginOpaResource() resource.Resource {
 
 // PluginOpaResource defines the resource implementation.
 type PluginOpaResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

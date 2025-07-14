@@ -30,6 +30,7 @@ func NewPluginConfluentConsumeResource() resource.Resource {
 
 // PluginConfluentConsumeResource defines the resource implementation.
 type PluginConfluentConsumeResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewKeyAuthDataSource() datasource.DataSource {
 
 // KeyAuthDataSource is the data source implementation.
 type KeyAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -29,6 +29,7 @@ func NewPluginOauth2IntrospectionResource() resource.Resource {
 
 // PluginOauth2IntrospectionResource defines the resource implementation.
 type PluginOauth2IntrospectionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

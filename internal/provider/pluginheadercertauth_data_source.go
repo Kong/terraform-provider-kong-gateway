@@ -23,6 +23,7 @@ func NewPluginHeaderCertAuthDataSource() datasource.DataSource {
 
 // PluginHeaderCertAuthDataSource is the data source implementation.
 type PluginHeaderCertAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

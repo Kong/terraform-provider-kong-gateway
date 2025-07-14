@@ -30,6 +30,7 @@ func NewPluginDatadogResource() resource.Resource {
 
 // PluginDatadogResource defines the resource implementation.
 type PluginDatadogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

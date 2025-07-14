@@ -28,6 +28,7 @@ func NewPluginRateLimitingResource() resource.Resource {
 
 // PluginRateLimitingResource defines the resource implementation.
 type PluginRateLimitingResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

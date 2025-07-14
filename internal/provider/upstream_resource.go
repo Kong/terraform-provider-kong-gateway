@@ -26,6 +26,7 @@ func NewUpstreamResource() resource.Resource {
 
 // UpstreamResource defines the resource implementation.
 type UpstreamResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

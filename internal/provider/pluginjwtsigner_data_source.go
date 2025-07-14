@@ -23,6 +23,7 @@ func NewPluginJwtSignerDataSource() datasource.DataSource {
 
 // PluginJwtSignerDataSource is the data source implementation.
 type PluginJwtSignerDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

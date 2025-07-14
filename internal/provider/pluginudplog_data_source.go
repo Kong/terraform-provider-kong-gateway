@@ -23,6 +23,7 @@ func NewPluginUDPLogDataSource() datasource.DataSource {
 
 // PluginUDPLogDataSource is the data source implementation.
 type PluginUDPLogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

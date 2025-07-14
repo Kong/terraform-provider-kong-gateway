@@ -23,6 +23,7 @@ func NewPluginCorrelationIDDataSource() datasource.DataSource {
 
 // PluginCorrelationIDDataSource is the data source implementation.
 type PluginCorrelationIDDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

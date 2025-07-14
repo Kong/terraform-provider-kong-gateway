@@ -26,6 +26,7 @@ func NewBasicAuthResource() resource.Resource {
 
 // BasicAuthResource defines the resource implementation.
 type BasicAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 
@@ -333,7 +334,7 @@ func (r *BasicAuthResource) ImportState(ctx context.Context, req resource.Import
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "id": "80db1b58-ca7c-4d21-b92a-64eb07725872",  "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "80db1b58-ca7c-4d21-b92a-64eb07725872"}': `+err.Error())
 		return
 	}
 
@@ -347,5 +348,4 @@ func (r *BasicAuthResource) ImportState(ctx context.Context, req resource.Import
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
-
 }

@@ -26,6 +26,7 @@ func NewPartialResource() resource.Resource {
 
 // PartialResource defines the resource implementation.
 type PartialResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginKafkaUpstreamDataSource() datasource.DataSource {
 
 // PluginKafkaUpstreamDataSource is the data source implementation.
 type PluginKafkaUpstreamDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

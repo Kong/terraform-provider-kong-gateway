@@ -26,6 +26,7 @@ func NewPluginPreFunctionResource() resource.Resource {
 
 // PluginPreFunctionResource defines the resource implementation.
 type PluginPreFunctionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

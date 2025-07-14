@@ -23,6 +23,7 @@ func NewPluginRateLimitingAdvancedDataSource() datasource.DataSource {
 
 // PluginRateLimitingAdvancedDataSource is the data source implementation.
 type PluginRateLimitingAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginRouteTransformerAdvancedDataSource() datasource.DataSource {
 
 // PluginRouteTransformerAdvancedDataSource is the data source implementation.
 type PluginRouteTransformerAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

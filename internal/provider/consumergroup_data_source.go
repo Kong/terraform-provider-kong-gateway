@@ -22,6 +22,7 @@ func NewConsumerGroupDataSource() datasource.DataSource {
 
 // ConsumerGroupDataSource is the data source implementation.
 type ConsumerGroupDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

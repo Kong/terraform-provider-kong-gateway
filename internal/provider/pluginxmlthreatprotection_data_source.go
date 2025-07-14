@@ -23,6 +23,7 @@ func NewPluginXMLThreatProtectionDataSource() datasource.DataSource {
 
 // PluginXMLThreatProtectionDataSource is the data source implementation.
 type PluginXMLThreatProtectionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -30,6 +30,7 @@ func NewPluginKafkaUpstreamResource() resource.Resource {
 
 // PluginKafkaUpstreamResource defines the resource implementation.
 type PluginKafkaUpstreamResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

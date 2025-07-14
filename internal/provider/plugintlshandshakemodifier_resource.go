@@ -27,6 +27,7 @@ func NewPluginTLSHandshakeModifierResource() resource.Resource {
 
 // PluginTLSHandshakeModifierResource defines the resource implementation.
 type PluginTLSHandshakeModifierResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

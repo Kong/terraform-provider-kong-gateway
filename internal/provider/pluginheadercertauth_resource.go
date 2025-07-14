@@ -28,6 +28,7 @@ func NewPluginHeaderCertAuthResource() resource.Resource {
 
 // PluginHeaderCertAuthResource defines the resource implementation.
 type PluginHeaderCertAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

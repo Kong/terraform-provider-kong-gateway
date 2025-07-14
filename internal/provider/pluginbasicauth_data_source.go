@@ -23,6 +23,7 @@ func NewPluginBasicAuthDataSource() datasource.DataSource {
 
 // PluginBasicAuthDataSource is the data source implementation.
 type PluginBasicAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

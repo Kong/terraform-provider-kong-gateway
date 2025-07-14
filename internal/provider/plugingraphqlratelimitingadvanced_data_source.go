@@ -23,6 +23,7 @@ func NewPluginGraphqlRateLimitingAdvancedDataSource() datasource.DataSource {
 
 // PluginGraphqlRateLimitingAdvancedDataSource is the data source implementation.
 type PluginGraphqlRateLimitingAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

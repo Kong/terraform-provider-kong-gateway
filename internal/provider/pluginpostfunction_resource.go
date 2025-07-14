@@ -26,6 +26,7 @@ func NewPluginPostFunctionResource() resource.Resource {
 
 // PluginPostFunctionResource defines the resource implementation.
 type PluginPostFunctionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

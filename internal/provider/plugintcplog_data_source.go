@@ -23,6 +23,7 @@ func NewPluginTCPLogDataSource() datasource.DataSource {
 
 // PluginTCPLogDataSource is the data source implementation.
 type PluginTCPLogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

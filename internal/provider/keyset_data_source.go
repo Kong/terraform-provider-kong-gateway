@@ -22,6 +22,7 @@ func NewKeySetDataSource() datasource.DataSource {
 
 // KeySetDataSource is the data source implementation.
 type KeySetDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

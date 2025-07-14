@@ -28,6 +28,7 @@ func NewPluginServiceProtectionResource() resource.Resource {
 
 // PluginServiceProtectionResource defines the resource implementation.
 type PluginServiceProtectionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

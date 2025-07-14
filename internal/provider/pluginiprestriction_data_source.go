@@ -23,6 +23,7 @@ func NewPluginIPRestrictionDataSource() datasource.DataSource {
 
 // PluginIPRestrictionDataSource is the data source implementation.
 type PluginIPRestrictionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

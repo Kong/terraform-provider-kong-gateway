@@ -23,6 +23,7 @@ func NewPluginFileLogDataSource() datasource.DataSource {
 
 // PluginFileLogDataSource is the data source implementation.
 type PluginFileLogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -26,6 +26,7 @@ func NewPluginExitTransformerResource() resource.Resource {
 
 // PluginExitTransformerResource defines the resource implementation.
 type PluginExitTransformerResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

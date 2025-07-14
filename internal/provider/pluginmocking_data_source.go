@@ -23,6 +23,7 @@ func NewPluginMockingDataSource() datasource.DataSource {
 
 // PluginMockingDataSource is the data source implementation.
 type PluginMockingDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

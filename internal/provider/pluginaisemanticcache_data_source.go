@@ -23,6 +23,7 @@ func NewPluginAiSemanticCacheDataSource() datasource.DataSource {
 
 // PluginAiSemanticCacheDataSource is the data source implementation.
 type PluginAiSemanticCacheDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

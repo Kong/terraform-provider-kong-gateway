@@ -26,6 +26,7 @@ func NewPluginStandardWebhooksResource() resource.Resource {
 
 // PluginStandardWebhooksResource defines the resource implementation.
 type PluginStandardWebhooksResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

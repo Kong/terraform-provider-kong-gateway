@@ -23,6 +23,7 @@ func NewPluginJweDecryptDataSource() datasource.DataSource {
 
 // PluginJweDecryptDataSource is the data source implementation.
 type PluginJweDecryptDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

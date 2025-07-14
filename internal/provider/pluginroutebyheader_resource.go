@@ -30,6 +30,7 @@ func NewPluginRouteByHeaderResource() resource.Resource {
 
 // PluginRouteByHeaderResource defines the resource implementation.
 type PluginRouteByHeaderResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

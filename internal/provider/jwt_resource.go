@@ -28,6 +28,7 @@ func NewJwtResource() resource.Resource {
 
 // JwtResource defines the resource implementation.
 type JwtResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 
@@ -364,7 +365,7 @@ func (r *JwtResource) ImportState(ctx context.Context, req resource.ImportStateR
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}': `+err.Error())
 		return
 	}
 
@@ -378,5 +379,4 @@ func (r *JwtResource) ImportState(ctx context.Context, req resource.ImportStateR
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-
 }

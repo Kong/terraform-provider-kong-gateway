@@ -23,6 +23,7 @@ func NewPluginUpstreamOauthDataSource() datasource.DataSource {
 
 // PluginUpstreamOauthDataSource is the data source implementation.
 type PluginUpstreamOauthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

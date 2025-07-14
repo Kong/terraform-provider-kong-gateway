@@ -29,6 +29,7 @@ func NewPluginJwtSignerResource() resource.Resource {
 
 // PluginJwtSignerResource defines the resource implementation.
 type PluginJwtSignerResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

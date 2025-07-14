@@ -26,6 +26,7 @@ func NewPluginDegraphqlResource() resource.Resource {
 
 // PluginDegraphqlResource defines the resource implementation.
 type PluginDegraphqlResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

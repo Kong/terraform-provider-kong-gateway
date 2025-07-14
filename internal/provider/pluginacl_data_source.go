@@ -23,6 +23,7 @@ func NewPluginACLDataSource() datasource.DataSource {
 
 // PluginACLDataSource is the data source implementation.
 type PluginACLDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

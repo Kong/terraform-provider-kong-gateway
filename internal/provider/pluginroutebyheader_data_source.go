@@ -23,6 +23,7 @@ func NewPluginRouteByHeaderDataSource() datasource.DataSource {
 
 // PluginRouteByHeaderDataSource is the data source implementation.
 type PluginRouteByHeaderDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

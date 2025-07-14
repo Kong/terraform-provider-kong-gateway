@@ -23,6 +23,7 @@ func NewPluginGraphqlProxyCacheAdvancedDataSource() datasource.DataSource {
 
 // PluginGraphqlProxyCacheAdvancedDataSource is the data source implementation.
 type PluginGraphqlProxyCacheAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -26,6 +26,7 @@ func NewPluginCorsResource() resource.Resource {
 
 // PluginCorsResource defines the resource implementation.
 type PluginCorsResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

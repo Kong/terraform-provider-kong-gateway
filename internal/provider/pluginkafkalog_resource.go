@@ -32,6 +32,7 @@ func NewPluginKafkaLogResource() resource.Resource {
 
 // PluginKafkaLogResource defines the resource implementation.
 type PluginKafkaLogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

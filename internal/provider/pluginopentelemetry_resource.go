@@ -32,6 +32,7 @@ func NewPluginOpentelemetryResource() resource.Resource {
 
 // PluginOpentelemetryResource defines the resource implementation.
 type PluginOpentelemetryResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

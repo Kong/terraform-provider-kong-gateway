@@ -23,6 +23,7 @@ func NewRouteExpressionDataSource() datasource.DataSource {
 
 // RouteExpressionDataSource is the data source implementation.
 type RouteExpressionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

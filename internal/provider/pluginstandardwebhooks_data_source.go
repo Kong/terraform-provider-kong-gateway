@@ -23,6 +23,7 @@ func NewPluginStandardWebhooksDataSource() datasource.DataSource {
 
 // PluginStandardWebhooksDataSource is the data source implementation.
 type PluginStandardWebhooksDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

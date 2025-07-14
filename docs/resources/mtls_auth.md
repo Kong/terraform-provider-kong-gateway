@@ -69,5 +69,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_mtls_auth.my_kong-gateway_mtls_auth "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"id\": \"\"}"
+terraform import kong-gateway_mtls_auth.my_kong-gateway_mtls_auth '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": ""}'
 ```

@@ -23,6 +23,7 @@ func NewPluginOauth2IntrospectionDataSource() datasource.DataSource {
 
 // PluginOauth2IntrospectionDataSource is the data source implementation.
 type PluginOauth2IntrospectionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

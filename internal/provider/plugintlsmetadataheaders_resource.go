@@ -26,6 +26,7 @@ func NewPluginTLSMetadataHeadersResource() resource.Resource {
 
 // PluginTLSMetadataHeadersResource defines the resource implementation.
 type PluginTLSMetadataHeadersResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

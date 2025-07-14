@@ -23,6 +23,7 @@ func NewPluginGrpcGatewayDataSource() datasource.DataSource {
 
 // PluginGrpcGatewayDataSource is the data source implementation.
 type PluginGrpcGatewayDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

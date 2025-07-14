@@ -23,6 +23,7 @@ func NewPluginResponseTransformerAdvancedDataSource() datasource.DataSource {
 
 // PluginResponseTransformerAdvancedDataSource is the data source implementation.
 type PluginResponseTransformerAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

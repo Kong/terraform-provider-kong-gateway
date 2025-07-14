@@ -26,6 +26,7 @@ func NewPluginAzureFunctionsResource() resource.Resource {
 
 // PluginAzureFunctionsResource defines the resource implementation.
 type PluginAzureFunctionsResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

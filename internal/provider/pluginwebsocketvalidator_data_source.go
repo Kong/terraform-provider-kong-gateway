@@ -23,6 +23,7 @@ func NewPluginWebsocketValidatorDataSource() datasource.DataSource {
 
 // PluginWebsocketValidatorDataSource is the data source implementation.
 type PluginWebsocketValidatorDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewUpstreamDataSource() datasource.DataSource {
 
 // UpstreamDataSource is the data source implementation.
 type UpstreamDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

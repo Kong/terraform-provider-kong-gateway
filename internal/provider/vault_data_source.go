@@ -22,6 +22,7 @@ func NewVaultDataSource() datasource.DataSource {
 
 // VaultDataSource is the data source implementation.
 type VaultDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

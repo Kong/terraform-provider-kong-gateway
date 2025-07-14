@@ -30,6 +30,7 @@ func NewPluginLogglyResource() resource.Resource {
 
 // PluginLogglyResource defines the resource implementation.
 type PluginLogglyResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

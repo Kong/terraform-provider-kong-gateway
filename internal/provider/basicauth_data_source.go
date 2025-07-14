@@ -23,6 +23,7 @@ func NewBasicAuthDataSource() datasource.DataSource {
 
 // BasicAuthDataSource is the data source implementation.
 type BasicAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

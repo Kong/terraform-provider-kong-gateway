@@ -26,6 +26,7 @@ func NewPluginJweDecryptResource() resource.Resource {
 
 // PluginJweDecryptResource defines the resource implementation.
 type PluginJweDecryptResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

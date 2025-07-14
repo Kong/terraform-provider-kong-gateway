@@ -32,6 +32,7 @@ func NewPluginRequestCalloutResource() resource.Resource {
 
 // PluginRequestCalloutResource defines the resource implementation.
 type PluginRequestCalloutResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -26,6 +26,7 @@ func NewKeyAuthResource() resource.Resource {
 
 // KeyAuthResource defines the resource implementation.
 type KeyAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 
@@ -334,7 +335,7 @@ func (r *KeyAuthResource) ImportState(ctx context.Context, req resource.ImportSt
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21",  "id": ""}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": ""}': `+err.Error())
 		return
 	}
 
@@ -348,5 +349,4 @@ func (r *KeyAuthResource) ImportState(ctx context.Context, req resource.ImportSt
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-
 }

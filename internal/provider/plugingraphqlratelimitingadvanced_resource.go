@@ -28,6 +28,7 @@ func NewPluginGraphqlRateLimitingAdvancedResource() resource.Resource {
 
 // PluginGraphqlRateLimitingAdvancedResource defines the resource implementation.
 type PluginGraphqlRateLimitingAdvancedResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

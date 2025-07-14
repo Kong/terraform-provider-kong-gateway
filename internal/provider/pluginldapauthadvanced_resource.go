@@ -26,6 +26,7 @@ func NewPluginLdapAuthAdvancedResource() resource.Resource {
 
 // PluginLdapAuthAdvancedResource defines the resource implementation.
 type PluginLdapAuthAdvancedResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -28,6 +28,7 @@ func NewPluginAiPromptDecoratorResource() resource.Resource {
 
 // PluginAiPromptDecoratorResource defines the resource implementation.
 type PluginAiPromptDecoratorResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

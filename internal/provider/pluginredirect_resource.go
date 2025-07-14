@@ -27,6 +27,7 @@ func NewPluginRedirectResource() resource.Resource {
 
 // PluginRedirectResource defines the resource implementation.
 type PluginRedirectResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

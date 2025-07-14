@@ -23,6 +23,7 @@ func NewPluginOpenidConnectDataSource() datasource.DataSource {
 
 // PluginOpenidConnectDataSource is the data source implementation.
 type PluginOpenidConnectDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

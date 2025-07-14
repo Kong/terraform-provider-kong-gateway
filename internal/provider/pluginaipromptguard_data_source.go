@@ -23,6 +23,7 @@ func NewPluginAiPromptGuardDataSource() datasource.DataSource {
 
 // PluginAiPromptGuardDataSource is the data source implementation.
 type PluginAiPromptGuardDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

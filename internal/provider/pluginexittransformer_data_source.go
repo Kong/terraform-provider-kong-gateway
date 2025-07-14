@@ -23,6 +23,7 @@ func NewPluginExitTransformerDataSource() datasource.DataSource {
 
 // PluginExitTransformerDataSource is the data source implementation.
 type PluginExitTransformerDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

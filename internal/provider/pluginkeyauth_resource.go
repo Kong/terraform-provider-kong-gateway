@@ -27,6 +27,7 @@ func NewPluginKeyAuthResource() resource.Resource {
 
 // PluginKeyAuthResource defines the resource implementation.
 type PluginKeyAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

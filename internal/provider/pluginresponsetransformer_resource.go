@@ -26,6 +26,7 @@ func NewPluginResponseTransformerResource() resource.Resource {
 
 // PluginResponseTransformerResource defines the resource implementation.
 type PluginResponseTransformerResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

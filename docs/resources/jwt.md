@@ -63,5 +63,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_jwt.my_kong-gateway_jwt "{ \"consumer_id\": \"f28acbfa-c866-4587-b688-0208ac24df21\",  \"id\": \"4a7f5faa-8c96-46d6-8214-c87573ef2ac4\"}"
+terraform import kong-gateway_jwt.my_kong-gateway_jwt '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}'
 ```

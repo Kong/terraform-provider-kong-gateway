@@ -27,6 +27,7 @@ func NewPluginRequestSizeLimitingResource() resource.Resource {
 
 // PluginRequestSizeLimitingResource defines the resource implementation.
 type PluginRequestSizeLimitingResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

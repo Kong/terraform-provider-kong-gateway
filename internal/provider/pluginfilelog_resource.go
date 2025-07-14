@@ -28,6 +28,7 @@ func NewPluginFileLogResource() resource.Resource {
 
 // PluginFileLogResource defines the resource implementation.
 type PluginFileLogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

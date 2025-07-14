@@ -26,6 +26,7 @@ func NewServiceResource() resource.Resource {
 
 // ServiceResource defines the resource implementation.
 type ServiceResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

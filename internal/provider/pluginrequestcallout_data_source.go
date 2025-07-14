@@ -23,6 +23,7 @@ func NewPluginRequestCalloutDataSource() datasource.DataSource {
 
 // PluginRequestCalloutDataSource is the data source implementation.
 type PluginRequestCalloutDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

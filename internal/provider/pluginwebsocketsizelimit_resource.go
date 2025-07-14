@@ -27,6 +27,7 @@ func NewPluginWebsocketSizeLimitResource() resource.Resource {
 
 // PluginWebsocketSizeLimitResource defines the resource implementation.
 type PluginWebsocketSizeLimitResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

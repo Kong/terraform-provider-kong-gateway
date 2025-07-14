@@ -23,6 +23,7 @@ func NewPluginUpstreamTimeoutDataSource() datasource.DataSource {
 
 // PluginUpstreamTimeoutDataSource is the data source implementation.
 type PluginUpstreamTimeoutDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -28,6 +28,7 @@ func NewPluginAiRagInjectorResource() resource.Resource {
 
 // PluginAiRagInjectorResource defines the resource implementation.
 type PluginAiRagInjectorResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

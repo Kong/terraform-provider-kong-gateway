@@ -26,6 +26,7 @@ func NewPluginACLResource() resource.Resource {
 
 // PluginACLResource defines the resource implementation.
 type PluginACLResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

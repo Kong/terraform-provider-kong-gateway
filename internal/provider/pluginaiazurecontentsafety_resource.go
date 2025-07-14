@@ -29,6 +29,7 @@ func NewPluginAiAzureContentSafetyResource() resource.Resource {
 
 // PluginAiAzureContentSafetyResource defines the resource implementation.
 type PluginAiAzureContentSafetyResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

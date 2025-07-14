@@ -28,6 +28,7 @@ func NewPluginForwardProxyResource() resource.Resource {
 
 // PluginForwardProxyResource defines the resource implementation.
 type PluginForwardProxyResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

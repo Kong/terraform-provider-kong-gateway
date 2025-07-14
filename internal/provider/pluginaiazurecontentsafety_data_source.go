@@ -23,6 +23,7 @@ func NewPluginAiAzureContentSafetyDataSource() datasource.DataSource {
 
 // PluginAiAzureContentSafetyDataSource is the data source implementation.
 type PluginAiAzureContentSafetyDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

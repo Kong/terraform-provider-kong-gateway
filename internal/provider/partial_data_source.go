@@ -22,6 +22,7 @@ func NewPartialDataSource() datasource.DataSource {
 
 // PartialDataSource is the data source implementation.
 type PartialDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

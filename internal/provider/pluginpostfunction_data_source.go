@@ -23,6 +23,7 @@ func NewPluginPostFunctionDataSource() datasource.DataSource {
 
 // PluginPostFunctionDataSource is the data source implementation.
 type PluginPostFunctionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

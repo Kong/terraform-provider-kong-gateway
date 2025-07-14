@@ -27,6 +27,7 @@ func NewPluginRequestTerminationResource() resource.Resource {
 
 // PluginRequestTerminationResource defines the resource implementation.
 type PluginRequestTerminationResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginHTTPLogDataSource() datasource.DataSource {
 
 // PluginHTTPLogDataSource is the data source implementation.
 type PluginHTTPLogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

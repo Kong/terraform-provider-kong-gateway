@@ -27,3 +27,8 @@ actions:
   # File Log Plugin
   - target: $["components"]["schemas"]["FileLogPluginConfig"]["properties"]["config"]["properties"]["path"]["pattern"]
     remove: true
+  
+  # Security Scheme - allow operations when admin token is not given
+  - target: $["security"]
+    update:
+    - {} 

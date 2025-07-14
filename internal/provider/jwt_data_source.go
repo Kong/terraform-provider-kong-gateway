@@ -23,6 +23,7 @@ func NewJwtDataSource() datasource.DataSource {
 
 // JwtDataSource is the data source implementation.
 type JwtDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

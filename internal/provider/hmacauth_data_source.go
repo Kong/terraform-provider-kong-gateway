@@ -23,6 +23,7 @@ func NewHMACAuthDataSource() datasource.DataSource {
 
 // HMACAuthDataSource is the data source implementation.
 type HMACAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

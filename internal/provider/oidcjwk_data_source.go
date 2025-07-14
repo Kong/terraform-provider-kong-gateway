@@ -23,6 +23,7 @@ func NewOidcJwkDataSource() datasource.DataSource {
 
 // OidcJwkDataSource is the data source implementation.
 type OidcJwkDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

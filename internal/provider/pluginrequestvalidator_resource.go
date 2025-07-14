@@ -29,6 +29,7 @@ func NewPluginRequestValidatorResource() resource.Resource {
 
 // PluginRequestValidatorResource defines the resource implementation.
 type PluginRequestValidatorResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

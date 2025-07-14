@@ -27,6 +27,7 @@ func NewPluginCorrelationIDResource() resource.Resource {
 
 // PluginCorrelationIDResource defines the resource implementation.
 type PluginCorrelationIDResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

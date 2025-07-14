@@ -23,6 +23,7 @@ func NewPluginBotDetectionDataSource() datasource.DataSource {
 
 // PluginBotDetectionDataSource is the data source implementation.
 type PluginBotDetectionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

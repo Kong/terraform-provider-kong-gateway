@@ -26,6 +26,7 @@ func NewPluginBotDetectionResource() resource.Resource {
 
 // PluginBotDetectionResource defines the resource implementation.
 type PluginBotDetectionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

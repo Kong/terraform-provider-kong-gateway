@@ -23,6 +23,7 @@ func NewPluginDatadogTracingDataSource() datasource.DataSource {
 
 // PluginDatadogTracingDataSource is the data source implementation.
 type PluginDatadogTracingDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

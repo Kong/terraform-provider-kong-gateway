@@ -23,6 +23,7 @@ func NewPluginStatsdDataSource() datasource.DataSource {
 
 // PluginStatsdDataSource is the data source implementation.
 type PluginStatsdDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

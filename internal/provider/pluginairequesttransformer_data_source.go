@@ -23,6 +23,7 @@ func NewPluginAiRequestTransformerDataSource() datasource.DataSource {
 
 // PluginAiRequestTransformerDataSource is the data source implementation.
 type PluginAiRequestTransformerDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

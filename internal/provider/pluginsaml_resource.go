@@ -29,6 +29,7 @@ func NewPluginSamlResource() resource.Resource {
 
 // PluginSamlResource defines the resource implementation.
 type PluginSamlResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

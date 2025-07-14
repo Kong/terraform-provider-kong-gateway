@@ -29,6 +29,7 @@ func NewPluginTCPLogResource() resource.Resource {
 
 // PluginTCPLogResource defines the resource implementation.
 type PluginTCPLogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

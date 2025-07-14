@@ -26,6 +26,7 @@ func NewPluginJqResource() resource.Resource {
 
 // PluginJqResource defines the resource implementation.
 type PluginJqResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

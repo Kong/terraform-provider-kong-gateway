@@ -26,6 +26,7 @@ func NewPluginGrpcGatewayResource() resource.Resource {
 
 // PluginGrpcGatewayResource defines the resource implementation.
 type PluginGrpcGatewayResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

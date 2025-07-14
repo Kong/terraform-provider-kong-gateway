@@ -22,6 +22,7 @@ func NewCertificateDataSource() datasource.DataSource {
 
 // CertificateDataSource is the data source implementation.
 type CertificateDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

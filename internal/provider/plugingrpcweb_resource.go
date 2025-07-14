@@ -26,6 +26,7 @@ func NewPluginGrpcWebResource() resource.Resource {
 
 // PluginGrpcWebResource defines the resource implementation.
 type PluginGrpcWebResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

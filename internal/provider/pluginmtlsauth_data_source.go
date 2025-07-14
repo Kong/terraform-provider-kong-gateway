@@ -23,6 +23,7 @@ func NewPluginMtlsAuthDataSource() datasource.DataSource {
 
 // PluginMtlsAuthDataSource is the data source implementation.
 type PluginMtlsAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

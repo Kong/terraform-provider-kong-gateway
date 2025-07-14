@@ -28,6 +28,7 @@ func NewRouteResource() resource.Resource {
 
 // RouteResource defines the resource implementation.
 type RouteResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

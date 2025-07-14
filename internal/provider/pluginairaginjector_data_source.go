@@ -23,6 +23,7 @@ func NewPluginAiRagInjectorDataSource() datasource.DataSource {
 
 // PluginAiRagInjectorDataSource is the data source implementation.
 type PluginAiRagInjectorDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

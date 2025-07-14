@@ -29,6 +29,7 @@ func NewPluginAiSemanticCacheResource() resource.Resource {
 
 // PluginAiSemanticCacheResource defines the resource implementation.
 type PluginAiSemanticCacheResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

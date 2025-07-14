@@ -23,6 +23,7 @@ func NewPluginAiPromptDecoratorDataSource() datasource.DataSource {
 
 // PluginAiPromptDecoratorDataSource is the data source implementation.
 type PluginAiPromptDecoratorDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

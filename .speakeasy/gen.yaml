@@ -4,6 +4,7 @@ generation:
   maintainOpenAPIOrder: true
   usageSnippets:
     optionalPropertyRendering: withExample
+    sdkInitStyle: constructor
   useClassNamesForArrayFields: true
   fixes:
     nameResolutionDec2023: true
@@ -15,8 +16,12 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
+  tests:
+    generateTests: true
+    generateNewTests: false
+    skipResponseBodyAssertions: false
 terraform:
-  version: 0.5.1
+  version: 0.5.2
   additionalDataSources: []
   additionalDependencies: {}
   additionalEphemeralResources: []
@@ -26,6 +31,7 @@ terraform:
   additionalResources: []
   allowUnknownFieldsInWeakUnions: false
   author: kong
+  baseErrorName: KongGatewayError
   defaultErrorName: SDKError
   enableTypeDeduplication: true
   environmentVariables: []

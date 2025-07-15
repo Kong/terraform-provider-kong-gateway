@@ -23,6 +23,7 @@ func NewPluginDegraphqlDataSource() datasource.DataSource {
 
 // PluginDegraphqlDataSource is the data source implementation.
 type PluginDegraphqlDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

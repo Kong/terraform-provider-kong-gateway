@@ -28,6 +28,7 @@ func NewPluginOpenidConnectResource() resource.Resource {
 
 // PluginOpenidConnectResource defines the resource implementation.
 type PluginOpenidConnectResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

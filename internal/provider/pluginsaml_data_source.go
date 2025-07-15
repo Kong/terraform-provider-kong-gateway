@@ -23,6 +23,7 @@ func NewPluginSamlDataSource() datasource.DataSource {
 
 // PluginSamlDataSource is the data source implementation.
 type PluginSamlDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

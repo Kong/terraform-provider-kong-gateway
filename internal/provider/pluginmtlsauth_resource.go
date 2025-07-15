@@ -28,6 +28,7 @@ func NewPluginMtlsAuthResource() resource.Resource {
 
 // PluginMtlsAuthResource defines the resource implementation.
 type PluginMtlsAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

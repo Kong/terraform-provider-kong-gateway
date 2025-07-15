@@ -23,6 +23,7 @@ func NewPluginResponseRatelimitingDataSource() datasource.DataSource {
 
 // PluginResponseRatelimitingDataSource is the data source implementation.
 type PluginResponseRatelimitingDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

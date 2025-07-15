@@ -26,6 +26,7 @@ func NewPluginMockingResource() resource.Resource {
 
 // PluginMockingResource defines the resource implementation.
 type PluginMockingResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -29,6 +29,7 @@ func NewPluginConfluentResource() resource.Resource {
 
 // PluginConfluentResource defines the resource implementation.
 type PluginConfluentResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

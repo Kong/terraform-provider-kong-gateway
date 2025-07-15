@@ -26,6 +26,7 @@ func NewPluginIPRestrictionResource() resource.Resource {
 
 // PluginIPRestrictionResource defines the resource implementation.
 type PluginIPRestrictionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

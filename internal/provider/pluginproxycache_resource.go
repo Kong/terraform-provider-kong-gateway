@@ -27,6 +27,7 @@ func NewPluginProxyCacheResource() resource.Resource {
 
 // PluginProxyCacheResource defines the resource implementation.
 type PluginProxyCacheResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

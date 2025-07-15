@@ -29,6 +29,7 @@ func NewPluginAiSanitizerResource() resource.Resource {
 
 // PluginAiSanitizerResource defines the resource implementation.
 type PluginAiSanitizerResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

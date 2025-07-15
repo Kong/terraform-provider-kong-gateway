@@ -23,6 +23,7 @@ func NewPluginAiSanitizerDataSource() datasource.DataSource {
 
 // PluginAiSanitizerDataSource is the data source implementation.
 type PluginAiSanitizerDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

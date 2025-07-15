@@ -23,6 +23,7 @@ func NewPluginLdapAuthAdvancedDataSource() datasource.DataSource {
 
 // PluginLdapAuthAdvancedDataSource is the data source implementation.
 type PluginLdapAuthAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

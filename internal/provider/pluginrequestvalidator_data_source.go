@@ -23,6 +23,7 @@ func NewPluginRequestValidatorDataSource() datasource.DataSource {
 
 // PluginRequestValidatorDataSource is the data source implementation.
 type PluginRequestValidatorDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

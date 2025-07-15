@@ -23,6 +23,7 @@ func NewPluginKeyAuthDataSource() datasource.DataSource {
 
 // PluginKeyAuthDataSource is the data source implementation.
 type PluginKeyAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

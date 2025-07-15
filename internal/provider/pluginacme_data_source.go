@@ -23,6 +23,7 @@ func NewPluginAcmeDataSource() datasource.DataSource {
 
 // PluginAcmeDataSource is the data source implementation.
 type PluginAcmeDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

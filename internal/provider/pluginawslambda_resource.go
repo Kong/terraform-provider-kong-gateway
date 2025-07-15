@@ -28,6 +28,7 @@ func NewPluginAwsLambdaResource() resource.Resource {
 
 // PluginAwsLambdaResource defines the resource implementation.
 type PluginAwsLambdaResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

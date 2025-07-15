@@ -26,6 +26,7 @@ func NewOidcJwkResource() resource.Resource {
 
 // OidcJwkResource defines the resource implementation.
 type OidcJwkResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

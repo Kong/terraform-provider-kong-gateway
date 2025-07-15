@@ -28,6 +28,7 @@ func NewPluginXMLThreatProtectionResource() resource.Resource {
 
 // PluginXMLThreatProtectionResource defines the resource implementation.
 type PluginXMLThreatProtectionResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

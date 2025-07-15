@@ -23,6 +23,7 @@ func NewPluginAiProxyAdvancedDataSource() datasource.DataSource {
 
 // PluginAiProxyAdvancedDataSource is the data source implementation.
 type PluginAiProxyAdvancedDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

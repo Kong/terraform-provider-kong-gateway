@@ -29,6 +29,7 @@ func NewPluginUDPLogResource() resource.Resource {
 
 // PluginUDPLogResource defines the resource implementation.
 type PluginUDPLogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

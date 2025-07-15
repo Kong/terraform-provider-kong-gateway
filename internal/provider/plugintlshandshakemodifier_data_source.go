@@ -23,6 +23,7 @@ func NewPluginTLSHandshakeModifierDataSource() datasource.DataSource {
 
 // PluginTLSHandshakeModifierDataSource is the data source implementation.
 type PluginTLSHandshakeModifierDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

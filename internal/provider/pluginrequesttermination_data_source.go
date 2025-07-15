@@ -23,6 +23,7 @@ func NewPluginRequestTerminationDataSource() datasource.DataSource {
 
 // PluginRequestTerminationDataSource is the data source implementation.
 type PluginRequestTerminationDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

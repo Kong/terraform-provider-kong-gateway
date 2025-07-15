@@ -26,6 +26,7 @@ func NewPluginPrometheusResource() resource.Resource {
 
 // PluginPrometheusResource defines the resource implementation.
 type PluginPrometheusResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

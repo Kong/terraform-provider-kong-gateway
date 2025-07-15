@@ -27,6 +27,7 @@ func NewPluginJwtResource() resource.Resource {
 
 // PluginJwtResource defines the resource implementation.
 type PluginJwtResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

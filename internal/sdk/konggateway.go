@@ -2,10 +2,13 @@
 
 package sdk
 
+// Generated from OpenAPI doc version 0.0.1 and generator version 2.656.5
+
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/config"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/hooks"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -20,7 +23,7 @@ var ServerList = []string{
 	"{protocol}://{hostname}:{port}{path}",
 }
 
-// HTTPClient provides an interface for suplying the SDK with a custom HTTP client
+// HTTPClient provides an interface for supplying the SDK with a custom HTTP client
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -46,30 +49,6 @@ func Float64(f float64) *float64 { return &f }
 // Pointer provides a helper function to return a pointer to a type
 func Pointer[T any](v T) *T { return &v }
 
-type sdkConfiguration struct {
-	Client            HTTPClient
-	Security          func(context.Context) (interface{}, error)
-	ServerURL         string
-	ServerIndex       int
-	ServerDefaults    []map[string]string
-	Language          string
-	OpenAPIDocVersion string
-	SDKVersion        string
-	GenVersion        string
-	UserAgent         string
-	RetryConfig       *retry.Config
-	Hooks             *hooks.Hooks
-	Timeout           *time.Duration
-}
-
-func (c *sdkConfiguration) GetServerDetails() (string, map[string]string) {
-	if c.ServerURL != "" {
-		return c.ServerURL, nil
-	}
-
-	return ServerList[c.ServerIndex], c.ServerDefaults[c.ServerIndex]
-}
-
 // KongGateway - Kong Gateway Admin API: OpenAPI 3.0 spec for Kong Gateway's Admin API.
 //
 // You can lean more about Kong Gateway at [developer.konghq.com](https://developer.konghq.com)
@@ -77,6 +56,7 @@ func (c *sdkConfiguration) GetServerDetails() (string, map[string]string) {
 //
 // https://developer.konghq.com - Documentation for Kong Gateway and its APIs
 type KongGateway struct {
+	SDKVersion string
 	// A CA certificate object represents a trusted certificate authority.
 	// These objects are used by Kong Gateway to verify the validity of a client or server certificate.
 	CACertificates *CACertificates
@@ -169,7 +149,8 @@ type KongGateway struct {
 	//
 	Vaults *Vaults
 
-	sdkConfiguration sdkConfiguration
+	sdkConfiguration config.SDKConfiguration
+	hooks            *hooks.Hooks
 }
 
 type SDKOption func(*KongGateway)
@@ -206,12 +187,12 @@ func WithServerIndex(serverIndex int) SDKOption {
 // WithHostname allows setting the hostname variable for url substitution
 func WithHostname(hostname string) SDKOption {
 	return func(sdk *KongGateway) {
-		for idx := range sdk.sdkConfiguration.ServerDefaults {
-			if _, ok := sdk.sdkConfiguration.ServerDefaults[idx]["hostname"]; !ok {
+		for idx := range sdk.sdkConfiguration.ServerVariables {
+			if _, ok := sdk.sdkConfiguration.ServerVariables[idx]["hostname"]; !ok {
 				continue
 			}
 
-			sdk.sdkConfiguration.ServerDefaults[idx]["hostname"] = fmt.Sprintf("%v", hostname)
+			sdk.sdkConfiguration.ServerVariables[idx]["hostname"] = fmt.Sprintf("%v", hostname)
 		}
 	}
 }
@@ -219,12 +200,12 @@ func WithHostname(hostname string) SDKOption {
 // WithPath allows setting the path variable for url substitution
 func WithPath(path string) SDKOption {
 	return func(sdk *KongGateway) {
-		for idx := range sdk.sdkConfiguration.ServerDefaults {
-			if _, ok := sdk.sdkConfiguration.ServerDefaults[idx]["path"]; !ok {
+		for idx := range sdk.sdkConfiguration.ServerVariables {
+			if _, ok := sdk.sdkConfiguration.ServerVariables[idx]["path"]; !ok {
 				continue
 			}
 
-			sdk.sdkConfiguration.ServerDefaults[idx]["path"] = fmt.Sprintf("%v", path)
+			sdk.sdkConfiguration.ServerVariables[idx]["path"] = fmt.Sprintf("%v", path)
 		}
 	}
 }
@@ -232,12 +213,12 @@ func WithPath(path string) SDKOption {
 // WithPort allows setting the port variable for url substitution
 func WithPort(port string) SDKOption {
 	return func(sdk *KongGateway) {
-		for idx := range sdk.sdkConfiguration.ServerDefaults {
-			if _, ok := sdk.sdkConfiguration.ServerDefaults[idx]["port"]; !ok {
+		for idx := range sdk.sdkConfiguration.ServerVariables {
+			if _, ok := sdk.sdkConfiguration.ServerVariables[idx]["port"]; !ok {
 				continue
 			}
 
-			sdk.sdkConfiguration.ServerDefaults[idx]["port"] = fmt.Sprintf("%v", port)
+			sdk.sdkConfiguration.ServerVariables[idx]["port"] = fmt.Sprintf("%v", port)
 		}
 	}
 }
@@ -272,12 +253,12 @@ func (e *ServerProtocol) UnmarshalJSON(data []byte) error {
 // WithProtocol allows setting the protocol variable for url substitution
 func WithProtocol(protocol ServerProtocol) SDKOption {
 	return func(sdk *KongGateway) {
-		for idx := range sdk.sdkConfiguration.ServerDefaults {
-			if _, ok := sdk.sdkConfiguration.ServerDefaults[idx]["protocol"]; !ok {
+		for idx := range sdk.sdkConfiguration.ServerVariables {
+			if _, ok := sdk.sdkConfiguration.ServerVariables[idx]["protocol"]; !ok {
 				continue
 			}
 
-			sdk.sdkConfiguration.ServerDefaults[idx]["protocol"] = fmt.Sprintf("%v", protocol)
+			sdk.sdkConfiguration.ServerVariables[idx]["protocol"] = fmt.Sprintf("%v", protocol)
 		}
 	}
 }
@@ -321,13 +302,11 @@ func WithTimeout(timeout time.Duration) SDKOption {
 // New creates a new instance of the SDK with the provided options
 func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
-		sdkConfiguration: sdkConfiguration{
-			Language:          "go",
-			OpenAPIDocVersion: "0.0.1",
-			SDKVersion:        "0.5.1",
-			GenVersion:        "2.595.4",
-			UserAgent:         "speakeasy-sdk/terraform 0.5.1 2.595.4 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
-			ServerDefaults: []map[string]string{
+		SDKVersion: "0.5.2",
+		sdkConfiguration: config.SDKConfiguration{
+			UserAgent:  "speakeasy-sdk/terraform 0.5.2 2.656.5 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			ServerList: ServerList,
+			ServerVariables: []map[string]string{
 				{
 					"hostname": "localhost",
 					"path":     "/",
@@ -335,8 +314,8 @@ func New(opts ...SDKOption) *KongGateway {
 					"protocol": "http",
 				},
 			},
-			Hooks: hooks.New(),
 		},
+		hooks: hooks.New(),
 	}
 	for _, opt := range opts {
 		opt(sdk)
@@ -349,52 +328,32 @@ func New(opts ...SDKOption) *KongGateway {
 
 	currentServerURL, _ := sdk.sdkConfiguration.GetServerDetails()
 	serverURL := currentServerURL
-	serverURL, sdk.sdkConfiguration.Client = sdk.sdkConfiguration.Hooks.SDKInit(currentServerURL, sdk.sdkConfiguration.Client)
-	if serverURL != currentServerURL {
+	serverURL, sdk.sdkConfiguration.Client = sdk.hooks.SDKInit(currentServerURL, sdk.sdkConfiguration.Client)
+	if currentServerURL != serverURL {
 		sdk.sdkConfiguration.ServerURL = serverURL
 	}
 
-	sdk.CACertificates = newCACertificates(sdk.sdkConfiguration)
-
-	sdk.Certificates = newCertificates(sdk.sdkConfiguration)
-
-	sdk.ConsumerGroups = newConsumerGroups(sdk.sdkConfiguration)
-
-	sdk.Consumers = newConsumers(sdk.sdkConfiguration)
-
-	sdk.ACLs = newACLs(sdk.sdkConfiguration)
-
-	sdk.BasicAuthCredentials = newBasicAuthCredentials(sdk.sdkConfiguration)
-
-	sdk.HMACAuthCredentials = newHMACAuthCredentials(sdk.sdkConfiguration)
-
-	sdk.JWTs = newJWTs(sdk.sdkConfiguration)
-
-	sdk.APIKeys = newAPIKeys(sdk.sdkConfiguration)
-
-	sdk.MTLSAuthCredentials = newMTLSAuthCredentials(sdk.sdkConfiguration)
-
-	sdk.KeySets = newKeySets(sdk.sdkConfiguration)
-
-	sdk.Keys = newKeys(sdk.sdkConfiguration)
-
-	sdk.OIDCJWKs = newOIDCJWKs(sdk.sdkConfiguration)
-
-	sdk.Partials = newPartials(sdk.sdkConfiguration)
-
-	sdk.Plugins = newPlugins(sdk.sdkConfiguration)
-
-	sdk.Routes = newRoutes(sdk.sdkConfiguration)
-
-	sdk.Services = newServices(sdk.sdkConfiguration)
-
-	sdk.SNIs = newSNIs(sdk.sdkConfiguration)
-
-	sdk.Upstreams = newUpstreams(sdk.sdkConfiguration)
-
-	sdk.Targets = newTargets(sdk.sdkConfiguration)
-
-	sdk.Vaults = newVaults(sdk.sdkConfiguration)
+	sdk.CACertificates = newCACertificates(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Certificates = newCertificates(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.ConsumerGroups = newConsumerGroups(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Consumers = newConsumers(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.ACLs = newACLs(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.BasicAuthCredentials = newBasicAuthCredentials(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.HMACAuthCredentials = newHMACAuthCredentials(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.JWTs = newJWTs(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.APIKeys = newAPIKeys(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.MTLSAuthCredentials = newMTLSAuthCredentials(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.KeySets = newKeySets(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Keys = newKeys(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.OIDCJWKs = newOIDCJWKs(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Partials = newPartials(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Plugins = newPlugins(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Routes = newRoutes(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Services = newServices(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.SNIs = newSNIs(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Upstreams = newUpstreams(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Targets = newTargets(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Vaults = newVaults(sdk, sdk.sdkConfiguration, sdk.hooks)
 
 	return sdk
 }

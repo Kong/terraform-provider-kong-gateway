@@ -30,6 +30,7 @@ func NewPluginStatsdAdvancedResource() resource.Resource {
 
 // PluginStatsdAdvancedResource defines the resource implementation.
 type PluginStatsdAdvancedResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

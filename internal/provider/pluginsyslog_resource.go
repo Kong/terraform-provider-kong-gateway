@@ -29,6 +29,7 @@ func NewPluginSyslogResource() resource.Resource {
 
 // PluginSyslogResource defines the resource implementation.
 type PluginSyslogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

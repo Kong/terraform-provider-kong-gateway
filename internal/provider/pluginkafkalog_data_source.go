@@ -23,6 +23,7 @@ func NewPluginKafkaLogDataSource() datasource.DataSource {
 
 // PluginKafkaLogDataSource is the data source implementation.
 type PluginKafkaLogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

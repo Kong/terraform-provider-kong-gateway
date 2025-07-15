@@ -23,6 +23,7 @@ func NewPluginForwardProxyDataSource() datasource.DataSource {
 
 // PluginForwardProxyDataSource is the data source implementation.
 type PluginForwardProxyDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

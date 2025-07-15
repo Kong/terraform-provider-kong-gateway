@@ -23,6 +23,7 @@ func NewPluginHmacAuthDataSource() datasource.DataSource {
 
 // PluginHmacAuthDataSource is the data source implementation.
 type PluginHmacAuthDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

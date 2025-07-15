@@ -23,6 +23,7 @@ func NewPluginDatadogDataSource() datasource.DataSource {
 
 // PluginDatadogDataSource is the data source implementation.
 type PluginDatadogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

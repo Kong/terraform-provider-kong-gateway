@@ -23,6 +23,7 @@ func NewPluginTLSMetadataHeadersDataSource() datasource.DataSource {
 
 // PluginTLSMetadataHeadersDataSource is the data source implementation.
 type PluginTLSMetadataHeadersDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

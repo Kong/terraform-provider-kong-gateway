@@ -23,6 +23,7 @@ func NewACLDataSource() datasource.DataSource {
 
 // ACLDataSource is the data source implementation.
 type ACLDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

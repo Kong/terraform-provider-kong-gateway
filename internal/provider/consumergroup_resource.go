@@ -23,6 +23,7 @@ func NewConsumerGroupResource() resource.Resource {
 
 // ConsumerGroupResource defines the resource implementation.
 type ConsumerGroupResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

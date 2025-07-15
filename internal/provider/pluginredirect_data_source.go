@@ -23,6 +23,7 @@ func NewPluginRedirectDataSource() datasource.DataSource {
 
 // PluginRedirectDataSource is the data source implementation.
 type PluginRedirectDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

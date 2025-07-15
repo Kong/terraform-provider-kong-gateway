@@ -23,6 +23,7 @@ func NewPluginOasValidationDataSource() datasource.DataSource {
 
 // PluginOasValidationDataSource is the data source implementation.
 type PluginOasValidationDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

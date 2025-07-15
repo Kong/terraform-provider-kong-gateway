@@ -23,6 +23,7 @@ func NewPluginJqDataSource() datasource.DataSource {
 
 // PluginJqDataSource is the data source implementation.
 type PluginJqDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

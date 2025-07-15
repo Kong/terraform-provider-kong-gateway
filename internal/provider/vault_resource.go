@@ -25,6 +25,7 @@ func NewVaultResource() resource.Resource {
 
 // VaultResource defines the resource implementation.
 type VaultResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

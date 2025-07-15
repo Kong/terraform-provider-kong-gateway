@@ -61,5 +61,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import kong-gateway_target.my_kong-gateway_target "{ \"id\": \"5a078780-5d4c-4aae-984a-bdc6f52113d8\",  \"upstream_id\": \"5a078780-5d4c-4aae-984a-bdc6f52113d8\"}"
+terraform import kong-gateway_target.my_kong-gateway_target '{"id": "5a078780-5d4c-4aae-984a-bdc6f52113d8", "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}'
 ```

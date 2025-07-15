@@ -23,6 +23,7 @@ func NewPluginZipkinDataSource() datasource.DataSource {
 
 // PluginZipkinDataSource is the data source implementation.
 type PluginZipkinDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

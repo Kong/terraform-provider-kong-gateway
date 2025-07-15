@@ -23,6 +23,7 @@ func NewPluginConfluentDataSource() datasource.DataSource {
 
 // PluginConfluentDataSource is the data source implementation.
 type PluginConfluentDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -26,6 +26,7 @@ func NewPluginOasValidationResource() resource.Resource {
 
 // PluginOasValidationResource defines the resource implementation.
 type PluginOasValidationResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

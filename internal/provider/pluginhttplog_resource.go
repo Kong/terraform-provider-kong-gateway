@@ -31,6 +31,7 @@ func NewPluginHTTPLogResource() resource.Resource {
 
 // PluginHTTPLogResource defines the resource implementation.
 type PluginHTTPLogResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

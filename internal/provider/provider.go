@@ -70,14 +70,10 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		ServerURL = "{protocol}://{hostname}:{port}{path}"
 	}
 
-	adminToken := new(string)
-	if !data.AdminToken.IsUnknown() && !data.AdminToken.IsNull() {
-		*adminToken = data.AdminToken.ValueString()
-	} else {
-		adminToken = nil
-	}
-	security := shared.Security{
-		AdminToken: adminToken,
+	security := shared.Security{}
+
+	if !data.AdminToken.IsUnknown() {
+		security.AdminToken = data.AdminToken.ValueStringPointer()
 	}
 
 	providerHTTPTransportOpts := ProviderHTTPTransportOpts{
@@ -93,8 +89,8 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		sdk.WithSecurity(security),
 		sdk.WithClient(httpClient),
 	}
-	client := sdk.New(opts...)
 
+	client := sdk.New(opts...)
 	resp.DataSourceData = client
 	resp.EphemeralResourceData = client
 	resp.ResourceData = client

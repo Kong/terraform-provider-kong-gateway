@@ -28,6 +28,7 @@ func NewPluginWebsocketValidatorResource() resource.Resource {
 
 // PluginWebsocketValidatorResource defines the resource implementation.
 type PluginWebsocketValidatorResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

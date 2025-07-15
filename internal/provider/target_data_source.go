@@ -23,6 +23,7 @@ func NewTargetDataSource() datasource.DataSource {
 
 // TargetDataSource is the data source implementation.
 type TargetDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

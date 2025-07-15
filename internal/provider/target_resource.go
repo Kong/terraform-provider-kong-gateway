@@ -26,6 +26,7 @@ func NewTargetResource() resource.Resource {
 
 // TargetResource defines the resource implementation.
 type TargetResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 
@@ -343,7 +344,7 @@ func (r *TargetResource) ImportState(ctx context.Context, req resource.ImportSta
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{ "id": "5a078780-5d4c-4aae-984a-bdc6f52113d8",  "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "5a078780-5d4c-4aae-984a-bdc6f52113d8", "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}': `+err.Error())
 		return
 	}
 
@@ -357,5 +358,4 @@ func (r *TargetResource) ImportState(ctx context.Context, req resource.ImportSta
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("upstream_id"), data.UpstreamID)...)
-
 }

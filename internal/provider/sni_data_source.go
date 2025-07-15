@@ -23,6 +23,7 @@ func NewSniDataSource() datasource.DataSource {
 
 // SniDataSource is the data source implementation.
 type SniDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginServiceProtectionDataSource() datasource.DataSource {
 
 // PluginServiceProtectionDataSource is the data source implementation.
 type PluginServiceProtectionDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

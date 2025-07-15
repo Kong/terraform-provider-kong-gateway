@@ -23,6 +23,7 @@ func NewPluginCorsDataSource() datasource.DataSource {
 
 // PluginCorsDataSource is the data source implementation.
 type PluginCorsDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

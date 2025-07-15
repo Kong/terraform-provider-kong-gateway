@@ -30,6 +30,7 @@ func NewPluginUpstreamOauthResource() resource.Resource {
 
 // PluginUpstreamOauthResource defines the resource implementation.
 type PluginUpstreamOauthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

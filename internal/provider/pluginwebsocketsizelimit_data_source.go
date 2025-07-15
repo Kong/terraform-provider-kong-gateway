@@ -23,6 +23,7 @@ func NewPluginWebsocketSizeLimitDataSource() datasource.DataSource {
 
 // PluginWebsocketSizeLimitDataSource is the data source implementation.
 type PluginWebsocketSizeLimitDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

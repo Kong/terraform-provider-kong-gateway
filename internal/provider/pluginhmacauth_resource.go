@@ -26,6 +26,7 @@ func NewPluginHmacAuthResource() resource.Resource {
 
 // PluginHmacAuthResource defines the resource implementation.
 type PluginHmacAuthResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -30,6 +30,7 @@ func NewPluginZipkinResource() resource.Resource {
 
 // PluginZipkinResource defines the resource implementation.
 type PluginZipkinResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

@@ -23,6 +23,7 @@ func NewPluginAwsLambdaDataSource() datasource.DataSource {
 
 // PluginAwsLambdaDataSource is the data source implementation.
 type PluginAwsLambdaDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

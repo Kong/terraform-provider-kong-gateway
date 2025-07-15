@@ -23,6 +23,7 @@ func NewCACertificateResource() resource.Resource {
 
 // CACertificateResource defines the resource implementation.
 type CACertificateResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

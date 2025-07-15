@@ -30,6 +30,7 @@ func NewPluginKafkaConsumeResource() resource.Resource {
 
 // PluginKafkaConsumeResource defines the resource implementation.
 type PluginKafkaConsumeResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

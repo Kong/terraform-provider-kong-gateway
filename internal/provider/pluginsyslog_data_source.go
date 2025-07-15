@@ -23,6 +23,7 @@ func NewPluginSyslogDataSource() datasource.DataSource {
 
 // PluginSyslogDataSource is the data source implementation.
 type PluginSyslogDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

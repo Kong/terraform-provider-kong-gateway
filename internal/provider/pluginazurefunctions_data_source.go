@@ -23,6 +23,7 @@ func NewPluginAzureFunctionsDataSource() datasource.DataSource {
 
 // PluginAzureFunctionsDataSource is the data source implementation.
 type PluginAzureFunctionsDataSource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

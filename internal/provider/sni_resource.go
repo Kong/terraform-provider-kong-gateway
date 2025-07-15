@@ -24,6 +24,7 @@ func NewSniResource() resource.Resource {
 
 // SniResource defines the resource implementation.
 type SniResource struct {
+	// Provider configured SDK client.
 	client *sdk.KongGateway
 }
 

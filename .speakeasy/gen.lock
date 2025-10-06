@@ -1,7 +1,7 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: 60d93dddeef01d81a1ddd2b0cdd56c86
+  docChecksum: cc9966b8c8e99ff683e37bdffd3a1208
   docVersion: 0.0.1
   speakeasyVersion: 1.634.1
   generationVersion: 2.721.0
@@ -67,6 +67,12 @@ generatedFiles:
   - examples/resources/kong-gateway_plugin_basic_auth/import-by-string-id.tf
   - examples/resources/kong-gateway_plugin_basic_auth/import.sh
   - examples/resources/kong-gateway_plugin_basic_auth/resource.tf
+  - examples/resources/kong-gateway_plugin_key_auth/import-by-string-id.tf
+  - examples/resources/kong-gateway_plugin_key_auth/import.sh
+  - examples/resources/kong-gateway_plugin_key_auth/resource.tf
+  - examples/resources/kong-gateway_plugin_key_auth_enc/import-by-string-id.tf
+  - examples/resources/kong-gateway_plugin_key_auth_enc/import.sh
+  - examples/resources/kong-gateway_plugin_key_auth_enc/resource.tf
   - examples/resources/kong-gateway_route/import-by-string-id.tf
   - examples/resources/kong-gateway_route/import.sh
   - examples/resources/kong-gateway_route/resource.tf
@@ -133,6 +139,10 @@ generatedFiles:
   - internal/provider/partial_resource_sdk.go
   - internal/provider/pluginbasicauth_resource.go
   - internal/provider/pluginbasicauth_resource_sdk.go
+  - internal/provider/pluginkeyauth_resource.go
+  - internal/provider/pluginkeyauth_resource_sdk.go
+  - internal/provider/pluginkeyauthenc_resource.go
+  - internal/provider/pluginkeyauthenc_resource_sdk.go
   - internal/provider/provider.go
   - internal/provider/reflect/diags.go
   - internal/provider/reflect/doc.go
@@ -169,6 +179,9 @@ generatedFiles:
   - internal/provider/types/consumer_group.go
   - internal/provider/types/healthchecks.go
   - internal/provider/types/healthy.go
+  - internal/provider/types/identity_realms.go
+  - internal/provider/types/key_auth_enc_plugin_config.go
+  - internal/provider/types/key_auth_plugin_config.go
   - internal/provider/types/meta.go
   - internal/provider/types/ordering.go
   - internal/provider/types/partial_redis_ce.go
@@ -230,6 +243,8 @@ generatedFiles:
   - internal/sdk/models/operations/createhmacauthwithconsumer.go
   - internal/sdk/models/operations/createjwtwithconsumer.go
   - internal/sdk/models/operations/createkey.go
+  - internal/sdk/models/operations/createkeyauthencplugin.go
+  - internal/sdk/models/operations/createkeyauthplugin.go
   - internal/sdk/models/operations/createkeyauthwithconsumer.go
   - internal/sdk/models/operations/createkeyset.go
   - internal/sdk/models/operations/createmtlsauthwithconsumer.go
@@ -252,6 +267,8 @@ generatedFiles:
   - internal/sdk/models/operations/deletehmacauthwithconsumer.go
   - internal/sdk/models/operations/deletejwtwithconsumer.go
   - internal/sdk/models/operations/deletekey.go
+  - internal/sdk/models/operations/deletekeyauthencplugin.go
+  - internal/sdk/models/operations/deletekeyauthplugin.go
   - internal/sdk/models/operations/deletekeyauthwithconsumer.go
   - internal/sdk/models/operations/deletekeyset.go
   - internal/sdk/models/operations/deletemtlsauthwithconsumer.go
@@ -273,6 +290,8 @@ generatedFiles:
   - internal/sdk/models/operations/gethmacauthwithconsumer.go
   - internal/sdk/models/operations/getjwtwithconsumer.go
   - internal/sdk/models/operations/getkey.go
+  - internal/sdk/models/operations/getkeyauthencplugin.go
+  - internal/sdk/models/operations/getkeyauthplugin.go
   - internal/sdk/models/operations/getkeyauthwithconsumer.go
   - internal/sdk/models/operations/getkeyset.go
   - internal/sdk/models/operations/getmtlsauthwithconsumer.go
@@ -307,6 +326,8 @@ generatedFiles:
   - internal/sdk/models/operations/options.go
   - internal/sdk/models/operations/removeconsumerfromgroup.go
   - internal/sdk/models/operations/updatebasicauthplugin.go
+  - internal/sdk/models/operations/updatekeyauthencplugin.go
+  - internal/sdk/models/operations/updatekeyauthplugin.go
   - internal/sdk/models/operations/upsertaclwithconsumer.go
   - internal/sdk/models/operations/upsertbasicauthwithconsumer.go
   - internal/sdk/models/operations/upsertcacertificate.go
@@ -344,6 +365,8 @@ generatedFiles:
   - internal/sdk/models/shared/jwtwithoutparents.go
   - internal/sdk/models/shared/key.go
   - internal/sdk/models/shared/keyauth.go
+  - internal/sdk/models/shared/keyauthencplugin.go
+  - internal/sdk/models/shared/keyauthplugin.go
   - internal/sdk/models/shared/keyauthwithoutparents.go
   - internal/sdk/models/shared/keyset.go
   - internal/sdk/models/shared/mtlsauth.go
@@ -2622,39 +2645,57 @@ examples:
           application/json: {"message": "No API key found in request", "status": 401}
   create-keyauth-plugin:
     DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
     InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
     NoAPIKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
   create-keyauthenc-plugin:
     DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
     InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
     NoAPIKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8240,6 +8281,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "<value>", "status": 937898}
@@ -8247,6 +8289,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8254,6 +8297,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8261,6 +8305,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8269,15 +8314,17 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "200":
-          application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+          application/json: {"name": "key-auth"}
         "401":
           application/json: {"message": "<value>", "status": 623545}
     DuplicateApiKey:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8285,6 +8332,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8292,6 +8340,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8300,19 +8349,21 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "200":
-          application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+          application/json: {"name": "key-auth"}
         "401":
           application/json: {"message": "<value>", "status": 814995}
     DuplicateApiKey:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8320,8 +8371,9 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8329,8 +8381,9 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth"}
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8339,6 +8392,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "<value>", "status": 80831}
@@ -8346,6 +8400,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8353,6 +8408,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8360,6 +8416,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8368,15 +8425,17 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "200":
-          application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+          application/json: {"name": "key-auth-enc"}
         "401":
           application/json: {"message": "<value>", "status": 755965}
     DuplicateApiKey:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8384,6 +8443,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8391,6 +8451,7 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
@@ -8399,19 +8460,21 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "200":
-          application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+          application/json: {"name": "key-auth-enc"}
         "401":
           application/json: {"message": "<value>", "status": 173752}
     DuplicateApiKey:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "Duplicate API key found", "status": 401}
@@ -8419,8 +8482,9 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "Unauthorized", "status": 401}
@@ -8428,8 +8492,9 @@ examples:
       parameters:
         path:
           PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
       requestBody:
-        application/json: {"enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth-enc", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "protocols": ["grpc", "grpcs", "http", "https"]}
+        application/json: {"name": "key-auth-enc"}
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}

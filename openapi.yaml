@@ -3195,6 +3195,7 @@ paths:
         required: true
         schema:
           type: string
+        x-speakeasy-name-override: consumer_id
   /{workspace}/consumers:
     get:
       description: List all Consumers

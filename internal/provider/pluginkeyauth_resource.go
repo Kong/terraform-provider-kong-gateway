@@ -41,8 +41,8 @@ type PluginKeyAuthResourceModel struct {
 	Enabled      types.Bool                   `tfsdk:"enabled"`
 	ID           types.String                 `tfsdk:"id"`
 	InstanceName types.String                 `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering            `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials           `tfsdk:"partials"`
+	Ordering     *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials  `tfsdk:"partials"`
 	Protocols    []types.String               `tfsdk:"protocols"`
 	Route        *tfTypes.Set                 `tfsdk:"route"`
 	Service      *tfTypes.Set                 `tfsdk:"service"`

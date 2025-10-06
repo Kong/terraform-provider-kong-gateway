@@ -36,19 +36,19 @@ type PluginBasicAuthResource struct {
 
 // PluginBasicAuthResourceModel describes the resource data model.
 type PluginBasicAuthResourceModel struct {
-	Config       *tfTypes.Config    `tfsdk:"config"`
-	CreatedAt    types.Int64        `tfsdk:"created_at"`
-	Enabled      types.Bool         `tfsdk:"enabled"`
-	ID           types.String       `tfsdk:"id"`
-	InstanceName types.String       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering  `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials `tfsdk:"partials"`
-	Protocols    []types.String     `tfsdk:"protocols"`
-	Route        *tfTypes.Set       `tfsdk:"route"`
-	Service      *tfTypes.Set       `tfsdk:"service"`
-	Tags         []types.String     `tfsdk:"tags"`
-	UpdatedAt    types.Int64        `tfsdk:"updated_at"`
-	Workspace    types.String       `tfsdk:"workspace"`
+	Config       *tfTypes.BasicAuthPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                    `tfsdk:"created_at"`
+	Enabled      types.Bool                     `tfsdk:"enabled"`
+	ID           types.String                   `tfsdk:"id"`
+	InstanceName types.String                   `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials    `tfsdk:"partials"`
+	Protocols    []types.String                 `tfsdk:"protocols"`
+	Route        *tfTypes.Set                   `tfsdk:"route"`
+	Service      *tfTypes.Set                   `tfsdk:"service"`
+	Tags         []types.String                 `tfsdk:"tags"`
+	UpdatedAt    types.Int64                    `tfsdk:"updated_at"`
+	Workspace    types.String                   `tfsdk:"workspace"`
 }
 
 func (r *PluginBasicAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

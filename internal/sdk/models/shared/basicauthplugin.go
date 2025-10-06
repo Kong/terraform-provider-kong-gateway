@@ -8,48 +8,48 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type After struct {
+type BasicAuthPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (a *After) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type Before struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (b *Before) GetAccess() []string {
+func (b *BasicAuthPluginAfter) GetAccess() []string {
 	if b == nil {
 		return nil
 	}
 	return b.Access
 }
 
-type Ordering struct {
-	After  *After  `json:"after,omitempty"`
-	Before *Before `json:"before,omitempty"`
+type BasicAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
 }
 
-func (o *Ordering) GetAfter() *After {
-	if o == nil {
+func (b *BasicAuthPluginBefore) GetAccess() []string {
+	if b == nil {
 		return nil
 	}
-	return o.After
+	return b.Access
 }
 
-func (o *Ordering) GetBefore() *Before {
-	if o == nil {
+type BasicAuthPluginOrdering struct {
+	After  *BasicAuthPluginAfter  `json:"after,omitempty"`
+	Before *BasicAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (b *BasicAuthPluginOrdering) GetAfter() *BasicAuthPluginAfter {
+	if b == nil {
 		return nil
 	}
-	return o.Before
+	return b.After
 }
 
-type Partials struct {
+func (b *BasicAuthPluginOrdering) GetBefore() *BasicAuthPluginBefore {
+	if b == nil {
+		return nil
+	}
+	return b.Before
+}
+
+type BasicAuthPluginPartials struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
@@ -57,28 +57,28 @@ type Partials struct {
 	Path *string `json:"path,omitempty"`
 }
 
-func (p *Partials) GetID() *string {
-	if p == nil {
+func (b *BasicAuthPluginPartials) GetID() *string {
+	if b == nil {
 		return nil
 	}
-	return p.ID
+	return b.ID
 }
 
-func (p *Partials) GetName() *string {
-	if p == nil {
+func (b *BasicAuthPluginPartials) GetName() *string {
+	if b == nil {
 		return nil
 	}
-	return p.Name
+	return b.Name
 }
 
-func (p *Partials) GetPath() *string {
-	if p == nil {
+func (b *BasicAuthPluginPartials) GetPath() *string {
+	if b == nil {
 		return nil
 	}
-	return p.Path
+	return b.Path
 }
 
-type Config struct {
+type BasicAuthPluginConfig struct {
 	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
 	Anonymous *string `json:"anonymous,omitempty"`
 	// An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
@@ -87,42 +87,42 @@ type Config struct {
 	Realm *string `json:"realm,omitempty"`
 }
 
-func (c *Config) GetAnonymous() *string {
-	if c == nil {
+func (b *BasicAuthPluginConfig) GetAnonymous() *string {
+	if b == nil {
 		return nil
 	}
-	return c.Anonymous
+	return b.Anonymous
 }
 
-func (c *Config) GetHideCredentials() *bool {
-	if c == nil {
+func (b *BasicAuthPluginConfig) GetHideCredentials() *bool {
+	if b == nil {
 		return nil
 	}
-	return c.HideCredentials
+	return b.HideCredentials
 }
 
-func (c *Config) GetRealm() *string {
-	if c == nil {
+func (b *BasicAuthPluginConfig) GetRealm() *string {
+	if b == nil {
 		return nil
 	}
-	return c.Realm
+	return b.Realm
 }
 
-type Protocols string
+type BasicAuthPluginProtocols string
 
 const (
-	ProtocolsGrpc  Protocols = "grpc"
-	ProtocolsGrpcs Protocols = "grpcs"
-	ProtocolsHTTP  Protocols = "http"
-	ProtocolsHTTPS Protocols = "https"
-	ProtocolsWs    Protocols = "ws"
-	ProtocolsWss   Protocols = "wss"
+	BasicAuthPluginProtocolsGrpc  BasicAuthPluginProtocols = "grpc"
+	BasicAuthPluginProtocolsGrpcs BasicAuthPluginProtocols = "grpcs"
+	BasicAuthPluginProtocolsHTTP  BasicAuthPluginProtocols = "http"
+	BasicAuthPluginProtocolsHTTPS BasicAuthPluginProtocols = "https"
+	BasicAuthPluginProtocolsWs    BasicAuthPluginProtocols = "ws"
+	BasicAuthPluginProtocolsWss   BasicAuthPluginProtocols = "wss"
 )
 
-func (e Protocols) ToPointer() *Protocols {
+func (e BasicAuthPluginProtocols) ToPointer() *BasicAuthPluginProtocols {
 	return &e
 }
-func (e *Protocols) UnmarshalJSON(data []byte) error {
+func (e *BasicAuthPluginProtocols) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -139,10 +139,10 @@ func (e *Protocols) UnmarshalJSON(data []byte) error {
 	case "ws":
 		fallthrough
 	case "wss":
-		*e = Protocols(v)
+		*e = BasicAuthPluginProtocols(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Protocols: %v", v)
+		return fmt.Errorf("invalid value for BasicAuthPluginProtocols: %v", v)
 	}
 }
 
@@ -179,18 +179,18 @@ type BasicAuthPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string   `json:"instance_name,omitempty"`
-	name         string    `const:"basic-auth" json:"name"`
-	Ordering     *Ordering `json:"ordering,omitempty"`
+	InstanceName *string                  `json:"instance_name,omitempty"`
+	name         string                   `const:"basic-auth" json:"name"`
+	Ordering     *BasicAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
-	Partials []Partials `json:"partials,omitempty"`
+	Partials []BasicAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64  `json:"updated_at,omitempty"`
-	Config    *Config `json:"config,omitempty"`
+	UpdatedAt *int64                 `json:"updated_at,omitempty"`
+	Config    *BasicAuthPluginConfig `json:"config,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
-	Protocols []Protocols `json:"protocols,omitempty"`
+	Protocols []BasicAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *BasicAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -240,14 +240,14 @@ func (b *BasicAuthPlugin) GetName() string {
 	return "basic-auth"
 }
 
-func (b *BasicAuthPlugin) GetOrdering() *Ordering {
+func (b *BasicAuthPlugin) GetOrdering() *BasicAuthPluginOrdering {
 	if b == nil {
 		return nil
 	}
 	return b.Ordering
 }
 
-func (b *BasicAuthPlugin) GetPartials() []Partials {
+func (b *BasicAuthPlugin) GetPartials() []BasicAuthPluginPartials {
 	if b == nil {
 		return nil
 	}
@@ -268,14 +268,14 @@ func (b *BasicAuthPlugin) GetUpdatedAt() *int64 {
 	return b.UpdatedAt
 }
 
-func (b *BasicAuthPlugin) GetConfig() *Config {
+func (b *BasicAuthPlugin) GetConfig() *BasicAuthPluginConfig {
 	if b == nil {
 		return nil
 	}
 	return b.Config
 }
 
-func (b *BasicAuthPlugin) GetProtocols() []Protocols {
+func (b *BasicAuthPlugin) GetProtocols() []BasicAuthPluginProtocols {
 	if b == nil {
 		return nil
 	}

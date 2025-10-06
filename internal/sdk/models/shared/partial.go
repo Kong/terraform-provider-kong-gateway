@@ -9,83 +9,83 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type ClusterNodes struct {
+type PartialRedisEeClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (c ClusterNodes) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(c, "", false)
+func (p PartialRedisEeClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
 }
 
-func (c *ClusterNodes) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+func (p *PartialRedisEeClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *ClusterNodes) GetIP() *string {
-	if c == nil {
+func (p *PartialRedisEeClusterNodes) GetIP() *string {
+	if p == nil {
 		return nil
 	}
-	return c.IP
+	return p.IP
 }
 
-func (c *ClusterNodes) GetPort() *int64 {
-	if c == nil {
+func (p *PartialRedisEeClusterNodes) GetPort() *int64 {
+	if p == nil {
 		return nil
 	}
-	return c.Port
+	return p.Port
 }
 
-type SentinelNodes struct {
+type PartialRedisEeSentinelNodes struct {
 	// A string representing a host name, such as example.com.
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (s SentinelNodes) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(s, "", false)
+func (p PartialRedisEeSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
 }
 
-func (s *SentinelNodes) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+func (p *PartialRedisEeSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *SentinelNodes) GetHost() *string {
-	if s == nil {
+func (p *PartialRedisEeSentinelNodes) GetHost() *string {
+	if p == nil {
 		return nil
 	}
-	return s.Host
+	return p.Host
 }
 
-func (s *SentinelNodes) GetPort() *int64 {
-	if s == nil {
+func (p *PartialRedisEeSentinelNodes) GetPort() *int64 {
+	if p == nil {
 		return nil
 	}
-	return s.Port
+	return p.Port
 }
 
-// SentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
-type SentinelRole string
+// PartialRedisEeSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+type PartialRedisEeSentinelRole string
 
 const (
-	SentinelRoleAny    SentinelRole = "any"
-	SentinelRoleMaster SentinelRole = "master"
-	SentinelRoleSlave  SentinelRole = "slave"
+	PartialRedisEeSentinelRoleAny    PartialRedisEeSentinelRole = "any"
+	PartialRedisEeSentinelRoleMaster PartialRedisEeSentinelRole = "master"
+	PartialRedisEeSentinelRoleSlave  PartialRedisEeSentinelRole = "slave"
 )
 
-func (e SentinelRole) ToPointer() *SentinelRole {
+func (e PartialRedisEeSentinelRole) ToPointer() *PartialRedisEeSentinelRole {
 	return &e
 }
-func (e *SentinelRole) UnmarshalJSON(data []byte) error {
+func (e *PartialRedisEeSentinelRole) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -96,10 +96,10 @@ func (e *SentinelRole) UnmarshalJSON(data []byte) error {
 	case "master":
 		fallthrough
 	case "slave":
-		*e = SentinelRole(v)
+		*e = PartialRedisEeSentinelRole(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for SentinelRole: %v", v)
+		return fmt.Errorf("invalid value for PartialRedisEeSentinelRole: %v", v)
 	}
 }
 
@@ -107,7 +107,7 @@ type PartialRedisEeConfig struct {
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
-	ClusterNodes []ClusterNodes `json:"cluster_nodes,omitempty"`
+	ClusterNodes []PartialRedisEeClusterNodes `json:"cluster_nodes,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
 	// If the connection to Redis is proxied (e.g. Envoy), set it `true`. Set the `host` and `port` to point to the proxy address.
@@ -131,11 +131,11 @@ type PartialRedisEeConfig struct {
 	// Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
 	SentinelMaster *string `json:"sentinel_master,omitempty"`
 	// Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.
-	SentinelNodes []SentinelNodes `json:"sentinel_nodes,omitempty"`
+	SentinelNodes []PartialRedisEeSentinelNodes `json:"sentinel_nodes,omitempty"`
 	// Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.
 	SentinelPassword *string `json:"sentinel_password,omitempty"`
 	// Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
-	SentinelRole *SentinelRole `json:"sentinel_role,omitempty"`
+	SentinelRole *PartialRedisEeSentinelRole `json:"sentinel_role,omitempty"`
 	// Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.
 	SentinelUsername *string `json:"sentinel_username,omitempty"`
 	// A string representing an SNI (server name indication) value for TLS.
@@ -166,7 +166,7 @@ func (p *PartialRedisEeConfig) GetClusterMaxRedirections() *int64 {
 	return p.ClusterMaxRedirections
 }
 
-func (p *PartialRedisEeConfig) GetClusterNodes() []ClusterNodes {
+func (p *PartialRedisEeConfig) GetClusterNodes() []PartialRedisEeClusterNodes {
 	if p == nil {
 		return nil
 	}
@@ -250,7 +250,7 @@ func (p *PartialRedisEeConfig) GetSentinelMaster() *string {
 	return p.SentinelMaster
 }
 
-func (p *PartialRedisEeConfig) GetSentinelNodes() []SentinelNodes {
+func (p *PartialRedisEeConfig) GetSentinelNodes() []PartialRedisEeSentinelNodes {
 	if p == nil {
 		return nil
 	}
@@ -264,7 +264,7 @@ func (p *PartialRedisEeConfig) GetSentinelPassword() *string {
 	return p.SentinelPassword
 }
 
-func (p *PartialRedisEeConfig) GetSentinelRole() *SentinelRole {
+func (p *PartialRedisEeConfig) GetSentinelRole() *PartialRedisEeSentinelRole {
 	if p == nil {
 		return nil
 	}

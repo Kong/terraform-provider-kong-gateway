@@ -17,10 +17,10 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, res
 	if resp != nil {
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		if resp.Destinations != nil {
-			r.Destinations = []tfTypes.ClusterNodes{}
+			r.Destinations = []tfTypes.PartialRedisEeClusterNodes{}
 
 			for _, destinationsItem := range resp.Destinations {
-				var destinations tfTypes.ClusterNodes
+				var destinations tfTypes.PartialRedisEeClusterNodes
 
 				destinations.IP = types.StringPointerValue(destinationsItem.IP)
 				destinations.Port = types.Int64PointerValue(destinationsItem.Port)
@@ -81,10 +81,10 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, res
 			}
 		}
 		if resp.Sources != nil {
-			r.Sources = []tfTypes.ClusterNodes{}
+			r.Sources = []tfTypes.PartialRedisEeClusterNodes{}
 
 			for _, sourcesItem := range resp.Sources {
-				var sources tfTypes.ClusterNodes
+				var sources tfTypes.PartialRedisEeClusterNodes
 
 				sources.IP = types.StringPointerValue(sourcesItem.IP)
 				sources.Port = types.Int64PointerValue(sourcesItem.Port)

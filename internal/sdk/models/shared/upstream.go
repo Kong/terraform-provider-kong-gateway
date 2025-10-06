@@ -172,20 +172,20 @@ func (h *Healthy) GetSuccesses() *int64 {
 	return h.Successes
 }
 
-type Type string
+type UpstreamType string
 
 const (
-	TypeGrpc  Type = "grpc"
-	TypeGrpcs Type = "grpcs"
-	TypeHTTP  Type = "http"
-	TypeHTTPS Type = "https"
-	TypeTCP   Type = "tcp"
+	UpstreamTypeGrpc  UpstreamType = "grpc"
+	UpstreamTypeGrpcs UpstreamType = "grpcs"
+	UpstreamTypeHTTP  UpstreamType = "http"
+	UpstreamTypeHTTPS UpstreamType = "https"
+	UpstreamTypeTCP   UpstreamType = "tcp"
 )
 
-func (e Type) ToPointer() *Type {
+func (e UpstreamType) ToPointer() *UpstreamType {
 	return &e
 }
-func (e *Type) UnmarshalJSON(data []byte) error {
+func (e *UpstreamType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -200,10 +200,10 @@ func (e *Type) UnmarshalJSON(data []byte) error {
 	case "https":
 		fallthrough
 	case "tcp":
-		*e = Type(v)
+		*e = UpstreamType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Type: %v", v)
+		return fmt.Errorf("invalid value for UpstreamType: %v", v)
 	}
 }
 
@@ -258,11 +258,11 @@ type Active struct {
 	// A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).
 	HTTPPath *string `json:"http_path,omitempty"`
 	// A string representing an SNI (server name indication) value for TLS.
-	HTTPSSni               *string    `json:"https_sni,omitempty"`
-	HTTPSVerifyCertificate *bool      `json:"https_verify_certificate,omitempty"`
-	Timeout                *float64   `json:"timeout,omitempty"`
-	Type                   *Type      `json:"type,omitempty"`
-	Unhealthy              *Unhealthy `json:"unhealthy,omitempty"`
+	HTTPSSni               *string       `json:"https_sni,omitempty"`
+	HTTPSVerifyCertificate *bool         `json:"https_verify_certificate,omitempty"`
+	Timeout                *float64      `json:"timeout,omitempty"`
+	Type                   *UpstreamType `json:"type,omitempty"`
+	Unhealthy              *Unhealthy    `json:"unhealthy,omitempty"`
 }
 
 func (a *Active) GetConcurrency() *int64 {
@@ -314,7 +314,7 @@ func (a *Active) GetTimeout() *float64 {
 	return a.Timeout
 }
 
-func (a *Active) GetType() *Type {
+func (a *Active) GetType() *UpstreamType {
 	if a == nil {
 		return nil
 	}
@@ -347,20 +347,20 @@ func (u *UpstreamHealthy) GetSuccesses() *int64 {
 	return u.Successes
 }
 
-type UpstreamType string
+type UpstreamHealthchecksType string
 
 const (
-	UpstreamTypeGrpc  UpstreamType = "grpc"
-	UpstreamTypeGrpcs UpstreamType = "grpcs"
-	UpstreamTypeHTTP  UpstreamType = "http"
-	UpstreamTypeHTTPS UpstreamType = "https"
-	UpstreamTypeTCP   UpstreamType = "tcp"
+	UpstreamHealthchecksTypeGrpc  UpstreamHealthchecksType = "grpc"
+	UpstreamHealthchecksTypeGrpcs UpstreamHealthchecksType = "grpcs"
+	UpstreamHealthchecksTypeHTTP  UpstreamHealthchecksType = "http"
+	UpstreamHealthchecksTypeHTTPS UpstreamHealthchecksType = "https"
+	UpstreamHealthchecksTypeTCP   UpstreamHealthchecksType = "tcp"
 )
 
-func (e UpstreamType) ToPointer() *UpstreamType {
+func (e UpstreamHealthchecksType) ToPointer() *UpstreamHealthchecksType {
 	return &e
 }
-func (e *UpstreamType) UnmarshalJSON(data []byte) error {
+func (e *UpstreamHealthchecksType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -375,10 +375,10 @@ func (e *UpstreamType) UnmarshalJSON(data []byte) error {
 	case "https":
 		fallthrough
 	case "tcp":
-		*e = UpstreamType(v)
+		*e = UpstreamHealthchecksType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for UpstreamType: %v", v)
+		return fmt.Errorf("invalid value for UpstreamHealthchecksType: %v", v)
 	}
 }
 
@@ -418,9 +418,9 @@ func (u *UpstreamUnhealthy) GetTimeouts() *int64 {
 }
 
 type Passive struct {
-	Healthy   *UpstreamHealthy   `json:"healthy,omitempty"`
-	Type      *UpstreamType      `json:"type,omitempty"`
-	Unhealthy *UpstreamUnhealthy `json:"unhealthy,omitempty"`
+	Healthy   *UpstreamHealthy          `json:"healthy,omitempty"`
+	Type      *UpstreamHealthchecksType `json:"type,omitempty"`
+	Unhealthy *UpstreamUnhealthy        `json:"unhealthy,omitempty"`
 }
 
 func (p *Passive) GetHealthy() *UpstreamHealthy {
@@ -430,7 +430,7 @@ func (p *Passive) GetHealthy() *UpstreamHealthy {
 	return p.Healthy
 }
 
-func (p *Passive) GetType() *UpstreamType {
+func (p *Passive) GetType() *UpstreamHealthchecksType {
 	if p == nil {
 		return nil
 	}

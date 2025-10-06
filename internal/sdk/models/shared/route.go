@@ -8,22 +8,22 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RouteType string
+type RouteUnionType string
 
 const (
-	RouteTypeRouteJSON       RouteType = "RouteJson"
-	RouteTypeRouteExpression RouteType = "RouteExpression"
+	RouteUnionTypeRouteJSON       RouteUnionType = "RouteJson"
+	RouteUnionTypeRouteExpression RouteUnionType = "RouteExpression"
 )
 
 type Route struct {
 	RouteJSON       *RouteJSON       `queryParam:"inline,name=Route"`
 	RouteExpression *RouteExpression `queryParam:"inline,name=Route"`
 
-	Type RouteType
+	Type RouteUnionType
 }
 
 func CreateRouteRouteJSON(routeJSON RouteJSON) Route {
-	typ := RouteTypeRouteJSON
+	typ := RouteUnionTypeRouteJSON
 
 	return Route{
 		RouteJSON: &routeJSON,
@@ -32,7 +32,7 @@ func CreateRouteRouteJSON(routeJSON RouteJSON) Route {
 }
 
 func CreateRouteRouteExpression(routeExpression RouteExpression) Route {
-	typ := RouteTypeRouteExpression
+	typ := RouteUnionTypeRouteExpression
 
 	return Route{
 		RouteExpression: &routeExpression,
@@ -45,14 +45,14 @@ func (u *Route) UnmarshalJSON(data []byte) error {
 	var routeJSON RouteJSON = RouteJSON{}
 	if err := utils.UnmarshalJSON(data, &routeJSON, "", true, nil); err == nil {
 		u.RouteJSON = &routeJSON
-		u.Type = RouteTypeRouteJSON
+		u.Type = RouteUnionTypeRouteJSON
 		return nil
 	}
 
 	var routeExpression RouteExpression = RouteExpression{}
 	if err := utils.UnmarshalJSON(data, &routeExpression, "", true, nil); err == nil {
 		u.RouteExpression = &routeExpression
-		u.Type = RouteTypeRouteExpression
+		u.Type = RouteUnionTypeRouteExpression
 		return nil
 	}
 

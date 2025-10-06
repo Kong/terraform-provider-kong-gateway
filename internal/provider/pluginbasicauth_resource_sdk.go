@@ -18,7 +18,7 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx cont
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
-			r.Config = &tfTypes.Config{}
+			r.Config = &tfTypes.BasicAuthPluginConfig{}
 			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
@@ -30,11 +30,11 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx cont
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.Ordering{}
+			r.Ordering = &tfTypes.AcePluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -43,17 +43,17 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx cont
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.Partials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.Partials
+			var partials tfTypes.AcePluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -196,34 +196,34 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 	} else {
 		instanceName = nil
 	}
-	var ordering *shared.Ordering
+	var ordering *shared.BasicAuthPluginOrdering
 	if r.Ordering != nil {
-		var after *shared.After
+		var after *shared.BasicAuthPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
-			after = &shared.After{
+			after = &shared.BasicAuthPluginAfter{
 				Access: access,
 			}
 		}
-		var before *shared.Before
+		var before *shared.BasicAuthPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
-			before = &shared.Before{
+			before = &shared.BasicAuthPluginBefore{
 				Access: access1,
 			}
 		}
-		ordering = &shared.Ordering{
+		ordering = &shared.BasicAuthPluginOrdering{
 			After:  after,
 			Before: before,
 		}
 	}
-	partials := make([]shared.Partials, 0, len(r.Partials))
+	partials := make([]shared.BasicAuthPluginPartials, 0, len(r.Partials))
 	for _, partialsItem := range r.Partials {
 		id1 := new(string)
 		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
@@ -243,7 +243,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 		} else {
 			path = nil
 		}
-		partials = append(partials, shared.Partials{
+		partials = append(partials, shared.BasicAuthPluginPartials{
 			ID:   id1,
 			Name: name,
 			Path: path,
@@ -262,7 +262,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 	} else {
 		updatedAt = nil
 	}
-	var config *shared.Config
+	var config *shared.BasicAuthPluginConfig
 	if r.Config != nil {
 		anonymous := new(string)
 		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
@@ -282,15 +282,15 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 		} else {
 			realm = nil
 		}
-		config = &shared.Config{
+		config = &shared.BasicAuthPluginConfig{
 			Anonymous:       anonymous,
 			HideCredentials: hideCredentials,
 			Realm:           realm,
 		}
 	}
-	protocols := make([]shared.Protocols, 0, len(r.Protocols))
+	protocols := make([]shared.BasicAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.Protocols(protocolsItem.ValueString()))
+		protocols = append(protocols, shared.BasicAuthPluginProtocols(protocolsItem.ValueString()))
 	}
 	var route *shared.BasicAuthPluginRoute
 	if r.Route != nil {

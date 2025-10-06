@@ -7,7 +7,9 @@ import (
 )
 
 type Config struct {
-	Anonymous       types.String `tfsdk:"anonymous"`
-	HideCredentials types.Bool   `tfsdk:"hide_credentials"`
-	Realm           types.String `tfsdk:"realm"`
+	Allow                        []types.String `tfsdk:"allow"`
+	AlwaysUseAuthenticatedGroups types.Bool     `tfsdk:"always_use_authenticated_groups"`
+	Deny                         []types.String `tfsdk:"deny"`
+	HideGroupsHeader             types.Bool     `tfsdk:"hide_groups_header"`
+	IncludeConsumerGroups        types.Bool     `tfsdk:"include_consumer_groups"`
 }

@@ -30,11 +30,17 @@ resource "kong-gateway_route" "hello" {
   name    = "Anything"
   paths   = ["/anything"]
 
+  protocols = [
+    "http",
+    "https"
+  ]
+
   strip_path = false
 
   service = {
     id = kong-gateway_service.httpbin.id
   }
+
 }
 
 resource "kong-gateway_consumer" "alice" {

@@ -1,5 +1,10 @@
 resource "kong-gateway_plugin_basic_auth" "basic_auth" {
   enabled = true
+  protocols = [
+    "http",
+    "https"
+  ]
+
   service = {
     id = kong-gateway_service.httpbin.id
   }
@@ -11,6 +16,11 @@ resource "kong-gateway_plugin_basic_auth" "basic_auth" {
 resource "kong-gateway_plugin_key_auth" "my_key_auth" {
   enabled = true
 
+  protocols = [
+    "http",
+    "https"
+  ]
+
   config = {
     key_names = ["apikey"]
   }
@@ -21,6 +31,11 @@ resource "kong-gateway_plugin_key_auth" "my_key_auth" {
 }
 resource "kong-gateway_plugin_key_auth_enc" "my_key_auth_enc" {
   enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
 
   config = {
     key_names    = ["apikey"]

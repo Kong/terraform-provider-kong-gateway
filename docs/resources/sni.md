@@ -24,6 +24,7 @@ resource "kong-gateway_sni" "my_sni" {
     "..."
   ]
   updated_at = 3
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -38,12 +39,10 @@ resource "kong-gateway_sni" "my_sni" {
 ### Optional
 
 - `created_at` (Number) Unix epoch when the resource was created.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `tags` (List of String) An optional set of strings associated with the SNIs for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--certificate"></a>
 ### Nested Schema for `certificate`
@@ -56,6 +55,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_sni.my_kong-gateway_sni
+  id = jsonencode({
+    id = "64c17a1a-b7d7-4a65-a5a4-42e4a7016e7f"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_sni.my_kong-gateway_sni ""
+terraform import kong-gateway_sni.my_kong-gateway_sni '{"id": "64c17a1a-b7d7-4a65-a5a4-42e4a7016e7f", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

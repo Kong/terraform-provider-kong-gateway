@@ -20,25 +20,34 @@ resource "kong-gateway_service" "my_service" {
   client_certificate = {
     id = "...my_id..."
   }
-  connect_timeout = 8
+  connect_timeout = 1619290746
   created_at      = 8
   enabled         = false
   host            = "...my_host..."
   id              = "...my_id..."
   name            = "...my_name..."
   path            = "...my_path..."
-  port            = 1
+  port            = 9502
   protocol        = "grpcs"
-  read_timeout    = 7
-  retries         = 5
+  read_timeout    = 1518929605
+  retries         = 17057
   tags = [
     "..."
   ]
+  tls_sans = {
+    dnsnames = [
+      "..."
+    ]
+    uris = [
+      "..."
+    ]
+  }
   tls_verify       = false
-  tls_verify_depth = 0
+  tls_verify_depth = 4
   updated_at       = 10
   url              = "...my_url..."
-  write_timeout    = 4
+  workspace        = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  write_timeout    = 870025639
 }
 ```
 
@@ -56,6 +65,7 @@ resource "kong-gateway_service" "my_service" {
 - `connect_timeout` (Number) The timeout in milliseconds for establishing a connection to the upstream server.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the Service is active. If set to `false`, the proxy behavior will be as if any routes attached to it do not exist (404). Default: `true`.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `name` (String) The Service name.
 - `path` (String) The path to be used in requests to the upstream server.
 - `port` (Number) The upstream server port.
@@ -63,15 +73,13 @@ resource "kong-gateway_service" "my_service" {
 - `read_timeout` (Number) The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server.
 - `retries` (Number) The number of retries to execute upon failure to proxy.
 - `tags` (List of String) An optional set of strings associated with the Service for grouping and filtering.
+- `tls_sans` (Attributes) Additional Subject Alternative Names that can be matched on Upstream server's TLS certificate (in addition to `host`). (see [below for nested schema](#nestedatt--tls_sans))
 - `tls_verify` (Boolean) Whether to enable verification of upstream server TLS certificate. If set to `null`, then the Nginx default is respected.
 - `tls_verify_depth` (Number) Maximum depth of chain while verifying Upstream server's TLS certificate. If set to `null`, then the Nginx default is respected.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
 - `url` (String) Helper field to set `protocol`, `host`, `port` and `path` using a URL. This field is write-only and is not returned in responses.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 - `write_timeout` (Number) The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
 
 <a id="nestedatt--client_certificate"></a>
 ### Nested Schema for `client_certificate`
@@ -80,10 +88,33 @@ Optional:
 
 - `id` (String)
 
+
+<a id="nestedatt--tls_sans"></a>
+### Nested Schema for `tls_sans`
+
+Optional:
+
+- `dnsnames` (List of String) A dnsName for TLS verification.
+- `uris` (List of String) An URI for TLS verification.
+
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_service.my_kong-gateway_service
+  id = jsonencode({
+    id = "7fca84d6-7d37-4a74-a7b0-93e576089a41"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_service.my_kong-gateway_service ""
+terraform import kong-gateway_service.my_kong-gateway_service '{"id": "7fca84d6-7d37-4a74-a7b0-93e576089a41", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

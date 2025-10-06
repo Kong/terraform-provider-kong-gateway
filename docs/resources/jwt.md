@@ -14,10 +14,7 @@ Jwt Resource
 
 ```terraform
 resource "kong-gateway_jwt" "my_jwt" {
-  algorithm = "PS512"
-  consumer = {
-    id = "...my_id..."
-  }
+  algorithm      = "PS512"
   consumer_id    = "f28acbfa-c866-4587-b688-0208ac24df21"
   created_at     = 2
   id             = "...my_id..."
@@ -27,6 +24,7 @@ resource "kong-gateway_jwt" "my_jwt" {
   tags = [
     "..."
   ]
+  workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -35,33 +33,38 @@ resource "kong-gateway_jwt" "my_jwt" {
 
 ### Required
 
-- `consumer_id` (String) Consumer ID for nested entities
+- `consumer_id` (String) Consumer ID for nested entities. Requires replacement if changed.
 
 ### Optional
 
-- `algorithm` (String) must be one of ["HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384", "PS512", "EdDSA"]
-- `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
-- `created_at` (Number) Unix epoch when the resource was created.
-- `key` (String)
-- `rsa_public_key` (String)
-- `secret` (String)
-- `tags` (List of String)
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
-
-<a id="nestedatt--consumer"></a>
-### Nested Schema for `consumer`
-
-Optional:
-
-- `id` (String)
+- `algorithm` (String) must be one of ["ES256", "ES256K", "ES384", "ES512", "ESB256", "ESB320", "ESB384", "ESB512", "ESP256", "ESP384", "ESP512", "Ed25519", "Ed448", "EdDSA", "HS256", "HS384", "HS512", "PS256", "PS384", "PS512", "RS256", "RS384", "RS512"]; Requires replacement if changed.
+- `created_at` (Number) Unix epoch when the resource was created. Requires replacement if changed.
+- `id` (String) A string representing a UUID (universally unique identifier). Requires replacement if changed.
+- `key` (String) Requires replacement if changed.
+- `rsa_public_key` (String) Requires replacement if changed.
+- `secret` (String) Requires replacement if changed.
+- `tags` (List of String) A set of strings representing tags. Requires replacement if changed.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_jwt.my_kong-gateway_jwt
+  id = jsonencode({
+    consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+    id = "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_jwt.my_kong-gateway_jwt '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4"}'
+terraform import kong-gateway_jwt.my_kong-gateway_jwt '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "4a7f5faa-8c96-46d6-8214-c87573ef2ac4", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

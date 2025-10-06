@@ -24,6 +24,7 @@ resource "kong-gateway_vault" "my_vault" {
     "..."
   ]
   updated_at = 10
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -32,25 +33,37 @@ resource "kong-gateway_vault" "my_vault" {
 
 ### Required
 
-- `config` (String) The configuration properties for the Vault which can be found on the vaults' documentation page. Parsed as JSON.
 - `name` (String) The name of the Vault that's going to be added. Currently, the Vault implementation must be installed in every Kong instance.
 - `prefix` (String) The unique prefix (or identifier) for this Vault configuration. The prefix is used to load the right Vault configuration and implementation when referencing secrets with the other entities.
 
 ### Optional
 
+- `config` (String) The configuration properties for the Vault which can be found on the vaults' documentation page. Parsed as JSON.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `description` (String) The description of the Vault entity.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `tags` (List of String) An optional set of strings associated with the Vault for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_vault.my_kong-gateway_vault
+  id = jsonencode({
+    id = "9d4d6d19-77c6-428e-a965-9bc9647633e9"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_vault.my_kong-gateway_vault ""
+terraform import kong-gateway_vault.my_kong-gateway_vault '{"id": "9d4d6d19-77c6-428e-a965-9bc9647633e9", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

@@ -22,6 +22,7 @@ resource "kong-gateway_consumer" "my_consumer" {
   ]
   updated_at = 1
   username   = "...my_username..."
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -32,18 +33,30 @@ resource "kong-gateway_consumer" "my_consumer" {
 
 - `created_at` (Number) Unix epoch when the resource was created.
 - `custom_id` (String) Field for storing an existing unique ID for the Consumer - useful for mapping Kong with users in your existing database. You must send either this field or `username` with the request.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `tags` (List of String) An optional set of strings associated with the Consumer for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
 - `username` (String) The unique username of the Consumer. You must send either this field or `custom_id` with the request.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_consumer.my_kong-gateway_consumer
+  id = jsonencode({
+    id = "c1059869-6fa7-4329-a5f5-5946d14ca2c5"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_consumer.my_kong-gateway_consumer ""
+terraform import kong-gateway_consumer.my_kong-gateway_consumer '{"id": "c1059869-6fa7-4329-a5f5-5946d14ca2c5", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

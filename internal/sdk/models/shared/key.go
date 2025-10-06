@@ -8,18 +8,18 @@ type Pem struct {
 	PublicKey  *string `json:"public_key,omitempty"`
 }
 
-func (o *Pem) GetPrivateKey() *string {
-	if o == nil {
+func (p *Pem) GetPrivateKey() *string {
+	if p == nil {
 		return nil
 	}
-	return o.PrivateKey
+	return p.PrivateKey
 }
 
-func (o *Pem) GetPublicKey() *string {
-	if o == nil {
+func (p *Pem) GetPublicKey() *string {
+	if p == nil {
 		return nil
 	}
-	return o.PublicKey
+	return p.PublicKey
 }
 
 // Set - The id (an UUID) of the key-set with which to associate the key.
@@ -27,18 +27,19 @@ type Set struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *Set) GetID() *string {
-	if o == nil {
+func (s *Set) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 // A Key object holds a representation of asymmetric keys in various formats. When Kong or a Kong plugin requires a specific public or private key to perform certain operations, it can use this entity.
 type Key struct {
 	// Unix epoch when the resource was created.
-	CreatedAt *int64  `json:"created_at,omitempty"`
-	ID        *string `json:"id,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// A JSON Web Key represented as a string.
 	Jwk *string `json:"jwk,omitempty"`
 	// A unique identifier for a key.
@@ -52,76 +53,77 @@ type Key struct {
 	// An optional set of strings associated with the Key for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64  `json:"updated_at,omitempty"`
-	X5t       *string `json:"x5t,omitempty"`
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
+	// X.509 certificate SHA-1 thumbprint.
+	X5t *string `json:"x5t,omitempty"`
 }
 
-func (o *Key) GetCreatedAt() *int64 {
-	if o == nil {
+func (k *Key) GetCreatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return k.CreatedAt
 }
 
-func (o *Key) GetID() *string {
-	if o == nil {
+func (k *Key) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
-func (o *Key) GetJwk() *string {
-	if o == nil {
+func (k *Key) GetJwk() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Jwk
+	return k.Jwk
 }
 
-func (o *Key) GetKid() string {
-	if o == nil {
+func (k *Key) GetKid() string {
+	if k == nil {
 		return ""
 	}
-	return o.Kid
+	return k.Kid
 }
 
-func (o *Key) GetName() *string {
-	if o == nil {
+func (k *Key) GetName() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Name
+	return k.Name
 }
 
-func (o *Key) GetPem() *Pem {
-	if o == nil {
+func (k *Key) GetPem() *Pem {
+	if k == nil {
 		return nil
 	}
-	return o.Pem
+	return k.Pem
 }
 
-func (o *Key) GetSet() *Set {
-	if o == nil {
+func (k *Key) GetSet() *Set {
+	if k == nil {
 		return nil
 	}
-	return o.Set
+	return k.Set
 }
 
-func (o *Key) GetTags() []string {
-	if o == nil {
+func (k *Key) GetTags() []string {
+	if k == nil {
 		return nil
 	}
-	return o.Tags
+	return k.Tags
 }
 
-func (o *Key) GetUpdatedAt() *int64 {
-	if o == nil {
+func (k *Key) GetUpdatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return k.UpdatedAt
 }
 
-func (o *Key) GetX5t() *string {
-	if o == nil {
+func (k *Key) GetX5t() *string {
+	if k == nil {
 		return nil
 	}
-	return o.X5t
+	return k.X5t
 }

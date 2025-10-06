@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteKeyRequest struct {
 	// ID or name of the Key to lookup
 	KeyIDOrName string `pathParam:"style=simple,explode=false,name=KeyIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteKeyRequest) GetKeyIDOrName() string {
-	if o == nil {
+func (d DeleteKeyRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteKeyRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"KeyIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteKeyRequest) GetKeyIDOrName() string {
+	if d == nil {
 		return ""
 	}
-	return o.KeyIDOrName
+	return d.KeyIDOrName
+}
+
+func (d *DeleteKeyRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteKeyResponse struct {
@@ -30,30 +51,30 @@ type DeleteKeyResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteKeyResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteKeyResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteKeyResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteKeyResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteKeyResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteKeyResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteKeyResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteKeyResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

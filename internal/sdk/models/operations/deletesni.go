@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteSniRequest struct {
 	// ID or name of the SNI to lookup
 	SNIIDOrName string `pathParam:"style=simple,explode=false,name=SNIIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteSniRequest) GetSNIIDOrName() string {
-	if o == nil {
+func (d DeleteSniRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteSniRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"SNIIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteSniRequest) GetSNIIDOrName() string {
+	if d == nil {
 		return ""
 	}
-	return o.SNIIDOrName
+	return d.SNIIDOrName
+}
+
+func (d *DeleteSniRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteSniResponse struct {
@@ -30,30 +51,30 @@ type DeleteSniResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteSniResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteSniResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteSniResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteSniResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteSniResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteSniResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteSniResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteSniResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

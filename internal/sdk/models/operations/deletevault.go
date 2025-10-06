@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteVaultRequest struct {
 	// ID or prefix of the Vault to lookup
 	VaultIDOrPrefix string `pathParam:"style=simple,explode=false,name=VaultIdOrPrefix"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteVaultRequest) GetVaultIDOrPrefix() string {
-	if o == nil {
+func (d DeleteVaultRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteVaultRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"VaultIdOrPrefix", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteVaultRequest) GetVaultIDOrPrefix() string {
+	if d == nil {
 		return ""
 	}
-	return o.VaultIDOrPrefix
+	return d.VaultIDOrPrefix
+}
+
+func (d *DeleteVaultRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteVaultResponse struct {
@@ -30,30 +51,30 @@ type DeleteVaultResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteVaultResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteVaultResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteVaultResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteVaultResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteVaultResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteVaultResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

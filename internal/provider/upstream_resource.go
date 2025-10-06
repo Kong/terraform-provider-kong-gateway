@@ -3,12 +3,17 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -32,27 +37,30 @@ type UpstreamResource struct {
 
 // UpstreamResourceModel describes the resource data model.
 type UpstreamResourceModel struct {
-	Algorithm              types.String                       `tfsdk:"algorithm"`
-	ClientCertificate      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"client_certificate"`
-	CreatedAt              types.Int64                        `tfsdk:"created_at"`
-	HashFallback           types.String                       `tfsdk:"hash_fallback"`
-	HashFallbackHeader     types.String                       `tfsdk:"hash_fallback_header"`
-	HashFallbackQueryArg   types.String                       `tfsdk:"hash_fallback_query_arg"`
-	HashFallbackURICapture types.String                       `tfsdk:"hash_fallback_uri_capture"`
-	HashOn                 types.String                       `tfsdk:"hash_on"`
-	HashOnCookie           types.String                       `tfsdk:"hash_on_cookie"`
-	HashOnCookiePath       types.String                       `tfsdk:"hash_on_cookie_path"`
-	HashOnHeader           types.String                       `tfsdk:"hash_on_header"`
-	HashOnQueryArg         types.String                       `tfsdk:"hash_on_query_arg"`
-	HashOnURICapture       types.String                       `tfsdk:"hash_on_uri_capture"`
-	Healthchecks           *tfTypes.Healthchecks              `tfsdk:"healthchecks"`
-	HostHeader             types.String                       `tfsdk:"host_header"`
-	ID                     types.String                       `tfsdk:"id"`
-	Name                   types.String                       `tfsdk:"name"`
-	Slots                  types.Int64                        `tfsdk:"slots"`
-	Tags                   []types.String                     `tfsdk:"tags"`
-	UpdatedAt              types.Int64                        `tfsdk:"updated_at"`
-	UseSrvName             types.Bool                         `tfsdk:"use_srv_name"`
+	Algorithm                types.String          `tfsdk:"algorithm"`
+	ClientCertificate        *tfTypes.Set          `tfsdk:"client_certificate"`
+	CreatedAt                types.Int64           `tfsdk:"created_at"`
+	HashFallback             types.String          `tfsdk:"hash_fallback"`
+	HashFallbackHeader       types.String          `tfsdk:"hash_fallback_header"`
+	HashFallbackQueryArg     types.String          `tfsdk:"hash_fallback_query_arg"`
+	HashFallbackURICapture   types.String          `tfsdk:"hash_fallback_uri_capture"`
+	HashOn                   types.String          `tfsdk:"hash_on"`
+	HashOnCookie             types.String          `tfsdk:"hash_on_cookie"`
+	HashOnCookiePath         types.String          `tfsdk:"hash_on_cookie_path"`
+	HashOnHeader             types.String          `tfsdk:"hash_on_header"`
+	HashOnQueryArg           types.String          `tfsdk:"hash_on_query_arg"`
+	HashOnURICapture         types.String          `tfsdk:"hash_on_uri_capture"`
+	Healthchecks             *tfTypes.Healthchecks `tfsdk:"healthchecks"`
+	HostHeader               types.String          `tfsdk:"host_header"`
+	ID                       types.String          `tfsdk:"id"`
+	Name                     types.String          `tfsdk:"name"`
+	Slots                    types.Int64           `tfsdk:"slots"`
+	StickySessionsCookie     types.String          `tfsdk:"sticky_sessions_cookie"`
+	StickySessionsCookiePath types.String          `tfsdk:"sticky_sessions_cookie_path"`
+	Tags                     []types.String        `tfsdk:"tags"`
+	UpdatedAt                types.Int64           `tfsdk:"updated_at"`
+	UseSrvName               types.Bool            `tfsdk:"use_srv_name"`
+	Workspace                types.String          `tfsdk:"workspace"`
 }
 
 func (r *UpstreamResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -66,13 +74,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 			"algorithm": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `Which load balancing algorithm to use. must be one of ["consistent-hashing", "least-connections", "round-robin", "latency"]`,
+				Description: `Which load balancing algorithm to use. must be one of ["consistent-hashing", "latency", "least-connections", "round-robin", "sticky-sessions"]`,
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"consistent-hashing",
+						"latency",
 						"least-connections",
 						"round-robin",
-						"latency",
+						"sticky-sessions",
 					),
 				},
 			},
@@ -95,14 +104,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 			"hash_fallback": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `What to use as hashing input if the primary ` + "`" + `hash_on` + "`" + ` does not return a hash (eg. header is missing, or no Consumer identified). Not available if ` + "`" + `hash_on` + "`" + ` is set to ` + "`" + `cookie` + "`" + `. must be one of ["none", "consumer", "ip", "header", "cookie", "path", "query_arg", "uri_capture"]`,
+				Description: `What to use as hashing input if the primary ` + "`" + `hash_on` + "`" + ` does not return a hash (eg. header is missing, or no Consumer identified). Not available if ` + "`" + `hash_on` + "`" + ` is set to ` + "`" + `cookie` + "`" + `. must be one of ["consumer", "cookie", "header", "ip", "none", "path", "query_arg", "uri_capture"]`,
 				Validators: []validator.String{
 					stringvalidator.OneOf(
-						"none",
 						"consumer",
-						"ip",
-						"header",
 						"cookie",
+						"header",
+						"ip",
+						"none",
 						"path",
 						"query_arg",
 						"uri_capture",
@@ -118,23 +127,29 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 				Computed:    true,
 				Optional:    true,
 				Description: `The name of the query string argument to take the value from as hash input. Only required when ` + "`" + `hash_fallback` + "`" + ` is set to ` + "`" + `query_arg` + "`" + `.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"hash_fallback_uri_capture": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `The name of the route URI capture to take the value from as hash input. Only required when ` + "`" + `hash_fallback` + "`" + ` is set to ` + "`" + `uri_capture` + "`" + `.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"hash_on": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `What to use as hashing input. Using ` + "`" + `none` + "`" + ` results in a weighted-round-robin scheme with no hashing. must be one of ["none", "consumer", "ip", "header", "cookie", "path", "query_arg", "uri_capture"]`,
+				Description: `What to use as hashing input. Using ` + "`" + `none` + "`" + ` results in a weighted-round-robin scheme with no hashing. must be one of ["consumer", "cookie", "header", "ip", "none", "path", "query_arg", "uri_capture"]`,
 				Validators: []validator.String{
 					stringvalidator.OneOf(
-						"none",
 						"consumer",
-						"ip",
-						"header",
 						"cookie",
+						"header",
+						"ip",
+						"none",
 						"path",
 						"query_arg",
 						"uri_capture",
@@ -160,11 +175,17 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 				Computed:    true,
 				Optional:    true,
 				Description: `The name of the query string argument to take the value from as hash input. Only required when ` + "`" + `hash_on` + "`" + ` is set to ` + "`" + `query_arg` + "`" + `.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"hash_on_uri_capture": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `The name of the route URI capture to take the value from as hash input. Only required when ` + "`" + `hash_on` + "`" + ` is set to ` + "`" + `uri_capture` + "`" + `.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"healthchecks": schema.SingleNestedAttribute{
 				Computed: true,
@@ -177,11 +198,17 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 							"concurrency": schema.Int64Attribute{
 								Computed: true,
 								Optional: true,
+								Validators: []validator.Int64{
+									int64validator.Between(1, 2147483648),
+								},
 							},
 							"headers": schema.MapAttribute{
-								Computed:    true,
-								Optional:    true,
-								ElementType: types.StringType,
+								Computed: true,
+								Optional: true,
+								ElementType: types.ListType{
+									ElemType: types.StringType,
+								},
+								Description: `A map of header names to arrays of header values.`,
 							},
 							"healthy": schema.SingleNestedAttribute{
 								Computed: true,
@@ -195,20 +222,28 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"interval": schema.Float64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Float64{
+											float64validator.AtMost(65535),
+										},
 									},
 									"successes": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 								},
 							},
 							"http_path": schema.StringAttribute{
-								Computed: true,
-								Optional: true,
+								Computed:    true,
+								Optional:    true,
+								Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).`,
 							},
 							"https_sni": schema.StringAttribute{
-								Computed: true,
-								Optional: true,
+								Computed:    true,
+								Optional:    true,
+								Description: `A string representing an SNI (server name indication) value for TLS.`,
 							},
 							"https_verify_certificate": schema.BoolAttribute{
 								Computed: true,
@@ -217,18 +252,21 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 							"timeout": schema.Float64Attribute{
 								Computed: true,
 								Optional: true,
+								Validators: []validator.Float64{
+									float64validator.AtMost(65535),
+								},
 							},
 							"type": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `must be one of ["tcp", "http", "https", "grpc", "grpcs"]`,
+								Description: `must be one of ["grpc", "grpcs", "http", "https", "tcp"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
-										"tcp",
-										"http",
-										"https",
 										"grpc",
 										"grpcs",
+										"http",
+										"https",
+										"tcp",
 									),
 								},
 							},
@@ -239,6 +277,9 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"http_failures": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 									"http_statuses": schema.ListAttribute{
 										Computed:    true,
@@ -248,14 +289,23 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"interval": schema.Float64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Float64{
+											float64validator.AtMost(65535),
+										},
 									},
 									"tcp_failures": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 								},
 							},
@@ -277,20 +327,23 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"successes": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 								},
 							},
 							"type": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `must be one of ["tcp", "http", "https", "grpc", "grpcs"]`,
+								Description: `must be one of ["grpc", "grpcs", "http", "https", "tcp"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
-										"tcp",
-										"http",
-										"https",
 										"grpc",
 										"grpcs",
+										"http",
+										"https",
+										"tcp",
 									),
 								},
 							},
@@ -301,6 +354,9 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"http_failures": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 									"http_statuses": schema.ListAttribute{
 										Computed:    true,
@@ -310,10 +366,16 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 									"tcp_failures": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
+										Validators: []validator.Int64{
+											int64validator.AtMost(255),
+										},
 									},
 								},
 							},
@@ -322,8 +384,12 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 					"threshold": schema.Float64Attribute{
 						Computed: true,
 						Optional: true,
+						Validators: []validator.Float64{
+							float64validator.AtMost(100),
+						},
 					},
 				},
+				Description: `The array of healthchecks.`,
 			},
 			"host_header": schema.StringAttribute{
 				Computed:    true,
@@ -331,8 +397,9 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 				Description: `The hostname to be used as ` + "`" + `Host` + "`" + ` header when proxying requests through Kong.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
@@ -342,6 +409,19 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 				Computed:    true,
 				Optional:    true,
 				Description: `The number of slots in the load balancer algorithm. If ` + "`" + `algorithm` + "`" + ` is set to ` + "`" + `round-robin` + "`" + `, this setting determines the maximum number of slots. If ` + "`" + `algorithm` + "`" + ` is set to ` + "`" + `consistent-hashing` + "`" + `, this setting determines the actual number of slots in the algorithm. Accepts an integer in the range ` + "`" + `10` + "`" + `-` + "`" + `65536` + "`" + `.`,
+				Validators: []validator.Int64{
+					int64validator.Between(10, 65536),
+				},
+			},
+			"sticky_sessions_cookie": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `The cookie name to keep sticky sessions.`,
+			},
+			"sticky_sessions_cookie_path": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).`,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
@@ -358,6 +438,12 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 				Computed:    true,
 				Optional:    true,
 				Description: `If set, the balancer will use SRV hostname(if DNS Answer has SRV record) as the proxy upstream ` + "`" + `Host` + "`" + `.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -401,7 +487,7 @@ func (r *UpstreamResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	request, requestDiags := data.ToSharedUpstream(ctx)
+	request, requestDiags := data.ToOperationsCreateUpstreamRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -601,5 +687,26 @@ func (r *UpstreamResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 func (r *UpstreamResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "426d620c-7058-4ae6-aacc-f85a3204a2c5", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"426d620c-7058-4ae6-aacc-f85a3204a2c5"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

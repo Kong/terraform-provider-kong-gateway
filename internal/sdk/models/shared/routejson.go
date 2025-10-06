@@ -5,36 +5,50 @@ package shared
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
 type Destinations struct {
-	IP   *string `json:"ip,omitempty"`
-	Port *int64  `json:"port,omitempty"`
+	// A string representing an IP address or CIDR block, such as 192.168.1.1 or 192.168.0.0/16.
+	IP *string `json:"ip,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *Destinations) GetIP() *string {
-	if o == nil {
-		return nil
-	}
-	return o.IP
+func (d Destinations) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *Destinations) GetPort() *int64 {
-	if o == nil {
+func (d *Destinations) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Destinations) GetIP() *string {
+	if d == nil {
 		return nil
 	}
-	return o.Port
+	return d.IP
+}
+
+func (d *Destinations) GetPort() *int64 {
+	if d == nil {
+		return nil
+	}
+	return d.Port
 }
 
 // HTTPSRedirectStatusCode - The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.
 type HTTPSRedirectStatusCode int64
 
 const (
-	HTTPSRedirectStatusCodeFourHundredAndTwentySix HTTPSRedirectStatusCode = 426
 	HTTPSRedirectStatusCodeThreeHundredAndOne      HTTPSRedirectStatusCode = 301
 	HTTPSRedirectStatusCodeThreeHundredAndTwo      HTTPSRedirectStatusCode = 302
 	HTTPSRedirectStatusCodeThreeHundredAndSeven    HTTPSRedirectStatusCode = 307
 	HTTPSRedirectStatusCodeThreeHundredAndEight    HTTPSRedirectStatusCode = 308
+	HTTPSRedirectStatusCodeFourHundredAndTwentySix HTTPSRedirectStatusCode = 426
 )
 
 func (e HTTPSRedirectStatusCode) ToPointer() *HTTPSRedirectStatusCode {
@@ -46,8 +60,6 @@ func (e *HTTPSRedirectStatusCode) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
-	case 426:
-		fallthrough
 	case 301:
 		fallthrough
 	case 302:
@@ -55,6 +67,8 @@ func (e *HTTPSRedirectStatusCode) UnmarshalJSON(data []byte) error {
 	case 307:
 		fallthrough
 	case 308:
+		fallthrough
+	case 426:
 		*e = HTTPSRedirectStatusCode(v)
 		return nil
 	default:
@@ -89,25 +103,26 @@ func (e *PathHandling) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type RouteJSONProtocols string
+// Protocols - A string representing a protocol, such as HTTP or HTTPS.
+type Protocols string
 
 const (
-	RouteJSONProtocolsGrpc           RouteJSONProtocols = "grpc"
-	RouteJSONProtocolsGrpcs          RouteJSONProtocols = "grpcs"
-	RouteJSONProtocolsHTTP           RouteJSONProtocols = "http"
-	RouteJSONProtocolsHTTPS          RouteJSONProtocols = "https"
-	RouteJSONProtocolsTCP            RouteJSONProtocols = "tcp"
-	RouteJSONProtocolsTLS            RouteJSONProtocols = "tls"
-	RouteJSONProtocolsTLSPassthrough RouteJSONProtocols = "tls_passthrough"
-	RouteJSONProtocolsUDP            RouteJSONProtocols = "udp"
-	RouteJSONProtocolsWs             RouteJSONProtocols = "ws"
-	RouteJSONProtocolsWss            RouteJSONProtocols = "wss"
+	ProtocolsGrpc           Protocols = "grpc"
+	ProtocolsGrpcs          Protocols = "grpcs"
+	ProtocolsHTTP           Protocols = "http"
+	ProtocolsHTTPS          Protocols = "https"
+	ProtocolsTCP            Protocols = "tcp"
+	ProtocolsTLS            Protocols = "tls"
+	ProtocolsTLSPassthrough Protocols = "tls_passthrough"
+	ProtocolsUDP            Protocols = "udp"
+	ProtocolsWs             Protocols = "ws"
+	ProtocolsWss            Protocols = "wss"
 )
 
-func (e RouteJSONProtocols) ToPointer() *RouteJSONProtocols {
+func (e Protocols) ToPointer() *Protocols {
 	return &e
 }
-func (e *RouteJSONProtocols) UnmarshalJSON(data []byte) error {
+func (e *Protocols) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -132,10 +147,10 @@ func (e *RouteJSONProtocols) UnmarshalJSON(data []byte) error {
 	case "ws":
 		fallthrough
 	case "wss":
-		*e = RouteJSONProtocols(v)
+		*e = Protocols(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for RouteJSONProtocols: %v", v)
+		return fmt.Errorf("invalid value for Protocols: %v", v)
 	}
 }
 
@@ -144,30 +159,54 @@ type RouteJSONService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RouteJSONService) GetID() *string {
-	if o == nil {
+func (r RouteJSONService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RouteJSONService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RouteJSONService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 type Sources struct {
-	IP   *string `json:"ip,omitempty"`
-	Port *int64  `json:"port,omitempty"`
+	// A string representing an IP address or CIDR block, such as 192.168.1.1 or 192.168.0.0/16.
+	IP *string `json:"ip,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *Sources) GetIP() *string {
-	if o == nil {
-		return nil
-	}
-	return o.IP
+func (s Sources) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
 }
 
-func (o *Sources) GetPort() *int64 {
-	if o == nil {
+func (s *Sources) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Sources) GetIP() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Port
+	return s.IP
+}
+
+func (s *Sources) GetPort() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.Port
 }
 
 // RouteJSON - Route entities define rules to match client requests. Each Route is associated with a Service, and a Service may have multiple Routes associated to it. Every request matching a given Route will be proxied to its associated Service. The combination of Routes and Services (and the separation of concerns between them) offers a powerful routing mechanism with which it is possible to define fine-grained entry-points in Kong leading to different upstream services of your infrastructure. You need at least one matching rule that applies to the protocol being matched by the Route.
@@ -176,13 +215,12 @@ type RouteJSON struct {
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
 	Destinations []Destinations `json:"destinations,omitempty"`
-	// One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.
-	Headers map[string][]string `json:"headers,omitempty"`
 	// A list of domain names that match this Route. Note that the hosts value is case sensitive.
 	Hosts []string `json:"hosts,omitempty"`
 	// The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.
 	HTTPSRedirectStatusCode *HTTPSRedirectStatusCode `json:"https_redirect_status_code,omitempty"`
-	ID                      *string                  `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// A list of HTTP methods that match this Route.
 	Methods []string `json:"methods,omitempty"`
 	// The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".
@@ -194,7 +232,7 @@ type RouteJSON struct {
 	// When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
 	PreserveHost *bool `json:"preserve_host,omitempty"`
 	// An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.
-	Protocols []RouteJSONProtocols `json:"protocols,omitempty"`
+	Protocols []Protocols `json:"protocols,omitempty"`
 	// A number used to choose which route resolves a given request when several routes match it using regexes simultaneously. When two routes match the path and have the same `regex_priority`, the older one (lowest `created_at`) is used. Note that the priority for non-regex routes is different (longer non-regex routes are matched before shorter ones).
 	RegexPriority *int64 `json:"regex_priority,omitempty"`
 	// Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
@@ -215,149 +253,153 @@ type RouteJSON struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *RouteJSON) GetCreatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.CreatedAt
+func (r RouteJSON) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
 }
 
-func (o *RouteJSON) GetDestinations() []Destinations {
-	if o == nil {
-		return nil
+func (r *RouteJSON) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
 	}
-	return o.Destinations
+	return nil
 }
 
-func (o *RouteJSON) GetHeaders() map[string][]string {
-	if o == nil {
+func (r *RouteJSON) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Headers
+	return r.CreatedAt
 }
 
-func (o *RouteJSON) GetHosts() []string {
-	if o == nil {
+func (r *RouteJSON) GetDestinations() []Destinations {
+	if r == nil {
 		return nil
 	}
-	return o.Hosts
+	return r.Destinations
 }
 
-func (o *RouteJSON) GetHTTPSRedirectStatusCode() *HTTPSRedirectStatusCode {
-	if o == nil {
+func (r *RouteJSON) GetHosts() []string {
+	if r == nil {
 		return nil
 	}
-	return o.HTTPSRedirectStatusCode
+	return r.Hosts
 }
 
-func (o *RouteJSON) GetID() *string {
-	if o == nil {
+func (r *RouteJSON) GetHTTPSRedirectStatusCode() *HTTPSRedirectStatusCode {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.HTTPSRedirectStatusCode
 }
 
-func (o *RouteJSON) GetMethods() []string {
-	if o == nil {
+func (r *RouteJSON) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Methods
+	return r.ID
 }
 
-func (o *RouteJSON) GetName() *string {
-	if o == nil {
+func (r *RouteJSON) GetMethods() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Name
+	return r.Methods
 }
 
-func (o *RouteJSON) GetPathHandling() *PathHandling {
-	if o == nil {
+func (r *RouteJSON) GetName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.PathHandling
+	return r.Name
 }
 
-func (o *RouteJSON) GetPaths() []string {
-	if o == nil {
+func (r *RouteJSON) GetPathHandling() *PathHandling {
+	if r == nil {
 		return nil
 	}
-	return o.Paths
+	return r.PathHandling
 }
 
-func (o *RouteJSON) GetPreserveHost() *bool {
-	if o == nil {
+func (r *RouteJSON) GetPaths() []string {
+	if r == nil {
 		return nil
 	}
-	return o.PreserveHost
+	return r.Paths
 }
 
-func (o *RouteJSON) GetProtocols() []RouteJSONProtocols {
-	if o == nil {
+func (r *RouteJSON) GetPreserveHost() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Protocols
+	return r.PreserveHost
 }
 
-func (o *RouteJSON) GetRegexPriority() *int64 {
-	if o == nil {
+func (r *RouteJSON) GetProtocols() []Protocols {
+	if r == nil {
 		return nil
 	}
-	return o.RegexPriority
+	return r.Protocols
 }
 
-func (o *RouteJSON) GetRequestBuffering() *bool {
-	if o == nil {
+func (r *RouteJSON) GetRegexPriority() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.RequestBuffering
+	return r.RegexPriority
 }
 
-func (o *RouteJSON) GetResponseBuffering() *bool {
-	if o == nil {
+func (r *RouteJSON) GetRequestBuffering() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.ResponseBuffering
+	return r.RequestBuffering
 }
 
-func (o *RouteJSON) GetService() *RouteJSONService {
-	if o == nil {
+func (r *RouteJSON) GetResponseBuffering() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Service
+	return r.ResponseBuffering
 }
 
-func (o *RouteJSON) GetSnis() []string {
-	if o == nil {
+func (r *RouteJSON) GetService() *RouteJSONService {
+	if r == nil {
 		return nil
 	}
-	return o.Snis
+	return r.Service
 }
 
-func (o *RouteJSON) GetSources() []Sources {
-	if o == nil {
+func (r *RouteJSON) GetSnis() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Sources
+	return r.Snis
 }
 
-func (o *RouteJSON) GetStripPath() *bool {
-	if o == nil {
+func (r *RouteJSON) GetSources() []Sources {
+	if r == nil {
 		return nil
 	}
-	return o.StripPath
+	return r.Sources
 }
 
-func (o *RouteJSON) GetTags() []string {
-	if o == nil {
+func (r *RouteJSON) GetStripPath() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.StripPath
 }
 
-func (o *RouteJSON) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *RouteJSON) GetTags() []string {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.Tags
+}
+
+func (r *RouteJSON) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
 }

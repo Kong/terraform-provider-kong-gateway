@@ -4,45 +4,48 @@ package shared
 
 type KeySet struct {
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
-	Name      *string  `json:"name,omitempty"`
-	Tags      []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// The name to associate with the given key-set.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *KeySet) GetCreatedAt() *int64 {
-	if o == nil {
+func (k *KeySet) GetCreatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return k.CreatedAt
 }
 
-func (o *KeySet) GetID() *string {
-	if o == nil {
+func (k *KeySet) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
-func (o *KeySet) GetName() *string {
-	if o == nil {
+func (k *KeySet) GetName() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Name
+	return k.Name
 }
 
-func (o *KeySet) GetTags() []string {
-	if o == nil {
+func (k *KeySet) GetTags() []string {
+	if k == nil {
 		return nil
 	}
-	return o.Tags
+	return k.Tags
 }
 
-func (o *KeySet) GetUpdatedAt() *int64 {
-	if o == nil {
+func (k *KeySet) GetUpdatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return k.UpdatedAt
 }

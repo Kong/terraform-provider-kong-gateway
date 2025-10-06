@@ -7,50 +7,76 @@ import (
 	"fmt"
 )
 
-type Algorithm string
+type JWTWithoutParentsAlgorithm string
 
 const (
-	AlgorithmHs256 Algorithm = "HS256"
-	AlgorithmHs384 Algorithm = "HS384"
-	AlgorithmHs512 Algorithm = "HS512"
-	AlgorithmRs256 Algorithm = "RS256"
-	AlgorithmRs384 Algorithm = "RS384"
-	AlgorithmRs512 Algorithm = "RS512"
-	AlgorithmEs256 Algorithm = "ES256"
-	AlgorithmEs384 Algorithm = "ES384"
-	AlgorithmEs512 Algorithm = "ES512"
-	AlgorithmPs256 Algorithm = "PS256"
-	AlgorithmPs384 Algorithm = "PS384"
-	AlgorithmPs512 Algorithm = "PS512"
-	AlgorithmEdDsa Algorithm = "EdDSA"
+	JWTWithoutParentsAlgorithmEs256   JWTWithoutParentsAlgorithm = "ES256"
+	JWTWithoutParentsAlgorithmEs256K  JWTWithoutParentsAlgorithm = "ES256K"
+	JWTWithoutParentsAlgorithmEs384   JWTWithoutParentsAlgorithm = "ES384"
+	JWTWithoutParentsAlgorithmEs512   JWTWithoutParentsAlgorithm = "ES512"
+	JWTWithoutParentsAlgorithmEsb256  JWTWithoutParentsAlgorithm = "ESB256"
+	JWTWithoutParentsAlgorithmEsb320  JWTWithoutParentsAlgorithm = "ESB320"
+	JWTWithoutParentsAlgorithmEsb384  JWTWithoutParentsAlgorithm = "ESB384"
+	JWTWithoutParentsAlgorithmEsb512  JWTWithoutParentsAlgorithm = "ESB512"
+	JWTWithoutParentsAlgorithmEsp256  JWTWithoutParentsAlgorithm = "ESP256"
+	JWTWithoutParentsAlgorithmEsp384  JWTWithoutParentsAlgorithm = "ESP384"
+	JWTWithoutParentsAlgorithmEsp512  JWTWithoutParentsAlgorithm = "ESP512"
+	JWTWithoutParentsAlgorithmEd25519 JWTWithoutParentsAlgorithm = "Ed25519"
+	JWTWithoutParentsAlgorithmEd448   JWTWithoutParentsAlgorithm = "Ed448"
+	JWTWithoutParentsAlgorithmEdDsa   JWTWithoutParentsAlgorithm = "EdDSA"
+	JWTWithoutParentsAlgorithmHs256   JWTWithoutParentsAlgorithm = "HS256"
+	JWTWithoutParentsAlgorithmHs384   JWTWithoutParentsAlgorithm = "HS384"
+	JWTWithoutParentsAlgorithmHs512   JWTWithoutParentsAlgorithm = "HS512"
+	JWTWithoutParentsAlgorithmPs256   JWTWithoutParentsAlgorithm = "PS256"
+	JWTWithoutParentsAlgorithmPs384   JWTWithoutParentsAlgorithm = "PS384"
+	JWTWithoutParentsAlgorithmPs512   JWTWithoutParentsAlgorithm = "PS512"
+	JWTWithoutParentsAlgorithmRs256   JWTWithoutParentsAlgorithm = "RS256"
+	JWTWithoutParentsAlgorithmRs384   JWTWithoutParentsAlgorithm = "RS384"
+	JWTWithoutParentsAlgorithmRs512   JWTWithoutParentsAlgorithm = "RS512"
 )
 
-func (e Algorithm) ToPointer() *Algorithm {
+func (e JWTWithoutParentsAlgorithm) ToPointer() *JWTWithoutParentsAlgorithm {
 	return &e
 }
-func (e *Algorithm) UnmarshalJSON(data []byte) error {
+func (e *JWTWithoutParentsAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
+	case "ES256":
+		fallthrough
+	case "ES256K":
+		fallthrough
+	case "ES384":
+		fallthrough
+	case "ES512":
+		fallthrough
+	case "ESB256":
+		fallthrough
+	case "ESB320":
+		fallthrough
+	case "ESB384":
+		fallthrough
+	case "ESB512":
+		fallthrough
+	case "ESP256":
+		fallthrough
+	case "ESP384":
+		fallthrough
+	case "ESP512":
+		fallthrough
+	case "Ed25519":
+		fallthrough
+	case "Ed448":
+		fallthrough
+	case "EdDSA":
+		fallthrough
 	case "HS256":
 		fallthrough
 	case "HS384":
 		fallthrough
 	case "HS512":
-		fallthrough
-	case "RS256":
-		fallthrough
-	case "RS384":
-		fallthrough
-	case "RS512":
-		fallthrough
-	case "ES256":
-		fallthrough
-	case "ES384":
-		fallthrough
-	case "ES512":
 		fallthrough
 	case "PS256":
 		fallthrough
@@ -58,11 +84,15 @@ func (e *Algorithm) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "PS512":
 		fallthrough
-	case "EdDSA":
-		*e = Algorithm(v)
+	case "RS256":
+		fallthrough
+	case "RS384":
+		fallthrough
+	case "RS512":
+		*e = JWTWithoutParentsAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Algorithm: %v", v)
+		return fmt.Errorf("invalid value for JWTWithoutParentsAlgorithm: %v", v)
 	}
 }
 
@@ -70,77 +100,79 @@ type JWTWithoutParentsConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JWTWithoutParentsConsumer) GetID() *string {
-	if o == nil {
+func (j *JWTWithoutParentsConsumer) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
 type JWTWithoutParents struct {
-	Algorithm *Algorithm                 `json:"algorithm,omitempty"`
-	Consumer  *JWTWithoutParentsConsumer `json:"consumer,omitempty"`
+	Algorithm *JWTWithoutParentsAlgorithm `json:"algorithm,omitempty"`
+	Consumer  *JWTWithoutParentsConsumer  `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt    *int64   `json:"created_at,omitempty"`
-	ID           *string  `json:"id,omitempty"`
-	Key          *string  `json:"key,omitempty"`
-	RsaPublicKey *string  `json:"rsa_public_key,omitempty"`
-	Secret       *string  `json:"secret,omitempty"`
-	Tags         []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID           *string `json:"id,omitempty"`
+	Key          *string `json:"key,omitempty"`
+	RsaPublicKey *string `json:"rsa_public_key,omitempty"`
+	Secret       *string `json:"secret,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 }
 
-func (o *JWTWithoutParents) GetAlgorithm() *Algorithm {
-	if o == nil {
+func (j *JWTWithoutParents) GetAlgorithm() *JWTWithoutParentsAlgorithm {
+	if j == nil {
 		return nil
 	}
-	return o.Algorithm
+	return j.Algorithm
 }
 
-func (o *JWTWithoutParents) GetConsumer() *JWTWithoutParentsConsumer {
-	if o == nil {
+func (j *JWTWithoutParents) GetConsumer() *JWTWithoutParentsConsumer {
+	if j == nil {
 		return nil
 	}
-	return o.Consumer
+	return j.Consumer
 }
 
-func (o *JWTWithoutParents) GetCreatedAt() *int64 {
-	if o == nil {
+func (j *JWTWithoutParents) GetCreatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return j.CreatedAt
 }
 
-func (o *JWTWithoutParents) GetID() *string {
-	if o == nil {
+func (j *JWTWithoutParents) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
-func (o *JWTWithoutParents) GetKey() *string {
-	if o == nil {
+func (j *JWTWithoutParents) GetKey() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Key
+	return j.Key
 }
 
-func (o *JWTWithoutParents) GetRsaPublicKey() *string {
-	if o == nil {
+func (j *JWTWithoutParents) GetRsaPublicKey() *string {
+	if j == nil {
 		return nil
 	}
-	return o.RsaPublicKey
+	return j.RsaPublicKey
 }
 
-func (o *JWTWithoutParents) GetSecret() *string {
-	if o == nil {
+func (j *JWTWithoutParents) GetSecret() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Secret
+	return j.Secret
 }
 
-func (o *JWTWithoutParents) GetTags() []string {
-	if o == nil {
+func (j *JWTWithoutParents) GetTags() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Tags
+	return j.Tags
 }

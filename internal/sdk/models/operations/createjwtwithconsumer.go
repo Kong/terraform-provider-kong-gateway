@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type CreateJwtWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new JWT for creation
-	JWTWithoutParents shared.JWTWithoutParents `request:"mediaType=application/json"`
+	JWTWithoutParents *shared.JWTWithoutParents `request:"mediaType=application/json"`
 }
 
-func (o *CreateJwtWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
+func (c CreateJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateJwtWithConsumerRequest) GetConsumerID() string {
+	if c == nil {
 		return ""
 	}
-	return o.ConsumerID
+	return c.ConsumerID
 }
 
-func (o *CreateJwtWithConsumerRequest) GetJWTWithoutParents() shared.JWTWithoutParents {
-	if o == nil {
-		return shared.JWTWithoutParents{}
+func (c *CreateJwtWithConsumerRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
 	}
-	return o.JWTWithoutParents
+	return c.Workspace
+}
+
+func (c *CreateJwtWithConsumerRequest) GetJWTWithoutParents() *shared.JWTWithoutParents {
+	if c == nil {
+		return nil
+	}
+	return c.JWTWithoutParents
 }
 
 type CreateJwtWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type CreateJwtWithConsumerResponse struct {
 	Jwt *shared.Jwt
 }
 
-func (o *CreateJwtWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateJwtWithConsumerResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateJwtWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateJwtWithConsumerResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateJwtWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateJwtWithConsumerResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateJwtWithConsumerResponse) GetJwt() *shared.Jwt {
-	if o == nil {
+func (c *CreateJwtWithConsumerResponse) GetJwt() *shared.Jwt {
+	if c == nil {
 		return nil
 	}
-	return o.Jwt
+	return c.Jwt
 }

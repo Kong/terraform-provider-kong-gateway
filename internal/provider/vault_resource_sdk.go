@@ -5,17 +5,127 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *VaultResourceModel) RefreshFromSharedVault(ctx context.Context, resp *shared.Vault) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = jsontypes.NewNormalizedNull()
+		} else {
+			configResult, _ := json.Marshal(resp.Config)
+			r.Config = jsontypes.NewNormalizedValue(string(configResult))
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Description = types.StringPointerValue(resp.Description)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Name = types.StringValue(resp.Name)
+		r.Prefix = types.StringValue(resp.Prefix)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *VaultResourceModel) ToOperationsCreateVaultRequest(ctx context.Context) (*operations.CreateVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	vault, vaultDiags := r.ToSharedVault(ctx)
+	diags.Append(vaultDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateVaultRequest{
+		Workspace: workspace,
+		Vault:     *vault,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) ToOperationsDeleteVaultRequest(ctx context.Context) (*operations.DeleteVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) ToOperationsGetVaultRequest(ctx context.Context) (*operations.GetVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *VaultResourceModel) ToOperationsUpsertVaultRequest(ctx context.Context) (*operations.UpsertVaultRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var vaultIDOrPrefix string
+	vaultIDOrPrefix = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	vault, vaultDiags := r.ToSharedVault(ctx)
+	diags.Append(vaultDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertVaultRequest{
+		VaultIDOrPrefix: vaultIDOrPrefix,
+		Workspace:       workspace,
+		Vault:           *vault,
+	}
+
+	return &out, diags
+}
+
 func (r *VaultResourceModel) ToSharedVault(ctx context.Context) (*shared.Vault, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	var config interface{}
-	_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
+	if !r.Config.IsUnknown() && !r.Config.IsNull() {
+		_ = json.Unmarshal([]byte(r.Config.ValueString()), &config)
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -40,9 +150,12 @@ func (r *VaultResourceModel) ToSharedVault(ctx context.Context) (*shared.Vault, 
 	var prefix string
 	prefix = r.Prefix.ValueString()
 
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -62,72 +175,4 @@ func (r *VaultResourceModel) ToSharedVault(ctx context.Context) (*shared.Vault, 
 	}
 
 	return &out, diags
-}
-
-func (r *VaultResourceModel) ToOperationsUpsertVaultRequest(ctx context.Context) (*operations.UpsertVaultRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var vaultIDOrPrefix string
-	vaultIDOrPrefix = r.ID.ValueString()
-
-	vault, vaultDiags := r.ToSharedVault(ctx)
-	diags.Append(vaultDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertVaultRequest{
-		VaultIDOrPrefix: vaultIDOrPrefix,
-		Vault:           *vault,
-	}
-
-	return &out, diags
-}
-
-func (r *VaultResourceModel) ToOperationsGetVaultRequest(ctx context.Context) (*operations.GetVaultRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var vaultIDOrPrefix string
-	vaultIDOrPrefix = r.ID.ValueString()
-
-	out := operations.GetVaultRequest{
-		VaultIDOrPrefix: vaultIDOrPrefix,
-	}
-
-	return &out, diags
-}
-
-func (r *VaultResourceModel) ToOperationsDeleteVaultRequest(ctx context.Context) (*operations.DeleteVaultRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var vaultIDOrPrefix string
-	vaultIDOrPrefix = r.ID.ValueString()
-
-	out := operations.DeleteVaultRequest{
-		VaultIDOrPrefix: vaultIDOrPrefix,
-	}
-
-	return &out, diags
-}
-
-func (r *VaultResourceModel) RefreshFromSharedVault(ctx context.Context, resp *shared.Vault) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		configResult, _ := json.Marshal(resp.Config)
-		r.Config = types.StringValue(string(configResult))
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Description = types.StringPointerValue(resp.Description)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Name = types.StringValue(resp.Name)
-		r.Prefix = types.StringValue(resp.Prefix)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

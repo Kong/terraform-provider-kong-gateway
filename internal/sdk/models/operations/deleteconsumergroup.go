@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteConsumerGroupRequest struct {
 	// ID of the Consumer Group to lookup
 	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteConsumerGroupRequest) GetConsumerGroupID() string {
-	if o == nil {
+func (d DeleteConsumerGroupRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteConsumerGroupRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerGroupId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteConsumerGroupRequest) GetConsumerGroupID() string {
+	if d == nil {
 		return ""
 	}
-	return o.ConsumerGroupID
+	return d.ConsumerGroupID
+}
+
+func (d *DeleteConsumerGroupRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteConsumerGroupResponse struct {
@@ -30,30 +51,30 @@ type DeleteConsumerGroupResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteConsumerGroupResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteConsumerGroupResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteConsumerGroupResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteConsumerGroupResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteConsumerGroupResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteConsumerGroupResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteConsumerGroupResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteConsumerGroupResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

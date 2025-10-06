@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteMtlsAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the MTLS-auth credential to lookup
 	MTLSAuthID string `pathParam:"style=simple,explode=false,name=MTLSAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteMtlsAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteMtlsAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteMtlsAuthWithConsumerRequest) GetMTLSAuthID() string {
-	if o == nil {
+func (d *DeleteMtlsAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "MTLSAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteMtlsAuthWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.MTLSAuthID
+	return d.ConsumerID
+}
+
+func (d *DeleteMtlsAuthWithConsumerRequest) GetMTLSAuthID() string {
+	if d == nil {
+		return ""
+	}
+	return d.MTLSAuthID
+}
+
+func (d *DeleteMtlsAuthWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteMtlsAuthWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteMtlsAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteMtlsAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteMtlsAuthWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteMtlsAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteMtlsAuthWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteMtlsAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteMtlsAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

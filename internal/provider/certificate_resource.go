@@ -5,11 +5,18 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	speakeasy_int64planmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/int64planmodifier"
+	speakeasy_listplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/listplanmodifier"
+	speakeasy_stringplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/stringplanmodifier"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 )
 
@@ -38,6 +45,7 @@ type CertificateResourceModel struct {
 	Snis      []types.String `tfsdk:"snis"`
 	Tags      []types.String `tfsdk:"tags"`
 	UpdatedAt types.Int64    `tfsdk:"updated_at"`
+	Workspace types.String   `tfsdk:"workspace"`
 }
 
 func (r *CertificateResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -49,47 +57,94 @@ func (r *CertificateResource) Schema(ctx context.Context, req resource.SchemaReq
 		MarkdownDescription: "Certificate Resource",
 		Attributes: map[string]schema.Attribute{
 			"cert": schema.StringAttribute{
-				Required:    true,
-				Description: `PEM-encoded public certificate chain of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).`,
+				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `PEM-encoded public certificate chain of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.`,
 			},
 			"cert_alt": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.`,
 			},
 			"created_at": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Unix epoch when the resource was created.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_int64planmodifier.SuppressDiff(speakeasy_int64planmodifier.ExplicitSuppress),
+				},
+				Description: `Unix epoch when the resource was created. Requires replacement if changed.`,
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `A string representing a UUID (universally unique identifier). Requires replacement if changed.`,
 			},
 			"key": schema.StringAttribute{
-				Required:    true,
-				Description: `PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).`,
+				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.`,
 			},
 			"key_alt": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.`,
 			},
 			"snis": schema.ListAttribute{
-				Computed:    true,
-				Optional:    true,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_listplanmodifier.SuppressDiff(speakeasy_listplanmodifier.ExplicitSuppress),
+				},
 				ElementType: types.StringType,
+				Description: `Requires replacement if changed.`,
 			},
 			"tags": schema.ListAttribute{
-				Computed:    true,
-				Optional:    true,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_listplanmodifier.SuppressDiff(speakeasy_listplanmodifier.ExplicitSuppress),
+				},
 				ElementType: types.StringType,
-				Description: `An optional set of strings associated with the Certificate for grouping and filtering.`,
+				Description: `An optional set of strings associated with the Certificate for grouping and filtering. Requires replacement if changed.`,
 			},
 			"updated_at": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Unix epoch when the resource was last updated.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_int64planmodifier.SuppressDiff(speakeasy_int64planmodifier.ExplicitSuppress),
+				},
+				Description: `Unix epoch when the resource was last updated. Requires replacement if changed.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString(`default`),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Description: `The name or UUID of the workspace. Default: "default"; Requires replacement if changed.`,
 			},
 		},
 	}
@@ -133,7 +188,7 @@ func (r *CertificateResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	request, requestDiags := data.ToSharedCertificate(ctx)
+	request, requestDiags := data.ToOperationsCreateCertificateRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -193,41 +248,7 @@ func (r *CertificateResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
-	request, requestDiags := data.ToOperationsGetCertificateRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Certificates.GetCertificate(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
-	if res.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-	if !(res.Certificate != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
-		return
-	}
-	resp.Diagnostics.Append(data.RefreshFromSharedCertificate(ctx, res.Certificate)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	// Not Implemented; we rely entirely on CREATE API request response
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -247,43 +268,7 @@ func (r *CertificateResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	request, requestDiags := data.ToOperationsUpsertCertificateRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Certificates.UpsertCertificate(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-	if !(res.Certificate != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
-		return
-	}
-	resp.Diagnostics.Append(data.RefreshFromSharedCertificate(ctx, res.Certificate)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	// Not Implemented; all attributes marked as RequiresReplace
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -307,31 +292,9 @@ func (r *CertificateResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	request, requestDiags := data.ToOperationsDeleteCertificateRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Certificates.DeleteCertificate(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode != 204 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-
+	// Not Implemented; entity does not have a configured DELETE operation
 }
 
 func (r *CertificateResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	resp.Diagnostics.AddError("Not Implemented", "No available import state operation is available for resource certificate.")
 }

@@ -4,71 +4,113 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PartialResourceModel) ToSharedPartial(ctx context.Context) (*shared.Partial, diag.Diagnostics) {
+func (r *PartialResourceModel) RefreshFromSharedPartial(ctx context.Context, resp *shared.Partial) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	config := make(map[string]interface{})
-	for configKey, configValue := range r.Config {
-		var configInst interface{}
-		_ = json.Unmarshal([]byte(configValue.ValueString()), &configInst)
-		config[configKey] = configInst
-	}
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	name := new(string)
-	if !r.Name.IsUnknown() && !r.Name.IsNull() {
-		*name = r.Name.ValueString()
-	} else {
-		name = nil
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	var typeVar string
-	typeVar = r.Type.ValueString()
+	if resp != nil {
+		if resp.PartialRedisCe != nil {
+			r.RedisCe = &tfTypes.PartialRedisCe{}
+			r.RedisCe.Config.Database = types.Int64PointerValue(resp.PartialRedisCe.Config.Database)
+			r.RedisCe.Config.Host = types.StringPointerValue(resp.PartialRedisCe.Config.Host)
+			r.RedisCe.Config.Password = types.StringPointerValue(resp.PartialRedisCe.Config.Password)
+			r.RedisCe.Config.Port = types.Int64PointerValue(resp.PartialRedisCe.Config.Port)
+			r.RedisCe.Config.ServerName = types.StringPointerValue(resp.PartialRedisCe.Config.ServerName)
+			r.RedisCe.Config.Ssl = types.BoolPointerValue(resp.PartialRedisCe.Config.Ssl)
+			r.RedisCe.Config.SslVerify = types.BoolPointerValue(resp.PartialRedisCe.Config.SslVerify)
+			r.RedisCe.Config.Timeout = types.Int64PointerValue(resp.PartialRedisCe.Config.Timeout)
+			r.RedisCe.Config.Username = types.StringPointerValue(resp.PartialRedisCe.Config.Username)
+			r.RedisCe.CreatedAt = types.Int64PointerValue(resp.PartialRedisCe.CreatedAt)
+			r.CreatedAt = r.RedisCe.CreatedAt
+			r.RedisCe.ID = types.StringPointerValue(resp.PartialRedisCe.ID)
+			r.ID = r.RedisCe.ID
+			r.RedisCe.Name = types.StringPointerValue(resp.PartialRedisCe.Name)
+			r.Name = r.RedisCe.Name
+			if resp.PartialRedisCe.Tags != nil {
+				r.RedisCe.Tags = make([]types.String, 0, len(resp.PartialRedisCe.Tags))
+				for _, v := range resp.PartialRedisCe.Tags {
+					r.RedisCe.Tags = append(r.RedisCe.Tags, types.StringValue(v))
+				}
+			}
+			r.RedisCe.UpdatedAt = types.Int64PointerValue(resp.PartialRedisCe.UpdatedAt)
+			r.UpdatedAt = r.RedisCe.UpdatedAt
+		}
+		if resp.PartialRedisEe != nil {
+			r.RedisEe = &tfTypes.PartialRedisEe{}
+			r.RedisEe.Config.ClusterMaxRedirections = types.Int64PointerValue(resp.PartialRedisEe.Config.ClusterMaxRedirections)
+			r.RedisEe.Config.ClusterNodes = []tfTypes.ClusterNodes{}
 
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	out := shared.Partial{
-		Config:    config,
-		CreatedAt: createdAt,
-		ID:        id,
-		Name:      name,
-		Tags:      tags,
-		Type:      typeVar,
-		UpdatedAt: updatedAt,
+			for _, clusterNodesItem := range resp.PartialRedisEe.Config.ClusterNodes {
+				var clusterNodes tfTypes.ClusterNodes
+
+				clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+				clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
+
+				r.RedisEe.Config.ClusterNodes = append(r.RedisEe.Config.ClusterNodes, clusterNodes)
+			}
+			r.RedisEe.Config.ConnectTimeout = types.Int64PointerValue(resp.PartialRedisEe.Config.ConnectTimeout)
+			r.RedisEe.Config.ConnectionIsProxied = types.BoolPointerValue(resp.PartialRedisEe.Config.ConnectionIsProxied)
+			r.RedisEe.Config.Database = types.Int64PointerValue(resp.PartialRedisEe.Config.Database)
+			r.RedisEe.Config.Host = types.StringPointerValue(resp.PartialRedisEe.Config.Host)
+			r.RedisEe.Config.KeepaliveBacklog = types.Int64PointerValue(resp.PartialRedisEe.Config.KeepaliveBacklog)
+			r.RedisEe.Config.KeepalivePoolSize = types.Int64PointerValue(resp.PartialRedisEe.Config.KeepalivePoolSize)
+			r.RedisEe.Config.Password = types.StringPointerValue(resp.PartialRedisEe.Config.Password)
+			r.RedisEe.Config.Port = types.Int64PointerValue(resp.PartialRedisEe.Config.Port)
+			r.RedisEe.Config.ReadTimeout = types.Int64PointerValue(resp.PartialRedisEe.Config.ReadTimeout)
+			r.RedisEe.Config.SendTimeout = types.Int64PointerValue(resp.PartialRedisEe.Config.SendTimeout)
+			r.RedisEe.Config.SentinelMaster = types.StringPointerValue(resp.PartialRedisEe.Config.SentinelMaster)
+			r.RedisEe.Config.SentinelNodes = []tfTypes.SentinelNodes{}
+
+			for _, sentinelNodesItem := range resp.PartialRedisEe.Config.SentinelNodes {
+				var sentinelNodes tfTypes.SentinelNodes
+
+				sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+				sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+
+				r.RedisEe.Config.SentinelNodes = append(r.RedisEe.Config.SentinelNodes, sentinelNodes)
+			}
+			r.RedisEe.Config.SentinelPassword = types.StringPointerValue(resp.PartialRedisEe.Config.SentinelPassword)
+			if resp.PartialRedisEe.Config.SentinelRole != nil {
+				r.RedisEe.Config.SentinelRole = types.StringValue(string(*resp.PartialRedisEe.Config.SentinelRole))
+			} else {
+				r.RedisEe.Config.SentinelRole = types.StringNull()
+			}
+			r.RedisEe.Config.SentinelUsername = types.StringPointerValue(resp.PartialRedisEe.Config.SentinelUsername)
+			r.RedisEe.Config.ServerName = types.StringPointerValue(resp.PartialRedisEe.Config.ServerName)
+			r.RedisEe.Config.Ssl = types.BoolPointerValue(resp.PartialRedisEe.Config.Ssl)
+			r.RedisEe.Config.SslVerify = types.BoolPointerValue(resp.PartialRedisEe.Config.SslVerify)
+			r.RedisEe.Config.Username = types.StringPointerValue(resp.PartialRedisEe.Config.Username)
+			r.RedisEe.CreatedAt = types.Int64PointerValue(resp.PartialRedisEe.CreatedAt)
+			r.CreatedAt = r.RedisEe.CreatedAt
+			r.RedisEe.ID = types.StringPointerValue(resp.PartialRedisEe.ID)
+			r.ID = r.RedisEe.ID
+			r.RedisEe.Name = types.StringPointerValue(resp.PartialRedisEe.Name)
+			r.Name = r.RedisEe.Name
+			if resp.PartialRedisEe.Tags != nil {
+				r.RedisEe.Tags = make([]types.String, 0, len(resp.PartialRedisEe.Tags))
+				for _, v := range resp.PartialRedisEe.Tags {
+					r.RedisEe.Tags = append(r.RedisEe.Tags, types.StringValue(v))
+				}
+			}
+			r.RedisEe.UpdatedAt = types.Int64PointerValue(resp.PartialRedisEe.UpdatedAt)
+			r.UpdatedAt = r.RedisEe.UpdatedAt
+		}
 	}
 
-	return &out, diags
+	return diags
 }
 
-func (r *PartialResourceModel) ToOperationsUpsertPartialRequest(ctx context.Context) (*operations.UpsertPartialRequest, diag.Diagnostics) {
+func (r *PartialResourceModel) ToOperationsCreatePartialRequest(ctx context.Context) (*operations.CreatePartialRequest, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var partialID string
-	partialID = r.ID.ValueString()
+	var workspace string
+	workspace = r.Workspace.ValueString()
 
 	partial, partialDiags := r.ToSharedPartial(ctx)
 	diags.Append(partialDiags...)
@@ -77,61 +119,352 @@ func (r *PartialResourceModel) ToOperationsUpsertPartialRequest(ctx context.Cont
 		return nil, diags
 	}
 
-	out := operations.UpsertPartialRequest{
-		PartialID: partialID,
+	out := operations.CreatePartialRequest{
+		Workspace: workspace,
 		Partial:   *partial,
 	}
 
 	return &out, diags
 }
 
-func (r *PartialResourceModel) ToOperationsGetPartialRequest(ctx context.Context) (*operations.GetPartialRequest, diag.Diagnostics) {
+func (r *PartialResourceModel) ToSharedPartial(ctx context.Context) (*shared.Partial, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var partialID string
-	partialID = r.ID.ValueString()
-
-	out := operations.GetPartialRequest{
-		PartialID: partialID,
-	}
-
-	return &out, diags
-}
-
-func (r *PartialResourceModel) ToOperationsDeletePartialRequest(ctx context.Context) (*operations.DeletePartialRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var partialID string
-	partialID = r.ID.ValueString()
-
-	out := operations.DeletePartialRequest{
-		PartialID: partialID,
-	}
-
-	return &out, diags
-}
-
-func (r *PartialResourceModel) RefreshFromSharedPartial(ctx context.Context, resp *shared.Partial) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if len(resp.Config) > 0 {
-			r.Config = make(map[string]types.String, len(resp.Config))
-			for key, value := range resp.Config {
-				result, _ := json.Marshal(value)
-				r.Config[key] = types.StringValue(string(result))
+	var out shared.Partial
+	var partialRedisCe *shared.PartialRedisCe
+	if r.RedisCe != nil {
+		database := new(int64)
+		if !r.RedisCe.Config.Database.IsUnknown() && !r.RedisCe.Config.Database.IsNull() {
+			*database = r.RedisCe.Config.Database.ValueInt64()
+		} else {
+			database = nil
+		}
+		host := new(string)
+		if !r.RedisCe.Config.Host.IsUnknown() && !r.RedisCe.Config.Host.IsNull() {
+			*host = r.RedisCe.Config.Host.ValueString()
+		} else {
+			host = nil
+		}
+		password := new(string)
+		if !r.RedisCe.Config.Password.IsUnknown() && !r.RedisCe.Config.Password.IsNull() {
+			*password = r.RedisCe.Config.Password.ValueString()
+		} else {
+			password = nil
+		}
+		port := new(int64)
+		if !r.RedisCe.Config.Port.IsUnknown() && !r.RedisCe.Config.Port.IsNull() {
+			*port = r.RedisCe.Config.Port.ValueInt64()
+		} else {
+			port = nil
+		}
+		serverName := new(string)
+		if !r.RedisCe.Config.ServerName.IsUnknown() && !r.RedisCe.Config.ServerName.IsNull() {
+			*serverName = r.RedisCe.Config.ServerName.ValueString()
+		} else {
+			serverName = nil
+		}
+		ssl := new(bool)
+		if !r.RedisCe.Config.Ssl.IsUnknown() && !r.RedisCe.Config.Ssl.IsNull() {
+			*ssl = r.RedisCe.Config.Ssl.ValueBool()
+		} else {
+			ssl = nil
+		}
+		sslVerify := new(bool)
+		if !r.RedisCe.Config.SslVerify.IsUnknown() && !r.RedisCe.Config.SslVerify.IsNull() {
+			*sslVerify = r.RedisCe.Config.SslVerify.ValueBool()
+		} else {
+			sslVerify = nil
+		}
+		timeout := new(int64)
+		if !r.RedisCe.Config.Timeout.IsUnknown() && !r.RedisCe.Config.Timeout.IsNull() {
+			*timeout = r.RedisCe.Config.Timeout.ValueInt64()
+		} else {
+			timeout = nil
+		}
+		username := new(string)
+		if !r.RedisCe.Config.Username.IsUnknown() && !r.RedisCe.Config.Username.IsNull() {
+			*username = r.RedisCe.Config.Username.ValueString()
+		} else {
+			username = nil
+		}
+		config := shared.PartialRedisCeConfig{
+			Database:   database,
+			Host:       host,
+			Password:   password,
+			Port:       port,
+			ServerName: serverName,
+			Ssl:        ssl,
+			SslVerify:  sslVerify,
+			Timeout:    timeout,
+			Username:   username,
+		}
+		createdAt := new(int64)
+		if !r.RedisCe.CreatedAt.IsUnknown() && !r.RedisCe.CreatedAt.IsNull() {
+			*createdAt = r.RedisCe.CreatedAt.ValueInt64()
+		} else {
+			createdAt = nil
+		}
+		id := new(string)
+		if !r.RedisCe.ID.IsUnknown() && !r.RedisCe.ID.IsNull() {
+			*id = r.RedisCe.ID.ValueString()
+		} else {
+			id = nil
+		}
+		name := new(string)
+		if !r.RedisCe.Name.IsUnknown() && !r.RedisCe.Name.IsNull() {
+			*name = r.RedisCe.Name.ValueString()
+		} else {
+			name = nil
+		}
+		var tags []string
+		if r.RedisCe.Tags != nil {
+			tags = make([]string, 0, len(r.RedisCe.Tags))
+			for _, tagsItem := range r.RedisCe.Tags {
+				tags = append(tags, tagsItem.ValueString())
 			}
 		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Name = types.StringPointerValue(resp.Name)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
+		updatedAt := new(int64)
+		if !r.RedisCe.UpdatedAt.IsUnknown() && !r.RedisCe.UpdatedAt.IsNull() {
+			*updatedAt = r.RedisCe.UpdatedAt.ValueInt64()
+		} else {
+			updatedAt = nil
 		}
-		r.Type = types.StringValue(resp.Type)
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		partialRedisCe = &shared.PartialRedisCe{
+			Config:    config,
+			CreatedAt: createdAt,
+			ID:        id,
+			Name:      name,
+			Tags:      tags,
+			UpdatedAt: updatedAt,
+		}
+	}
+	if partialRedisCe != nil {
+		out = shared.Partial{
+			PartialRedisCe: partialRedisCe,
+		}
+	}
+	var partialRedisEe *shared.PartialRedisEe
+	if r.RedisEe != nil {
+		clusterMaxRedirections := new(int64)
+		if !r.RedisEe.Config.ClusterMaxRedirections.IsUnknown() && !r.RedisEe.Config.ClusterMaxRedirections.IsNull() {
+			*clusterMaxRedirections = r.RedisEe.Config.ClusterMaxRedirections.ValueInt64()
+		} else {
+			clusterMaxRedirections = nil
+		}
+		clusterNodes := make([]shared.ClusterNodes, 0, len(r.RedisEe.Config.ClusterNodes))
+		for _, clusterNodesItem := range r.RedisEe.Config.ClusterNodes {
+			ip := new(string)
+			if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
+				*ip = clusterNodesItem.IP.ValueString()
+			} else {
+				ip = nil
+			}
+			port1 := new(int64)
+			if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
+				*port1 = clusterNodesItem.Port.ValueInt64()
+			} else {
+				port1 = nil
+			}
+			clusterNodes = append(clusterNodes, shared.ClusterNodes{
+				IP:   ip,
+				Port: port1,
+			})
+		}
+		connectTimeout := new(int64)
+		if !r.RedisEe.Config.ConnectTimeout.IsUnknown() && !r.RedisEe.Config.ConnectTimeout.IsNull() {
+			*connectTimeout = r.RedisEe.Config.ConnectTimeout.ValueInt64()
+		} else {
+			connectTimeout = nil
+		}
+		connectionIsProxied := new(bool)
+		if !r.RedisEe.Config.ConnectionIsProxied.IsUnknown() && !r.RedisEe.Config.ConnectionIsProxied.IsNull() {
+			*connectionIsProxied = r.RedisEe.Config.ConnectionIsProxied.ValueBool()
+		} else {
+			connectionIsProxied = nil
+		}
+		database1 := new(int64)
+		if !r.RedisEe.Config.Database.IsUnknown() && !r.RedisEe.Config.Database.IsNull() {
+			*database1 = r.RedisEe.Config.Database.ValueInt64()
+		} else {
+			database1 = nil
+		}
+		host1 := new(string)
+		if !r.RedisEe.Config.Host.IsUnknown() && !r.RedisEe.Config.Host.IsNull() {
+			*host1 = r.RedisEe.Config.Host.ValueString()
+		} else {
+			host1 = nil
+		}
+		keepaliveBacklog := new(int64)
+		if !r.RedisEe.Config.KeepaliveBacklog.IsUnknown() && !r.RedisEe.Config.KeepaliveBacklog.IsNull() {
+			*keepaliveBacklog = r.RedisEe.Config.KeepaliveBacklog.ValueInt64()
+		} else {
+			keepaliveBacklog = nil
+		}
+		keepalivePoolSize := new(int64)
+		if !r.RedisEe.Config.KeepalivePoolSize.IsUnknown() && !r.RedisEe.Config.KeepalivePoolSize.IsNull() {
+			*keepalivePoolSize = r.RedisEe.Config.KeepalivePoolSize.ValueInt64()
+		} else {
+			keepalivePoolSize = nil
+		}
+		password1 := new(string)
+		if !r.RedisEe.Config.Password.IsUnknown() && !r.RedisEe.Config.Password.IsNull() {
+			*password1 = r.RedisEe.Config.Password.ValueString()
+		} else {
+			password1 = nil
+		}
+		port2 := new(int64)
+		if !r.RedisEe.Config.Port.IsUnknown() && !r.RedisEe.Config.Port.IsNull() {
+			*port2 = r.RedisEe.Config.Port.ValueInt64()
+		} else {
+			port2 = nil
+		}
+		readTimeout := new(int64)
+		if !r.RedisEe.Config.ReadTimeout.IsUnknown() && !r.RedisEe.Config.ReadTimeout.IsNull() {
+			*readTimeout = r.RedisEe.Config.ReadTimeout.ValueInt64()
+		} else {
+			readTimeout = nil
+		}
+		sendTimeout := new(int64)
+		if !r.RedisEe.Config.SendTimeout.IsUnknown() && !r.RedisEe.Config.SendTimeout.IsNull() {
+			*sendTimeout = r.RedisEe.Config.SendTimeout.ValueInt64()
+		} else {
+			sendTimeout = nil
+		}
+		sentinelMaster := new(string)
+		if !r.RedisEe.Config.SentinelMaster.IsUnknown() && !r.RedisEe.Config.SentinelMaster.IsNull() {
+			*sentinelMaster = r.RedisEe.Config.SentinelMaster.ValueString()
+		} else {
+			sentinelMaster = nil
+		}
+		sentinelNodes := make([]shared.SentinelNodes, 0, len(r.RedisEe.Config.SentinelNodes))
+		for _, sentinelNodesItem := range r.RedisEe.Config.SentinelNodes {
+			host2 := new(string)
+			if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
+				*host2 = sentinelNodesItem.Host.ValueString()
+			} else {
+				host2 = nil
+			}
+			port3 := new(int64)
+			if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
+				*port3 = sentinelNodesItem.Port.ValueInt64()
+			} else {
+				port3 = nil
+			}
+			sentinelNodes = append(sentinelNodes, shared.SentinelNodes{
+				Host: host2,
+				Port: port3,
+			})
+		}
+		sentinelPassword := new(string)
+		if !r.RedisEe.Config.SentinelPassword.IsUnknown() && !r.RedisEe.Config.SentinelPassword.IsNull() {
+			*sentinelPassword = r.RedisEe.Config.SentinelPassword.ValueString()
+		} else {
+			sentinelPassword = nil
+		}
+		sentinelRole := new(shared.SentinelRole)
+		if !r.RedisEe.Config.SentinelRole.IsUnknown() && !r.RedisEe.Config.SentinelRole.IsNull() {
+			*sentinelRole = shared.SentinelRole(r.RedisEe.Config.SentinelRole.ValueString())
+		} else {
+			sentinelRole = nil
+		}
+		sentinelUsername := new(string)
+		if !r.RedisEe.Config.SentinelUsername.IsUnknown() && !r.RedisEe.Config.SentinelUsername.IsNull() {
+			*sentinelUsername = r.RedisEe.Config.SentinelUsername.ValueString()
+		} else {
+			sentinelUsername = nil
+		}
+		serverName1 := new(string)
+		if !r.RedisEe.Config.ServerName.IsUnknown() && !r.RedisEe.Config.ServerName.IsNull() {
+			*serverName1 = r.RedisEe.Config.ServerName.ValueString()
+		} else {
+			serverName1 = nil
+		}
+		ssl1 := new(bool)
+		if !r.RedisEe.Config.Ssl.IsUnknown() && !r.RedisEe.Config.Ssl.IsNull() {
+			*ssl1 = r.RedisEe.Config.Ssl.ValueBool()
+		} else {
+			ssl1 = nil
+		}
+		sslVerify1 := new(bool)
+		if !r.RedisEe.Config.SslVerify.IsUnknown() && !r.RedisEe.Config.SslVerify.IsNull() {
+			*sslVerify1 = r.RedisEe.Config.SslVerify.ValueBool()
+		} else {
+			sslVerify1 = nil
+		}
+		username1 := new(string)
+		if !r.RedisEe.Config.Username.IsUnknown() && !r.RedisEe.Config.Username.IsNull() {
+			*username1 = r.RedisEe.Config.Username.ValueString()
+		} else {
+			username1 = nil
+		}
+		config1 := shared.PartialRedisEeConfig{
+			ClusterMaxRedirections: clusterMaxRedirections,
+			ClusterNodes:           clusterNodes,
+			ConnectTimeout:         connectTimeout,
+			ConnectionIsProxied:    connectionIsProxied,
+			Database:               database1,
+			Host:                   host1,
+			KeepaliveBacklog:       keepaliveBacklog,
+			KeepalivePoolSize:      keepalivePoolSize,
+			Password:               password1,
+			Port:                   port2,
+			ReadTimeout:            readTimeout,
+			SendTimeout:            sendTimeout,
+			SentinelMaster:         sentinelMaster,
+			SentinelNodes:          sentinelNodes,
+			SentinelPassword:       sentinelPassword,
+			SentinelRole:           sentinelRole,
+			SentinelUsername:       sentinelUsername,
+			ServerName:             serverName1,
+			Ssl:                    ssl1,
+			SslVerify:              sslVerify1,
+			Username:               username1,
+		}
+		createdAt1 := new(int64)
+		if !r.RedisEe.CreatedAt.IsUnknown() && !r.RedisEe.CreatedAt.IsNull() {
+			*createdAt1 = r.RedisEe.CreatedAt.ValueInt64()
+		} else {
+			createdAt1 = nil
+		}
+		id1 := new(string)
+		if !r.RedisEe.ID.IsUnknown() && !r.RedisEe.ID.IsNull() {
+			*id1 = r.RedisEe.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name1 := new(string)
+		if !r.RedisEe.Name.IsUnknown() && !r.RedisEe.Name.IsNull() {
+			*name1 = r.RedisEe.Name.ValueString()
+		} else {
+			name1 = nil
+		}
+		var tags1 []string
+		if r.RedisEe.Tags != nil {
+			tags1 = make([]string, 0, len(r.RedisEe.Tags))
+			for _, tagsItem1 := range r.RedisEe.Tags {
+				tags1 = append(tags1, tagsItem1.ValueString())
+			}
+		}
+		updatedAt1 := new(int64)
+		if !r.RedisEe.UpdatedAt.IsUnknown() && !r.RedisEe.UpdatedAt.IsNull() {
+			*updatedAt1 = r.RedisEe.UpdatedAt.ValueInt64()
+		} else {
+			updatedAt1 = nil
+		}
+		partialRedisEe = &shared.PartialRedisEe{
+			Config:    config1,
+			CreatedAt: createdAt1,
+			ID:        id1,
+			Name:      name1,
+			Tags:      tags1,
+			UpdatedAt: updatedAt1,
+		}
+	}
+	if partialRedisEe != nil {
+		out = shared.Partial{
+			PartialRedisEe: partialRedisEe,
+		}
 	}
 
-	return diags
+	return &out, diags
 }

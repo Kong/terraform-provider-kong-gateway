@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteHmacAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the HMAC-auth credential to lookup
 	HMACAuthID string `pathParam:"style=simple,explode=false,name=HMACAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteHmacAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteHmacAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteHmacAuthWithConsumerRequest) GetHMACAuthID() string {
-	if o == nil {
+func (d *DeleteHmacAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "HMACAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteHmacAuthWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.HMACAuthID
+	return d.ConsumerID
+}
+
+func (d *DeleteHmacAuthWithConsumerRequest) GetHMACAuthID() string {
+	if d == nil {
+		return ""
+	}
+	return d.HMACAuthID
+}
+
+func (d *DeleteHmacAuthWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteHmacAuthWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteHmacAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteHmacAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteHmacAuthWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteHmacAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteHmacAuthWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteHmacAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteHmacAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

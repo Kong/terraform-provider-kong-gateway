@@ -10,47 +10,47 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *CACertificateResourceModel) ToSharedCACertificate(ctx context.Context) (*shared.CACertificate, diag.Diagnostics) {
+func (r *CACertificateResourceModel) RefreshFromSharedCACertificate(ctx context.Context, resp *shared.CACertificate) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	var cert string
-	cert = r.Cert.ValueString()
+	if resp != nil {
+		r.Cert = types.StringValue(resp.Cert)
+		r.CertDigest = types.StringPointerValue(resp.CertDigest)
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
 
-	certDigest := new(string)
-	if !r.CertDigest.IsUnknown() && !r.CertDigest.IsNull() {
-		*certDigest = r.CertDigest.ValueString()
-	} else {
-		certDigest = nil
+	return diags
+}
+
+func (r *CACertificateResourceModel) ToOperationsDeleteCaCertificateRequest(ctx context.Context) (*operations.DeleteCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	out := operations.DeleteCaCertificateRequest{
+		CACertificateID: caCertificateID,
 	}
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	out := shared.CACertificate{
-		Cert:       cert,
-		CertDigest: certDigest,
-		CreatedAt:  createdAt,
-		ID:         id,
-		Tags:       tags,
-		UpdatedAt:  updatedAt,
+
+	return &out, diags
+}
+
+func (r *CACertificateResourceModel) ToOperationsGetCaCertificateRequest(ctx context.Context) (*operations.GetCaCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var caCertificateID string
+	caCertificateID = r.ID.ValueString()
+
+	out := operations.GetCaCertificateRequest{
+		CACertificateID: caCertificateID,
 	}
 
 	return &out, diags
@@ -77,46 +77,51 @@ func (r *CACertificateResourceModel) ToOperationsUpsertCaCertificateRequest(ctx 
 	return &out, diags
 }
 
-func (r *CACertificateResourceModel) ToOperationsGetCaCertificateRequest(ctx context.Context) (*operations.GetCaCertificateRequest, diag.Diagnostics) {
+func (r *CACertificateResourceModel) ToSharedCACertificate(ctx context.Context) (*shared.CACertificate, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var caCertificateID string
-	caCertificateID = r.ID.ValueString()
+	var cert string
+	cert = r.Cert.ValueString()
 
-	out := operations.GetCaCertificateRequest{
-		CACertificateID: caCertificateID,
+	certDigest := new(string)
+	if !r.CertDigest.IsUnknown() && !r.CertDigest.IsNull() {
+		*certDigest = r.CertDigest.ValueString()
+	} else {
+		certDigest = nil
 	}
-
-	return &out, diags
-}
-
-func (r *CACertificateResourceModel) ToOperationsDeleteCaCertificateRequest(ctx context.Context) (*operations.DeleteCaCertificateRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var caCertificateID string
-	caCertificateID = r.ID.ValueString()
-
-	out := operations.DeleteCaCertificateRequest{
-		CACertificateID: caCertificateID,
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
 	}
-
-	return &out, diags
-}
-
-func (r *CACertificateResourceModel) RefreshFromSharedCACertificate(ctx context.Context, resp *shared.CACertificate) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.Cert = types.StringValue(resp.Cert)
-		r.CertDigest = types.StringPointerValue(resp.CertDigest)
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
 		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.CACertificate{
+		Cert:       cert,
+		CertDigest: certDigest,
+		CreatedAt:  createdAt,
+		ID:         id,
+		Tags:       tags,
+		UpdatedAt:  updatedAt,
 	}
 
-	return diags
+	return &out, diags
 }

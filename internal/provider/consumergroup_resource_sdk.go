@@ -10,6 +10,105 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *ConsumerGroupResourceModel) RefreshFromSharedConsumerGroup(ctx context.Context, resp *shared.ConsumerGroup) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Name = types.StringValue(resp.Name)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *ConsumerGroupResourceModel) ToOperationsCreateConsumerGroupRequest(ctx context.Context) (*operations.CreateConsumerGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	consumerGroup, consumerGroupDiags := r.ToSharedConsumerGroup(ctx)
+	diags.Append(consumerGroupDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateConsumerGroupRequest{
+		Workspace:     workspace,
+		ConsumerGroup: *consumerGroup,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerGroupResourceModel) ToOperationsDeleteConsumerGroupRequest(ctx context.Context) (*operations.DeleteConsumerGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteConsumerGroupRequest{
+		ConsumerGroupID: consumerGroupID,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerGroupResourceModel) ToOperationsGetConsumerGroupRequest(ctx context.Context) (*operations.GetConsumerGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetConsumerGroupRequest{
+		ConsumerGroupID: consumerGroupID,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerGroupResourceModel) ToOperationsUpsertConsumerGroupRequest(ctx context.Context) (*operations.UpsertConsumerGroupRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerGroupID string
+	consumerGroupID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	consumerGroup, consumerGroupDiags := r.ToSharedConsumerGroup(ctx)
+	diags.Append(consumerGroupDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertConsumerGroupRequest{
+		ConsumerGroupID: consumerGroupID,
+		Workspace:       workspace,
+		ConsumerGroup:   *consumerGroup,
+	}
+
+	return &out, diags
+}
+
 func (r *ConsumerGroupResourceModel) ToSharedConsumerGroup(ctx context.Context) (*shared.ConsumerGroup, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -28,9 +127,12 @@ func (r *ConsumerGroupResourceModel) ToSharedConsumerGroup(ctx context.Context) 
 	var name string
 	name = r.Name.ValueString()
 
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -47,68 +149,4 @@ func (r *ConsumerGroupResourceModel) ToSharedConsumerGroup(ctx context.Context) 
 	}
 
 	return &out, diags
-}
-
-func (r *ConsumerGroupResourceModel) ToOperationsUpsertConsumerGroupRequest(ctx context.Context) (*operations.UpsertConsumerGroupRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerGroupID string
-	consumerGroupID = r.ID.ValueString()
-
-	consumerGroup, consumerGroupDiags := r.ToSharedConsumerGroup(ctx)
-	diags.Append(consumerGroupDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-		ConsumerGroup:   *consumerGroup,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerGroupResourceModel) ToOperationsGetConsumerGroupRequest(ctx context.Context) (*operations.GetConsumerGroupRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerGroupID string
-	consumerGroupID = r.ID.ValueString()
-
-	out := operations.GetConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerGroupResourceModel) ToOperationsDeleteConsumerGroupRequest(ctx context.Context) (*operations.DeleteConsumerGroupRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerGroupID string
-	consumerGroupID = r.ID.ValueString()
-
-	out := operations.DeleteConsumerGroupRequest{
-		ConsumerGroupID: consumerGroupID,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerGroupResourceModel) RefreshFromSharedConsumerGroup(ctx context.Context, resp *shared.ConsumerGroup) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Name = types.StringValue(resp.Name)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

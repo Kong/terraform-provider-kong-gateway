@@ -3,15 +3,28 @@
 package provider
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/float64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	speakeasy_boolplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/boolplanmodifier"
+	speakeasy_float64planmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/float64planmodifier"
+	speakeasy_int64planmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/int64planmodifier"
+	speakeasy_listplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/listplanmodifier"
+	speakeasy_objectplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/objectplanmodifier"
+	speakeasy_stringplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/stringplanmodifier"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 )
@@ -32,14 +45,16 @@ type TargetResource struct {
 
 // TargetResourceModel describes the resource data model.
 type TargetResourceModel struct {
-	CreatedAt  types.Float64                      `tfsdk:"created_at"`
-	ID         types.String                       `tfsdk:"id"`
-	Tags       []types.String                     `tfsdk:"tags"`
-	Target     types.String                       `tfsdk:"target"`
-	UpdatedAt  types.Float64                      `tfsdk:"updated_at"`
-	Upstream   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"upstream"`
-	UpstreamID types.String                       `tfsdk:"upstream_id"`
-	Weight     types.Int64                        `tfsdk:"weight"`
+	CreatedAt  types.Float64  `tfsdk:"created_at"`
+	Failover   types.Bool     `tfsdk:"failover"`
+	ID         types.String   `tfsdk:"id"`
+	Tags       []types.String `tfsdk:"tags"`
+	Target     types.String   `tfsdk:"target"`
+	UpdatedAt  types.Float64  `tfsdk:"updated_at"`
+	Upstream   *tfTypes.Set   `tfsdk:"upstream"`
+	UpstreamID types.String   `tfsdk:"upstream_id"`
+	Weight     types.Int64    `tfsdk:"weight"`
+	Workspace  types.String   `tfsdk:"workspace"`
 }
 
 func (r *TargetResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -51,48 +66,107 @@ func (r *TargetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 		MarkdownDescription: "Target Resource",
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Float64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Unix epoch when the resource was created.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Float64{
+					float64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_float64planmodifier.SuppressDiff(speakeasy_float64planmodifier.ExplicitSuppress),
+				},
+				Description: `Unix epoch when the resource was created. Requires replacement if changed.`,
+			},
+			"failover": schema.BoolAttribute{
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_boolplanmodifier.SuppressDiff(speakeasy_boolplanmodifier.ExplicitSuppress),
+				},
+				Description: `Whether to use this target only as backup or not. Requires replacement if changed.`,
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `A string representing a UUID (universally unique identifier). Requires replacement if changed.`,
 			},
 			"tags": schema.ListAttribute{
-				Computed:    true,
-				Optional:    true,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_listplanmodifier.SuppressDiff(speakeasy_listplanmodifier.ExplicitSuppress),
+				},
 				ElementType: types.StringType,
-				Description: `An optional set of strings associated with the Target for grouping and filtering.`,
+				Description: `An optional set of strings associated with the Target for grouping and filtering. Requires replacement if changed.`,
 			},
 			"target": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the ` + "`" + `port` + "`" + ` value will be overridden by the value from the DNS record.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the ` + "`" + `port` + "`" + ` value will be overridden by the value from the DNS record. Requires replacement if changed.`,
 			},
 			"updated_at": schema.Float64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Unix epoch when the resource was last updated.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Float64{
+					float64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_float64planmodifier.SuppressDiff(speakeasy_float64planmodifier.ExplicitSuppress),
+				},
+				Description: `Unix epoch when the resource was last updated. Requires replacement if changed.`,
 			},
 			"upstream": schema.SingleNestedAttribute{
 				Computed: true,
 				Optional: true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_objectplanmodifier.SuppressDiff(speakeasy_objectplanmodifier.ExplicitSuppress),
+				},
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						Computed: true,
 						Optional: true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplaceIfConfigured(),
+							speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+						},
+						Description: `Requires replacement if changed.`,
 					},
 				},
+				Description: `The unique identifier or the name of the upstream for which to update the target. Requires replacement if changed.`,
 			},
 			"upstream_id": schema.StringAttribute{
-				Required:    true,
-				Description: `ID or target of the Target to lookup`,
+				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Description: `ID or target of the Target to lookup. Requires replacement if changed.`,
 			},
 			"weight": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `The weight this target gets within the upstream loadbalancer (` + "`" + `0` + "`" + `-` + "`" + `65535` + "`" + `). If the hostname resolves to an SRV record, the ` + "`" + `weight` + "`" + ` value will be overridden by the value from the DNS record.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_int64planmodifier.SuppressDiff(speakeasy_int64planmodifier.ExplicitSuppress),
+				},
+				Description: `The weight this target gets within the upstream loadbalancer (` + "`" + `0` + "`" + `-` + "`" + `65535` + "`" + `). If the hostname resolves to an SRV record, the ` + "`" + `weight` + "`" + ` value will be overridden by the value from the DNS record. Requires replacement if changed.`,
+				Validators: []validator.Int64{
+					int64validator.AtMost(65535),
+				},
+			},
+			"workspace": schema.StringAttribute{
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString(`default`),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Description: `The name or UUID of the workspace. Default: "default"; Requires replacement if changed.`,
 			},
 		},
 	}
@@ -196,41 +270,7 @@ func (r *TargetResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	request, requestDiags := data.ToOperationsGetTargetWithUpstreamRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Targets.GetTargetWithUpstream(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode == 404 {
-		resp.State.RemoveResource(ctx)
-		return
-	}
-	if res.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-	if !(res.Target != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
-		return
-	}
-	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	// Not Implemented; we rely entirely on CREATE API request response
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -250,43 +290,7 @@ func (r *TargetResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	request, requestDiags := data.ToOperationsUpdateTargetWithUpstreamRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Targets.UpdateTargetWithUpstream(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-	if !(res.Target != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
-		return
-	}
-	resp.Diagnostics.Append(data.RefreshFromSharedTarget(ctx, res.Target)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	// Not Implemented; all attributes marked as RequiresReplace
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -310,52 +314,9 @@ func (r *TargetResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	request, requestDiags := data.ToOperationsDeleteTargetWithUpstreamRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.Targets.DeleteTargetWithUpstream(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode != 204 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-
+	// Not Implemented; entity does not have a configured DELETE operation
 }
 
 func (r *TargetResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
-	dec.DisallowUnknownFields()
-	var data struct {
-		ID         string `json:"id"`
-		UpstreamID string `json:"upstream_id"`
-	}
-
-	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "5a078780-5d4c-4aae-984a-bdc6f52113d8", "upstream_id": "5a078780-5d4c-4aae-984a-bdc6f52113d8"}': `+err.Error())
-		return
-	}
-
-	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"5a078780-5d4c-4aae-984a-bdc6f52113d8"`)
-		return
-	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-	if len(data.UpstreamID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field upstream_id is required but was not found in the json encoded ID. It's expected to be a value alike '"5a078780-5d4c-4aae-984a-bdc6f52113d8"`)
-		return
-	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("upstream_id"), data.UpstreamID)...)
+	resp.Diagnostics.AddError("Not Implemented", "No available import state operation is available for resource target.")
 }

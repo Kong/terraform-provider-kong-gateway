@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetVaultRequest struct {
 	// ID or prefix of the Vault to lookup
 	VaultIDOrPrefix string `pathParam:"style=simple,explode=false,name=VaultIdOrPrefix"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetVaultRequest) GetVaultIDOrPrefix() string {
-	if o == nil {
+func (g GetVaultRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetVaultRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"VaultIdOrPrefix", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetVaultRequest) GetVaultIDOrPrefix() string {
+	if g == nil {
 		return ""
 	}
-	return o.VaultIDOrPrefix
+	return g.VaultIDOrPrefix
+}
+
+func (g *GetVaultRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetVaultResponse struct {
@@ -32,37 +53,37 @@ type GetVaultResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetVaultResponse) GetContentType() string {
-	if o == nil {
+func (g *GetVaultResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetVaultResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetVaultResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetVaultResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetVaultResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetVaultResponse) GetVault() *shared.Vault {
-	if o == nil {
+func (g *GetVaultResponse) GetVault() *shared.Vault {
+	if g == nil {
 		return nil
 	}
-	return o.Vault
+	return g.Vault
 }
 
-func (o *GetVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

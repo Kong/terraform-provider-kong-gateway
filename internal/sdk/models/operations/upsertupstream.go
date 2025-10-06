@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertUpstreamRequest struct {
 	// ID or name of the Upstream to lookup
 	UpstreamIDOrName string `pathParam:"style=simple,explode=false,name=UpstreamIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Upstream
 	Upstream shared.Upstream `request:"mediaType=application/json"`
 }
 
-func (o *UpsertUpstreamRequest) GetUpstreamIDOrName() string {
-	if o == nil {
-		return ""
-	}
-	return o.UpstreamIDOrName
+func (u UpsertUpstreamRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertUpstreamRequest) GetUpstream() shared.Upstream {
-	if o == nil {
+func (u *UpsertUpstreamRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"UpstreamIdOrName", "workspace", "Upstream"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertUpstreamRequest) GetUpstreamIDOrName() string {
+	if u == nil {
+		return ""
+	}
+	return u.UpstreamIDOrName
+}
+
+func (u *UpsertUpstreamRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertUpstreamRequest) GetUpstream() shared.Upstream {
+	if u == nil {
 		return shared.Upstream{}
 	}
-	return o.Upstream
+	return u.Upstream
 }
 
 type UpsertUpstreamResponse struct {
@@ -41,37 +62,37 @@ type UpsertUpstreamResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertUpstreamResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertUpstreamResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertUpstreamResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertUpstreamResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertUpstreamResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertUpstreamResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertUpstreamResponse) GetUpstream() *shared.Upstream {
-	if o == nil {
+func (u *UpsertUpstreamResponse) GetUpstream() *shared.Upstream {
+	if u == nil {
 		return nil
 	}
-	return o.Upstream
+	return u.Upstream
 }
 
-func (o *UpsertUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

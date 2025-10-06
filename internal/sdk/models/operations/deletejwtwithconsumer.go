@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteJwtWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the JWT to lookup
 	JWTID string `pathParam:"style=simple,explode=false,name=JWTId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteJwtWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteJwtWithConsumerRequest) GetJWTID() string {
-	if o == nil {
+func (d *DeleteJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "JWTId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteJwtWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.JWTID
+	return d.ConsumerID
+}
+
+func (d *DeleteJwtWithConsumerRequest) GetJWTID() string {
+	if d == nil {
+		return ""
+	}
+	return d.JWTID
+}
+
+func (d *DeleteJwtWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteJwtWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteJwtWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteJwtWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteJwtWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteJwtWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteJwtWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteJwtWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteJwtWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

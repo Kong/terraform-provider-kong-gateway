@@ -3,16 +3,18 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -31,14 +33,15 @@ type VaultResource struct {
 
 // VaultResourceModel describes the resource data model.
 type VaultResourceModel struct {
-	Config      types.String   `tfsdk:"config"`
-	CreatedAt   types.Int64    `tfsdk:"created_at"`
-	Description types.String   `tfsdk:"description"`
-	ID          types.String   `tfsdk:"id"`
-	Name        types.String   `tfsdk:"name"`
-	Prefix      types.String   `tfsdk:"prefix"`
-	Tags        []types.String `tfsdk:"tags"`
-	UpdatedAt   types.Int64    `tfsdk:"updated_at"`
+	Config      jsontypes.Normalized `tfsdk:"config"`
+	CreatedAt   types.Int64          `tfsdk:"created_at"`
+	Description types.String         `tfsdk:"description"`
+	ID          types.String         `tfsdk:"id"`
+	Name        types.String         `tfsdk:"name"`
+	Prefix      types.String         `tfsdk:"prefix"`
+	Tags        []types.String       `tfsdk:"tags"`
+	UpdatedAt   types.Int64          `tfsdk:"updated_at"`
+	Workspace   types.String         `tfsdk:"workspace"`
 }
 
 func (r *VaultResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -50,11 +53,10 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 		MarkdownDescription: "Vault Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.StringAttribute{
-				Required:    true,
+				CustomType:  jsontypes.NormalizedType{},
+				Computed:    true,
+				Optional:    true,
 				Description: `The configuration properties for the Vault which can be found on the vaults' documentation page. Parsed as JSON.`,
-				Validators: []validator.String{
-					validators.IsValidJSON(),
-				},
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -67,8 +69,9 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Description: `The description of the Vault entity.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
@@ -88,6 +91,12 @@ func (r *VaultResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -131,7 +140,7 @@ func (r *VaultResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	request, requestDiags := data.ToSharedVault(ctx)
+	request, requestDiags := data.ToOperationsCreateVaultRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -331,5 +340,26 @@ func (r *VaultResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 }
 
 func (r *VaultResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "9d4d6d19-77c6-428e-a965-9bc9647633e9", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"9d4d6d19-77c6-428e-a965-9bc9647633e9"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

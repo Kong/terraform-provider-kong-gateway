@@ -6,9 +6,9 @@ type Security struct {
 	AdminToken *string `security:"scheme,type=apiKey,subtype=header,name=Kong-Admin-Token"`
 }
 
-func (o *Security) GetAdminToken() *string {
-	if o == nil {
+func (s *Security) GetAdminToken() *string {
+	if s == nil {
 		return nil
 	}
-	return o.AdminToken
+	return s.AdminToken
 }

@@ -3,9 +3,42 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRouteRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new Route for creation
+	RouteJSON shared.RouteJSON `request:"mediaType=application/json"`
+}
+
+func (c CreateRouteRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRouteRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RouteJson"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRouteRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRouteRequest) GetRouteJSON() shared.RouteJSON {
+	if c == nil {
+		return shared.RouteJSON{}
+	}
+	return c.RouteJSON
+}
 
 type CreateRouteResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +53,37 @@ type CreateRouteResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRouteResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRouteResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRouteResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRouteResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRouteResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRouteResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRouteResponse) GetRouteJSON() *shared.RouteJSON {
-	if o == nil {
+func (c *CreateRouteResponse) GetRouteJSON() *shared.RouteJSON {
+	if c == nil {
 		return nil
 	}
-	return o.RouteJSON
+	return c.RouteJSON
 }
 
-func (o *CreateRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

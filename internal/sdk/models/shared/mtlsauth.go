@@ -6,72 +6,74 @@ type MTLSAuthCaCertificate struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MTLSAuthCaCertificate) GetID() *string {
-	if o == nil {
+func (m *MTLSAuthCaCertificate) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 type MTLSAuthConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MTLSAuthConsumer) GetID() *string {
-	if o == nil {
+func (m *MTLSAuthConsumer) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 type MTLSAuth struct {
 	CaCertificate *MTLSAuthCaCertificate `json:"ca_certificate,omitempty"`
 	Consumer      *MTLSAuthConsumer      `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt   *int64   `json:"created_at,omitempty"`
-	ID          *string  `json:"id,omitempty"`
-	SubjectName string   `json:"subject_name"`
-	Tags        []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID          *string `json:"id,omitempty"`
+	SubjectName string  `json:"subject_name"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 }
 
-func (o *MTLSAuth) GetCaCertificate() *MTLSAuthCaCertificate {
-	if o == nil {
+func (m *MTLSAuth) GetCaCertificate() *MTLSAuthCaCertificate {
+	if m == nil {
 		return nil
 	}
-	return o.CaCertificate
+	return m.CaCertificate
 }
 
-func (o *MTLSAuth) GetConsumer() *MTLSAuthConsumer {
-	if o == nil {
+func (m *MTLSAuth) GetConsumer() *MTLSAuthConsumer {
+	if m == nil {
 		return nil
 	}
-	return o.Consumer
+	return m.Consumer
 }
 
-func (o *MTLSAuth) GetCreatedAt() *int64 {
-	if o == nil {
+func (m *MTLSAuth) GetCreatedAt() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return m.CreatedAt
 }
 
-func (o *MTLSAuth) GetID() *string {
-	if o == nil {
+func (m *MTLSAuth) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
-func (o *MTLSAuth) GetSubjectName() string {
-	if o == nil {
+func (m *MTLSAuth) GetSubjectName() string {
+	if m == nil {
 		return ""
 	}
-	return o.SubjectName
+	return m.SubjectName
 }
 
-func (o *MTLSAuth) GetTags() []string {
-	if o == nil {
+func (m *MTLSAuth) GetTags() []string {
+	if m == nil {
 		return nil
 	}
-	return o.Tags
+	return m.Tags
 }

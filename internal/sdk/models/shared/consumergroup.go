@@ -4,45 +4,48 @@ package shared
 
 type ConsumerGroup struct {
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
-	Name      string   `json:"name"`
-	Tags      []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// The name of the consumer group.
+	Name string `json:"name"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *ConsumerGroup) GetCreatedAt() *int64 {
-	if o == nil {
+func (c *ConsumerGroup) GetCreatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return c.CreatedAt
 }
 
-func (o *ConsumerGroup) GetID() *string {
-	if o == nil {
+func (c *ConsumerGroup) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-func (o *ConsumerGroup) GetName() string {
-	if o == nil {
+func (c *ConsumerGroup) GetName() string {
+	if c == nil {
 		return ""
 	}
-	return o.Name
+	return c.Name
 }
 
-func (o *ConsumerGroup) GetTags() []string {
-	if o == nil {
+func (c *ConsumerGroup) GetTags() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Tags
+	return c.Tags
 }
 
-func (o *ConsumerGroup) GetUpdatedAt() *int64 {
-	if o == nil {
+func (c *ConsumerGroup) GetUpdatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return c.UpdatedAt
 }

@@ -10,6 +10,106 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *ConsumerResourceModel) RefreshFromSharedConsumer(ctx context.Context, resp *shared.Consumer) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.CustomID = types.StringPointerValue(resp.CustomID)
+		r.ID = types.StringPointerValue(resp.ID)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		r.Username = types.StringPointerValue(resp.Username)
+	}
+
+	return diags
+}
+
+func (r *ConsumerResourceModel) ToOperationsCreateConsumerRequest(ctx context.Context) (*operations.CreateConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	consumer, consumerDiags := r.ToSharedConsumer(ctx)
+	diags.Append(consumerDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateConsumerRequest{
+		Workspace: workspace,
+		Consumer:  *consumer,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerResourceModel) ToOperationsDeleteConsumerRequest(ctx context.Context) (*operations.DeleteConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerIDOrUsername string
+	consumerIDOrUsername = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteConsumerRequest{
+		ConsumerIDOrUsername: consumerIDOrUsername,
+		Workspace:            workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerResourceModel) ToOperationsGetConsumerRequest(ctx context.Context) (*operations.GetConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerIDOrUsername string
+	consumerIDOrUsername = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetConsumerRequest{
+		ConsumerIDOrUsername: consumerIDOrUsername,
+		Workspace:            workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ConsumerResourceModel) ToOperationsUpsertConsumerRequest(ctx context.Context) (*operations.UpsertConsumerRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var consumerIDOrUsername string
+	consumerIDOrUsername = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	consumer, consumerDiags := r.ToSharedConsumer(ctx)
+	diags.Append(consumerDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertConsumerRequest{
+		ConsumerIDOrUsername: consumerIDOrUsername,
+		Workspace:            workspace,
+		Consumer:             *consumer,
+	}
+
+	return &out, diags
+}
+
 func (r *ConsumerResourceModel) ToSharedConsumer(ctx context.Context) (*shared.Consumer, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -31,9 +131,12 @@ func (r *ConsumerResourceModel) ToSharedConsumer(ctx context.Context) (*shared.C
 	} else {
 		id = nil
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -57,69 +160,4 @@ func (r *ConsumerResourceModel) ToSharedConsumer(ctx context.Context) (*shared.C
 	}
 
 	return &out, diags
-}
-
-func (r *ConsumerResourceModel) ToOperationsUpsertConsumerRequest(ctx context.Context) (*operations.UpsertConsumerRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerIDOrUsername string
-	consumerIDOrUsername = r.ID.ValueString()
-
-	consumer, consumerDiags := r.ToSharedConsumer(ctx)
-	diags.Append(consumerDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
-		Consumer:             *consumer,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerResourceModel) ToOperationsGetConsumerRequest(ctx context.Context) (*operations.GetConsumerRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerIDOrUsername string
-	consumerIDOrUsername = r.ID.ValueString()
-
-	out := operations.GetConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerResourceModel) ToOperationsDeleteConsumerRequest(ctx context.Context) (*operations.DeleteConsumerRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var consumerIDOrUsername string
-	consumerIDOrUsername = r.ID.ValueString()
-
-	out := operations.DeleteConsumerRequest{
-		ConsumerIDOrUsername: consumerIDOrUsername,
-	}
-
-	return &out, diags
-}
-
-func (r *ConsumerResourceModel) RefreshFromSharedConsumer(ctx context.Context, resp *shared.Consumer) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.CustomID = types.StringPointerValue(resp.CustomID)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-		r.Username = types.StringPointerValue(resp.Username)
-	}
-
-	return diags
 }

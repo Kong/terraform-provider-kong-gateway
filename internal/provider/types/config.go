@@ -7,9 +7,24 @@ import (
 )
 
 type Config struct {
-	Allow                        []types.String `tfsdk:"allow"`
-	AlwaysUseAuthenticatedGroups types.Bool     `tfsdk:"always_use_authenticated_groups"`
-	Deny                         []types.String `tfsdk:"deny"`
-	HideGroupsHeader             types.Bool     `tfsdk:"hide_groups_header"`
-	IncludeConsumerGroups        types.Bool     `tfsdk:"include_consumer_groups"`
+	Meta                          map[string]types.String `tfsdk:"meta"`
+	Portal                        types.Bool              `tfsdk:"portal"`
+	PortalAccessRequestEmail      types.Bool              `tfsdk:"portal_access_request_email"`
+	PortalApplicationRequestEmail types.Bool              `tfsdk:"portal_application_request_email"`
+	PortalApplicationStatusEmail  types.Bool              `tfsdk:"portal_application_status_email"`
+	PortalApprovedEmail           types.Bool              `tfsdk:"portal_approved_email"`
+	PortalAuth                    types.String            `tfsdk:"portal_auth"`
+	PortalAuthConf                types.String            `tfsdk:"portal_auth_conf"`
+	PortalAutoApprove             types.Bool              `tfsdk:"portal_auto_approve"`
+	PortalCorsOrigins             []types.String          `tfsdk:"portal_cors_origins"`
+	PortalDeveloperMetaFields     types.String            `tfsdk:"portal_developer_meta_fields"`
+	PortalEmailsFrom              types.String            `tfsdk:"portal_emails_from"`
+	PortalEmailsReplyTo           types.String            `tfsdk:"portal_emails_reply_to"`
+	PortalInviteEmail             types.Bool              `tfsdk:"portal_invite_email"`
+	PortalIsLegacy                types.Bool              `tfsdk:"portal_is_legacy"`
+	PortalResetEmail              types.Bool              `tfsdk:"portal_reset_email"`
+	PortalResetSuccessEmail       types.Bool              `tfsdk:"portal_reset_success_email"`
+	PortalSessionConf             types.String            `tfsdk:"portal_session_conf"`
+	PortalSMTPAdminEmails         []types.String          `tfsdk:"portal_smtp_admin_emails"`
+	PortalTokenExp                types.Int64             `tfsdk:"portal_token_exp"`
 }

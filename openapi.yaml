@@ -2486,10 +2486,95 @@ components:
           nullable: true
           type: string
         healthchecks:
+          default:
+            active:
+              concurrency: 10
+              healthy:
+                http_statuses:
+                  - 200
+                  - 302
+                interval: 0
+                successes: 0
+              http_path: /
+              https_verify_certificate: true
+              timeout: 1
+              type: http
+              unhealthy:
+                http_failures: 0
+                http_statuses:
+                  - 429
+                  - 404
+                  - 500
+                  - 501
+                  - 502
+                  - 503
+                  - 504
+                  - 505
+                interval: 0
+                tcp_failures: 0
+                timeouts: 0
+            passive:
+              healthy:
+                http_statuses:
+                  - 200
+                  - 201
+                  - 202
+                  - 203
+                  - 204
+                  - 205
+                  - 206
+                  - 207
+                  - 208
+                  - 226
+                  - 300
+                  - 301
+                  - 302
+                  - 303
+                  - 304
+                  - 305
+                  - 306
+                  - 307
+                  - 308
+                successes: 0
+              type: http
+              unhealthy:
+                http_failures: 0
+                http_statuses:
+                  - 429
+                  - 500
+                  - 503
+                tcp_failures: 0
+                timeouts: 0
           description: The array of healthchecks.
           nullable: true
           properties:
             active:
+              default:
+                concurrency: 10
+                healthy:
+                  http_statuses:
+                    - 200
+                    - 302
+                  interval: 0
+                  successes: 0
+                http_path: /
+                https_verify_certificate: true
+                timeout: 1
+                type: http
+                unhealthy:
+                  http_failures: 0
+                  http_statuses:
+                    - 429
+                    - 404
+                    - 500
+                    - 501
+                    - 502
+                    - 503
+                    - 504
+                    - 505
+                  interval: 0
+                  tcp_failures: 0
+                  timeouts: 0
               properties:
                 concurrency:
                   default: 10
@@ -2504,6 +2589,12 @@ components:
                   description: A map of header names to arrays of header values.
                   type: object
                 healthy:
+                  default:
+                    http_statuses:
+                      - 200
+                      - 302
+                    interval: 0
+                    successes: 0
                   properties:
                     http_statuses:
                       default:
@@ -2555,6 +2646,20 @@ components:
                     - tcp
                   type: string
                 unhealthy:
+                  default:
+                    http_failures: 0
+                    http_statuses:
+                      - 429
+                      - 404
+                      - 500
+                      - 501
+                      - 502
+                      - 503
+                      - 504
+                      - 505
+                    interval: 0
+                    tcp_failures: 0
+                    timeouts: 0
                   properties:
                     http_failures:
                       default: 0
@@ -2594,8 +2699,62 @@ components:
                   type: object
               type: object
             passive:
+              default:
+                healthy:
+                  http_statuses:
+                    - 200
+                    - 201
+                    - 202
+                    - 203
+                    - 204
+                    - 205
+                    - 206
+                    - 207
+                    - 208
+                    - 226
+                    - 300
+                    - 301
+                    - 302
+                    - 303
+                    - 304
+                    - 305
+                    - 306
+                    - 307
+                    - 308
+                  successes: 0
+                type: http
+                unhealthy:
+                  http_failures: 0
+                  http_statuses:
+                    - 429
+                    - 500
+                    - 503
+                  tcp_failures: 0
+                  timeouts: 0
               properties:
                 healthy:
+                  default:
+                    http_statuses:
+                      - 200
+                      - 201
+                      - 202
+                      - 203
+                      - 204
+                      - 205
+                      - 206
+                      - 207
+                      - 208
+                      - 226
+                      - 300
+                      - 301
+                      - 302
+                      - 303
+                      - 304
+                      - 305
+                      - 306
+                      - 307
+                      - 308
+                    successes: 0
                   properties:
                     http_statuses:
                       default:
@@ -2639,6 +2798,14 @@ components:
                     - tcp
                   type: string
                 unhealthy:
+                  default:
+                    http_failures: 0
+                    http_statuses:
+                      - 429
+                      - 500
+                      - 503
+                    tcp_failures: 0
+                    timeouts: 0
                   properties:
                     http_failures:
                       default: 0
@@ -2849,8 +3016,7 @@ components:
           nullable: true
           properties:
             meta:
-              additionalProperties:
-                type: string
+              additionalProperties: true
               type: object
             portal:
               default: false

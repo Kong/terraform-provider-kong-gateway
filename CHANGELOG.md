@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0
+> Released on 2025/??/??
+
+### BREAKING CHANGES
+
+* The provider now requires Kong Enterprise due to the addition of `workspace` support
+* Resources no longer accept `consumer.id` as a property in addition to `consumer_id`
+* `gateway_consumer_group_member` has been renamed to `consumer_group_member`
+* `oidc_jwks` support has been removed (open an issue if you have a valid use case)
+
+### Features
+
+* All resources now support workspaces (with a default value `default`)
+* You can now pass arbitrary `http_headers` to the provider setup block
+
 ## 0.5.2
 > Released on 2025/07/14
 

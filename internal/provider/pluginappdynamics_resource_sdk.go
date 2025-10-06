@@ -57,16 +57,18 @@ func (r *PluginAppDynamicsResourceModel) RefreshFromSharedAppDynamicsPlugin(ctx 
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -179,6 +181,24 @@ func (r *PluginAppDynamicsResourceModel) ToOperationsUpdateAppdynamicsPluginRequ
 func (r *PluginAppDynamicsResourceModel) ToSharedAppDynamicsPlugin(ctx context.Context) (*shared.AppDynamicsPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	config := make(map[string]interface{})
+	for configKey, configValue := range r.Config {
+		var configInst interface{}
+		_ = json.Unmarshal([]byte(configValue.ValueString()), &configInst)
+		config[configKey] = configInst
+	}
+	var consumer *shared.AppDynamicsPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.AppDynamicsPluginConsumer{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -191,11 +211,11 @@ func (r *PluginAppDynamicsResourceModel) ToSharedAppDynamicsPlugin(ctx context.C
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -230,61 +250,33 @@ func (r *PluginAppDynamicsResourceModel) ToSharedAppDynamicsPlugin(ctx context.C
 			Before: before,
 		}
 	}
-	partials := make([]shared.AppDynamicsPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AppDynamicsPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	config := make(map[string]interface{})
-	for configKey, configValue := range r.Config {
-		var configInst interface{}
-		_ = json.Unmarshal([]byte(configValue.ValueString()), &configInst)
-		config[configKey] = configInst
-	}
-	var consumer *shared.AppDynamicsPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.AppDynamicsPluginConsumer{
-			ID: id2,
+	var partials []shared.AppDynamicsPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AppDynamicsPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AppDynamicsPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.AppDynamicsPluginProtocols, 0, len(r.Protocols))
@@ -315,20 +307,33 @@ func (r *PluginAppDynamicsResourceModel) ToSharedAppDynamicsPlugin(ctx context.C
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.AppDynamicsPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

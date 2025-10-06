@@ -15,29 +15,34 @@ func (r *PluginAiGcpModelArmorResourceModel) RefreshFromSharedAiGcpModelArmorPlu
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		r.Config.EnableMultiLanguageDetection = types.BoolPointerValue(resp.Config.EnableMultiLanguageDetection)
-		r.Config.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.GcpServiceAccountJSON)
-		r.Config.GcpUseServiceAccount = types.BoolPointerValue(resp.Config.GcpUseServiceAccount)
-		if resp.Config.GuardingMode != nil {
-			r.Config.GuardingMode = types.StringValue(string(*resp.Config.GuardingMode))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.GuardingMode = types.StringNull()
+			r.Config = &tfTypes.AiGcpModelArmorPluginConfig{}
+			r.Config.EnableMultiLanguageDetection = types.BoolPointerValue(resp.Config.EnableMultiLanguageDetection)
+			r.Config.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.GcpServiceAccountJSON)
+			r.Config.GcpUseServiceAccount = types.BoolPointerValue(resp.Config.GcpUseServiceAccount)
+			if resp.Config.GuardingMode != nil {
+				r.Config.GuardingMode = types.StringValue(string(*resp.Config.GuardingMode))
+			} else {
+				r.Config.GuardingMode = types.StringNull()
+			}
+			r.Config.LocationID = types.StringValue(resp.Config.LocationID)
+			r.Config.ProjectID = types.StringValue(resp.Config.ProjectID)
+			r.Config.RequestFailureMessage = types.StringPointerValue(resp.Config.RequestFailureMessage)
+			r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
+			r.Config.ResponseFailureMessage = types.StringPointerValue(resp.Config.ResponseFailureMessage)
+			r.Config.RevealFailureCategories = types.BoolPointerValue(resp.Config.RevealFailureCategories)
+			r.Config.SourceLanguage = types.StringPointerValue(resp.Config.SourceLanguage)
+			r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
+			r.Config.TemplateID = types.StringValue(resp.Config.TemplateID)
+			if resp.Config.TextSource != nil {
+				r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
+			} else {
+				r.Config.TextSource = types.StringNull()
+			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
-		r.Config.LocationID = types.StringValue(resp.Config.LocationID)
-		r.Config.ProjectID = types.StringValue(resp.Config.ProjectID)
-		r.Config.RequestFailureMessage = types.StringPointerValue(resp.Config.RequestFailureMessage)
-		r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
-		r.Config.ResponseFailureMessage = types.StringPointerValue(resp.Config.ResponseFailureMessage)
-		r.Config.RevealFailureCategories = types.BoolPointerValue(resp.Config.RevealFailureCategories)
-		r.Config.SourceLanguage = types.StringPointerValue(resp.Config.SourceLanguage)
-		r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
-		r.Config.TemplateID = types.StringValue(resp.Config.TemplateID)
-		if resp.Config.TextSource != nil {
-			r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
-		} else {
-			r.Config.TextSource = types.StringNull()
-		}
-		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -77,16 +82,18 @@ func (r *PluginAiGcpModelArmorResourceModel) RefreshFromSharedAiGcpModelArmorPlu
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -199,6 +206,131 @@ func (r *PluginAiGcpModelArmorResourceModel) ToOperationsUpdateAigcpmodelarmorPl
 func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx context.Context) (*shared.AiGcpModelArmorPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.AiGcpModelArmorPluginConfig
+	if r.Config != nil {
+		enableMultiLanguageDetection := new(bool)
+		if !r.Config.EnableMultiLanguageDetection.IsUnknown() && !r.Config.EnableMultiLanguageDetection.IsNull() {
+			*enableMultiLanguageDetection = r.Config.EnableMultiLanguageDetection.ValueBool()
+		} else {
+			enableMultiLanguageDetection = nil
+		}
+		gcpServiceAccountJSON := new(string)
+		if !r.Config.GcpServiceAccountJSON.IsUnknown() && !r.Config.GcpServiceAccountJSON.IsNull() {
+			*gcpServiceAccountJSON = r.Config.GcpServiceAccountJSON.ValueString()
+		} else {
+			gcpServiceAccountJSON = nil
+		}
+		gcpUseServiceAccount := new(bool)
+		if !r.Config.GcpUseServiceAccount.IsUnknown() && !r.Config.GcpUseServiceAccount.IsNull() {
+			*gcpUseServiceAccount = r.Config.GcpUseServiceAccount.ValueBool()
+		} else {
+			gcpUseServiceAccount = nil
+		}
+		guardingMode := new(shared.AiGcpModelArmorPluginGuardingMode)
+		if !r.Config.GuardingMode.IsUnknown() && !r.Config.GuardingMode.IsNull() {
+			*guardingMode = shared.AiGcpModelArmorPluginGuardingMode(r.Config.GuardingMode.ValueString())
+		} else {
+			guardingMode = nil
+		}
+		var locationID string
+		locationID = r.Config.LocationID.ValueString()
+
+		var projectID string
+		projectID = r.Config.ProjectID.ValueString()
+
+		requestFailureMessage := new(string)
+		if !r.Config.RequestFailureMessage.IsUnknown() && !r.Config.RequestFailureMessage.IsNull() {
+			*requestFailureMessage = r.Config.RequestFailureMessage.ValueString()
+		} else {
+			requestFailureMessage = nil
+		}
+		responseBufferSize := new(float64)
+		if !r.Config.ResponseBufferSize.IsUnknown() && !r.Config.ResponseBufferSize.IsNull() {
+			*responseBufferSize = r.Config.ResponseBufferSize.ValueFloat64()
+		} else {
+			responseBufferSize = nil
+		}
+		responseFailureMessage := new(string)
+		if !r.Config.ResponseFailureMessage.IsUnknown() && !r.Config.ResponseFailureMessage.IsNull() {
+			*responseFailureMessage = r.Config.ResponseFailureMessage.ValueString()
+		} else {
+			responseFailureMessage = nil
+		}
+		revealFailureCategories := new(bool)
+		if !r.Config.RevealFailureCategories.IsUnknown() && !r.Config.RevealFailureCategories.IsNull() {
+			*revealFailureCategories = r.Config.RevealFailureCategories.ValueBool()
+		} else {
+			revealFailureCategories = nil
+		}
+		sourceLanguage := new(string)
+		if !r.Config.SourceLanguage.IsUnknown() && !r.Config.SourceLanguage.IsNull() {
+			*sourceLanguage = r.Config.SourceLanguage.ValueString()
+		} else {
+			sourceLanguage = nil
+		}
+		stopOnError := new(bool)
+		if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
+			*stopOnError = r.Config.StopOnError.ValueBool()
+		} else {
+			stopOnError = nil
+		}
+		var templateID string
+		templateID = r.Config.TemplateID.ValueString()
+
+		textSource := new(shared.AiGcpModelArmorPluginTextSource)
+		if !r.Config.TextSource.IsUnknown() && !r.Config.TextSource.IsNull() {
+			*textSource = shared.AiGcpModelArmorPluginTextSource(r.Config.TextSource.ValueString())
+		} else {
+			textSource = nil
+		}
+		timeout := new(float64)
+		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+			*timeout = r.Config.Timeout.ValueFloat64()
+		} else {
+			timeout = nil
+		}
+		config = &shared.AiGcpModelArmorPluginConfig{
+			EnableMultiLanguageDetection: enableMultiLanguageDetection,
+			GcpServiceAccountJSON:        gcpServiceAccountJSON,
+			GcpUseServiceAccount:         gcpUseServiceAccount,
+			GuardingMode:                 guardingMode,
+			LocationID:                   locationID,
+			ProjectID:                    projectID,
+			RequestFailureMessage:        requestFailureMessage,
+			ResponseBufferSize:           responseBufferSize,
+			ResponseFailureMessage:       responseFailureMessage,
+			RevealFailureCategories:      revealFailureCategories,
+			SourceLanguage:               sourceLanguage,
+			StopOnError:                  stopOnError,
+			TemplateID:                   templateID,
+			TextSource:                   textSource,
+			Timeout:                      timeout,
+		}
+	}
+	var consumer *shared.AiGcpModelArmorPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.AiGcpModelArmorPluginConsumer{
+			ID: id,
+		}
+	}
+	var consumerGroup *shared.AiGcpModelArmorPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		consumerGroup = &shared.AiGcpModelArmorPluginConsumerGroup{
+			ID: id1,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -211,11 +343,11 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id2 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id2 = r.ID.ValueString()
 	} else {
-		id = nil
+		id2 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -250,165 +382,33 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 			Before: before,
 		}
 	}
-	partials := make([]shared.AiGcpModelArmorPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiGcpModelArmorPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	enableMultiLanguageDetection := new(bool)
-	if !r.Config.EnableMultiLanguageDetection.IsUnknown() && !r.Config.EnableMultiLanguageDetection.IsNull() {
-		*enableMultiLanguageDetection = r.Config.EnableMultiLanguageDetection.ValueBool()
-	} else {
-		enableMultiLanguageDetection = nil
-	}
-	gcpServiceAccountJSON := new(string)
-	if !r.Config.GcpServiceAccountJSON.IsUnknown() && !r.Config.GcpServiceAccountJSON.IsNull() {
-		*gcpServiceAccountJSON = r.Config.GcpServiceAccountJSON.ValueString()
-	} else {
-		gcpServiceAccountJSON = nil
-	}
-	gcpUseServiceAccount := new(bool)
-	if !r.Config.GcpUseServiceAccount.IsUnknown() && !r.Config.GcpUseServiceAccount.IsNull() {
-		*gcpUseServiceAccount = r.Config.GcpUseServiceAccount.ValueBool()
-	} else {
-		gcpUseServiceAccount = nil
-	}
-	guardingMode := new(shared.AiGcpModelArmorPluginGuardingMode)
-	if !r.Config.GuardingMode.IsUnknown() && !r.Config.GuardingMode.IsNull() {
-		*guardingMode = shared.AiGcpModelArmorPluginGuardingMode(r.Config.GuardingMode.ValueString())
-	} else {
-		guardingMode = nil
-	}
-	var locationID string
-	locationID = r.Config.LocationID.ValueString()
-
-	var projectID string
-	projectID = r.Config.ProjectID.ValueString()
-
-	requestFailureMessage := new(string)
-	if !r.Config.RequestFailureMessage.IsUnknown() && !r.Config.RequestFailureMessage.IsNull() {
-		*requestFailureMessage = r.Config.RequestFailureMessage.ValueString()
-	} else {
-		requestFailureMessage = nil
-	}
-	responseBufferSize := new(float64)
-	if !r.Config.ResponseBufferSize.IsUnknown() && !r.Config.ResponseBufferSize.IsNull() {
-		*responseBufferSize = r.Config.ResponseBufferSize.ValueFloat64()
-	} else {
-		responseBufferSize = nil
-	}
-	responseFailureMessage := new(string)
-	if !r.Config.ResponseFailureMessage.IsUnknown() && !r.Config.ResponseFailureMessage.IsNull() {
-		*responseFailureMessage = r.Config.ResponseFailureMessage.ValueString()
-	} else {
-		responseFailureMessage = nil
-	}
-	revealFailureCategories := new(bool)
-	if !r.Config.RevealFailureCategories.IsUnknown() && !r.Config.RevealFailureCategories.IsNull() {
-		*revealFailureCategories = r.Config.RevealFailureCategories.ValueBool()
-	} else {
-		revealFailureCategories = nil
-	}
-	sourceLanguage := new(string)
-	if !r.Config.SourceLanguage.IsUnknown() && !r.Config.SourceLanguage.IsNull() {
-		*sourceLanguage = r.Config.SourceLanguage.ValueString()
-	} else {
-		sourceLanguage = nil
-	}
-	stopOnError := new(bool)
-	if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
-		*stopOnError = r.Config.StopOnError.ValueBool()
-	} else {
-		stopOnError = nil
-	}
-	var templateID string
-	templateID = r.Config.TemplateID.ValueString()
-
-	textSource := new(shared.AiGcpModelArmorPluginTextSource)
-	if !r.Config.TextSource.IsUnknown() && !r.Config.TextSource.IsNull() {
-		*textSource = shared.AiGcpModelArmorPluginTextSource(r.Config.TextSource.ValueString())
-	} else {
-		textSource = nil
-	}
-	timeout := new(float64)
-	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-		*timeout = r.Config.Timeout.ValueFloat64()
-	} else {
-		timeout = nil
-	}
-	config := shared.AiGcpModelArmorPluginConfig{
-		EnableMultiLanguageDetection: enableMultiLanguageDetection,
-		GcpServiceAccountJSON:        gcpServiceAccountJSON,
-		GcpUseServiceAccount:         gcpUseServiceAccount,
-		GuardingMode:                 guardingMode,
-		LocationID:                   locationID,
-		ProjectID:                    projectID,
-		RequestFailureMessage:        requestFailureMessage,
-		ResponseBufferSize:           responseBufferSize,
-		ResponseFailureMessage:       responseFailureMessage,
-		RevealFailureCategories:      revealFailureCategories,
-		SourceLanguage:               sourceLanguage,
-		StopOnError:                  stopOnError,
-		TemplateID:                   templateID,
-		TextSource:                   textSource,
-		Timeout:                      timeout,
-	}
-	var consumer *shared.AiGcpModelArmorPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.AiGcpModelArmorPluginConsumer{
-			ID: id2,
-		}
-	}
-	var consumerGroup *shared.AiGcpModelArmorPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id3 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id3 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		consumerGroup = &shared.AiGcpModelArmorPluginConsumerGroup{
-			ID: id3,
+	var partials []shared.AiGcpModelArmorPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiGcpModelArmorPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id3 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id3 = partialsItem.ID.ValueString()
+			} else {
+				id3 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiGcpModelArmorPluginPartials{
+				ID:   id3,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.AiGcpModelArmorPluginProtocols, 0, len(r.Protocols))
@@ -439,21 +439,34 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 			ID: id5,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.AiGcpModelArmorPlugin{
-		CreatedAt:     createdAt,
-		Enabled:       enabled,
-		ID:            id,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id2,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

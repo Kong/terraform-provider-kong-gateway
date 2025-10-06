@@ -8,6 +8,60 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type RedirectPluginConfig struct {
+	// Use the incoming request's path and query string in the redirect URL
+	KeepIncomingPath *bool `json:"keep_incoming_path,omitempty"`
+	// The URL to redirect to
+	Location string `json:"location"`
+	// The response code to send. Must be an integer between 100 and 599.
+	StatusCode *int64 `json:"status_code,omitempty"`
+}
+
+func (r *RedirectPluginConfig) GetKeepIncomingPath() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.KeepIncomingPath
+}
+
+func (r *RedirectPluginConfig) GetLocation() string {
+	if r == nil {
+		return ""
+	}
+	return r.Location
+}
+
+func (r *RedirectPluginConfig) GetStatusCode() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.StatusCode
+}
+
+// RedirectPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type RedirectPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (r *RedirectPluginConsumer) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+// RedirectPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+type RedirectPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (r *RedirectPluginConsumerGroup) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
 type RedirectPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -78,60 +132,6 @@ func (r *RedirectPluginPartials) GetPath() *string {
 	return r.Path
 }
 
-type RedirectPluginConfig struct {
-	// Use the incoming request's path and query string in the redirect URL
-	KeepIncomingPath *bool `json:"keep_incoming_path,omitempty"`
-	// The URL to redirect to
-	Location string `json:"location"`
-	// The response code to send. Must be an integer between 100 and 599.
-	StatusCode *int64 `json:"status_code,omitempty"`
-}
-
-func (r *RedirectPluginConfig) GetKeepIncomingPath() *bool {
-	if r == nil {
-		return nil
-	}
-	return r.KeepIncomingPath
-}
-
-func (r *RedirectPluginConfig) GetLocation() string {
-	if r == nil {
-		return ""
-	}
-	return r.Location
-}
-
-func (r *RedirectPluginConfig) GetStatusCode() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.StatusCode
-}
-
-// RedirectPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type RedirectPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (r *RedirectPluginConsumer) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-// RedirectPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-type RedirectPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (r *RedirectPluginConsumerGroup) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
 type RedirectPluginProtocols string
 
 const (
@@ -188,8 +188,12 @@ func (r *RedirectPluginService) GetID() *string {
 	return r.ID
 }
 
-// RedirectPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RedirectPlugin struct {
+	Config *RedirectPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RedirectPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *RedirectPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -202,21 +206,16 @@ type RedirectPlugin struct {
 	Ordering     *RedirectPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RedirectPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    RedirectPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RedirectPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *RedirectPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RedirectPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RedirectPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RedirectPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RedirectPlugin) MarshalJSON() ([]byte, error) {
@@ -224,10 +223,31 @@ func (r RedirectPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RedirectPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *RedirectPlugin) GetConfig() *RedirectPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RedirectPlugin) GetConsumer() *RedirectPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
+func (r *RedirectPlugin) GetConsumerGroup() *RedirectPluginConsumerGroup {
+	if r == nil {
+		return nil
+	}
+	return r.ConsumerGroup
 }
 
 func (r *RedirectPlugin) GetCreatedAt() *int64 {
@@ -276,41 +296,6 @@ func (r *RedirectPlugin) GetPartials() []RedirectPluginPartials {
 	return r.Partials
 }
 
-func (r *RedirectPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RedirectPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
-}
-
-func (r *RedirectPlugin) GetConfig() RedirectPluginConfig {
-	if r == nil {
-		return RedirectPluginConfig{}
-	}
-	return r.Config
-}
-
-func (r *RedirectPlugin) GetConsumer() *RedirectPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
-func (r *RedirectPlugin) GetConsumerGroup() *RedirectPluginConsumerGroup {
-	if r == nil {
-		return nil
-	}
-	return r.ConsumerGroup
-}
-
 func (r *RedirectPlugin) GetProtocols() []RedirectPluginProtocols {
 	if r == nil {
 		return nil
@@ -330,4 +315,18 @@ func (r *RedirectPlugin) GetService() *RedirectPluginService {
 		return nil
 	}
 	return r.Service
+}
+
+func (r *RedirectPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RedirectPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
 }

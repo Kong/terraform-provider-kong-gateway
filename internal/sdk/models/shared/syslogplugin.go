@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type SyslogPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *SyslogPluginAfter) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type SyslogPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *SyslogPluginBefore) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type SyslogPluginOrdering struct {
-	After  *SyslogPluginAfter  `json:"after,omitempty"`
-	Before *SyslogPluginBefore `json:"before,omitempty"`
-}
-
-func (s *SyslogPluginOrdering) GetAfter() *SyslogPluginAfter {
-	if s == nil {
-		return nil
-	}
-	return s.After
-}
-
-func (s *SyslogPluginOrdering) GetBefore() *SyslogPluginBefore {
-	if s == nil {
-		return nil
-	}
-	return s.Before
-}
-
-type SyslogPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (s *SyslogPluginPartials) GetID() *string {
-	if s == nil {
-		return nil
-	}
-	return s.ID
-}
-
-func (s *SyslogPluginPartials) GetName() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Name
-}
-
-func (s *SyslogPluginPartials) GetPath() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Path
-}
-
 type SyslogPluginClientErrorsSeverity string
 
 const (
@@ -400,6 +330,76 @@ func (s *SyslogPluginConsumer) GetID() *string {
 	return s.ID
 }
 
+type SyslogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SyslogPluginAfter) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SyslogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SyslogPluginBefore) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SyslogPluginOrdering struct {
+	After  *SyslogPluginAfter  `json:"after,omitempty"`
+	Before *SyslogPluginBefore `json:"before,omitempty"`
+}
+
+func (s *SyslogPluginOrdering) GetAfter() *SyslogPluginAfter {
+	if s == nil {
+		return nil
+	}
+	return s.After
+}
+
+func (s *SyslogPluginOrdering) GetBefore() *SyslogPluginBefore {
+	if s == nil {
+		return nil
+	}
+	return s.Before
+}
+
+type SyslogPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (s *SyslogPluginPartials) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *SyslogPluginPartials) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *SyslogPluginPartials) GetPath() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Path
+}
+
 // SyslogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type SyslogPluginProtocols string
 
@@ -475,8 +475,10 @@ func (s *SyslogPluginService) GetID() *string {
 	return s.ID
 }
 
-// SyslogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SyslogPlugin struct {
+	Config *SyslogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *SyslogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -489,19 +491,16 @@ type SyslogPlugin struct {
 	Ordering     *SyslogPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []SyslogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64              `json:"updated_at,omitempty"`
-	Config    *SyslogPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *SyslogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []SyslogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *SyslogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *SyslogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s SyslogPlugin) MarshalJSON() ([]byte, error) {
@@ -513,6 +512,20 @@ func (s *SyslogPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SyslogPlugin) GetConfig() *SyslogPluginConfig {
+	if s == nil {
+		return nil
+	}
+	return s.Config
+}
+
+func (s *SyslogPlugin) GetConsumer() *SyslogPluginConsumer {
+	if s == nil {
+		return nil
+	}
+	return s.Consumer
 }
 
 func (s *SyslogPlugin) GetCreatedAt() *int64 {
@@ -561,34 +574,6 @@ func (s *SyslogPlugin) GetPartials() []SyslogPluginPartials {
 	return s.Partials
 }
 
-func (s *SyslogPlugin) GetTags() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Tags
-}
-
-func (s *SyslogPlugin) GetUpdatedAt() *int64 {
-	if s == nil {
-		return nil
-	}
-	return s.UpdatedAt
-}
-
-func (s *SyslogPlugin) GetConfig() *SyslogPluginConfig {
-	if s == nil {
-		return nil
-	}
-	return s.Config
-}
-
-func (s *SyslogPlugin) GetConsumer() *SyslogPluginConsumer {
-	if s == nil {
-		return nil
-	}
-	return s.Consumer
-}
-
 func (s *SyslogPlugin) GetProtocols() []SyslogPluginProtocols {
 	if s == nil {
 		return nil
@@ -608,4 +593,18 @@ func (s *SyslogPlugin) GetService() *SyslogPluginService {
 		return nil
 	}
 	return s.Service
+}
+
+func (s *SyslogPlugin) GetTags() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Tags
+}
+
+func (s *SyslogPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.UpdatedAt
 }

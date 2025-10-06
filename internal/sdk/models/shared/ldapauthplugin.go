@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type LdapAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (l *LdapAuthPluginAfter) GetAccess() []string {
-	if l == nil {
-		return nil
-	}
-	return l.Access
-}
-
-type LdapAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (l *LdapAuthPluginBefore) GetAccess() []string {
-	if l == nil {
-		return nil
-	}
-	return l.Access
-}
-
-type LdapAuthPluginOrdering struct {
-	After  *LdapAuthPluginAfter  `json:"after,omitempty"`
-	Before *LdapAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (l *LdapAuthPluginOrdering) GetAfter() *LdapAuthPluginAfter {
-	if l == nil {
-		return nil
-	}
-	return l.After
-}
-
-func (l *LdapAuthPluginOrdering) GetBefore() *LdapAuthPluginBefore {
-	if l == nil {
-		return nil
-	}
-	return l.Before
-}
-
-type LdapAuthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (l *LdapAuthPluginPartials) GetID() *string {
-	if l == nil {
-		return nil
-	}
-	return l.ID
-}
-
-func (l *LdapAuthPluginPartials) GetName() *string {
-	if l == nil {
-		return nil
-	}
-	return l.Name
-}
-
-func (l *LdapAuthPluginPartials) GetPath() *string {
-	if l == nil {
-		return nil
-	}
-	return l.Path
-}
-
 type LdapAuthPluginConfig struct {
 	// An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure `4xx`.
 	Anonymous *string `json:"anonymous,omitempty"`
@@ -207,6 +137,76 @@ func (l *LdapAuthPluginConfig) GetVerifyLdapHost() *bool {
 	return l.VerifyLdapHost
 }
 
+type LdapAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (l *LdapAuthPluginAfter) GetAccess() []string {
+	if l == nil {
+		return nil
+	}
+	return l.Access
+}
+
+type LdapAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (l *LdapAuthPluginBefore) GetAccess() []string {
+	if l == nil {
+		return nil
+	}
+	return l.Access
+}
+
+type LdapAuthPluginOrdering struct {
+	After  *LdapAuthPluginAfter  `json:"after,omitempty"`
+	Before *LdapAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (l *LdapAuthPluginOrdering) GetAfter() *LdapAuthPluginAfter {
+	if l == nil {
+		return nil
+	}
+	return l.After
+}
+
+func (l *LdapAuthPluginOrdering) GetBefore() *LdapAuthPluginBefore {
+	if l == nil {
+		return nil
+	}
+	return l.Before
+}
+
+type LdapAuthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (l *LdapAuthPluginPartials) GetID() *string {
+	if l == nil {
+		return nil
+	}
+	return l.ID
+}
+
+func (l *LdapAuthPluginPartials) GetName() *string {
+	if l == nil {
+		return nil
+	}
+	return l.Name
+}
+
+func (l *LdapAuthPluginPartials) GetPath() *string {
+	if l == nil {
+		return nil
+	}
+	return l.Path
+}
+
 type LdapAuthPluginProtocols string
 
 const (
@@ -269,8 +269,8 @@ func (l *LdapAuthPluginService) GetID() *string {
 	return l.ID
 }
 
-// LdapAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type LdapAuthPlugin struct {
+	Config *LdapAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -283,17 +283,16 @@ type LdapAuthPlugin struct {
 	Ordering     *LdapAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []LdapAuthPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    LdapAuthPluginConfig `json:"config"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []LdapAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *LdapAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *LdapAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (l LdapAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -301,10 +300,17 @@ func (l LdapAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (l *LdapAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (l *LdapAuthPlugin) GetConfig() *LdapAuthPluginConfig {
+	if l == nil {
+		return nil
+	}
+	return l.Config
 }
 
 func (l *LdapAuthPlugin) GetCreatedAt() *int64 {
@@ -353,27 +359,6 @@ func (l *LdapAuthPlugin) GetPartials() []LdapAuthPluginPartials {
 	return l.Partials
 }
 
-func (l *LdapAuthPlugin) GetTags() []string {
-	if l == nil {
-		return nil
-	}
-	return l.Tags
-}
-
-func (l *LdapAuthPlugin) GetUpdatedAt() *int64 {
-	if l == nil {
-		return nil
-	}
-	return l.UpdatedAt
-}
-
-func (l *LdapAuthPlugin) GetConfig() LdapAuthPluginConfig {
-	if l == nil {
-		return LdapAuthPluginConfig{}
-	}
-	return l.Config
-}
-
 func (l *LdapAuthPlugin) GetProtocols() []LdapAuthPluginProtocols {
 	if l == nil {
 		return nil
@@ -393,4 +378,18 @@ func (l *LdapAuthPlugin) GetService() *LdapAuthPluginService {
 		return nil
 	}
 	return l.Service
+}
+
+func (l *LdapAuthPlugin) GetTags() []string {
+	if l == nil {
+		return nil
+	}
+	return l.Tags
+}
+
+func (l *LdapAuthPlugin) GetUpdatedAt() *int64 {
+	if l == nil {
+		return nil
+	}
+	return l.UpdatedAt
 }

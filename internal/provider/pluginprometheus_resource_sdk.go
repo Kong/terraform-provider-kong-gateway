@@ -60,16 +60,18 @@ func (r *PluginPrometheusResourceModel) RefreshFromSharedPrometheusPlugin(ctx co
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -182,96 +184,6 @@ func (r *PluginPrometheusResourceModel) ToOperationsUpdatePrometheusPluginReques
 func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Context) (*shared.PrometheusPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.PrometheusPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.PrometheusPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.PrometheusPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.PrometheusPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.PrometheusPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.PrometheusPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	partials := make([]shared.PrometheusPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.PrometheusPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.PrometheusPluginConfig
 	if r.Config != nil {
 		aiMetrics := new(bool)
@@ -328,14 +240,94 @@ func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Con
 	}
 	var consumer *shared.PrometheusPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.PrometheusPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.PrometheusPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.PrometheusPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.PrometheusPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.PrometheusPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.PrometheusPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.PrometheusPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.PrometheusPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.PrometheusPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.PrometheusPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.PrometheusPluginProtocols, 0, len(r.Protocols))
@@ -366,20 +358,33 @@ func (r *PluginPrometheusResourceModel) ToSharedPrometheusPlugin(ctx context.Con
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.PrometheusPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

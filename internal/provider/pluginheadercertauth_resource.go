@@ -18,7 +18,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,19 +39,19 @@ type PluginHeaderCertAuthResource struct {
 
 // PluginHeaderCertAuthResourceModel describes the resource data model.
 type PluginHeaderCertAuthResourceModel struct {
-	Config       tfTypes.HeaderCertAuthPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.Set                       `tfsdk:"route"`
-	Service      *tfTypes.Set                       `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
-	Workspace    types.String                       `tfsdk:"workspace"`
+	Config       *tfTypes.HeaderCertAuthPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                         `tfsdk:"created_at"`
+	Enabled      types.Bool                          `tfsdk:"enabled"`
+	ID           types.String                        `tfsdk:"id"`
+	InstanceName types.String                        `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols    []types.String                      `tfsdk:"protocols"`
+	Route        *tfTypes.Set                        `tfsdk:"route"`
+	Service      *tfTypes.Set                        `tfsdk:"service"`
+	Tags         []types.String                      `tfsdk:"tags"`
+	UpdatedAt    types.Int64                         `tfsdk:"updated_at"`
+	Workspace    types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginHeaderCertAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +63,8 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 		MarkdownDescription: "PluginHeaderCertAuth Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"allow_partial_chain": schema.BoolAttribute{
 						Computed:    true,
@@ -82,9 +85,13 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						},
 					},
 					"ca_certificates": schema.ListAttribute{
-						Required:    true,
+						Computed:    true,
+						Optional:    true,
 						ElementType: types.StringType,
-						Description: `List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (` + "`" + `id` + "`" + `).`,
+						Description: `List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (` + "`" + `id` + "`" + `). Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
@@ -97,9 +104,11 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						Description: `The length of time in milliseconds between refreshes of the revocation check status cache.`,
 					},
 					"certificate_header_format": schema.StringAttribute{
-						Required:    true,
-						Description: `Format of the certificate header. Supported formats: ` + "`" + `base64_encoded` + "`" + `, ` + "`" + `url_encoded` + "`" + `. must be one of ["base64_encoded", "url_encoded"]`,
+						Computed:    true,
+						Optional:    true,
+						Description: `Format of the certificate header. Supported formats: ` + "`" + `base64_encoded` + "`" + `, ` + "`" + `url_encoded` + "`" + `. Not Null; must be one of ["base64_encoded", "url_encoded"]`,
 						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
 							stringvalidator.OneOf(
 								"base64_encoded",
 								"url_encoded",
@@ -107,8 +116,12 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						},
 					},
 					"certificate_header_name": schema.StringAttribute{
-						Required:    true,
-						Description: `Name of the header that contains the certificate, received from the WAF or other L7 downstream proxy.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `Name of the header that contains the certificate, received from the WAF or other L7 downstream proxy. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"consumer_by": schema.ListAttribute{
 						Computed:    true,

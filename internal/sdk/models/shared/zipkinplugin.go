@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type ZipkinPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (z *ZipkinPluginAfter) GetAccess() []string {
-	if z == nil {
-		return nil
-	}
-	return z.Access
-}
-
-type ZipkinPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (z *ZipkinPluginBefore) GetAccess() []string {
-	if z == nil {
-		return nil
-	}
-	return z.Access
-}
-
-type ZipkinPluginOrdering struct {
-	After  *ZipkinPluginAfter  `json:"after,omitempty"`
-	Before *ZipkinPluginBefore `json:"before,omitempty"`
-}
-
-func (z *ZipkinPluginOrdering) GetAfter() *ZipkinPluginAfter {
-	if z == nil {
-		return nil
-	}
-	return z.After
-}
-
-func (z *ZipkinPluginOrdering) GetBefore() *ZipkinPluginBefore {
-	if z == nil {
-		return nil
-	}
-	return z.Before
-}
-
-type ZipkinPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (z *ZipkinPluginPartials) GetID() *string {
-	if z == nil {
-		return nil
-	}
-	return z.ID
-}
-
-func (z *ZipkinPluginPartials) GetName() *string {
-	if z == nil {
-		return nil
-	}
-	return z.Name
-}
-
-func (z *ZipkinPluginPartials) GetPath() *string {
-	if z == nil {
-		return nil
-	}
-	return z.Path
-}
-
 // DefaultHeaderType - Allows specifying the type of header to be added to requests with no pre-existing tracing headers and when `config.header_type` is set to `"preserve"`. When `header_type` is set to any other value, `default_header_type` is ignored.
 type DefaultHeaderType string
 
@@ -737,6 +667,76 @@ func (z *ZipkinPluginConsumer) GetID() *string {
 	return z.ID
 }
 
+type ZipkinPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (z *ZipkinPluginAfter) GetAccess() []string {
+	if z == nil {
+		return nil
+	}
+	return z.Access
+}
+
+type ZipkinPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (z *ZipkinPluginBefore) GetAccess() []string {
+	if z == nil {
+		return nil
+	}
+	return z.Access
+}
+
+type ZipkinPluginOrdering struct {
+	After  *ZipkinPluginAfter  `json:"after,omitempty"`
+	Before *ZipkinPluginBefore `json:"before,omitempty"`
+}
+
+func (z *ZipkinPluginOrdering) GetAfter() *ZipkinPluginAfter {
+	if z == nil {
+		return nil
+	}
+	return z.After
+}
+
+func (z *ZipkinPluginOrdering) GetBefore() *ZipkinPluginBefore {
+	if z == nil {
+		return nil
+	}
+	return z.Before
+}
+
+type ZipkinPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (z *ZipkinPluginPartials) GetID() *string {
+	if z == nil {
+		return nil
+	}
+	return z.ID
+}
+
+func (z *ZipkinPluginPartials) GetName() *string {
+	if z == nil {
+		return nil
+	}
+	return z.Name
+}
+
+func (z *ZipkinPluginPartials) GetPath() *string {
+	if z == nil {
+		return nil
+	}
+	return z.Path
+}
+
 // ZipkinPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type ZipkinPluginProtocols string
 
@@ -812,8 +812,10 @@ func (z *ZipkinPluginService) GetID() *string {
 	return z.ID
 }
 
-// ZipkinPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ZipkinPlugin struct {
+	Config *ZipkinPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ZipkinPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -826,19 +828,16 @@ type ZipkinPlugin struct {
 	Ordering     *ZipkinPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ZipkinPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64              `json:"updated_at,omitempty"`
-	Config    *ZipkinPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ZipkinPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []ZipkinPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ZipkinPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ZipkinPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (z ZipkinPlugin) MarshalJSON() ([]byte, error) {
@@ -850,6 +849,20 @@ func (z *ZipkinPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (z *ZipkinPlugin) GetConfig() *ZipkinPluginConfig {
+	if z == nil {
+		return nil
+	}
+	return z.Config
+}
+
+func (z *ZipkinPlugin) GetConsumer() *ZipkinPluginConsumer {
+	if z == nil {
+		return nil
+	}
+	return z.Consumer
 }
 
 func (z *ZipkinPlugin) GetCreatedAt() *int64 {
@@ -898,34 +911,6 @@ func (z *ZipkinPlugin) GetPartials() []ZipkinPluginPartials {
 	return z.Partials
 }
 
-func (z *ZipkinPlugin) GetTags() []string {
-	if z == nil {
-		return nil
-	}
-	return z.Tags
-}
-
-func (z *ZipkinPlugin) GetUpdatedAt() *int64 {
-	if z == nil {
-		return nil
-	}
-	return z.UpdatedAt
-}
-
-func (z *ZipkinPlugin) GetConfig() *ZipkinPluginConfig {
-	if z == nil {
-		return nil
-	}
-	return z.Config
-}
-
-func (z *ZipkinPlugin) GetConsumer() *ZipkinPluginConsumer {
-	if z == nil {
-		return nil
-	}
-	return z.Consumer
-}
-
 func (z *ZipkinPlugin) GetProtocols() []ZipkinPluginProtocols {
 	if z == nil {
 		return nil
@@ -945,4 +930,18 @@ func (z *ZipkinPlugin) GetService() *ZipkinPluginService {
 		return nil
 	}
 	return z.Service
+}
+
+func (z *ZipkinPlugin) GetTags() []string {
+	if z == nil {
+		return nil
+	}
+	return z.Tags
+}
+
+func (z *ZipkinPlugin) GetUpdatedAt() *int64 {
+	if z == nil {
+		return nil
+	}
+	return z.UpdatedAt
 }

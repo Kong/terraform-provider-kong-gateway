@@ -17,41 +17,46 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config.ClientErrorsSeverity != nil {
-			r.Config.ClientErrorsSeverity = types.StringValue(string(*resp.Config.ClientErrorsSeverity))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.ClientErrorsSeverity = types.StringNull()
-		}
-		if len(resp.Config.CustomFieldsByLua) > 0 {
-			r.Config.CustomFieldsByLua = make(map[string]jsontypes.Normalized, len(resp.Config.CustomFieldsByLua))
-			for key, value := range resp.Config.CustomFieldsByLua {
-				result, _ := json.Marshal(value)
-				r.Config.CustomFieldsByLua[key] = jsontypes.NewNormalizedValue(string(result))
+			r.Config = &tfTypes.LogglyPluginConfig{}
+			if resp.Config.ClientErrorsSeverity != nil {
+				r.Config.ClientErrorsSeverity = types.StringValue(string(*resp.Config.ClientErrorsSeverity))
+			} else {
+				r.Config.ClientErrorsSeverity = types.StringNull()
 			}
+			if len(resp.Config.CustomFieldsByLua) > 0 {
+				r.Config.CustomFieldsByLua = make(map[string]jsontypes.Normalized, len(resp.Config.CustomFieldsByLua))
+				for key, value := range resp.Config.CustomFieldsByLua {
+					result, _ := json.Marshal(value)
+					r.Config.CustomFieldsByLua[key] = jsontypes.NewNormalizedValue(string(result))
+				}
+			}
+			r.Config.Host = types.StringPointerValue(resp.Config.Host)
+			r.Config.Key = types.StringValue(resp.Config.Key)
+			if resp.Config.LogLevel != nil {
+				r.Config.LogLevel = types.StringValue(string(*resp.Config.LogLevel))
+			} else {
+				r.Config.LogLevel = types.StringNull()
+			}
+			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+			if resp.Config.ServerErrorsSeverity != nil {
+				r.Config.ServerErrorsSeverity = types.StringValue(string(*resp.Config.ServerErrorsSeverity))
+			} else {
+				r.Config.ServerErrorsSeverity = types.StringNull()
+			}
+			if resp.Config.SuccessfulSeverity != nil {
+				r.Config.SuccessfulSeverity = types.StringValue(string(*resp.Config.SuccessfulSeverity))
+			} else {
+				r.Config.SuccessfulSeverity = types.StringNull()
+			}
+			r.Config.Tags = make([]types.String, 0, len(resp.Config.Tags))
+			for _, v := range resp.Config.Tags {
+				r.Config.Tags = append(r.Config.Tags, types.StringValue(v))
+			}
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
-		r.Config.Host = types.StringPointerValue(resp.Config.Host)
-		r.Config.Key = types.StringValue(resp.Config.Key)
-		if resp.Config.LogLevel != nil {
-			r.Config.LogLevel = types.StringValue(string(*resp.Config.LogLevel))
-		} else {
-			r.Config.LogLevel = types.StringNull()
-		}
-		r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-		if resp.Config.ServerErrorsSeverity != nil {
-			r.Config.ServerErrorsSeverity = types.StringValue(string(*resp.Config.ServerErrorsSeverity))
-		} else {
-			r.Config.ServerErrorsSeverity = types.StringNull()
-		}
-		if resp.Config.SuccessfulSeverity != nil {
-			r.Config.SuccessfulSeverity = types.StringValue(string(*resp.Config.SuccessfulSeverity))
-		} else {
-			r.Config.SuccessfulSeverity = types.StringNull()
-		}
-		r.Config.Tags = make([]types.String, 0, len(resp.Config.Tags))
-		for _, v := range resp.Config.Tags {
-			r.Config.Tags = append(r.Config.Tags, types.StringValue(v))
-		}
-		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -85,16 +90,18 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -207,6 +214,88 @@ func (r *PluginLogglyResourceModel) ToOperationsUpdateLogglyPluginRequest(ctx co
 func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*shared.LogglyPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.LogglyPluginConfig
+	if r.Config != nil {
+		clientErrorsSeverity := new(shared.ClientErrorsSeverity)
+		if !r.Config.ClientErrorsSeverity.IsUnknown() && !r.Config.ClientErrorsSeverity.IsNull() {
+			*clientErrorsSeverity = shared.ClientErrorsSeverity(r.Config.ClientErrorsSeverity.ValueString())
+		} else {
+			clientErrorsSeverity = nil
+		}
+		customFieldsByLua := make(map[string]interface{})
+		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
+			var customFieldsByLuaInst interface{}
+			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
+			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
+		}
+		host := new(string)
+		if !r.Config.Host.IsUnknown() && !r.Config.Host.IsNull() {
+			*host = r.Config.Host.ValueString()
+		} else {
+			host = nil
+		}
+		var key string
+		key = r.Config.Key.ValueString()
+
+		logLevel := new(shared.LogLevel)
+		if !r.Config.LogLevel.IsUnknown() && !r.Config.LogLevel.IsNull() {
+			*logLevel = shared.LogLevel(r.Config.LogLevel.ValueString())
+		} else {
+			logLevel = nil
+		}
+		port := new(int64)
+		if !r.Config.Port.IsUnknown() && !r.Config.Port.IsNull() {
+			*port = r.Config.Port.ValueInt64()
+		} else {
+			port = nil
+		}
+		serverErrorsSeverity := new(shared.ServerErrorsSeverity)
+		if !r.Config.ServerErrorsSeverity.IsUnknown() && !r.Config.ServerErrorsSeverity.IsNull() {
+			*serverErrorsSeverity = shared.ServerErrorsSeverity(r.Config.ServerErrorsSeverity.ValueString())
+		} else {
+			serverErrorsSeverity = nil
+		}
+		successfulSeverity := new(shared.SuccessfulSeverity)
+		if !r.Config.SuccessfulSeverity.IsUnknown() && !r.Config.SuccessfulSeverity.IsNull() {
+			*successfulSeverity = shared.SuccessfulSeverity(r.Config.SuccessfulSeverity.ValueString())
+		} else {
+			successfulSeverity = nil
+		}
+		tags := make([]string, 0, len(r.Config.Tags))
+		for _, tagsItem := range r.Config.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+		timeout := new(float64)
+		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+			*timeout = r.Config.Timeout.ValueFloat64()
+		} else {
+			timeout = nil
+		}
+		config = &shared.LogglyPluginConfig{
+			ClientErrorsSeverity: clientErrorsSeverity,
+			CustomFieldsByLua:    customFieldsByLua,
+			Host:                 host,
+			Key:                  key,
+			LogLevel:             logLevel,
+			Port:                 port,
+			ServerErrorsSeverity: serverErrorsSeverity,
+			SuccessfulSeverity:   successfulSeverity,
+			Tags:                 tags,
+			Timeout:              timeout,
+		}
+	}
+	var consumer *shared.LogglyPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.LogglyPluginConsumer{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -219,11 +308,11 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -258,122 +347,33 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 			Before: before,
 		}
 	}
-	partials := make([]shared.LogglyPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.LogglyPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	clientErrorsSeverity := new(shared.ClientErrorsSeverity)
-	if !r.Config.ClientErrorsSeverity.IsUnknown() && !r.Config.ClientErrorsSeverity.IsNull() {
-		*clientErrorsSeverity = shared.ClientErrorsSeverity(r.Config.ClientErrorsSeverity.ValueString())
-	} else {
-		clientErrorsSeverity = nil
-	}
-	customFieldsByLua := make(map[string]interface{})
-	for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
-		var customFieldsByLuaInst interface{}
-		_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
-		customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
-	}
-	host := new(string)
-	if !r.Config.Host.IsUnknown() && !r.Config.Host.IsNull() {
-		*host = r.Config.Host.ValueString()
-	} else {
-		host = nil
-	}
-	var key string
-	key = r.Config.Key.ValueString()
-
-	logLevel := new(shared.LogLevel)
-	if !r.Config.LogLevel.IsUnknown() && !r.Config.LogLevel.IsNull() {
-		*logLevel = shared.LogLevel(r.Config.LogLevel.ValueString())
-	} else {
-		logLevel = nil
-	}
-	port := new(int64)
-	if !r.Config.Port.IsUnknown() && !r.Config.Port.IsNull() {
-		*port = r.Config.Port.ValueInt64()
-	} else {
-		port = nil
-	}
-	serverErrorsSeverity := new(shared.ServerErrorsSeverity)
-	if !r.Config.ServerErrorsSeverity.IsUnknown() && !r.Config.ServerErrorsSeverity.IsNull() {
-		*serverErrorsSeverity = shared.ServerErrorsSeverity(r.Config.ServerErrorsSeverity.ValueString())
-	} else {
-		serverErrorsSeverity = nil
-	}
-	successfulSeverity := new(shared.SuccessfulSeverity)
-	if !r.Config.SuccessfulSeverity.IsUnknown() && !r.Config.SuccessfulSeverity.IsNull() {
-		*successfulSeverity = shared.SuccessfulSeverity(r.Config.SuccessfulSeverity.ValueString())
-	} else {
-		successfulSeverity = nil
-	}
-	tags1 := make([]string, 0, len(r.Config.Tags))
-	for _, tagsItem1 := range r.Config.Tags {
-		tags1 = append(tags1, tagsItem1.ValueString())
-	}
-	timeout := new(float64)
-	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-		*timeout = r.Config.Timeout.ValueFloat64()
-	} else {
-		timeout = nil
-	}
-	config := shared.LogglyPluginConfig{
-		ClientErrorsSeverity: clientErrorsSeverity,
-		CustomFieldsByLua:    customFieldsByLua,
-		Host:                 host,
-		Key:                  key,
-		LogLevel:             logLevel,
-		Port:                 port,
-		ServerErrorsSeverity: serverErrorsSeverity,
-		SuccessfulSeverity:   successfulSeverity,
-		Tags:                 tags1,
-		Timeout:              timeout,
-	}
-	var consumer *shared.LogglyPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.LogglyPluginConsumer{
-			ID: id2,
+	var partials []shared.LogglyPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.LogglyPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.LogglyPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.LogglyPluginProtocols, 0, len(r.Protocols))
@@ -404,20 +404,33 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 			ID: id4,
 		}
 	}
+	var tags1 []string
+	if r.Tags != nil {
+		tags1 = make([]string, 0, len(r.Tags))
+		for _, tagsItem1 := range r.Tags {
+			tags1 = append(tags1, tagsItem1.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.LogglyPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags1,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

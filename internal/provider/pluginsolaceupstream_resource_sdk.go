@@ -17,73 +17,78 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		r.Config.Message.AckTimeout = types.Int64PointerValue(resp.Config.Message.AckTimeout)
-		r.Config.Message.DefaultContent = types.StringPointerValue(resp.Config.Message.DefaultContent)
-		if resp.Config.Message.DeliveryMode != nil {
-			r.Config.Message.DeliveryMode = types.StringValue(string(*resp.Config.Message.DeliveryMode))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.Message.DeliveryMode = types.StringNull()
-		}
-		r.Config.Message.Destinations = []tfTypes.Binds{}
-
-		for _, destinationsItem := range resp.Config.Message.Destinations {
-			var destinations tfTypes.Binds
-
-			destinations.Name = types.StringValue(destinationsItem.Name)
-			if destinationsItem.Type != nil {
-				destinations.Type = types.StringValue(string(*destinationsItem.Type))
+			r.Config = &tfTypes.SolaceUpstreamPluginConfig{}
+			r.Config.Message.AckTimeout = types.Int64PointerValue(resp.Config.Message.AckTimeout)
+			r.Config.Message.DefaultContent = types.StringPointerValue(resp.Config.Message.DefaultContent)
+			if resp.Config.Message.DeliveryMode != nil {
+				r.Config.Message.DeliveryMode = types.StringValue(string(*resp.Config.Message.DeliveryMode))
 			} else {
-				destinations.Type = types.StringNull()
+				r.Config.Message.DeliveryMode = types.StringNull()
 			}
+			r.Config.Message.Destinations = []tfTypes.Binds{}
 
-			r.Config.Message.Destinations = append(r.Config.Message.Destinations, destinations)
-		}
-		r.Config.Message.DmqEligible = types.BoolPointerValue(resp.Config.Message.DmqEligible)
-		r.Config.Message.ForwardBody = types.BoolPointerValue(resp.Config.Message.ForwardBody)
-		r.Config.Message.ForwardHeaders = types.BoolPointerValue(resp.Config.Message.ForwardHeaders)
-		r.Config.Message.ForwardMethod = types.BoolPointerValue(resp.Config.Message.ForwardMethod)
-		r.Config.Message.ForwardURI = types.BoolPointerValue(resp.Config.Message.ForwardURI)
-		r.Config.Message.Functions = make([]types.String, 0, len(resp.Config.Message.Functions))
-		for _, v := range resp.Config.Message.Functions {
-			r.Config.Message.Functions = append(r.Config.Message.Functions, types.StringValue(v))
-		}
-		r.Config.Message.Priority = types.Int64PointerValue(resp.Config.Message.Priority)
-		r.Config.Message.SenderID = types.StringPointerValue(resp.Config.Message.SenderID)
-		r.Config.Message.Tracing = types.BoolPointerValue(resp.Config.Message.Tracing)
-		r.Config.Message.TracingSampled = types.BoolPointerValue(resp.Config.Message.TracingSampled)
-		r.Config.Message.TTL = types.Int64PointerValue(resp.Config.Message.TTL)
-		if resp.Config.Session.Authentication == nil {
-			r.Config.Session.Authentication = nil
-		} else {
-			r.Config.Session.Authentication = &tfTypes.SolaceConsumePluginAuthentication{}
-			r.Config.Session.Authentication.AccessToken = types.StringPointerValue(resp.Config.Session.Authentication.AccessToken)
-			r.Config.Session.Authentication.AccessTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.AccessTokenHeader)
-			r.Config.Session.Authentication.IDToken = types.StringPointerValue(resp.Config.Session.Authentication.IDToken)
-			r.Config.Session.Authentication.IDTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.IDTokenHeader)
-			r.Config.Session.Authentication.Password = types.StringPointerValue(resp.Config.Session.Authentication.Password)
-			if resp.Config.Session.Authentication.Scheme != nil {
-				r.Config.Session.Authentication.Scheme = types.StringValue(string(*resp.Config.Session.Authentication.Scheme))
+			for _, destinationsItem := range resp.Config.Message.Destinations {
+				var destinations tfTypes.Binds
+
+				destinations.Name = types.StringValue(destinationsItem.Name)
+				if destinationsItem.Type != nil {
+					destinations.Type = types.StringValue(string(*destinationsItem.Type))
+				} else {
+					destinations.Type = types.StringNull()
+				}
+
+				r.Config.Message.Destinations = append(r.Config.Message.Destinations, destinations)
+			}
+			r.Config.Message.DmqEligible = types.BoolPointerValue(resp.Config.Message.DmqEligible)
+			r.Config.Message.ForwardBody = types.BoolPointerValue(resp.Config.Message.ForwardBody)
+			r.Config.Message.ForwardHeaders = types.BoolPointerValue(resp.Config.Message.ForwardHeaders)
+			r.Config.Message.ForwardMethod = types.BoolPointerValue(resp.Config.Message.ForwardMethod)
+			r.Config.Message.ForwardURI = types.BoolPointerValue(resp.Config.Message.ForwardURI)
+			r.Config.Message.Functions = make([]types.String, 0, len(resp.Config.Message.Functions))
+			for _, v := range resp.Config.Message.Functions {
+				r.Config.Message.Functions = append(r.Config.Message.Functions, types.StringValue(v))
+			}
+			r.Config.Message.Priority = types.Int64PointerValue(resp.Config.Message.Priority)
+			r.Config.Message.SenderID = types.StringPointerValue(resp.Config.Message.SenderID)
+			r.Config.Message.Tracing = types.BoolPointerValue(resp.Config.Message.Tracing)
+			r.Config.Message.TracingSampled = types.BoolPointerValue(resp.Config.Message.TracingSampled)
+			r.Config.Message.TTL = types.Int64PointerValue(resp.Config.Message.TTL)
+			if resp.Config.Session.Authentication == nil {
+				r.Config.Session.Authentication = nil
 			} else {
-				r.Config.Session.Authentication.Scheme = types.StringNull()
+				r.Config.Session.Authentication = &tfTypes.SolaceConsumePluginAuthentication{}
+				r.Config.Session.Authentication.AccessToken = types.StringPointerValue(resp.Config.Session.Authentication.AccessToken)
+				r.Config.Session.Authentication.AccessTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.AccessTokenHeader)
+				r.Config.Session.Authentication.IDToken = types.StringPointerValue(resp.Config.Session.Authentication.IDToken)
+				r.Config.Session.Authentication.IDTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.IDTokenHeader)
+				r.Config.Session.Authentication.Password = types.StringPointerValue(resp.Config.Session.Authentication.Password)
+				if resp.Config.Session.Authentication.Scheme != nil {
+					r.Config.Session.Authentication.Scheme = types.StringValue(string(*resp.Config.Session.Authentication.Scheme))
+				} else {
+					r.Config.Session.Authentication.Scheme = types.StringNull()
+				}
+				r.Config.Session.Authentication.Username = types.StringPointerValue(resp.Config.Session.Authentication.Username)
 			}
-			r.Config.Session.Authentication.Username = types.StringPointerValue(resp.Config.Session.Authentication.Username)
-		}
-		r.Config.Session.CalculateMessageExpiry = types.BoolPointerValue(resp.Config.Session.CalculateMessageExpiry)
-		r.Config.Session.ConnectTimeout = types.Int64PointerValue(resp.Config.Session.ConnectTimeout)
-		r.Config.Session.GenerateRcvTimestamps = types.BoolPointerValue(resp.Config.Session.GenerateRcvTimestamps)
-		r.Config.Session.GenerateSendTimestamps = types.BoolPointerValue(resp.Config.Session.GenerateSendTimestamps)
-		r.Config.Session.GenerateSenderID = types.BoolPointerValue(resp.Config.Session.GenerateSenderID)
-		r.Config.Session.GenerateSequenceNumber = types.BoolPointerValue(resp.Config.Session.GenerateSequenceNumber)
-		r.Config.Session.Host = types.StringValue(resp.Config.Session.Host)
-		if len(resp.Config.Session.Properties) > 0 {
-			r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
-			for key, value := range resp.Config.Session.Properties {
-				result, _ := json.Marshal(value)
-				r.Config.Session.Properties[key] = jsontypes.NewNormalizedValue(string(result))
+			r.Config.Session.CalculateMessageExpiry = types.BoolPointerValue(resp.Config.Session.CalculateMessageExpiry)
+			r.Config.Session.ConnectTimeout = types.Int64PointerValue(resp.Config.Session.ConnectTimeout)
+			r.Config.Session.GenerateRcvTimestamps = types.BoolPointerValue(resp.Config.Session.GenerateRcvTimestamps)
+			r.Config.Session.GenerateSendTimestamps = types.BoolPointerValue(resp.Config.Session.GenerateSendTimestamps)
+			r.Config.Session.GenerateSenderID = types.BoolPointerValue(resp.Config.Session.GenerateSenderID)
+			r.Config.Session.GenerateSequenceNumber = types.BoolPointerValue(resp.Config.Session.GenerateSequenceNumber)
+			r.Config.Session.Host = types.StringValue(resp.Config.Session.Host)
+			if len(resp.Config.Session.Properties) > 0 {
+				r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
+				for key, value := range resp.Config.Session.Properties {
+					result, _ := json.Marshal(value)
+					r.Config.Session.Properties[key] = jsontypes.NewNormalizedValue(string(result))
+				}
 			}
+			r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
+			r.Config.Session.VpnName = types.StringPointerValue(resp.Config.Session.VpnName)
 		}
-		r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
-		r.Config.Session.VpnName = types.StringPointerValue(resp.Config.Session.VpnName)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -111,16 +116,18 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -233,6 +240,252 @@ func (r *PluginSolaceUpstreamResourceModel) ToOperationsUpdateSolaceupstreamPlug
 func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx context.Context) (*shared.SolaceUpstreamPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.SolaceUpstreamPluginConfig
+	if r.Config != nil {
+		ackTimeout := new(int64)
+		if !r.Config.Message.AckTimeout.IsUnknown() && !r.Config.Message.AckTimeout.IsNull() {
+			*ackTimeout = r.Config.Message.AckTimeout.ValueInt64()
+		} else {
+			ackTimeout = nil
+		}
+		defaultContent := new(string)
+		if !r.Config.Message.DefaultContent.IsUnknown() && !r.Config.Message.DefaultContent.IsNull() {
+			*defaultContent = r.Config.Message.DefaultContent.ValueString()
+		} else {
+			defaultContent = nil
+		}
+		deliveryMode := new(shared.SolaceUpstreamPluginDeliveryMode)
+		if !r.Config.Message.DeliveryMode.IsUnknown() && !r.Config.Message.DeliveryMode.IsNull() {
+			*deliveryMode = shared.SolaceUpstreamPluginDeliveryMode(r.Config.Message.DeliveryMode.ValueString())
+		} else {
+			deliveryMode = nil
+		}
+		destinations := make([]shared.SolaceUpstreamPluginDestinations, 0, len(r.Config.Message.Destinations))
+		for _, destinationsItem := range r.Config.Message.Destinations {
+			var name string
+			name = destinationsItem.Name.ValueString()
+
+			typeVar := new(shared.SolaceUpstreamPluginType)
+			if !destinationsItem.Type.IsUnknown() && !destinationsItem.Type.IsNull() {
+				*typeVar = shared.SolaceUpstreamPluginType(destinationsItem.Type.ValueString())
+			} else {
+				typeVar = nil
+			}
+			destinations = append(destinations, shared.SolaceUpstreamPluginDestinations{
+				Name: name,
+				Type: typeVar,
+			})
+		}
+		dmqEligible := new(bool)
+		if !r.Config.Message.DmqEligible.IsUnknown() && !r.Config.Message.DmqEligible.IsNull() {
+			*dmqEligible = r.Config.Message.DmqEligible.ValueBool()
+		} else {
+			dmqEligible = nil
+		}
+		forwardBody := new(bool)
+		if !r.Config.Message.ForwardBody.IsUnknown() && !r.Config.Message.ForwardBody.IsNull() {
+			*forwardBody = r.Config.Message.ForwardBody.ValueBool()
+		} else {
+			forwardBody = nil
+		}
+		forwardHeaders := new(bool)
+		if !r.Config.Message.ForwardHeaders.IsUnknown() && !r.Config.Message.ForwardHeaders.IsNull() {
+			*forwardHeaders = r.Config.Message.ForwardHeaders.ValueBool()
+		} else {
+			forwardHeaders = nil
+		}
+		forwardMethod := new(bool)
+		if !r.Config.Message.ForwardMethod.IsUnknown() && !r.Config.Message.ForwardMethod.IsNull() {
+			*forwardMethod = r.Config.Message.ForwardMethod.ValueBool()
+		} else {
+			forwardMethod = nil
+		}
+		forwardURI := new(bool)
+		if !r.Config.Message.ForwardURI.IsUnknown() && !r.Config.Message.ForwardURI.IsNull() {
+			*forwardURI = r.Config.Message.ForwardURI.ValueBool()
+		} else {
+			forwardURI = nil
+		}
+		functions := make([]string, 0, len(r.Config.Message.Functions))
+		for _, functionsItem := range r.Config.Message.Functions {
+			functions = append(functions, functionsItem.ValueString())
+		}
+		priority := new(int64)
+		if !r.Config.Message.Priority.IsUnknown() && !r.Config.Message.Priority.IsNull() {
+			*priority = r.Config.Message.Priority.ValueInt64()
+		} else {
+			priority = nil
+		}
+		senderID := new(string)
+		if !r.Config.Message.SenderID.IsUnknown() && !r.Config.Message.SenderID.IsNull() {
+			*senderID = r.Config.Message.SenderID.ValueString()
+		} else {
+			senderID = nil
+		}
+		tracing := new(bool)
+		if !r.Config.Message.Tracing.IsUnknown() && !r.Config.Message.Tracing.IsNull() {
+			*tracing = r.Config.Message.Tracing.ValueBool()
+		} else {
+			tracing = nil
+		}
+		tracingSampled := new(bool)
+		if !r.Config.Message.TracingSampled.IsUnknown() && !r.Config.Message.TracingSampled.IsNull() {
+			*tracingSampled = r.Config.Message.TracingSampled.ValueBool()
+		} else {
+			tracingSampled = nil
+		}
+		ttl := new(int64)
+		if !r.Config.Message.TTL.IsUnknown() && !r.Config.Message.TTL.IsNull() {
+			*ttl = r.Config.Message.TTL.ValueInt64()
+		} else {
+			ttl = nil
+		}
+		message := shared.SolaceUpstreamPluginMessage{
+			AckTimeout:     ackTimeout,
+			DefaultContent: defaultContent,
+			DeliveryMode:   deliveryMode,
+			Destinations:   destinations,
+			DmqEligible:    dmqEligible,
+			ForwardBody:    forwardBody,
+			ForwardHeaders: forwardHeaders,
+			ForwardMethod:  forwardMethod,
+			ForwardURI:     forwardURI,
+			Functions:      functions,
+			Priority:       priority,
+			SenderID:       senderID,
+			Tracing:        tracing,
+			TracingSampled: tracingSampled,
+			TTL:            ttl,
+		}
+		var authentication *shared.SolaceUpstreamPluginAuthentication
+		if r.Config.Session.Authentication != nil {
+			accessToken := new(string)
+			if !r.Config.Session.Authentication.AccessToken.IsUnknown() && !r.Config.Session.Authentication.AccessToken.IsNull() {
+				*accessToken = r.Config.Session.Authentication.AccessToken.ValueString()
+			} else {
+				accessToken = nil
+			}
+			accessTokenHeader := new(string)
+			if !r.Config.Session.Authentication.AccessTokenHeader.IsUnknown() && !r.Config.Session.Authentication.AccessTokenHeader.IsNull() {
+				*accessTokenHeader = r.Config.Session.Authentication.AccessTokenHeader.ValueString()
+			} else {
+				accessTokenHeader = nil
+			}
+			idToken := new(string)
+			if !r.Config.Session.Authentication.IDToken.IsUnknown() && !r.Config.Session.Authentication.IDToken.IsNull() {
+				*idToken = r.Config.Session.Authentication.IDToken.ValueString()
+			} else {
+				idToken = nil
+			}
+			idTokenHeader := new(string)
+			if !r.Config.Session.Authentication.IDTokenHeader.IsUnknown() && !r.Config.Session.Authentication.IDTokenHeader.IsNull() {
+				*idTokenHeader = r.Config.Session.Authentication.IDTokenHeader.ValueString()
+			} else {
+				idTokenHeader = nil
+			}
+			password := new(string)
+			if !r.Config.Session.Authentication.Password.IsUnknown() && !r.Config.Session.Authentication.Password.IsNull() {
+				*password = r.Config.Session.Authentication.Password.ValueString()
+			} else {
+				password = nil
+			}
+			scheme := new(shared.SolaceUpstreamPluginScheme)
+			if !r.Config.Session.Authentication.Scheme.IsUnknown() && !r.Config.Session.Authentication.Scheme.IsNull() {
+				*scheme = shared.SolaceUpstreamPluginScheme(r.Config.Session.Authentication.Scheme.ValueString())
+			} else {
+				scheme = nil
+			}
+			username := new(string)
+			if !r.Config.Session.Authentication.Username.IsUnknown() && !r.Config.Session.Authentication.Username.IsNull() {
+				*username = r.Config.Session.Authentication.Username.ValueString()
+			} else {
+				username = nil
+			}
+			authentication = &shared.SolaceUpstreamPluginAuthentication{
+				AccessToken:       accessToken,
+				AccessTokenHeader: accessTokenHeader,
+				IDToken:           idToken,
+				IDTokenHeader:     idTokenHeader,
+				Password:          password,
+				Scheme:            scheme,
+				Username:          username,
+			}
+		}
+		calculateMessageExpiry := new(bool)
+		if !r.Config.Session.CalculateMessageExpiry.IsUnknown() && !r.Config.Session.CalculateMessageExpiry.IsNull() {
+			*calculateMessageExpiry = r.Config.Session.CalculateMessageExpiry.ValueBool()
+		} else {
+			calculateMessageExpiry = nil
+		}
+		connectTimeout := new(int64)
+		if !r.Config.Session.ConnectTimeout.IsUnknown() && !r.Config.Session.ConnectTimeout.IsNull() {
+			*connectTimeout = r.Config.Session.ConnectTimeout.ValueInt64()
+		} else {
+			connectTimeout = nil
+		}
+		generateRcvTimestamps := new(bool)
+		if !r.Config.Session.GenerateRcvTimestamps.IsUnknown() && !r.Config.Session.GenerateRcvTimestamps.IsNull() {
+			*generateRcvTimestamps = r.Config.Session.GenerateRcvTimestamps.ValueBool()
+		} else {
+			generateRcvTimestamps = nil
+		}
+		generateSendTimestamps := new(bool)
+		if !r.Config.Session.GenerateSendTimestamps.IsUnknown() && !r.Config.Session.GenerateSendTimestamps.IsNull() {
+			*generateSendTimestamps = r.Config.Session.GenerateSendTimestamps.ValueBool()
+		} else {
+			generateSendTimestamps = nil
+		}
+		generateSenderID := new(bool)
+		if !r.Config.Session.GenerateSenderID.IsUnknown() && !r.Config.Session.GenerateSenderID.IsNull() {
+			*generateSenderID = r.Config.Session.GenerateSenderID.ValueBool()
+		} else {
+			generateSenderID = nil
+		}
+		generateSequenceNumber := new(bool)
+		if !r.Config.Session.GenerateSequenceNumber.IsUnknown() && !r.Config.Session.GenerateSequenceNumber.IsNull() {
+			*generateSequenceNumber = r.Config.Session.GenerateSequenceNumber.ValueBool()
+		} else {
+			generateSequenceNumber = nil
+		}
+		var host string
+		host = r.Config.Session.Host.ValueString()
+
+		properties := make(map[string]interface{})
+		for propertiesKey, propertiesValue := range r.Config.Session.Properties {
+			var propertiesInst interface{}
+			_ = json.Unmarshal([]byte(propertiesValue.ValueString()), &propertiesInst)
+			properties[propertiesKey] = propertiesInst
+		}
+		sslValidateCertificate := new(bool)
+		if !r.Config.Session.SslValidateCertificate.IsUnknown() && !r.Config.Session.SslValidateCertificate.IsNull() {
+			*sslValidateCertificate = r.Config.Session.SslValidateCertificate.ValueBool()
+		} else {
+			sslValidateCertificate = nil
+		}
+		vpnName := new(string)
+		if !r.Config.Session.VpnName.IsUnknown() && !r.Config.Session.VpnName.IsNull() {
+			*vpnName = r.Config.Session.VpnName.ValueString()
+		} else {
+			vpnName = nil
+		}
+		session := shared.SolaceUpstreamPluginSession{
+			Authentication:         authentication,
+			CalculateMessageExpiry: calculateMessageExpiry,
+			ConnectTimeout:         connectTimeout,
+			GenerateRcvTimestamps:  generateRcvTimestamps,
+			GenerateSendTimestamps: generateSendTimestamps,
+			GenerateSenderID:       generateSenderID,
+			GenerateSequenceNumber: generateSequenceNumber,
+			Host:                   host,
+			Properties:             properties,
+			SslValidateCertificate: sslValidateCertificate,
+			VpnName:                vpnName,
+		}
+		config = &shared.SolaceUpstreamPluginConfig{
+			Message: message,
+			Session: session,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -284,287 +537,34 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 			Before: before,
 		}
 	}
-	partials := make([]shared.SolaceUpstreamPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.SolaceUpstreamPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.SolaceUpstreamPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name1 := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name1 = partialsItem.Name.ValueString()
+			} else {
+				name1 = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.SolaceUpstreamPluginPartials{
+				ID:   id1,
+				Name: name1,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.SolaceUpstreamPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	ackTimeout := new(int64)
-	if !r.Config.Message.AckTimeout.IsUnknown() && !r.Config.Message.AckTimeout.IsNull() {
-		*ackTimeout = r.Config.Message.AckTimeout.ValueInt64()
-	} else {
-		ackTimeout = nil
-	}
-	defaultContent := new(string)
-	if !r.Config.Message.DefaultContent.IsUnknown() && !r.Config.Message.DefaultContent.IsNull() {
-		*defaultContent = r.Config.Message.DefaultContent.ValueString()
-	} else {
-		defaultContent = nil
-	}
-	deliveryMode := new(shared.SolaceUpstreamPluginDeliveryMode)
-	if !r.Config.Message.DeliveryMode.IsUnknown() && !r.Config.Message.DeliveryMode.IsNull() {
-		*deliveryMode = shared.SolaceUpstreamPluginDeliveryMode(r.Config.Message.DeliveryMode.ValueString())
-	} else {
-		deliveryMode = nil
-	}
-	destinations := make([]shared.SolaceUpstreamPluginDestinations, 0, len(r.Config.Message.Destinations))
-	for _, destinationsItem := range r.Config.Message.Destinations {
-		var name1 string
-		name1 = destinationsItem.Name.ValueString()
-
-		typeVar := new(shared.SolaceUpstreamPluginType)
-		if !destinationsItem.Type.IsUnknown() && !destinationsItem.Type.IsNull() {
-			*typeVar = shared.SolaceUpstreamPluginType(destinationsItem.Type.ValueString())
-		} else {
-			typeVar = nil
-		}
-		destinations = append(destinations, shared.SolaceUpstreamPluginDestinations{
-			Name: name1,
-			Type: typeVar,
-		})
-	}
-	dmqEligible := new(bool)
-	if !r.Config.Message.DmqEligible.IsUnknown() && !r.Config.Message.DmqEligible.IsNull() {
-		*dmqEligible = r.Config.Message.DmqEligible.ValueBool()
-	} else {
-		dmqEligible = nil
-	}
-	forwardBody := new(bool)
-	if !r.Config.Message.ForwardBody.IsUnknown() && !r.Config.Message.ForwardBody.IsNull() {
-		*forwardBody = r.Config.Message.ForwardBody.ValueBool()
-	} else {
-		forwardBody = nil
-	}
-	forwardHeaders := new(bool)
-	if !r.Config.Message.ForwardHeaders.IsUnknown() && !r.Config.Message.ForwardHeaders.IsNull() {
-		*forwardHeaders = r.Config.Message.ForwardHeaders.ValueBool()
-	} else {
-		forwardHeaders = nil
-	}
-	forwardMethod := new(bool)
-	if !r.Config.Message.ForwardMethod.IsUnknown() && !r.Config.Message.ForwardMethod.IsNull() {
-		*forwardMethod = r.Config.Message.ForwardMethod.ValueBool()
-	} else {
-		forwardMethod = nil
-	}
-	forwardURI := new(bool)
-	if !r.Config.Message.ForwardURI.IsUnknown() && !r.Config.Message.ForwardURI.IsNull() {
-		*forwardURI = r.Config.Message.ForwardURI.ValueBool()
-	} else {
-		forwardURI = nil
-	}
-	functions := make([]string, 0, len(r.Config.Message.Functions))
-	for _, functionsItem := range r.Config.Message.Functions {
-		functions = append(functions, functionsItem.ValueString())
-	}
-	priority := new(int64)
-	if !r.Config.Message.Priority.IsUnknown() && !r.Config.Message.Priority.IsNull() {
-		*priority = r.Config.Message.Priority.ValueInt64()
-	} else {
-		priority = nil
-	}
-	senderID := new(string)
-	if !r.Config.Message.SenderID.IsUnknown() && !r.Config.Message.SenderID.IsNull() {
-		*senderID = r.Config.Message.SenderID.ValueString()
-	} else {
-		senderID = nil
-	}
-	tracing := new(bool)
-	if !r.Config.Message.Tracing.IsUnknown() && !r.Config.Message.Tracing.IsNull() {
-		*tracing = r.Config.Message.Tracing.ValueBool()
-	} else {
-		tracing = nil
-	}
-	tracingSampled := new(bool)
-	if !r.Config.Message.TracingSampled.IsUnknown() && !r.Config.Message.TracingSampled.IsNull() {
-		*tracingSampled = r.Config.Message.TracingSampled.ValueBool()
-	} else {
-		tracingSampled = nil
-	}
-	ttl := new(int64)
-	if !r.Config.Message.TTL.IsUnknown() && !r.Config.Message.TTL.IsNull() {
-		*ttl = r.Config.Message.TTL.ValueInt64()
-	} else {
-		ttl = nil
-	}
-	message := shared.SolaceUpstreamPluginMessage{
-		AckTimeout:     ackTimeout,
-		DefaultContent: defaultContent,
-		DeliveryMode:   deliveryMode,
-		Destinations:   destinations,
-		DmqEligible:    dmqEligible,
-		ForwardBody:    forwardBody,
-		ForwardHeaders: forwardHeaders,
-		ForwardMethod:  forwardMethod,
-		ForwardURI:     forwardURI,
-		Functions:      functions,
-		Priority:       priority,
-		SenderID:       senderID,
-		Tracing:        tracing,
-		TracingSampled: tracingSampled,
-		TTL:            ttl,
-	}
-	var authentication *shared.SolaceUpstreamPluginAuthentication
-	if r.Config.Session.Authentication != nil {
-		accessToken := new(string)
-		if !r.Config.Session.Authentication.AccessToken.IsUnknown() && !r.Config.Session.Authentication.AccessToken.IsNull() {
-			*accessToken = r.Config.Session.Authentication.AccessToken.ValueString()
-		} else {
-			accessToken = nil
-		}
-		accessTokenHeader := new(string)
-		if !r.Config.Session.Authentication.AccessTokenHeader.IsUnknown() && !r.Config.Session.Authentication.AccessTokenHeader.IsNull() {
-			*accessTokenHeader = r.Config.Session.Authentication.AccessTokenHeader.ValueString()
-		} else {
-			accessTokenHeader = nil
-		}
-		idToken := new(string)
-		if !r.Config.Session.Authentication.IDToken.IsUnknown() && !r.Config.Session.Authentication.IDToken.IsNull() {
-			*idToken = r.Config.Session.Authentication.IDToken.ValueString()
-		} else {
-			idToken = nil
-		}
-		idTokenHeader := new(string)
-		if !r.Config.Session.Authentication.IDTokenHeader.IsUnknown() && !r.Config.Session.Authentication.IDTokenHeader.IsNull() {
-			*idTokenHeader = r.Config.Session.Authentication.IDTokenHeader.ValueString()
-		} else {
-			idTokenHeader = nil
-		}
-		password := new(string)
-		if !r.Config.Session.Authentication.Password.IsUnknown() && !r.Config.Session.Authentication.Password.IsNull() {
-			*password = r.Config.Session.Authentication.Password.ValueString()
-		} else {
-			password = nil
-		}
-		scheme := new(shared.SolaceUpstreamPluginScheme)
-		if !r.Config.Session.Authentication.Scheme.IsUnknown() && !r.Config.Session.Authentication.Scheme.IsNull() {
-			*scheme = shared.SolaceUpstreamPluginScheme(r.Config.Session.Authentication.Scheme.ValueString())
-		} else {
-			scheme = nil
-		}
-		username := new(string)
-		if !r.Config.Session.Authentication.Username.IsUnknown() && !r.Config.Session.Authentication.Username.IsNull() {
-			*username = r.Config.Session.Authentication.Username.ValueString()
-		} else {
-			username = nil
-		}
-		authentication = &shared.SolaceUpstreamPluginAuthentication{
-			AccessToken:       accessToken,
-			AccessTokenHeader: accessTokenHeader,
-			IDToken:           idToken,
-			IDTokenHeader:     idTokenHeader,
-			Password:          password,
-			Scheme:            scheme,
-			Username:          username,
-		}
-	}
-	calculateMessageExpiry := new(bool)
-	if !r.Config.Session.CalculateMessageExpiry.IsUnknown() && !r.Config.Session.CalculateMessageExpiry.IsNull() {
-		*calculateMessageExpiry = r.Config.Session.CalculateMessageExpiry.ValueBool()
-	} else {
-		calculateMessageExpiry = nil
-	}
-	connectTimeout := new(int64)
-	if !r.Config.Session.ConnectTimeout.IsUnknown() && !r.Config.Session.ConnectTimeout.IsNull() {
-		*connectTimeout = r.Config.Session.ConnectTimeout.ValueInt64()
-	} else {
-		connectTimeout = nil
-	}
-	generateRcvTimestamps := new(bool)
-	if !r.Config.Session.GenerateRcvTimestamps.IsUnknown() && !r.Config.Session.GenerateRcvTimestamps.IsNull() {
-		*generateRcvTimestamps = r.Config.Session.GenerateRcvTimestamps.ValueBool()
-	} else {
-		generateRcvTimestamps = nil
-	}
-	generateSendTimestamps := new(bool)
-	if !r.Config.Session.GenerateSendTimestamps.IsUnknown() && !r.Config.Session.GenerateSendTimestamps.IsNull() {
-		*generateSendTimestamps = r.Config.Session.GenerateSendTimestamps.ValueBool()
-	} else {
-		generateSendTimestamps = nil
-	}
-	generateSenderID := new(bool)
-	if !r.Config.Session.GenerateSenderID.IsUnknown() && !r.Config.Session.GenerateSenderID.IsNull() {
-		*generateSenderID = r.Config.Session.GenerateSenderID.ValueBool()
-	} else {
-		generateSenderID = nil
-	}
-	generateSequenceNumber := new(bool)
-	if !r.Config.Session.GenerateSequenceNumber.IsUnknown() && !r.Config.Session.GenerateSequenceNumber.IsNull() {
-		*generateSequenceNumber = r.Config.Session.GenerateSequenceNumber.ValueBool()
-	} else {
-		generateSequenceNumber = nil
-	}
-	var host string
-	host = r.Config.Session.Host.ValueString()
-
-	properties := make(map[string]interface{})
-	for propertiesKey, propertiesValue := range r.Config.Session.Properties {
-		var propertiesInst interface{}
-		_ = json.Unmarshal([]byte(propertiesValue.ValueString()), &propertiesInst)
-		properties[propertiesKey] = propertiesInst
-	}
-	sslValidateCertificate := new(bool)
-	if !r.Config.Session.SslValidateCertificate.IsUnknown() && !r.Config.Session.SslValidateCertificate.IsNull() {
-		*sslValidateCertificate = r.Config.Session.SslValidateCertificate.ValueBool()
-	} else {
-		sslValidateCertificate = nil
-	}
-	vpnName := new(string)
-	if !r.Config.Session.VpnName.IsUnknown() && !r.Config.Session.VpnName.IsNull() {
-		*vpnName = r.Config.Session.VpnName.ValueString()
-	} else {
-		vpnName = nil
-	}
-	session := shared.SolaceUpstreamPluginSession{
-		Authentication:         authentication,
-		CalculateMessageExpiry: calculateMessageExpiry,
-		ConnectTimeout:         connectTimeout,
-		GenerateRcvTimestamps:  generateRcvTimestamps,
-		GenerateSendTimestamps: generateSendTimestamps,
-		GenerateSenderID:       generateSenderID,
-		GenerateSequenceNumber: generateSequenceNumber,
-		Host:                   host,
-		Properties:             properties,
-		SslValidateCertificate: sslValidateCertificate,
-		VpnName:                vpnName,
-	}
-	config := shared.SolaceUpstreamPluginConfig{
-		Message: message,
-		Session: session,
 	}
 	protocols := make([]shared.SolaceUpstreamPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -594,19 +594,32 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.SolaceUpstreamPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

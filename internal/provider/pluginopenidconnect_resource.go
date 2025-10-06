@@ -19,6 +19,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,19 +38,19 @@ type PluginOpenidConnectResource struct {
 
 // PluginOpenidConnectResourceModel describes the resource data model.
 type PluginOpenidConnectResourceModel struct {
-	Config       tfTypes.OpenidConnectPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                       `tfsdk:"created_at"`
-	Enabled      types.Bool                        `tfsdk:"enabled"`
-	ID           types.String                      `tfsdk:"id"`
-	InstanceName types.String                      `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols    []types.String                    `tfsdk:"protocols"`
-	Route        *tfTypes.Set                      `tfsdk:"route"`
-	Service      *tfTypes.Set                      `tfsdk:"service"`
-	Tags         []types.String                    `tfsdk:"tags"`
-	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
-	Workspace    types.String                      `tfsdk:"workspace"`
+	Config       *tfTypes.OpenidConnectPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.Set                       `tfsdk:"route"`
+	Service      *tfTypes.Set                       `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Workspace    types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginOpenidConnectResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +62,8 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginOpenidConnect Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -899,8 +901,12 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Description: `Designate token's parameter name for introspection.`,
 					},
 					"issuer": schema.StringAttribute{
-						Required:    true,
-						Description: `The discovery endpoint (or the issuer identifier). When there is no discovery endpoint, please also configure ` + "`" + `config.using_pseudo_issuer=true` + "`" + `.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The discovery endpoint (or the issuer identifier). When there is no discovery endpoint, please also configure ` + "`" + `config.using_pseudo_issuer=true` + "`" + `. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"issuers_allowed": schema.ListAttribute{
 						Computed:    true,

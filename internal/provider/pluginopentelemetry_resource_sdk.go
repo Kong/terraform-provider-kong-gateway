@@ -30,10 +30,9 @@ func (r *PluginOpentelemetryResourceModel) RefreshFromSharedOpentelemetryPlugin(
 				r.Config.HeaderType = types.StringNull()
 			}
 			if len(resp.Config.Headers) > 0 {
-				r.Config.Headers = make(map[string]jsontypes.Normalized, len(resp.Config.Headers))
+				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
 				for key, value := range resp.Config.Headers {
-					result, _ := json.Marshal(value)
-					r.Config.Headers[key] = jsontypes.NewNormalizedValue(string(result))
+					r.Config.Headers[key] = types.StringValue(value)
 				}
 			}
 			r.Config.HTTPResponseHeaderForTraceid = types.StringPointerValue(resp.Config.HTTPResponseHeaderForTraceid)
@@ -81,8 +80,8 @@ func (r *PluginOpentelemetryResourceModel) RefreshFromSharedOpentelemetryPlugin(
 			if len(resp.Config.ResourceAttributes) > 0 {
 				r.Config.ResourceAttributes = make(map[string]jsontypes.Normalized, len(resp.Config.ResourceAttributes))
 				for key1, value1 := range resp.Config.ResourceAttributes {
-					result1, _ := json.Marshal(value1)
-					r.Config.ResourceAttributes[key1] = jsontypes.NewNormalizedValue(string(result1))
+					result, _ := json.Marshal(value1)
+					r.Config.ResourceAttributes[key1] = jsontypes.NewNormalizedValue(string(result))
 				}
 			}
 			r.Config.SamplingRate = types.Float64PointerValue(resp.Config.SamplingRate)
@@ -127,16 +126,18 @@ func (r *PluginOpentelemetryResourceModel) RefreshFromSharedOpentelemetryPlugin(
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -249,96 +250,6 @@ func (r *PluginOpentelemetryResourceModel) ToOperationsUpdateOpentelemetryPlugin
 func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx context.Context) (*shared.OpentelemetryPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.OpentelemetryPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.OpentelemetryPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.OpentelemetryPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.OpentelemetryPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.OpentelemetryPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.OpentelemetryPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	partials := make([]shared.OpentelemetryPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.OpentelemetryPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.OpentelemetryPluginConfig
 	if r.Config != nil {
 		batchFlushDelay := new(int64)
@@ -365,10 +276,11 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 		} else {
 			headerType = nil
 		}
-		headers := make(map[string]interface{})
+		headers := make(map[string]string)
 		for headersKey, headersValue := range r.Config.Headers {
-			var headersInst interface{}
-			_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
+			var headersInst string
+			headersInst = headersValue.ValueString()
+
 			headers[headersKey] = headersInst
 		}
 		httpResponseHeaderForTraceid := new(string)
@@ -527,14 +439,94 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 	}
 	var consumer *shared.OpentelemetryPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.OpentelemetryPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.OpentelemetryPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.OpentelemetryPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.OpentelemetryPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.OpentelemetryPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.OpentelemetryPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.OpentelemetryPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.OpentelemetryPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.OpentelemetryPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.OpentelemetryPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.OpentelemetryPluginProtocols, 0, len(r.Protocols))
@@ -565,20 +557,33 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.OpentelemetryPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

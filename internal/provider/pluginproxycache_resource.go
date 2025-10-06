@@ -18,6 +18,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -36,21 +37,21 @@ type PluginProxyCacheResource struct {
 
 // PluginProxyCacheResourceModel describes the resource data model.
 type PluginProxyCacheResourceModel struct {
-	Config        tfTypes.ProxyCachePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                   `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                   `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                    `tfsdk:"created_at"`
-	Enabled       types.Bool                     `tfsdk:"enabled"`
-	ID            types.String                   `tfsdk:"id"`
-	InstanceName  types.String                   `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials    `tfsdk:"partials"`
-	Protocols     []types.String                 `tfsdk:"protocols"`
-	Route         *tfTypes.Set                   `tfsdk:"route"`
-	Service       *tfTypes.Set                   `tfsdk:"service"`
-	Tags          []types.String                 `tfsdk:"tags"`
-	UpdatedAt     types.Int64                    `tfsdk:"updated_at"`
-	Workspace     types.String                   `tfsdk:"workspace"`
+	Config        *tfTypes.ProxyCachePluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                    `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                    `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                     `tfsdk:"created_at"`
+	Enabled       types.Bool                      `tfsdk:"enabled"`
+	ID            types.String                    `tfsdk:"id"`
+	InstanceName  types.String                    `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering      `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials     `tfsdk:"partials"`
+	Protocols     []types.String                  `tfsdk:"protocols"`
+	Route         *tfTypes.Set                    `tfsdk:"route"`
+	Service       *tfTypes.Set                    `tfsdk:"service"`
+	Tags          []types.String                  `tfsdk:"tags"`
+	UpdatedAt     types.Int64                     `tfsdk:"updated_at"`
+	Workspace     types.String                    `tfsdk:"workspace"`
 }
 
 func (r *PluginProxyCacheResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,7 +63,8 @@ func (r *PluginProxyCacheResource) Schema(ctx context.Context, req resource.Sche
 		MarkdownDescription: "PluginProxyCache Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"cache_control": schema.BoolAttribute{
 						Computed:    true,
@@ -132,9 +134,11 @@ func (r *PluginProxyCacheResource) Schema(ctx context.Context, req resource.Sche
 						Description: `Number of seconds to keep resources in the storage backend. This value is independent of ` + "`" + `cache_ttl` + "`" + ` or resource TTLs defined by Cache-Control behaviors.`,
 					},
 					"strategy": schema.StringAttribute{
-						Required:    true,
-						Description: `The backing data store in which to hold cache entities. must be "memory"`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The backing data store in which to hold cache entities. Not Null; must be "memory"`,
 						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
 							stringvalidator.OneOf("memory"),
 						},
 					},

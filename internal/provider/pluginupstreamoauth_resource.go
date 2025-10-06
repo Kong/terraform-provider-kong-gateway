@@ -22,6 +22,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -40,21 +41,21 @@ type PluginUpstreamOauthResource struct {
 
 // PluginUpstreamOauthResourceModel describes the resource data model.
 type PluginUpstreamOauthResourceModel struct {
-	Config        tfTypes.UpstreamOauthPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                      `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                      `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                       `tfsdk:"created_at"`
-	Enabled       types.Bool                        `tfsdk:"enabled"`
-	ID            types.String                      `tfsdk:"id"`
-	InstanceName  types.String                      `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols     []types.String                    `tfsdk:"protocols"`
-	Route         *tfTypes.Set                      `tfsdk:"route"`
-	Service       *tfTypes.Set                      `tfsdk:"service"`
-	Tags          []types.String                    `tfsdk:"tags"`
-	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
-	Workspace     types.String                      `tfsdk:"workspace"`
+	Config        *tfTypes.UpstreamOauthPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                       `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                       `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                        `tfsdk:"created_at"`
+	Enabled       types.Bool                         `tfsdk:"enabled"`
+	ID            types.String                       `tfsdk:"id"`
+	InstanceName  types.String                       `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials        `tfsdk:"partials"`
+	Protocols     []types.String                     `tfsdk:"protocols"`
+	Route         *tfTypes.Set                       `tfsdk:"route"`
+	Service       *tfTypes.Set                       `tfsdk:"service"`
+	Tags          []types.String                     `tfsdk:"tags"`
+	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
+	Workspace     types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginUpstreamOauthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -66,7 +67,8 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginUpstreamOauth Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"behavior": schema.SingleNestedAttribute{
 						Computed: true,
@@ -401,7 +403,8 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 						},
 					},
 					"oauth": schema.SingleNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						Attributes: map[string]schema.Attribute{
 							"audience": schema.ListAttribute{
 								Computed:    true,
@@ -442,8 +445,12 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 								Description: `List of scopes to request from the IdP when obtaining a new token.`,
 							},
 							"token_endpoint": schema.StringAttribute{
-								Required:    true,
-								Description: `The token endpoint URI.`,
+								Computed:    true,
+								Optional:    true,
+								Description: `The token endpoint URI. Not Null`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+								},
 							},
 							"token_headers": schema.MapAttribute{
 								Computed:    true,
@@ -468,6 +475,10 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 								Optional:    true,
 								Description: `The username to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
 							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 				},

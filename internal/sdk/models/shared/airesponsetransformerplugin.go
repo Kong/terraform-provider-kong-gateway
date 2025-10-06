@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AiResponseTransformerPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiResponseTransformerPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiResponseTransformerPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiResponseTransformerPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiResponseTransformerPluginOrdering struct {
-	After  *AiResponseTransformerPluginAfter  `json:"after,omitempty"`
-	Before *AiResponseTransformerPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiResponseTransformerPluginOrdering) GetAfter() *AiResponseTransformerPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiResponseTransformerPluginOrdering) GetBefore() *AiResponseTransformerPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiResponseTransformerPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiResponseTransformerPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiResponseTransformerPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiResponseTransformerPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 // AiResponseTransformerPluginParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
 type AiResponseTransformerPluginParamLocation string
 
@@ -959,6 +889,76 @@ func (a *AiResponseTransformerPluginConsumerGroup) GetID() *string {
 	return a.ID
 }
 
+type AiResponseTransformerPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiResponseTransformerPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiResponseTransformerPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiResponseTransformerPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiResponseTransformerPluginOrdering struct {
+	After  *AiResponseTransformerPluginAfter  `json:"after,omitempty"`
+	Before *AiResponseTransformerPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiResponseTransformerPluginOrdering) GetAfter() *AiResponseTransformerPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiResponseTransformerPluginOrdering) GetBefore() *AiResponseTransformerPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiResponseTransformerPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiResponseTransformerPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiResponseTransformerPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiResponseTransformerPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AiResponseTransformerPluginProtocols string
 
 const (
@@ -1015,8 +1015,12 @@ func (a *AiResponseTransformerPluginService) GetID() *string {
 	return a.ID
 }
 
-// AiResponseTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiResponseTransformerPlugin struct {
+	Config *AiResponseTransformerPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AiResponseTransformerPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *AiResponseTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1029,21 +1033,16 @@ type AiResponseTransformerPlugin struct {
 	Ordering     *AiResponseTransformerPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiResponseTransformerPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                            `json:"updated_at,omitempty"`
-	Config    AiResponseTransformerPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AiResponseTransformerPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *AiResponseTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiResponseTransformerPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiResponseTransformerPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiResponseTransformerPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiResponseTransformerPlugin) MarshalJSON() ([]byte, error) {
@@ -1051,10 +1050,31 @@ func (a AiResponseTransformerPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiResponseTransformerPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AiResponseTransformerPlugin) GetConfig() *AiResponseTransformerPluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
+}
+
+func (a *AiResponseTransformerPlugin) GetConsumer() *AiResponseTransformerPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
+func (a *AiResponseTransformerPlugin) GetConsumerGroup() *AiResponseTransformerPluginConsumerGroup {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerGroup
 }
 
 func (a *AiResponseTransformerPlugin) GetCreatedAt() *int64 {
@@ -1103,41 +1123,6 @@ func (a *AiResponseTransformerPlugin) GetPartials() []AiResponseTransformerPlugi
 	return a.Partials
 }
 
-func (a *AiResponseTransformerPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiResponseTransformerPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
-}
-
-func (a *AiResponseTransformerPlugin) GetConfig() AiResponseTransformerPluginConfig {
-	if a == nil {
-		return AiResponseTransformerPluginConfig{}
-	}
-	return a.Config
-}
-
-func (a *AiResponseTransformerPlugin) GetConsumer() *AiResponseTransformerPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
-}
-
-func (a *AiResponseTransformerPlugin) GetConsumerGroup() *AiResponseTransformerPluginConsumerGroup {
-	if a == nil {
-		return nil
-	}
-	return a.ConsumerGroup
-}
-
 func (a *AiResponseTransformerPlugin) GetProtocols() []AiResponseTransformerPluginProtocols {
 	if a == nil {
 		return nil
@@ -1157,4 +1142,18 @@ func (a *AiResponseTransformerPlugin) GetService() *AiResponseTransformerPluginS
 		return nil
 	}
 	return a.Service
+}
+
+func (a *AiResponseTransformerPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiResponseTransformerPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
 }

@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type HTTPLogPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HTTPLogPluginAfter) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HTTPLogPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HTTPLogPluginBefore) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HTTPLogPluginOrdering struct {
-	After  *HTTPLogPluginAfter  `json:"after,omitempty"`
-	Before *HTTPLogPluginBefore `json:"before,omitempty"`
-}
-
-func (h *HTTPLogPluginOrdering) GetAfter() *HTTPLogPluginAfter {
-	if h == nil {
-		return nil
-	}
-	return h.After
-}
-
-func (h *HTTPLogPluginOrdering) GetBefore() *HTTPLogPluginBefore {
-	if h == nil {
-		return nil
-	}
-	return h.Before
-}
-
-type HTTPLogPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (h *HTTPLogPluginPartials) GetID() *string {
-	if h == nil {
-		return nil
-	}
-	return h.ID
-}
-
-func (h *HTTPLogPluginPartials) GetName() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Name
-}
-
-func (h *HTTPLogPluginPartials) GetPath() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Path
-}
-
 // ContentType - Indicates the type of data sent. The only available option is `application/json`.
 type ContentType string
 
@@ -350,6 +280,76 @@ func (h *HTTPLogPluginConsumer) GetID() *string {
 	return h.ID
 }
 
+type HTTPLogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HTTPLogPluginAfter) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HTTPLogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HTTPLogPluginBefore) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HTTPLogPluginOrdering struct {
+	After  *HTTPLogPluginAfter  `json:"after,omitempty"`
+	Before *HTTPLogPluginBefore `json:"before,omitempty"`
+}
+
+func (h *HTTPLogPluginOrdering) GetAfter() *HTTPLogPluginAfter {
+	if h == nil {
+		return nil
+	}
+	return h.After
+}
+
+func (h *HTTPLogPluginOrdering) GetBefore() *HTTPLogPluginBefore {
+	if h == nil {
+		return nil
+	}
+	return h.Before
+}
+
+type HTTPLogPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (h *HTTPLogPluginPartials) GetID() *string {
+	if h == nil {
+		return nil
+	}
+	return h.ID
+}
+
+func (h *HTTPLogPluginPartials) GetName() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Name
+}
+
+func (h *HTTPLogPluginPartials) GetPath() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Path
+}
+
 // HTTPLogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type HTTPLogPluginProtocols string
 
@@ -425,8 +425,10 @@ func (h *HTTPLogPluginService) GetID() *string {
 	return h.ID
 }
 
-// HTTPLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HTTPLogPlugin struct {
+	Config *HTTPLogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *HTTPLogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -439,19 +441,16 @@ type HTTPLogPlugin struct {
 	Ordering     *HTTPLogPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []HTTPLogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64              `json:"updated_at,omitempty"`
-	Config    HTTPLogPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *HTTPLogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []HTTPLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *HTTPLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *HTTPLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (h HTTPLogPlugin) MarshalJSON() ([]byte, error) {
@@ -459,10 +458,24 @@ func (h HTTPLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (h *HTTPLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (h *HTTPLogPlugin) GetConfig() *HTTPLogPluginConfig {
+	if h == nil {
+		return nil
+	}
+	return h.Config
+}
+
+func (h *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
+	if h == nil {
+		return nil
+	}
+	return h.Consumer
 }
 
 func (h *HTTPLogPlugin) GetCreatedAt() *int64 {
@@ -511,34 +524,6 @@ func (h *HTTPLogPlugin) GetPartials() []HTTPLogPluginPartials {
 	return h.Partials
 }
 
-func (h *HTTPLogPlugin) GetTags() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Tags
-}
-
-func (h *HTTPLogPlugin) GetUpdatedAt() *int64 {
-	if h == nil {
-		return nil
-	}
-	return h.UpdatedAt
-}
-
-func (h *HTTPLogPlugin) GetConfig() HTTPLogPluginConfig {
-	if h == nil {
-		return HTTPLogPluginConfig{}
-	}
-	return h.Config
-}
-
-func (h *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
-	if h == nil {
-		return nil
-	}
-	return h.Consumer
-}
-
 func (h *HTTPLogPlugin) GetProtocols() []HTTPLogPluginProtocols {
 	if h == nil {
 		return nil
@@ -558,4 +543,18 @@ func (h *HTTPLogPlugin) GetService() *HTTPLogPluginService {
 		return nil
 	}
 	return h.Service
+}
+
+func (h *HTTPLogPlugin) GetTags() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Tags
+}
+
+func (h *HTTPLogPlugin) GetUpdatedAt() *int64 {
+	if h == nil {
+		return nil
+	}
+	return h.UpdatedAt
 }

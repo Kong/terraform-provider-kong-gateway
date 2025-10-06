@@ -21,7 +21,9 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
+	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -40,7 +42,7 @@ type PluginUDPLogResource struct {
 
 // PluginUDPLogResourceModel describes the resource data model.
 type PluginUDPLogResourceModel struct {
-	Config       tfTypes.UDPLogPluginConfig  `tfsdk:"config"`
+	Config       *tfTypes.UDPLogPluginConfig `tfsdk:"config"`
 	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
@@ -65,7 +67,8 @@ func (r *PluginUDPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginUDPLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"custom_fields_by_lua": schema.MapAttribute{
 						Computed:    true,
@@ -77,13 +80,19 @@ func (r *PluginUDPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 						},
 					},
 					"host": schema.StringAttribute{
-						Required:    true,
-						Description: `A string representing a host name, such as example.com.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `A string representing a host name, such as example.com. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"port": schema.Int64Attribute{
-						Required:    true,
-						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `An integer representing a port number between 0 and 65535, inclusive. Not Null`,
 						Validators: []validator.Int64{
+							speakeasy_int64validators.NotNull(),
 							int64validator.AtMost(65535),
 						},
 					},

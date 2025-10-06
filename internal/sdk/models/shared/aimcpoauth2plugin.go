@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AiMcpOauth2PluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiMcpOauth2PluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiMcpOauth2PluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiMcpOauth2PluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiMcpOauth2PluginOrdering struct {
-	After  *AiMcpOauth2PluginAfter  `json:"after,omitempty"`
-	Before *AiMcpOauth2PluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiMcpOauth2PluginOrdering) GetAfter() *AiMcpOauth2PluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiMcpOauth2PluginOrdering) GetBefore() *AiMcpOauth2PluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiMcpOauth2PluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiMcpOauth2PluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiMcpOauth2PluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiMcpOauth2PluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type ClaimToHeader struct {
 	// The claim name to be used in the access token.
 	Claim string `json:"claim"`
@@ -502,6 +432,76 @@ func (a *AiMcpOauth2PluginConfig) GetTLSClientAuthSslVerify() *bool {
 	return a.TLSClientAuthSslVerify
 }
 
+type AiMcpOauth2PluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiMcpOauth2PluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiMcpOauth2PluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiMcpOauth2PluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiMcpOauth2PluginOrdering struct {
+	After  *AiMcpOauth2PluginAfter  `json:"after,omitempty"`
+	Before *AiMcpOauth2PluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiMcpOauth2PluginOrdering) GetAfter() *AiMcpOauth2PluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiMcpOauth2PluginOrdering) GetBefore() *AiMcpOauth2PluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiMcpOauth2PluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiMcpOauth2PluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiMcpOauth2PluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiMcpOauth2PluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AiMcpOauth2PluginProtocols string
 
 const (
@@ -558,8 +558,9 @@ func (a *AiMcpOauth2PluginService) GetID() *string {
 	return a.ID
 }
 
-// AiMcpOauth2Plugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiMcpOauth2Plugin struct {
+	// The configuration for MCP authorization in OAuth2. If this is enabled, make sure the configured metadata_endpoint is also covered by the same route so the authorization can be applied correctly.
+	Config *AiMcpOauth2PluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -568,22 +569,20 @@ type AiMcpOauth2Plugin struct {
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
 	InstanceName *string                    `json:"instance_name,omitempty"`
-	name         string                     `const:"ai-mcp-oauth-2" json:"name"`
+	name         string                     `const:"ai-mcp-oauth2" json:"name"`
 	Ordering     *AiMcpOauth2PluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiMcpOauth2PluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
-	// The configuration for MCP authorization in OAuth2. If this is enabled, make sure the configured metadata_endpoint is also covered by the same route so the authorization can be applied correctly.
-	Config *AiMcpOauth2PluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiMcpOauth2PluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiMcpOauth2PluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiMcpOauth2PluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiMcpOauth2Plugin) MarshalJSON() ([]byte, error) {
@@ -595,6 +594,13 @@ func (a *AiMcpOauth2Plugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiMcpOauth2Plugin) GetConfig() *AiMcpOauth2PluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
 }
 
 func (a *AiMcpOauth2Plugin) GetCreatedAt() *int64 {
@@ -626,7 +632,7 @@ func (a *AiMcpOauth2Plugin) GetInstanceName() *string {
 }
 
 func (a *AiMcpOauth2Plugin) GetName() string {
-	return "ai-mcp-oauth-2"
+	return "ai-mcp-oauth2"
 }
 
 func (a *AiMcpOauth2Plugin) GetOrdering() *AiMcpOauth2PluginOrdering {
@@ -641,27 +647,6 @@ func (a *AiMcpOauth2Plugin) GetPartials() []AiMcpOauth2PluginPartials {
 		return nil
 	}
 	return a.Partials
-}
-
-func (a *AiMcpOauth2Plugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiMcpOauth2Plugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
-}
-
-func (a *AiMcpOauth2Plugin) GetConfig() *AiMcpOauth2PluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
 }
 
 func (a *AiMcpOauth2Plugin) GetProtocols() []AiMcpOauth2PluginProtocols {
@@ -683,4 +668,18 @@ func (a *AiMcpOauth2Plugin) GetService() *AiMcpOauth2PluginService {
 		return nil
 	}
 	return a.Service
+}
+
+func (a *AiMcpOauth2Plugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiMcpOauth2Plugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
 }

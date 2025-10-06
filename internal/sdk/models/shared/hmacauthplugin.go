@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type HmacAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HmacAuthPluginAfter) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HmacAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HmacAuthPluginBefore) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HmacAuthPluginOrdering struct {
-	After  *HmacAuthPluginAfter  `json:"after,omitempty"`
-	Before *HmacAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (h *HmacAuthPluginOrdering) GetAfter() *HmacAuthPluginAfter {
-	if h == nil {
-		return nil
-	}
-	return h.After
-}
-
-func (h *HmacAuthPluginOrdering) GetBefore() *HmacAuthPluginBefore {
-	if h == nil {
-		return nil
-	}
-	return h.Before
-}
-
-type HmacAuthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (h *HmacAuthPluginPartials) GetID() *string {
-	if h == nil {
-		return nil
-	}
-	return h.ID
-}
-
-func (h *HmacAuthPluginPartials) GetName() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Name
-}
-
-func (h *HmacAuthPluginPartials) GetPath() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Path
-}
-
 type Algorithms string
 
 const (
@@ -176,6 +106,76 @@ func (h *HmacAuthPluginConfig) GetValidateRequestBody() *bool {
 	return h.ValidateRequestBody
 }
 
+type HmacAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HmacAuthPluginAfter) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HmacAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HmacAuthPluginBefore) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HmacAuthPluginOrdering struct {
+	After  *HmacAuthPluginAfter  `json:"after,omitempty"`
+	Before *HmacAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (h *HmacAuthPluginOrdering) GetAfter() *HmacAuthPluginAfter {
+	if h == nil {
+		return nil
+	}
+	return h.After
+}
+
+func (h *HmacAuthPluginOrdering) GetBefore() *HmacAuthPluginBefore {
+	if h == nil {
+		return nil
+	}
+	return h.Before
+}
+
+type HmacAuthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (h *HmacAuthPluginPartials) GetID() *string {
+	if h == nil {
+		return nil
+	}
+	return h.ID
+}
+
+func (h *HmacAuthPluginPartials) GetName() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Name
+}
+
+func (h *HmacAuthPluginPartials) GetPath() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Path
+}
+
 type HmacAuthPluginProtocols string
 
 const (
@@ -238,8 +238,8 @@ func (h *HmacAuthPluginService) GetID() *string {
 	return h.ID
 }
 
-// HmacAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HmacAuthPlugin struct {
+	Config *HmacAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -252,17 +252,16 @@ type HmacAuthPlugin struct {
 	Ordering     *HmacAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []HmacAuthPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                `json:"updated_at,omitempty"`
-	Config    *HmacAuthPluginConfig `json:"config,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []HmacAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *HmacAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *HmacAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (h HmacAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -274,6 +273,13 @@ func (h *HmacAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (h *HmacAuthPlugin) GetConfig() *HmacAuthPluginConfig {
+	if h == nil {
+		return nil
+	}
+	return h.Config
 }
 
 func (h *HmacAuthPlugin) GetCreatedAt() *int64 {
@@ -322,27 +328,6 @@ func (h *HmacAuthPlugin) GetPartials() []HmacAuthPluginPartials {
 	return h.Partials
 }
 
-func (h *HmacAuthPlugin) GetTags() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Tags
-}
-
-func (h *HmacAuthPlugin) GetUpdatedAt() *int64 {
-	if h == nil {
-		return nil
-	}
-	return h.UpdatedAt
-}
-
-func (h *HmacAuthPlugin) GetConfig() *HmacAuthPluginConfig {
-	if h == nil {
-		return nil
-	}
-	return h.Config
-}
-
 func (h *HmacAuthPlugin) GetProtocols() []HmacAuthPluginProtocols {
 	if h == nil {
 		return nil
@@ -362,4 +347,18 @@ func (h *HmacAuthPlugin) GetService() *HmacAuthPluginService {
 		return nil
 	}
 	return h.Service
+}
+
+func (h *HmacAuthPlugin) GetTags() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Tags
+}
+
+func (h *HmacAuthPlugin) GetUpdatedAt() *int64 {
+	if h == nil {
+		return nil
+	}
+	return h.UpdatedAt
 }

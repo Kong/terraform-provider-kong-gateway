@@ -168,16 +168,18 @@ func (r *PluginRequestTransformerAdvancedResourceModel) RefreshFromSharedRequest
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -290,96 +292,6 @@ func (r *PluginRequestTransformerAdvancedResourceModel) ToOperationsUpdateReques
 func (r *PluginRequestTransformerAdvancedResourceModel) ToSharedRequestTransformerAdvancedPlugin(ctx context.Context) (*shared.RequestTransformerAdvancedPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.RequestTransformerAdvancedPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.RequestTransformerAdvancedPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.RequestTransformerAdvancedPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.RequestTransformerAdvancedPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.RequestTransformerAdvancedPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.RequestTransformerAdvancedPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	partials := make([]shared.RequestTransformerAdvancedPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.RequestTransformerAdvancedPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.RequestTransformerAdvancedPluginConfig
 	if r.Config != nil {
 		var add *shared.RequestTransformerAdvancedPluginAdd
@@ -539,26 +451,106 @@ func (r *PluginRequestTransformerAdvancedResourceModel) ToSharedRequestTransform
 	}
 	var consumer *shared.RequestTransformerAdvancedPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.RequestTransformerAdvancedPluginConsumer{
-			ID: id2,
+			ID: id,
 		}
 	}
 	var consumerGroup *shared.RequestTransformerAdvancedPluginConsumerGroup
 	if r.ConsumerGroup != nil {
-		id3 := new(string)
+		id1 := new(string)
 		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id3 = r.ConsumerGroup.ID.ValueString()
+			*id1 = r.ConsumerGroup.ID.ValueString()
 		} else {
-			id3 = nil
+			id1 = nil
 		}
 		consumerGroup = &shared.RequestTransformerAdvancedPluginConsumerGroup{
-			ID: id3,
+			ID: id1,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id2 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id2 = r.ID.ValueString()
+	} else {
+		id2 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.RequestTransformerAdvancedPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.RequestTransformerAdvancedPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.RequestTransformerAdvancedPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.RequestTransformerAdvancedPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.RequestTransformerAdvancedPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.RequestTransformerAdvancedPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.RequestTransformerAdvancedPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.RequestTransformerAdvancedPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id3 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id3 = partialsItem.ID.ValueString()
+			} else {
+				id3 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.RequestTransformerAdvancedPluginPartials{
+				ID:   id3,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.RequestTransformerAdvancedPluginProtocols, 0, len(r.Protocols))
@@ -589,21 +581,34 @@ func (r *PluginRequestTransformerAdvancedResourceModel) ToSharedRequestTransform
 			ID: id5,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.RequestTransformerAdvancedPlugin{
-		CreatedAt:     createdAt,
-		Enabled:       enabled,
-		ID:            id,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id2,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

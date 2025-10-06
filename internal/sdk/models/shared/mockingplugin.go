@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type MockingPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (m *MockingPluginAfter) GetAccess() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Access
-}
-
-type MockingPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (m *MockingPluginBefore) GetAccess() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Access
-}
-
-type MockingPluginOrdering struct {
-	After  *MockingPluginAfter  `json:"after,omitempty"`
-	Before *MockingPluginBefore `json:"before,omitempty"`
-}
-
-func (m *MockingPluginOrdering) GetAfter() *MockingPluginAfter {
-	if m == nil {
-		return nil
-	}
-	return m.After
-}
-
-func (m *MockingPluginOrdering) GetBefore() *MockingPluginBefore {
-	if m == nil {
-		return nil
-	}
-	return m.Before
-}
-
-type MockingPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (m *MockingPluginPartials) GetID() *string {
-	if m == nil {
-		return nil
-	}
-	return m.ID
-}
-
-func (m *MockingPluginPartials) GetName() *string {
-	if m == nil {
-		return nil
-	}
-	return m.Name
-}
-
-func (m *MockingPluginPartials) GetPath() *string {
-	if m == nil {
-		return nil
-	}
-	return m.Path
-}
-
 type MockingPluginConfig struct {
 	// The contents of the specification file. You must use this option for hybrid or DB-less mode. You can include the full specification as part of the configuration. In Kong Manager, you can copy and paste the contents of the spec directly into the `Config.Api Specification` text field.
 	APISpecification *string `json:"api_specification,omitempty"`
@@ -183,6 +113,76 @@ func (m *MockingPluginConsumer) GetID() *string {
 	return m.ID
 }
 
+type MockingPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (m *MockingPluginAfter) GetAccess() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Access
+}
+
+type MockingPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (m *MockingPluginBefore) GetAccess() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Access
+}
+
+type MockingPluginOrdering struct {
+	After  *MockingPluginAfter  `json:"after,omitempty"`
+	Before *MockingPluginBefore `json:"before,omitempty"`
+}
+
+func (m *MockingPluginOrdering) GetAfter() *MockingPluginAfter {
+	if m == nil {
+		return nil
+	}
+	return m.After
+}
+
+func (m *MockingPluginOrdering) GetBefore() *MockingPluginBefore {
+	if m == nil {
+		return nil
+	}
+	return m.Before
+}
+
+type MockingPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (m *MockingPluginPartials) GetID() *string {
+	if m == nil {
+		return nil
+	}
+	return m.ID
+}
+
+func (m *MockingPluginPartials) GetName() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Name
+}
+
+func (m *MockingPluginPartials) GetPath() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Path
+}
+
 type MockingPluginProtocols string
 
 const (
@@ -239,8 +239,10 @@ func (m *MockingPluginService) GetID() *string {
 	return m.ID
 }
 
-// MockingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type MockingPlugin struct {
+	Config *MockingPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *MockingPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -253,19 +255,16 @@ type MockingPlugin struct {
 	Ordering     *MockingPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []MockingPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *MockingPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *MockingPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []MockingPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *MockingPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *MockingPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (m MockingPlugin) MarshalJSON() ([]byte, error) {
@@ -277,6 +276,20 @@ func (m *MockingPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (m *MockingPlugin) GetConfig() *MockingPluginConfig {
+	if m == nil {
+		return nil
+	}
+	return m.Config
+}
+
+func (m *MockingPlugin) GetConsumer() *MockingPluginConsumer {
+	if m == nil {
+		return nil
+	}
+	return m.Consumer
 }
 
 func (m *MockingPlugin) GetCreatedAt() *int64 {
@@ -325,34 +338,6 @@ func (m *MockingPlugin) GetPartials() []MockingPluginPartials {
 	return m.Partials
 }
 
-func (m *MockingPlugin) GetTags() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Tags
-}
-
-func (m *MockingPlugin) GetUpdatedAt() *int64 {
-	if m == nil {
-		return nil
-	}
-	return m.UpdatedAt
-}
-
-func (m *MockingPlugin) GetConfig() *MockingPluginConfig {
-	if m == nil {
-		return nil
-	}
-	return m.Config
-}
-
-func (m *MockingPlugin) GetConsumer() *MockingPluginConsumer {
-	if m == nil {
-		return nil
-	}
-	return m.Consumer
-}
-
 func (m *MockingPlugin) GetProtocols() []MockingPluginProtocols {
 	if m == nil {
 		return nil
@@ -372,4 +357,18 @@ func (m *MockingPlugin) GetService() *MockingPluginService {
 		return nil
 	}
 	return m.Service
+}
+
+func (m *MockingPlugin) GetTags() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Tags
+}
+
+func (m *MockingPlugin) GetUpdatedAt() *int64 {
+	if m == nil {
+		return nil
+	}
+	return m.UpdatedAt
 }

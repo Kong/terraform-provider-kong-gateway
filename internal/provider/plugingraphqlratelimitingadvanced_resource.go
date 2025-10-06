@@ -18,6 +18,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -37,20 +39,20 @@ type PluginGraphqlRateLimitingAdvancedResource struct {
 
 // PluginGraphqlRateLimitingAdvancedResourceModel describes the resource data model.
 type PluginGraphqlRateLimitingAdvancedResourceModel struct {
-	Config       tfTypes.GraphqlRateLimitingAdvancedPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                                    `tfsdk:"consumer"`
-	CreatedAt    types.Int64                                     `tfsdk:"created_at"`
-	Enabled      types.Bool                                      `tfsdk:"enabled"`
-	ID           types.String                                    `tfsdk:"id"`
-	InstanceName types.String                                    `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering                      `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials                     `tfsdk:"partials"`
-	Protocols    []types.String                                  `tfsdk:"protocols"`
-	Route        *tfTypes.Set                                    `tfsdk:"route"`
-	Service      *tfTypes.Set                                    `tfsdk:"service"`
-	Tags         []types.String                                  `tfsdk:"tags"`
-	UpdatedAt    types.Int64                                     `tfsdk:"updated_at"`
-	Workspace    types.String                                    `tfsdk:"workspace"`
+	Config       *tfTypes.GraphqlRateLimitingAdvancedPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                                     `tfsdk:"consumer"`
+	CreatedAt    types.Int64                                      `tfsdk:"created_at"`
+	Enabled      types.Bool                                       `tfsdk:"enabled"`
+	ID           types.String                                     `tfsdk:"id"`
+	InstanceName types.String                                     `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering                       `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials                      `tfsdk:"partials"`
+	Protocols    []types.String                                   `tfsdk:"protocols"`
+	Route        *tfTypes.Set                                     `tfsdk:"route"`
+	Service      *tfTypes.Set                                     `tfsdk:"service"`
+	Tags         []types.String                                   `tfsdk:"tags"`
+	UpdatedAt    types.Int64                                      `tfsdk:"updated_at"`
+	Workspace    types.String                                     `tfsdk:"workspace"`
 }
 
 func (r *PluginGraphqlRateLimitingAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,7 +64,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 		MarkdownDescription: "PluginGraphqlRateLimitingAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"cost_strategy": schema.StringAttribute{
 						Computed:    true,
@@ -98,9 +101,13 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 						},
 					},
 					"limit": schema.ListAttribute{
-						Required:    true,
+						Computed:    true,
+						Optional:    true,
 						ElementType: types.Float64Type,
-						Description: `One or more requests-per-window limits to apply.`,
+						Description: `One or more requests-per-window limits to apply. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"max_cost": schema.Float64Attribute{
 						Computed:    true,
@@ -310,13 +317,21 @@ func (r *PluginGraphqlRateLimitingAdvancedResource) Schema(ctx context.Context, 
 						},
 					},
 					"sync_rate": schema.Float64Attribute{
-						Required:    true,
-						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 syncs the counters in that many number of seconds.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 syncs the counters in that many number of seconds. Not Null`,
+						Validators: []validator.Float64{
+							speakeasy_float64validators.NotNull(),
+						},
 					},
 					"window_size": schema.ListAttribute{
-						Required:    true,
+						Computed:    true,
+						Optional:    true,
 						ElementType: types.Float64Type,
-						Description: `One or more window sizes to apply a limit to (defined in seconds).`,
+						Description: `One or more window sizes to apply a limit to (defined in seconds). Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"window_type": schema.StringAttribute{
 						Computed:    true,

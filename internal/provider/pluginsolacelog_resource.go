@@ -21,6 +21,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -41,19 +42,19 @@ type PluginSolaceLogResource struct {
 
 // PluginSolaceLogResourceModel describes the resource data model.
 type PluginSolaceLogResourceModel struct {
-	Config       tfTypes.SolaceLogPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                   `tfsdk:"created_at"`
-	Enabled      types.Bool                    `tfsdk:"enabled"`
-	ID           types.String                  `tfsdk:"id"`
-	InstanceName types.String                  `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering    `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials   `tfsdk:"partials"`
-	Protocols    []types.String                `tfsdk:"protocols"`
-	Route        *tfTypes.Set                  `tfsdk:"route"`
-	Service      *tfTypes.Set                  `tfsdk:"service"`
-	Tags         []types.String                `tfsdk:"tags"`
-	UpdatedAt    types.Int64                   `tfsdk:"updated_at"`
-	Workspace    types.String                  `tfsdk:"workspace"`
+	Config       *tfTypes.SolaceLogPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                    `tfsdk:"created_at"`
+	Enabled      types.Bool                     `tfsdk:"enabled"`
+	ID           types.String                   `tfsdk:"id"`
+	InstanceName types.String                   `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials    `tfsdk:"partials"`
+	Protocols    []types.String                 `tfsdk:"protocols"`
+	Route        *tfTypes.Set                   `tfsdk:"route"`
+	Service      *tfTypes.Set                   `tfsdk:"service"`
+	Tags         []types.String                 `tfsdk:"tags"`
+	UpdatedAt    types.Int64                    `tfsdk:"updated_at"`
+	Workspace    types.String                   `tfsdk:"workspace"`
 }
 
 func (r *PluginSolaceLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,10 +66,12 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 		MarkdownDescription: "PluginSolaceLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"message": schema.SingleNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						Attributes: map[string]schema.Attribute{
 							"ack_timeout": schema.Int64Attribute{
 								Computed:    true,
@@ -99,7 +102,8 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 								},
 							},
 							"destinations": schema.ListNestedAttribute{
-								Required: true,
+								Computed: true,
+								Optional: true,
 								NestedObject: schema.NestedAttributeObject{
 									Validators: []validator.Object{
 										speakeasy_objectvalidators.NotNull(),
@@ -126,7 +130,10 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 										},
 									},
 								},
-								Description: `The log message destinations.`,
+								Description: `The log message destinations. Not Null`,
+								Validators: []validator.List{
+									speakeasy_listvalidators.NotNull(),
+								},
 							},
 							"dmq_eligible": schema.BoolAttribute{
 								Computed:    true,
@@ -162,10 +169,14 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 								Description: `Sets the time to live (TTL) in milliseconds for the log message. Setting the time to live to zero disables the TTL for the log message.`,
 							},
 						},
-						Description: `The log message related configuration.`,
+						Description: `The log message related configuration. Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
+						},
 					},
 					"session": schema.SingleNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						Attributes: map[string]schema.Attribute{
 							"authentication": schema.SingleNestedAttribute{
 								Computed: true,
@@ -254,8 +265,12 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 								Description: `When enabled, a sequence number is automatically included (if not already present) in the Solace-defined fields for each message sent.`,
 							},
 							"host": schema.StringAttribute{
-								Required:    true,
-								Description: `The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry).`,
+								Computed:    true,
+								Optional:    true,
+								Description: `The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry). Not Null`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+								},
 							},
 							"properties": schema.MapAttribute{
 								Computed:    true,
@@ -280,7 +295,10 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 								},
 							},
 						},
-						Description: `Session related configuration.`,
+						Description: `Session related configuration. Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
+						},
 					},
 				},
 			},

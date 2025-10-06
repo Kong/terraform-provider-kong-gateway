@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -37,21 +38,21 @@ type PluginAiPromptTemplateResource struct {
 
 // PluginAiPromptTemplateResourceModel describes the resource data model.
 type PluginAiPromptTemplateResourceModel struct {
-	Config        tfTypes.AiPromptTemplatePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                          `tfsdk:"created_at"`
-	Enabled       types.Bool                           `tfsdk:"enabled"`
-	ID            types.String                         `tfsdk:"id"`
-	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials          `tfsdk:"partials"`
-	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.Set                         `tfsdk:"route"`
-	Service       *tfTypes.Set                         `tfsdk:"service"`
-	Tags          []types.String                       `tfsdk:"tags"`
-	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
-	Workspace     types.String                         `tfsdk:"workspace"`
+	Config        *tfTypes.AiPromptTemplatePluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                          `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                          `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                           `tfsdk:"created_at"`
+	Enabled       types.Bool                            `tfsdk:"enabled"`
+	ID            types.String                          `tfsdk:"id"`
+	InstanceName  types.String                          `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering            `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials           `tfsdk:"partials"`
+	Protocols     []types.String                        `tfsdk:"protocols"`
+	Route         *tfTypes.Set                          `tfsdk:"route"`
+	Service       *tfTypes.Set                          `tfsdk:"service"`
+	Tags          []types.String                        `tfsdk:"tags"`
+	UpdatedAt     types.Int64                           `tfsdk:"updated_at"`
+	Workspace     types.String                          `tfsdk:"workspace"`
 }
 
 func (r *PluginAiPromptTemplateResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -63,7 +64,8 @@ func (r *PluginAiPromptTemplateResource) Schema(ctx context.Context, req resourc
 		MarkdownDescription: "PluginAiPromptTemplate Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"allow_untemplated_requests": schema.BoolAttribute{
 						Computed:    true,
@@ -81,7 +83,8 @@ func (r *PluginAiPromptTemplateResource) Schema(ctx context.Context, req resourc
 						Description: `max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.`,
 					},
 					"templates": schema.ListNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -105,7 +108,10 @@ func (r *PluginAiPromptTemplateResource) Schema(ctx context.Context, req resourc
 								},
 							},
 						},
-						Description: `Array of templates available to the request context.`,
+						Description: `Array of templates available to the request context. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 				},
 			},

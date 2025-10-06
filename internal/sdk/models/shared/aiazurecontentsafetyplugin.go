@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AiAzureContentSafetyPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiAzureContentSafetyPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiAzureContentSafetyPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiAzureContentSafetyPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiAzureContentSafetyPluginOrdering struct {
-	After  *AiAzureContentSafetyPluginAfter  `json:"after,omitempty"`
-	Before *AiAzureContentSafetyPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiAzureContentSafetyPluginOrdering) GetAfter() *AiAzureContentSafetyPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiAzureContentSafetyPluginOrdering) GetBefore() *AiAzureContentSafetyPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiAzureContentSafetyPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiAzureContentSafetyPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiAzureContentSafetyPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiAzureContentSafetyPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type Categories struct {
 	Name           string `json:"name"`
 	RejectionLevel int64  `json:"rejection_level"`
@@ -328,6 +258,76 @@ func (a *AiAzureContentSafetyPluginConfig) GetTextSource() *AiAzureContentSafety
 	return a.TextSource
 }
 
+type AiAzureContentSafetyPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiAzureContentSafetyPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiAzureContentSafetyPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiAzureContentSafetyPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiAzureContentSafetyPluginOrdering struct {
+	After  *AiAzureContentSafetyPluginAfter  `json:"after,omitempty"`
+	Before *AiAzureContentSafetyPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiAzureContentSafetyPluginOrdering) GetAfter() *AiAzureContentSafetyPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiAzureContentSafetyPluginOrdering) GetBefore() *AiAzureContentSafetyPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiAzureContentSafetyPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiAzureContentSafetyPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiAzureContentSafetyPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiAzureContentSafetyPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AiAzureContentSafetyPluginProtocols string
 
 const (
@@ -384,8 +384,8 @@ func (a *AiAzureContentSafetyPluginService) GetID() *string {
 	return a.ID
 }
 
-// AiAzureContentSafetyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiAzureContentSafetyPlugin struct {
+	Config *AiAzureContentSafetyPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -398,17 +398,16 @@ type AiAzureContentSafetyPlugin struct {
 	Ordering     *AiAzureContentSafetyPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiAzureContentSafetyPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                           `json:"updated_at,omitempty"`
-	Config    AiAzureContentSafetyPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiAzureContentSafetyPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiAzureContentSafetyPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiAzureContentSafetyPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiAzureContentSafetyPlugin) MarshalJSON() ([]byte, error) {
@@ -416,10 +415,17 @@ func (a AiAzureContentSafetyPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiAzureContentSafetyPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AiAzureContentSafetyPlugin) GetConfig() *AiAzureContentSafetyPluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
 }
 
 func (a *AiAzureContentSafetyPlugin) GetCreatedAt() *int64 {
@@ -468,27 +474,6 @@ func (a *AiAzureContentSafetyPlugin) GetPartials() []AiAzureContentSafetyPluginP
 	return a.Partials
 }
 
-func (a *AiAzureContentSafetyPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiAzureContentSafetyPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
-}
-
-func (a *AiAzureContentSafetyPlugin) GetConfig() AiAzureContentSafetyPluginConfig {
-	if a == nil {
-		return AiAzureContentSafetyPluginConfig{}
-	}
-	return a.Config
-}
-
 func (a *AiAzureContentSafetyPlugin) GetProtocols() []AiAzureContentSafetyPluginProtocols {
 	if a == nil {
 		return nil
@@ -508,4 +493,18 @@ func (a *AiAzureContentSafetyPlugin) GetService() *AiAzureContentSafetyPluginSer
 		return nil
 	}
 	return a.Service
+}
+
+func (a *AiAzureContentSafetyPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiAzureContentSafetyPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
 }

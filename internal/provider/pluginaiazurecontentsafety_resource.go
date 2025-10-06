@@ -38,19 +38,19 @@ type PluginAiAzureContentSafetyResource struct {
 
 // PluginAiAzureContentSafetyResourceModel describes the resource data model.
 type PluginAiAzureContentSafetyResourceModel struct {
-	Config       tfTypes.AiAzureContentSafetyPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                              `tfsdk:"created_at"`
-	Enabled      types.Bool                               `tfsdk:"enabled"`
-	ID           types.String                             `tfsdk:"id"`
-	InstanceName types.String                             `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering               `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials              `tfsdk:"partials"`
-	Protocols    []types.String                           `tfsdk:"protocols"`
-	Route        *tfTypes.Set                             `tfsdk:"route"`
-	Service      *tfTypes.Set                             `tfsdk:"service"`
-	Tags         []types.String                           `tfsdk:"tags"`
-	UpdatedAt    types.Int64                              `tfsdk:"updated_at"`
-	Workspace    types.String                             `tfsdk:"workspace"`
+	Config       *tfTypes.AiAzureContentSafetyPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                               `tfsdk:"created_at"`
+	Enabled      types.Bool                                `tfsdk:"enabled"`
+	ID           types.String                              `tfsdk:"id"`
+	InstanceName types.String                              `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering                `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials               `tfsdk:"partials"`
+	Protocols    []types.String                            `tfsdk:"protocols"`
+	Route        *tfTypes.Set                              `tfsdk:"route"`
+	Service      *tfTypes.Set                              `tfsdk:"service"`
+	Tags         []types.String                            `tfsdk:"tags"`
+	UpdatedAt    types.Int64                               `tfsdk:"updated_at"`
+	Workspace    types.String                              `tfsdk:"workspace"`
 }
 
 func (r *PluginAiAzureContentSafetyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,7 +62,8 @@ func (r *PluginAiAzureContentSafetyResource) Schema(ctx context.Context, req res
 		MarkdownDescription: "PluginAiAzureContentSafety Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"azure_api_version": schema.StringAttribute{
 						Computed:    true,
@@ -132,8 +133,12 @@ func (r *PluginAiAzureContentSafetyResource) Schema(ctx context.Context, req res
 						Description: `If ` + "`" + `azure_use_managed_identity` + "`" + ` is true, set the API key to call Content Safety.`,
 					},
 					"content_safety_url": schema.StringAttribute{
-						Required:    true,
-						Description: `Full URL, inc protocol, of the Azure Content Safety instance.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `Full URL, inc protocol, of the Azure Content Safety instance. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"guarding_mode": schema.StringAttribute{
 						Computed:    true,

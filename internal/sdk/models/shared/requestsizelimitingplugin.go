@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RequestSizeLimitingPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestSizeLimitingPluginAfter) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestSizeLimitingPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestSizeLimitingPluginBefore) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestSizeLimitingPluginOrdering struct {
-	After  *RequestSizeLimitingPluginAfter  `json:"after,omitempty"`
-	Before *RequestSizeLimitingPluginBefore `json:"before,omitempty"`
-}
-
-func (r *RequestSizeLimitingPluginOrdering) GetAfter() *RequestSizeLimitingPluginAfter {
-	if r == nil {
-		return nil
-	}
-	return r.After
-}
-
-func (r *RequestSizeLimitingPluginOrdering) GetBefore() *RequestSizeLimitingPluginBefore {
-	if r == nil {
-		return nil
-	}
-	return r.Before
-}
-
-type RequestSizeLimitingPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (r *RequestSizeLimitingPluginPartials) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-func (r *RequestSizeLimitingPluginPartials) GetName() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Name
-}
-
-func (r *RequestSizeLimitingPluginPartials) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
 // SizeUnit - Size unit can be set either in `bytes`, `kilobytes`, or `megabytes` (default). This configuration is not available in versions prior to Kong Gateway 1.3 and Kong Gateway (OSS) 2.0.
 type SizeUnit string
 
@@ -150,6 +80,76 @@ func (r *RequestSizeLimitingPluginConsumer) GetID() *string {
 	return r.ID
 }
 
+type RequestSizeLimitingPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestSizeLimitingPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestSizeLimitingPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestSizeLimitingPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestSizeLimitingPluginOrdering struct {
+	After  *RequestSizeLimitingPluginAfter  `json:"after,omitempty"`
+	Before *RequestSizeLimitingPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestSizeLimitingPluginOrdering) GetAfter() *RequestSizeLimitingPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestSizeLimitingPluginOrdering) GetBefore() *RequestSizeLimitingPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestSizeLimitingPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestSizeLimitingPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestSizeLimitingPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestSizeLimitingPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
 type RequestSizeLimitingPluginProtocols string
 
 const (
@@ -206,8 +206,10 @@ func (r *RequestSizeLimitingPluginService) GetID() *string {
 	return r.ID
 }
 
-// RequestSizeLimitingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestSizeLimitingPlugin struct {
+	Config *RequestSizeLimitingPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RequestSizeLimitingPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -220,19 +222,16 @@ type RequestSizeLimitingPlugin struct {
 	Ordering     *RequestSizeLimitingPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RequestSizeLimitingPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                           `json:"updated_at,omitempty"`
-	Config    *RequestSizeLimitingPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RequestSizeLimitingPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RequestSizeLimitingPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestSizeLimitingPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestSizeLimitingPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestSizeLimitingPlugin) MarshalJSON() ([]byte, error) {
@@ -244,6 +243,20 @@ func (r *RequestSizeLimitingPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RequestSizeLimitingPlugin) GetConfig() *RequestSizeLimitingPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RequestSizeLimitingPlugin) GetConsumer() *RequestSizeLimitingPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
 }
 
 func (r *RequestSizeLimitingPlugin) GetCreatedAt() *int64 {
@@ -292,34 +305,6 @@ func (r *RequestSizeLimitingPlugin) GetPartials() []RequestSizeLimitingPluginPar
 	return r.Partials
 }
 
-func (r *RequestSizeLimitingPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RequestSizeLimitingPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
-}
-
-func (r *RequestSizeLimitingPlugin) GetConfig() *RequestSizeLimitingPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *RequestSizeLimitingPlugin) GetConsumer() *RequestSizeLimitingPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
 func (r *RequestSizeLimitingPlugin) GetProtocols() []RequestSizeLimitingPluginProtocols {
 	if r == nil {
 		return nil
@@ -339,4 +324,18 @@ func (r *RequestSizeLimitingPlugin) GetService() *RequestSizeLimitingPluginServi
 		return nil
 	}
 	return r.Service
+}
+
+func (r *RequestSizeLimitingPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RequestSizeLimitingPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
 }

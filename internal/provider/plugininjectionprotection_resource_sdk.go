@@ -72,16 +72,18 @@ func (r *PluginInjectionProtectionResourceModel) RefreshFromSharedInjectionProte
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -194,6 +196,56 @@ func (r *PluginInjectionProtectionResourceModel) ToOperationsUpdateInjectionprot
 func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlugin(ctx context.Context) (*shared.InjectionProtectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.InjectionProtectionPluginConfig
+	if r.Config != nil {
+		customInjections := make([]shared.CustomInjections, 0, len(r.Config.CustomInjections))
+		for _, customInjectionsItem := range r.Config.CustomInjections {
+			var name string
+			name = customInjectionsItem.Name.ValueString()
+
+			var regex string
+			regex = customInjectionsItem.Regex.ValueString()
+
+			customInjections = append(customInjections, shared.CustomInjections{
+				Name:  name,
+				Regex: regex,
+			})
+		}
+		enforcementMode := new(shared.EnforcementMode)
+		if !r.Config.EnforcementMode.IsUnknown() && !r.Config.EnforcementMode.IsNull() {
+			*enforcementMode = shared.EnforcementMode(r.Config.EnforcementMode.ValueString())
+		} else {
+			enforcementMode = nil
+		}
+		errorMessage := new(string)
+		if !r.Config.ErrorMessage.IsUnknown() && !r.Config.ErrorMessage.IsNull() {
+			*errorMessage = r.Config.ErrorMessage.ValueString()
+		} else {
+			errorMessage = nil
+		}
+		errorStatusCode := new(int64)
+		if !r.Config.ErrorStatusCode.IsUnknown() && !r.Config.ErrorStatusCode.IsNull() {
+			*errorStatusCode = r.Config.ErrorStatusCode.ValueInt64()
+		} else {
+			errorStatusCode = nil
+		}
+		injectionTypes := make([]shared.InjectionTypes, 0, len(r.Config.InjectionTypes))
+		for _, injectionTypesItem := range r.Config.InjectionTypes {
+			injectionTypes = append(injectionTypes, shared.InjectionTypes(injectionTypesItem.ValueString()))
+		}
+		locations := make([]shared.Locations, 0, len(r.Config.Locations))
+		for _, locationsItem := range r.Config.Locations {
+			locations = append(locations, shared.Locations(locationsItem.ValueString()))
+		}
+		config = &shared.InjectionProtectionPluginConfig{
+			CustomInjections: customInjections,
+			EnforcementMode:  enforcementMode,
+			ErrorMessage:     errorMessage,
+			ErrorStatusCode:  errorStatusCode,
+			InjectionTypes:   injectionTypes,
+			Locations:        locations,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -245,93 +297,33 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 			Before: before,
 		}
 	}
-	partials := make([]shared.InjectionProtectionPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.InjectionProtectionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.InjectionProtectionPluginConfig
-	if r.Config != nil {
-		customInjections := make([]shared.CustomInjections, 0, len(r.Config.CustomInjections))
-		for _, customInjectionsItem := range r.Config.CustomInjections {
-			var name1 string
-			name1 = customInjectionsItem.Name.ValueString()
-
-			var regex string
-			regex = customInjectionsItem.Regex.ValueString()
-
-			customInjections = append(customInjections, shared.CustomInjections{
-				Name:  name1,
-				Regex: regex,
+	var partials []shared.InjectionProtectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.InjectionProtectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name1 := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name1 = partialsItem.Name.ValueString()
+			} else {
+				name1 = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.InjectionProtectionPluginPartials{
+				ID:   id1,
+				Name: name1,
+				Path: path,
 			})
-		}
-		enforcementMode := new(shared.EnforcementMode)
-		if !r.Config.EnforcementMode.IsUnknown() && !r.Config.EnforcementMode.IsNull() {
-			*enforcementMode = shared.EnforcementMode(r.Config.EnforcementMode.ValueString())
-		} else {
-			enforcementMode = nil
-		}
-		errorMessage := new(string)
-		if !r.Config.ErrorMessage.IsUnknown() && !r.Config.ErrorMessage.IsNull() {
-			*errorMessage = r.Config.ErrorMessage.ValueString()
-		} else {
-			errorMessage = nil
-		}
-		errorStatusCode := new(int64)
-		if !r.Config.ErrorStatusCode.IsUnknown() && !r.Config.ErrorStatusCode.IsNull() {
-			*errorStatusCode = r.Config.ErrorStatusCode.ValueInt64()
-		} else {
-			errorStatusCode = nil
-		}
-		injectionTypes := make([]shared.InjectionTypes, 0, len(r.Config.InjectionTypes))
-		for _, injectionTypesItem := range r.Config.InjectionTypes {
-			injectionTypes = append(injectionTypes, shared.InjectionTypes(injectionTypesItem.ValueString()))
-		}
-		locations := make([]shared.Locations, 0, len(r.Config.Locations))
-		for _, locationsItem := range r.Config.Locations {
-			locations = append(locations, shared.Locations(locationsItem.ValueString()))
-		}
-		config = &shared.InjectionProtectionPluginConfig{
-			CustomInjections: customInjections,
-			EnforcementMode:  enforcementMode,
-			ErrorMessage:     errorMessage,
-			ErrorStatusCode:  errorStatusCode,
-			InjectionTypes:   injectionTypes,
-			Locations:        locations,
 		}
 	}
 	protocols := make([]shared.InjectionProtectionPluginProtocols, 0, len(r.Protocols))
@@ -362,19 +354,32 @@ func (r *PluginInjectionProtectionResourceModel) ToSharedInjectionProtectionPlug
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.InjectionProtectionPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

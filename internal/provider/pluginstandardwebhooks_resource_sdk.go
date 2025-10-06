@@ -15,8 +15,13 @@ func (r *PluginStandardWebhooksResourceModel) RefreshFromSharedStandardWebhooksP
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		r.Config.SecretV1 = types.StringValue(resp.Config.SecretV1)
-		r.Config.ToleranceSecond = types.Int64PointerValue(resp.Config.ToleranceSecond)
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.StandardWebhooksPluginConfig{}
+			r.Config.SecretV1 = types.StringValue(resp.Config.SecretV1)
+			r.Config.ToleranceSecond = types.Int64PointerValue(resp.Config.ToleranceSecond)
+		}
 		if resp.ConsumerGroup == nil {
 			r.ConsumerGroup = nil
 		} else {
@@ -50,16 +55,18 @@ func (r *PluginStandardWebhooksResourceModel) RefreshFromSharedStandardWebhooksP
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -172,6 +179,34 @@ func (r *PluginStandardWebhooksResourceModel) ToOperationsUpdateStandardwebhooks
 func (r *PluginStandardWebhooksResourceModel) ToSharedStandardWebhooksPlugin(ctx context.Context) (*shared.StandardWebhooksPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.StandardWebhooksPluginConfig
+	if r.Config != nil {
+		var secretV1 string
+		secretV1 = r.Config.SecretV1.ValueString()
+
+		toleranceSecond := new(int64)
+		if !r.Config.ToleranceSecond.IsUnknown() && !r.Config.ToleranceSecond.IsNull() {
+			*toleranceSecond = r.Config.ToleranceSecond.ValueInt64()
+		} else {
+			toleranceSecond = nil
+		}
+		config = &shared.StandardWebhooksPluginConfig{
+			SecretV1:        secretV1,
+			ToleranceSecond: toleranceSecond,
+		}
+	}
+	var consumerGroup *shared.StandardWebhooksPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumerGroup = &shared.StandardWebhooksPluginConsumerGroup{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -184,11 +219,11 @@ func (r *PluginStandardWebhooksResourceModel) ToSharedStandardWebhooksPlugin(ctx
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -223,68 +258,33 @@ func (r *PluginStandardWebhooksResourceModel) ToSharedStandardWebhooksPlugin(ctx
 			Before: before,
 		}
 	}
-	partials := make([]shared.StandardWebhooksPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.StandardWebhooksPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var secretV1 string
-	secretV1 = r.Config.SecretV1.ValueString()
-
-	toleranceSecond := new(int64)
-	if !r.Config.ToleranceSecond.IsUnknown() && !r.Config.ToleranceSecond.IsNull() {
-		*toleranceSecond = r.Config.ToleranceSecond.ValueInt64()
-	} else {
-		toleranceSecond = nil
-	}
-	config := shared.StandardWebhooksPluginConfig{
-		SecretV1:        secretV1,
-		ToleranceSecond: toleranceSecond,
-	}
-	var consumerGroup *shared.StandardWebhooksPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id2 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id2 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumerGroup = &shared.StandardWebhooksPluginConsumerGroup{
-			ID: id2,
+	var partials []shared.StandardWebhooksPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.StandardWebhooksPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.StandardWebhooksPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.StandardWebhooksPluginProtocols, 0, len(r.Protocols))
@@ -315,20 +315,33 @@ func (r *PluginStandardWebhooksResourceModel) ToSharedStandardWebhooksPlugin(ctx
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.StandardWebhooksPlugin{
+		Config:        config,
+		ConsumerGroup: consumerGroup,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
-		ID:            id,
+		ID:            id1,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
-		Config:        config,
-		ConsumerGroup: consumerGroup,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

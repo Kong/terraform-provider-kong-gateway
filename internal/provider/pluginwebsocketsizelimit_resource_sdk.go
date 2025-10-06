@@ -55,16 +55,18 @@ func (r *PluginWebsocketSizeLimitResourceModel) RefreshFromSharedWebsocketSizeLi
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -177,6 +179,37 @@ func (r *PluginWebsocketSizeLimitResourceModel) ToOperationsUpdateWebsocketsizel
 func (r *PluginWebsocketSizeLimitResourceModel) ToSharedWebsocketSizeLimitPlugin(ctx context.Context) (*shared.WebsocketSizeLimitPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.WebsocketSizeLimitPluginConfig
+	if r.Config != nil {
+		clientMaxPayload := new(int64)
+		if !r.Config.ClientMaxPayload.IsUnknown() && !r.Config.ClientMaxPayload.IsNull() {
+			*clientMaxPayload = r.Config.ClientMaxPayload.ValueInt64()
+		} else {
+			clientMaxPayload = nil
+		}
+		upstreamMaxPayload := new(int64)
+		if !r.Config.UpstreamMaxPayload.IsUnknown() && !r.Config.UpstreamMaxPayload.IsNull() {
+			*upstreamMaxPayload = r.Config.UpstreamMaxPayload.ValueInt64()
+		} else {
+			upstreamMaxPayload = nil
+		}
+		config = &shared.WebsocketSizeLimitPluginConfig{
+			ClientMaxPayload:   clientMaxPayload,
+			UpstreamMaxPayload: upstreamMaxPayload,
+		}
+	}
+	var consumer *shared.WebsocketSizeLimitPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.WebsocketSizeLimitPluginConsumer{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -189,11 +222,11 @@ func (r *PluginWebsocketSizeLimitResourceModel) ToSharedWebsocketSizeLimitPlugin
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -228,74 +261,33 @@ func (r *PluginWebsocketSizeLimitResourceModel) ToSharedWebsocketSizeLimitPlugin
 			Before: before,
 		}
 	}
-	partials := make([]shared.WebsocketSizeLimitPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.WebsocketSizeLimitPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.WebsocketSizeLimitPluginConfig
-	if r.Config != nil {
-		clientMaxPayload := new(int64)
-		if !r.Config.ClientMaxPayload.IsUnknown() && !r.Config.ClientMaxPayload.IsNull() {
-			*clientMaxPayload = r.Config.ClientMaxPayload.ValueInt64()
-		} else {
-			clientMaxPayload = nil
-		}
-		upstreamMaxPayload := new(int64)
-		if !r.Config.UpstreamMaxPayload.IsUnknown() && !r.Config.UpstreamMaxPayload.IsNull() {
-			*upstreamMaxPayload = r.Config.UpstreamMaxPayload.ValueInt64()
-		} else {
-			upstreamMaxPayload = nil
-		}
-		config = &shared.WebsocketSizeLimitPluginConfig{
-			ClientMaxPayload:   clientMaxPayload,
-			UpstreamMaxPayload: upstreamMaxPayload,
-		}
-	}
-	var consumer *shared.WebsocketSizeLimitPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.WebsocketSizeLimitPluginConsumer{
-			ID: id2,
+	var partials []shared.WebsocketSizeLimitPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.WebsocketSizeLimitPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.WebsocketSizeLimitPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.WebsocketSizeLimitPluginProtocols, 0, len(r.Protocols))
@@ -326,20 +318,33 @@ func (r *PluginWebsocketSizeLimitResourceModel) ToSharedWebsocketSizeLimitPlugin
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.WebsocketSizeLimitPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

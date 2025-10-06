@@ -19,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -38,21 +39,21 @@ type PluginRateLimitingAdvancedResource struct {
 
 // PluginRateLimitingAdvancedResourceModel describes the resource data model.
 type PluginRateLimitingAdvancedResourceModel struct {
-	Config        tfTypes.RateLimitingAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                             `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                             `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering               `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials              `tfsdk:"partials"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.Set                             `tfsdk:"route"`
-	Service       *tfTypes.Set                             `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
-	Workspace     types.String                             `tfsdk:"workspace"`
+	Config        *tfTypes.RateLimitingAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                              `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                               `tfsdk:"created_at"`
+	Enabled       types.Bool                                `tfsdk:"enabled"`
+	ID            types.String                              `tfsdk:"id"`
+	InstanceName  types.String                              `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering                `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials               `tfsdk:"partials"`
+	Protocols     []types.String                            `tfsdk:"protocols"`
+	Route         *tfTypes.Set                              `tfsdk:"route"`
+	Service       *tfTypes.Set                              `tfsdk:"service"`
+	Tags          []types.String                            `tfsdk:"tags"`
+	UpdatedAt     types.Int64                               `tfsdk:"updated_at"`
+	Workspace     types.String                              `tfsdk:"workspace"`
 }
 
 func (r *PluginRateLimitingAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,7 +65,8 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 		MarkdownDescription: "PluginRateLimitingAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"compound_identifier": schema.ListAttribute{
 						Computed:    true,
@@ -130,9 +132,13 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 						},
 					},
 					"limit": schema.ListAttribute{
-						Required:    true,
+						Computed:    true,
+						Optional:    true,
 						ElementType: types.Float64Type,
-						Description: `One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified.`,
+						Description: `One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"lock_dictionary_name": schema.StringAttribute{
 						Computed:    true,
@@ -393,9 +399,13 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 						},
 					},
 					"window_size": schema.ListAttribute{
-						Required:    true,
+						Computed:    true,
+						Optional:    true,
 						ElementType: types.Float64Type,
-						Description: `One or more window sizes to apply a limit to (defined in seconds). There must be a matching number of window limits and sizes specified.`,
+						Description: `One or more window sizes to apply a limit to (defined in seconds). There must be a matching number of window limits and sizes specified. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"window_type": schema.StringAttribute{
 						Computed:    true,

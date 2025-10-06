@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type DatadogPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (d *DatadogPluginAfter) GetAccess() []string {
-	if d == nil {
-		return nil
-	}
-	return d.Access
-}
-
-type DatadogPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (d *DatadogPluginBefore) GetAccess() []string {
-	if d == nil {
-		return nil
-	}
-	return d.Access
-}
-
-type DatadogPluginOrdering struct {
-	After  *DatadogPluginAfter  `json:"after,omitempty"`
-	Before *DatadogPluginBefore `json:"before,omitempty"`
-}
-
-func (d *DatadogPluginOrdering) GetAfter() *DatadogPluginAfter {
-	if d == nil {
-		return nil
-	}
-	return d.After
-}
-
-func (d *DatadogPluginOrdering) GetBefore() *DatadogPluginBefore {
-	if d == nil {
-		return nil
-	}
-	return d.Before
-}
-
-type DatadogPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (d *DatadogPluginPartials) GetID() *string {
-	if d == nil {
-		return nil
-	}
-	return d.ID
-}
-
-func (d *DatadogPluginPartials) GetName() *string {
-	if d == nil {
-		return nil
-	}
-	return d.Name
-}
-
-func (d *DatadogPluginPartials) GetPath() *string {
-	if d == nil {
-		return nil
-	}
-	return d.Path
-}
-
 // ConsumerIdentifier - Authenticated user detail
 type ConsumerIdentifier string
 
@@ -452,6 +382,76 @@ func (d *DatadogPluginConsumer) GetID() *string {
 	return d.ID
 }
 
+type DatadogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (d *DatadogPluginAfter) GetAccess() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Access
+}
+
+type DatadogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (d *DatadogPluginBefore) GetAccess() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Access
+}
+
+type DatadogPluginOrdering struct {
+	After  *DatadogPluginAfter  `json:"after,omitempty"`
+	Before *DatadogPluginBefore `json:"before,omitempty"`
+}
+
+func (d *DatadogPluginOrdering) GetAfter() *DatadogPluginAfter {
+	if d == nil {
+		return nil
+	}
+	return d.After
+}
+
+func (d *DatadogPluginOrdering) GetBefore() *DatadogPluginBefore {
+	if d == nil {
+		return nil
+	}
+	return d.Before
+}
+
+type DatadogPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (d *DatadogPluginPartials) GetID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.ID
+}
+
+func (d *DatadogPluginPartials) GetName() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Name
+}
+
+func (d *DatadogPluginPartials) GetPath() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Path
+}
+
 // DatadogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type DatadogPluginProtocols string
 
@@ -527,8 +527,10 @@ func (d *DatadogPluginService) GetID() *string {
 	return d.ID
 }
 
-// DatadogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type DatadogPlugin struct {
+	Config *DatadogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *DatadogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -541,19 +543,16 @@ type DatadogPlugin struct {
 	Ordering     *DatadogPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []DatadogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *DatadogPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *DatadogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []DatadogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *DatadogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *DatadogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (d DatadogPlugin) MarshalJSON() ([]byte, error) {
@@ -565,6 +564,20 @@ func (d *DatadogPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (d *DatadogPlugin) GetConfig() *DatadogPluginConfig {
+	if d == nil {
+		return nil
+	}
+	return d.Config
+}
+
+func (d *DatadogPlugin) GetConsumer() *DatadogPluginConsumer {
+	if d == nil {
+		return nil
+	}
+	return d.Consumer
 }
 
 func (d *DatadogPlugin) GetCreatedAt() *int64 {
@@ -613,34 +626,6 @@ func (d *DatadogPlugin) GetPartials() []DatadogPluginPartials {
 	return d.Partials
 }
 
-func (d *DatadogPlugin) GetTags() []string {
-	if d == nil {
-		return nil
-	}
-	return d.Tags
-}
-
-func (d *DatadogPlugin) GetUpdatedAt() *int64 {
-	if d == nil {
-		return nil
-	}
-	return d.UpdatedAt
-}
-
-func (d *DatadogPlugin) GetConfig() *DatadogPluginConfig {
-	if d == nil {
-		return nil
-	}
-	return d.Config
-}
-
-func (d *DatadogPlugin) GetConsumer() *DatadogPluginConsumer {
-	if d == nil {
-		return nil
-	}
-	return d.Consumer
-}
-
 func (d *DatadogPlugin) GetProtocols() []DatadogPluginProtocols {
 	if d == nil {
 		return nil
@@ -660,4 +645,18 @@ func (d *DatadogPlugin) GetService() *DatadogPluginService {
 		return nil
 	}
 	return d.Service
+}
+
+func (d *DatadogPlugin) GetTags() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Tags
+}
+
+func (d *DatadogPlugin) GetUpdatedAt() *int64 {
+	if d == nil {
+		return nil
+	}
+	return d.UpdatedAt
 }

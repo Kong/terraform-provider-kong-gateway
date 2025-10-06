@@ -18,6 +18,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -36,20 +37,20 @@ type PluginAzureFunctionsResource struct {
 
 // PluginAzureFunctionsResourceModel describes the resource data model.
 type PluginAzureFunctionsResourceModel struct {
-	Config       tfTypes.AzureFunctionsPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                       `tfsdk:"consumer"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.Set                       `tfsdk:"route"`
-	Service      *tfTypes.Set                       `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
-	Workspace    types.String                       `tfsdk:"workspace"`
+	Config       *tfTypes.AzureFunctionsPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                        `tfsdk:"consumer"`
+	CreatedAt    types.Int64                         `tfsdk:"created_at"`
+	Enabled      types.Bool                          `tfsdk:"enabled"`
+	ID           types.String                        `tfsdk:"id"`
+	InstanceName types.String                        `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols    []types.String                      `tfsdk:"protocols"`
+	Route        *tfTypes.Set                        `tfsdk:"route"`
+	Service      *tfTypes.Set                        `tfsdk:"service"`
+	Tags         []types.String                      `tfsdk:"tags"`
+	UpdatedAt    types.Int64                         `tfsdk:"updated_at"`
+	Workspace    types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginAzureFunctionsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +62,8 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 		MarkdownDescription: "PluginAzureFunctions Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"apikey": schema.StringAttribute{
 						Computed:    true,
@@ -69,8 +71,12 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 						Description: `The apikey to access the Azure resources. If provided, it is injected as the ` + "`" + `x-functions-key` + "`" + ` header.`,
 					},
 					"appname": schema.StringAttribute{
-						Required:    true,
-						Description: `The Azure app name.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The Azure app name. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"clientid": schema.StringAttribute{
 						Computed:    true,
@@ -78,8 +84,12 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 						Description: `The ` + "`" + `clientid` + "`" + ` to access the Azure resources. If provided, it is injected as the ` + "`" + `x-functions-clientid` + "`" + ` header.`,
 					},
 					"functionname": schema.StringAttribute{
-						Required:    true,
-						Description: `Name of the Azure function to invoke.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `Name of the Azure function to invoke. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"hostdomain": schema.StringAttribute{
 						Computed:    true,

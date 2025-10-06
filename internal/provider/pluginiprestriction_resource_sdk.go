@@ -69,16 +69,18 @@ func (r *PluginIPRestrictionResourceModel) RefreshFromSharedIPRestrictionPlugin(
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -191,6 +193,59 @@ func (r *PluginIPRestrictionResourceModel) ToOperationsUpdateIprestrictionPlugin
 func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx context.Context) (*shared.IPRestrictionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.IPRestrictionPluginConfig
+	if r.Config != nil {
+		allow := make([]string, 0, len(r.Config.Allow))
+		for _, allowItem := range r.Config.Allow {
+			allow = append(allow, allowItem.ValueString())
+		}
+		deny := make([]string, 0, len(r.Config.Deny))
+		for _, denyItem := range r.Config.Deny {
+			deny = append(deny, denyItem.ValueString())
+		}
+		message := new(string)
+		if !r.Config.Message.IsUnknown() && !r.Config.Message.IsNull() {
+			*message = r.Config.Message.ValueString()
+		} else {
+			message = nil
+		}
+		status := new(float64)
+		if !r.Config.Status.IsUnknown() && !r.Config.Status.IsNull() {
+			*status = r.Config.Status.ValueFloat64()
+		} else {
+			status = nil
+		}
+		config = &shared.IPRestrictionPluginConfig{
+			Allow:   allow,
+			Deny:    deny,
+			Message: message,
+			Status:  status,
+		}
+	}
+	var consumer *shared.IPRestrictionPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.IPRestrictionPluginConsumer{
+			ID: id,
+		}
+	}
+	var consumerGroup *shared.IPRestrictionPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		consumerGroup = &shared.IPRestrictionPluginConsumerGroup{
+			ID: id1,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -203,11 +258,11 @@ func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx conte
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id2 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id2 = r.ID.ValueString()
 	} else {
-		id = nil
+		id2 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -242,96 +297,33 @@ func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx conte
 			Before: before,
 		}
 	}
-	partials := make([]shared.IPRestrictionPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.IPRestrictionPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.IPRestrictionPluginConfig
-	if r.Config != nil {
-		allow := make([]string, 0, len(r.Config.Allow))
-		for _, allowItem := range r.Config.Allow {
-			allow = append(allow, allowItem.ValueString())
-		}
-		deny := make([]string, 0, len(r.Config.Deny))
-		for _, denyItem := range r.Config.Deny {
-			deny = append(deny, denyItem.ValueString())
-		}
-		message := new(string)
-		if !r.Config.Message.IsUnknown() && !r.Config.Message.IsNull() {
-			*message = r.Config.Message.ValueString()
-		} else {
-			message = nil
-		}
-		status := new(float64)
-		if !r.Config.Status.IsUnknown() && !r.Config.Status.IsNull() {
-			*status = r.Config.Status.ValueFloat64()
-		} else {
-			status = nil
-		}
-		config = &shared.IPRestrictionPluginConfig{
-			Allow:   allow,
-			Deny:    deny,
-			Message: message,
-			Status:  status,
-		}
-	}
-	var consumer *shared.IPRestrictionPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.IPRestrictionPluginConsumer{
-			ID: id2,
-		}
-	}
-	var consumerGroup *shared.IPRestrictionPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id3 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id3 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		consumerGroup = &shared.IPRestrictionPluginConsumerGroup{
-			ID: id3,
+	var partials []shared.IPRestrictionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.IPRestrictionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id3 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id3 = partialsItem.ID.ValueString()
+			} else {
+				id3 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.IPRestrictionPluginPartials{
+				ID:   id3,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.IPRestrictionPluginProtocols, 0, len(r.Protocols))
@@ -362,21 +354,34 @@ func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx conte
 			ID: id5,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.IPRestrictionPlugin{
-		CreatedAt:     createdAt,
-		Enabled:       enabled,
-		ID:            id,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id2,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

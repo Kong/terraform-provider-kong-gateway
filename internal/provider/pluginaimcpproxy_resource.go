@@ -40,19 +40,19 @@ type PluginAiMcpProxyResource struct {
 
 // PluginAiMcpProxyResourceModel describes the resource data model.
 type PluginAiMcpProxyResourceModel struct {
-	Config       tfTypes.AiMcpProxyPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                    `tfsdk:"created_at"`
-	Enabled      types.Bool                     `tfsdk:"enabled"`
-	ID           types.String                   `tfsdk:"id"`
-	InstanceName types.String                   `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials    `tfsdk:"partials"`
-	Protocols    []types.String                 `tfsdk:"protocols"`
-	Route        *tfTypes.Set                   `tfsdk:"route"`
-	Service      *tfTypes.Set                   `tfsdk:"service"`
-	Tags         []types.String                 `tfsdk:"tags"`
-	UpdatedAt    types.Int64                    `tfsdk:"updated_at"`
-	Workspace    types.String                   `tfsdk:"workspace"`
+	Config       *tfTypes.AiMcpProxyPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                     `tfsdk:"created_at"`
+	Enabled      types.Bool                      `tfsdk:"enabled"`
+	ID           types.String                    `tfsdk:"id"`
+	InstanceName types.String                    `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering      `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials     `tfsdk:"partials"`
+	Protocols    []types.String                  `tfsdk:"protocols"`
+	Route        *tfTypes.Set                    `tfsdk:"route"`
+	Service      *tfTypes.Set                    `tfsdk:"service"`
+	Tags         []types.String                  `tfsdk:"tags"`
+	UpdatedAt    types.Int64                     `tfsdk:"updated_at"`
+	Workspace    types.String                    `tfsdk:"workspace"`
 }
 
 func (r *PluginAiMcpProxyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,7 +64,8 @@ func (r *PluginAiMcpProxyResource) Schema(ctx context.Context, req resource.Sche
 		MarkdownDescription: "PluginAiMcpProxy Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"logging": schema.SingleNestedAttribute{
 						Computed: true,
@@ -88,9 +89,11 @@ func (r *PluginAiMcpProxyResource) Schema(ctx context.Context, req resource.Sche
 						Description: `max allowed body size allowed to be handled as MCP request.`,
 					},
 					"mode": schema.StringAttribute{
-						Required:    true,
-						Description: `The mode of the MCP proxy. Possible values are: 'passthrough-listener', 'conversion-listener', 'conversion-only', 'listener'. must be one of ["conversion-listener", "conversion-only", "listener", "passthrough-listener"]`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The mode of the MCP proxy. Possible values are: 'passthrough-listener', 'conversion-listener', 'conversion-only', 'listener'. Not Null; must be one of ["conversion-listener", "conversion-only", "listener", "passthrough-listener"]`,
 						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
 							stringvalidator.OneOf(
 								"conversion-listener",
 								"conversion-only",

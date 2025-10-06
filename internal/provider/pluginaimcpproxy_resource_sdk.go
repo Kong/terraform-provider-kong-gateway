@@ -17,69 +17,74 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config.Logging == nil {
-			r.Config.Logging = nil
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.Logging = &tfTypes.AiLlmAsJudgePluginLogging{}
-			r.Config.Logging.LogPayloads = types.BoolPointerValue(resp.Config.Logging.LogPayloads)
-			r.Config.Logging.LogStatistics = types.BoolPointerValue(resp.Config.Logging.LogStatistics)
-		}
-		r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
-		r.Config.Mode = types.StringValue(string(resp.Config.Mode))
-		if resp.Config.Server == nil {
-			r.Config.Server = nil
-		} else {
-			r.Config.Server = &tfTypes.Server{}
-			r.Config.Server.ForwardClientHeaders = types.BoolPointerValue(resp.Config.Server.ForwardClientHeaders)
-			r.Config.Server.Tag = types.StringPointerValue(resp.Config.Server.Tag)
-			r.Config.Server.Timeout = types.Float64PointerValue(resp.Config.Server.Timeout)
-		}
-		r.Config.Tools = []tfTypes.Tools{}
-
-		for _, toolsItem := range resp.Config.Tools {
-			var tools tfTypes.Tools
-
-			if toolsItem.Annotations == nil {
-				tools.Annotations = nil
+			r.Config = &tfTypes.AiMcpProxyPluginConfig{}
+			if resp.Config.Logging == nil {
+				r.Config.Logging = nil
 			} else {
-				tools.Annotations = &tfTypes.Annotations{}
-				tools.Annotations.DestructiveHint = types.BoolPointerValue(toolsItem.Annotations.DestructiveHint)
-				tools.Annotations.IdempotentHint = types.BoolPointerValue(toolsItem.Annotations.IdempotentHint)
-				tools.Annotations.OpenWorldHint = types.BoolPointerValue(toolsItem.Annotations.OpenWorldHint)
-				tools.Annotations.ReadOnlyHint = types.BoolPointerValue(toolsItem.Annotations.ReadOnlyHint)
-				tools.Annotations.Title = types.StringPointerValue(toolsItem.Annotations.Title)
+				r.Config.Logging = &tfTypes.AiLlmAsJudgePluginLogging{}
+				r.Config.Logging.LogPayloads = types.BoolPointerValue(resp.Config.Logging.LogPayloads)
+				r.Config.Logging.LogStatistics = types.BoolPointerValue(resp.Config.Logging.LogStatistics)
 			}
-			tools.Description = types.StringValue(toolsItem.Description)
-			if len(toolsItem.Headers) > 0 {
-				tools.Headers = make(map[string]jsontypes.Normalized, len(toolsItem.Headers))
-				for key, value := range toolsItem.Headers {
-					result, _ := json.Marshal(value)
-					tools.Headers[key] = jsontypes.NewNormalizedValue(string(result))
+			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
+			r.Config.Mode = types.StringValue(string(resp.Config.Mode))
+			if resp.Config.Server == nil {
+				r.Config.Server = nil
+			} else {
+				r.Config.Server = &tfTypes.Server{}
+				r.Config.Server.ForwardClientHeaders = types.BoolPointerValue(resp.Config.Server.ForwardClientHeaders)
+				r.Config.Server.Tag = types.StringPointerValue(resp.Config.Server.Tag)
+				r.Config.Server.Timeout = types.Float64PointerValue(resp.Config.Server.Timeout)
+			}
+			r.Config.Tools = []tfTypes.Tools{}
+
+			for _, toolsItem := range resp.Config.Tools {
+				var tools tfTypes.Tools
+
+				if toolsItem.Annotations == nil {
+					tools.Annotations = nil
+				} else {
+					tools.Annotations = &tfTypes.Annotations{}
+					tools.Annotations.DestructiveHint = types.BoolPointerValue(toolsItem.Annotations.DestructiveHint)
+					tools.Annotations.IdempotentHint = types.BoolPointerValue(toolsItem.Annotations.IdempotentHint)
+					tools.Annotations.OpenWorldHint = types.BoolPointerValue(toolsItem.Annotations.OpenWorldHint)
+					tools.Annotations.ReadOnlyHint = types.BoolPointerValue(toolsItem.Annotations.ReadOnlyHint)
+					tools.Annotations.Title = types.StringPointerValue(toolsItem.Annotations.Title)
 				}
-			}
-			tools.Host = types.StringPointerValue(toolsItem.Host)
-			if toolsItem.Method != nil {
-				tools.Method = types.StringValue(string(*toolsItem.Method))
-			} else {
-				tools.Method = types.StringNull()
-			}
-			tools.Parameters = types.StringPointerValue(toolsItem.Parameters)
-			tools.Path = types.StringPointerValue(toolsItem.Path)
-			if len(toolsItem.Query) > 0 {
-				tools.Query = make(map[string]jsontypes.Normalized, len(toolsItem.Query))
-				for key1, value1 := range toolsItem.Query {
-					result1, _ := json.Marshal(value1)
-					tools.Query[key1] = jsontypes.NewNormalizedValue(string(result1))
+				tools.Description = types.StringValue(toolsItem.Description)
+				if len(toolsItem.Headers) > 0 {
+					tools.Headers = make(map[string]jsontypes.Normalized, len(toolsItem.Headers))
+					for key, value := range toolsItem.Headers {
+						result, _ := json.Marshal(value)
+						tools.Headers[key] = jsontypes.NewNormalizedValue(string(result))
+					}
 				}
-			}
-			tools.RequestBody = types.StringPointerValue(toolsItem.RequestBody)
-			if toolsItem.Scheme != nil {
-				tools.Scheme = types.StringValue(string(*toolsItem.Scheme))
-			} else {
-				tools.Scheme = types.StringNull()
-			}
+				tools.Host = types.StringPointerValue(toolsItem.Host)
+				if toolsItem.Method != nil {
+					tools.Method = types.StringValue(string(*toolsItem.Method))
+				} else {
+					tools.Method = types.StringNull()
+				}
+				tools.Parameters = types.StringPointerValue(toolsItem.Parameters)
+				tools.Path = types.StringPointerValue(toolsItem.Path)
+				if len(toolsItem.Query) > 0 {
+					tools.Query = make(map[string]jsontypes.Normalized, len(toolsItem.Query))
+					for key1, value1 := range toolsItem.Query {
+						result1, _ := json.Marshal(value1)
+						tools.Query[key1] = jsontypes.NewNormalizedValue(string(result1))
+					}
+				}
+				tools.RequestBody = types.StringPointerValue(toolsItem.RequestBody)
+				if toolsItem.Scheme != nil {
+					tools.Scheme = types.StringValue(string(*toolsItem.Scheme))
+				} else {
+					tools.Scheme = types.StringNull()
+				}
 
-			r.Config.Tools = append(r.Config.Tools, tools)
+				r.Config.Tools = append(r.Config.Tools, tools)
+			}
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -108,16 +113,18 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -230,6 +237,174 @@ func (r *PluginAiMcpProxyResourceModel) ToOperationsUpdateAimcpproxyPluginReques
 func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Context) (*shared.AiMcpProxyPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.AiMcpProxyPluginConfig
+	if r.Config != nil {
+		var logging *shared.Logging
+		if r.Config.Logging != nil {
+			logPayloads := new(bool)
+			if !r.Config.Logging.LogPayloads.IsUnknown() && !r.Config.Logging.LogPayloads.IsNull() {
+				*logPayloads = r.Config.Logging.LogPayloads.ValueBool()
+			} else {
+				logPayloads = nil
+			}
+			logStatistics := new(bool)
+			if !r.Config.Logging.LogStatistics.IsUnknown() && !r.Config.Logging.LogStatistics.IsNull() {
+				*logStatistics = r.Config.Logging.LogStatistics.ValueBool()
+			} else {
+				logStatistics = nil
+			}
+			logging = &shared.Logging{
+				LogPayloads:   logPayloads,
+				LogStatistics: logStatistics,
+			}
+		}
+		maxRequestBodySize := new(int64)
+		if !r.Config.MaxRequestBodySize.IsUnknown() && !r.Config.MaxRequestBodySize.IsNull() {
+			*maxRequestBodySize = r.Config.MaxRequestBodySize.ValueInt64()
+		} else {
+			maxRequestBodySize = nil
+		}
+		mode := shared.Mode(r.Config.Mode.ValueString())
+		var server *shared.Server
+		if r.Config.Server != nil {
+			forwardClientHeaders := new(bool)
+			if !r.Config.Server.ForwardClientHeaders.IsUnknown() && !r.Config.Server.ForwardClientHeaders.IsNull() {
+				*forwardClientHeaders = r.Config.Server.ForwardClientHeaders.ValueBool()
+			} else {
+				forwardClientHeaders = nil
+			}
+			tag := new(string)
+			if !r.Config.Server.Tag.IsUnknown() && !r.Config.Server.Tag.IsNull() {
+				*tag = r.Config.Server.Tag.ValueString()
+			} else {
+				tag = nil
+			}
+			timeout := new(float64)
+			if !r.Config.Server.Timeout.IsUnknown() && !r.Config.Server.Timeout.IsNull() {
+				*timeout = r.Config.Server.Timeout.ValueFloat64()
+			} else {
+				timeout = nil
+			}
+			server = &shared.Server{
+				ForwardClientHeaders: forwardClientHeaders,
+				Tag:                  tag,
+				Timeout:              timeout,
+			}
+		}
+		tools := make([]shared.Tools, 0, len(r.Config.Tools))
+		for _, toolsItem := range r.Config.Tools {
+			var annotations *shared.Annotations
+			if toolsItem.Annotations != nil {
+				destructiveHint := new(bool)
+				if !toolsItem.Annotations.DestructiveHint.IsUnknown() && !toolsItem.Annotations.DestructiveHint.IsNull() {
+					*destructiveHint = toolsItem.Annotations.DestructiveHint.ValueBool()
+				} else {
+					destructiveHint = nil
+				}
+				idempotentHint := new(bool)
+				if !toolsItem.Annotations.IdempotentHint.IsUnknown() && !toolsItem.Annotations.IdempotentHint.IsNull() {
+					*idempotentHint = toolsItem.Annotations.IdempotentHint.ValueBool()
+				} else {
+					idempotentHint = nil
+				}
+				openWorldHint := new(bool)
+				if !toolsItem.Annotations.OpenWorldHint.IsUnknown() && !toolsItem.Annotations.OpenWorldHint.IsNull() {
+					*openWorldHint = toolsItem.Annotations.OpenWorldHint.ValueBool()
+				} else {
+					openWorldHint = nil
+				}
+				readOnlyHint := new(bool)
+				if !toolsItem.Annotations.ReadOnlyHint.IsUnknown() && !toolsItem.Annotations.ReadOnlyHint.IsNull() {
+					*readOnlyHint = toolsItem.Annotations.ReadOnlyHint.ValueBool()
+				} else {
+					readOnlyHint = nil
+				}
+				title := new(string)
+				if !toolsItem.Annotations.Title.IsUnknown() && !toolsItem.Annotations.Title.IsNull() {
+					*title = toolsItem.Annotations.Title.ValueString()
+				} else {
+					title = nil
+				}
+				annotations = &shared.Annotations{
+					DestructiveHint: destructiveHint,
+					IdempotentHint:  idempotentHint,
+					OpenWorldHint:   openWorldHint,
+					ReadOnlyHint:    readOnlyHint,
+					Title:           title,
+				}
+			}
+			var description string
+			description = toolsItem.Description.ValueString()
+
+			headers := make(map[string]interface{})
+			for headersKey, headersValue := range toolsItem.Headers {
+				var headersInst interface{}
+				_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
+				headers[headersKey] = headersInst
+			}
+			host := new(string)
+			if !toolsItem.Host.IsUnknown() && !toolsItem.Host.IsNull() {
+				*host = toolsItem.Host.ValueString()
+			} else {
+				host = nil
+			}
+			method := new(shared.AiMcpProxyPluginMethod)
+			if !toolsItem.Method.IsUnknown() && !toolsItem.Method.IsNull() {
+				*method = shared.AiMcpProxyPluginMethod(toolsItem.Method.ValueString())
+			} else {
+				method = nil
+			}
+			parameters := new(string)
+			if !toolsItem.Parameters.IsUnknown() && !toolsItem.Parameters.IsNull() {
+				*parameters = toolsItem.Parameters.ValueString()
+			} else {
+				parameters = nil
+			}
+			path := new(string)
+			if !toolsItem.Path.IsUnknown() && !toolsItem.Path.IsNull() {
+				*path = toolsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			query := make(map[string]interface{})
+			for queryKey, queryValue := range toolsItem.Query {
+				var queryInst interface{}
+				_ = json.Unmarshal([]byte(queryValue.ValueString()), &queryInst)
+				query[queryKey] = queryInst
+			}
+			requestBody := new(string)
+			if !toolsItem.RequestBody.IsUnknown() && !toolsItem.RequestBody.IsNull() {
+				*requestBody = toolsItem.RequestBody.ValueString()
+			} else {
+				requestBody = nil
+			}
+			scheme := new(shared.Scheme)
+			if !toolsItem.Scheme.IsUnknown() && !toolsItem.Scheme.IsNull() {
+				*scheme = shared.Scheme(toolsItem.Scheme.ValueString())
+			} else {
+				scheme = nil
+			}
+			tools = append(tools, shared.Tools{
+				Annotations: annotations,
+				Description: description,
+				Headers:     headers,
+				Host:        host,
+				Method:      method,
+				Parameters:  parameters,
+				Path:        path,
+				Query:       query,
+				RequestBody: requestBody,
+				Scheme:      scheme,
+			})
+		}
+		config = &shared.AiMcpProxyPluginConfig{
+			Logging:            logging,
+			MaxRequestBodySize: maxRequestBodySize,
+			Mode:               mode,
+			Server:             server,
+			Tools:              tools,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -281,209 +456,34 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 			Before: before,
 		}
 	}
-	partials := make([]shared.AiMcpProxyPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiMcpProxyPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var logging *shared.Logging
-	if r.Config.Logging != nil {
-		logPayloads := new(bool)
-		if !r.Config.Logging.LogPayloads.IsUnknown() && !r.Config.Logging.LogPayloads.IsNull() {
-			*logPayloads = r.Config.Logging.LogPayloads.ValueBool()
-		} else {
-			logPayloads = nil
-		}
-		logStatistics := new(bool)
-		if !r.Config.Logging.LogStatistics.IsUnknown() && !r.Config.Logging.LogStatistics.IsNull() {
-			*logStatistics = r.Config.Logging.LogStatistics.ValueBool()
-		} else {
-			logStatistics = nil
-		}
-		logging = &shared.Logging{
-			LogPayloads:   logPayloads,
-			LogStatistics: logStatistics,
-		}
-	}
-	maxRequestBodySize := new(int64)
-	if !r.Config.MaxRequestBodySize.IsUnknown() && !r.Config.MaxRequestBodySize.IsNull() {
-		*maxRequestBodySize = r.Config.MaxRequestBodySize.ValueInt64()
-	} else {
-		maxRequestBodySize = nil
-	}
-	mode := shared.Mode(r.Config.Mode.ValueString())
-	var server *shared.Server
-	if r.Config.Server != nil {
-		forwardClientHeaders := new(bool)
-		if !r.Config.Server.ForwardClientHeaders.IsUnknown() && !r.Config.Server.ForwardClientHeaders.IsNull() {
-			*forwardClientHeaders = r.Config.Server.ForwardClientHeaders.ValueBool()
-		} else {
-			forwardClientHeaders = nil
-		}
-		tag := new(string)
-		if !r.Config.Server.Tag.IsUnknown() && !r.Config.Server.Tag.IsNull() {
-			*tag = r.Config.Server.Tag.ValueString()
-		} else {
-			tag = nil
-		}
-		timeout := new(float64)
-		if !r.Config.Server.Timeout.IsUnknown() && !r.Config.Server.Timeout.IsNull() {
-			*timeout = r.Config.Server.Timeout.ValueFloat64()
-		} else {
-			timeout = nil
-		}
-		server = &shared.Server{
-			ForwardClientHeaders: forwardClientHeaders,
-			Tag:                  tag,
-			Timeout:              timeout,
-		}
-	}
-	tools := make([]shared.Tools, 0, len(r.Config.Tools))
-	for _, toolsItem := range r.Config.Tools {
-		var annotations *shared.Annotations
-		if toolsItem.Annotations != nil {
-			destructiveHint := new(bool)
-			if !toolsItem.Annotations.DestructiveHint.IsUnknown() && !toolsItem.Annotations.DestructiveHint.IsNull() {
-				*destructiveHint = toolsItem.Annotations.DestructiveHint.ValueBool()
+	var partials []shared.AiMcpProxyPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiMcpProxyPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
 			} else {
-				destructiveHint = nil
+				id1 = nil
 			}
-			idempotentHint := new(bool)
-			if !toolsItem.Annotations.IdempotentHint.IsUnknown() && !toolsItem.Annotations.IdempotentHint.IsNull() {
-				*idempotentHint = toolsItem.Annotations.IdempotentHint.ValueBool()
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
 			} else {
-				idempotentHint = nil
+				name = nil
 			}
-			openWorldHint := new(bool)
-			if !toolsItem.Annotations.OpenWorldHint.IsUnknown() && !toolsItem.Annotations.OpenWorldHint.IsNull() {
-				*openWorldHint = toolsItem.Annotations.OpenWorldHint.ValueBool()
+			path1 := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path1 = partialsItem.Path.ValueString()
 			} else {
-				openWorldHint = nil
+				path1 = nil
 			}
-			readOnlyHint := new(bool)
-			if !toolsItem.Annotations.ReadOnlyHint.IsUnknown() && !toolsItem.Annotations.ReadOnlyHint.IsNull() {
-				*readOnlyHint = toolsItem.Annotations.ReadOnlyHint.ValueBool()
-			} else {
-				readOnlyHint = nil
-			}
-			title := new(string)
-			if !toolsItem.Annotations.Title.IsUnknown() && !toolsItem.Annotations.Title.IsNull() {
-				*title = toolsItem.Annotations.Title.ValueString()
-			} else {
-				title = nil
-			}
-			annotations = &shared.Annotations{
-				DestructiveHint: destructiveHint,
-				IdempotentHint:  idempotentHint,
-				OpenWorldHint:   openWorldHint,
-				ReadOnlyHint:    readOnlyHint,
-				Title:           title,
-			}
+			partials = append(partials, shared.AiMcpProxyPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path1,
+			})
 		}
-		var description string
-		description = toolsItem.Description.ValueString()
-
-		headers := make(map[string]interface{})
-		for headersKey, headersValue := range toolsItem.Headers {
-			var headersInst interface{}
-			_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
-			headers[headersKey] = headersInst
-		}
-		host := new(string)
-		if !toolsItem.Host.IsUnknown() && !toolsItem.Host.IsNull() {
-			*host = toolsItem.Host.ValueString()
-		} else {
-			host = nil
-		}
-		method := new(shared.AiMcpProxyPluginMethod)
-		if !toolsItem.Method.IsUnknown() && !toolsItem.Method.IsNull() {
-			*method = shared.AiMcpProxyPluginMethod(toolsItem.Method.ValueString())
-		} else {
-			method = nil
-		}
-		parameters := new(string)
-		if !toolsItem.Parameters.IsUnknown() && !toolsItem.Parameters.IsNull() {
-			*parameters = toolsItem.Parameters.ValueString()
-		} else {
-			parameters = nil
-		}
-		path1 := new(string)
-		if !toolsItem.Path.IsUnknown() && !toolsItem.Path.IsNull() {
-			*path1 = toolsItem.Path.ValueString()
-		} else {
-			path1 = nil
-		}
-		query := make(map[string]interface{})
-		for queryKey, queryValue := range toolsItem.Query {
-			var queryInst interface{}
-			_ = json.Unmarshal([]byte(queryValue.ValueString()), &queryInst)
-			query[queryKey] = queryInst
-		}
-		requestBody := new(string)
-		if !toolsItem.RequestBody.IsUnknown() && !toolsItem.RequestBody.IsNull() {
-			*requestBody = toolsItem.RequestBody.ValueString()
-		} else {
-			requestBody = nil
-		}
-		scheme := new(shared.Scheme)
-		if !toolsItem.Scheme.IsUnknown() && !toolsItem.Scheme.IsNull() {
-			*scheme = shared.Scheme(toolsItem.Scheme.ValueString())
-		} else {
-			scheme = nil
-		}
-		tools = append(tools, shared.Tools{
-			Annotations: annotations,
-			Description: description,
-			Headers:     headers,
-			Host:        host,
-			Method:      method,
-			Parameters:  parameters,
-			Path:        path1,
-			Query:       query,
-			RequestBody: requestBody,
-			Scheme:      scheme,
-		})
-	}
-	config := shared.AiMcpProxyPluginConfig{
-		Logging:            logging,
-		MaxRequestBodySize: maxRequestBodySize,
-		Mode:               mode,
-		Server:             server,
-		Tools:              tools,
 	}
 	protocols := make([]shared.AiMcpProxyPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -513,19 +513,32 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.AiMcpProxyPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

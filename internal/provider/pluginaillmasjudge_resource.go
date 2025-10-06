@@ -20,6 +20,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,21 +39,21 @@ type PluginAiLlmAsJudgeResource struct {
 
 // PluginAiLlmAsJudgeResourceModel describes the resource data model.
 type PluginAiLlmAsJudgeResourceModel struct {
-	Config        tfTypes.AiLlmAsJudgePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                     `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                     `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                      `tfsdk:"created_at"`
-	Enabled       types.Bool                       `tfsdk:"enabled"`
-	ID            types.String                     `tfsdk:"id"`
-	InstanceName  types.String                     `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering       `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials      `tfsdk:"partials"`
-	Protocols     []types.String                   `tfsdk:"protocols"`
-	Route         *tfTypes.Set                     `tfsdk:"route"`
-	Service       *tfTypes.Set                     `tfsdk:"service"`
-	Tags          []types.String                   `tfsdk:"tags"`
-	UpdatedAt     types.Int64                      `tfsdk:"updated_at"`
-	Workspace     types.String                     `tfsdk:"workspace"`
+	Config        *tfTypes.AiLlmAsJudgePluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                      `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                      `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials       `tfsdk:"partials"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.Set                      `tfsdk:"route"`
+	Service       *tfTypes.Set                      `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
+	Workspace     types.String                      `tfsdk:"workspace"`
 }
 
 func (r *PluginAiLlmAsJudgeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,7 +65,8 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 		MarkdownDescription: "PluginAiLlmAsJudge Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"http_proxy_host": schema.StringAttribute{
 						Computed:    true,
@@ -118,7 +120,8 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 						Description: `Ignore and discard any tool prompts when evaluating the request`,
 					},
 					"llm": schema.SingleNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						Attributes: map[string]schema.Attribute{
 							"auth": schema.SingleNestedAttribute{
 								Computed: true,
@@ -219,7 +222,8 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 								},
 							},
 							"model": schema.SingleNestedAttribute{
-								Required: true,
+								Computed: true,
+								Optional: true,
 								Attributes: map[string]schema.Attribute{
 									"name": schema.StringAttribute{
 										Computed:    true,
@@ -434,9 +438,11 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 										Description: `Key/value settings for the model`,
 									},
 									"provider": schema.StringAttribute{
-										Required:    true,
-										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
+										Computed:    true,
+										Optional:    true,
+										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. Not Null; must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
 										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
 											stringvalidator.OneOf(
 												"anthropic",
 												"azure",
@@ -451,11 +457,17 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 										},
 									},
 								},
+								Description: `Not Null`,
+								Validators: []validator.Object{
+									speakeasy_objectvalidators.NotNull(),
+								},
 							},
 							"route_type": schema.StringAttribute{
-								Required:    true,
-								Description: `The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]`,
+								Computed:    true,
+								Optional:    true,
+								Description: `The model's operation implementation, for this provider. Not Null; must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]`,
 								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"audio/v1/audio/speech",
 										"audio/v1/audio/transcriptions",
@@ -474,6 +486,10 @@ func (r *PluginAiLlmAsJudgeResource) Schema(ctx context.Context, req resource.Sc
 									),
 								},
 							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 					"message_countback": schema.Float64Attribute{

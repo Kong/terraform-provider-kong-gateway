@@ -19,6 +19,7 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -38,21 +39,21 @@ type PluginAiPromptCompressorResource struct {
 
 // PluginAiPromptCompressorResourceModel describes the resource data model.
 type PluginAiPromptCompressorResourceModel struct {
-	Config        tfTypes.AiPromptCompressorPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                           `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                           `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                            `tfsdk:"created_at"`
-	Enabled       types.Bool                             `tfsdk:"enabled"`
-	ID            types.String                           `tfsdk:"id"`
-	InstanceName  types.String                           `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering             `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials            `tfsdk:"partials"`
-	Protocols     []types.String                         `tfsdk:"protocols"`
-	Route         *tfTypes.Set                           `tfsdk:"route"`
-	Service       *tfTypes.Set                           `tfsdk:"service"`
-	Tags          []types.String                         `tfsdk:"tags"`
-	UpdatedAt     types.Int64                            `tfsdk:"updated_at"`
-	Workspace     types.String                           `tfsdk:"workspace"`
+	Config        *tfTypes.AiPromptCompressorPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                            `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                            `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                             `tfsdk:"created_at"`
+	Enabled       types.Bool                              `tfsdk:"enabled"`
+	ID            types.String                            `tfsdk:"id"`
+	InstanceName  types.String                            `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering              `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials             `tfsdk:"partials"`
+	Protocols     []types.String                          `tfsdk:"protocols"`
+	Route         *tfTypes.Set                            `tfsdk:"route"`
+	Service       *tfTypes.Set                            `tfsdk:"service"`
+	Tags          []types.String                          `tfsdk:"tags"`
+	UpdatedAt     types.Int64                             `tfsdk:"updated_at"`
+	Workspace     types.String                            `tfsdk:"workspace"`
 }
 
 func (r *PluginAiPromptCompressorResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,10 +65,12 @@ func (r *PluginAiPromptCompressorResource) Schema(ctx context.Context, req resou
 		MarkdownDescription: "PluginAiPromptCompressor Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"compression_ranges": schema.ListNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -99,7 +102,10 @@ func (r *PluginAiPromptCompressorResource) Schema(ctx context.Context, req resou
 								},
 							},
 						},
-						Description: `What value to be used to compress with. The 'value' is interpreted as rate or target_token depending on compressor_type.`,
+						Description: `What value to be used to compress with. The 'value' is interpreted as rate or target_token depending on compressor_type. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"compressor_type": schema.StringAttribute{
 						Computed:    true,

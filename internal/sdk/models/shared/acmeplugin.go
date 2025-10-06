@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AcmePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AcmePluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AcmePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AcmePluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AcmePluginOrdering struct {
-	After  *AcmePluginAfter  `json:"after,omitempty"`
-	Before *AcmePluginBefore `json:"before,omitempty"`
-}
-
-func (a *AcmePluginOrdering) GetAfter() *AcmePluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AcmePluginOrdering) GetBefore() *AcmePluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AcmePluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AcmePluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AcmePluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AcmePluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 // AccountKey - The private key associated with the account.
 type AccountKey struct {
 	// The Key ID.
@@ -705,6 +635,76 @@ func (a *AcmePluginConfig) GetTosAccepted() *bool {
 	return a.TosAccepted
 }
 
+type AcmePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AcmePluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AcmePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AcmePluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AcmePluginOrdering struct {
+	After  *AcmePluginAfter  `json:"after,omitempty"`
+	Before *AcmePluginBefore `json:"before,omitempty"`
+}
+
+func (a *AcmePluginOrdering) GetAfter() *AcmePluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AcmePluginOrdering) GetBefore() *AcmePluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AcmePluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AcmePluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AcmePluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AcmePluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AcmePluginProtocols string
 
 const (
@@ -737,8 +737,8 @@ func (e *AcmePluginProtocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// AcmePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AcmePlugin struct {
+	Config *AcmePluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -751,13 +751,12 @@ type AcmePlugin struct {
 	Ordering     *AcmePluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AcmePluginPartials `json:"partials,omitempty"`
+	// A set of strings representing HTTP protocols.
+	Protocols []AcmePluginProtocols `json:"protocols,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64           `json:"updated_at,omitempty"`
-	Config    AcmePluginConfig `json:"config"`
-	// A set of strings representing HTTP protocols.
-	Protocols []AcmePluginProtocols `json:"protocols,omitempty"`
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AcmePlugin) MarshalJSON() ([]byte, error) {
@@ -765,10 +764,17 @@ func (a AcmePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AcmePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AcmePlugin) GetConfig() *AcmePluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
 }
 
 func (a *AcmePlugin) GetCreatedAt() *int64 {
@@ -817,6 +823,13 @@ func (a *AcmePlugin) GetPartials() []AcmePluginPartials {
 	return a.Partials
 }
 
+func (a *AcmePlugin) GetProtocols() []AcmePluginProtocols {
+	if a == nil {
+		return nil
+	}
+	return a.Protocols
+}
+
 func (a *AcmePlugin) GetTags() []string {
 	if a == nil {
 		return nil
@@ -829,18 +842,4 @@ func (a *AcmePlugin) GetUpdatedAt() *int64 {
 		return nil
 	}
 	return a.UpdatedAt
-}
-
-func (a *AcmePlugin) GetConfig() AcmePluginConfig {
-	if a == nil {
-		return AcmePluginConfig{}
-	}
-	return a.Config
-}
-
-func (a *AcmePlugin) GetProtocols() []AcmePluginProtocols {
-	if a == nil {
-		return nil
-	}
-	return a.Protocols
 }

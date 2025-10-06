@@ -15,31 +15,36 @@ func (r *PluginAiPromptCompressorResourceModel) RefreshFromSharedAiPromptCompres
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		r.Config.CompressionRanges = []tfTypes.CompressionRanges{}
-
-		for _, compressionRangesItem := range resp.Config.CompressionRanges {
-			var compressionRanges tfTypes.CompressionRanges
-
-			compressionRanges.MaxTokens = types.Int64Value(compressionRangesItem.MaxTokens)
-			compressionRanges.MinTokens = types.Int64Value(compressionRangesItem.MinTokens)
-			compressionRanges.Value = types.Float64Value(compressionRangesItem.Value)
-
-			r.Config.CompressionRanges = append(r.Config.CompressionRanges, compressionRanges)
-		}
-		if resp.Config.CompressorType != nil {
-			r.Config.CompressorType = types.StringValue(string(*resp.Config.CompressorType))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.CompressorType = types.StringNull()
+			r.Config = &tfTypes.AiPromptCompressorPluginConfig{}
+			r.Config.CompressionRanges = []tfTypes.CompressionRanges{}
+
+			for _, compressionRangesItem := range resp.Config.CompressionRanges {
+				var compressionRanges tfTypes.CompressionRanges
+
+				compressionRanges.MaxTokens = types.Int64Value(compressionRangesItem.MaxTokens)
+				compressionRanges.MinTokens = types.Int64Value(compressionRangesItem.MinTokens)
+				compressionRanges.Value = types.Float64Value(compressionRangesItem.Value)
+
+				r.Config.CompressionRanges = append(r.Config.CompressionRanges, compressionRanges)
+			}
+			if resp.Config.CompressorType != nil {
+				r.Config.CompressorType = types.StringValue(string(*resp.Config.CompressorType))
+			} else {
+				r.Config.CompressorType = types.StringNull()
+			}
+			r.Config.CompressorURL = types.StringPointerValue(resp.Config.CompressorURL)
+			r.Config.KeepaliveTimeout = types.Float64PointerValue(resp.Config.KeepaliveTimeout)
+			r.Config.LogTextData = types.BoolPointerValue(resp.Config.LogTextData)
+			r.Config.MessageType = make([]types.String, 0, len(resp.Config.MessageType))
+			for _, v := range resp.Config.MessageType {
+				r.Config.MessageType = append(r.Config.MessageType, types.StringValue(string(v)))
+			}
+			r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
-		r.Config.CompressorURL = types.StringPointerValue(resp.Config.CompressorURL)
-		r.Config.KeepaliveTimeout = types.Float64PointerValue(resp.Config.KeepaliveTimeout)
-		r.Config.LogTextData = types.BoolPointerValue(resp.Config.LogTextData)
-		r.Config.MessageType = make([]types.String, 0, len(resp.Config.MessageType))
-		for _, v := range resp.Config.MessageType {
-			r.Config.MessageType = append(r.Config.MessageType, types.StringValue(string(v)))
-		}
-		r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
-		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -79,16 +84,18 @@ func (r *PluginAiPromptCompressorResourceModel) RefreshFromSharedAiPromptCompres
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -201,6 +208,100 @@ func (r *PluginAiPromptCompressorResourceModel) ToOperationsUpdateAipromptcompre
 func (r *PluginAiPromptCompressorResourceModel) ToSharedAiPromptCompressorPlugin(ctx context.Context) (*shared.AiPromptCompressorPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.AiPromptCompressorPluginConfig
+	if r.Config != nil {
+		compressionRanges := make([]shared.CompressionRanges, 0, len(r.Config.CompressionRanges))
+		for _, compressionRangesItem := range r.Config.CompressionRanges {
+			var maxTokens int64
+			maxTokens = compressionRangesItem.MaxTokens.ValueInt64()
+
+			var minTokens int64
+			minTokens = compressionRangesItem.MinTokens.ValueInt64()
+
+			var value float64
+			value = compressionRangesItem.Value.ValueFloat64()
+
+			compressionRanges = append(compressionRanges, shared.CompressionRanges{
+				MaxTokens: maxTokens,
+				MinTokens: minTokens,
+				Value:     value,
+			})
+		}
+		compressorType := new(shared.CompressorType)
+		if !r.Config.CompressorType.IsUnknown() && !r.Config.CompressorType.IsNull() {
+			*compressorType = shared.CompressorType(r.Config.CompressorType.ValueString())
+		} else {
+			compressorType = nil
+		}
+		compressorURL := new(string)
+		if !r.Config.CompressorURL.IsUnknown() && !r.Config.CompressorURL.IsNull() {
+			*compressorURL = r.Config.CompressorURL.ValueString()
+		} else {
+			compressorURL = nil
+		}
+		keepaliveTimeout := new(float64)
+		if !r.Config.KeepaliveTimeout.IsUnknown() && !r.Config.KeepaliveTimeout.IsNull() {
+			*keepaliveTimeout = r.Config.KeepaliveTimeout.ValueFloat64()
+		} else {
+			keepaliveTimeout = nil
+		}
+		logTextData := new(bool)
+		if !r.Config.LogTextData.IsUnknown() && !r.Config.LogTextData.IsNull() {
+			*logTextData = r.Config.LogTextData.ValueBool()
+		} else {
+			logTextData = nil
+		}
+		messageType := make([]shared.MessageType, 0, len(r.Config.MessageType))
+		for _, messageTypeItem := range r.Config.MessageType {
+			messageType = append(messageType, shared.MessageType(messageTypeItem.ValueString()))
+		}
+		stopOnError := new(bool)
+		if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
+			*stopOnError = r.Config.StopOnError.ValueBool()
+		} else {
+			stopOnError = nil
+		}
+		timeout := new(float64)
+		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+			*timeout = r.Config.Timeout.ValueFloat64()
+		} else {
+			timeout = nil
+		}
+		config = &shared.AiPromptCompressorPluginConfig{
+			CompressionRanges: compressionRanges,
+			CompressorType:    compressorType,
+			CompressorURL:     compressorURL,
+			KeepaliveTimeout:  keepaliveTimeout,
+			LogTextData:       logTextData,
+			MessageType:       messageType,
+			StopOnError:       stopOnError,
+			Timeout:           timeout,
+		}
+	}
+	var consumer *shared.AiPromptCompressorPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.AiPromptCompressorPluginConsumer{
+			ID: id,
+		}
+	}
+	var consumerGroup *shared.AiPromptCompressorPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		consumerGroup = &shared.AiPromptCompressorPluginConsumerGroup{
+			ID: id1,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -213,11 +314,11 @@ func (r *PluginAiPromptCompressorResourceModel) ToSharedAiPromptCompressorPlugin
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id2 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id2 = r.ID.ValueString()
 	} else {
-		id = nil
+		id2 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -252,134 +353,33 @@ func (r *PluginAiPromptCompressorResourceModel) ToSharedAiPromptCompressorPlugin
 			Before: before,
 		}
 	}
-	partials := make([]shared.AiPromptCompressorPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.AiPromptCompressorPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	compressionRanges := make([]shared.CompressionRanges, 0, len(r.Config.CompressionRanges))
-	for _, compressionRangesItem := range r.Config.CompressionRanges {
-		var maxTokens int64
-		maxTokens = compressionRangesItem.MaxTokens.ValueInt64()
-
-		var minTokens int64
-		minTokens = compressionRangesItem.MinTokens.ValueInt64()
-
-		var value float64
-		value = compressionRangesItem.Value.ValueFloat64()
-
-		compressionRanges = append(compressionRanges, shared.CompressionRanges{
-			MaxTokens: maxTokens,
-			MinTokens: minTokens,
-			Value:     value,
-		})
-	}
-	compressorType := new(shared.CompressorType)
-	if !r.Config.CompressorType.IsUnknown() && !r.Config.CompressorType.IsNull() {
-		*compressorType = shared.CompressorType(r.Config.CompressorType.ValueString())
-	} else {
-		compressorType = nil
-	}
-	compressorURL := new(string)
-	if !r.Config.CompressorURL.IsUnknown() && !r.Config.CompressorURL.IsNull() {
-		*compressorURL = r.Config.CompressorURL.ValueString()
-	} else {
-		compressorURL = nil
-	}
-	keepaliveTimeout := new(float64)
-	if !r.Config.KeepaliveTimeout.IsUnknown() && !r.Config.KeepaliveTimeout.IsNull() {
-		*keepaliveTimeout = r.Config.KeepaliveTimeout.ValueFloat64()
-	} else {
-		keepaliveTimeout = nil
-	}
-	logTextData := new(bool)
-	if !r.Config.LogTextData.IsUnknown() && !r.Config.LogTextData.IsNull() {
-		*logTextData = r.Config.LogTextData.ValueBool()
-	} else {
-		logTextData = nil
-	}
-	messageType := make([]shared.MessageType, 0, len(r.Config.MessageType))
-	for _, messageTypeItem := range r.Config.MessageType {
-		messageType = append(messageType, shared.MessageType(messageTypeItem.ValueString()))
-	}
-	stopOnError := new(bool)
-	if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
-		*stopOnError = r.Config.StopOnError.ValueBool()
-	} else {
-		stopOnError = nil
-	}
-	timeout := new(float64)
-	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-		*timeout = r.Config.Timeout.ValueFloat64()
-	} else {
-		timeout = nil
-	}
-	config := shared.AiPromptCompressorPluginConfig{
-		CompressionRanges: compressionRanges,
-		CompressorType:    compressorType,
-		CompressorURL:     compressorURL,
-		KeepaliveTimeout:  keepaliveTimeout,
-		LogTextData:       logTextData,
-		MessageType:       messageType,
-		StopOnError:       stopOnError,
-		Timeout:           timeout,
-	}
-	var consumer *shared.AiPromptCompressorPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.AiPromptCompressorPluginConsumer{
-			ID: id2,
-		}
-	}
-	var consumerGroup *shared.AiPromptCompressorPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id3 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id3 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		consumerGroup = &shared.AiPromptCompressorPluginConsumerGroup{
-			ID: id3,
+	var partials []shared.AiPromptCompressorPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.AiPromptCompressorPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id3 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id3 = partialsItem.ID.ValueString()
+			} else {
+				id3 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.AiPromptCompressorPluginPartials{
+				ID:   id3,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.AiPromptCompressorPluginProtocols, 0, len(r.Protocols))
@@ -410,21 +410,34 @@ func (r *PluginAiPromptCompressorResourceModel) ToSharedAiPromptCompressorPlugin
 			ID: id5,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.AiPromptCompressorPlugin{
-		CreatedAt:     createdAt,
-		Enabled:       enabled,
-		ID:            id,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id2,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

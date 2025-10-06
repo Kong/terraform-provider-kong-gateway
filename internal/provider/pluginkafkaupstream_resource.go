@@ -43,20 +43,20 @@ type PluginKafkaUpstreamResource struct {
 
 // PluginKafkaUpstreamResourceModel describes the resource data model.
 type PluginKafkaUpstreamResourceModel struct {
-	Config       tfTypes.KafkaUpstreamPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                      `tfsdk:"consumer"`
-	CreatedAt    types.Int64                       `tfsdk:"created_at"`
-	Enabled      types.Bool                        `tfsdk:"enabled"`
-	ID           types.String                      `tfsdk:"id"`
-	InstanceName types.String                      `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols    []types.String                    `tfsdk:"protocols"`
-	Route        *tfTypes.Set                      `tfsdk:"route"`
-	Service      *tfTypes.Set                      `tfsdk:"service"`
-	Tags         []types.String                    `tfsdk:"tags"`
-	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
-	Workspace    types.String                      `tfsdk:"workspace"`
+	Config       *tfTypes.KafkaUpstreamPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                       `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.Set                       `tfsdk:"route"`
+	Service      *tfTypes.Set                       `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Workspace    types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginKafkaUpstreamResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -68,7 +68,8 @@ func (r *PluginKafkaUpstreamResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginKafkaUpstream Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"allowed_topics": schema.ListAttribute{
 						Computed:    true,
@@ -517,8 +518,12 @@ func (r *PluginKafkaUpstreamResource) Schema(ctx context.Context, req resource.S
 						Description: `Socket timeout in milliseconds.`,
 					},
 					"topic": schema.StringAttribute{
-						Required:    true,
-						Description: `The default Kafka topic to publish to if the query parameter defined in the ` + "`" + `topics_query_arg` + "`" + ` does not exist in the request`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The default Kafka topic to publish to if the query parameter defined in the ` + "`" + `topics_query_arg` + "`" + ` does not exist in the request. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"topics_query_arg": schema.StringAttribute{
 						Computed:    true,

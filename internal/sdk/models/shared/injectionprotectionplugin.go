@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type InjectionProtectionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (i *InjectionProtectionPluginAfter) GetAccess() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Access
-}
-
-type InjectionProtectionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (i *InjectionProtectionPluginBefore) GetAccess() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Access
-}
-
-type InjectionProtectionPluginOrdering struct {
-	After  *InjectionProtectionPluginAfter  `json:"after,omitempty"`
-	Before *InjectionProtectionPluginBefore `json:"before,omitempty"`
-}
-
-func (i *InjectionProtectionPluginOrdering) GetAfter() *InjectionProtectionPluginAfter {
-	if i == nil {
-		return nil
-	}
-	return i.After
-}
-
-func (i *InjectionProtectionPluginOrdering) GetBefore() *InjectionProtectionPluginBefore {
-	if i == nil {
-		return nil
-	}
-	return i.Before
-}
-
-type InjectionProtectionPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (i *InjectionProtectionPluginPartials) GetID() *string {
-	if i == nil {
-		return nil
-	}
-	return i.ID
-}
-
-func (i *InjectionProtectionPluginPartials) GetName() *string {
-	if i == nil {
-		return nil
-	}
-	return i.Name
-}
-
-func (i *InjectionProtectionPluginPartials) GetPath() *string {
-	if i == nil {
-		return nil
-	}
-	return i.Path
-}
-
 type CustomInjections struct {
 	// A unique name for this injection.
 	Name string `json:"name"`
@@ -256,6 +186,76 @@ func (i *InjectionProtectionPluginConfig) GetLocations() []Locations {
 	return i.Locations
 }
 
+type InjectionProtectionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (i *InjectionProtectionPluginAfter) GetAccess() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Access
+}
+
+type InjectionProtectionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (i *InjectionProtectionPluginBefore) GetAccess() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Access
+}
+
+type InjectionProtectionPluginOrdering struct {
+	After  *InjectionProtectionPluginAfter  `json:"after,omitempty"`
+	Before *InjectionProtectionPluginBefore `json:"before,omitempty"`
+}
+
+func (i *InjectionProtectionPluginOrdering) GetAfter() *InjectionProtectionPluginAfter {
+	if i == nil {
+		return nil
+	}
+	return i.After
+}
+
+func (i *InjectionProtectionPluginOrdering) GetBefore() *InjectionProtectionPluginBefore {
+	if i == nil {
+		return nil
+	}
+	return i.Before
+}
+
+type InjectionProtectionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (i *InjectionProtectionPluginPartials) GetID() *string {
+	if i == nil {
+		return nil
+	}
+	return i.ID
+}
+
+func (i *InjectionProtectionPluginPartials) GetName() *string {
+	if i == nil {
+		return nil
+	}
+	return i.Name
+}
+
+func (i *InjectionProtectionPluginPartials) GetPath() *string {
+	if i == nil {
+		return nil
+	}
+	return i.Path
+}
+
 type InjectionProtectionPluginProtocols string
 
 const (
@@ -312,8 +312,8 @@ func (i *InjectionProtectionPluginService) GetID() *string {
 	return i.ID
 }
 
-// InjectionProtectionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type InjectionProtectionPlugin struct {
+	Config *InjectionProtectionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -326,17 +326,16 @@ type InjectionProtectionPlugin struct {
 	Ordering     *InjectionProtectionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []InjectionProtectionPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                           `json:"updated_at,omitempty"`
-	Config    *InjectionProtectionPluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []InjectionProtectionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *InjectionProtectionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *InjectionProtectionPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (i InjectionProtectionPlugin) MarshalJSON() ([]byte, error) {
@@ -348,6 +347,13 @@ func (i *InjectionProtectionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (i *InjectionProtectionPlugin) GetConfig() *InjectionProtectionPluginConfig {
+	if i == nil {
+		return nil
+	}
+	return i.Config
 }
 
 func (i *InjectionProtectionPlugin) GetCreatedAt() *int64 {
@@ -396,27 +402,6 @@ func (i *InjectionProtectionPlugin) GetPartials() []InjectionProtectionPluginPar
 	return i.Partials
 }
 
-func (i *InjectionProtectionPlugin) GetTags() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Tags
-}
-
-func (i *InjectionProtectionPlugin) GetUpdatedAt() *int64 {
-	if i == nil {
-		return nil
-	}
-	return i.UpdatedAt
-}
-
-func (i *InjectionProtectionPlugin) GetConfig() *InjectionProtectionPluginConfig {
-	if i == nil {
-		return nil
-	}
-	return i.Config
-}
-
 func (i *InjectionProtectionPlugin) GetProtocols() []InjectionProtectionPluginProtocols {
 	if i == nil {
 		return nil
@@ -436,4 +421,18 @@ func (i *InjectionProtectionPlugin) GetService() *InjectionProtectionPluginServi
 		return nil
 	}
 	return i.Service
+}
+
+func (i *InjectionProtectionPlugin) GetTags() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Tags
+}
+
+func (i *InjectionProtectionPlugin) GetUpdatedAt() *int64 {
+	if i == nil {
+		return nil
+	}
+	return i.UpdatedAt
 }

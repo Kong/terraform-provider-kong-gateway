@@ -18,6 +18,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -36,20 +37,20 @@ type PluginOasValidationResource struct {
 
 // PluginOasValidationResourceModel describes the resource data model.
 type PluginOasValidationResourceModel struct {
-	Config       tfTypes.OasValidationPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                      `tfsdk:"consumer"`
-	CreatedAt    types.Int64                       `tfsdk:"created_at"`
-	Enabled      types.Bool                        `tfsdk:"enabled"`
-	ID           types.String                      `tfsdk:"id"`
-	InstanceName types.String                      `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols    []types.String                    `tfsdk:"protocols"`
-	Route        *tfTypes.Set                      `tfsdk:"route"`
-	Service      *tfTypes.Set                      `tfsdk:"service"`
-	Tags         []types.String                    `tfsdk:"tags"`
-	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
-	Workspace    types.String                      `tfsdk:"workspace"`
+	Config       *tfTypes.OasValidationPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                       `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.Set                       `tfsdk:"route"`
+	Service      *tfTypes.Set                       `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Workspace    types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginOasValidationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +62,8 @@ func (r *PluginOasValidationResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginOasValidation Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"allowed_header_parameters": schema.StringAttribute{
 						Computed:    true,
@@ -69,8 +71,12 @@ func (r *PluginOasValidationResource) Schema(ctx context.Context, req resource.S
 						Description: `List of header parameters in the request that will be ignored when performing HTTP header validation. These are additional headers added to an API request beyond those defined in the API specification.  For example, you might include the HTTP header ` + "`" + `User-Agent` + "`" + `, which lets servers and network peers identify the application, operating system, vendor, and/or version of the requesting user agent.`,
 					},
 					"api_spec": schema.StringAttribute{
-						Required:    true,
-						Description: `The API specification defined using either Swagger or the OpenAPI. This can be either a JSON or YAML based file. If using a YAML file, the spec needs to be URI-Encoded to preserve the YAML format.`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The API specification defined using either Swagger or the OpenAPI. This can be either a JSON or YAML based file. If using a YAML file, the spec needs to be URI-Encoded to preserve the YAML format. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"api_spec_encoded": schema.BoolAttribute{
 						Computed:    true,

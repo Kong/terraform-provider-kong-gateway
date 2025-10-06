@@ -308,18 +308,6 @@ components:
       x-speakeasy-entity: ACL
     ACLPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -380,9 +368,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: acl
           minLength: 1
           type: string
         ordering:
@@ -509,18 +495,6 @@ components:
       x-speakeasy-entity: ACL
     AcePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -752,9 +726,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ace
           minLength: 1
           type: string
         ordering:
@@ -846,18 +818,6 @@ components:
       x-speakeasy-entity: PluginAce
     AcmePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -1158,9 +1118,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: acme
           minLength: 1
           type: string
         ordering:
@@ -1232,18 +1190,6 @@ components:
       x-speakeasy-entity: PluginAcme
     AiAwsGuardrailsPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -1354,9 +1300,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-aws-guardrails
           minLength: 1
           type: string
         ordering:
@@ -1448,18 +1392,6 @@ components:
       x-speakeasy-entity: PluginAiAwsGuardrails
     AiAzureContentSafetyPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -1591,9 +1523,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-azure-content-safety
           minLength: 1
           type: string
         ordering:
@@ -1685,18 +1615,6 @@ components:
       x-speakeasy-entity: PluginAiAzureContentSafety
     AiGcpModelArmorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -1830,9 +1748,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-gcp-model-armor
           minLength: 1
           type: string
         ordering:
@@ -1924,18 +1840,6 @@ components:
       x-speakeasy-entity: PluginAiGcpModelArmor
     AiLlmAsJudgePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -2384,9 +2288,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-llm-as-judge
           minLength: 1
           type: string
         ordering:
@@ -2478,18 +2380,6 @@ components:
       x-speakeasy-entity: PluginAiLlmAsJudge
     AiMcpOauth2Plugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           description: >-
@@ -2681,9 +2571,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-mcp-oauth2
           minLength: 1
           type: string
         ordering:
@@ -2775,18 +2663,6 @@ components:
       x-speakeasy-entity: PluginAiMcpOauth2
     AiMcpProxyPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -2961,9 +2837,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-mcp-proxy
           minLength: 1
           type: string
         ordering:
@@ -3055,18 +2929,6 @@ components:
       x-speakeasy-entity: PluginAiMcpProxy
     AiPromptCompressorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -3171,9 +3033,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-prompt-compressor
           minLength: 1
           type: string
         ordering:
@@ -3265,18 +3125,6 @@ components:
       x-speakeasy-entity: PluginAiPromptCompressor
     AiPromptDecoratorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -3388,9 +3236,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-prompt-decorator
           minLength: 1
           type: string
         ordering:
@@ -3482,18 +3328,6 @@ components:
       x-speakeasy-entity: PluginAiPromptDecorator
     AiPromptGuardPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -3600,9 +3434,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-prompt-guard
           minLength: 1
           type: string
         ordering:
@@ -3694,18 +3526,6 @@ components:
       x-speakeasy-entity: PluginAiPromptGuard
     AiPromptTemplatePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -3792,9 +3612,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-prompt-template
           minLength: 1
           type: string
         ordering:
@@ -3886,18 +3704,6 @@ components:
       x-speakeasy-entity: PluginAiPromptTemplate
     AiProxyAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -4901,9 +4707,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-proxy-advanced
           minLength: 1
           type: string
         ordering:
@@ -5003,18 +4807,6 @@ components:
       x-speakeasy-entity: PluginAiProxyAdvanced
     AiProxyPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -5414,9 +5206,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-proxy
           minLength: 1
           type: string
         ordering:
@@ -5516,18 +5306,6 @@ components:
       x-speakeasy-entity: PluginAiProxy
     AiRagInjectorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -6072,9 +5850,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-rag-injector
           minLength: 1
           type: string
         ordering:
@@ -6166,18 +5942,6 @@ components:
       x-speakeasy-entity: PluginAiRagInjector
     AiRateLimitingAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -6610,9 +6374,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-rate-limiting-advanced
           minLength: 1
           type: string
         ordering:
@@ -6704,18 +6466,6 @@ components:
       x-speakeasy-entity: PluginAiRateLimitingAdvanced
     AiRequestTransformerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -7126,9 +6876,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-request-transformer
           minLength: 1
           type: string
         ordering:
@@ -7220,18 +6968,6 @@ components:
       x-speakeasy-entity: PluginAiRequestTransformer
     AiResponseTransformerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -7663,9 +7399,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-response-transformer
           minLength: 1
           type: string
         ordering:
@@ -7757,18 +7491,6 @@ components:
       x-speakeasy-entity: PluginAiResponseTransformer
     AiSanitizerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -7911,9 +7633,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-sanitizer
           minLength: 1
           type: string
         ordering:
@@ -8005,18 +7725,6 @@ components:
       x-speakeasy-entity: PluginAiSanitizer
     AiSemanticCachePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -8595,9 +8303,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-semantic-cache
           minLength: 1
           type: string
         ordering:
@@ -8689,18 +8395,6 @@ components:
       x-speakeasy-entity: PluginAiSemanticCache
     AiSemanticPromptGuardPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -9291,9 +8985,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-semantic-prompt-guard
           minLength: 1
           type: string
         ordering:
@@ -9385,18 +9077,6 @@ components:
       x-speakeasy-entity: PluginAiSemanticPromptGuard
     AiSemanticResponseGuardPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -9976,9 +9656,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ai-semantic-response-guard
           minLength: 1
           type: string
         ordering:
@@ -10070,18 +9748,6 @@ components:
       x-speakeasy-entity: PluginAiSemanticResponseGuard
     AppDynamicsPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           additionalProperties: true
@@ -10116,9 +9782,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: app-dynamics
           minLength: 1
           type: string
         ordering:
@@ -10210,18 +9874,6 @@ components:
       x-speakeasy-entity: PluginAppDynamics
     AwsLambdaPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -10423,9 +10075,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: aws-lambda
           minLength: 1
           type: string
         ordering:
@@ -10517,18 +10167,6 @@ components:
       x-speakeasy-entity: PluginAwsLambda
     AzureFunctionsPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -10610,9 +10248,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: azure-functions
           minLength: 1
           type: string
         ordering:
@@ -10753,18 +10389,6 @@ components:
       x-speakeasy-entity: BasicAuth
     BasicAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -10811,9 +10435,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: basic-auth
           minLength: 1
           type: string
         ordering:
@@ -10953,18 +10575,6 @@ components:
       x-speakeasy-entity: BasicAuth
     BotDetectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -11006,9 +10616,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: bot-detection
           minLength: 1
           type: string
         ordering:
@@ -11152,18 +10760,6 @@ components:
       x-speakeasy-entity: CACertificate
     CanaryPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -11268,9 +10864,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: canary
           minLength: 1
           type: string
         ordering:
@@ -11458,18 +11052,6 @@ components:
       x-speakeasy-entity: Certificate
     ConfluentConsumePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -12005,9 +11587,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: confluent-consume
           minLength: 1
           type: string
         ordering:
@@ -12107,18 +11687,6 @@ components:
       x-speakeasy-entity: PluginConfluentConsume
     ConfluentPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -12535,9 +12103,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: confluent
           minLength: 1
           type: string
         ordering:
@@ -12713,18 +12279,6 @@ components:
       type: object
     CorrelationIdPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -12778,9 +12332,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: correlation-id
           minLength: 1
           type: string
         ordering:
@@ -12872,18 +12424,6 @@ components:
       x-speakeasy-entity: PluginCorrelationId
     CorsPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -12988,9 +12528,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: cors
           minLength: 1
           type: string
         ordering:
@@ -13083,18 +12621,6 @@ components:
       x-speakeasy-entity: PluginCors
     DatadogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -13280,9 +12806,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: datadog
           minLength: 1
           type: string
         ordering:
@@ -13381,18 +12905,6 @@ components:
       x-speakeasy-entity: PluginDatadog
     DatakitPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -13701,9 +13213,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: datakit
           minLength: 1
           type: string
         ordering:
@@ -13795,18 +13305,6 @@ components:
       x-speakeasy-entity: PluginDatakit
     DegraphqlPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -13834,9 +13332,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: degraphql
           minLength: 1
           type: string
         ordering:
@@ -13928,18 +13424,6 @@ components:
       x-speakeasy-entity: PluginDegraphql
     ExitTransformerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -13992,9 +13476,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: exit-transformer
           minLength: 1
           type: string
         ordering:
@@ -14086,18 +13568,6 @@ components:
       x-speakeasy-entity: PluginExitTransformer
     FileLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -14149,9 +13619,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: file-log
           minLength: 1
           type: string
         ordering:
@@ -14250,18 +13718,6 @@ components:
       x-speakeasy-entity: PluginFileLog
     ForwardProxyPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -14352,9 +13808,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: forward-proxy
           minLength: 1
           type: string
         ordering:
@@ -14456,18 +13910,6 @@ components:
       type: object
     GraphqlProxyCacheAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -14733,9 +14175,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: graphql-proxy-cache-advanced
           minLength: 1
           type: string
         ordering:
@@ -14827,18 +14267,6 @@ components:
       x-speakeasy-entity: PluginGraphqlProxyCacheAdvanced
     GraphqlRateLimitingAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -15161,9 +14589,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: graphql-rate-limiting-advanced
           minLength: 1
           type: string
         ordering:
@@ -15255,18 +14681,6 @@ components:
       x-speakeasy-entity: PluginGraphqlRateLimitingAdvanced
     GrpcGatewayPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -15304,9 +14718,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: grpc-gateway
           minLength: 1
           type: string
         ordering:
@@ -15405,18 +14817,6 @@ components:
       x-speakeasy-entity: PluginGrpcGateway
     GrpcWebPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -15468,9 +14868,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: grpc-web
           minLength: 1
           type: string
         ordering:
@@ -15649,18 +15047,6 @@ components:
       x-speakeasy-entity: HMACAuth
     HeaderCertAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -15824,9 +15210,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: header-cert-auth
           minLength: 1
           type: string
         ordering:
@@ -15918,18 +15302,6 @@ components:
       x-speakeasy-entity: PluginHeaderCertAuth
     HmacAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -16003,9 +15375,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: hmac-auth
           minLength: 1
           type: string
         ordering:
@@ -16105,18 +15475,6 @@ components:
       x-speakeasy-entity: PluginHmacAuth
     HttpLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -16276,9 +15634,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: http-log
           minLength: 1
           type: string
         ordering:
@@ -16377,18 +15733,6 @@ components:
       x-speakeasy-entity: PluginHttpLog
     InjectionProtectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -16471,9 +15815,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: injection-protection
           minLength: 1
           type: string
         ordering:
@@ -16565,18 +15907,6 @@ components:
       x-speakeasy-entity: PluginInjectionProtection
     IpRestrictionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -16651,9 +15981,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ip-restriction
           minLength: 1
           type: string
         ordering:
@@ -16896,18 +16224,6 @@ components:
       x-speakeasy-entity: JWT
     JqPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -17002,9 +16318,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: jq
           minLength: 1
           type: string
         ordering:
@@ -17096,18 +16410,6 @@ components:
       x-speakeasy-entity: PluginJq
     JsonThreatProtectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -17188,9 +16490,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: json-threat-protection
           minLength: 1
           type: string
         ordering:
@@ -17282,18 +16582,6 @@ components:
       x-speakeasy-entity: PluginJsonThreatProtection
     JweDecryptPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -17343,9 +16631,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: jwe-decrypt
           minLength: 1
           type: string
         ordering:
@@ -17437,18 +16723,6 @@ components:
       x-speakeasy-entity: PluginJweDecrypt
     JwtPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -17545,9 +16819,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: jwt
           minLength: 1
           type: string
         ordering:
@@ -17639,18 +16911,6 @@ components:
       x-speakeasy-entity: PluginJwt
     JwtSignerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -18927,9 +18187,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: jwt-signer
           minLength: 1
           type: string
         ordering:
@@ -19021,18 +18279,6 @@ components:
       x-speakeasy-entity: PluginJwtSigner
     KafkaConsumePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -19572,9 +18818,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: kafka-consume
           minLength: 1
           type: string
         ordering:
@@ -19664,18 +18908,6 @@ components:
       x-speakeasy-entity: PluginKafkaConsume
     KafkaLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -20065,9 +19297,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: kafka-log
           minLength: 1
           type: string
         ordering:
@@ -20167,18 +19397,6 @@ components:
       x-speakeasy-entity: PluginKafkaLog
     KafkaUpstreamPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -20616,9 +19834,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: kafka-upstream
           minLength: 1
           type: string
         ordering:
@@ -20824,18 +20040,6 @@ components:
       x-speakeasy-entity: KeyAuth
     KeyAuthEncPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -20922,9 +20126,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: key-auth-enc
           minLength: 1
           type: string
         ordering:
@@ -21024,18 +20226,6 @@ components:
       x-speakeasy-entity: PluginKeyAuthEnc
     KeyAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -21135,9 +20325,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: key-auth
           minLength: 1
           type: string
         ordering:
@@ -21308,18 +20496,6 @@ components:
       x-speakeasy-entity: KeySet
     LdapAuthAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -21500,9 +20676,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ldap-auth-advanced
           minLength: 1
           type: string
         ordering:
@@ -21602,18 +20776,6 @@ components:
       x-speakeasy-entity: PluginLdapAuthAdvanced
     LdapAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -21721,9 +20883,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: ldap-auth
           minLength: 1
           type: string
         ordering:
@@ -21823,18 +20983,6 @@ components:
       x-speakeasy-entity: PluginLdapAuth
     LogglyPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -21946,9 +21094,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: loggly
           minLength: 1
           type: string
         ordering:
@@ -22135,18 +21281,6 @@ components:
       x-speakeasy-entity: MTLSAuth
     MockingPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -22247,9 +21381,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: mocking
           minLength: 1
           type: string
         ordering:
@@ -22341,18 +21473,6 @@ components:
       x-speakeasy-entity: PluginMocking
     MtlsAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -22500,9 +21620,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: mtls-auth
           minLength: 1
           type: string
         ordering:
@@ -22594,18 +21712,6 @@ components:
       x-speakeasy-entity: PluginMtlsAuth
     OasValidationPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -22736,9 +21842,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: oas-validation
           minLength: 1
           type: string
         ordering:
@@ -22830,18 +21934,6 @@ components:
       x-speakeasy-entity: PluginOasValidation
     Oauth2IntrospectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -22960,9 +22052,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: oauth2-introspection
           minLength: 1
           type: string
         ordering:
@@ -23054,18 +22144,6 @@ components:
       x-speakeasy-entity: PluginOauth2Introspection
     Oauth2Plugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -23201,9 +22279,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: oauth2
           minLength: 1
           type: string
         ordering:
@@ -23303,18 +22379,6 @@ components:
       x-speakeasy-entity: PluginOauth2
     OpaPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -23408,9 +22472,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: opa
           minLength: 1
           type: string
         ordering:
@@ -23502,18 +22564,6 @@ components:
       x-speakeasy-entity: PluginOpa
     OpenidConnectPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -25535,9 +24585,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: openid-connect
           minLength: 1
           type: string
         ordering:
@@ -25629,18 +24677,6 @@ components:
       x-speakeasy-entity: PluginOpenidConnect
     OpentelemetryPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -25674,7 +24710,8 @@ components:
                 - w3c
               type: string
             headers:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: >-
                 The custom headers to be added in the HTTP request sent to the
                 OTLP server. This setting is useful for adding the
@@ -25902,9 +24939,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: opentelemetry
           minLength: 1
           type: string
         ordering:
@@ -26545,18 +25580,6 @@ components:
       type: object
     PostFunctionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -26630,9 +25653,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: post-function
           minLength: 1
           type: string
         ordering:
@@ -26731,18 +25752,6 @@ components:
       x-speakeasy-entity: PluginPostFunction
     PreFunctionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -26816,9 +25825,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: pre-function
           minLength: 1
           type: string
         ordering:
@@ -26917,18 +25924,6 @@ components:
       x-speakeasy-entity: PluginPreFunction
     PrometheusPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -27009,9 +26004,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: prometheus
           minLength: 1
           type: string
         ordering:
@@ -27110,18 +26103,6 @@ components:
       x-speakeasy-entity: PluginPrometheus
     ProxyCacheAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -27485,9 +26466,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: proxy-cache-advanced
           minLength: 1
           type: string
         ordering:
@@ -27579,18 +26558,6 @@ components:
       x-speakeasy-entity: PluginProxyCacheAdvanced
     ProxyCachePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -27739,9 +26706,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: proxy-cache
           minLength: 1
           type: string
         ordering:
@@ -27840,18 +26805,6 @@ components:
       x-speakeasy-entity: PluginProxyCache
     RateLimitingAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -28304,9 +27257,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: rate-limiting-advanced
           minLength: 1
           type: string
         ordering:
@@ -28398,18 +27349,6 @@ components:
       x-speakeasy-entity: PluginRateLimitingAdvanced
     RateLimitingPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -28597,9 +27536,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: rate-limiting
           minLength: 1
           type: string
         ordering:
@@ -28691,18 +27628,6 @@ components:
       x-speakeasy-entity: PluginRateLimiting
     RedirectPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -28768,9 +27693,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: redirect
           minLength: 1
           type: string
         ordering:
@@ -28862,18 +27785,6 @@ components:
       x-speakeasy-entity: PluginRedirect
     RequestCalloutPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -29480,9 +28391,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-callout
           minLength: 1
           type: string
         ordering:
@@ -29574,18 +28483,6 @@ components:
       x-speakeasy-entity: PluginRequestCallout
     RequestSizeLimitingPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -29643,9 +28540,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-size-limiting
           minLength: 1
           type: string
         ordering:
@@ -29737,18 +28632,6 @@ components:
       x-speakeasy-entity: PluginRequestSizeLimiting
     RequestTerminationPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -29825,9 +28708,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-termination
           minLength: 1
           type: string
         ordering:
@@ -29919,18 +28800,6 @@ components:
       x-speakeasy-entity: PluginRequestTermination
     RequestTransformerAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -30115,9 +28984,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-transformer-advanced
           minLength: 1
           type: string
         ordering:
@@ -30209,18 +29076,6 @@ components:
       x-speakeasy-entity: PluginRequestTransformerAdvanced
     RequestTransformerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -30364,9 +29219,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-transformer
           minLength: 1
           type: string
         ordering:
@@ -30465,18 +29318,6 @@ components:
       x-speakeasy-entity: PluginRequestTransformer
     RequestValidatorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -30614,9 +29455,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: request-validator
           minLength: 1
           type: string
         ordering:
@@ -30708,18 +29547,6 @@ components:
       x-speakeasy-entity: PluginRequestValidator
     ResponseRatelimitingPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -30866,9 +29693,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: response-ratelimiting
           minLength: 1
           type: string
         ordering:
@@ -30960,18 +29785,6 @@ components:
       x-speakeasy-entity: PluginResponseRatelimiting
     ResponseTransformerAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -31165,9 +29978,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: response-transformer-advanced
           minLength: 1
           type: string
         ordering:
@@ -31259,18 +30070,6 @@ components:
       x-speakeasy-entity: PluginResponseTransformerAdvanced
     ResponseTransformerPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -31427,9 +30226,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: response-transformer
           minLength: 1
           type: string
         ordering:
@@ -31525,18 +30322,6 @@ components:
         - $ref: '#/components/schemas/RouteExpression'
     RouteByHeaderPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -31586,9 +30371,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: route-by-header
           minLength: 1
           type: string
         ordering:
@@ -32088,18 +30871,6 @@ components:
       x-speakeasy-entity: Route
     RouteTransformerAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -32143,9 +30914,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: route-transformer-advanced
           minLength: 1
           type: string
         ordering:
@@ -32290,18 +31059,6 @@ components:
       x-speakeasy-entity: SNI
     SamlPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -32790,9 +31547,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: saml
           minLength: 1
           type: string
         ordering:
@@ -33075,18 +31830,6 @@ components:
       x-speakeasy-entity: Service
     ServiceProtectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -33416,9 +32159,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: service-protection
           minLength: 1
           type: string
         ordering:
@@ -33500,18 +32241,6 @@ components:
       x-speakeasy-entity: PluginServiceProtection
     SessionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -33710,9 +32439,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: session
           minLength: 1
           type: string
         ordering:
@@ -33811,18 +32538,6 @@ components:
       x-speakeasy-entity: PluginSession
     SolaceConsumePlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -34089,9 +32804,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: solace-consume
           minLength: 1
           type: string
         ordering:
@@ -34183,18 +32896,6 @@ components:
       x-speakeasy-entity: PluginSolaceConsume
     SolaceLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -34424,9 +33125,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: solace-log
           minLength: 1
           type: string
         ordering:
@@ -34526,18 +33225,6 @@ components:
       x-speakeasy-entity: PluginSolaceLog
     SolaceUpstreamPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -34796,9 +33483,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: solace-upstream
           minLength: 1
           type: string
         ordering:
@@ -34890,18 +33575,6 @@ components:
       x-speakeasy-entity: PluginSolaceUpstream
     StandardWebhooksPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -34949,9 +33622,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: standard-webhooks
           minLength: 1
           type: string
         ordering:
@@ -35043,18 +33714,6 @@ components:
       x-speakeasy-entity: PluginStandardWebhooks
     StatsdAdvancedPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -35279,9 +33938,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: statsd-advanced
           minLength: 1
           type: string
         ordering:
@@ -35380,18 +34037,6 @@ components:
       x-speakeasy-entity: PluginStatsdAdvanced
     StatsdPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -35614,9 +34259,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: statsd
           minLength: 1
           type: string
         ordering:
@@ -35715,18 +34358,6 @@ components:
       x-speakeasy-entity: PluginStatsd
     SyslogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -35840,9 +34471,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: syslog
           minLength: 1
           type: string
         ordering:
@@ -36087,18 +34716,6 @@ components:
       x-speakeasy-entity: Target
     TcpLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -36174,9 +34791,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: tcp-log
           minLength: 1
           type: string
         ordering:
@@ -36275,18 +34890,6 @@ components:
       x-speakeasy-entity: PluginTcpLog
     TlsHandshakeModifierPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -36316,9 +34919,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: tls-handshake-modifier
           minLength: 1
           type: string
         ordering:
@@ -36411,18 +35012,6 @@ components:
       x-speakeasy-entity: PluginTlsHandshakeModifier
     TlsMetadataHeadersPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -36482,9 +35071,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: tls-metadata-headers
           minLength: 1
           type: string
         ordering:
@@ -36577,18 +35164,6 @@ components:
       x-speakeasy-entity: PluginTlsMetadataHeaders
     UdpLogPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -36646,9 +35221,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: udp-log
           minLength: 1
           type: string
         ordering:
@@ -37357,18 +35930,6 @@ components:
       x-speakeasy-entity: Upstream
     UpstreamOauthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -37823,9 +36384,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: upstream-oauth
           minLength: 1
           type: string
         ordering:
@@ -37917,18 +36476,6 @@ components:
       x-speakeasy-entity: PluginUpstreamOauth
     UpstreamTimeoutPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -37986,9 +36533,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: upstream-timeout
           minLength: 1
           type: string
         ordering:
@@ -38149,18 +36694,6 @@ components:
       x-speakeasy-entity: Vault
     VaultAuthPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -38246,9 +36779,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: vault-auth
           minLength: 1
           type: string
         ordering:
@@ -38340,18 +36871,6 @@ components:
       x-speakeasy-entity: PluginVaultAuth
     WebsocketSizeLimitPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -38394,9 +36913,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: websocket-size-limit
           minLength: 1
           type: string
         ordering:
@@ -38488,18 +37005,6 @@ components:
       x-speakeasy-entity: PluginWebsocketSizeLimit
     WebsocketValidatorPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -38620,9 +37125,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: websocket-validator
           minLength: 1
           type: string
         ordering:
@@ -38837,18 +37340,6 @@ components:
       x-speakeasy-entity: Workspace
     XmlThreatProtectionPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -39016,9 +37507,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: xml-threat-protection
           minLength: 1
           type: string
         ordering:
@@ -39110,18 +37599,6 @@ components:
       x-speakeasy-entity: PluginXmlThreatProtection
     ZipkinPlugin:
       additionalProperties: false
-      description: >-
-        A Plugin entity represents a plugin configuration that will be executed
-        during the HTTP request/response lifecycle. It is how you can add
-        functionalities to Services that run behind Kong, like Authentication or
-        Rate Limiting for example. You can find more information about how to
-        install and what values each plugin takes by visiting the [Kong
-        Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration
-        to a Service, every request made by a client to that Service will run
-        said Plugin. If a Plugin needs to be tuned to different values for some
-        specific Consumers, you can do so by creating a separate plugin instance
-        that specifies both the Service and the Consumer, through the `service`
-        and `consumer` fields.
       properties:
         config:
           properties:
@@ -39430,9 +37907,7 @@ components:
           nullable: true
           type: string
         name:
-          description: >-
-            The name of the Plugin that's going to be added. Currently, the
-            Plugin must be installed in every Kong instance separately.
+          const: zipkin
           minLength: 1
           type: string
         ordering:

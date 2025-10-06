@@ -8,6 +8,27 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type BotDetectionPluginConfig struct {
+	// An array of regular expressions that should be allowed. The regular expressions will be checked against the `User-Agent` header.
+	Allow []string `json:"allow,omitempty"`
+	// An array of regular expressions that should be denied. The regular expressions will be checked against the `User-Agent` header.
+	Deny []string `json:"deny,omitempty"`
+}
+
+func (b *BotDetectionPluginConfig) GetAllow() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Allow
+}
+
+func (b *BotDetectionPluginConfig) GetDeny() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Deny
+}
+
 type BotDetectionPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -78,27 +99,6 @@ func (b *BotDetectionPluginPartials) GetPath() *string {
 	return b.Path
 }
 
-type BotDetectionPluginConfig struct {
-	// An array of regular expressions that should be allowed. The regular expressions will be checked against the `User-Agent` header.
-	Allow []string `json:"allow,omitempty"`
-	// An array of regular expressions that should be denied. The regular expressions will be checked against the `User-Agent` header.
-	Deny []string `json:"deny,omitempty"`
-}
-
-func (b *BotDetectionPluginConfig) GetAllow() []string {
-	if b == nil {
-		return nil
-	}
-	return b.Allow
-}
-
-func (b *BotDetectionPluginConfig) GetDeny() []string {
-	if b == nil {
-		return nil
-	}
-	return b.Deny
-}
-
 type BotDetectionPluginProtocols string
 
 const (
@@ -155,8 +155,8 @@ func (b *BotDetectionPluginService) GetID() *string {
 	return b.ID
 }
 
-// BotDetectionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type BotDetectionPlugin struct {
+	Config *BotDetectionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -169,17 +169,16 @@ type BotDetectionPlugin struct {
 	Ordering     *BotDetectionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []BotDetectionPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                    `json:"updated_at,omitempty"`
-	Config    *BotDetectionPluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []BotDetectionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *BotDetectionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *BotDetectionPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (b BotDetectionPlugin) MarshalJSON() ([]byte, error) {
@@ -191,6 +190,13 @@ func (b *BotDetectionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (b *BotDetectionPlugin) GetConfig() *BotDetectionPluginConfig {
+	if b == nil {
+		return nil
+	}
+	return b.Config
 }
 
 func (b *BotDetectionPlugin) GetCreatedAt() *int64 {
@@ -239,27 +245,6 @@ func (b *BotDetectionPlugin) GetPartials() []BotDetectionPluginPartials {
 	return b.Partials
 }
 
-func (b *BotDetectionPlugin) GetTags() []string {
-	if b == nil {
-		return nil
-	}
-	return b.Tags
-}
-
-func (b *BotDetectionPlugin) GetUpdatedAt() *int64 {
-	if b == nil {
-		return nil
-	}
-	return b.UpdatedAt
-}
-
-func (b *BotDetectionPlugin) GetConfig() *BotDetectionPluginConfig {
-	if b == nil {
-		return nil
-	}
-	return b.Config
-}
-
 func (b *BotDetectionPlugin) GetProtocols() []BotDetectionPluginProtocols {
 	if b == nil {
 		return nil
@@ -279,4 +264,18 @@ func (b *BotDetectionPlugin) GetService() *BotDetectionPluginService {
 		return nil
 	}
 	return b.Service
+}
+
+func (b *BotDetectionPlugin) GetTags() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Tags
+}
+
+func (b *BotDetectionPlugin) GetUpdatedAt() *int64 {
+	if b == nil {
+		return nil
+	}
+	return b.UpdatedAt
 }

@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type HeaderCertAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HeaderCertAuthPluginAfter) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HeaderCertAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (h *HeaderCertAuthPluginBefore) GetAccess() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Access
-}
-
-type HeaderCertAuthPluginOrdering struct {
-	After  *HeaderCertAuthPluginAfter  `json:"after,omitempty"`
-	Before *HeaderCertAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (h *HeaderCertAuthPluginOrdering) GetAfter() *HeaderCertAuthPluginAfter {
-	if h == nil {
-		return nil
-	}
-	return h.After
-}
-
-func (h *HeaderCertAuthPluginOrdering) GetBefore() *HeaderCertAuthPluginBefore {
-	if h == nil {
-		return nil
-	}
-	return h.Before
-}
-
-type HeaderCertAuthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (h *HeaderCertAuthPluginPartials) GetID() *string {
-	if h == nil {
-		return nil
-	}
-	return h.ID
-}
-
-func (h *HeaderCertAuthPluginPartials) GetName() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Name
-}
-
-func (h *HeaderCertAuthPluginPartials) GetPath() *string {
-	if h == nil {
-		return nil
-	}
-	return h.Path
-}
-
 // AuthenticatedGroupBy - Certificate property to use as the authenticated group. Valid values are `CN` (Common Name) or `DN` (Distinguished Name). Once `skip_consumer_lookup` is applied, any client with a valid certificate can access the Service/API. To restrict usage to only some of the authenticated users, also add the ACL plugin (not covered here) and create allowed or denied groups of users.
 type AuthenticatedGroupBy string
 
@@ -353,6 +283,76 @@ func (h *HeaderCertAuthPluginConfig) GetSkipConsumerLookup() *bool {
 	return h.SkipConsumerLookup
 }
 
+type HeaderCertAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HeaderCertAuthPluginAfter) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HeaderCertAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HeaderCertAuthPluginBefore) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HeaderCertAuthPluginOrdering struct {
+	After  *HeaderCertAuthPluginAfter  `json:"after,omitempty"`
+	Before *HeaderCertAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (h *HeaderCertAuthPluginOrdering) GetAfter() *HeaderCertAuthPluginAfter {
+	if h == nil {
+		return nil
+	}
+	return h.After
+}
+
+func (h *HeaderCertAuthPluginOrdering) GetBefore() *HeaderCertAuthPluginBefore {
+	if h == nil {
+		return nil
+	}
+	return h.Before
+}
+
+type HeaderCertAuthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (h *HeaderCertAuthPluginPartials) GetID() *string {
+	if h == nil {
+		return nil
+	}
+	return h.ID
+}
+
+func (h *HeaderCertAuthPluginPartials) GetName() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Name
+}
+
+func (h *HeaderCertAuthPluginPartials) GetPath() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Path
+}
+
 type HeaderCertAuthPluginProtocols string
 
 const (
@@ -409,8 +409,8 @@ func (h *HeaderCertAuthPluginService) GetID() *string {
 	return h.ID
 }
 
-// HeaderCertAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HeaderCertAuthPlugin struct {
+	Config *HeaderCertAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -423,17 +423,16 @@ type HeaderCertAuthPlugin struct {
 	Ordering     *HeaderCertAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []HeaderCertAuthPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                     `json:"updated_at,omitempty"`
-	Config    HeaderCertAuthPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []HeaderCertAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *HeaderCertAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *HeaderCertAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (h HeaderCertAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -441,10 +440,17 @@ func (h HeaderCertAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (h *HeaderCertAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (h *HeaderCertAuthPlugin) GetConfig() *HeaderCertAuthPluginConfig {
+	if h == nil {
+		return nil
+	}
+	return h.Config
 }
 
 func (h *HeaderCertAuthPlugin) GetCreatedAt() *int64 {
@@ -493,27 +499,6 @@ func (h *HeaderCertAuthPlugin) GetPartials() []HeaderCertAuthPluginPartials {
 	return h.Partials
 }
 
-func (h *HeaderCertAuthPlugin) GetTags() []string {
-	if h == nil {
-		return nil
-	}
-	return h.Tags
-}
-
-func (h *HeaderCertAuthPlugin) GetUpdatedAt() *int64 {
-	if h == nil {
-		return nil
-	}
-	return h.UpdatedAt
-}
-
-func (h *HeaderCertAuthPlugin) GetConfig() HeaderCertAuthPluginConfig {
-	if h == nil {
-		return HeaderCertAuthPluginConfig{}
-	}
-	return h.Config
-}
-
 func (h *HeaderCertAuthPlugin) GetProtocols() []HeaderCertAuthPluginProtocols {
 	if h == nil {
 		return nil
@@ -533,4 +518,18 @@ func (h *HeaderCertAuthPlugin) GetService() *HeaderCertAuthPluginService {
 		return nil
 	}
 	return h.Service
+}
+
+func (h *HeaderCertAuthPlugin) GetTags() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Tags
+}
+
+func (h *HeaderCertAuthPlugin) GetUpdatedAt() *int64 {
+	if h == nil {
+		return nil
+	}
+	return h.UpdatedAt
 }

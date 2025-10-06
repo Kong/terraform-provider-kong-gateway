@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RequestCalloutPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestCalloutPluginAfter) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestCalloutPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestCalloutPluginBefore) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestCalloutPluginOrdering struct {
-	After  *RequestCalloutPluginAfter  `json:"after,omitempty"`
-	Before *RequestCalloutPluginBefore `json:"before,omitempty"`
-}
-
-func (r *RequestCalloutPluginOrdering) GetAfter() *RequestCalloutPluginAfter {
-	if r == nil {
-		return nil
-	}
-	return r.After
-}
-
-func (r *RequestCalloutPluginOrdering) GetBefore() *RequestCalloutPluginBefore {
-	if r == nil {
-		return nil
-	}
-	return r.Before
-}
-
-type RequestCalloutPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (r *RequestCalloutPluginPartials) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-func (r *RequestCalloutPluginPartials) GetName() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Name
-}
-
-func (r *RequestCalloutPluginPartials) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
 type RequestCalloutPluginMemory struct {
 	// The name of the shared dictionary in which to hold cache entities when the memory strategy is selected. Note that this dictionary currently must be defined manually in the Kong Nginx template.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
@@ -1055,6 +985,76 @@ func (r *RequestCalloutPluginConsumerGroup) GetID() *string {
 	return r.ID
 }
 
+type RequestCalloutPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestCalloutPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestCalloutPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestCalloutPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestCalloutPluginOrdering struct {
+	After  *RequestCalloutPluginAfter  `json:"after,omitempty"`
+	Before *RequestCalloutPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestCalloutPluginOrdering) GetAfter() *RequestCalloutPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestCalloutPluginOrdering) GetBefore() *RequestCalloutPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestCalloutPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestCalloutPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestCalloutPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestCalloutPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
 type RequestCalloutPluginProtocols string
 
 const (
@@ -1111,8 +1111,12 @@ func (r *RequestCalloutPluginService) GetID() *string {
 	return r.ID
 }
 
-// RequestCalloutPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestCalloutPlugin struct {
+	Config *RequestCalloutPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RequestCalloutPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *RequestCalloutPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1125,21 +1129,16 @@ type RequestCalloutPlugin struct {
 	Ordering     *RequestCalloutPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RequestCalloutPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                     `json:"updated_at,omitempty"`
-	Config    RequestCalloutPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RequestCalloutPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *RequestCalloutPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RequestCalloutPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestCalloutPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestCalloutPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestCalloutPlugin) MarshalJSON() ([]byte, error) {
@@ -1147,10 +1146,31 @@ func (r RequestCalloutPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RequestCalloutPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *RequestCalloutPlugin) GetConfig() *RequestCalloutPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RequestCalloutPlugin) GetConsumer() *RequestCalloutPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
+func (r *RequestCalloutPlugin) GetConsumerGroup() *RequestCalloutPluginConsumerGroup {
+	if r == nil {
+		return nil
+	}
+	return r.ConsumerGroup
 }
 
 func (r *RequestCalloutPlugin) GetCreatedAt() *int64 {
@@ -1199,41 +1219,6 @@ func (r *RequestCalloutPlugin) GetPartials() []RequestCalloutPluginPartials {
 	return r.Partials
 }
 
-func (r *RequestCalloutPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RequestCalloutPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
-}
-
-func (r *RequestCalloutPlugin) GetConfig() RequestCalloutPluginConfig {
-	if r == nil {
-		return RequestCalloutPluginConfig{}
-	}
-	return r.Config
-}
-
-func (r *RequestCalloutPlugin) GetConsumer() *RequestCalloutPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
-func (r *RequestCalloutPlugin) GetConsumerGroup() *RequestCalloutPluginConsumerGroup {
-	if r == nil {
-		return nil
-	}
-	return r.ConsumerGroup
-}
-
 func (r *RequestCalloutPlugin) GetProtocols() []RequestCalloutPluginProtocols {
 	if r == nil {
 		return nil
@@ -1253,4 +1238,18 @@ func (r *RequestCalloutPlugin) GetService() *RequestCalloutPluginService {
 		return nil
 	}
 	return r.Service
+}
+
+func (r *RequestCalloutPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RequestCalloutPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
 }

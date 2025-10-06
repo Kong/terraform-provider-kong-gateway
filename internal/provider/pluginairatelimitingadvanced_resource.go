@@ -39,21 +39,21 @@ type PluginAiRateLimitingAdvancedResource struct {
 
 // PluginAiRateLimitingAdvancedResourceModel describes the resource data model.
 type PluginAiRateLimitingAdvancedResourceModel struct {
-	Config        tfTypes.AiRateLimitingAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                               `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                               `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                `tfsdk:"created_at"`
-	Enabled       types.Bool                                 `tfsdk:"enabled"`
-	ID            types.String                               `tfsdk:"id"`
-	InstanceName  types.String                               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering                 `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials                `tfsdk:"partials"`
-	Protocols     []types.String                             `tfsdk:"protocols"`
-	Route         *tfTypes.Set                               `tfsdk:"route"`
-	Service       *tfTypes.Set                               `tfsdk:"service"`
-	Tags          []types.String                             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                `tfsdk:"updated_at"`
-	Workspace     types.String                               `tfsdk:"workspace"`
+	Config        *tfTypes.AiRateLimitingAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                                `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                                `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                                 `tfsdk:"created_at"`
+	Enabled       types.Bool                                  `tfsdk:"enabled"`
+	ID            types.String                                `tfsdk:"id"`
+	InstanceName  types.String                                `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering                  `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials                 `tfsdk:"partials"`
+	Protocols     []types.String                              `tfsdk:"protocols"`
+	Route         *tfTypes.Set                                `tfsdk:"route"`
+	Service       *tfTypes.Set                                `tfsdk:"service"`
+	Tags          []types.String                              `tfsdk:"tags"`
+	UpdatedAt     types.Int64                                 `tfsdk:"updated_at"`
+	Workspace     types.String                                `tfsdk:"workspace"`
 }
 
 func (r *PluginAiRateLimitingAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,7 +65,8 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 		MarkdownDescription: "PluginAiRateLimitingAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"dictionary_name": schema.StringAttribute{
 						Computed:    true,
@@ -133,7 +134,8 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 						},
 					},
 					"llm_providers": schema.ListNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -179,7 +181,10 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 								},
 							},
 						},
-						Description: `The provider config. Takes an array of ` + "`" + `name` + "`" + `, ` + "`" + `limit` + "`" + ` and ` + "`" + `window size` + "`" + ` values.`,
+						Description: `The provider config. Takes an array of ` + "`" + `name` + "`" + `, ` + "`" + `limit` + "`" + ` and ` + "`" + `window size` + "`" + ` values. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"namespace": schema.StringAttribute{
 						Computed:    true,

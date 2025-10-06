@@ -21,6 +21,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -41,21 +42,21 @@ type PluginRequestCalloutResource struct {
 
 // PluginRequestCalloutResourceModel describes the resource data model.
 type PluginRequestCalloutResourceModel struct {
-	Config        tfTypes.RequestCalloutPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                        `tfsdk:"created_at"`
-	Enabled       types.Bool                         `tfsdk:"enabled"`
-	ID            types.String                       `tfsdk:"id"`
-	InstanceName  types.String                       `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials        `tfsdk:"partials"`
-	Protocols     []types.String                     `tfsdk:"protocols"`
-	Route         *tfTypes.Set                       `tfsdk:"route"`
-	Service       *tfTypes.Set                       `tfsdk:"service"`
-	Tags          []types.String                     `tfsdk:"tags"`
-	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
-	Workspace     types.String                       `tfsdk:"workspace"`
+	Config        *tfTypes.RequestCalloutPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                         `tfsdk:"created_at"`
+	Enabled       types.Bool                          `tfsdk:"enabled"`
+	ID            types.String                        `tfsdk:"id"`
+	InstanceName  types.String                        `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols     []types.String                      `tfsdk:"protocols"`
+	Route         *tfTypes.Set                        `tfsdk:"route"`
+	Service       *tfTypes.Set                        `tfsdk:"service"`
+	Tags          []types.String                      `tfsdk:"tags"`
+	UpdatedAt     types.Int64                         `tfsdk:"updated_at"`
+	Workspace     types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginRequestCalloutResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -67,7 +68,8 @@ func (r *PluginRequestCalloutResource) Schema(ctx context.Context, req resource.
 		MarkdownDescription: "PluginRequestCallout Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"cache": schema.SingleNestedAttribute{
 						Computed: true,
@@ -281,7 +283,8 @@ func (r *PluginRequestCalloutResource) Schema(ctx context.Context, req resource.
 						Description: `Plugin global caching configuration.`,
 					},
 					"callouts": schema.ListNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -566,7 +569,10 @@ func (r *PluginRequestCalloutResource) Schema(ctx context.Context, req resource.
 								},
 							},
 						},
-						Description: `A collection of callout objects, where each object represents an HTTP request made in the context of a proxy request.`,
+						Description: `A collection of callout objects, where each object represents an HTTP request made in the context of a proxy request. Not Null`,
+						Validators: []validator.List{
+							speakeasy_listvalidators.NotNull(),
+						},
 					},
 					"upstream": schema.SingleNestedAttribute{
 						Computed: true,

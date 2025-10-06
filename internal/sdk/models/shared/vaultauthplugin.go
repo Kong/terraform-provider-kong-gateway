@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type VaultAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (v *VaultAuthPluginAfter) GetAccess() []string {
-	if v == nil {
-		return nil
-	}
-	return v.Access
-}
-
-type VaultAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (v *VaultAuthPluginBefore) GetAccess() []string {
-	if v == nil {
-		return nil
-	}
-	return v.Access
-}
-
-type VaultAuthPluginOrdering struct {
-	After  *VaultAuthPluginAfter  `json:"after,omitempty"`
-	Before *VaultAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (v *VaultAuthPluginOrdering) GetAfter() *VaultAuthPluginAfter {
-	if v == nil {
-		return nil
-	}
-	return v.After
-}
-
-func (v *VaultAuthPluginOrdering) GetBefore() *VaultAuthPluginBefore {
-	if v == nil {
-		return nil
-	}
-	return v.Before
-}
-
-type VaultAuthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (v *VaultAuthPluginPartials) GetID() *string {
-	if v == nil {
-		return nil
-	}
-	return v.ID
-}
-
-func (v *VaultAuthPluginPartials) GetName() *string {
-	if v == nil {
-		return nil
-	}
-	return v.Name
-}
-
-func (v *VaultAuthPluginPartials) GetPath() *string {
-	if v == nil {
-		return nil
-	}
-	return v.Path
-}
-
 // VaultAuthPluginVault - A reference to an existing `vault` object within the database. `vault` entities define the connection and authentication parameters used to connect to a Vault HTTP(S) API.
 type VaultAuthPluginVault struct {
 	ID *string `json:"id,omitempty"`
@@ -156,6 +86,76 @@ func (v *VaultAuthPluginConfig) GetVault() *VaultAuthPluginVault {
 	return v.Vault
 }
 
+type VaultAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (v *VaultAuthPluginAfter) GetAccess() []string {
+	if v == nil {
+		return nil
+	}
+	return v.Access
+}
+
+type VaultAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (v *VaultAuthPluginBefore) GetAccess() []string {
+	if v == nil {
+		return nil
+	}
+	return v.Access
+}
+
+type VaultAuthPluginOrdering struct {
+	After  *VaultAuthPluginAfter  `json:"after,omitempty"`
+	Before *VaultAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (v *VaultAuthPluginOrdering) GetAfter() *VaultAuthPluginAfter {
+	if v == nil {
+		return nil
+	}
+	return v.After
+}
+
+func (v *VaultAuthPluginOrdering) GetBefore() *VaultAuthPluginBefore {
+	if v == nil {
+		return nil
+	}
+	return v.Before
+}
+
+type VaultAuthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (v *VaultAuthPluginPartials) GetID() *string {
+	if v == nil {
+		return nil
+	}
+	return v.ID
+}
+
+func (v *VaultAuthPluginPartials) GetName() *string {
+	if v == nil {
+		return nil
+	}
+	return v.Name
+}
+
+func (v *VaultAuthPluginPartials) GetPath() *string {
+	if v == nil {
+		return nil
+	}
+	return v.Path
+}
+
 type VaultAuthPluginProtocols string
 
 const (
@@ -212,8 +212,8 @@ func (v *VaultAuthPluginService) GetID() *string {
 	return v.ID
 }
 
-// VaultAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type VaultAuthPlugin struct {
+	Config *VaultAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -226,17 +226,16 @@ type VaultAuthPlugin struct {
 	Ordering     *VaultAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []VaultAuthPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                 `json:"updated_at,omitempty"`
-	Config    *VaultAuthPluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []VaultAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *VaultAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *VaultAuthPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (v VaultAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -248,6 +247,13 @@ func (v *VaultAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (v *VaultAuthPlugin) GetConfig() *VaultAuthPluginConfig {
+	if v == nil {
+		return nil
+	}
+	return v.Config
 }
 
 func (v *VaultAuthPlugin) GetCreatedAt() *int64 {
@@ -296,27 +302,6 @@ func (v *VaultAuthPlugin) GetPartials() []VaultAuthPluginPartials {
 	return v.Partials
 }
 
-func (v *VaultAuthPlugin) GetTags() []string {
-	if v == nil {
-		return nil
-	}
-	return v.Tags
-}
-
-func (v *VaultAuthPlugin) GetUpdatedAt() *int64 {
-	if v == nil {
-		return nil
-	}
-	return v.UpdatedAt
-}
-
-func (v *VaultAuthPlugin) GetConfig() *VaultAuthPluginConfig {
-	if v == nil {
-		return nil
-	}
-	return v.Config
-}
-
 func (v *VaultAuthPlugin) GetProtocols() []VaultAuthPluginProtocols {
 	if v == nil {
 		return nil
@@ -336,4 +321,18 @@ func (v *VaultAuthPlugin) GetService() *VaultAuthPluginService {
 		return nil
 	}
 	return v.Service
+}
+
+func (v *VaultAuthPlugin) GetTags() []string {
+	if v == nil {
+		return nil
+	}
+	return v.Tags
+}
+
+func (v *VaultAuthPlugin) GetUpdatedAt() *int64 {
+	if v == nil {
+		return nil
+	}
+	return v.UpdatedAt
 }

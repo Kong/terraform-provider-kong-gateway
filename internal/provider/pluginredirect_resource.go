@@ -19,6 +19,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,21 +38,21 @@ type PluginRedirectResource struct {
 
 // PluginRedirectResourceModel describes the resource data model.
 type PluginRedirectResourceModel struct {
-	Config        tfTypes.RedirectPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                 `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                 `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                  `tfsdk:"created_at"`
-	Enabled       types.Bool                   `tfsdk:"enabled"`
-	ID            types.String                 `tfsdk:"id"`
-	InstanceName  types.String                 `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials  `tfsdk:"partials"`
-	Protocols     []types.String               `tfsdk:"protocols"`
-	Route         *tfTypes.Set                 `tfsdk:"route"`
-	Service       *tfTypes.Set                 `tfsdk:"service"`
-	Tags          []types.String               `tfsdk:"tags"`
-	UpdatedAt     types.Int64                  `tfsdk:"updated_at"`
-	Workspace     types.String                 `tfsdk:"workspace"`
+	Config        *tfTypes.RedirectPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                  `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                  `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                   `tfsdk:"created_at"`
+	Enabled       types.Bool                    `tfsdk:"enabled"`
+	ID            types.String                  `tfsdk:"id"`
+	InstanceName  types.String                  `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering    `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials   `tfsdk:"partials"`
+	Protocols     []types.String                `tfsdk:"protocols"`
+	Route         *tfTypes.Set                  `tfsdk:"route"`
+	Service       *tfTypes.Set                  `tfsdk:"service"`
+	Tags          []types.String                `tfsdk:"tags"`
+	UpdatedAt     types.Int64                   `tfsdk:"updated_at"`
+	Workspace     types.String                  `tfsdk:"workspace"`
 }
 
 func (r *PluginRedirectResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -63,7 +64,8 @@ func (r *PluginRedirectResource) Schema(ctx context.Context, req resource.Schema
 		MarkdownDescription: "PluginRedirect Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"keep_incoming_path": schema.BoolAttribute{
 						Computed:    true,
@@ -71,8 +73,12 @@ func (r *PluginRedirectResource) Schema(ctx context.Context, req resource.Schema
 						Description: `Use the incoming request's path and query string in the redirect URL`,
 					},
 					"location": schema.StringAttribute{
-						Required:    true,
-						Description: `The URL to redirect to`,
+						Computed:    true,
+						Optional:    true,
+						Description: `The URL to redirect to. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"status_code": schema.Int64Attribute{
 						Computed:    true,

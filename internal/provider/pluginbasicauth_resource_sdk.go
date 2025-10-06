@@ -50,16 +50,18 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx cont
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -172,6 +174,32 @@ func (r *PluginBasicAuthResourceModel) ToOperationsUpdateBasicauthPluginRequest(
 func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Context) (*shared.BasicAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.BasicAuthPluginConfig
+	if r.Config != nil {
+		anonymous := new(string)
+		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+			*anonymous = r.Config.Anonymous.ValueString()
+		} else {
+			anonymous = nil
+		}
+		hideCredentials := new(bool)
+		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
+			*hideCredentials = r.Config.HideCredentials.ValueBool()
+		} else {
+			hideCredentials = nil
+		}
+		realm := new(string)
+		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
+			*realm = r.Config.Realm.ValueString()
+		} else {
+			realm = nil
+		}
+		config = &shared.BasicAuthPluginConfig{
+			Anonymous:       anonymous,
+			HideCredentials: hideCredentials,
+			Realm:           realm,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -223,69 +251,33 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 			Before: before,
 		}
 	}
-	partials := make([]shared.BasicAuthPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.BasicAuthPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.BasicAuthPluginConfig
-	if r.Config != nil {
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		hideCredentials := new(bool)
-		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
-			*hideCredentials = r.Config.HideCredentials.ValueBool()
-		} else {
-			hideCredentials = nil
-		}
-		realm := new(string)
-		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
-			*realm = r.Config.Realm.ValueString()
-		} else {
-			realm = nil
-		}
-		config = &shared.BasicAuthPluginConfig{
-			Anonymous:       anonymous,
-			HideCredentials: hideCredentials,
-			Realm:           realm,
+	var partials []shared.BasicAuthPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.BasicAuthPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.BasicAuthPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.BasicAuthPluginProtocols, 0, len(r.Protocols))
@@ -316,19 +308,32 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.BasicAuthPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

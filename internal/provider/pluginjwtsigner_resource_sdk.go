@@ -484,16 +484,18 @@ func (r *PluginJwtSignerResourceModel) RefreshFromSharedJwtSignerPlugin(ctx cont
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -606,96 +608,6 @@ func (r *PluginJwtSignerResourceModel) ToOperationsUpdateJwtsignerPluginRequest(
 func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Context) (*shared.JwtSignerPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.JwtSignerPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.JwtSignerPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.JwtSignerPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.JwtSignerPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.JwtSignerPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.JwtSignerPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	partials := make([]shared.JwtSignerPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.JwtSignerPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.JwtSignerPluginConfig
 	if r.Config != nil {
 		accessTokenAudienceClaim := make([]string, 0, len(r.Config.AccessTokenAudienceClaim))
@@ -844,14 +756,14 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 		}
 		var accessTokenJwksURIClientCertificate *shared.AccessTokenJwksURIClientCertificate
 		if r.Config.AccessTokenJwksURIClientCertificate != nil {
-			id2 := new(string)
+			id := new(string)
 			if !r.Config.AccessTokenJwksURIClientCertificate.ID.IsUnknown() && !r.Config.AccessTokenJwksURIClientCertificate.ID.IsNull() {
-				*id2 = r.Config.AccessTokenJwksURIClientCertificate.ID.ValueString()
+				*id = r.Config.AccessTokenJwksURIClientCertificate.ID.ValueString()
 			} else {
-				id2 = nil
+				id = nil
 			}
 			accessTokenJwksURIClientCertificate = &shared.AccessTokenJwksURIClientCertificate{
-				ID: id2,
+				ID: id,
 			}
 		}
 		accessTokenJwksURIClientPassword := new(string)
@@ -880,14 +792,14 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 		}
 		var accessTokenKeysetClientCertificate *shared.AccessTokenKeysetClientCertificate
 		if r.Config.AccessTokenKeysetClientCertificate != nil {
-			id3 := new(string)
+			id1 := new(string)
 			if !r.Config.AccessTokenKeysetClientCertificate.ID.IsUnknown() && !r.Config.AccessTokenKeysetClientCertificate.ID.IsNull() {
-				*id3 = r.Config.AccessTokenKeysetClientCertificate.ID.ValueString()
+				*id1 = r.Config.AccessTokenKeysetClientCertificate.ID.ValueString()
 			} else {
-				id3 = nil
+				id1 = nil
 			}
 			accessTokenKeysetClientCertificate = &shared.AccessTokenKeysetClientCertificate{
-				ID: id3,
+				ID: id1,
 			}
 		}
 		accessTokenKeysetClientPassword := new(string)
@@ -1162,14 +1074,14 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 		}
 		var channelTokenJwksURIClientCertificate *shared.ChannelTokenJwksURIClientCertificate
 		if r.Config.ChannelTokenJwksURIClientCertificate != nil {
-			id4 := new(string)
+			id2 := new(string)
 			if !r.Config.ChannelTokenJwksURIClientCertificate.ID.IsUnknown() && !r.Config.ChannelTokenJwksURIClientCertificate.ID.IsNull() {
-				*id4 = r.Config.ChannelTokenJwksURIClientCertificate.ID.ValueString()
+				*id2 = r.Config.ChannelTokenJwksURIClientCertificate.ID.ValueString()
 			} else {
-				id4 = nil
+				id2 = nil
 			}
 			channelTokenJwksURIClientCertificate = &shared.ChannelTokenJwksURIClientCertificate{
-				ID: id4,
+				ID: id2,
 			}
 		}
 		channelTokenJwksURIClientPassword := new(string)
@@ -1198,14 +1110,14 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 		}
 		var channelTokenKeysetClientCertificate *shared.ChannelTokenKeysetClientCertificate
 		if r.Config.ChannelTokenKeysetClientCertificate != nil {
-			id5 := new(string)
+			id3 := new(string)
 			if !r.Config.ChannelTokenKeysetClientCertificate.ID.IsUnknown() && !r.Config.ChannelTokenKeysetClientCertificate.ID.IsNull() {
-				*id5 = r.Config.ChannelTokenKeysetClientCertificate.ID.ValueString()
+				*id3 = r.Config.ChannelTokenKeysetClientCertificate.ID.ValueString()
 			} else {
-				id5 = nil
+				id3 = nil
 			}
 			channelTokenKeysetClientCertificate = &shared.ChannelTokenKeysetClientCertificate{
-				ID: id5,
+				ID: id3,
 			}
 		}
 		channelTokenKeysetClientPassword := new(string)
@@ -1694,6 +1606,86 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 			VerifyChannelTokenSubject:                 verifyChannelTokenSubject,
 		}
 	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id4 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id4 = r.ID.ValueString()
+	} else {
+		id4 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.JwtSignerPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.JwtSignerPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.JwtSignerPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.JwtSignerPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.JwtSignerPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.JwtSignerPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.JwtSignerPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.JwtSignerPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id5 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id5 = partialsItem.ID.ValueString()
+			} else {
+				id5 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.JwtSignerPluginPartials{
+				ID:   id5,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
 	protocols := make([]shared.JwtSignerPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.JwtSignerPluginProtocols(protocolsItem.ValueString()))
@@ -1722,19 +1714,32 @@ func (r *PluginJwtSignerResourceModel) ToSharedJwtSignerPlugin(ctx context.Conte
 			ID: id7,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.JwtSignerPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id4,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

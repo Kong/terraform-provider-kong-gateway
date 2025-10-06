@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type ConfluentConsumePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *ConfluentConsumePluginAfter) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type ConfluentConsumePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *ConfluentConsumePluginBefore) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type ConfluentConsumePluginOrdering struct {
-	After  *ConfluentConsumePluginAfter  `json:"after,omitempty"`
-	Before *ConfluentConsumePluginBefore `json:"before,omitempty"`
-}
-
-func (c *ConfluentConsumePluginOrdering) GetAfter() *ConfluentConsumePluginAfter {
-	if c == nil {
-		return nil
-	}
-	return c.After
-}
-
-func (c *ConfluentConsumePluginOrdering) GetBefore() *ConfluentConsumePluginBefore {
-	if c == nil {
-		return nil
-	}
-	return c.Before
-}
-
-type ConfluentConsumePluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (c *ConfluentConsumePluginPartials) GetID() *string {
-	if c == nil {
-		return nil
-	}
-	return c.ID
-}
-
-func (c *ConfluentConsumePluginPartials) GetName() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Name
-}
-
-func (c *ConfluentConsumePluginPartials) GetPath() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Path
-}
-
 // AutoOffsetReset - The offset to start from when there is no initial offset in the consumer group.
 type AutoOffsetReset string
 
@@ -1240,6 +1170,76 @@ func (c *ConfluentConsumePluginConsumer) GetID() *string {
 	return c.ID
 }
 
+type ConfluentConsumePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentConsumePluginAfter) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentConsumePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentConsumePluginBefore) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentConsumePluginOrdering struct {
+	After  *ConfluentConsumePluginAfter  `json:"after,omitempty"`
+	Before *ConfluentConsumePluginBefore `json:"before,omitempty"`
+}
+
+func (c *ConfluentConsumePluginOrdering) GetAfter() *ConfluentConsumePluginAfter {
+	if c == nil {
+		return nil
+	}
+	return c.After
+}
+
+func (c *ConfluentConsumePluginOrdering) GetBefore() *ConfluentConsumePluginBefore {
+	if c == nil {
+		return nil
+	}
+	return c.Before
+}
+
+type ConfluentConsumePluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (c *ConfluentConsumePluginPartials) GetID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ID
+}
+
+func (c *ConfluentConsumePluginPartials) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *ConfluentConsumePluginPartials) GetPath() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Path
+}
+
 type ConfluentConsumePluginProtocols string
 
 const (
@@ -1302,8 +1302,10 @@ func (c *ConfluentConsumePluginService) GetID() *string {
 	return c.ID
 }
 
-// ConfluentConsumePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ConfluentConsumePlugin struct {
+	Config *ConfluentConsumePluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ConfluentConsumePluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1316,19 +1318,16 @@ type ConfluentConsumePlugin struct {
 	Ordering     *ConfluentConsumePluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ConfluentConsumePluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                       `json:"updated_at,omitempty"`
-	Config    ConfluentConsumePluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ConfluentConsumePluginConsumer `json:"consumer,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []ConfluentConsumePluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ConfluentConsumePluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ConfluentConsumePluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (c ConfluentConsumePlugin) MarshalJSON() ([]byte, error) {
@@ -1336,10 +1335,24 @@ func (c ConfluentConsumePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentConsumePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *ConfluentConsumePlugin) GetConfig() *ConfluentConsumePluginConfig {
+	if c == nil {
+		return nil
+	}
+	return c.Config
+}
+
+func (c *ConfluentConsumePlugin) GetConsumer() *ConfluentConsumePluginConsumer {
+	if c == nil {
+		return nil
+	}
+	return c.Consumer
 }
 
 func (c *ConfluentConsumePlugin) GetCreatedAt() *int64 {
@@ -1388,34 +1401,6 @@ func (c *ConfluentConsumePlugin) GetPartials() []ConfluentConsumePluginPartials 
 	return c.Partials
 }
 
-func (c *ConfluentConsumePlugin) GetTags() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Tags
-}
-
-func (c *ConfluentConsumePlugin) GetUpdatedAt() *int64 {
-	if c == nil {
-		return nil
-	}
-	return c.UpdatedAt
-}
-
-func (c *ConfluentConsumePlugin) GetConfig() ConfluentConsumePluginConfig {
-	if c == nil {
-		return ConfluentConsumePluginConfig{}
-	}
-	return c.Config
-}
-
-func (c *ConfluentConsumePlugin) GetConsumer() *ConfluentConsumePluginConsumer {
-	if c == nil {
-		return nil
-	}
-	return c.Consumer
-}
-
 func (c *ConfluentConsumePlugin) GetProtocols() []ConfluentConsumePluginProtocols {
 	if c == nil {
 		return nil
@@ -1435,4 +1420,18 @@ func (c *ConfluentConsumePlugin) GetService() *ConfluentConsumePluginService {
 		return nil
 	}
 	return c.Service
+}
+
+func (c *ConfluentConsumePlugin) GetTags() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Tags
+}
+
+func (c *ConfluentConsumePlugin) GetUpdatedAt() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.UpdatedAt
 }

@@ -15,21 +15,26 @@ func (r *PluginOpaResourceModel) RefreshFromSharedOpaPlugin(ctx context.Context,
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		r.Config.IncludeBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeBodyInOpaInput)
-		r.Config.IncludeConsumerInOpaInput = types.BoolPointerValue(resp.Config.IncludeConsumerInOpaInput)
-		r.Config.IncludeParsedJSONBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeParsedJSONBodyInOpaInput)
-		r.Config.IncludeRouteInOpaInput = types.BoolPointerValue(resp.Config.IncludeRouteInOpaInput)
-		r.Config.IncludeServiceInOpaInput = types.BoolPointerValue(resp.Config.IncludeServiceInOpaInput)
-		r.Config.IncludeURICapturesInOpaInput = types.BoolPointerValue(resp.Config.IncludeURICapturesInOpaInput)
-		r.Config.OpaHost = types.StringPointerValue(resp.Config.OpaHost)
-		r.Config.OpaPath = types.StringValue(resp.Config.OpaPath)
-		r.Config.OpaPort = types.Int64PointerValue(resp.Config.OpaPort)
-		if resp.Config.OpaProtocol != nil {
-			r.Config.OpaProtocol = types.StringValue(string(*resp.Config.OpaProtocol))
+		if resp.Config == nil {
+			r.Config = nil
 		} else {
-			r.Config.OpaProtocol = types.StringNull()
+			r.Config = &tfTypes.OpaPluginConfig{}
+			r.Config.IncludeBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeBodyInOpaInput)
+			r.Config.IncludeConsumerInOpaInput = types.BoolPointerValue(resp.Config.IncludeConsumerInOpaInput)
+			r.Config.IncludeParsedJSONBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeParsedJSONBodyInOpaInput)
+			r.Config.IncludeRouteInOpaInput = types.BoolPointerValue(resp.Config.IncludeRouteInOpaInput)
+			r.Config.IncludeServiceInOpaInput = types.BoolPointerValue(resp.Config.IncludeServiceInOpaInput)
+			r.Config.IncludeURICapturesInOpaInput = types.BoolPointerValue(resp.Config.IncludeURICapturesInOpaInput)
+			r.Config.OpaHost = types.StringPointerValue(resp.Config.OpaHost)
+			r.Config.OpaPath = types.StringValue(resp.Config.OpaPath)
+			r.Config.OpaPort = types.Int64PointerValue(resp.Config.OpaPort)
+			if resp.Config.OpaProtocol != nil {
+				r.Config.OpaProtocol = types.StringValue(string(*resp.Config.OpaProtocol))
+			} else {
+				r.Config.OpaProtocol = types.StringNull()
+			}
+			r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		}
-		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -57,16 +62,18 @@ func (r *PluginOpaResourceModel) RefreshFromSharedOpaPlugin(ctx context.Context,
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
 
-		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
 
-			partials.ID = types.StringPointerValue(partialsItem.ID)
-			partials.Name = types.StringPointerValue(partialsItem.Name)
-			partials.Path = types.StringPointerValue(partialsItem.Path)
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
 
-			r.Partials = append(r.Partials, partials)
+				r.Partials = append(r.Partials, partials)
+			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -179,6 +186,85 @@ func (r *PluginOpaResourceModel) ToOperationsUpdateOpaPluginRequest(ctx context.
 func (r *PluginOpaResourceModel) ToSharedOpaPlugin(ctx context.Context) (*shared.OpaPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.OpaPluginConfig
+	if r.Config != nil {
+		includeBodyInOpaInput := new(bool)
+		if !r.Config.IncludeBodyInOpaInput.IsUnknown() && !r.Config.IncludeBodyInOpaInput.IsNull() {
+			*includeBodyInOpaInput = r.Config.IncludeBodyInOpaInput.ValueBool()
+		} else {
+			includeBodyInOpaInput = nil
+		}
+		includeConsumerInOpaInput := new(bool)
+		if !r.Config.IncludeConsumerInOpaInput.IsUnknown() && !r.Config.IncludeConsumerInOpaInput.IsNull() {
+			*includeConsumerInOpaInput = r.Config.IncludeConsumerInOpaInput.ValueBool()
+		} else {
+			includeConsumerInOpaInput = nil
+		}
+		includeParsedJSONBodyInOpaInput := new(bool)
+		if !r.Config.IncludeParsedJSONBodyInOpaInput.IsUnknown() && !r.Config.IncludeParsedJSONBodyInOpaInput.IsNull() {
+			*includeParsedJSONBodyInOpaInput = r.Config.IncludeParsedJSONBodyInOpaInput.ValueBool()
+		} else {
+			includeParsedJSONBodyInOpaInput = nil
+		}
+		includeRouteInOpaInput := new(bool)
+		if !r.Config.IncludeRouteInOpaInput.IsUnknown() && !r.Config.IncludeRouteInOpaInput.IsNull() {
+			*includeRouteInOpaInput = r.Config.IncludeRouteInOpaInput.ValueBool()
+		} else {
+			includeRouteInOpaInput = nil
+		}
+		includeServiceInOpaInput := new(bool)
+		if !r.Config.IncludeServiceInOpaInput.IsUnknown() && !r.Config.IncludeServiceInOpaInput.IsNull() {
+			*includeServiceInOpaInput = r.Config.IncludeServiceInOpaInput.ValueBool()
+		} else {
+			includeServiceInOpaInput = nil
+		}
+		includeURICapturesInOpaInput := new(bool)
+		if !r.Config.IncludeURICapturesInOpaInput.IsUnknown() && !r.Config.IncludeURICapturesInOpaInput.IsNull() {
+			*includeURICapturesInOpaInput = r.Config.IncludeURICapturesInOpaInput.ValueBool()
+		} else {
+			includeURICapturesInOpaInput = nil
+		}
+		opaHost := new(string)
+		if !r.Config.OpaHost.IsUnknown() && !r.Config.OpaHost.IsNull() {
+			*opaHost = r.Config.OpaHost.ValueString()
+		} else {
+			opaHost = nil
+		}
+		var opaPath string
+		opaPath = r.Config.OpaPath.ValueString()
+
+		opaPort := new(int64)
+		if !r.Config.OpaPort.IsUnknown() && !r.Config.OpaPort.IsNull() {
+			*opaPort = r.Config.OpaPort.ValueInt64()
+		} else {
+			opaPort = nil
+		}
+		opaProtocol := new(shared.OpaProtocol)
+		if !r.Config.OpaProtocol.IsUnknown() && !r.Config.OpaProtocol.IsNull() {
+			*opaProtocol = shared.OpaProtocol(r.Config.OpaProtocol.ValueString())
+		} else {
+			opaProtocol = nil
+		}
+		sslVerify := new(bool)
+		if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+			*sslVerify = r.Config.SslVerify.ValueBool()
+		} else {
+			sslVerify = nil
+		}
+		config = &shared.OpaPluginConfig{
+			IncludeBodyInOpaInput:           includeBodyInOpaInput,
+			IncludeConsumerInOpaInput:       includeConsumerInOpaInput,
+			IncludeParsedJSONBodyInOpaInput: includeParsedJSONBodyInOpaInput,
+			IncludeRouteInOpaInput:          includeRouteInOpaInput,
+			IncludeServiceInOpaInput:        includeServiceInOpaInput,
+			IncludeURICapturesInOpaInput:    includeURICapturesInOpaInput,
+			OpaHost:                         opaHost,
+			OpaPath:                         opaPath,
+			OpaPort:                         opaPort,
+			OpaProtocol:                     opaProtocol,
+			SslVerify:                       sslVerify,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -230,120 +316,34 @@ func (r *PluginOpaResourceModel) ToSharedOpaPlugin(ctx context.Context) (*shared
 			Before: before,
 		}
 	}
-	partials := make([]shared.OpaPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
-		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
-		} else {
-			id1 = nil
+	var partials []shared.OpaPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.OpaPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.OpaPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
 		}
-		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
-		} else {
-			name = nil
-		}
-		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
-		} else {
-			path = nil
-		}
-		partials = append(partials, shared.OpaPluginPartials{
-			ID:   id1,
-			Name: name,
-			Path: path,
-		})
-	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	includeBodyInOpaInput := new(bool)
-	if !r.Config.IncludeBodyInOpaInput.IsUnknown() && !r.Config.IncludeBodyInOpaInput.IsNull() {
-		*includeBodyInOpaInput = r.Config.IncludeBodyInOpaInput.ValueBool()
-	} else {
-		includeBodyInOpaInput = nil
-	}
-	includeConsumerInOpaInput := new(bool)
-	if !r.Config.IncludeConsumerInOpaInput.IsUnknown() && !r.Config.IncludeConsumerInOpaInput.IsNull() {
-		*includeConsumerInOpaInput = r.Config.IncludeConsumerInOpaInput.ValueBool()
-	} else {
-		includeConsumerInOpaInput = nil
-	}
-	includeParsedJSONBodyInOpaInput := new(bool)
-	if !r.Config.IncludeParsedJSONBodyInOpaInput.IsUnknown() && !r.Config.IncludeParsedJSONBodyInOpaInput.IsNull() {
-		*includeParsedJSONBodyInOpaInput = r.Config.IncludeParsedJSONBodyInOpaInput.ValueBool()
-	} else {
-		includeParsedJSONBodyInOpaInput = nil
-	}
-	includeRouteInOpaInput := new(bool)
-	if !r.Config.IncludeRouteInOpaInput.IsUnknown() && !r.Config.IncludeRouteInOpaInput.IsNull() {
-		*includeRouteInOpaInput = r.Config.IncludeRouteInOpaInput.ValueBool()
-	} else {
-		includeRouteInOpaInput = nil
-	}
-	includeServiceInOpaInput := new(bool)
-	if !r.Config.IncludeServiceInOpaInput.IsUnknown() && !r.Config.IncludeServiceInOpaInput.IsNull() {
-		*includeServiceInOpaInput = r.Config.IncludeServiceInOpaInput.ValueBool()
-	} else {
-		includeServiceInOpaInput = nil
-	}
-	includeURICapturesInOpaInput := new(bool)
-	if !r.Config.IncludeURICapturesInOpaInput.IsUnknown() && !r.Config.IncludeURICapturesInOpaInput.IsNull() {
-		*includeURICapturesInOpaInput = r.Config.IncludeURICapturesInOpaInput.ValueBool()
-	} else {
-		includeURICapturesInOpaInput = nil
-	}
-	opaHost := new(string)
-	if !r.Config.OpaHost.IsUnknown() && !r.Config.OpaHost.IsNull() {
-		*opaHost = r.Config.OpaHost.ValueString()
-	} else {
-		opaHost = nil
-	}
-	var opaPath string
-	opaPath = r.Config.OpaPath.ValueString()
-
-	opaPort := new(int64)
-	if !r.Config.OpaPort.IsUnknown() && !r.Config.OpaPort.IsNull() {
-		*opaPort = r.Config.OpaPort.ValueInt64()
-	} else {
-		opaPort = nil
-	}
-	opaProtocol := new(shared.OpaProtocol)
-	if !r.Config.OpaProtocol.IsUnknown() && !r.Config.OpaProtocol.IsNull() {
-		*opaProtocol = shared.OpaProtocol(r.Config.OpaProtocol.ValueString())
-	} else {
-		opaProtocol = nil
-	}
-	sslVerify := new(bool)
-	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
-		*sslVerify = r.Config.SslVerify.ValueBool()
-	} else {
-		sslVerify = nil
-	}
-	config := shared.OpaPluginConfig{
-		IncludeBodyInOpaInput:           includeBodyInOpaInput,
-		IncludeConsumerInOpaInput:       includeConsumerInOpaInput,
-		IncludeParsedJSONBodyInOpaInput: includeParsedJSONBodyInOpaInput,
-		IncludeRouteInOpaInput:          includeRouteInOpaInput,
-		IncludeServiceInOpaInput:        includeServiceInOpaInput,
-		IncludeURICapturesInOpaInput:    includeURICapturesInOpaInput,
-		OpaHost:                         opaHost,
-		OpaPath:                         opaPath,
-		OpaPort:                         opaPort,
-		OpaProtocol:                     opaProtocol,
-		SslVerify:                       sslVerify,
 	}
 	protocols := make([]shared.OpaPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -373,19 +373,32 @@ func (r *PluginOpaResourceModel) ToSharedOpaPlugin(ctx context.Context) (*shared
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.OpaPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

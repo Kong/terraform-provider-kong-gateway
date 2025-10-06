@@ -8,76 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AiRateLimitingAdvancedPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiRateLimitingAdvancedPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiRateLimitingAdvancedPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiRateLimitingAdvancedPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiRateLimitingAdvancedPluginOrdering struct {
-	After  *AiRateLimitingAdvancedPluginAfter  `json:"after,omitempty"`
-	Before *AiRateLimitingAdvancedPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiRateLimitingAdvancedPluginOrdering) GetAfter() *AiRateLimitingAdvancedPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiRateLimitingAdvancedPluginOrdering) GetBefore() *AiRateLimitingAdvancedPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiRateLimitingAdvancedPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiRateLimitingAdvancedPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiRateLimitingAdvancedPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiRateLimitingAdvancedPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 // Identifier - The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Can be `ip`, `credential`, `consumer`, `service`, `header`, `path` or `consumer-group`. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
 type Identifier string
 
@@ -788,6 +718,76 @@ func (a *AiRateLimitingAdvancedPluginConsumerGroup) GetID() *string {
 	return a.ID
 }
 
+type AiRateLimitingAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiRateLimitingAdvancedPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiRateLimitingAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiRateLimitingAdvancedPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiRateLimitingAdvancedPluginOrdering struct {
+	After  *AiRateLimitingAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *AiRateLimitingAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiRateLimitingAdvancedPluginOrdering) GetAfter() *AiRateLimitingAdvancedPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiRateLimitingAdvancedPluginOrdering) GetBefore() *AiRateLimitingAdvancedPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiRateLimitingAdvancedPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiRateLimitingAdvancedPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiRateLimitingAdvancedPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiRateLimitingAdvancedPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AiRateLimitingAdvancedPluginProtocols string
 
 const (
@@ -844,8 +844,12 @@ func (a *AiRateLimitingAdvancedPluginService) GetID() *string {
 	return a.ID
 }
 
-// AiRateLimitingAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiRateLimitingAdvancedPlugin struct {
+	Config *AiRateLimitingAdvancedPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AiRateLimitingAdvancedPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *AiRateLimitingAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -858,21 +862,16 @@ type AiRateLimitingAdvancedPlugin struct {
 	Ordering     *AiRateLimitingAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiRateLimitingAdvancedPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                             `json:"updated_at,omitempty"`
-	Config    AiRateLimitingAdvancedPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AiRateLimitingAdvancedPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *AiRateLimitingAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiRateLimitingAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiRateLimitingAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiRateLimitingAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiRateLimitingAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -880,10 +879,31 @@ func (a AiRateLimitingAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiRateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetConfig() *AiRateLimitingAdvancedPluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetConsumer() *AiRateLimitingAdvancedPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetConsumerGroup() *AiRateLimitingAdvancedPluginConsumerGroup {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerGroup
 }
 
 func (a *AiRateLimitingAdvancedPlugin) GetCreatedAt() *int64 {
@@ -932,41 +952,6 @@ func (a *AiRateLimitingAdvancedPlugin) GetPartials() []AiRateLimitingAdvancedPlu
 	return a.Partials
 }
 
-func (a *AiRateLimitingAdvancedPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiRateLimitingAdvancedPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
-}
-
-func (a *AiRateLimitingAdvancedPlugin) GetConfig() AiRateLimitingAdvancedPluginConfig {
-	if a == nil {
-		return AiRateLimitingAdvancedPluginConfig{}
-	}
-	return a.Config
-}
-
-func (a *AiRateLimitingAdvancedPlugin) GetConsumer() *AiRateLimitingAdvancedPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
-}
-
-func (a *AiRateLimitingAdvancedPlugin) GetConsumerGroup() *AiRateLimitingAdvancedPluginConsumerGroup {
-	if a == nil {
-		return nil
-	}
-	return a.ConsumerGroup
-}
-
 func (a *AiRateLimitingAdvancedPlugin) GetProtocols() []AiRateLimitingAdvancedPluginProtocols {
 	if a == nil {
 		return nil
@@ -986,4 +971,18 @@ func (a *AiRateLimitingAdvancedPlugin) GetService() *AiRateLimitingAdvancedPlugi
 		return nil
 	}
 	return a.Service
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
 }

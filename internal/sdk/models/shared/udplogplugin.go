@@ -8,6 +8,57 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type UDPLogPluginConfig struct {
+	// Lua code as a key-value map
+	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host string `json:"host"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port int64 `json:"port"`
+	// An optional timeout in milliseconds when sending data to the upstream server.
+	Timeout *float64 `json:"timeout,omitempty"`
+}
+
+func (u *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
+	if u == nil {
+		return nil
+	}
+	return u.CustomFieldsByLua
+}
+
+func (u *UDPLogPluginConfig) GetHost() string {
+	if u == nil {
+		return ""
+	}
+	return u.Host
+}
+
+func (u *UDPLogPluginConfig) GetPort() int64 {
+	if u == nil {
+		return 0
+	}
+	return u.Port
+}
+
+func (u *UDPLogPluginConfig) GetTimeout() *float64 {
+	if u == nil {
+		return nil
+	}
+	return u.Timeout
+}
+
+// UDPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type UDPLogPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (u *UDPLogPluginConsumer) GetID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ID
+}
+
 type UDPLogPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -76,57 +127,6 @@ func (u *UDPLogPluginPartials) GetPath() *string {
 		return nil
 	}
 	return u.Path
-}
-
-type UDPLogPluginConfig struct {
-	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
-	// A string representing a host name, such as example.com.
-	Host string `json:"host"`
-	// An integer representing a port number between 0 and 65535, inclusive.
-	Port int64 `json:"port"`
-	// An optional timeout in milliseconds when sending data to the upstream server.
-	Timeout *float64 `json:"timeout,omitempty"`
-}
-
-func (u *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
-	if u == nil {
-		return nil
-	}
-	return u.CustomFieldsByLua
-}
-
-func (u *UDPLogPluginConfig) GetHost() string {
-	if u == nil {
-		return ""
-	}
-	return u.Host
-}
-
-func (u *UDPLogPluginConfig) GetPort() int64 {
-	if u == nil {
-		return 0
-	}
-	return u.Port
-}
-
-func (u *UDPLogPluginConfig) GetTimeout() *float64 {
-	if u == nil {
-		return nil
-	}
-	return u.Timeout
-}
-
-// UDPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type UDPLogPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (u *UDPLogPluginConsumer) GetID() *string {
-	if u == nil {
-		return nil
-	}
-	return u.ID
 }
 
 // UDPLogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -204,8 +204,10 @@ func (u *UDPLogPluginService) GetID() *string {
 	return u.ID
 }
 
-// UDPLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type UDPLogPlugin struct {
+	Config *UDPLogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *UDPLogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -218,19 +220,16 @@ type UDPLogPlugin struct {
 	Ordering     *UDPLogPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []UDPLogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64             `json:"updated_at,omitempty"`
-	Config    UDPLogPluginConfig `json:"config"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *UDPLogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []UDPLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *UDPLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *UDPLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (u UDPLogPlugin) MarshalJSON() ([]byte, error) {
@@ -238,10 +237,24 @@ func (u UDPLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UDPLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (u *UDPLogPlugin) GetConfig() *UDPLogPluginConfig {
+	if u == nil {
+		return nil
+	}
+	return u.Config
+}
+
+func (u *UDPLogPlugin) GetConsumer() *UDPLogPluginConsumer {
+	if u == nil {
+		return nil
+	}
+	return u.Consumer
 }
 
 func (u *UDPLogPlugin) GetCreatedAt() *int64 {
@@ -290,34 +303,6 @@ func (u *UDPLogPlugin) GetPartials() []UDPLogPluginPartials {
 	return u.Partials
 }
 
-func (u *UDPLogPlugin) GetTags() []string {
-	if u == nil {
-		return nil
-	}
-	return u.Tags
-}
-
-func (u *UDPLogPlugin) GetUpdatedAt() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.UpdatedAt
-}
-
-func (u *UDPLogPlugin) GetConfig() UDPLogPluginConfig {
-	if u == nil {
-		return UDPLogPluginConfig{}
-	}
-	return u.Config
-}
-
-func (u *UDPLogPlugin) GetConsumer() *UDPLogPluginConsumer {
-	if u == nil {
-		return nil
-	}
-	return u.Consumer
-}
-
 func (u *UDPLogPlugin) GetProtocols() []UDPLogPluginProtocols {
 	if u == nil {
 		return nil
@@ -337,4 +322,18 @@ func (u *UDPLogPlugin) GetService() *UDPLogPluginService {
 		return nil
 	}
 	return u.Service
+}
+
+func (u *UDPLogPlugin) GetTags() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Tags
+}
+
+func (u *UDPLogPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.UpdatedAt
 }

@@ -40,7 +40,6 @@ resource "kong-gateway_route" "hello" {
   service = {
     id = kong-gateway_service.httpbin.id
   }
-
 }
 
 resource "kong-gateway_consumer" "alice" {

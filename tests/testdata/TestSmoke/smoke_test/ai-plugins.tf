@@ -138,32 +138,32 @@ EOF
   }
 }
 
-#resource "kong-gateway_plugin_ai_mcp_oauth2" "my_ai_mcp_oauth2" {
-#  enabled = true
-#
-#  protocols = [
-#    "http",
-#    "https"
-#  ]
-#
-#  config = {
-#    resource               = "https://mcp.example.com"
-#    authorization_servers  = ["https://keycloak.example.com/auth/realms/myrealm/protocol/openid-connect"]
-#    introspection_endpoint = "https://keycloak.example.com/auth/realms/myrealm/protocol/openid-connect/token"
-#    client_id              = "my-client-id"
-#    client_secret          = "my-client-secret"
-#    claim_to_header = [
-#      {
-#        claim  = "sub"
-#        header = "X-User-Id"
-#    }]
-#    insecure_relaxed_audience_validation = true
-#  }
-#
-#  route = {
-#    id = kong-gateway_route.hello.id
-#  }
-#}
+resource "kong-gateway_plugin_ai_mcp_oauth2" "my_ai_mcp_oauth2" {
+  enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
+
+  config = {
+    resource               = "https://mcp.example.com"
+    authorization_servers  = ["https://keycloak.example.com/auth/realms/myrealm/protocol/openid-connect"]
+    introspection_endpoint = "https://keycloak.example.com/auth/realms/myrealm/protocol/openid-connect/token"
+    client_id              = "my-client-id"
+    client_secret          = "my-client-secret"
+    claim_to_header = [
+      {
+        claim  = "sub"
+        header = "X-User-Id"
+    }]
+    insecure_relaxed_audience_validation = true
+  }
+
+  route = {
+    id = kong-gateway_route.hello.id
+  }
+}
 
 resource "kong-gateway_plugin_ai_mcp_proxy" "my_ai_mcp_proxy" {
   enabled = true

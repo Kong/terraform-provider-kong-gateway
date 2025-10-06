@@ -8,6 +8,54 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type Config struct {
+	// Arbitrary group names that are allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
+	Allow []string `json:"allow,omitempty"`
+	// If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous.
+	AlwaysUseAuthenticatedGroups *bool `json:"always_use_authenticated_groups,omitempty"`
+	// Arbitrary group names that are not allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
+	Deny []string `json:"deny,omitempty"`
+	// If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service.
+	HideGroupsHeader *bool `json:"hide_groups_header,omitempty"`
+	// If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields
+	IncludeConsumerGroups *bool `json:"include_consumer_groups,omitempty"`
+}
+
+func (c *Config) GetAllow() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Allow
+}
+
+func (c *Config) GetAlwaysUseAuthenticatedGroups() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.AlwaysUseAuthenticatedGroups
+}
+
+func (c *Config) GetDeny() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Deny
+}
+
+func (c *Config) GetHideGroupsHeader() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.HideGroupsHeader
+}
+
+func (c *Config) GetIncludeConsumerGroups() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.IncludeConsumerGroups
+}
+
 type ACLPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -78,54 +126,6 @@ func (a *ACLPluginPartials) GetPath() *string {
 	return a.Path
 }
 
-type Config struct {
-	// Arbitrary group names that are allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
-	Allow []string `json:"allow,omitempty"`
-	// If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous.
-	AlwaysUseAuthenticatedGroups *bool `json:"always_use_authenticated_groups,omitempty"`
-	// Arbitrary group names that are not allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
-	Deny []string `json:"deny,omitempty"`
-	// If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service.
-	HideGroupsHeader *bool `json:"hide_groups_header,omitempty"`
-	// If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields
-	IncludeConsumerGroups *bool `json:"include_consumer_groups,omitempty"`
-}
-
-func (c *Config) GetAllow() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Allow
-}
-
-func (c *Config) GetAlwaysUseAuthenticatedGroups() *bool {
-	if c == nil {
-		return nil
-	}
-	return c.AlwaysUseAuthenticatedGroups
-}
-
-func (c *Config) GetDeny() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Deny
-}
-
-func (c *Config) GetHideGroupsHeader() *bool {
-	if c == nil {
-		return nil
-	}
-	return c.HideGroupsHeader
-}
-
-func (c *Config) GetIncludeConsumerGroups() *bool {
-	if c == nil {
-		return nil
-	}
-	return c.IncludeConsumerGroups
-}
-
 type ACLPluginProtocols string
 
 const (
@@ -182,8 +182,8 @@ func (a *ACLPluginService) GetID() *string {
 	return a.ID
 }
 
-// ACLPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ACLPlugin struct {
+	Config *Config `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -196,17 +196,16 @@ type ACLPlugin struct {
 	Ordering     *ACLPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ACLPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64  `json:"updated_at,omitempty"`
-	Config    *Config `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []ACLPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ACLPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ACLPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a ACLPlugin) MarshalJSON() ([]byte, error) {
@@ -218,6 +217,13 @@ func (a *ACLPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *ACLPlugin) GetConfig() *Config {
+	if a == nil {
+		return nil
+	}
+	return a.Config
 }
 
 func (a *ACLPlugin) GetCreatedAt() *int64 {
@@ -266,27 +272,6 @@ func (a *ACLPlugin) GetPartials() []ACLPluginPartials {
 	return a.Partials
 }
 
-func (a *ACLPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *ACLPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
-}
-
-func (a *ACLPlugin) GetConfig() *Config {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
 func (a *ACLPlugin) GetProtocols() []ACLPluginProtocols {
 	if a == nil {
 		return nil
@@ -306,4 +291,18 @@ func (a *ACLPlugin) GetService() *ACLPluginService {
 		return nil
 	}
 	return a.Service
+}
+
+func (a *ACLPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *ACLPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
 }

@@ -27,6 +27,15 @@ components:
       schema:
         type: string
       x-speakeasy-match: id
+    CertificateId:
+      description: ID of the Certificate to lookup
+      example: ddf3cdaa-3329-4961-822a-ce6dbd38eff7
+      in: path
+      name: CertificateId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: id
     ConsumerGroupId:
       description: ID of the Consumer Group to lookup
       example: ''
@@ -146,6 +155,15 @@ components:
       name: tags
       schema:
         type: string
+    PartialId:
+      description: ID of the Partial to lookup
+      example: ''
+      in: path
+      name: PartialId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: id
     PluginId:
       description: ID of the Plugin to lookup
       example: 3473c251-5b6c-4f45-b1ff-7ede735a366d
@@ -3356,6 +3374,75 @@ paths:
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: Certificate#create
+  /{workspace}/certificates/{CertificateId}:
+    delete:
+      description: Delete a Certificate
+      operationId: delete-certificate
+      parameters:
+        - $ref: '#/components/parameters/CertificateId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted Certificate or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      summary: Delete a Certificate
+      tags:
+        - Certificates
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Certificate#delete
+    get:
+      description: Get a Certificate using ID.
+      operationId: get-certificate
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+          description: Successfully fetched Certificate
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      summary: Fetch a Certificate
+      tags:
+        - Certificates
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Certificate#read
+    parameters:
+      - $ref: '#/components/parameters/CertificateId'
+    put:
+      description: Create or Update Certificate using ID.
+      operationId: upsert-certificate
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Certificate'
+        description: Description of the Certificate
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+          description: Successfully upserted Certificate
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      summary: Upsert a Certificate
+      tags:
+        - Certificates
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Certificate#update
   /{workspace}/consumer_groups:
     get:
       description: List all Consumer Groups
@@ -4688,6 +4775,75 @@ paths:
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: Partial#create
+  /{workspace}/partials/{PartialId}:
+    delete:
+      description: Delete a Partial
+      operationId: delete-partial
+      parameters:
+        - $ref: '#/components/parameters/PartialId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted Partial or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      summary: Delete a Partial
+      tags:
+        - Partials
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Partial#delete
+    get:
+      description: Get a Partial using ID.
+      operationId: get-partial
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial'
+          description: Successfully fetched Partial
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      summary: Fetch a Partial
+      tags:
+        - Partials
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Partial#read
+    parameters:
+      - $ref: '#/components/parameters/PartialId'
+    put:
+      description: Create or Update Partial using ID.
+      operationId: upsert-partial
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Partial'
+        description: Description of the Partial
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partial'
+          description: Successfully upserted Partial
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      summary: Upsert a Partial
+      tags:
+        - Partials
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Partial#update
   /{workspace}/routes:
     get:
       description: List all Routes

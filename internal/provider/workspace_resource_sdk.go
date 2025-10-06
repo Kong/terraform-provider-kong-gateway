@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -19,11 +21,12 @@ func (r *WorkspaceResourceModel) RefreshFromSharedWorkspace(ctx context.Context,
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
-			r.Config = &tfTypes.Config{}
+			r.Config = &tfTypes.WorkspaceConfig{}
 			if len(resp.Config.Meta) > 0 {
-				r.Config.Meta = make(map[string]types.String, len(resp.Config.Meta))
+				r.Config.Meta = make(map[string]jsontypes.Normalized, len(resp.Config.Meta))
 				for key, value := range resp.Config.Meta {
-					r.Config.Meta[key] = types.StringValue(value)
+					result, _ := json.Marshal(value)
+					r.Config.Meta[key] = jsontypes.NewNormalizedValue(string(result))
 				}
 			}
 			r.Config.Portal = types.BoolPointerValue(resp.Config.Portal)
@@ -124,13 +127,12 @@ func (r *WorkspaceResourceModel) ToSharedWorkspace(ctx context.Context) (*shared
 	} else {
 		comment = nil
 	}
-	var config *shared.Config
+	var config *shared.WorkspaceConfig
 	if r.Config != nil {
-		meta := make(map[string]string)
+		meta := make(map[string]interface{})
 		for metaKey, metaValue := range r.Config.Meta {
-			var metaInst string
-			metaInst = metaValue.ValueString()
-
+			var metaInst interface{}
+			_ = json.Unmarshal([]byte(metaValue.ValueString()), &metaInst)
 			meta[metaKey] = metaInst
 		}
 		portal := new(bool)
@@ -243,7 +245,7 @@ func (r *WorkspaceResourceModel) ToSharedWorkspace(ctx context.Context) (*shared
 		} else {
 			portalTokenExp = nil
 		}
-		config = &shared.Config{
+		config = &shared.WorkspaceConfig{
 			Meta:                          meta,
 			Portal:                        portal,
 			PortalAccessRequestEmail:      portalAccessRequestEmail,

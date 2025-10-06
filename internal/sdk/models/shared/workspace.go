@@ -2,167 +2,167 @@
 
 package shared
 
-type Config struct {
-	Meta                          map[string]string `json:"meta,omitempty"`
-	Portal                        *bool             `json:"portal,omitempty"`
-	PortalAccessRequestEmail      *bool             `json:"portal_access_request_email,omitempty"`
-	PortalApplicationRequestEmail *bool             `json:"portal_application_request_email,omitempty"`
-	PortalApplicationStatusEmail  *bool             `json:"portal_application_status_email,omitempty"`
-	PortalApprovedEmail           *bool             `json:"portal_approved_email,omitempty"`
-	PortalAuth                    *string           `json:"portal_auth,omitempty"`
-	PortalAuthConf                *string           `json:"portal_auth_conf,omitempty"`
-	PortalAutoApprove             *bool             `json:"portal_auto_approve,omitempty"`
-	PortalCorsOrigins             []string          `json:"portal_cors_origins,omitempty"`
-	PortalDeveloperMetaFields     *string           `json:"portal_developer_meta_fields,omitempty"`
-	PortalEmailsFrom              *string           `json:"portal_emails_from,omitempty"`
-	PortalEmailsReplyTo           *string           `json:"portal_emails_reply_to,omitempty"`
-	PortalInviteEmail             *bool             `json:"portal_invite_email,omitempty"`
-	PortalIsLegacy                *bool             `json:"portal_is_legacy,omitempty"`
-	PortalResetEmail              *bool             `json:"portal_reset_email,omitempty"`
-	PortalResetSuccessEmail       *bool             `json:"portal_reset_success_email,omitempty"`
-	PortalSessionConf             *string           `json:"portal_session_conf,omitempty"`
-	PortalSMTPAdminEmails         []string          `json:"portal_smtp_admin_emails,omitempty"`
-	PortalTokenExp                *int64            `json:"portal_token_exp,omitempty"`
+type WorkspaceConfig struct {
+	Meta                          map[string]any `json:"meta,omitempty"`
+	Portal                        *bool          `json:"portal,omitempty"`
+	PortalAccessRequestEmail      *bool          `json:"portal_access_request_email,omitempty"`
+	PortalApplicationRequestEmail *bool          `json:"portal_application_request_email,omitempty"`
+	PortalApplicationStatusEmail  *bool          `json:"portal_application_status_email,omitempty"`
+	PortalApprovedEmail           *bool          `json:"portal_approved_email,omitempty"`
+	PortalAuth                    *string        `json:"portal_auth,omitempty"`
+	PortalAuthConf                *string        `json:"portal_auth_conf,omitempty"`
+	PortalAutoApprove             *bool          `json:"portal_auto_approve,omitempty"`
+	PortalCorsOrigins             []string       `json:"portal_cors_origins,omitempty"`
+	PortalDeveloperMetaFields     *string        `json:"portal_developer_meta_fields,omitempty"`
+	PortalEmailsFrom              *string        `json:"portal_emails_from,omitempty"`
+	PortalEmailsReplyTo           *string        `json:"portal_emails_reply_to,omitempty"`
+	PortalInviteEmail             *bool          `json:"portal_invite_email,omitempty"`
+	PortalIsLegacy                *bool          `json:"portal_is_legacy,omitempty"`
+	PortalResetEmail              *bool          `json:"portal_reset_email,omitempty"`
+	PortalResetSuccessEmail       *bool          `json:"portal_reset_success_email,omitempty"`
+	PortalSessionConf             *string        `json:"portal_session_conf,omitempty"`
+	PortalSMTPAdminEmails         []string       `json:"portal_smtp_admin_emails,omitempty"`
+	PortalTokenExp                *int64         `json:"portal_token_exp,omitempty"`
 }
 
-func (c *Config) GetMeta() map[string]string {
-	if c == nil {
+func (w *WorkspaceConfig) GetMeta() map[string]any {
+	if w == nil {
 		return nil
 	}
-	return c.Meta
+	return w.Meta
 }
 
-func (c *Config) GetPortal() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortal() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.Portal
+	return w.Portal
 }
 
-func (c *Config) GetPortalAccessRequestEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalAccessRequestEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalAccessRequestEmail
+	return w.PortalAccessRequestEmail
 }
 
-func (c *Config) GetPortalApplicationRequestEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalApplicationRequestEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalApplicationRequestEmail
+	return w.PortalApplicationRequestEmail
 }
 
-func (c *Config) GetPortalApplicationStatusEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalApplicationStatusEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalApplicationStatusEmail
+	return w.PortalApplicationStatusEmail
 }
 
-func (c *Config) GetPortalApprovedEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalApprovedEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalApprovedEmail
+	return w.PortalApprovedEmail
 }
 
-func (c *Config) GetPortalAuth() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalAuth() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalAuth
+	return w.PortalAuth
 }
 
-func (c *Config) GetPortalAuthConf() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalAuthConf() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalAuthConf
+	return w.PortalAuthConf
 }
 
-func (c *Config) GetPortalAutoApprove() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalAutoApprove() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalAutoApprove
+	return w.PortalAutoApprove
 }
 
-func (c *Config) GetPortalCorsOrigins() []string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalCorsOrigins() []string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalCorsOrigins
+	return w.PortalCorsOrigins
 }
 
-func (c *Config) GetPortalDeveloperMetaFields() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalDeveloperMetaFields() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalDeveloperMetaFields
+	return w.PortalDeveloperMetaFields
 }
 
-func (c *Config) GetPortalEmailsFrom() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalEmailsFrom() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalEmailsFrom
+	return w.PortalEmailsFrom
 }
 
-func (c *Config) GetPortalEmailsReplyTo() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalEmailsReplyTo() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalEmailsReplyTo
+	return w.PortalEmailsReplyTo
 }
 
-func (c *Config) GetPortalInviteEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalInviteEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalInviteEmail
+	return w.PortalInviteEmail
 }
 
-func (c *Config) GetPortalIsLegacy() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalIsLegacy() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalIsLegacy
+	return w.PortalIsLegacy
 }
 
-func (c *Config) GetPortalResetEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalResetEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalResetEmail
+	return w.PortalResetEmail
 }
 
-func (c *Config) GetPortalResetSuccessEmail() *bool {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalResetSuccessEmail() *bool {
+	if w == nil {
 		return nil
 	}
-	return c.PortalResetSuccessEmail
+	return w.PortalResetSuccessEmail
 }
 
-func (c *Config) GetPortalSessionConf() *string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalSessionConf() *string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalSessionConf
+	return w.PortalSessionConf
 }
 
-func (c *Config) GetPortalSMTPAdminEmails() []string {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalSMTPAdminEmails() []string {
+	if w == nil {
 		return nil
 	}
-	return c.PortalSMTPAdminEmails
+	return w.PortalSMTPAdminEmails
 }
 
-func (c *Config) GetPortalTokenExp() *int64 {
-	if c == nil {
+func (w *WorkspaceConfig) GetPortalTokenExp() *int64 {
+	if w == nil {
 		return nil
 	}
-	return c.PortalTokenExp
+	return w.PortalTokenExp
 }
 
 type Meta struct {
@@ -186,8 +186,8 @@ func (m *Meta) GetThumbnail() *string {
 
 type Workspace struct {
 	// A description or additional information about the workspace.
-	Comment *string `json:"comment,omitempty"`
-	Config  *Config `json:"config,omitempty"`
+	Comment *string          `json:"comment,omitempty"`
+	Config  *WorkspaceConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// A string representing a UUID (universally unique identifier).
@@ -206,7 +206,7 @@ func (w *Workspace) GetComment() *string {
 	return w.Comment
 }
 
-func (w *Workspace) GetConfig() *Config {
+func (w *Workspace) GetConfig() *WorkspaceConfig {
 	if w == nil {
 		return nil
 	}

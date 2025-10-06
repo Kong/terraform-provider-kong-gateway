@@ -59,6 +59,65 @@ func (r *CertificateResourceModel) ToOperationsCreateCertificateRequest(ctx cont
 	return &out, diags
 }
 
+func (r *CertificateResourceModel) ToOperationsDeleteCertificateRequest(ctx context.Context) (*operations.DeleteCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *CertificateResourceModel) ToOperationsGetCertificateRequest(ctx context.Context) (*operations.GetCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *CertificateResourceModel) ToOperationsUpsertCertificateRequest(ctx context.Context) (*operations.UpsertCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	certificate, certificateDiags := r.ToSharedCertificate(ctx)
+	diags.Append(certificateDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+		Certificate:   *certificate,
+	}
+
+	return &out, diags
+}
+
 func (r *CertificateResourceModel) ToSharedCertificate(ctx context.Context) (*shared.Certificate, diag.Diagnostics) {
 	var diags diag.Diagnostics
 

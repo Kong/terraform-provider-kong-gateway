@@ -178,6 +178,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewKeySetResource,
 		NewMTLSAuthResource,
 		NewPartialResource,
+		NewPluginBasicAuthResource,
 		NewRouteResource,
 		NewRouteExpressionResource,
 		NewServiceResource,

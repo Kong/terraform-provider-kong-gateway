@@ -127,6 +127,65 @@ func (r *PartialResourceModel) ToOperationsCreatePartialRequest(ctx context.Cont
 	return &out, diags
 }
 
+func (r *PartialResourceModel) ToOperationsDeletePartialRequest(ctx context.Context) (*operations.DeletePartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeletePartialRequest{
+		PartialID: partialID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialResourceModel) ToOperationsGetPartialRequest(ctx context.Context) (*operations.GetPartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetPartialRequest{
+		PartialID: partialID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PartialResourceModel) ToOperationsUpsertPartialRequest(ctx context.Context) (*operations.UpsertPartialRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var partialID string
+	partialID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	partial, partialDiags := r.ToSharedPartial(ctx)
+	diags.Append(partialDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertPartialRequest{
+		PartialID: partialID,
+		Workspace: workspace,
+		Partial:   *partial,
+	}
+
+	return &out, diags
+}
+
 func (r *PartialResourceModel) ToSharedPartial(ctx context.Context) (*shared.Partial, diag.Diagnostics) {
 	var diags diag.Diagnostics
 

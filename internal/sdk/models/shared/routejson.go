@@ -103,26 +103,26 @@ func (e *PathHandling) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// Protocols - A string representing a protocol, such as HTTP or HTTPS.
-type Protocols string
+// RouteJSONProtocols - A string representing a protocol, such as HTTP or HTTPS.
+type RouteJSONProtocols string
 
 const (
-	ProtocolsGrpc           Protocols = "grpc"
-	ProtocolsGrpcs          Protocols = "grpcs"
-	ProtocolsHTTP           Protocols = "http"
-	ProtocolsHTTPS          Protocols = "https"
-	ProtocolsTCP            Protocols = "tcp"
-	ProtocolsTLS            Protocols = "tls"
-	ProtocolsTLSPassthrough Protocols = "tls_passthrough"
-	ProtocolsUDP            Protocols = "udp"
-	ProtocolsWs             Protocols = "ws"
-	ProtocolsWss            Protocols = "wss"
+	RouteJSONProtocolsGrpc           RouteJSONProtocols = "grpc"
+	RouteJSONProtocolsGrpcs          RouteJSONProtocols = "grpcs"
+	RouteJSONProtocolsHTTP           RouteJSONProtocols = "http"
+	RouteJSONProtocolsHTTPS          RouteJSONProtocols = "https"
+	RouteJSONProtocolsTCP            RouteJSONProtocols = "tcp"
+	RouteJSONProtocolsTLS            RouteJSONProtocols = "tls"
+	RouteJSONProtocolsTLSPassthrough RouteJSONProtocols = "tls_passthrough"
+	RouteJSONProtocolsUDP            RouteJSONProtocols = "udp"
+	RouteJSONProtocolsWs             RouteJSONProtocols = "ws"
+	RouteJSONProtocolsWss            RouteJSONProtocols = "wss"
 )
 
-func (e Protocols) ToPointer() *Protocols {
+func (e RouteJSONProtocols) ToPointer() *RouteJSONProtocols {
 	return &e
 }
-func (e *Protocols) UnmarshalJSON(data []byte) error {
+func (e *RouteJSONProtocols) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -147,10 +147,10 @@ func (e *Protocols) UnmarshalJSON(data []byte) error {
 	case "ws":
 		fallthrough
 	case "wss":
-		*e = Protocols(v)
+		*e = RouteJSONProtocols(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Protocols: %v", v)
+		return fmt.Errorf("invalid value for RouteJSONProtocols: %v", v)
 	}
 }
 
@@ -232,7 +232,7 @@ type RouteJSON struct {
 	// When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
 	PreserveHost *bool `json:"preserve_host,omitempty"`
 	// An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.
-	Protocols []Protocols `json:"protocols,omitempty"`
+	Protocols []RouteJSONProtocols `json:"protocols,omitempty"`
 	// A number used to choose which route resolves a given request when several routes match it using regexes simultaneously. When two routes match the path and have the same `regex_priority`, the older one (lowest `created_at`) is used. Note that the priority for non-regex routes is different (longer non-regex routes are matched before shorter ones).
 	RegexPriority *int64 `json:"regex_priority,omitempty"`
 	// Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
@@ -334,7 +334,7 @@ func (r *RouteJSON) GetPreserveHost() *bool {
 	return r.PreserveHost
 }
 
-func (r *RouteJSON) GetProtocols() []Protocols {
+func (r *RouteJSON) GetProtocols() []RouteJSONProtocols {
 	if r == nil {
 		return nil
 	}

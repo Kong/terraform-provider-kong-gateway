@@ -36,16 +36,38 @@ resource "kong-gateway_certificate" "my_certificate" {
 
 ### Required
 
-- `cert` (String) PEM-encoded public certificate chain of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.
-- `key` (String) PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.
+- `cert` (String) PEM-encoded public certificate chain of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+- `key` (String) PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
 
 ### Optional
 
-- `cert_alt` (String) PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.
-- `created_at` (Number) Unix epoch when the resource was created. Requires replacement if changed.
-- `id` (String) A string representing a UUID (universally unique identifier). Requires replacement if changed.
-- `key_alt` (String) PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format). Requires replacement if changed.
-- `snis` (List of String) Requires replacement if changed.
-- `tags` (List of String) An optional set of strings associated with the Certificate for grouping and filtering. Requires replacement if changed.
-- `updated_at` (Number) Unix epoch when the resource was last updated. Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `cert_alt` (String) PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+- `created_at` (Number) Unix epoch when the resource was created.
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `key_alt` (String) PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
+- `snis` (List of String)
+- `tags` (List of String) An optional set of strings associated with the Certificate for grouping and filtering.
+- `updated_at` (Number) Unix epoch when the resource was last updated.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
+
+## Import
+
+Import is supported using the following syntax:
+
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_certificate.my_kong-gateway_certificate
+  id = jsonencode({
+    id = "ddf3cdaa-3329-4961-822a-ce6dbd38eff7"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+terraform import kong-gateway_certificate.my_kong-gateway_certificate '{"id": "ddf3cdaa-3329-4961-822a-ce6dbd38eff7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+```

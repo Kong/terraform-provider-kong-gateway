@@ -267,11 +267,11 @@ func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.Rou
 	} else {
 		preserveHost = nil
 	}
-	var protocols []shared.Protocols
+	var protocols []shared.RouteJSONProtocols
 	if r.Protocols != nil {
-		protocols = make([]shared.Protocols, 0, len(r.Protocols))
+		protocols = make([]shared.RouteJSONProtocols, 0, len(r.Protocols))
 		for _, protocolsItem := range r.Protocols {
-			protocols = append(protocols, shared.Protocols(protocolsItem.ValueString()))
+			protocols = append(protocols, shared.RouteJSONProtocols(protocolsItem.ValueString()))
 		}
 	}
 	regexPriority := new(int64)

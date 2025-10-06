@@ -15,24 +15,27 @@ import (
 	"net/http"
 )
 
-// Partials - Some entities in Kong Gateway share common configuration settings that often need to be repeated. For example, multiple plugins that connect to Redis may require the same connection settings. Without Partials, you would need to replicate this configuration across all plugins. If the settings change, you would need to update each plugin individually.
-type Partials struct {
+// Plugins - A plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. Plugins let you add functionality to services that run behind a Kong Gateway instance, like authentication or rate limiting.
+// You can find more information about available plugins and which values each plugin accepts at the [Plugin Hub](https://developer.konghq.com/plugins/).
+// <br><br>
+// When adding a plugin configuration to a service, the plugin will run on every request made by a client to that service. If a plugin needs to be tuned to different values for some specific consumers, you can do so by creating a separate plugin instance that specifies both the service and the consumer, through the service and consumer fields.
+type Plugins struct {
 	rootSDK          *KongGateway
 	sdkConfiguration config.SDKConfiguration
 	hooks            *hooks.Hooks
 }
 
-func newPartials(rootSDK *KongGateway, sdkConfig config.SDKConfiguration, hooks *hooks.Hooks) *Partials {
-	return &Partials{
+func newPlugins(rootSDK *KongGateway, sdkConfig config.SDKConfiguration, hooks *hooks.Hooks) *Plugins {
+	return &Plugins{
 		rootSDK:          rootSDK,
 		sdkConfiguration: sdkConfig,
 		hooks:            hooks,
 	}
 }
 
-// ListPartial - List all Partials
-// List all Partials
-func (s *Partials) ListPartial(ctx context.Context, request operations.ListPartialRequest, opts ...operations.Option) (*operations.ListPartialResponse, error) {
+// CreateBasicauthPlugin - Create a BasicAuth plugin
+// Create a BasicAuth plugin
+func (s *Plugins) CreateBasicauthPlugin(ctx context.Context, request operations.CreateBasicauthPluginRequest, opts ...operations.Option) (*operations.CreateBasicauthPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -50,7 +53,7 @@ func (s *Partials) ListPartial(ctx context.Context, request operations.ListParti
 	} else {
 		baseURL = *o.ServerURL
 	}
-	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/partials", request, nil)
+	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/plugins", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
@@ -60,166 +63,11 @@ func (s *Partials) ListPartial(ctx context.Context, request operations.ListParti
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "list-partial",
+		OperationID:      "create-basicauth-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
-
-	timeout := o.Timeout
-	if timeout == nil {
-		timeout = s.sdkConfiguration.Timeout
-	}
-
-	if timeout != nil {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, *timeout)
-		defer cancel()
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "GET", opURL, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating request: %w", err)
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
-
-	if err := utils.PopulateQueryParams(ctx, req, request, nil); err != nil {
-		return nil, fmt.Errorf("error populating query params: %w", err)
-	}
-
-	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
-		return nil, err
-	}
-
-	for k, v := range o.SetHeaders {
-		req.Header.Set(k, v)
-	}
-
-	req, err = s.hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
-	if err != nil {
-		return nil, err
-	}
-
-	httpRes, err := s.sdkConfiguration.Client.Do(req)
-	if err != nil || httpRes == nil {
-		if err != nil {
-			err = fmt.Errorf("error sending request: %w", err)
-		} else {
-			err = fmt.Errorf("error sending request: no response")
-		}
-
-		_, err = s.hooks.AfterError(hooks.AfterErrorContext{HookContext: hookCtx}, nil, err)
-		return nil, err
-	} else if utils.MatchStatusCodes([]string{}, httpRes.StatusCode) {
-		_httpRes, err := s.hooks.AfterError(hooks.AfterErrorContext{HookContext: hookCtx}, httpRes, nil)
-		if err != nil {
-			return nil, err
-		} else if _httpRes != nil {
-			httpRes = _httpRes
-		}
-	} else {
-		httpRes, err = s.hooks.AfterSuccess(hooks.AfterSuccessContext{HookContext: hookCtx}, httpRes)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	res := &operations.ListPartialResponse{
-		StatusCode:  httpRes.StatusCode,
-		ContentType: httpRes.Header.Get("Content-Type"),
-		RawResponse: httpRes,
-	}
-
-	switch {
-	case httpRes.StatusCode == 200:
-		switch {
-		case utils.MatchContentType(httpRes.Header.Get("Content-Type"), `application/json`):
-			rawBody, err := utils.ConsumeRawBody(httpRes)
-			if err != nil {
-				return nil, err
-			}
-
-			var out operations.ListPartialResponseBody
-			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
-				return nil, err
-			}
-
-			res.Object = &out
-		default:
-			rawBody, err := utils.ConsumeRawBody(httpRes)
-			if err != nil {
-				return nil, err
-			}
-			return nil, errors.NewSDKError(fmt.Sprintf("unknown content-type received: %s", httpRes.Header.Get("Content-Type")), httpRes.StatusCode, string(rawBody), httpRes)
-		}
-	case httpRes.StatusCode == 401:
-		switch {
-		case utils.MatchContentType(httpRes.Header.Get("Content-Type"), `application/json`):
-			rawBody, err := utils.ConsumeRawBody(httpRes)
-			if err != nil {
-				return nil, err
-			}
-
-			var out shared.GatewayUnauthorizedError
-			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
-				return nil, err
-			}
-
-			res.GatewayUnauthorizedError = &out
-		default:
-			rawBody, err := utils.ConsumeRawBody(httpRes)
-			if err != nil {
-				return nil, err
-			}
-			return nil, errors.NewSDKError(fmt.Sprintf("unknown content-type received: %s", httpRes.Header.Get("Content-Type")), httpRes.StatusCode, string(rawBody), httpRes)
-		}
-	default:
-		rawBody, err := utils.ConsumeRawBody(httpRes)
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.NewSDKError("unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
-	}
-
-	return res, nil
-
-}
-
-// CreatePartial - Create a new Partial
-// Create a new Partial
-func (s *Partials) CreatePartial(ctx context.Context, request operations.CreatePartialRequest, opts ...operations.Option) (*operations.CreatePartialResponse, error) {
-	o := operations.Options{}
-	supportedOptions := []string{
-		operations.SupportedOptionTimeout,
-	}
-
-	for _, opt := range opts {
-		if err := opt(&o, supportedOptions...); err != nil {
-			return nil, fmt.Errorf("error applying option: %w", err)
-		}
-	}
-
-	var baseURL string
-	if o.ServerURL == nil {
-		baseURL = utils.ReplaceParameters(s.sdkConfiguration.GetServerDetails())
-	} else {
-		baseURL = *o.ServerURL
-	}
-	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/partials", request, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error generating URL: %w", err)
-	}
-
-	hookCtx := hooks.HookContext{
-		SDK:              s.rootSDK,
-		SDKConfiguration: s.sdkConfiguration,
-		BaseURL:          baseURL,
-		Context:          ctx,
-		OperationID:      "create-partial",
-		OAuth2Scopes:     []string{},
-		SecuritySource:   s.sdkConfiguration.Security,
-	}
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Partial", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "BasicAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +130,7 @@ func (s *Partials) CreatePartial(ctx context.Context, request operations.CreateP
 		}
 	}
 
-	res := &operations.CreatePartialResponse{
+	res := &operations.CreateBasicauthPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -297,12 +145,12 @@ func (s *Partials) CreatePartial(ctx context.Context, request operations.CreateP
 				return nil, err
 			}
 
-			var out shared.Partial
+			var out shared.BasicAuthPlugin
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
 
-			res.Partial = &out
+			res.BasicAuthPlugin = &out
 		default:
 			rawBody, err := utils.ConsumeRawBody(httpRes)
 			if err != nil {
@@ -343,9 +191,9 @@ func (s *Partials) CreatePartial(ctx context.Context, request operations.CreateP
 
 }
 
-// DeletePartial - Delete a Partial
-// Delete a Partial
-func (s *Partials) DeletePartial(ctx context.Context, request operations.DeletePartialRequest, opts ...operations.Option) (*operations.DeletePartialResponse, error) {
+// DeleteBasicauthPlugin - Delete a BasicAuth plugin
+// Delete a BasicAuth plugin
+func (s *Plugins) DeleteBasicauthPlugin(ctx context.Context, request operations.DeleteBasicauthPluginRequest, opts ...operations.Option) (*operations.DeleteBasicauthPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -363,7 +211,7 @@ func (s *Partials) DeletePartial(ctx context.Context, request operations.DeleteP
 	} else {
 		baseURL = *o.ServerURL
 	}
-	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/partials/{PartialId}", request, nil)
+	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/plugins/{PluginId}", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
@@ -373,7 +221,7 @@ func (s *Partials) DeletePartial(ctx context.Context, request operations.DeleteP
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "delete-partial",
+		OperationID:      "delete-basicauth-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -433,7 +281,7 @@ func (s *Partials) DeletePartial(ctx context.Context, request operations.DeleteP
 		}
 	}
 
-	res := &operations.DeletePartialResponse{
+	res := &operations.DeleteBasicauthPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -474,9 +322,9 @@ func (s *Partials) DeletePartial(ctx context.Context, request operations.DeleteP
 
 }
 
-// GetPartial - Fetch a Partial
-// Get a Partial using ID.
-func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartialRequest, opts ...operations.Option) (*operations.GetPartialResponse, error) {
+// GetBasicauthPlugin - Get a BasicAuth plugin
+// Get a BasicAuth plugin
+func (s *Plugins) GetBasicauthPlugin(ctx context.Context, request operations.GetBasicauthPluginRequest, opts ...operations.Option) (*operations.GetBasicauthPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -494,7 +342,7 @@ func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartial
 	} else {
 		baseURL = *o.ServerURL
 	}
-	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/partials/{PartialId}", request, nil)
+	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/plugins/{PluginId}", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
@@ -504,7 +352,7 @@ func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartial
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "get-partial",
+		OperationID:      "get-basicauth-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -564,7 +412,7 @@ func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartial
 		}
 	}
 
-	res := &operations.GetPartialResponse{
+	res := &operations.GetBasicauthPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -579,12 +427,12 @@ func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartial
 				return nil, err
 			}
 
-			var out shared.Partial
+			var out shared.BasicAuthPlugin
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
 
-			res.Partial = &out
+			res.BasicAuthPlugin = &out
 		default:
 			rawBody, err := utils.ConsumeRawBody(httpRes)
 			if err != nil {
@@ -626,9 +474,9 @@ func (s *Partials) GetPartial(ctx context.Context, request operations.GetPartial
 
 }
 
-// UpsertPartial - Upsert a Partial
-// Create or Update Partial using ID.
-func (s *Partials) UpsertPartial(ctx context.Context, request operations.UpsertPartialRequest, opts ...operations.Option) (*operations.UpsertPartialResponse, error) {
+// UpdateBasicauthPlugin - Update a BasicAuth plugin
+// Update a BasicAuth plugin
+func (s *Plugins) UpdateBasicauthPlugin(ctx context.Context, request operations.UpdateBasicauthPluginRequest, opts ...operations.Option) (*operations.UpdateBasicauthPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -646,7 +494,7 @@ func (s *Partials) UpsertPartial(ctx context.Context, request operations.UpsertP
 	} else {
 		baseURL = *o.ServerURL
 	}
-	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/partials/{PartialId}", request, nil)
+	opURL, err := utils.GenerateURL(ctx, baseURL, "/{workspace}/plugins/{PluginId}", request, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error generating URL: %w", err)
 	}
@@ -656,11 +504,11 @@ func (s *Partials) UpsertPartial(ctx context.Context, request operations.UpsertP
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "upsert-partial",
+		OperationID:      "update-basicauth-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
-	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Partial", "json", `request:"mediaType=application/json"`)
+	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "BasicAuthPlugin", "json", `request:"mediaType=application/json"`)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +571,7 @@ func (s *Partials) UpsertPartial(ctx context.Context, request operations.UpsertP
 		}
 	}
 
-	res := &operations.UpsertPartialResponse{
+	res := &operations.UpdateBasicauthPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -738,12 +586,12 @@ func (s *Partials) UpsertPartial(ctx context.Context, request operations.UpsertP
 				return nil, err
 			}
 
-			var out shared.Partial
+			var out shared.BasicAuthPlugin
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
 
-			res.Partial = &out
+			res.BasicAuthPlugin = &out
 		default:
 			rawBody, err := utils.ConsumeRawBody(httpRes)
 			if err != nil {

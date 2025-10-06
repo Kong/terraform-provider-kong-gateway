@@ -5,6 +5,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -32,13 +35,13 @@ type WorkspaceResource struct {
 
 // WorkspaceResourceModel describes the resource data model.
 type WorkspaceResourceModel struct {
-	Comment   types.String    `tfsdk:"comment"`
-	Config    *tfTypes.Config `tfsdk:"config"`
-	CreatedAt types.Int64     `tfsdk:"created_at"`
-	ID        types.String    `tfsdk:"id"`
-	Meta      *tfTypes.Meta   `tfsdk:"meta"`
-	Name      types.String    `tfsdk:"name"`
-	UpdatedAt types.Int64     `tfsdk:"updated_at"`
+	Comment   types.String             `tfsdk:"comment"`
+	Config    *tfTypes.WorkspaceConfig `tfsdk:"config"`
+	CreatedAt types.Int64              `tfsdk:"created_at"`
+	ID        types.String             `tfsdk:"id"`
+	Meta      *tfTypes.Meta            `tfsdk:"meta"`
+	Name      types.String             `tfsdk:"name"`
+	UpdatedAt types.Int64              `tfsdk:"updated_at"`
 }
 
 func (r *WorkspaceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,7 +64,10 @@ func (r *WorkspaceResource) Schema(ctx context.Context, req resource.SchemaReque
 					"meta": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
+						Validators: []validator.Map{
+							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+						},
 					},
 					"portal": schema.BoolAttribute{
 						Computed: true,

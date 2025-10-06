@@ -10,7 +10,7 @@ format:
 	@npx openapi-format --sortFile .openapi-format-sort.json openapi.yaml -o openapi.yaml
 
 speakeasy: check-speakeasy
-	speakeasy run -o console --skip-versioning
+	speakeasy run --skip-versioning --output console --minimal
 	@go generate .
 	@git clean -fd docs/data-sources examples > /dev/null
 	@git checkout -- README.md examples/README.md

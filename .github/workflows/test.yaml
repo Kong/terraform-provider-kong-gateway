@@ -21,6 +21,8 @@ jobs:
         terraform-version:
           - "1.11.*"
         kong-gateway-version:
+          - "3.12"
+          - "3.11"
           - "3.10"
           - "3.9"
     steps:
@@ -32,9 +34,15 @@ jobs:
         with:
           terraform_version: ${{ matrix.terraform-version }}
           terraform_wrapper: false
+      - uses: Kong/kong-license@bfa1c17600a68d879042f44a9ec3fb5b60f4fad5 # master @ 20250819
+        id: license
+        with:
+          op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Setup Kong Gateway
+        env:
+          KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
         run: |
-          curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }}
+          curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }} -e KONG_LICENSE_DATA
       - run: make acceptance
       - name: Tear Down Kong Gateway
         run: |

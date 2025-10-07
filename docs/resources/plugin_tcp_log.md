@@ -16,7 +16,7 @@ PluginTCPLog Resource
 resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
   config = {
     custom_fields_by_lua = {
-      key = jsonencode("value")
+      key = "value"
     }
     host      = "...my_host..."
     keepalive = 5.51

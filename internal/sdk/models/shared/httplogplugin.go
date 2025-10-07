@@ -171,7 +171,7 @@ type HTTPLogPluginConfig struct {
 	// Indicates the type of data sent. The only available option is `application/json`.
 	ContentType *ContentType `json:"content_type,omitempty"`
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// Optional time in seconds. If `queue_size` > 1, this is the max idle time before sending a log with less than `queue_size` records.
 	FlushTimeout *float64 `json:"flush_timeout,omitempty"`
 	// An optional table of headers included in the HTTP message to the upstream server. Values are indexed by header name, and each header name accepts a single string.
@@ -198,7 +198,7 @@ func (h *HTTPLogPluginConfig) GetContentType() *ContentType {
 	return h.ContentType
 }
 
-func (h *HTTPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
+func (h *HTTPLogPluginConfig) GetCustomFieldsByLua() map[string]string {
 	if h == nil {
 		return nil
 	}

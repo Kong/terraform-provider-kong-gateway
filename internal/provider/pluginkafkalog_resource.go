@@ -149,11 +149,8 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 					"custom_fields_by_lua": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: jsontypes.NormalizedType{},
+						ElementType: types.StringType,
 						Description: `Lua code as a key-value map`,
-						Validators: []validator.Map{
-							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-						},
 					},
 					"keepalive": schema.Int64Attribute{
 						Computed: true,

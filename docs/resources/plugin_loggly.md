@@ -17,7 +17,7 @@ resource "kong-gateway_plugin_loggly" "my_pluginloggly" {
   config = {
     client_errors_severity = "warning"
     custom_fields_by_lua = {
-      key = jsonencode("value")
+      key = "value"
     }
     host                   = "...my_host..."
     key                    = "...my_key..."

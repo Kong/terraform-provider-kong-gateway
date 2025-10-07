@@ -10,7 +10,7 @@ import (
 
 type TCPLogPluginConfig struct {
 	// A list of key-value pairs, where the key is the name of a log field and the value is a chunk of Lua code, whose return value sets or replaces the log field value.
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// The IP address or host name to send data to.
 	Host string `json:"host"`
 	// An optional value in milliseconds that defines how long an idle connection lives before being closed.
@@ -25,7 +25,7 @@ type TCPLogPluginConfig struct {
 	TLSSni *string `json:"tls_sni,omitempty"`
 }
 
-func (t *TCPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
+func (t *TCPLogPluginConfig) GetCustomFieldsByLua() map[string]string {
 	if t == nil {
 		return nil
 	}

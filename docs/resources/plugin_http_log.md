@@ -17,7 +17,7 @@ resource "kong-gateway_plugin_http_log" "my_pluginhttplog" {
   config = {
     content_type = "application/json"
     custom_fields_by_lua = {
-      key = jsonencode("value")
+      key = "value"
     }
     flush_timeout = 8.6
     headers = {

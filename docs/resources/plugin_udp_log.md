@@ -16,7 +16,7 @@ PluginUDPLog Resource
 resource "kong-gateway_plugin_udp_log" "my_pluginudplog" {
   config = {
     custom_fields_by_lua = {
-      key = jsonencode("value")
+      key = "value"
     }
     host    = "...my_host..."
     port    = 6547

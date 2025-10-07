@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -22,10 +20,9 @@ func (r *PluginUDPLogResourceModel) RefreshFromSharedUDPLogPlugin(ctx context.Co
 		} else {
 			r.Config = &tfTypes.UDPLogPluginConfig{}
 			if len(resp.Config.CustomFieldsByLua) > 0 {
-				r.Config.CustomFieldsByLua = make(map[string]jsontypes.Normalized, len(resp.Config.CustomFieldsByLua))
+				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
 				for key, value := range resp.Config.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.CustomFieldsByLua[key] = jsontypes.NewNormalizedValue(string(result))
+					r.Config.CustomFieldsByLua[key] = types.StringValue(value)
 				}
 			}
 			r.Config.Host = types.StringValue(resp.Config.Host)
@@ -191,10 +188,11 @@ func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*
 
 	var config *shared.UDPLogPluginConfig
 	if r.Config != nil {
-		customFieldsByLua := make(map[string]interface{})
+		customFieldsByLua := make(map[string]string)
 		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
-			var customFieldsByLuaInst interface{}
-			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
+			var customFieldsByLuaInst string
+			customFieldsByLuaInst = customFieldsByLuaValue.ValueString()
+
 			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
 		}
 		var host string

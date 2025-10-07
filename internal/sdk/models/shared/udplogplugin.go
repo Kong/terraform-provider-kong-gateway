@@ -10,7 +10,7 @@ import (
 
 type UDPLogPluginConfig struct {
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// A string representing a host name, such as example.com.
 	Host string `json:"host"`
 	// An integer representing a port number between 0 and 65535, inclusive.
@@ -19,7 +19,7 @@ type UDPLogPluginConfig struct {
 	Timeout *float64 `json:"timeout,omitempty"`
 }
 
-func (u *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
+func (u *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]string {
 	if u == nil {
 		return nil
 	}

@@ -268,7 +268,7 @@ func (e *SyslogPluginSuccessfulSeverity) UnmarshalJSON(data []byte) error {
 type SyslogPluginConfig struct {
 	ClientErrorsSeverity *SyslogPluginClientErrorsSeverity `json:"client_errors_severity,omitempty"`
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// The facility is used by the operating system to decide how to handle each log message.
 	Facility             *Facility                         `json:"facility,omitempty"`
 	LogLevel             *SyslogPluginLogLevel             `json:"log_level,omitempty"`
@@ -283,7 +283,7 @@ func (s *SyslogPluginConfig) GetClientErrorsSeverity() *SyslogPluginClientErrors
 	return s.ClientErrorsSeverity
 }
 
-func (s *SyslogPluginConfig) GetCustomFieldsByLua() map[string]any {
+func (s *SyslogPluginConfig) GetCustomFieldsByLua() map[string]string {
 	if s == nil {
 		return nil
 	}

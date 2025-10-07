@@ -51,10 +51,9 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 			}
 			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
 			if len(resp.Config.CustomFieldsByLua) > 0 {
-				r.Config.CustomFieldsByLua = make(map[string]jsontypes.Normalized, len(resp.Config.CustomFieldsByLua))
+				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
 				for key, value := range resp.Config.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.CustomFieldsByLua[key] = jsontypes.NewNormalizedValue(string(result))
+					r.Config.CustomFieldsByLua[key] = types.StringValue(value)
 				}
 			}
 			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
@@ -121,15 +120,15 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
 								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 								for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-									result1, _ := json.Marshal(value1)
-									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key1] = jsontypes.NewNormalizedValue(string(result1))
+									result, _ := json.Marshal(value1)
+									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key1] = jsontypes.NewNormalizedValue(string(result))
 								}
 							}
 							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
 								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 								for key2, value2 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-									result2, _ := json.Marshal(value2)
-									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key2] = jsontypes.NewNormalizedValue(string(result2))
+									result1, _ := json.Marshal(value2)
+									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key2] = jsontypes.NewNormalizedValue(string(result1))
 								}
 							}
 							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -406,10 +405,11 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 		} else {
 			clusterName = nil
 		}
-		customFieldsByLua := make(map[string]interface{})
+		customFieldsByLua := make(map[string]string)
 		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
-			var customFieldsByLuaInst interface{}
-			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
+			var customFieldsByLuaInst string
+			customFieldsByLuaInst = customFieldsByLuaValue.ValueString()
+
 			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
 		}
 		keepalive := new(int64)

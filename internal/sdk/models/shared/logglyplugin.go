@@ -187,7 +187,7 @@ func (e *SuccessfulSeverity) UnmarshalJSON(data []byte) error {
 type LogglyPluginConfig struct {
 	ClientErrorsSeverity *ClientErrorsSeverity `json:"client_errors_severity,omitempty"`
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// A string representing a host name, such as example.com.
 	Host     *string   `json:"host,omitempty"`
 	Key      string    `json:"key"`
@@ -207,7 +207,7 @@ func (l *LogglyPluginConfig) GetClientErrorsSeverity() *ClientErrorsSeverity {
 	return l.ClientErrorsSeverity
 }
 
-func (l *LogglyPluginConfig) GetCustomFieldsByLua() map[string]any {
+func (l *LogglyPluginConfig) GetCustomFieldsByLua() map[string]string {
 	if l == nil {
 		return nil
 	}

@@ -30,7 +30,7 @@ resource "kong-gateway_plugin_kafka_log" "my_pluginkafkalog" {
     ]
     cluster_name = "...my_cluster_name..."
     custom_fields_by_lua = {
-      key = jsonencode("value")
+      key = "value"
     }
     keepalive                                          = 5
     keepalive_enabled                                  = false

@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateHmacauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID       string                `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	HmacAuthPlugin shared.HmacAuthPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateHmacauthPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateHmacauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateHmacauthPluginRequest) GetHmacAuthPlugin() shared.HmacAuthPlugin {
-	if o == nil {
+func (u *UpdateHmacauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "HmacAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateHmacauthPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateHmacauthPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateHmacauthPluginRequest) GetHmacAuthPlugin() shared.HmacAuthPlugin {
+	if u == nil {
 		return shared.HmacAuthPlugin{}
 	}
-	return o.HmacAuthPlugin
+	return u.HmacAuthPlugin
 }
 
 type UpdateHmacauthPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateHmacauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateHmacauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateHmacauthPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateHmacauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateHmacauthPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateHmacauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateHmacauthPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateHmacauthPluginResponse) GetHmacAuthPlugin() *shared.HmacAuthPlugin {
-	if o == nil {
+func (u *UpdateHmacauthPluginResponse) GetHmacAuthPlugin() *shared.HmacAuthPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.HmacAuthPlugin
+	return u.HmacAuthPlugin
 }
 
-func (o *UpdateHmacauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateHmacauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

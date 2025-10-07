@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type AiPromptTemplatePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *AiPromptTemplatePluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type AiPromptTemplatePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *AiPromptTemplatePluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type AiPromptTemplatePluginOrdering struct {
-	After  *AiPromptTemplatePluginAfter  `json:"after,omitempty"`
-	Before *AiPromptTemplatePluginBefore `json:"before,omitempty"`
-}
-
-func (o *AiPromptTemplatePluginOrdering) GetAfter() *AiPromptTemplatePluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *AiPromptTemplatePluginOrdering) GetBefore() *AiPromptTemplatePluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type AiPromptTemplatePluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *AiPromptTemplatePluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *AiPromptTemplatePluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *AiPromptTemplatePluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type Templates struct {
 	// Unique name for the template, can be called with `{template://NAME}`
 	Name string `json:"name"`
@@ -83,18 +15,18 @@ type Templates struct {
 	Template string `json:"template"`
 }
 
-func (o *Templates) GetName() string {
-	if o == nil {
+func (t *Templates) GetName() string {
+	if t == nil {
 		return ""
 	}
-	return o.Name
+	return t.Name
 }
 
-func (o *Templates) GetTemplate() string {
-	if o == nil {
+func (t *Templates) GetTemplate() string {
+	if t == nil {
 		return ""
 	}
-	return o.Template
+	return t.Template
 }
 
 type AiPromptTemplatePluginConfig struct {
@@ -102,38 +34,38 @@ type AiPromptTemplatePluginConfig struct {
 	AllowUntemplatedRequests *bool `json:"allow_untemplated_requests,omitempty"`
 	// Set true to add the original request to the Kong log plugin(s) output.
 	LogOriginalRequest *bool `json:"log_original_request,omitempty"`
-	// max allowed body size allowed to be introspected
+	// max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
 	// Array of templates available to the request context.
-	Templates []Templates `json:"templates,omitempty"`
+	Templates []Templates `json:"templates"`
 }
 
-func (o *AiPromptTemplatePluginConfig) GetAllowUntemplatedRequests() *bool {
-	if o == nil {
+func (a *AiPromptTemplatePluginConfig) GetAllowUntemplatedRequests() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.AllowUntemplatedRequests
+	return a.AllowUntemplatedRequests
 }
 
-func (o *AiPromptTemplatePluginConfig) GetLogOriginalRequest() *bool {
-	if o == nil {
+func (a *AiPromptTemplatePluginConfig) GetLogOriginalRequest() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.LogOriginalRequest
+	return a.LogOriginalRequest
 }
 
-func (o *AiPromptTemplatePluginConfig) GetMaxRequestBodySize() *int64 {
-	if o == nil {
+func (a *AiPromptTemplatePluginConfig) GetMaxRequestBodySize() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.MaxRequestBodySize
+	return a.MaxRequestBodySize
 }
 
-func (o *AiPromptTemplatePluginConfig) GetTemplates() []Templates {
-	if o == nil {
-		return nil
+func (a *AiPromptTemplatePluginConfig) GetTemplates() []Templates {
+	if a == nil {
+		return []Templates{}
 	}
-	return o.Templates
+	return a.Templates
 }
 
 // AiPromptTemplatePluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -141,11 +73,11 @@ type AiPromptTemplatePluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptTemplatePluginConsumer) GetID() *string {
-	if o == nil {
+func (a *AiPromptTemplatePluginConsumer) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiPromptTemplatePluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -153,11 +85,81 @@ type AiPromptTemplatePluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptTemplatePluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (a *AiPromptTemplatePluginConsumerGroup) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
+}
+
+type AiPromptTemplatePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiPromptTemplatePluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiPromptTemplatePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiPromptTemplatePluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiPromptTemplatePluginOrdering struct {
+	After  *AiPromptTemplatePluginAfter  `json:"after,omitempty"`
+	Before *AiPromptTemplatePluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiPromptTemplatePluginOrdering) GetAfter() *AiPromptTemplatePluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiPromptTemplatePluginOrdering) GetBefore() *AiPromptTemplatePluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiPromptTemplatePluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiPromptTemplatePluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiPromptTemplatePluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiPromptTemplatePluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
 }
 
 type AiPromptTemplatePluginProtocols string
@@ -197,11 +199,11 @@ type AiPromptTemplatePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptTemplatePluginRoute) GetID() *string {
-	if o == nil {
+func (a *AiPromptTemplatePluginRoute) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiPromptTemplatePluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -209,39 +211,41 @@ type AiPromptTemplatePluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptTemplatePluginService) GetID() *string {
-	if o == nil {
+func (a *AiPromptTemplatePluginService) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-// AiPromptTemplatePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiPromptTemplatePlugin struct {
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                            `json:"enabled,omitempty"`
-	ID           *string                          `json:"id,omitempty"`
-	InstanceName *string                          `json:"instance_name,omitempty"`
-	name         string                           `const:"ai-prompt-template" json:"name"`
-	Ordering     *AiPromptTemplatePluginOrdering  `json:"ordering,omitempty"`
-	Partials     []AiPromptTemplatePluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                        `json:"updated_at,omitempty"`
-	Config    *AiPromptTemplatePluginConfig `json:"config,omitempty"`
+	Config *AiPromptTemplatePluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *AiPromptTemplatePluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *AiPromptTemplatePluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                         `json:"instance_name,omitempty"`
+	name         string                          `const:"ai-prompt-template" json:"name"`
+	Ordering     *AiPromptTemplatePluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []AiPromptTemplatePluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiPromptTemplatePluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiPromptTemplatePluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiPromptTemplatePluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiPromptTemplatePlugin) MarshalJSON() ([]byte, error) {
@@ -249,110 +253,110 @@ func (a AiPromptTemplatePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiPromptTemplatePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *AiPromptTemplatePlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetConfig() *AiPromptTemplatePluginConfig {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.Config
 }
 
-func (o *AiPromptTemplatePlugin) GetEnabled() *bool {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetConsumer() *AiPromptTemplatePluginConsumer {
+	if a == nil {
 		return nil
 	}
-	return o.Enabled
+	return a.Consumer
 }
 
-func (o *AiPromptTemplatePlugin) GetID() *string {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetConsumerGroup() *AiPromptTemplatePluginConsumerGroup {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ConsumerGroup
 }
 
-func (o *AiPromptTemplatePlugin) GetInstanceName() *string {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.InstanceName
+	return a.CreatedAt
 }
 
-func (o *AiPromptTemplatePlugin) GetName() string {
+func (a *AiPromptTemplatePlugin) GetEnabled() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.Enabled
+}
+
+func (a *AiPromptTemplatePlugin) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiPromptTemplatePlugin) GetInstanceName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.InstanceName
+}
+
+func (a *AiPromptTemplatePlugin) GetName() string {
 	return "ai-prompt-template"
 }
 
-func (o *AiPromptTemplatePlugin) GetOrdering() *AiPromptTemplatePluginOrdering {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetOrdering() *AiPromptTemplatePluginOrdering {
+	if a == nil {
 		return nil
 	}
-	return o.Ordering
+	return a.Ordering
 }
 
-func (o *AiPromptTemplatePlugin) GetPartials() []AiPromptTemplatePluginPartials {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetPartials() []AiPromptTemplatePluginPartials {
+	if a == nil {
 		return nil
 	}
-	return o.Partials
+	return a.Partials
 }
 
-func (o *AiPromptTemplatePlugin) GetTags() []string {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetProtocols() []AiPromptTemplatePluginProtocols {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Protocols
 }
 
-func (o *AiPromptTemplatePlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetRoute() *AiPromptTemplatePluginRoute {
+	if a == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return a.Route
 }
 
-func (o *AiPromptTemplatePlugin) GetConfig() *AiPromptTemplatePluginConfig {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetService() *AiPromptTemplatePluginService {
+	if a == nil {
 		return nil
 	}
-	return o.Config
+	return a.Service
 }
 
-func (o *AiPromptTemplatePlugin) GetConsumer() *AiPromptTemplatePluginConsumer {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Consumer
+	return a.Tags
 }
 
-func (o *AiPromptTemplatePlugin) GetConsumerGroup() *AiPromptTemplatePluginConsumerGroup {
-	if o == nil {
+func (a *AiPromptTemplatePlugin) GetUpdatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerGroup
-}
-
-func (o *AiPromptTemplatePlugin) GetProtocols() []AiPromptTemplatePluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *AiPromptTemplatePlugin) GetRoute() *AiPromptTemplatePluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *AiPromptTemplatePlugin) GetService() *AiPromptTemplatePluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return a.UpdatedAt
 }

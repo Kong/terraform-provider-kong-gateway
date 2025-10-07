@@ -8,102 +8,34 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type UpstreamTimeoutPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *UpstreamTimeoutPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type UpstreamTimeoutPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *UpstreamTimeoutPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type UpstreamTimeoutPluginOrdering struct {
-	After  *UpstreamTimeoutPluginAfter  `json:"after,omitempty"`
-	Before *UpstreamTimeoutPluginBefore `json:"before,omitempty"`
-}
-
-func (o *UpstreamTimeoutPluginOrdering) GetAfter() *UpstreamTimeoutPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *UpstreamTimeoutPluginOrdering) GetBefore() *UpstreamTimeoutPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type UpstreamTimeoutPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *UpstreamTimeoutPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *UpstreamTimeoutPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *UpstreamTimeoutPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type UpstreamTimeoutPluginConfig struct {
-	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	// The timeout in milliseconds for establishing a connection to the upstream server. Must be an integer between 1 and 2^31-2.
 	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
-	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	// The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
 	ReadTimeout *int64 `json:"read_timeout,omitempty"`
-	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	// The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
 	SendTimeout *int64 `json:"send_timeout,omitempty"`
 }
 
-func (o *UpstreamTimeoutPluginConfig) GetConnectTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamTimeoutPluginConfig) GetConnectTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return u.ConnectTimeout
 }
 
-func (o *UpstreamTimeoutPluginConfig) GetReadTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamTimeoutPluginConfig) GetReadTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return u.ReadTimeout
 }
 
-func (o *UpstreamTimeoutPluginConfig) GetSendTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamTimeoutPluginConfig) GetSendTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.SendTimeout
+	return u.SendTimeout
 }
 
 // UpstreamTimeoutPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -111,11 +43,81 @@ type UpstreamTimeoutPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamTimeoutPluginConsumer) GetID() *string {
-	if o == nil {
+func (u *UpstreamTimeoutPluginConsumer) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
+}
+
+type UpstreamTimeoutPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginAfter) GetAccess() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Access
+}
+
+type UpstreamTimeoutPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginBefore) GetAccess() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Access
+}
+
+type UpstreamTimeoutPluginOrdering struct {
+	After  *UpstreamTimeoutPluginAfter  `json:"after,omitempty"`
+	Before *UpstreamTimeoutPluginBefore `json:"before,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginOrdering) GetAfter() *UpstreamTimeoutPluginAfter {
+	if u == nil {
+		return nil
+	}
+	return u.After
+}
+
+func (u *UpstreamTimeoutPluginOrdering) GetBefore() *UpstreamTimeoutPluginBefore {
+	if u == nil {
+		return nil
+	}
+	return u.Before
+}
+
+type UpstreamTimeoutPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginPartials) GetID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ID
+}
+
+func (u *UpstreamTimeoutPluginPartials) GetName() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Name
+}
+
+func (u *UpstreamTimeoutPluginPartials) GetPath() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Path
 }
 
 type UpstreamTimeoutPluginProtocols string
@@ -155,11 +157,11 @@ type UpstreamTimeoutPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamTimeoutPluginRoute) GetID() *string {
-	if o == nil {
+func (u *UpstreamTimeoutPluginRoute) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UpstreamTimeoutPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -167,37 +169,39 @@ type UpstreamTimeoutPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamTimeoutPluginService) GetID() *string {
-	if o == nil {
+func (u *UpstreamTimeoutPluginService) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
-// UpstreamTimeoutPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type UpstreamTimeoutPlugin struct {
+	Config *UpstreamTimeoutPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *UpstreamTimeoutPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                           `json:"enabled,omitempty"`
-	ID           *string                         `json:"id,omitempty"`
-	InstanceName *string                         `json:"instance_name,omitempty"`
-	name         string                          `const:"upstream-timeout" json:"name"`
-	Ordering     *UpstreamTimeoutPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []UpstreamTimeoutPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                       `json:"updated_at,omitempty"`
-	Config    *UpstreamTimeoutPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *UpstreamTimeoutPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                        `json:"instance_name,omitempty"`
+	name         string                         `const:"upstream-timeout" json:"name"`
+	Ordering     *UpstreamTimeoutPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []UpstreamTimeoutPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []UpstreamTimeoutPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *UpstreamTimeoutPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *UpstreamTimeoutPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (u UpstreamTimeoutPlugin) MarshalJSON() ([]byte, error) {
@@ -205,103 +209,103 @@ func (u UpstreamTimeoutPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpstreamTimeoutPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *UpstreamTimeoutPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetConfig() *UpstreamTimeoutPluginConfig {
+	if u == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return u.Config
 }
 
-func (o *UpstreamTimeoutPlugin) GetEnabled() *bool {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetConsumer() *UpstreamTimeoutPluginConsumer {
+	if u == nil {
 		return nil
 	}
-	return o.Enabled
+	return u.Consumer
 }
 
-func (o *UpstreamTimeoutPlugin) GetID() *string {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetCreatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.CreatedAt
 }
 
-func (o *UpstreamTimeoutPlugin) GetInstanceName() *string {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetEnabled() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.InstanceName
+	return u.Enabled
 }
 
-func (o *UpstreamTimeoutPlugin) GetName() string {
+func (u *UpstreamTimeoutPlugin) GetID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ID
+}
+
+func (u *UpstreamTimeoutPlugin) GetInstanceName() *string {
+	if u == nil {
+		return nil
+	}
+	return u.InstanceName
+}
+
+func (u *UpstreamTimeoutPlugin) GetName() string {
 	return "upstream-timeout"
 }
 
-func (o *UpstreamTimeoutPlugin) GetOrdering() *UpstreamTimeoutPluginOrdering {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetOrdering() *UpstreamTimeoutPluginOrdering {
+	if u == nil {
 		return nil
 	}
-	return o.Ordering
+	return u.Ordering
 }
 
-func (o *UpstreamTimeoutPlugin) GetPartials() []UpstreamTimeoutPluginPartials {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetPartials() []UpstreamTimeoutPluginPartials {
+	if u == nil {
 		return nil
 	}
-	return o.Partials
+	return u.Partials
 }
 
-func (o *UpstreamTimeoutPlugin) GetTags() []string {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetProtocols() []UpstreamTimeoutPluginProtocols {
+	if u == nil {
 		return nil
 	}
-	return o.Tags
+	return u.Protocols
 }
 
-func (o *UpstreamTimeoutPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetRoute() *UpstreamTimeoutPluginRoute {
+	if u == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return u.Route
 }
 
-func (o *UpstreamTimeoutPlugin) GetConfig() *UpstreamTimeoutPluginConfig {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetService() *UpstreamTimeoutPluginService {
+	if u == nil {
 		return nil
 	}
-	return o.Config
+	return u.Service
 }
 
-func (o *UpstreamTimeoutPlugin) GetConsumer() *UpstreamTimeoutPluginConsumer {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetTags() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Consumer
+	return u.Tags
 }
 
-func (o *UpstreamTimeoutPlugin) GetProtocols() []UpstreamTimeoutPluginProtocols {
-	if o == nil {
+func (u *UpstreamTimeoutPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *UpstreamTimeoutPlugin) GetRoute() *UpstreamTimeoutPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *UpstreamTimeoutPlugin) GetService() *UpstreamTimeoutPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return u.UpdatedAt
 }

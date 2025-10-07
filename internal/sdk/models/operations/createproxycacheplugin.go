@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateProxycachePluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace        string                  `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ProxyCachePlugin shared.ProxyCachePlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateProxycachePluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateProxycachePluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ProxyCachePlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateProxycachePluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateProxycachePluginRequest) GetProxyCachePlugin() shared.ProxyCachePlugin {
+	if c == nil {
+		return shared.ProxyCachePlugin{}
+	}
+	return c.ProxyCachePlugin
+}
 
 type CreateProxycachePluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateProxycachePluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateProxycachePluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateProxycachePluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateProxycachePluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateProxycachePluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateProxycachePluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateProxycachePluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateProxycachePluginResponse) GetProxyCachePlugin() *shared.ProxyCachePlugin {
-	if o == nil {
+func (c *CreateProxycachePluginResponse) GetProxyCachePlugin() *shared.ProxyCachePlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ProxyCachePlugin
+	return c.ProxyCachePlugin
 }
 
-func (o *CreateProxycachePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateProxycachePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

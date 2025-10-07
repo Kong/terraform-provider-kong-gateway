@@ -16,6 +16,7 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
+    hoistGlobalSecurity: true
   tests:
     generateTests: true
     generateNewTests: false
@@ -26,7 +27,7 @@ terraform:
   additionalDependencies: {}
   additionalEphemeralResources: []
   additionalProviderAttributes:
-    httpHeaders: ""
+    httpHeaders: http_headers
     tlsSkipVerify: ""
   additionalResources: []
   allowUnknownFieldsInWeakUnions: false

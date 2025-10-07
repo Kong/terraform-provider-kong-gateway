@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetCertificateRequest struct {
 	// ID of the Certificate to lookup
 	CertificateID string `pathParam:"style=simple,explode=false,name=CertificateId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetCertificateRequest) GetCertificateID() string {
-	if o == nil {
+func (g GetCertificateRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetCertificateRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"CertificateId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetCertificateRequest) GetCertificateID() string {
+	if g == nil {
 		return ""
 	}
-	return o.CertificateID
+	return g.CertificateID
+}
+
+func (g *GetCertificateRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetCertificateResponse struct {
@@ -32,37 +53,37 @@ type GetCertificateResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetCertificateResponse) GetContentType() string {
-	if o == nil {
+func (g *GetCertificateResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetCertificateResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetCertificateResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetCertificateResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetCertificateResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetCertificateResponse) GetCertificate() *shared.Certificate {
-	if o == nil {
+func (g *GetCertificateResponse) GetCertificate() *shared.Certificate {
+	if g == nil {
 		return nil
 	}
-	return o.Certificate
+	return g.Certificate
 }
 
-func (o *GetCertificateResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetCertificateResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

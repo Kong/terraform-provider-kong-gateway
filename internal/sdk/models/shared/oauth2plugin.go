@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type Oauth2PluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *Oauth2PluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type Oauth2PluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *Oauth2PluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type Oauth2PluginOrdering struct {
-	After  *Oauth2PluginAfter  `json:"after,omitempty"`
-	Before *Oauth2PluginBefore `json:"before,omitempty"`
-}
-
-func (o *Oauth2PluginOrdering) GetAfter() *Oauth2PluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *Oauth2PluginOrdering) GetBefore() *Oauth2PluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type Oauth2PluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *Oauth2PluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *Oauth2PluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *Oauth2PluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // Pkce - Specifies a mode of how the Proof Key for Code Exchange (PKCE) should be handled by the plugin.
 type Pkce string
 
@@ -270,6 +202,76 @@ func (o *Oauth2PluginConfig) GetTokenExpiration() *float64 {
 	return o.TokenExpiration
 }
 
+type Oauth2PluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2PluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2PluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2PluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2PluginOrdering struct {
+	After  *Oauth2PluginAfter  `json:"after,omitempty"`
+	Before *Oauth2PluginBefore `json:"before,omitempty"`
+}
+
+func (o *Oauth2PluginOrdering) GetAfter() *Oauth2PluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *Oauth2PluginOrdering) GetBefore() *Oauth2PluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type Oauth2PluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *Oauth2PluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *Oauth2PluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *Oauth2PluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type Oauth2PluginProtocols string
 
 const (
@@ -332,28 +334,30 @@ func (o *Oauth2PluginService) GetID() *string {
 	return o.ID
 }
 
-// Oauth2Plugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type Oauth2Plugin struct {
+	Config *Oauth2PluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                  `json:"enabled,omitempty"`
-	ID           *string                `json:"id,omitempty"`
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"oauth2" json:"name"`
-	Ordering     *Oauth2PluginOrdering  `json:"ordering,omitempty"`
-	Partials     []Oauth2PluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64              `json:"updated_at,omitempty"`
-	Config    *Oauth2PluginConfig `json:"config,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"oauth2" json:"name"`
+	Ordering     *Oauth2PluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []Oauth2PluginPartials `json:"partials,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []Oauth2PluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *Oauth2PluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *Oauth2PluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (o Oauth2Plugin) MarshalJSON() ([]byte, error) {
@@ -361,10 +365,17 @@ func (o Oauth2Plugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *Oauth2Plugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (o *Oauth2Plugin) GetConfig() *Oauth2PluginConfig {
+	if o == nil {
+		return nil
+	}
+	return o.Config
 }
 
 func (o *Oauth2Plugin) GetCreatedAt() *int64 {
@@ -413,27 +424,6 @@ func (o *Oauth2Plugin) GetPartials() []Oauth2PluginPartials {
 	return o.Partials
 }
 
-func (o *Oauth2Plugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *Oauth2Plugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
-}
-
-func (o *Oauth2Plugin) GetConfig() *Oauth2PluginConfig {
-	if o == nil {
-		return nil
-	}
-	return o.Config
-}
-
 func (o *Oauth2Plugin) GetProtocols() []Oauth2PluginProtocols {
 	if o == nil {
 		return nil
@@ -453,4 +443,18 @@ func (o *Oauth2Plugin) GetService() *Oauth2PluginService {
 		return nil
 	}
 	return o.Service
+}
+
+func (o *Oauth2Plugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *Oauth2Plugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
 }

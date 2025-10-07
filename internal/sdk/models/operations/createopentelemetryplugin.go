@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateOpentelemetryPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	OpentelemetryPlugin shared.OpentelemetryPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateOpentelemetryPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOpentelemetryPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OpentelemetryPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateOpentelemetryPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateOpentelemetryPluginRequest) GetOpentelemetryPlugin() shared.OpentelemetryPlugin {
+	if c == nil {
+		return shared.OpentelemetryPlugin{}
+	}
+	return c.OpentelemetryPlugin
+}
 
 type CreateOpentelemetryPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateOpentelemetryPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateOpentelemetryPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateOpentelemetryPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateOpentelemetryPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateOpentelemetryPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateOpentelemetryPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateOpentelemetryPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateOpentelemetryPluginResponse) GetOpentelemetryPlugin() *shared.OpentelemetryPlugin {
-	if o == nil {
+func (c *CreateOpentelemetryPluginResponse) GetOpentelemetryPlugin() *shared.OpentelemetryPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.OpentelemetryPlugin
+	return c.OpentelemetryPlugin
 }
 
-func (o *CreateOpentelemetryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateOpentelemetryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

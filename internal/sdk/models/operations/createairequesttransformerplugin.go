@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAirequesttransformerPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                  string                            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiRequestTransformerPlugin shared.AiRequestTransformerPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAirequesttransformerPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAirequesttransformerPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiRequestTransformerPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAirequesttransformerPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAirequesttransformerPluginRequest) GetAiRequestTransformerPlugin() shared.AiRequestTransformerPlugin {
+	if c == nil {
+		return shared.AiRequestTransformerPlugin{}
+	}
+	return c.AiRequestTransformerPlugin
+}
 
 type CreateAirequesttransformerPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAirequesttransformerPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAirequesttransformerPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAirequesttransformerPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAirequesttransformerPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAirequesttransformerPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAirequesttransformerPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAirequesttransformerPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAirequesttransformerPluginResponse) GetAiRequestTransformerPlugin() *shared.AiRequestTransformerPlugin {
-	if o == nil {
+func (c *CreateAirequesttransformerPluginResponse) GetAiRequestTransformerPlugin() *shared.AiRequestTransformerPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiRequestTransformerPlugin
+	return c.AiRequestTransformerPlugin
 }
 
-func (o *CreateAirequesttransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAirequesttransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

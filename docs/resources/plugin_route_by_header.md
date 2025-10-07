@@ -18,7 +18,7 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
     rules = [
       {
         condition = {
-          key = jsonencode("value")
+          key = "value"
         }
         upstream_name = "...my_upstream_name..."
       }
@@ -63,6 +63,7 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
     "..."
   ]
   updated_at = 4
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -75,18 +76,16 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -100,7 +99,7 @@ Optional:
 
 Optional:
 
-- `condition` (Map of String) Not Null
+- `condition` (Map of String)
 - `upstream_name` (String) Not Null
 
 
@@ -143,8 +142,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -167,6 +166,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_route_by_header.my_kong-gateway_plugin_route_by_header
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_route_by_header.my_kong-gateway_plugin_route_by_header ""
+terraform import kong-gateway_plugin_route_by_header.my_kong-gateway_plugin_route_by_header '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

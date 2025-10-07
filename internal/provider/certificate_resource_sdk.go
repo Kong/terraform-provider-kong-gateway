@@ -10,6 +10,114 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *CertificateResourceModel) RefreshFromSharedCertificate(ctx context.Context, resp *shared.Certificate) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.Cert = types.StringValue(resp.Cert)
+		r.CertAlt = types.StringPointerValue(resp.CertAlt)
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Key = types.StringValue(resp.Key)
+		r.KeyAlt = types.StringPointerValue(resp.KeyAlt)
+		if resp.Snis != nil {
+			r.Snis = make([]types.String, 0, len(resp.Snis))
+			for _, v := range resp.Snis {
+				r.Snis = append(r.Snis, types.StringValue(v))
+			}
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *CertificateResourceModel) ToOperationsCreateCertificateRequest(ctx context.Context) (*operations.CreateCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	certificate, certificateDiags := r.ToSharedCertificate(ctx)
+	diags.Append(certificateDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateCertificateRequest{
+		Workspace:   workspace,
+		Certificate: *certificate,
+	}
+
+	return &out, diags
+}
+
+func (r *CertificateResourceModel) ToOperationsDeleteCertificateRequest(ctx context.Context) (*operations.DeleteCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *CertificateResourceModel) ToOperationsGetCertificateRequest(ctx context.Context) (*operations.GetCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *CertificateResourceModel) ToOperationsUpsertCertificateRequest(ctx context.Context) (*operations.UpsertCertificateRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var certificateID string
+	certificateID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	certificate, certificateDiags := r.ToSharedCertificate(ctx)
+	diags.Append(certificateDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertCertificateRequest{
+		CertificateID: certificateID,
+		Workspace:     workspace,
+		Certificate:   *certificate,
+	}
+
+	return &out, diags
+}
+
 func (r *CertificateResourceModel) ToSharedCertificate(ctx context.Context) (*shared.Certificate, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -50,9 +158,12 @@ func (r *CertificateResourceModel) ToSharedCertificate(ctx context.Context) (*sh
 			snis = append(snis, snisItem.ValueString())
 		}
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -73,77 +184,4 @@ func (r *CertificateResourceModel) ToSharedCertificate(ctx context.Context) (*sh
 	}
 
 	return &out, diags
-}
-
-func (r *CertificateResourceModel) ToOperationsUpsertCertificateRequest(ctx context.Context) (*operations.UpsertCertificateRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var certificateID string
-	certificateID = r.ID.ValueString()
-
-	certificate, certificateDiags := r.ToSharedCertificate(ctx)
-	diags.Append(certificateDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertCertificateRequest{
-		CertificateID: certificateID,
-		Certificate:   *certificate,
-	}
-
-	return &out, diags
-}
-
-func (r *CertificateResourceModel) ToOperationsGetCertificateRequest(ctx context.Context) (*operations.GetCertificateRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var certificateID string
-	certificateID = r.ID.ValueString()
-
-	out := operations.GetCertificateRequest{
-		CertificateID: certificateID,
-	}
-
-	return &out, diags
-}
-
-func (r *CertificateResourceModel) ToOperationsDeleteCertificateRequest(ctx context.Context) (*operations.DeleteCertificateRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var certificateID string
-	certificateID = r.ID.ValueString()
-
-	out := operations.DeleteCertificateRequest{
-		CertificateID: certificateID,
-	}
-
-	return &out, diags
-}
-
-func (r *CertificateResourceModel) RefreshFromSharedCertificate(ctx context.Context, resp *shared.Certificate) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.Cert = types.StringValue(resp.Cert)
-		r.CertAlt = types.StringPointerValue(resp.CertAlt)
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Key = types.StringValue(resp.Key)
-		r.KeyAlt = types.StringPointerValue(resp.KeyAlt)
-		if resp.Snis != nil {
-			r.Snis = make([]types.String, 0, len(resp.Snis))
-			for _, v := range resp.Snis {
-				r.Snis = append(r.Snis, types.StringValue(v))
-			}
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

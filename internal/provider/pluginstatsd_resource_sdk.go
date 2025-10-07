@@ -11,99 +11,248 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginStatsdResourceModel) RefreshFromSharedStatsdPlugin(ctx context.Context, resp *shared.StatsdPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.StatsdPluginConfig{}
+			r.Config.AllowStatusCodes = make([]types.String, 0, len(resp.Config.AllowStatusCodes))
+			for _, v := range resp.Config.AllowStatusCodes {
+				r.Config.AllowStatusCodes = append(r.Config.AllowStatusCodes, types.StringValue(v))
+			}
+			if resp.Config.ConsumerIdentifierDefault != nil {
+				r.Config.ConsumerIdentifierDefault = types.StringValue(string(*resp.Config.ConsumerIdentifierDefault))
+			} else {
+				r.Config.ConsumerIdentifierDefault = types.StringNull()
+			}
+			r.Config.FlushTimeout = types.Float64PointerValue(resp.Config.FlushTimeout)
+			r.Config.Host = types.StringPointerValue(resp.Config.Host)
+			r.Config.HostnameInPrefix = types.BoolPointerValue(resp.Config.HostnameInPrefix)
+			r.Config.Metrics = []tfTypes.StatsdPluginMetrics{}
+
+			for _, metricsItem := range resp.Config.Metrics {
+				var metrics tfTypes.StatsdPluginMetrics
+
+				if metricsItem.ConsumerIdentifier != nil {
+					metrics.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
+				} else {
+					metrics.ConsumerIdentifier = types.StringNull()
+				}
+				metrics.Name = types.StringValue(string(metricsItem.Name))
+				metrics.SampleRate = types.Float64PointerValue(metricsItem.SampleRate)
+				if metricsItem.ServiceIdentifier != nil {
+					metrics.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
+				} else {
+					metrics.ServiceIdentifier = types.StringNull()
+				}
+				metrics.StatType = types.StringValue(string(metricsItem.StatType))
+				if metricsItem.WorkspaceIdentifier != nil {
+					metrics.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
+				} else {
+					metrics.WorkspaceIdentifier = types.StringNull()
+				}
+
+				r.Config.Metrics = append(r.Config.Metrics, metrics)
+			}
+			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+			r.Config.Prefix = types.StringPointerValue(resp.Config.Prefix)
+			if resp.Config.Queue == nil {
+				r.Config.Queue = nil
+			} else {
+				r.Config.Queue = &tfTypes.Queue{}
+				if resp.Config.Queue.ConcurrencyLimit != nil {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
+				} else {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
+				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
+				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
+				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
+				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
+			}
+			r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
+			r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
+			if resp.Config.ServiceIdentifierDefault != nil {
+				r.Config.ServiceIdentifierDefault = types.StringValue(string(*resp.Config.ServiceIdentifierDefault))
+			} else {
+				r.Config.ServiceIdentifierDefault = types.StringNull()
+			}
+			if resp.Config.TagStyle != nil {
+				r.Config.TagStyle = types.StringValue(string(*resp.Config.TagStyle))
+			} else {
+				r.Config.TagStyle = types.StringNull()
+			}
+			r.Config.UDPPacketSize = types.Float64PointerValue(resp.Config.UDPPacketSize)
+			r.Config.UseTCP = types.BoolPointerValue(resp.Config.UseTCP)
+			if resp.Config.WorkspaceIdentifierDefault != nil {
+				r.Config.WorkspaceIdentifierDefault = types.StringValue(string(*resp.Config.WorkspaceIdentifierDefault))
+			} else {
+				r.Config.WorkspaceIdentifierDefault = types.StringNull()
+			}
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginStatsdResourceModel) ToOperationsCreateStatsdPluginRequest(ctx context.Context) (*operations.CreateStatsdPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	statsdPlugin, statsdPluginDiags := r.ToSharedStatsdPlugin(ctx)
+	diags.Append(statsdPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateStatsdPluginRequest{
+		Workspace:    workspace,
+		StatsdPlugin: *statsdPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdResourceModel) ToOperationsDeleteStatsdPluginRequest(ctx context.Context) (*operations.DeleteStatsdPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteStatsdPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdResourceModel) ToOperationsGetStatsdPluginRequest(ctx context.Context) (*operations.GetStatsdPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetStatsdPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginStatsdResourceModel) ToOperationsUpdateStatsdPluginRequest(ctx context.Context) (*operations.UpdateStatsdPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	statsdPlugin, statsdPluginDiags := r.ToSharedStatsdPlugin(ctx)
+	diags.Append(statsdPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateStatsdPluginRequest{
+		PluginID:     pluginID,
+		Workspace:    workspace,
+		StatsdPlugin: *statsdPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginStatsdResourceModel) ToSharedStatsdPlugin(ctx context.Context) (*shared.StatsdPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.StatsdPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.StatsdPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.StatsdPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.StatsdPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.StatsdPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.StatsdPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.StatsdPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.StatsdPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.StatsdPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.StatsdPluginConfig
 	if r.Config != nil {
 		allowStatusCodes := make([]string, 0, len(r.Config.AllowStatusCodes))
@@ -142,7 +291,7 @@ func (r *PluginStatsdResourceModel) ToSharedStatsdPlugin(ctx context.Context) (*
 			} else {
 				consumerIdentifier = nil
 			}
-			name1 := shared.StatsdPluginName(metricsItem.Name.ValueString())
+			name := shared.StatsdPluginName(metricsItem.Name.ValueString())
 			sampleRate := new(float64)
 			if !metricsItem.SampleRate.IsUnknown() && !metricsItem.SampleRate.IsNull() {
 				*sampleRate = metricsItem.SampleRate.ValueFloat64()
@@ -164,7 +313,7 @@ func (r *PluginStatsdResourceModel) ToSharedStatsdPlugin(ctx context.Context) (*
 			}
 			metrics = append(metrics, shared.StatsdPluginMetrics{
 				ConsumerIdentifier:  consumerIdentifier,
-				Name:                name1,
+				Name:                name,
 				SampleRate:          sampleRate,
 				ServiceIdentifier:   serviceIdentifier,
 				StatType:            statType,
@@ -307,14 +456,94 @@ func (r *PluginStatsdResourceModel) ToSharedStatsdPlugin(ctx context.Context) (*
 	}
 	var consumer *shared.StatsdPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.StatsdPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.StatsdPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.StatsdPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.StatsdPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.StatsdPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.StatsdPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.StatsdPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.StatsdPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.StatsdPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name1 := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name1 = partialsItem.Name.ValueString()
+			} else {
+				name1 = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.StatsdPluginPartials{
+				ID:   id2,
+				Name: name1,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.StatsdPluginProtocols, 0, len(r.Protocols))
@@ -345,240 +574,34 @@ func (r *PluginStatsdResourceModel) ToSharedStatsdPlugin(ctx context.Context) (*
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.StatsdPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginStatsdResourceModel) ToOperationsUpdateStatsdPluginRequest(ctx context.Context) (*operations.UpdateStatsdPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	statsdPlugin, statsdPluginDiags := r.ToSharedStatsdPlugin(ctx)
-	diags.Append(statsdPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateStatsdPluginRequest{
-		PluginID:     pluginID,
-		StatsdPlugin: *statsdPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginStatsdResourceModel) ToOperationsGetStatsdPluginRequest(ctx context.Context) (*operations.GetStatsdPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetStatsdPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginStatsdResourceModel) ToOperationsDeleteStatsdPluginRequest(ctx context.Context) (*operations.DeleteStatsdPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteStatsdPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginStatsdResourceModel) RefreshFromSharedStatsdPlugin(ctx context.Context, resp *shared.StatsdPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.StatsdPluginConfig{}
-			r.Config.AllowStatusCodes = make([]types.String, 0, len(resp.Config.AllowStatusCodes))
-			for _, v := range resp.Config.AllowStatusCodes {
-				r.Config.AllowStatusCodes = append(r.Config.AllowStatusCodes, types.StringValue(v))
-			}
-			if resp.Config.ConsumerIdentifierDefault != nil {
-				r.Config.ConsumerIdentifierDefault = types.StringValue(string(*resp.Config.ConsumerIdentifierDefault))
-			} else {
-				r.Config.ConsumerIdentifierDefault = types.StringNull()
-			}
-			r.Config.FlushTimeout = types.Float64PointerValue(resp.Config.FlushTimeout)
-			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			r.Config.HostnameInPrefix = types.BoolPointerValue(resp.Config.HostnameInPrefix)
-			r.Config.Metrics = []tfTypes.StatsdPluginMetrics{}
-			if len(r.Config.Metrics) > len(resp.Config.Metrics) {
-				r.Config.Metrics = r.Config.Metrics[:len(resp.Config.Metrics)]
-			}
-			for metricsCount, metricsItem := range resp.Config.Metrics {
-				var metrics tfTypes.StatsdPluginMetrics
-				if metricsItem.ConsumerIdentifier != nil {
-					metrics.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
-				} else {
-					metrics.ConsumerIdentifier = types.StringNull()
-				}
-				metrics.Name = types.StringValue(string(metricsItem.Name))
-				metrics.SampleRate = types.Float64PointerValue(metricsItem.SampleRate)
-				if metricsItem.ServiceIdentifier != nil {
-					metrics.ServiceIdentifier = types.StringValue(string(*metricsItem.ServiceIdentifier))
-				} else {
-					metrics.ServiceIdentifier = types.StringNull()
-				}
-				metrics.StatType = types.StringValue(string(metricsItem.StatType))
-				if metricsItem.WorkspaceIdentifier != nil {
-					metrics.WorkspaceIdentifier = types.StringValue(string(*metricsItem.WorkspaceIdentifier))
-				} else {
-					metrics.WorkspaceIdentifier = types.StringNull()
-				}
-				if metricsCount+1 > len(r.Config.Metrics) {
-					r.Config.Metrics = append(r.Config.Metrics, metrics)
-				} else {
-					r.Config.Metrics[metricsCount].ConsumerIdentifier = metrics.ConsumerIdentifier
-					r.Config.Metrics[metricsCount].Name = metrics.Name
-					r.Config.Metrics[metricsCount].SampleRate = metrics.SampleRate
-					r.Config.Metrics[metricsCount].ServiceIdentifier = metrics.ServiceIdentifier
-					r.Config.Metrics[metricsCount].StatType = metrics.StatType
-					r.Config.Metrics[metricsCount].WorkspaceIdentifier = metrics.WorkspaceIdentifier
-				}
-			}
-			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-			r.Config.Prefix = types.StringPointerValue(resp.Config.Prefix)
-			if resp.Config.Queue == nil {
-				r.Config.Queue = nil
-			} else {
-				r.Config.Queue = &tfTypes.Queue{}
-				if resp.Config.Queue.ConcurrencyLimit != nil {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
-				} else {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
-				}
-				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
-				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
-				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
-				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
-				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
-			}
-			r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
-			r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
-			if resp.Config.ServiceIdentifierDefault != nil {
-				r.Config.ServiceIdentifierDefault = types.StringValue(string(*resp.Config.ServiceIdentifierDefault))
-			} else {
-				r.Config.ServiceIdentifierDefault = types.StringNull()
-			}
-			if resp.Config.TagStyle != nil {
-				r.Config.TagStyle = types.StringValue(string(*resp.Config.TagStyle))
-			} else {
-				r.Config.TagStyle = types.StringNull()
-			}
-			r.Config.UDPPacketSize = types.Float64PointerValue(resp.Config.UDPPacketSize)
-			r.Config.UseTCP = types.BoolPointerValue(resp.Config.UseTCP)
-			if resp.Config.WorkspaceIdentifierDefault != nil {
-				r.Config.WorkspaceIdentifierDefault = types.StringValue(string(*resp.Config.WorkspaceIdentifierDefault))
-			} else {
-				r.Config.WorkspaceIdentifierDefault = types.StringNull()
-			}
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

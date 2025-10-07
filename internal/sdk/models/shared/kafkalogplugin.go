@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type KafkaLogPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *KafkaLogPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type KafkaLogPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *KafkaLogPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type KafkaLogPluginOrdering struct {
-	After  *KafkaLogPluginAfter  `json:"after,omitempty"`
-	Before *KafkaLogPluginBefore `json:"before,omitempty"`
-}
-
-func (o *KafkaLogPluginOrdering) GetAfter() *KafkaLogPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *KafkaLogPluginOrdering) GetBefore() *KafkaLogPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type KafkaLogPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *KafkaLogPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *KafkaLogPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *KafkaLogPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // KafkaLogPluginMechanism - The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256` or `SCRAM-SHA-512`.
 type KafkaLogPluginMechanism string
 
@@ -143,39 +75,39 @@ type KafkaLogPluginAuthentication struct {
 	User *string `json:"user,omitempty"`
 }
 
-func (o *KafkaLogPluginAuthentication) GetMechanism() *KafkaLogPluginMechanism {
-	if o == nil {
+func (k *KafkaLogPluginAuthentication) GetMechanism() *KafkaLogPluginMechanism {
+	if k == nil {
 		return nil
 	}
-	return o.Mechanism
+	return k.Mechanism
 }
 
-func (o *KafkaLogPluginAuthentication) GetPassword() *string {
-	if o == nil {
+func (k *KafkaLogPluginAuthentication) GetPassword() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Password
+	return k.Password
 }
 
-func (o *KafkaLogPluginAuthentication) GetStrategy() *KafkaLogPluginStrategy {
-	if o == nil {
+func (k *KafkaLogPluginAuthentication) GetStrategy() *KafkaLogPluginStrategy {
+	if k == nil {
 		return nil
 	}
-	return o.Strategy
+	return k.Strategy
 }
 
-func (o *KafkaLogPluginAuthentication) GetTokenauth() *bool {
-	if o == nil {
+func (k *KafkaLogPluginAuthentication) GetTokenauth() *bool {
+	if k == nil {
 		return nil
 	}
-	return o.Tokenauth
+	return k.Tokenauth
 }
 
-func (o *KafkaLogPluginAuthentication) GetUser() *string {
-	if o == nil {
+func (k *KafkaLogPluginAuthentication) GetUser() *string {
+	if k == nil {
 		return nil
 	}
-	return o.User
+	return k.User
 }
 
 type KafkaLogPluginBootstrapServers struct {
@@ -185,18 +117,18 @@ type KafkaLogPluginBootstrapServers struct {
 	Port int64 `json:"port"`
 }
 
-func (o *KafkaLogPluginBootstrapServers) GetHost() string {
-	if o == nil {
+func (k *KafkaLogPluginBootstrapServers) GetHost() string {
+	if k == nil {
 		return ""
 	}
-	return o.Host
+	return k.Host
 }
 
-func (o *KafkaLogPluginBootstrapServers) GetPort() int64 {
-	if o == nil {
+func (k *KafkaLogPluginBootstrapServers) GetPort() int64 {
+	if k == nil {
 		return 0
 	}
-	return o.Port
+	return k.Port
 }
 
 // KafkaLogPluginProducerRequestAcks - The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
@@ -229,6 +161,481 @@ func (e *KafkaLogPluginProducerRequestAcks) UnmarshalJSON(data []byte) error {
 	}
 }
 
+type KafkaLogPluginBasic struct {
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+func (k *KafkaLogPluginBasic) GetPassword() string {
+	if k == nil {
+		return ""
+	}
+	return k.Password
+}
+
+func (k *KafkaLogPluginBasic) GetUsername() string {
+	if k == nil {
+		return ""
+	}
+	return k.Username
+}
+
+// KafkaLogPluginMode - Authentication mode to use with the schema registry.
+type KafkaLogPluginMode string
+
+const (
+	KafkaLogPluginModeBasic  KafkaLogPluginMode = "basic"
+	KafkaLogPluginModeNone   KafkaLogPluginMode = "none"
+	KafkaLogPluginModeOauth2 KafkaLogPluginMode = "oauth2"
+)
+
+func (e KafkaLogPluginMode) ToPointer() *KafkaLogPluginMode {
+	return &e
+}
+func (e *KafkaLogPluginMode) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "basic":
+		fallthrough
+	case "none":
+		fallthrough
+	case "oauth2":
+		*e = KafkaLogPluginMode(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaLogPluginMode: %v", v)
+	}
+}
+
+// KafkaLogPluginGrantType - The OAuth grant type to be used.
+type KafkaLogPluginGrantType string
+
+const (
+	KafkaLogPluginGrantTypeClientCredentials KafkaLogPluginGrantType = "client_credentials"
+	KafkaLogPluginGrantTypePassword          KafkaLogPluginGrantType = "password"
+)
+
+func (e KafkaLogPluginGrantType) ToPointer() *KafkaLogPluginGrantType {
+	return &e
+}
+func (e *KafkaLogPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = KafkaLogPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaLogPluginGrantType: %v", v)
+	}
+}
+
+type KafkaLogPluginOauth2 struct {
+	// List of audiences passed to the IdP when obtaining a new token.
+	Audience []string `json:"audience,omitempty"`
+	// The client ID for the application registration in the IdP.
+	ClientID *string `json:"client_id,omitempty"`
+	// The client secret for the application registration in the IdP.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// The OAuth grant type to be used.
+	GrantType *KafkaLogPluginGrantType `json:"grant_type,omitempty"`
+	// The password to use if `config.oauth.grant_type` is set to `password`.
+	Password *string `json:"password,omitempty"`
+	// List of scopes to request from the IdP when obtaining a new token.
+	Scopes []string `json:"scopes,omitempty"`
+	// The token endpoint URI.
+	TokenEndpoint string `json:"token_endpoint"`
+	// Extra headers to be passed in the token endpoint request.
+	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	// Extra post arguments to be passed in the token endpoint request.
+	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	// The username to use if `config.oauth.grant_type` is set to `password`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (k *KafkaLogPluginOauth2) GetAudience() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Audience
+}
+
+func (k *KafkaLogPluginOauth2) GetClientID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ClientID
+}
+
+func (k *KafkaLogPluginOauth2) GetClientSecret() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ClientSecret
+}
+
+func (k *KafkaLogPluginOauth2) GetGrantType() *KafkaLogPluginGrantType {
+	if k == nil {
+		return nil
+	}
+	return k.GrantType
+}
+
+func (k *KafkaLogPluginOauth2) GetPassword() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Password
+}
+
+func (k *KafkaLogPluginOauth2) GetScopes() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Scopes
+}
+
+func (k *KafkaLogPluginOauth2) GetTokenEndpoint() string {
+	if k == nil {
+		return ""
+	}
+	return k.TokenEndpoint
+}
+
+func (k *KafkaLogPluginOauth2) GetTokenHeaders() map[string]any {
+	if k == nil {
+		return nil
+	}
+	return k.TokenHeaders
+}
+
+func (k *KafkaLogPluginOauth2) GetTokenPostArgs() map[string]any {
+	if k == nil {
+		return nil
+	}
+	return k.TokenPostArgs
+}
+
+func (k *KafkaLogPluginOauth2) GetUsername() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Username
+}
+
+// KafkaLogPluginAuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+type KafkaLogPluginAuthMethod string
+
+const (
+	KafkaLogPluginAuthMethodClientSecretBasic KafkaLogPluginAuthMethod = "client_secret_basic"
+	KafkaLogPluginAuthMethodClientSecretJwt   KafkaLogPluginAuthMethod = "client_secret_jwt"
+	KafkaLogPluginAuthMethodClientSecretPost  KafkaLogPluginAuthMethod = "client_secret_post"
+	KafkaLogPluginAuthMethodNone              KafkaLogPluginAuthMethod = "none"
+)
+
+func (e KafkaLogPluginAuthMethod) ToPointer() *KafkaLogPluginAuthMethod {
+	return &e
+}
+func (e *KafkaLogPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		fallthrough
+	case "none":
+		*e = KafkaLogPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaLogPluginAuthMethod: %v", v)
+	}
+}
+
+// KafkaLogPluginClientSecretJwtAlg - The algorithm to use with JWT when using `client_secret_jwt` authentication.
+type KafkaLogPluginClientSecretJwtAlg string
+
+const (
+	KafkaLogPluginClientSecretJwtAlgHs256 KafkaLogPluginClientSecretJwtAlg = "HS256"
+	KafkaLogPluginClientSecretJwtAlgHs512 KafkaLogPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e KafkaLogPluginClientSecretJwtAlg) ToPointer() *KafkaLogPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *KafkaLogPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = KafkaLogPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaLogPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+type KafkaLogPluginOauth2Client struct {
+	// The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+	AuthMethod *KafkaLogPluginAuthMethod `json:"auth_method,omitempty"`
+	// The algorithm to use with JWT when using `client_secret_jwt` authentication.
+	ClientSecretJwtAlg *KafkaLogPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// The proxy to use when making HTTP requests to the IdP.
+	HTTPProxy *string `json:"http_proxy,omitempty"`
+	// The `Proxy-Authorization` header value to be used with `http_proxy`.
+	HTTPProxyAuthorization *string `json:"http_proxy_authorization,omitempty"`
+	// The HTTP version used for requests made by this plugin. Supported values: `1.1` for HTTP 1.1 and `1.0` for HTTP 1.0.
+	HTTPVersion *float64 `json:"http_version,omitempty"`
+	// The proxy to use when making HTTPS requests to the IdP.
+	HTTPSProxy *string `json:"https_proxy,omitempty"`
+	// The `Proxy-Authorization` header value to be used with `https_proxy`.
+	HTTPSProxyAuthorization *string `json:"https_proxy_authorization,omitempty"`
+	// Whether to use keepalive connections to the IdP.
+	KeepAlive *bool `json:"keep_alive,omitempty"`
+	// A comma-separated list of hosts that should not be proxied.
+	NoProxy *string `json:"no_proxy,omitempty"`
+	// Whether to verify the certificate presented by the IdP when using HTTPS.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Network I/O timeout for requests to the IdP in milliseconds.
+	Timeout *int64 `json:"timeout,omitempty"`
+}
+
+func (k *KafkaLogPluginOauth2Client) GetAuthMethod() *KafkaLogPluginAuthMethod {
+	if k == nil {
+		return nil
+	}
+	return k.AuthMethod
+}
+
+func (k *KafkaLogPluginOauth2Client) GetClientSecretJwtAlg() *KafkaLogPluginClientSecretJwtAlg {
+	if k == nil {
+		return nil
+	}
+	return k.ClientSecretJwtAlg
+}
+
+func (k *KafkaLogPluginOauth2Client) GetHTTPProxy() *string {
+	if k == nil {
+		return nil
+	}
+	return k.HTTPProxy
+}
+
+func (k *KafkaLogPluginOauth2Client) GetHTTPProxyAuthorization() *string {
+	if k == nil {
+		return nil
+	}
+	return k.HTTPProxyAuthorization
+}
+
+func (k *KafkaLogPluginOauth2Client) GetHTTPVersion() *float64 {
+	if k == nil {
+		return nil
+	}
+	return k.HTTPVersion
+}
+
+func (k *KafkaLogPluginOauth2Client) GetHTTPSProxy() *string {
+	if k == nil {
+		return nil
+	}
+	return k.HTTPSProxy
+}
+
+func (k *KafkaLogPluginOauth2Client) GetHTTPSProxyAuthorization() *string {
+	if k == nil {
+		return nil
+	}
+	return k.HTTPSProxyAuthorization
+}
+
+func (k *KafkaLogPluginOauth2Client) GetKeepAlive() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.KeepAlive
+}
+
+func (k *KafkaLogPluginOauth2Client) GetNoProxy() *string {
+	if k == nil {
+		return nil
+	}
+	return k.NoProxy
+}
+
+func (k *KafkaLogPluginOauth2Client) GetSslVerify() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.SslVerify
+}
+
+func (k *KafkaLogPluginOauth2Client) GetTimeout() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.Timeout
+}
+
+type KafkaLogPluginConfigAuthentication struct {
+	Basic *KafkaLogPluginBasic `json:"basic,omitempty"`
+	// Authentication mode to use with the schema registry.
+	Mode         *KafkaLogPluginMode         `json:"mode,omitempty"`
+	Oauth2       *KafkaLogPluginOauth2       `json:"oauth2,omitempty"`
+	Oauth2Client *KafkaLogPluginOauth2Client `json:"oauth2_client,omitempty"`
+}
+
+func (k *KafkaLogPluginConfigAuthentication) GetBasic() *KafkaLogPluginBasic {
+	if k == nil {
+		return nil
+	}
+	return k.Basic
+}
+
+func (k *KafkaLogPluginConfigAuthentication) GetMode() *KafkaLogPluginMode {
+	if k == nil {
+		return nil
+	}
+	return k.Mode
+}
+
+func (k *KafkaLogPluginConfigAuthentication) GetOauth2() *KafkaLogPluginOauth2 {
+	if k == nil {
+		return nil
+	}
+	return k.Oauth2
+}
+
+func (k *KafkaLogPluginConfigAuthentication) GetOauth2Client() *KafkaLogPluginOauth2Client {
+	if k == nil {
+		return nil
+	}
+	return k.Oauth2Client
+}
+
+type KafkaLogPluginKeySchema struct {
+	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
+	SchemaVersion *string `json:"schema_version,omitempty"`
+	// The name of the subject
+	SubjectName *string `json:"subject_name,omitempty"`
+}
+
+func (k *KafkaLogPluginKeySchema) GetSchemaVersion() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SchemaVersion
+}
+
+func (k *KafkaLogPluginKeySchema) GetSubjectName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SubjectName
+}
+
+type KafkaLogPluginValueSchema struct {
+	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
+	SchemaVersion *string `json:"schema_version,omitempty"`
+	// The name of the subject
+	SubjectName *string `json:"subject_name,omitempty"`
+}
+
+func (k *KafkaLogPluginValueSchema) GetSchemaVersion() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SchemaVersion
+}
+
+func (k *KafkaLogPluginValueSchema) GetSubjectName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SubjectName
+}
+
+type KafkaLogPluginConfluent struct {
+	Authentication *KafkaLogPluginConfigAuthentication `json:"authentication,omitempty"`
+	KeySchema      *KafkaLogPluginKeySchema            `json:"key_schema,omitempty"`
+	// Set to false to disable SSL certificate verification when connecting to the schema registry.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// The TTL in seconds for the schema registry cache.
+	TTL *float64 `json:"ttl,omitempty"`
+	// The URL of the schema registry.
+	URL         *string                    `json:"url,omitempty"`
+	ValueSchema *KafkaLogPluginValueSchema `json:"value_schema,omitempty"`
+}
+
+func (k *KafkaLogPluginConfluent) GetAuthentication() *KafkaLogPluginConfigAuthentication {
+	if k == nil {
+		return nil
+	}
+	return k.Authentication
+}
+
+func (k *KafkaLogPluginConfluent) GetKeySchema() *KafkaLogPluginKeySchema {
+	if k == nil {
+		return nil
+	}
+	return k.KeySchema
+}
+
+func (k *KafkaLogPluginConfluent) GetSslVerify() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.SslVerify
+}
+
+func (k *KafkaLogPluginConfluent) GetTTL() *float64 {
+	if k == nil {
+		return nil
+	}
+	return k.TTL
+}
+
+func (k *KafkaLogPluginConfluent) GetURL() *string {
+	if k == nil {
+		return nil
+	}
+	return k.URL
+}
+
+func (k *KafkaLogPluginConfluent) GetValueSchema() *KafkaLogPluginValueSchema {
+	if k == nil {
+		return nil
+	}
+	return k.ValueSchema
+}
+
+// KafkaLogPluginSchemaRegistry - The plugin-global schema registry configuration. This can be overwritten by the topic configuration.
+type KafkaLogPluginSchemaRegistry struct {
+	Confluent *KafkaLogPluginConfluent `json:"confluent,omitempty"`
+}
+
+func (k *KafkaLogPluginSchemaRegistry) GetConfluent() *KafkaLogPluginConfluent {
+	if k == nil {
+		return nil
+	}
+	return k.Confluent
+}
+
 type KafkaLogPluginSecurity struct {
 	// UUID of certificate entity for mTLS authentication.
 	CertificateID *string `json:"certificate_id,omitempty"`
@@ -236,18 +643,18 @@ type KafkaLogPluginSecurity struct {
 	Ssl *bool `json:"ssl,omitempty"`
 }
 
-func (o *KafkaLogPluginSecurity) GetCertificateID() *string {
-	if o == nil {
+func (k *KafkaLogPluginSecurity) GetCertificateID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.CertificateID
+	return k.CertificateID
 }
 
-func (o *KafkaLogPluginSecurity) GetSsl() *bool {
-	if o == nil {
+func (k *KafkaLogPluginSecurity) GetSsl() *bool {
+	if k == nil {
 		return nil
 	}
-	return o.Ssl
+	return k.Ssl
 }
 
 type KafkaLogPluginConfig struct {
@@ -257,9 +664,11 @@ type KafkaLogPluginConfig struct {
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
 	ClusterName *string `json:"cluster_name,omitempty"`
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
-	Keepalive         *int64         `json:"keepalive,omitempty"`
-	KeepaliveEnabled  *bool          `json:"keepalive_enabled,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
+	Keepalive         *int64            `json:"keepalive,omitempty"`
+	KeepaliveEnabled  *bool             `json:"keepalive_enabled,omitempty"`
+	// The request query parameter name that contains the Kafka message key. If specified, messages with the same key will be sent to the same Kafka partition, ensuring consistent ordering.
+	KeyQueryArg *string `json:"key_query_arg,omitempty"`
 	// Flag to enable asynchronous mode.
 	ProducerAsync *bool `json:"producer_async,omitempty"`
 	// Maximum number of messages that can be buffered in memory in asynchronous mode.
@@ -277,138 +686,154 @@ type KafkaLogPluginConfig struct {
 	// Maximum number of retry attempts per single Produce request.
 	ProducerRequestRetriesMaxAttempts *int64 `json:"producer_request_retries_max_attempts,omitempty"`
 	// Time to wait for a Produce response in milliseconds
-	ProducerRequestTimeout *int64                  `json:"producer_request_timeout,omitempty"`
-	Security               *KafkaLogPluginSecurity `json:"security,omitempty"`
+	ProducerRequestTimeout *int64 `json:"producer_request_timeout,omitempty"`
+	// The plugin-global schema registry configuration. This can be overwritten by the topic configuration.
+	SchemaRegistry *KafkaLogPluginSchemaRegistry `json:"schema_registry,omitempty"`
+	Security       *KafkaLogPluginSecurity       `json:"security,omitempty"`
 	// Socket timeout in milliseconds.
 	Timeout *int64 `json:"timeout,omitempty"`
 	// The Kafka topic to publish to.
-	Topic *string `json:"topic,omitempty"`
+	Topic string `json:"topic"`
 }
 
-func (o *KafkaLogPluginConfig) GetAuthentication() *KafkaLogPluginAuthentication {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetAuthentication() *KafkaLogPluginAuthentication {
+	if k == nil {
 		return nil
 	}
-	return o.Authentication
+	return k.Authentication
 }
 
-func (o *KafkaLogPluginConfig) GetBootstrapServers() []KafkaLogPluginBootstrapServers {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetBootstrapServers() []KafkaLogPluginBootstrapServers {
+	if k == nil {
 		return nil
 	}
-	return o.BootstrapServers
+	return k.BootstrapServers
 }
 
-func (o *KafkaLogPluginConfig) GetClusterName() *string {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetClusterName() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ClusterName
+	return k.ClusterName
 }
 
-func (o *KafkaLogPluginConfig) GetCustomFieldsByLua() map[string]any {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetCustomFieldsByLua() map[string]string {
+	if k == nil {
 		return nil
 	}
-	return o.CustomFieldsByLua
+	return k.CustomFieldsByLua
 }
 
-func (o *KafkaLogPluginConfig) GetKeepalive() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetKeepalive() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.Keepalive
+	return k.Keepalive
 }
 
-func (o *KafkaLogPluginConfig) GetKeepaliveEnabled() *bool {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetKeepaliveEnabled() *bool {
+	if k == nil {
 		return nil
 	}
-	return o.KeepaliveEnabled
+	return k.KeepaliveEnabled
 }
 
-func (o *KafkaLogPluginConfig) GetProducerAsync() *bool {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetKeyQueryArg() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerAsync
+	return k.KeyQueryArg
 }
 
-func (o *KafkaLogPluginConfig) GetProducerAsyncBufferingLimitsMessagesInMemory() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerAsync() *bool {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerAsyncBufferingLimitsMessagesInMemory
+	return k.ProducerAsync
 }
 
-func (o *KafkaLogPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerAsyncBufferingLimitsMessagesInMemory() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerAsyncFlushTimeout
+	return k.ProducerAsyncBufferingLimitsMessagesInMemory
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestAcks() *KafkaLogPluginProducerRequestAcks {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestAcks
+	return k.ProducerAsyncFlushTimeout
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestLimitsBytesPerRequest() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestAcks() *KafkaLogPluginProducerRequestAcks {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestLimitsBytesPerRequest
+	return k.ProducerRequestAcks
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestLimitsMessagesPerRequest() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestLimitsBytesPerRequest() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestLimitsMessagesPerRequest
+	return k.ProducerRequestLimitsBytesPerRequest
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestRetriesBackoffTimeout() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestLimitsMessagesPerRequest() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestRetriesBackoffTimeout
+	return k.ProducerRequestLimitsMessagesPerRequest
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestRetriesMaxAttempts() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestRetriesBackoffTimeout() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestRetriesMaxAttempts
+	return k.ProducerRequestRetriesBackoffTimeout
 }
 
-func (o *KafkaLogPluginConfig) GetProducerRequestTimeout() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestRetriesMaxAttempts() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ProducerRequestTimeout
+	return k.ProducerRequestRetriesMaxAttempts
 }
 
-func (o *KafkaLogPluginConfig) GetSecurity() *KafkaLogPluginSecurity {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetProducerRequestTimeout() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.Security
+	return k.ProducerRequestTimeout
 }
 
-func (o *KafkaLogPluginConfig) GetTimeout() *int64 {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetSchemaRegistry() *KafkaLogPluginSchemaRegistry {
+	if k == nil {
 		return nil
 	}
-	return o.Timeout
+	return k.SchemaRegistry
 }
 
-func (o *KafkaLogPluginConfig) GetTopic() *string {
-	if o == nil {
+func (k *KafkaLogPluginConfig) GetSecurity() *KafkaLogPluginSecurity {
+	if k == nil {
 		return nil
 	}
-	return o.Topic
+	return k.Security
+}
+
+func (k *KafkaLogPluginConfig) GetTimeout() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.Timeout
+}
+
+func (k *KafkaLogPluginConfig) GetTopic() string {
+	if k == nil {
+		return ""
+	}
+	return k.Topic
 }
 
 // KafkaLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -416,11 +841,81 @@ type KafkaLogPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *KafkaLogPluginConsumer) GetID() *string {
-	if o == nil {
+func (k *KafkaLogPluginConsumer) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
+}
+
+type KafkaLogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (k *KafkaLogPluginAfter) GetAccess() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Access
+}
+
+type KafkaLogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (k *KafkaLogPluginBefore) GetAccess() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Access
+}
+
+type KafkaLogPluginOrdering struct {
+	After  *KafkaLogPluginAfter  `json:"after,omitempty"`
+	Before *KafkaLogPluginBefore `json:"before,omitempty"`
+}
+
+func (k *KafkaLogPluginOrdering) GetAfter() *KafkaLogPluginAfter {
+	if k == nil {
+		return nil
+	}
+	return k.After
+}
+
+func (k *KafkaLogPluginOrdering) GetBefore() *KafkaLogPluginBefore {
+	if k == nil {
+		return nil
+	}
+	return k.Before
+}
+
+type KafkaLogPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (k *KafkaLogPluginPartials) GetID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ID
+}
+
+func (k *KafkaLogPluginPartials) GetName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Name
+}
+
+func (k *KafkaLogPluginPartials) GetPath() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Path
 }
 
 type KafkaLogPluginProtocols string
@@ -466,11 +961,11 @@ type KafkaLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *KafkaLogPluginRoute) GetID() *string {
-	if o == nil {
+func (k *KafkaLogPluginRoute) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
 // KafkaLogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -478,37 +973,39 @@ type KafkaLogPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *KafkaLogPluginService) GetID() *string {
-	if o == nil {
+func (k *KafkaLogPluginService) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
-// KafkaLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KafkaLogPlugin struct {
+	Config *KafkaLogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *KafkaLogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                    `json:"enabled,omitempty"`
-	ID           *string                  `json:"id,omitempty"`
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"kafka-log" json:"name"`
-	Ordering     *KafkaLogPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []KafkaLogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                `json:"updated_at,omitempty"`
-	Config    *KafkaLogPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *KafkaLogPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"kafka-log" json:"name"`
+	Ordering     *KafkaLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []KafkaLogPluginPartials `json:"partials,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []KafkaLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *KafkaLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *KafkaLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (k KafkaLogPlugin) MarshalJSON() ([]byte, error) {
@@ -516,103 +1013,103 @@ func (k KafkaLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (k *KafkaLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &k, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *KafkaLogPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (k *KafkaLogPlugin) GetConfig() *KafkaLogPluginConfig {
+	if k == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return k.Config
 }
 
-func (o *KafkaLogPlugin) GetEnabled() *bool {
-	if o == nil {
+func (k *KafkaLogPlugin) GetConsumer() *KafkaLogPluginConsumer {
+	if k == nil {
 		return nil
 	}
-	return o.Enabled
+	return k.Consumer
 }
 
-func (o *KafkaLogPlugin) GetID() *string {
-	if o == nil {
+func (k *KafkaLogPlugin) GetCreatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.CreatedAt
 }
 
-func (o *KafkaLogPlugin) GetInstanceName() *string {
-	if o == nil {
+func (k *KafkaLogPlugin) GetEnabled() *bool {
+	if k == nil {
 		return nil
 	}
-	return o.InstanceName
+	return k.Enabled
 }
 
-func (o *KafkaLogPlugin) GetName() string {
+func (k *KafkaLogPlugin) GetID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ID
+}
+
+func (k *KafkaLogPlugin) GetInstanceName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.InstanceName
+}
+
+func (k *KafkaLogPlugin) GetName() string {
 	return "kafka-log"
 }
 
-func (o *KafkaLogPlugin) GetOrdering() *KafkaLogPluginOrdering {
-	if o == nil {
+func (k *KafkaLogPlugin) GetOrdering() *KafkaLogPluginOrdering {
+	if k == nil {
 		return nil
 	}
-	return o.Ordering
+	return k.Ordering
 }
 
-func (o *KafkaLogPlugin) GetPartials() []KafkaLogPluginPartials {
-	if o == nil {
+func (k *KafkaLogPlugin) GetPartials() []KafkaLogPluginPartials {
+	if k == nil {
 		return nil
 	}
-	return o.Partials
+	return k.Partials
 }
 
-func (o *KafkaLogPlugin) GetTags() []string {
-	if o == nil {
+func (k *KafkaLogPlugin) GetProtocols() []KafkaLogPluginProtocols {
+	if k == nil {
 		return nil
 	}
-	return o.Tags
+	return k.Protocols
 }
 
-func (o *KafkaLogPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (k *KafkaLogPlugin) GetRoute() *KafkaLogPluginRoute {
+	if k == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return k.Route
 }
 
-func (o *KafkaLogPlugin) GetConfig() *KafkaLogPluginConfig {
-	if o == nil {
+func (k *KafkaLogPlugin) GetService() *KafkaLogPluginService {
+	if k == nil {
 		return nil
 	}
-	return o.Config
+	return k.Service
 }
 
-func (o *KafkaLogPlugin) GetConsumer() *KafkaLogPluginConsumer {
-	if o == nil {
+func (k *KafkaLogPlugin) GetTags() []string {
+	if k == nil {
 		return nil
 	}
-	return o.Consumer
+	return k.Tags
 }
 
-func (o *KafkaLogPlugin) GetProtocols() []KafkaLogPluginProtocols {
-	if o == nil {
+func (k *KafkaLogPlugin) GetUpdatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *KafkaLogPlugin) GetRoute() *KafkaLogPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *KafkaLogPlugin) GetService() *KafkaLogPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return k.UpdatedAt
 }

@@ -3,11 +3,14 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
@@ -38,6 +41,7 @@ type CertificateResourceModel struct {
 	Snis      []types.String `tfsdk:"snis"`
 	Tags      []types.String `tfsdk:"tags"`
 	UpdatedAt types.Int64    `tfsdk:"updated_at"`
+	Workspace types.String   `tfsdk:"workspace"`
 }
 
 func (r *CertificateResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -63,8 +67,9 @@ func (r *CertificateResource) Schema(ctx context.Context, req resource.SchemaReq
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"key": schema.StringAttribute{
 				Required:    true,
@@ -90,6 +95,12 @@ func (r *CertificateResource) Schema(ctx context.Context, req resource.SchemaReq
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -133,7 +144,7 @@ func (r *CertificateResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	request, requestDiags := data.ToSharedCertificate(ctx)
+	request, requestDiags := data.ToOperationsCreateCertificateRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -333,5 +344,26 @@ func (r *CertificateResource) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r *CertificateResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "ddf3cdaa-3329-4961-822a-ce6dbd38eff7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"ddf3cdaa-3329-4961-822a-ce6dbd38eff7"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

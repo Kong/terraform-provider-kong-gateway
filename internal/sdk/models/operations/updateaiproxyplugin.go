@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateAiproxyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiProxyPlugin shared.AiProxyPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateAiproxyPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateAiproxyPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateAiproxyPluginRequest) GetAiProxyPlugin() shared.AiProxyPlugin {
-	if o == nil {
+func (u *UpdateAiproxyPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiProxyPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateAiproxyPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateAiproxyPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateAiproxyPluginRequest) GetAiProxyPlugin() shared.AiProxyPlugin {
+	if u == nil {
 		return shared.AiProxyPlugin{}
 	}
-	return o.AiProxyPlugin
+	return u.AiProxyPlugin
 }
 
 type UpdateAiproxyPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateAiproxyPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateAiproxyPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateAiproxyPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateAiproxyPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateAiproxyPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateAiproxyPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateAiproxyPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateAiproxyPluginResponse) GetAiProxyPlugin() *shared.AiProxyPlugin {
-	if o == nil {
+func (u *UpdateAiproxyPluginResponse) GetAiProxyPlugin() *shared.AiProxyPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.AiProxyPlugin
+	return u.AiProxyPlugin
 }
 
-func (o *UpdateAiproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateAiproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

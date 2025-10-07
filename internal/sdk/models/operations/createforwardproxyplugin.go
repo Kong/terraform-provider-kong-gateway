@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateForwardproxyPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ForwardProxyPlugin shared.ForwardProxyPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateForwardproxyPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateForwardproxyPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ForwardProxyPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateForwardproxyPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateForwardproxyPluginRequest) GetForwardProxyPlugin() shared.ForwardProxyPlugin {
+	if c == nil {
+		return shared.ForwardProxyPlugin{}
+	}
+	return c.ForwardProxyPlugin
+}
 
 type CreateForwardproxyPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateForwardproxyPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateForwardproxyPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateForwardproxyPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateForwardproxyPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateForwardproxyPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateForwardproxyPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateForwardproxyPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateForwardproxyPluginResponse) GetForwardProxyPlugin() *shared.ForwardProxyPlugin {
-	if o == nil {
+func (c *CreateForwardproxyPluginResponse) GetForwardProxyPlugin() *shared.ForwardProxyPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ForwardProxyPlugin
+	return c.ForwardProxyPlugin
 }
 
-func (o *CreateForwardproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateForwardproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

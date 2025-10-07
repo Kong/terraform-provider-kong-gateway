@@ -70,6 +70,7 @@ resource "kong-gateway_plugin_oas_validation" "my_pluginoasvalidation" {
     "..."
   ]
   updated_at = 3
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -82,18 +83,16 @@ resource "kong-gateway_plugin_oas_validation" "my_pluginoasvalidation" {
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -101,7 +100,7 @@ resource "kong-gateway_plugin_oas_validation" "my_pluginoasvalidation" {
 Optional:
 
 - `allowed_header_parameters` (String) List of header parameters in the request that will be ignored when performing HTTP header validation. These are additional headers added to an API request beyond those defined in the API specification.  For example, you might include the HTTP header `User-Agent`, which lets servers and network peers identify the application, operating system, vendor, and/or version of the requesting user agent.
-- `api_spec` (String) The API specification defined using either Swagger or the OpenAPI. This can be either a JSON or YAML based file. If using a YAML file, the spec needs to be URI-Encoded to preserve the YAML format.
+- `api_spec` (String) The API specification defined using either Swagger or the OpenAPI. This can be either a JSON or YAML based file. If using a YAML file, the spec needs to be URI-Encoded to preserve the YAML format. Not Null
 - `api_spec_encoded` (Boolean) Indicates whether the api_spec is URI-Encoded.
 - `custom_base_path` (String) The base path to be used for path match evaluation. This value is ignored if `include_base_path` is set to `false`.
 - `header_parameter_check` (Boolean) If set to true, checks if HTTP header parameters in the request exist in the API specification.
@@ -155,8 +154,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -179,6 +178,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_oas_validation.my_kong-gateway_plugin_oas_validation
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_oas_validation.my_kong-gateway_plugin_oas_validation ""
+terraform import kong-gateway_plugin_oas_validation.my_kong-gateway_plugin_oas_validation '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

@@ -8,84 +8,16 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RequestCalloutPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestCalloutPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestCalloutPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestCalloutPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestCalloutPluginOrdering struct {
-	After  *RequestCalloutPluginAfter  `json:"after,omitempty"`
-	Before *RequestCalloutPluginBefore `json:"before,omitempty"`
-}
-
-func (o *RequestCalloutPluginOrdering) GetAfter() *RequestCalloutPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *RequestCalloutPluginOrdering) GetBefore() *RequestCalloutPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type RequestCalloutPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *RequestCalloutPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *RequestCalloutPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *RequestCalloutPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type RequestCalloutPluginMemory struct {
 	// The name of the shared dictionary in which to hold cache entities when the memory strategy is selected. Note that this dictionary currently must be defined manually in the Kong Nginx template.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
-func (o *RequestCalloutPluginMemory) GetDictionaryName() *string {
-	if o == nil {
+func (r *RequestCalloutPluginMemory) GetDictionaryName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.DictionaryName
+	return r.DictionaryName
 }
 
 type RequestCalloutPluginClusterNodes struct {
@@ -95,18 +27,18 @@ type RequestCalloutPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *RequestCalloutPluginClusterNodes) GetIP() *string {
-	if o == nil {
+func (r *RequestCalloutPluginClusterNodes) GetIP() *string {
+	if r == nil {
 		return nil
 	}
-	return o.IP
+	return r.IP
 }
 
-func (o *RequestCalloutPluginClusterNodes) GetPort() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginClusterNodes) GetPort() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Port
+	return r.Port
 }
 
 type RequestCalloutPluginSentinelNodes struct {
@@ -116,18 +48,18 @@ type RequestCalloutPluginSentinelNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *RequestCalloutPluginSentinelNodes) GetHost() *string {
-	if o == nil {
+func (r *RequestCalloutPluginSentinelNodes) GetHost() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Host
+	return r.Host
 }
 
-func (o *RequestCalloutPluginSentinelNodes) GetPort() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginSentinelNodes) GetPort() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Port
+	return r.Port
 }
 
 // RequestCalloutPluginSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
@@ -205,151 +137,151 @@ type RequestCalloutPluginRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *RequestCalloutPluginRedis) GetClusterMaxRedirections() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetClusterMaxRedirections() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ClusterMaxRedirections
+	return r.ClusterMaxRedirections
 }
 
-func (o *RequestCalloutPluginRedis) GetClusterNodes() []RequestCalloutPluginClusterNodes {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetClusterNodes() []RequestCalloutPluginClusterNodes {
+	if r == nil {
 		return nil
 	}
-	return o.ClusterNodes
+	return r.ClusterNodes
 }
 
-func (o *RequestCalloutPluginRedis) GetConnectTimeout() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetConnectTimeout() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return r.ConnectTimeout
 }
 
-func (o *RequestCalloutPluginRedis) GetConnectionIsProxied() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetConnectionIsProxied() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.ConnectionIsProxied
+	return r.ConnectionIsProxied
 }
 
-func (o *RequestCalloutPluginRedis) GetDatabase() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetDatabase() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Database
+	return r.Database
 }
 
-func (o *RequestCalloutPluginRedis) GetHost() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetHost() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Host
+	return r.Host
 }
 
-func (o *RequestCalloutPluginRedis) GetKeepaliveBacklog() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetKeepaliveBacklog() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.KeepaliveBacklog
+	return r.KeepaliveBacklog
 }
 
-func (o *RequestCalloutPluginRedis) GetKeepalivePoolSize() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetKeepalivePoolSize() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.KeepalivePoolSize
+	return r.KeepalivePoolSize
 }
 
-func (o *RequestCalloutPluginRedis) GetPassword() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetPassword() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Password
+	return r.Password
 }
 
-func (o *RequestCalloutPluginRedis) GetPort() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetPort() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Port
+	return r.Port
 }
 
-func (o *RequestCalloutPluginRedis) GetReadTimeout() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetReadTimeout() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return r.ReadTimeout
 }
 
-func (o *RequestCalloutPluginRedis) GetSendTimeout() *int64 {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSendTimeout() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.SendTimeout
+	return r.SendTimeout
 }
 
-func (o *RequestCalloutPluginRedis) GetSentinelMaster() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSentinelMaster() *string {
+	if r == nil {
 		return nil
 	}
-	return o.SentinelMaster
+	return r.SentinelMaster
 }
 
-func (o *RequestCalloutPluginRedis) GetSentinelNodes() []RequestCalloutPluginSentinelNodes {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSentinelNodes() []RequestCalloutPluginSentinelNodes {
+	if r == nil {
 		return nil
 	}
-	return o.SentinelNodes
+	return r.SentinelNodes
 }
 
-func (o *RequestCalloutPluginRedis) GetSentinelPassword() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSentinelPassword() *string {
+	if r == nil {
 		return nil
 	}
-	return o.SentinelPassword
+	return r.SentinelPassword
 }
 
-func (o *RequestCalloutPluginRedis) GetSentinelRole() *RequestCalloutPluginSentinelRole {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSentinelRole() *RequestCalloutPluginSentinelRole {
+	if r == nil {
 		return nil
 	}
-	return o.SentinelRole
+	return r.SentinelRole
 }
 
-func (o *RequestCalloutPluginRedis) GetSentinelUsername() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSentinelUsername() *string {
+	if r == nil {
 		return nil
 	}
-	return o.SentinelUsername
+	return r.SentinelUsername
 }
 
-func (o *RequestCalloutPluginRedis) GetServerName() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetServerName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ServerName
+	return r.ServerName
 }
 
-func (o *RequestCalloutPluginRedis) GetSsl() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSsl() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Ssl
+	return r.Ssl
 }
 
-func (o *RequestCalloutPluginRedis) GetSslVerify() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetSslVerify() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.SslVerify
+	return r.SslVerify
 }
 
-func (o *RequestCalloutPluginRedis) GetUsername() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRedis) GetUsername() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Username
+	return r.Username
 }
 
 // RequestCalloutPluginStrategy - The backing data store in which to hold cache entities. Accepted values are: `off`, `memory`, and `redis`.
@@ -392,76 +324,76 @@ type Cache struct {
 	Strategy *RequestCalloutPluginStrategy `json:"strategy,omitempty"`
 }
 
-func (o *Cache) GetCacheTTL() *int64 {
-	if o == nil {
+func (c *Cache) GetCacheTTL() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.CacheTTL
+	return c.CacheTTL
 }
 
-func (o *Cache) GetMemory() *RequestCalloutPluginMemory {
-	if o == nil {
+func (c *Cache) GetMemory() *RequestCalloutPluginMemory {
+	if c == nil {
 		return nil
 	}
-	return o.Memory
+	return c.Memory
 }
 
-func (o *Cache) GetRedis() *RequestCalloutPluginRedis {
-	if o == nil {
+func (c *Cache) GetRedis() *RequestCalloutPluginRedis {
+	if c == nil {
 		return nil
 	}
-	return o.Redis
+	return c.Redis
 }
 
-func (o *Cache) GetStrategy() *RequestCalloutPluginStrategy {
-	if o == nil {
+func (c *Cache) GetStrategy() *RequestCalloutPluginStrategy {
+	if c == nil {
 		return nil
 	}
-	return o.Strategy
+	return c.Strategy
 }
 
 // RequestCalloutPluginCache - Callout caching configuration.
 type RequestCalloutPluginCache struct {
-	// If true, skips caching the callout response.
+	// If `true`, skips caching the callout response.
 	Bypass *bool `json:"bypass,omitempty"`
 }
 
-func (o *RequestCalloutPluginCache) GetBypass() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginCache) GetBypass() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Bypass
+	return r.Bypass
 }
 
 // RequestCalloutPluginConfigBody - Callout request body customizations.
 type RequestCalloutPluginConfigBody struct {
-	// The custom body fields to be added in the callout HTTP request.Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom body fields to be added to the callout HTTP request. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If true, decodes the request's body to make it available for customizations.
+	// If `true`, decodes the request's body and make it available for customizations. Only JSON content type is supported.
 	Decode *bool `json:"decode,omitempty"`
-	// If true, forwards the incoming request's body to the callout request.
+	// If `true`, forwards the incoming request's body to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *RequestCalloutPluginConfigBody) GetCustom() map[string]any {
-	if o == nil {
+func (r *RequestCalloutPluginConfigBody) GetCustom() map[string]any {
+	if r == nil {
 		return nil
 	}
-	return o.Custom
+	return r.Custom
 }
 
-func (o *RequestCalloutPluginConfigBody) GetDecode() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginConfigBody) GetDecode() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Decode
+	return r.Decode
 }
 
-func (o *RequestCalloutPluginConfigBody) GetForward() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginConfigBody) GetForward() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Forward
+	return r.Forward
 }
 
 type OnError string
@@ -497,7 +429,7 @@ func (e *OnError) UnmarshalJSON(data []byte) error {
 type Error struct {
 	// The error code to respond with if `on_error` is `fail` or if `retries` is achieved.
 	ErrorResponseCode *int64 `json:"error_response_code,omitempty"`
-	// The error mesasge to respond with if `on_error` is `fail` or if `retries` is achieved.Templating with Lua expressions is supported.
+	// The error mesasge to respond with if `on_error` is set to `fail` or if `retries` is achieved. Templating with Lua expressions is supported.
 	ErrorResponseMsg *string `json:"error_response_msg,omitempty"`
 	// The list of HTTP status codes considered errors under the error handling policy.
 	HTTPStatuses []int64  `json:"http_statuses,omitempty"`
@@ -506,61 +438,61 @@ type Error struct {
 	Retries *int64 `json:"retries,omitempty"`
 }
 
-func (o *Error) GetErrorResponseCode() *int64 {
-	if o == nil {
+func (e *Error) GetErrorResponseCode() *int64 {
+	if e == nil {
 		return nil
 	}
-	return o.ErrorResponseCode
+	return e.ErrorResponseCode
 }
 
-func (o *Error) GetErrorResponseMsg() *string {
-	if o == nil {
+func (e *Error) GetErrorResponseMsg() *string {
+	if e == nil {
 		return nil
 	}
-	return o.ErrorResponseMsg
+	return e.ErrorResponseMsg
 }
 
-func (o *Error) GetHTTPStatuses() []int64 {
-	if o == nil {
+func (e *Error) GetHTTPStatuses() []int64 {
+	if e == nil {
 		return nil
 	}
-	return o.HTTPStatuses
+	return e.HTTPStatuses
 }
 
-func (o *Error) GetOnError() *OnError {
-	if o == nil {
+func (e *Error) GetOnError() *OnError {
+	if e == nil {
 		return nil
 	}
-	return o.OnError
+	return e.OnError
 }
 
-func (o *Error) GetRetries() *int64 {
-	if o == nil {
+func (e *Error) GetRetries() *int64 {
+	if e == nil {
 		return nil
 	}
-	return o.Retries
+	return e.Retries
 }
 
 // RequestCalloutPluginConfigHeaders - Callout request header customizations.
 type RequestCalloutPluginConfigHeaders struct {
-	// The custom headers to be added in the callout HTTP request.Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom headers to be added in the callout HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If true, forwards the incoming request's headers to the callout request.
+	// If `true`, forwards the incoming request's headers to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *RequestCalloutPluginConfigHeaders) GetCustom() map[string]any {
-	if o == nil {
+func (r *RequestCalloutPluginConfigHeaders) GetCustom() map[string]any {
+	if r == nil {
 		return nil
 	}
-	return o.Custom
+	return r.Custom
 }
 
-func (o *RequestCalloutPluginConfigHeaders) GetForward() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginConfigHeaders) GetForward() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Forward
+	return r.Forward
 }
 
 // Proxy settings.
@@ -575,32 +507,32 @@ type Proxy struct {
 	HTTPSProxy *string `json:"https_proxy,omitempty"`
 }
 
-func (o *Proxy) GetAuthPassword() *string {
-	if o == nil {
+func (p *Proxy) GetAuthPassword() *string {
+	if p == nil {
 		return nil
 	}
-	return o.AuthPassword
+	return p.AuthPassword
 }
 
-func (o *Proxy) GetAuthUsername() *string {
-	if o == nil {
+func (p *Proxy) GetAuthUsername() *string {
+	if p == nil {
 		return nil
 	}
-	return o.AuthUsername
+	return p.AuthUsername
 }
 
-func (o *Proxy) GetHTTPProxy() *string {
-	if o == nil {
+func (p *Proxy) GetHTTPProxy() *string {
+	if p == nil {
 		return nil
 	}
-	return o.HTTPProxy
+	return p.HTTPProxy
 }
 
-func (o *Proxy) GetHTTPSProxy() *string {
-	if o == nil {
+func (p *Proxy) GetHTTPSProxy() *string {
+	if p == nil {
 		return nil
 	}
-	return o.HTTPSProxy
+	return p.HTTPSProxy
 }
 
 // Timeouts - Socket timeouts in milliseconds. All or none must be set.
@@ -613,25 +545,25 @@ type Timeouts struct {
 	Write *int64 `json:"write,omitempty"`
 }
 
-func (o *Timeouts) GetConnect() *int64 {
-	if o == nil {
+func (t *Timeouts) GetConnect() *int64 {
+	if t == nil {
 		return nil
 	}
-	return o.Connect
+	return t.Connect
 }
 
-func (o *Timeouts) GetRead() *int64 {
-	if o == nil {
+func (t *Timeouts) GetRead() *int64 {
+	if t == nil {
 		return nil
 	}
-	return o.Read
+	return t.Read
 }
 
-func (o *Timeouts) GetWrite() *int64 {
-	if o == nil {
+func (t *Timeouts) GetWrite() *int64 {
+	if t == nil {
 		return nil
 	}
-	return o.Write
+	return t.Write
 }
 
 // HTTPOpts - HTTP connection parameters.
@@ -640,330 +572,330 @@ type HTTPOpts struct {
 	Proxy *Proxy `json:"proxy,omitempty"`
 	// The SNI used in the callout request. Defaults to host if omitted.
 	SslServerName *string `json:"ssl_server_name,omitempty"`
-	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	// If set to `true`, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Socket timeouts in milliseconds. All or none must be set.
 	Timeouts *Timeouts `json:"timeouts,omitempty"`
 }
 
-func (o *HTTPOpts) GetProxy() *Proxy {
-	if o == nil {
+func (h *HTTPOpts) GetProxy() *Proxy {
+	if h == nil {
 		return nil
 	}
-	return o.Proxy
+	return h.Proxy
 }
 
-func (o *HTTPOpts) GetSslServerName() *string {
-	if o == nil {
+func (h *HTTPOpts) GetSslServerName() *string {
+	if h == nil {
 		return nil
 	}
-	return o.SslServerName
+	return h.SslServerName
 }
 
-func (o *HTTPOpts) GetSslVerify() *bool {
-	if o == nil {
+func (h *HTTPOpts) GetSslVerify() *bool {
+	if h == nil {
 		return nil
 	}
-	return o.SslVerify
+	return h.SslVerify
 }
 
-func (o *HTTPOpts) GetTimeouts() *Timeouts {
-	if o == nil {
+func (h *HTTPOpts) GetTimeouts() *Timeouts {
+	if h == nil {
 		return nil
 	}
-	return o.Timeouts
+	return h.Timeouts
 }
 
 // RequestCalloutPluginQuery - Callout request query param customizations.
 type RequestCalloutPluginQuery struct {
-	// The custom query params to be added in the callout HTTP request.Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom query params to be added in the callout HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If true, forwards the incoming request's query params to the callout request.
+	// If `true`, forwards the incoming request's query params to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *RequestCalloutPluginQuery) GetCustom() map[string]any {
-	if o == nil {
+func (r *RequestCalloutPluginQuery) GetCustom() map[string]any {
+	if r == nil {
 		return nil
 	}
-	return o.Custom
+	return r.Custom
 }
 
-func (o *RequestCalloutPluginQuery) GetForward() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginQuery) GetForward() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Forward
+	return r.Forward
 }
 
 // Request - The customizations for the callout request.
 type Request struct {
 	// Callout request body customizations.
-	Body RequestCalloutPluginConfigBody `json:"body"`
-	// Lua code that executes before the callout request is made.Standard Lua sandboxing restrictions apply.
+	Body *RequestCalloutPluginConfigBody `json:"body,omitempty"`
+	// Lua code that executes before the callout request is made. **Warning** can impact system behavior. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
 	// The error handling policy the plugin will apply to TCP and HTTP errors.
-	Error Error `json:"error"`
+	Error *Error `json:"error,omitempty"`
 	// Callout request header customizations.
-	Headers RequestCalloutPluginConfigHeaders `json:"headers"`
+	Headers *RequestCalloutPluginConfigHeaders `json:"headers,omitempty"`
 	// HTTP connection parameters.
-	HTTPOpts HTTPOpts `json:"http_opts"`
+	HTTPOpts *HTTPOpts `json:"http_opts,omitempty"`
 	// The HTTP method that will be requested.
 	Method *string `json:"method,omitempty"`
 	// Callout request query param customizations.
-	Query RequestCalloutPluginQuery `json:"query"`
-	// The URL that will be requested.
+	Query *RequestCalloutPluginQuery `json:"query,omitempty"`
+	// The URL that will be requested. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	URL string `json:"url"`
 }
 
-func (o *Request) GetBody() RequestCalloutPluginConfigBody {
-	if o == nil {
-		return RequestCalloutPluginConfigBody{}
-	}
-	return o.Body
-}
-
-func (o *Request) GetByLua() *string {
-	if o == nil {
+func (r *Request) GetBody() *RequestCalloutPluginConfigBody {
+	if r == nil {
 		return nil
 	}
-	return o.ByLua
+	return r.Body
 }
 
-func (o *Request) GetError() Error {
-	if o == nil {
-		return Error{}
-	}
-	return o.Error
-}
-
-func (o *Request) GetHeaders() RequestCalloutPluginConfigHeaders {
-	if o == nil {
-		return RequestCalloutPluginConfigHeaders{}
-	}
-	return o.Headers
-}
-
-func (o *Request) GetHTTPOpts() HTTPOpts {
-	if o == nil {
-		return HTTPOpts{}
-	}
-	return o.HTTPOpts
-}
-
-func (o *Request) GetMethod() *string {
-	if o == nil {
+func (r *Request) GetByLua() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Method
+	return r.ByLua
 }
 
-func (o *Request) GetQuery() RequestCalloutPluginQuery {
-	if o == nil {
-		return RequestCalloutPluginQuery{}
+func (r *Request) GetError() *Error {
+	if r == nil {
+		return nil
 	}
-	return o.Query
+	return r.Error
 }
 
-func (o *Request) GetURL() string {
-	if o == nil {
+func (r *Request) GetHeaders() *RequestCalloutPluginConfigHeaders {
+	if r == nil {
+		return nil
+	}
+	return r.Headers
+}
+
+func (r *Request) GetHTTPOpts() *HTTPOpts {
+	if r == nil {
+		return nil
+	}
+	return r.HTTPOpts
+}
+
+func (r *Request) GetMethod() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Method
+}
+
+func (r *Request) GetQuery() *RequestCalloutPluginQuery {
+	if r == nil {
+		return nil
+	}
+	return r.Query
+}
+
+func (r *Request) GetURL() string {
+	if r == nil {
 		return ""
 	}
-	return o.URL
+	return r.URL
 }
 
 type RequestCalloutPluginBody struct {
-	// If true, decodes the response body before storing into the context. Only JSON is supported.
+	// If `true`, decodes the response body before storing into the context. Only JSON is supported.
 	Decode *bool `json:"decode,omitempty"`
-	// If false, skips storing the callout response body into kong.ctx.shared.callouts.<name>.response.body.
+	// If `false`, skips storing the callout response body into kong.ctx.shared.callouts.<name>.response.body.
 	Store *bool `json:"store,omitempty"`
 }
 
-func (o *RequestCalloutPluginBody) GetDecode() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginBody) GetDecode() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Decode
+	return r.Decode
 }
 
-func (o *RequestCalloutPluginBody) GetStore() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginBody) GetStore() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Store
+	return r.Store
 }
 
 // RequestCalloutPluginHeaders - Callout response header customizations.
 type RequestCalloutPluginHeaders struct {
-	// If false, skips storing the callout response headers intokong.ctx.shared.callouts.<name>.response.headers.
+	// If `false`, skips storing the callout response headers into kong.ctx.shared.callouts.<name>.response.headers.
 	Store *bool `json:"store,omitempty"`
 }
 
-func (o *RequestCalloutPluginHeaders) GetStore() *bool {
-	if o == nil {
+func (r *RequestCalloutPluginHeaders) GetStore() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Store
+	return r.Store
 }
 
 // Response - Configurations of callout response handling.
 type Response struct {
-	Body RequestCalloutPluginBody `json:"body"`
-	// Lua code that executes after the callout request is made, before caching takes place. Standard Lua sandboxing restrictions apply.
+	Body *RequestCalloutPluginBody `json:"body,omitempty"`
+	// Lua code that executes after the callout response is received, before caching takes place. Can produce side effects. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
 	// Callout response header customizations.
-	Headers RequestCalloutPluginHeaders `json:"headers"`
+	Headers *RequestCalloutPluginHeaders `json:"headers,omitempty"`
 }
 
-func (o *Response) GetBody() RequestCalloutPluginBody {
-	if o == nil {
-		return RequestCalloutPluginBody{}
-	}
-	return o.Body
-}
-
-func (o *Response) GetByLua() *string {
-	if o == nil {
+func (r *Response) GetBody() *RequestCalloutPluginBody {
+	if r == nil {
 		return nil
 	}
-	return o.ByLua
+	return r.Body
 }
 
-func (o *Response) GetHeaders() RequestCalloutPluginHeaders {
-	if o == nil {
-		return RequestCalloutPluginHeaders{}
+func (r *Response) GetByLua() *string {
+	if r == nil {
+		return nil
 	}
-	return o.Headers
+	return r.ByLua
+}
+
+func (r *Response) GetHeaders() *RequestCalloutPluginHeaders {
+	if r == nil {
+		return nil
+	}
+	return r.Headers
 }
 
 type Callouts struct {
 	// Callout caching configuration.
-	Cache RequestCalloutPluginCache `json:"cache"`
-	// An array of callout names the current callout depends on.This dependency determines the callout execution order.
+	Cache *RequestCalloutPluginCache `json:"cache,omitempty"`
+	// An array of callout names the current callout depends on. This dependency list determines the callout execution order via a topological sorting algorithm.
 	DependsOn []string `json:"depends_on,omitempty"`
-	// A string identifier for a callout. A callout object is referenceablevia its name in the kong.ctx.shared.callouts.<name>
+	// A string identifier for a callout. A callout object is referenceable via its name in the `kong.ctx.shared.callouts.<name>`
 	Name string `json:"name"`
 	// The customizations for the callout request.
 	Request Request `json:"request"`
 	// Configurations of callout response handling.
-	Response Response `json:"response"`
+	Response *Response `json:"response,omitempty"`
 }
 
-func (o *Callouts) GetCache() RequestCalloutPluginCache {
-	if o == nil {
-		return RequestCalloutPluginCache{}
-	}
-	return o.Cache
-}
-
-func (o *Callouts) GetDependsOn() []string {
-	if o == nil {
+func (c *Callouts) GetCache() *RequestCalloutPluginCache {
+	if c == nil {
 		return nil
 	}
-	return o.DependsOn
+	return c.Cache
 }
 
-func (o *Callouts) GetName() string {
-	if o == nil {
+func (c *Callouts) GetDependsOn() []string {
+	if c == nil {
+		return nil
+	}
+	return c.DependsOn
+}
+
+func (c *Callouts) GetName() string {
+	if c == nil {
 		return ""
 	}
-	return o.Name
+	return c.Name
 }
 
-func (o *Callouts) GetRequest() Request {
-	if o == nil {
+func (c *Callouts) GetRequest() Request {
+	if c == nil {
 		return Request{}
 	}
-	return o.Request
+	return c.Request
 }
 
-func (o *Callouts) GetResponse() Response {
-	if o == nil {
-		return Response{}
+func (c *Callouts) GetResponse() *Response {
+	if c == nil {
+		return nil
 	}
-	return o.Response
+	return c.Response
 }
 
 // Body - Callout request body customizations.
 type Body struct {
-	// The custom body fields to be added in the upstream request body. Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom body fields to be added in the upstream request body. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If true, decodes the request's body to make it available for upstream by_lua customizations.
+	// If `true`, decodes the request's body to make it available for upstream by_lua customizations. Only JSON content type is supported.
 	Decode *bool `json:"decode,omitempty"`
-	// If false, skips forwarding the incoming request's body to the upstream request.
+	// If `false`, skips forwarding the incoming request's body to the upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *Body) GetCustom() map[string]any {
-	if o == nil {
+func (b *Body) GetCustom() map[string]any {
+	if b == nil {
 		return nil
 	}
-	return o.Custom
+	return b.Custom
 }
 
-func (o *Body) GetDecode() *bool {
-	if o == nil {
+func (b *Body) GetDecode() *bool {
+	if b == nil {
 		return nil
 	}
-	return o.Decode
+	return b.Decode
 }
 
-func (o *Body) GetForward() *bool {
-	if o == nil {
+func (b *Body) GetForward() *bool {
+	if b == nil {
 		return nil
 	}
-	return o.Forward
+	return b.Forward
 }
 
 // Headers - Callout request header customizations.
 type Headers struct {
-	// The custom headers to be added in the upstream HTTP request. Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom headers to be added in the upstream HTTP request. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If false, does not forward request headers to upstream request.
+	// If `false`, does not forward request headers to upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *Headers) GetCustom() map[string]any {
-	if o == nil {
+func (h *Headers) GetCustom() map[string]any {
+	if h == nil {
 		return nil
 	}
-	return o.Custom
+	return h.Custom
 }
 
-func (o *Headers) GetForward() *bool {
-	if o == nil {
+func (h *Headers) GetForward() *bool {
+	if h == nil {
 		return nil
 	}
-	return o.Forward
+	return h.Forward
 }
 
 // Query - Upstream request query param customizations.
 type Query struct {
-	// The custom query params to be added in the upstream HTTP request. Values can contain Lua expressions in the form $(some_lua_code).
+	// The custom query params to be added in the upstream HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]any `json:"custom,omitempty"`
-	// If false, does not forward request query params to upstream request.
+	// If `false`, does not forward request query params to upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (o *Query) GetCustom() map[string]any {
-	if o == nil {
+func (q *Query) GetCustom() map[string]any {
+	if q == nil {
 		return nil
 	}
-	return o.Custom
+	return q.Custom
 }
 
-func (o *Query) GetForward() *bool {
-	if o == nil {
+func (q *Query) GetForward() *bool {
+	if q == nil {
 		return nil
 	}
-	return o.Forward
+	return q.Forward
 }
 
 // RequestCalloutPluginUpstream - Customizations to the upstream request.
 type RequestCalloutPluginUpstream struct {
 	// Callout request body customizations.
 	Body *Body `json:"body,omitempty"`
-	// Lua code that executes before the upstream request is made. Standard Lua sandboxing restrictions apply.
+	// Lua code that executes before the upstream request is made. Can produce side effects. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
 	// Callout request header customizations.
 	Headers *Headers `json:"headers,omitempty"`
@@ -971,62 +903,62 @@ type RequestCalloutPluginUpstream struct {
 	Query *Query `json:"query,omitempty"`
 }
 
-func (o *RequestCalloutPluginUpstream) GetBody() *Body {
-	if o == nil {
+func (r *RequestCalloutPluginUpstream) GetBody() *Body {
+	if r == nil {
 		return nil
 	}
-	return o.Body
+	return r.Body
 }
 
-func (o *RequestCalloutPluginUpstream) GetByLua() *string {
-	if o == nil {
+func (r *RequestCalloutPluginUpstream) GetByLua() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ByLua
+	return r.ByLua
 }
 
-func (o *RequestCalloutPluginUpstream) GetHeaders() *Headers {
-	if o == nil {
+func (r *RequestCalloutPluginUpstream) GetHeaders() *Headers {
+	if r == nil {
 		return nil
 	}
-	return o.Headers
+	return r.Headers
 }
 
-func (o *RequestCalloutPluginUpstream) GetQuery() *Query {
-	if o == nil {
+func (r *RequestCalloutPluginUpstream) GetQuery() *Query {
+	if r == nil {
 		return nil
 	}
-	return o.Query
+	return r.Query
 }
 
 type RequestCalloutPluginConfig struct {
 	// Plugin global caching configuration.
 	Cache *Cache `json:"cache,omitempty"`
-	// A collection of callout objects, where each object represents an HTTPrequest made in the context of a proxy request.
-	Callouts []Callouts `json:"callouts,omitempty"`
+	// A collection of callout objects, where each object represents an HTTP request made in the context of a proxy request.
+	Callouts []Callouts `json:"callouts"`
 	// Customizations to the upstream request.
 	Upstream *RequestCalloutPluginUpstream `json:"upstream,omitempty"`
 }
 
-func (o *RequestCalloutPluginConfig) GetCache() *Cache {
-	if o == nil {
+func (r *RequestCalloutPluginConfig) GetCache() *Cache {
+	if r == nil {
 		return nil
 	}
-	return o.Cache
+	return r.Cache
 }
 
-func (o *RequestCalloutPluginConfig) GetCallouts() []Callouts {
-	if o == nil {
-		return nil
+func (r *RequestCalloutPluginConfig) GetCallouts() []Callouts {
+	if r == nil {
+		return []Callouts{}
 	}
-	return o.Callouts
+	return r.Callouts
 }
 
-func (o *RequestCalloutPluginConfig) GetUpstream() *RequestCalloutPluginUpstream {
-	if o == nil {
+func (r *RequestCalloutPluginConfig) GetUpstream() *RequestCalloutPluginUpstream {
+	if r == nil {
 		return nil
 	}
-	return o.Upstream
+	return r.Upstream
 }
 
 // RequestCalloutPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -1034,11 +966,11 @@ type RequestCalloutPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestCalloutPluginConsumer) GetID() *string {
-	if o == nil {
+func (r *RequestCalloutPluginConsumer) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestCalloutPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -1046,11 +978,81 @@ type RequestCalloutPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestCalloutPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (r *RequestCalloutPluginConsumerGroup) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
+}
+
+type RequestCalloutPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestCalloutPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestCalloutPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestCalloutPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestCalloutPluginOrdering struct {
+	After  *RequestCalloutPluginAfter  `json:"after,omitempty"`
+	Before *RequestCalloutPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestCalloutPluginOrdering) GetAfter() *RequestCalloutPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestCalloutPluginOrdering) GetBefore() *RequestCalloutPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestCalloutPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestCalloutPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestCalloutPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestCalloutPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
 }
 
 type RequestCalloutPluginProtocols string
@@ -1090,11 +1092,11 @@ type RequestCalloutPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestCalloutPluginRoute) GetID() *string {
-	if o == nil {
+func (r *RequestCalloutPluginRoute) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestCalloutPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -1102,39 +1104,41 @@ type RequestCalloutPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestCalloutPluginService) GetID() *string {
-	if o == nil {
+func (r *RequestCalloutPluginService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
-// RequestCalloutPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestCalloutPlugin struct {
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                          `json:"enabled,omitempty"`
-	ID           *string                        `json:"id,omitempty"`
-	InstanceName *string                        `json:"instance_name,omitempty"`
-	name         string                         `const:"request-callout" json:"name"`
-	Ordering     *RequestCalloutPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []RequestCalloutPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                      `json:"updated_at,omitempty"`
-	Config    *RequestCalloutPluginConfig `json:"config,omitempty"`
+	Config *RequestCalloutPluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *RequestCalloutPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *RequestCalloutPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                       `json:"instance_name,omitempty"`
+	name         string                        `const:"request-callout" json:"name"`
+	Ordering     *RequestCalloutPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []RequestCalloutPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RequestCalloutPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestCalloutPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestCalloutPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestCalloutPlugin) MarshalJSON() ([]byte, error) {
@@ -1142,110 +1146,110 @@ func (r RequestCalloutPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RequestCalloutPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *RequestCalloutPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetConfig() *RequestCalloutPluginConfig {
+	if r == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return r.Config
 }
 
-func (o *RequestCalloutPlugin) GetEnabled() *bool {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetConsumer() *RequestCalloutPluginConsumer {
+	if r == nil {
 		return nil
 	}
-	return o.Enabled
+	return r.Consumer
 }
 
-func (o *RequestCalloutPlugin) GetID() *string {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetConsumerGroup() *RequestCalloutPluginConsumerGroup {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ConsumerGroup
 }
 
-func (o *RequestCalloutPlugin) GetInstanceName() *string {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.InstanceName
+	return r.CreatedAt
 }
 
-func (o *RequestCalloutPlugin) GetName() string {
+func (r *RequestCalloutPlugin) GetEnabled() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.Enabled
+}
+
+func (r *RequestCalloutPlugin) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestCalloutPlugin) GetInstanceName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.InstanceName
+}
+
+func (r *RequestCalloutPlugin) GetName() string {
 	return "request-callout"
 }
 
-func (o *RequestCalloutPlugin) GetOrdering() *RequestCalloutPluginOrdering {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetOrdering() *RequestCalloutPluginOrdering {
+	if r == nil {
 		return nil
 	}
-	return o.Ordering
+	return r.Ordering
 }
 
-func (o *RequestCalloutPlugin) GetPartials() []RequestCalloutPluginPartials {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetPartials() []RequestCalloutPluginPartials {
+	if r == nil {
 		return nil
 	}
-	return o.Partials
+	return r.Partials
 }
 
-func (o *RequestCalloutPlugin) GetTags() []string {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetProtocols() []RequestCalloutPluginProtocols {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.Protocols
 }
 
-func (o *RequestCalloutPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetRoute() *RequestCalloutPluginRoute {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.Route
 }
 
-func (o *RequestCalloutPlugin) GetConfig() *RequestCalloutPluginConfig {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetService() *RequestCalloutPluginService {
+	if r == nil {
 		return nil
 	}
-	return o.Config
+	return r.Service
 }
 
-func (o *RequestCalloutPlugin) GetConsumer() *RequestCalloutPluginConsumer {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetTags() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Consumer
+	return r.Tags
 }
 
-func (o *RequestCalloutPlugin) GetConsumerGroup() *RequestCalloutPluginConsumerGroup {
-	if o == nil {
+func (r *RequestCalloutPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ConsumerGroup
-}
-
-func (o *RequestCalloutPlugin) GetProtocols() []RequestCalloutPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *RequestCalloutPlugin) GetRoute() *RequestCalloutPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *RequestCalloutPlugin) GetService() *RequestCalloutPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return r.UpdatedAt
 }

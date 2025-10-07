@@ -41,10 +41,12 @@ resource "kong-gateway_plugin_ai_rag_injector" "my_pluginairaginjector" {
             instance      = "...my_instance..."
           }
           bedrock = {
-            aws_assume_role_arn   = "...my_aws_assume_role_arn..."
-            aws_region            = "...my_aws_region..."
-            aws_role_session_name = "...my_aws_role_session_name..."
-            aws_sts_endpoint_url  = "...my_aws_sts_endpoint_url..."
+            aws_assume_role_arn        = "...my_aws_assume_role_arn..."
+            aws_region                 = "...my_aws_region..."
+            aws_role_session_name      = "...my_aws_role_session_name..."
+            aws_sts_endpoint_url       = "...my_aws_sts_endpoint_url..."
+            embeddings_normalize       = false
+            performance_config_latency = "...my_performance_config_latency..."
           }
           gemini = {
             api_endpoint = "...my_api_endpoint..."
@@ -160,6 +162,7 @@ resource "kong-gateway_plugin_ai_rag_injector" "my_pluginairaginjector" {
     "..."
   ]
   updated_at = 0
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -173,30 +176,28 @@ resource "kong-gateway_plugin_ai_rag_injector" "my_pluginairaginjector" {
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
 Optional:
 
-- `embeddings` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings))
+- `embeddings` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--embeddings))
 - `fetch_chunks_count` (Number) The maximum number of chunks to fetch from vectordb
 - `inject_as_role` (String) must be one of ["assistant", "system", "user"]
 - `inject_template` (String)
 - `stop_on_failure` (Boolean) Halt the LLM request process in case of a vectordb or embeddings service failure
-- `vectordb` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb))
+- `vectordb` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--vectordb))
 - `vectordb_namespace` (String) The namespace of the vectordb to use for embeddings lookup
 
 <a id="nestedatt--config--embeddings"></a>
@@ -205,7 +206,7 @@ Optional:
 Optional:
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--auth))
-- `model` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model))
+- `model` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--embeddings--model))
 
 <a id="nestedatt--config--embeddings--auth"></a>
 ### Nested Schema for `config.embeddings.auth`
@@ -233,16 +234,16 @@ Optional:
 
 Optional:
 
-- `name` (String) Model name to execute.
+- `name` (String) Model name to execute. Not Null
 - `options` (Attributes) Key/value settings for the model (see [below for nested schema](#nestedatt--config--embeddings--model--options))
-- `provider` (String) AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]
+- `provider` (String) AI provider format to use for embeddings API. Not Null; must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]
 
 <a id="nestedatt--config--embeddings--model--options"></a>
 ### Nested Schema for `config.embeddings.model.options`
 
 Optional:
 
-- `azure` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--embeddings--model--options--azure))
+- `azure` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--azure))
 - `bedrock` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--bedrock))
 - `gemini` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--gemini))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--huggingface))
@@ -267,6 +268,8 @@ Optional:
 - `aws_region` (String) If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
 - `aws_role_session_name` (String) If using AWS providers (Bedrock), set the identifier of the assumed role session.
 - `aws_sts_endpoint_url` (String) If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+- `embeddings_normalize` (Boolean) If using AWS providers (Bedrock), set to true to normalize the embeddings.
+- `performance_config_latency` (String) Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 
 
 <a id="nestedatt--config--embeddings--model--options--gemini"></a>
@@ -296,11 +299,11 @@ Optional:
 
 Optional:
 
-- `dimensions` (Number) the desired dimensionality for the vectors
-- `distance_metric` (String) the distance metric to use for vector searches. must be one of ["cosine", "euclidean"]
+- `dimensions` (Number) the desired dimensionality for the vectors. Not Null
+- `distance_metric` (String) the distance metric to use for vector searches. Not Null; must be one of ["cosine", "euclidean"]
 - `pgvector` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb--pgvector))
 - `redis` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb--redis))
-- `strategy` (String) which vector database driver to use. must be one of ["pgvector", "redis"]
+- `strategy` (String) which vector database driver to use. Not Null; must be one of ["pgvector", "redis"]
 
 <a id="nestedatt--config--vectordb--pgvector"></a>
 ### Nested Schema for `config.vectordb.pgvector`
@@ -415,8 +418,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -439,6 +442,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ai_rag_injector.my_kong-gateway_plugin_ai_rag_injector
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ai_rag_injector.my_kong-gateway_plugin_ai_rag_injector ""
+terraform import kong-gateway_plugin_ai_rag_injector.my_kong-gateway_plugin_ai_rag_injector '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

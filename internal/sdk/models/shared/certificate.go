@@ -9,8 +9,9 @@ type Certificate struct {
 	// PEM-encoded public certificate chain of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
 	CertAlt *string `json:"cert_alt,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64  `json:"created_at,omitempty"`
-	ID        *string `json:"id,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// PEM-encoded private key of the SSL key pair. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
 	Key string `json:"key"`
 	// PEM-encoded private key of the alternate SSL key pair. This should only be set if you have both RSA and ECDSA types of certificate available and would like Kong to prefer serving using ECDSA certs when client advertises support for it. This field is _referenceable_, which means it can be securely stored as a [secret](/gateway/latest/plan-and-deploy/security/secrets-management/getting-started) in a vault. References must follow a [specific format](/gateway/latest/plan-and-deploy/security/secrets-management/reference-format).
@@ -22,65 +23,65 @@ type Certificate struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *Certificate) GetCert() string {
-	if o == nil {
+func (c *Certificate) GetCert() string {
+	if c == nil {
 		return ""
 	}
-	return o.Cert
+	return c.Cert
 }
 
-func (o *Certificate) GetCertAlt() *string {
-	if o == nil {
+func (c *Certificate) GetCertAlt() *string {
+	if c == nil {
 		return nil
 	}
-	return o.CertAlt
+	return c.CertAlt
 }
 
-func (o *Certificate) GetCreatedAt() *int64 {
-	if o == nil {
+func (c *Certificate) GetCreatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return c.CreatedAt
 }
 
-func (o *Certificate) GetID() *string {
-	if o == nil {
+func (c *Certificate) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-func (o *Certificate) GetKey() string {
-	if o == nil {
+func (c *Certificate) GetKey() string {
+	if c == nil {
 		return ""
 	}
-	return o.Key
+	return c.Key
 }
 
-func (o *Certificate) GetKeyAlt() *string {
-	if o == nil {
+func (c *Certificate) GetKeyAlt() *string {
+	if c == nil {
 		return nil
 	}
-	return o.KeyAlt
+	return c.KeyAlt
 }
 
-func (o *Certificate) GetSnis() []string {
-	if o == nil {
+func (c *Certificate) GetSnis() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Snis
+	return c.Snis
 }
 
-func (o *Certificate) GetTags() []string {
-	if o == nil {
+func (c *Certificate) GetTags() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Tags
+	return c.Tags
 }
 
-func (o *Certificate) GetUpdatedAt() *int64 {
-	if o == nil {
+func (c *Certificate) GetUpdatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return c.UpdatedAt
 }

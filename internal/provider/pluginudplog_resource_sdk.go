@@ -4,7 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -12,9 +11,221 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginUDPLogResourceModel) RefreshFromSharedUDPLogPlugin(ctx context.Context, resp *shared.UDPLogPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.UDPLogPluginConfig{}
+			if len(resp.Config.CustomFieldsByLua) > 0 {
+				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
+				for key, value := range resp.Config.CustomFieldsByLua {
+					r.Config.CustomFieldsByLua[key] = types.StringValue(value)
+				}
+			}
+			r.Config.Host = types.StringValue(resp.Config.Host)
+			r.Config.Port = types.Int64Value(resp.Config.Port)
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginUDPLogResourceModel) ToOperationsCreateUdplogPluginRequest(ctx context.Context) (*operations.CreateUdplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	udpLogPlugin, udpLogPluginDiags := r.ToSharedUDPLogPlugin(ctx)
+	diags.Append(udpLogPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateUdplogPluginRequest{
+		Workspace:    workspace,
+		UDPLogPlugin: *udpLogPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginUDPLogResourceModel) ToOperationsDeleteUdplogPluginRequest(ctx context.Context) (*operations.DeleteUdplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteUdplogPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginUDPLogResourceModel) ToOperationsGetUdplogPluginRequest(ctx context.Context) (*operations.GetUdplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetUdplogPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginUDPLogResourceModel) ToOperationsUpdateUdplogPluginRequest(ctx context.Context) (*operations.UpdateUdplogPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	udpLogPlugin, udpLogPluginDiags := r.ToSharedUDPLogPlugin(ctx)
+	diags.Append(udpLogPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateUdplogPluginRequest{
+		PluginID:     pluginID,
+		Workspace:    workspace,
+		UDPLogPlugin: *udpLogPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*shared.UDPLogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.UDPLogPluginConfig
+	if r.Config != nil {
+		customFieldsByLua := make(map[string]string)
+		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
+			var customFieldsByLuaInst string
+			customFieldsByLuaInst = customFieldsByLuaValue.ValueString()
+
+			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
+		}
+		var host string
+		host = r.Config.Host.ValueString()
+
+		var port int64
+		port = r.Config.Port.ValueInt64()
+
+		timeout := new(float64)
+		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+			*timeout = r.Config.Timeout.ValueFloat64()
+		} else {
+			timeout = nil
+		}
+		config = &shared.UDPLogPluginConfig{
+			CustomFieldsByLua: customFieldsByLua,
+			Host:              host,
+			Port:              port,
+			Timeout:           timeout,
+		}
+	}
+	var consumer *shared.UDPLogPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.UDPLogPluginConsumer{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -27,11 +238,11 @@ func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -70,11 +281,11 @@ func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*
 	if r.Partials != nil {
 		partials = make([]shared.UDPLogPluginPartials, 0, len(r.Partials))
 		for _, partialsItem := range r.Partials {
-			id1 := new(string)
+			id2 := new(string)
 			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
+				*id2 = partialsItem.ID.ValueString()
 			} else {
-				id1 = nil
+				id2 = nil
 			}
 			name := new(string)
 			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
@@ -89,65 +300,10 @@ func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*
 				path = nil
 			}
 			partials = append(partials, shared.UDPLogPluginPartials{
-				ID:   id1,
+				ID:   id2,
 				Name: name,
 				Path: path,
 			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.UDPLogPluginConfig
-	if r.Config != nil {
-		customFieldsByLua := make(map[string]interface{})
-		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
-			var customFieldsByLuaInst interface{}
-			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
-			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
-		}
-		host := new(string)
-		if !r.Config.Host.IsUnknown() && !r.Config.Host.IsNull() {
-			*host = r.Config.Host.ValueString()
-		} else {
-			host = nil
-		}
-		port := new(int64)
-		if !r.Config.Port.IsUnknown() && !r.Config.Port.IsNull() {
-			*port = r.Config.Port.ValueInt64()
-		} else {
-			port = nil
-		}
-		timeout := new(float64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueFloat64()
-		} else {
-			timeout = nil
-		}
-		config = &shared.UDPLogPluginConfig{
-			CustomFieldsByLua: customFieldsByLua,
-			Host:              host,
-			Port:              port,
-			Timeout:           timeout,
-		}
-	}
-	var consumer *shared.UDPLogPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.UDPLogPluginConsumer{
-			ID: id2,
 		}
 	}
 	protocols := make([]shared.UDPLogPluginProtocols, 0, len(r.Protocols))
@@ -178,165 +334,34 @@ func (r *PluginUDPLogResourceModel) ToSharedUDPLogPlugin(ctx context.Context) (*
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.UDPLogPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginUDPLogResourceModel) ToOperationsUpdateUdplogPluginRequest(ctx context.Context) (*operations.UpdateUdplogPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	udpLogPlugin, udpLogPluginDiags := r.ToSharedUDPLogPlugin(ctx)
-	diags.Append(udpLogPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateUdplogPluginRequest{
-		PluginID:     pluginID,
-		UDPLogPlugin: *udpLogPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginUDPLogResourceModel) ToOperationsGetUdplogPluginRequest(ctx context.Context) (*operations.GetUdplogPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetUdplogPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginUDPLogResourceModel) ToOperationsDeleteUdplogPluginRequest(ctx context.Context) (*operations.DeleteUdplogPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteUdplogPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginUDPLogResourceModel) RefreshFromSharedUDPLogPlugin(ctx context.Context, resp *shared.UDPLogPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.UDPLogPluginConfig{}
-			if len(resp.Config.CustomFieldsByLua) > 0 {
-				r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
-				for key, value := range resp.Config.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.CustomFieldsByLua[key] = types.StringValue(string(result))
-				}
-			}
-			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,50 @@ import (
 type UpsertPartialRequest struct {
 	// ID of the Partial to lookup
 	PartialID string `pathParam:"style=simple,explode=false,name=PartialId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Partial
 	Partial shared.Partial `request:"mediaType=application/json"`
 }
 
-func (o *UpsertPartialRequest) GetPartialID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PartialID
+func (u UpsertPartialRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertPartialRequest) GetPartial() shared.Partial {
-	if o == nil {
+func (u *UpsertPartialRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PartialId", "workspace", "Partial"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertPartialRequest) GetPartialID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PartialID
+}
+
+func (u *UpsertPartialRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertPartialRequest) GetPartial() shared.Partial {
+	if u == nil {
 		return shared.Partial{}
 	}
-	return o.Partial
+	return u.Partial
+}
+
+func (u *UpsertPartialRequest) GetPartialRedisCe() *shared.PartialRedisCe {
+	return u.GetPartial().PartialRedisCe
+}
+
+func (u *UpsertPartialRequest) GetPartialRedisEe() *shared.PartialRedisEe {
+	return u.GetPartial().PartialRedisEe
 }
 
 type UpsertPartialResponse struct {
@@ -41,37 +70,51 @@ type UpsertPartialResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertPartialResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertPartialResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertPartialResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertPartialResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertPartialResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertPartialResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertPartialResponse) GetPartial() *shared.Partial {
-	if o == nil {
+func (u *UpsertPartialResponse) GetPartial() *shared.Partial {
+	if u == nil {
 		return nil
 	}
-	return o.Partial
+	return u.Partial
 }
 
-func (o *UpsertPartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertPartialResponse) GetPartialRedisCe() *shared.PartialRedisCe {
+	if v := u.GetPartial(); v != nil {
+		return v.PartialRedisCe
+	}
+	return nil
+}
+
+func (u *UpsertPartialResponse) GetPartialRedisEe() *shared.PartialRedisEe {
+	if v := u.GetPartial(); v != nil {
+		return v.PartialRedisEe
+	}
+	return nil
+}
+
+func (u *UpsertPartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

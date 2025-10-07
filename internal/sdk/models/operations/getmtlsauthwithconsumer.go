@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -12,20 +13,40 @@ type GetMtlsAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the MTLS-auth credential to lookup
 	MTLSAuthID string `pathParam:"style=simple,explode=false,name=MTLSAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetMtlsAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (g GetMtlsAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
 }
 
-func (o *GetMtlsAuthWithConsumerRequest) GetMTLSAuthID() string {
-	if o == nil {
+func (g *GetMtlsAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "MTLSAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetMtlsAuthWithConsumerRequest) GetConsumerID() string {
+	if g == nil {
 		return ""
 	}
-	return o.MTLSAuthID
+	return g.ConsumerID
+}
+
+func (g *GetMtlsAuthWithConsumerRequest) GetMTLSAuthID() string {
+	if g == nil {
+		return ""
+	}
+	return g.MTLSAuthID
+}
+
+func (g *GetMtlsAuthWithConsumerRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetMtlsAuthWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type GetMtlsAuthWithConsumerResponse struct {
 	MTLSAuth *shared.MTLSAuth
 }
 
-func (o *GetMtlsAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (g *GetMtlsAuthWithConsumerResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetMtlsAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetMtlsAuthWithConsumerResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetMtlsAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetMtlsAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetMtlsAuthWithConsumerResponse) GetMTLSAuth() *shared.MTLSAuth {
-	if o == nil {
+func (g *GetMtlsAuthWithConsumerResponse) GetMTLSAuth() *shared.MTLSAuth {
+	if g == nil {
 		return nil
 	}
-	return o.MTLSAuth
+	return g.MTLSAuth
 }

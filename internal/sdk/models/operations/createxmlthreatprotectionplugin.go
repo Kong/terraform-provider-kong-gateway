@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateXmlthreatprotectionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	XMLThreatProtectionPlugin shared.XMLThreatProtectionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateXmlthreatprotectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateXmlthreatprotectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "XmlThreatProtectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateXmlthreatprotectionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateXmlthreatprotectionPluginRequest) GetXMLThreatProtectionPlugin() shared.XMLThreatProtectionPlugin {
+	if c == nil {
+		return shared.XMLThreatProtectionPlugin{}
+	}
+	return c.XMLThreatProtectionPlugin
+}
 
 type CreateXmlthreatprotectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateXmlthreatprotectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateXmlthreatprotectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateXmlthreatprotectionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateXmlthreatprotectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateXmlthreatprotectionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateXmlthreatprotectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateXmlthreatprotectionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateXmlthreatprotectionPluginResponse) GetXMLThreatProtectionPlugin() *shared.XMLThreatProtectionPlugin {
-	if o == nil {
+func (c *CreateXmlthreatprotectionPluginResponse) GetXMLThreatProtectionPlugin() *shared.XMLThreatProtectionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.XMLThreatProtectionPlugin
+	return c.XMLThreatProtectionPlugin
 }
 
-func (o *CreateXmlthreatprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateXmlthreatprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

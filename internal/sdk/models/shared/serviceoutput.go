@@ -12,11 +12,11 @@ type ClientCertificate struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ClientCertificate) GetID() *string {
-	if o == nil {
+func (c *ClientCertificate) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
 // Protocol - The protocol used to communicate with the upstream.
@@ -70,6 +70,28 @@ func (e *Protocol) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// TLSSans - Additional Subject Alternative Names that can be matched on Upstream server's TLS certificate (in addition to `host`).
+type TLSSans struct {
+	// A dnsName for TLS verification.
+	Dnsnames []string `json:"dnsnames,omitempty"`
+	// An URI for TLS verification.
+	Uris []string `json:"uris,omitempty"`
+}
+
+func (t *TLSSans) GetDnsnames() []string {
+	if t == nil {
+		return nil
+	}
+	return t.Dnsnames
+}
+
+func (t *TLSSans) GetUris() []string {
+	if t == nil {
+		return nil
+	}
+	return t.Uris
+}
+
 // ServiceOutput - Service entities, as the name implies, are abstractions of each of your own upstream services. Examples of Services would be a data transformation microservice, a billing API, etc. The main attribute of a Service is its URL (where Kong should proxy traffic to), which can be set as a single string or by specifying its `protocol`, `host`, `port` and `path` individually. Services are associated to Routes (a Service can have many Routes associated with it). Routes are entry-points in Kong and define rules to match client requests. Once a Route is matched, Kong proxies the request to its associated Service. See the [Proxy Reference][proxy-reference] for a detailed explanation of how Kong proxies traffic.
 type ServiceOutput struct {
 	// Array of `CA Certificate` object UUIDs that are used to build the trust store while verifying upstream server's TLS certificate. If set to `null` when Nginx default is respected. If default CA list in Nginx are not specified and TLS verification is enabled, then handshake with upstream server will always fail (because no CA are trusted).
@@ -83,8 +105,9 @@ type ServiceOutput struct {
 	// Whether the Service is active. If set to `false`, the proxy behavior will be as if any routes attached to it do not exist (404). Default: `true`.
 	Enabled *bool `json:"enabled,omitempty"`
 	// The host of the upstream server. Note that the host value is case sensitive.
-	Host string  `json:"host"`
-	ID   *string `json:"id,omitempty"`
+	Host string `json:"host"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// The Service name.
 	Name *string `json:"name,omitempty"`
 	// The path to be used in requests to the upstream server.
@@ -99,6 +122,8 @@ type ServiceOutput struct {
 	Retries *int64 `json:"retries,omitempty"`
 	// An optional set of strings associated with the Service for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
+	// Additional Subject Alternative Names that can be matched on Upstream server's TLS certificate (in addition to `host`).
+	TLSSans *TLSSans `json:"tls_sans,omitempty"`
 	// Whether to enable verification of upstream server TLS certificate. If set to `null`, then the Nginx default is respected.
 	TLSVerify *bool `json:"tls_verify,omitempty"`
 	// Maximum depth of chain while verifying Upstream server's TLS certificate. If set to `null`, then the Nginx default is respected.
@@ -109,130 +134,137 @@ type ServiceOutput struct {
 	WriteTimeout *int64 `json:"write_timeout,omitempty"`
 }
 
-func (o *ServiceOutput) GetCaCertificates() []string {
-	if o == nil {
+func (s *ServiceOutput) GetCaCertificates() []string {
+	if s == nil {
 		return nil
 	}
-	return o.CaCertificates
+	return s.CaCertificates
 }
 
-func (o *ServiceOutput) GetClientCertificate() *ClientCertificate {
-	if o == nil {
+func (s *ServiceOutput) GetClientCertificate() *ClientCertificate {
+	if s == nil {
 		return nil
 	}
-	return o.ClientCertificate
+	return s.ClientCertificate
 }
 
-func (o *ServiceOutput) GetConnectTimeout() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetConnectTimeout() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return s.ConnectTimeout
 }
 
-func (o *ServiceOutput) GetCreatedAt() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetCreatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return s.CreatedAt
 }
 
-func (o *ServiceOutput) GetEnabled() *bool {
-	if o == nil {
+func (s *ServiceOutput) GetEnabled() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.Enabled
+	return s.Enabled
 }
 
-func (o *ServiceOutput) GetHost() string {
-	if o == nil {
+func (s *ServiceOutput) GetHost() string {
+	if s == nil {
 		return ""
 	}
-	return o.Host
+	return s.Host
 }
 
-func (o *ServiceOutput) GetID() *string {
-	if o == nil {
+func (s *ServiceOutput) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-func (o *ServiceOutput) GetName() *string {
-	if o == nil {
+func (s *ServiceOutput) GetName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Name
+	return s.Name
 }
 
-func (o *ServiceOutput) GetPath() *string {
-	if o == nil {
+func (s *ServiceOutput) GetPath() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Path
+	return s.Path
 }
 
-func (o *ServiceOutput) GetPort() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetPort() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Port
+	return s.Port
 }
 
-func (o *ServiceOutput) GetProtocol() *Protocol {
-	if o == nil {
+func (s *ServiceOutput) GetProtocol() *Protocol {
+	if s == nil {
 		return nil
 	}
-	return o.Protocol
+	return s.Protocol
 }
 
-func (o *ServiceOutput) GetReadTimeout() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetReadTimeout() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return s.ReadTimeout
 }
 
-func (o *ServiceOutput) GetRetries() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetRetries() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Retries
+	return s.Retries
 }
 
-func (o *ServiceOutput) GetTags() []string {
-	if o == nil {
+func (s *ServiceOutput) GetTags() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Tags
+	return s.Tags
 }
 
-func (o *ServiceOutput) GetTLSVerify() *bool {
-	if o == nil {
+func (s *ServiceOutput) GetTLSSans() *TLSSans {
+	if s == nil {
 		return nil
 	}
-	return o.TLSVerify
+	return s.TLSSans
 }
 
-func (o *ServiceOutput) GetTLSVerifyDepth() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetTLSVerify() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.TLSVerifyDepth
+	return s.TLSVerify
 }
 
-func (o *ServiceOutput) GetUpdatedAt() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetTLSVerifyDepth() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return s.TLSVerifyDepth
 }
 
-func (o *ServiceOutput) GetWriteTimeout() *int64 {
-	if o == nil {
+func (s *ServiceOutput) GetUpdatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.WriteTimeout
+	return s.UpdatedAt
+}
+
+func (s *ServiceOutput) GetWriteTimeout() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.WriteTimeout
 }
 
 // Service entities, as the name implies, are abstractions of each of your own upstream services. Examples of Services would be a data transformation microservice, a billing API, etc. The main attribute of a Service is its URL (where Kong should proxy traffic to), which can be set as a single string or by specifying its `protocol`, `host`, `port` and `path` individually. Services are associated to Routes (a Service can have many Routes associated with it). Routes are entry-points in Kong and define rules to match client requests. Once a Route is matched, Kong proxies the request to its associated Service. See the [Proxy Reference][proxy-reference] for a detailed explanation of how Kong proxies traffic.
@@ -248,8 +280,9 @@ type Service struct {
 	// Whether the Service is active. If set to `false`, the proxy behavior will be as if any routes attached to it do not exist (404). Default: `true`.
 	Enabled *bool `json:"enabled,omitempty"`
 	// The host of the upstream server. Note that the host value is case sensitive.
-	Host string  `json:"host"`
-	ID   *string `json:"id,omitempty"`
+	Host string `json:"host"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// The Service name.
 	Name *string `json:"name,omitempty"`
 	// The path to be used in requests to the upstream server.
@@ -264,6 +297,8 @@ type Service struct {
 	Retries *int64 `json:"retries,omitempty"`
 	// An optional set of strings associated with the Service for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
+	// Additional Subject Alternative Names that can be matched on Upstream server's TLS certificate (in addition to `host`).
+	TLSSans *TLSSans `json:"tls_sans,omitempty"`
 	// Whether to enable verification of upstream server TLS certificate. If set to `null`, then the Nginx default is respected.
 	TLSVerify *bool `json:"tls_verify,omitempty"`
 	// Maximum depth of chain while verifying Upstream server's TLS certificate. If set to `null`, then the Nginx default is respected.
@@ -276,135 +311,142 @@ type Service struct {
 	WriteTimeout *int64 `json:"write_timeout,omitempty"`
 }
 
-func (o *Service) GetCaCertificates() []string {
-	if o == nil {
+func (s *Service) GetCaCertificates() []string {
+	if s == nil {
 		return nil
 	}
-	return o.CaCertificates
+	return s.CaCertificates
 }
 
-func (o *Service) GetClientCertificate() *ClientCertificate {
-	if o == nil {
+func (s *Service) GetClientCertificate() *ClientCertificate {
+	if s == nil {
 		return nil
 	}
-	return o.ClientCertificate
+	return s.ClientCertificate
 }
 
-func (o *Service) GetConnectTimeout() *int64 {
-	if o == nil {
+func (s *Service) GetConnectTimeout() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return s.ConnectTimeout
 }
 
-func (o *Service) GetCreatedAt() *int64 {
-	if o == nil {
+func (s *Service) GetCreatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return s.CreatedAt
 }
 
-func (o *Service) GetEnabled() *bool {
-	if o == nil {
+func (s *Service) GetEnabled() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.Enabled
+	return s.Enabled
 }
 
-func (o *Service) GetHost() string {
-	if o == nil {
+func (s *Service) GetHost() string {
+	if s == nil {
 		return ""
 	}
-	return o.Host
+	return s.Host
 }
 
-func (o *Service) GetID() *string {
-	if o == nil {
+func (s *Service) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-func (o *Service) GetName() *string {
-	if o == nil {
+func (s *Service) GetName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Name
+	return s.Name
 }
 
-func (o *Service) GetPath() *string {
-	if o == nil {
+func (s *Service) GetPath() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Path
+	return s.Path
 }
 
-func (o *Service) GetPort() *int64 {
-	if o == nil {
+func (s *Service) GetPort() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Port
+	return s.Port
 }
 
-func (o *Service) GetProtocol() *Protocol {
-	if o == nil {
+func (s *Service) GetProtocol() *Protocol {
+	if s == nil {
 		return nil
 	}
-	return o.Protocol
+	return s.Protocol
 }
 
-func (o *Service) GetReadTimeout() *int64 {
-	if o == nil {
+func (s *Service) GetReadTimeout() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return s.ReadTimeout
 }
 
-func (o *Service) GetRetries() *int64 {
-	if o == nil {
+func (s *Service) GetRetries() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Retries
+	return s.Retries
 }
 
-func (o *Service) GetTags() []string {
-	if o == nil {
+func (s *Service) GetTags() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Tags
+	return s.Tags
 }
 
-func (o *Service) GetTLSVerify() *bool {
-	if o == nil {
+func (s *Service) GetTLSSans() *TLSSans {
+	if s == nil {
 		return nil
 	}
-	return o.TLSVerify
+	return s.TLSSans
 }
 
-func (o *Service) GetTLSVerifyDepth() *int64 {
-	if o == nil {
+func (s *Service) GetTLSVerify() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.TLSVerifyDepth
+	return s.TLSVerify
 }
 
-func (o *Service) GetUpdatedAt() *int64 {
-	if o == nil {
+func (s *Service) GetTLSVerifyDepth() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return s.TLSVerifyDepth
 }
 
-func (o *Service) GetURL() *string {
-	if o == nil {
+func (s *Service) GetUpdatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.URL
+	return s.UpdatedAt
 }
 
-func (o *Service) GetWriteTimeout() *int64 {
-	if o == nil {
+func (s *Service) GetURL() *string {
+	if s == nil {
 		return nil
 	}
-	return o.WriteTimeout
+	return s.URL
+}
+
+func (s *Service) GetWriteTimeout() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.WriteTimeout
 }

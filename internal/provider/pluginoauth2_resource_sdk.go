@@ -11,99 +11,191 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginOauth2ResourceModel) RefreshFromSharedOauth2Plugin(ctx context.Context, resp *shared.Oauth2Plugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.Oauth2PluginConfig{}
+			r.Config.AcceptHTTPIfAlreadyTerminated = types.BoolPointerValue(resp.Config.AcceptHTTPIfAlreadyTerminated)
+			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+			r.Config.AuthHeaderName = types.StringPointerValue(resp.Config.AuthHeaderName)
+			r.Config.EnableAuthorizationCode = types.BoolPointerValue(resp.Config.EnableAuthorizationCode)
+			r.Config.EnableClientCredentials = types.BoolPointerValue(resp.Config.EnableClientCredentials)
+			r.Config.EnableImplicitGrant = types.BoolPointerValue(resp.Config.EnableImplicitGrant)
+			r.Config.EnablePasswordGrant = types.BoolPointerValue(resp.Config.EnablePasswordGrant)
+			r.Config.GlobalCredentials = types.BoolPointerValue(resp.Config.GlobalCredentials)
+			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+			r.Config.MandatoryScope = types.BoolPointerValue(resp.Config.MandatoryScope)
+			r.Config.PersistentRefreshToken = types.BoolPointerValue(resp.Config.PersistentRefreshToken)
+			if resp.Config.Pkce != nil {
+				r.Config.Pkce = types.StringValue(string(*resp.Config.Pkce))
+			} else {
+				r.Config.Pkce = types.StringNull()
+			}
+			r.Config.ProvisionKey = types.StringPointerValue(resp.Config.ProvisionKey)
+			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+			r.Config.RefreshTokenTTL = types.Float64PointerValue(resp.Config.RefreshTokenTTL)
+			r.Config.ReuseRefreshToken = types.BoolPointerValue(resp.Config.ReuseRefreshToken)
+			r.Config.Scopes = make([]types.String, 0, len(resp.Config.Scopes))
+			for _, v := range resp.Config.Scopes {
+				r.Config.Scopes = append(r.Config.Scopes, types.StringValue(v))
+			}
+			r.Config.TokenExpiration = types.Float64PointerValue(resp.Config.TokenExpiration)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginOauth2ResourceModel) ToOperationsCreateOauth2PluginRequest(ctx context.Context) (*operations.CreateOauth2PluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	oauth2Plugin, oauth2PluginDiags := r.ToSharedOauth2Plugin(ctx)
+	diags.Append(oauth2PluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateOauth2PluginRequest{
+		Workspace:    workspace,
+		Oauth2Plugin: *oauth2Plugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2ResourceModel) ToOperationsDeleteOauth2PluginRequest(ctx context.Context) (*operations.DeleteOauth2PluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteOauth2PluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2ResourceModel) ToOperationsGetOauth2PluginRequest(ctx context.Context) (*operations.GetOauth2PluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetOauth2PluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOauth2ResourceModel) ToOperationsUpdateOauth2PluginRequest(ctx context.Context) (*operations.UpdateOauth2PluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	oauth2Plugin, oauth2PluginDiags := r.ToSharedOauth2Plugin(ctx)
+	diags.Append(oauth2PluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateOauth2PluginRequest{
+		PluginID:     pluginID,
+		Workspace:    workspace,
+		Oauth2Plugin: *oauth2Plugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*shared.Oauth2Plugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.Oauth2PluginOrdering
-	if r.Ordering != nil {
-		var after *shared.Oauth2PluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.Oauth2PluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.Oauth2PluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.Oauth2PluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.Oauth2PluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.Oauth2PluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.Oauth2PluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.Oauth2PluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.Oauth2PluginConfig
 	if r.Config != nil {
 		acceptHTTPIfAlreadyTerminated := new(bool)
@@ -233,6 +325,86 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 			TokenExpiration:               tokenExpiration,
 		}
 	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.Oauth2PluginOrdering
+	if r.Ordering != nil {
+		var after *shared.Oauth2PluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.Oauth2PluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.Oauth2PluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.Oauth2PluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.Oauth2PluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.Oauth2PluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.Oauth2PluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.Oauth2PluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
 	protocols := make([]shared.Oauth2PluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.Oauth2PluginProtocols(protocolsItem.ValueString()))
@@ -261,173 +433,33 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.Oauth2Plugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginOauth2ResourceModel) ToOperationsUpdateOauth2PluginRequest(ctx context.Context) (*operations.UpdateOauth2PluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	oauth2Plugin, oauth2PluginDiags := r.ToSharedOauth2Plugin(ctx)
-	diags.Append(oauth2PluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateOauth2PluginRequest{
-		PluginID:     pluginID,
-		Oauth2Plugin: *oauth2Plugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOauth2ResourceModel) ToOperationsGetOauth2PluginRequest(ctx context.Context) (*operations.GetOauth2PluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetOauth2PluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOauth2ResourceModel) ToOperationsDeleteOauth2PluginRequest(ctx context.Context) (*operations.DeleteOauth2PluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteOauth2PluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOauth2ResourceModel) RefreshFromSharedOauth2Plugin(ctx context.Context, resp *shared.Oauth2Plugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.Oauth2PluginConfig{}
-			r.Config.AcceptHTTPIfAlreadyTerminated = types.BoolPointerValue(resp.Config.AcceptHTTPIfAlreadyTerminated)
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.AuthHeaderName = types.StringPointerValue(resp.Config.AuthHeaderName)
-			r.Config.EnableAuthorizationCode = types.BoolPointerValue(resp.Config.EnableAuthorizationCode)
-			r.Config.EnableClientCredentials = types.BoolPointerValue(resp.Config.EnableClientCredentials)
-			r.Config.EnableImplicitGrant = types.BoolPointerValue(resp.Config.EnableImplicitGrant)
-			r.Config.EnablePasswordGrant = types.BoolPointerValue(resp.Config.EnablePasswordGrant)
-			r.Config.GlobalCredentials = types.BoolPointerValue(resp.Config.GlobalCredentials)
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.MandatoryScope = types.BoolPointerValue(resp.Config.MandatoryScope)
-			r.Config.PersistentRefreshToken = types.BoolPointerValue(resp.Config.PersistentRefreshToken)
-			if resp.Config.Pkce != nil {
-				r.Config.Pkce = types.StringValue(string(*resp.Config.Pkce))
-			} else {
-				r.Config.Pkce = types.StringNull()
-			}
-			r.Config.ProvisionKey = types.StringPointerValue(resp.Config.ProvisionKey)
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.RefreshTokenTTL = types.Float64PointerValue(resp.Config.RefreshTokenTTL)
-			r.Config.ReuseRefreshToken = types.BoolPointerValue(resp.Config.ReuseRefreshToken)
-			r.Config.Scopes = make([]types.String, 0, len(resp.Config.Scopes))
-			for _, v := range resp.Config.Scopes {
-				r.Config.Scopes = append(r.Config.Scopes, types.StringValue(v))
-			}
-			r.Config.TokenExpiration = types.Float64PointerValue(resp.Config.TokenExpiration)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

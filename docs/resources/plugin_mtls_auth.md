@@ -72,6 +72,7 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
     "..."
   ]
   updated_at = 2
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -83,18 +84,16 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -104,7 +103,7 @@ Optional:
 - `allow_partial_chain` (Boolean) Allow certificate verification with only an intermediate certificate. When this is enabled, you don't need to upload the full chain to Kong Certificates.
 - `anonymous` (String) An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure `4xx`. Note that this value must refer to the consumer `id` or `username` attribute, and **not** its `custom_id`.
 - `authenticated_group_by` (String) Certificate property to use as the authenticated group. Valid values are `CN` (Common Name) or `DN` (Distinguished Name). Once `skip_consumer_lookup` is applied, any client with a valid certificate can access the Service/API. To restrict usage to only some of the authenticated users, also add the ACL plugin (not covered here) and create allowed or denied groups of users. must be one of ["CN", "DN"]
-- `ca_certificates` (List of String) List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (`id`).
+- `ca_certificates` (List of String) List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (`id`). Not Null
 - `cache_ttl` (Number) Cache expiry time in seconds.
 - `cert_cache_ttl` (Number) The length of time in seconds between refreshes of the revocation check status cache.
 - `consumer_by` (List of String) Whether to match the subject name of the client-supplied certificate against consumer's `username` and/or `custom_id` attribute. If set to `[]` (the empty array), then auto-matching is disabled.
@@ -149,8 +148,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -173,6 +172,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth ""
+terraform import kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

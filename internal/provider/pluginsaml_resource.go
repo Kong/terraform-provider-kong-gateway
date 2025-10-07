@@ -3,20 +3,23 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	"regexp"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -35,18 +38,19 @@ type PluginSamlResource struct {
 
 // PluginSamlResourceModel describes the resource data model.
 type PluginSamlResourceModel struct {
-	Config       *tfTypes.SamlPluginConfig          `tfsdk:"config"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Config       *tfTypes.SamlPluginConfig   `tfsdk:"config"`
+	CreatedAt    types.Int64                 `tfsdk:"created_at"`
+	Enabled      types.Bool                  `tfsdk:"enabled"`
+	ID           types.String                `tfsdk:"id"`
+	InstanceName types.String                `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Protocols    []types.String              `tfsdk:"protocols"`
+	Route        *tfTypes.Set                `tfsdk:"route"`
+	Service      *tfTypes.Set                `tfsdk:"service"`
+	Tags         []types.String              `tfsdk:"tags"`
+	UpdatedAt    types.Int64                 `tfsdk:"updated_at"`
+	Workspace    types.String                `tfsdk:"workspace"`
 }
 
 func (r *PluginSamlResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -69,7 +73,10 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"assertion_consumer_path": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).`,
+						Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes). Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"idp_certificate": schema.StringAttribute{
 						Computed:    true,
@@ -79,12 +86,18 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"idp_sso_url": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search.`,
+						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"issuer": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The unique identifier of the IdP application. Formatted as a URL containing information about the IdP so the SP can validate that the SAML assertions it receives are issued from the correct IdP.`,
+						Description: `The unique identifier of the IdP application. Formatted as a URL containing information about the IdP so the SP can validate that the SAML assertions it receives are issued from the correct IdP. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"nameid_format": schema.StringAttribute{
 						Computed:    true,
@@ -475,10 +488,10 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"session_secret": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The session secret. This must be a random string of 32 characters from the base64 alphabet (letters, numbers, ` + "`" + `/` + "`" + `, ` + "`" + `_` + "`" + ` and ` + "`" + `+` + "`" + `). It is used as the secret key for encrypting session data as well as state information that is sent to the IdP in the authentication exchange.`,
+						Description: `The session secret. This must be a random string of 32 characters from the base64 alphabet (letters, numbers, ` + "`" + `/` + "`" + `, ` + "`" + `_` + "`" + ` and ` + "`" + `+` + "`" + `). It is used as the secret key for encrypting session data as well as state information that is sent to the IdP in the authentication exchange. Not Null`,
 						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
 							stringvalidator.UTF8LengthBetween(32, 32),
-							stringvalidator.RegexMatches(regexp.MustCompile(`^[0-9a-zA-Z/_+]+$`), "must match pattern "+regexp.MustCompile(`^[0-9a-zA-Z/_+]+$`).String()),
 						},
 					},
 					"session_storage": schema.StringAttribute{
@@ -517,12 +530,17 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -561,12 +579,17 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -574,8 +597,9 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -613,6 +637,12 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -656,7 +686,7 @@ func (r *PluginSamlResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	request, requestDiags := data.ToSharedSamlPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateSamlPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -856,5 +886,26 @@ func (r *PluginSamlResource) Delete(ctx context.Context, req resource.DeleteRequ
 }
 
 func (r *PluginSamlResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

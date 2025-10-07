@@ -6,62 +6,64 @@ type KeyAuthWithoutParentsConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *KeyAuthWithoutParentsConsumer) GetID() *string {
-	if o == nil {
+func (k *KeyAuthWithoutParentsConsumer) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
 type KeyAuthWithoutParents struct {
 	Consumer *KeyAuthWithoutParentsConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
-	Key       string   `json:"key"`
-	Tags      []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID  *string `json:"id,omitempty"`
+	Key *string `json:"key,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 	// key-auth ttl in seconds
 	TTL *int64 `json:"ttl,omitempty"`
 }
 
-func (o *KeyAuthWithoutParents) GetConsumer() *KeyAuthWithoutParentsConsumer {
-	if o == nil {
+func (k *KeyAuthWithoutParents) GetConsumer() *KeyAuthWithoutParentsConsumer {
+	if k == nil {
 		return nil
 	}
-	return o.Consumer
+	return k.Consumer
 }
 
-func (o *KeyAuthWithoutParents) GetCreatedAt() *int64 {
-	if o == nil {
+func (k *KeyAuthWithoutParents) GetCreatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return k.CreatedAt
 }
 
-func (o *KeyAuthWithoutParents) GetID() *string {
-	if o == nil {
+func (k *KeyAuthWithoutParents) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
-func (o *KeyAuthWithoutParents) GetKey() string {
-	if o == nil {
-		return ""
-	}
-	return o.Key
-}
-
-func (o *KeyAuthWithoutParents) GetTags() []string {
-	if o == nil {
+func (k *KeyAuthWithoutParents) GetKey() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Tags
+	return k.Key
 }
 
-func (o *KeyAuthWithoutParents) GetTTL() *int64 {
-	if o == nil {
+func (k *KeyAuthWithoutParents) GetTags() []string {
+	if k == nil {
 		return nil
 	}
-	return o.TTL
+	return k.Tags
+}
+
+func (k *KeyAuthWithoutParents) GetTTL() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.TTL
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateCorrelationidPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	CorrelationIDPlugin shared.CorrelationIDPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateCorrelationidPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateCorrelationidPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "CorrelationIdPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateCorrelationidPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateCorrelationidPluginRequest) GetCorrelationIDPlugin() shared.CorrelationIDPlugin {
+	if c == nil {
+		return shared.CorrelationIDPlugin{}
+	}
+	return c.CorrelationIDPlugin
+}
 
 type CreateCorrelationidPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateCorrelationidPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateCorrelationidPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateCorrelationidPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateCorrelationidPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateCorrelationidPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateCorrelationidPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateCorrelationidPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateCorrelationidPluginResponse) GetCorrelationIDPlugin() *shared.CorrelationIDPlugin {
-	if o == nil {
+func (c *CreateCorrelationidPluginResponse) GetCorrelationIDPlugin() *shared.CorrelationIDPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.CorrelationIDPlugin
+	return c.CorrelationIDPlugin
 }
 
-func (o *CreateCorrelationidPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateCorrelationidPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -11,6 +11,58 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *TargetResourceModel) RefreshFromSharedTarget(ctx context.Context, resp *shared.Target) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Float64PointerValue(resp.CreatedAt)
+		r.Failover = types.BoolPointerValue(resp.Failover)
+		r.ID = types.StringPointerValue(resp.ID)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.Target = types.StringPointerValue(resp.Target)
+		r.UpdatedAt = types.Float64PointerValue(resp.UpdatedAt)
+		if resp.Upstream == nil {
+			r.Upstream = nil
+		} else {
+			r.Upstream = &tfTypes.Set{}
+			r.Upstream.ID = types.StringPointerValue(resp.Upstream.ID)
+		}
+		r.Weight = types.Int64PointerValue(resp.Weight)
+	}
+
+	return diags
+}
+
+func (r *TargetResourceModel) ToOperationsCreateTargetWithUpstreamRequest(ctx context.Context) (*operations.CreateTargetWithUpstreamRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var upstreamID string
+	upstreamID = r.UpstreamID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	targetWithoutParents, targetWithoutParentsDiags := r.ToSharedTargetWithoutParents(ctx)
+	diags.Append(targetWithoutParentsDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateTargetWithUpstreamRequest{
+		UpstreamID:           upstreamID,
+		Workspace:            workspace,
+		TargetWithoutParents: *targetWithoutParents,
+	}
+
+	return &out, diags
+}
+
 func (r *TargetResourceModel) ToSharedTargetWithoutParents(ctx context.Context) (*shared.TargetWithoutParents, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -20,15 +72,24 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents(ctx context.Context) 
 	} else {
 		createdAt = nil
 	}
+	failover := new(bool)
+	if !r.Failover.IsUnknown() && !r.Failover.IsNull() {
+		*failover = r.Failover.ValueBool()
+	} else {
+		failover = nil
+	}
 	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
 		*id = r.ID.ValueString()
 	} else {
 		id = nil
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	target := new(string)
 	if !r.Target.IsUnknown() && !r.Target.IsNull() {
@@ -62,6 +123,7 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents(ctx context.Context) 
 	}
 	out := shared.TargetWithoutParents{
 		CreatedAt: createdAt,
+		Failover:  failover,
 		ID:        id,
 		Tags:      tags,
 		Target:    target,
@@ -71,171 +133,4 @@ func (r *TargetResourceModel) ToSharedTargetWithoutParents(ctx context.Context) 
 	}
 
 	return &out, diags
-}
-
-func (r *TargetResourceModel) ToOperationsCreateTargetWithUpstreamRequest(ctx context.Context) (*operations.CreateTargetWithUpstreamRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var upstreamID string
-	upstreamID = r.UpstreamID.ValueString()
-
-	targetWithoutParents, targetWithoutParentsDiags := r.ToSharedTargetWithoutParents(ctx)
-	diags.Append(targetWithoutParentsDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.CreateTargetWithUpstreamRequest{
-		UpstreamID:           upstreamID,
-		TargetWithoutParents: *targetWithoutParents,
-	}
-
-	return &out, diags
-}
-
-func (r *TargetResourceModel) ToSharedTarget(ctx context.Context) (*shared.Target, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	createdAt := new(float64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueFloat64()
-	} else {
-		createdAt = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	target := new(string)
-	if !r.Target.IsUnknown() && !r.Target.IsNull() {
-		*target = r.Target.ValueString()
-	} else {
-		target = nil
-	}
-	updatedAt := new(float64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueFloat64()
-	} else {
-		updatedAt = nil
-	}
-	var upstream *shared.TargetUpstream
-	if r.Upstream != nil {
-		id1 := new(string)
-		if !r.Upstream.ID.IsUnknown() && !r.Upstream.ID.IsNull() {
-			*id1 = r.Upstream.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		upstream = &shared.TargetUpstream{
-			ID: id1,
-		}
-	}
-	weight := new(int64)
-	if !r.Weight.IsUnknown() && !r.Weight.IsNull() {
-		*weight = r.Weight.ValueInt64()
-	} else {
-		weight = nil
-	}
-	out := shared.Target{
-		CreatedAt: createdAt,
-		ID:        id,
-		Tags:      tags,
-		Target:    target,
-		UpdatedAt: updatedAt,
-		Upstream:  upstream,
-		Weight:    weight,
-	}
-
-	return &out, diags
-}
-
-func (r *TargetResourceModel) ToOperationsUpdateTargetWithUpstreamRequest(ctx context.Context) (*operations.UpdateTargetWithUpstreamRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var upstreamID string
-	upstreamID = r.UpstreamID.ValueString()
-
-	var targetIDOrTarget string
-	targetIDOrTarget = r.ID.ValueString()
-
-	targetPtr, targetDiags := r.ToSharedTarget(ctx)
-	diags.Append(targetDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	target := *targetPtr
-	out := operations.UpdateTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
-		Target:           target,
-	}
-
-	return &out, diags
-}
-
-func (r *TargetResourceModel) ToOperationsGetTargetWithUpstreamRequest(ctx context.Context) (*operations.GetTargetWithUpstreamRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var upstreamID string
-	upstreamID = r.UpstreamID.ValueString()
-
-	var targetIDOrTarget string
-	targetIDOrTarget = r.ID.ValueString()
-
-	out := operations.GetTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
-	}
-
-	return &out, diags
-}
-
-func (r *TargetResourceModel) ToOperationsDeleteTargetWithUpstreamRequest(ctx context.Context) (*operations.DeleteTargetWithUpstreamRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var upstreamID string
-	upstreamID = r.UpstreamID.ValueString()
-
-	var targetIDOrTarget string
-	targetIDOrTarget = r.ID.ValueString()
-
-	out := operations.DeleteTargetWithUpstreamRequest{
-		UpstreamID:       upstreamID,
-		TargetIDOrTarget: targetIDOrTarget,
-	}
-
-	return &out, diags
-}
-
-func (r *TargetResourceModel) RefreshFromSharedTarget(ctx context.Context, resp *shared.Target) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.CreatedAt = types.Float64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.Target = types.StringPointerValue(resp.Target)
-		r.UpdatedAt = types.Float64PointerValue(resp.UpdatedAt)
-		if resp.Upstream == nil {
-			r.Upstream = nil
-		} else {
-			r.Upstream = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Upstream.ID = types.StringPointerValue(resp.Upstream.ID)
-		}
-		r.Weight = types.Int64PointerValue(resp.Weight)
-	}
-
-	return diags
 }

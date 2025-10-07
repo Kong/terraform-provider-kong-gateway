@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateAiresponsetransformerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                    string                             `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                   string                             `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiResponseTransformerPlugin shared.AiResponseTransformerPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateAiresponsetransformerPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateAiresponsetransformerPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateAiresponsetransformerPluginRequest) GetAiResponseTransformerPlugin() shared.AiResponseTransformerPlugin {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiResponseTransformerPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateAiresponsetransformerPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateAiresponsetransformerPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateAiresponsetransformerPluginRequest) GetAiResponseTransformerPlugin() shared.AiResponseTransformerPlugin {
+	if u == nil {
 		return shared.AiResponseTransformerPlugin{}
 	}
-	return o.AiResponseTransformerPlugin
+	return u.AiResponseTransformerPlugin
 }
 
 type UpdateAiresponsetransformerPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateAiresponsetransformerPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateAiresponsetransformerPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateAiresponsetransformerPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateAiresponsetransformerPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateAiresponsetransformerPluginResponse) GetAiResponseTransformerPlugin() *shared.AiResponseTransformerPlugin {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginResponse) GetAiResponseTransformerPlugin() *shared.AiResponseTransformerPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.AiResponseTransformerPlugin
+	return u.AiResponseTransformerPlugin
 }
 
-func (o *UpdateAiresponsetransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateAiresponsetransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

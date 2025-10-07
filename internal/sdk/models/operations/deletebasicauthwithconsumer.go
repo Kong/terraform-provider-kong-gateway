@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteBasicAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the Basic-auth credential to lookup
 	BasicAuthID string `pathParam:"style=simple,explode=false,name=BasicAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteBasicAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteBasicAuthWithConsumerRequest) GetBasicAuthID() string {
-	if o == nil {
+func (d *DeleteBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "BasicAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteBasicAuthWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.BasicAuthID
+	return d.ConsumerID
+}
+
+func (d *DeleteBasicAuthWithConsumerRequest) GetBasicAuthID() string {
+	if d == nil {
+		return ""
+	}
+	return d.BasicAuthID
+}
+
+func (d *DeleteBasicAuthWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteBasicAuthWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteBasicAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteBasicAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteBasicAuthWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteBasicAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteBasicAuthWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteBasicAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteBasicAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

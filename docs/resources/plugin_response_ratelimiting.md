@@ -21,7 +21,14 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
     hide_client_headers      = false
     limit_by                 = "consumer"
     limits = {
-      key = jsonencode("value")
+      key = {
+        day    = 9.24
+        hour   = 3.49
+        minute = 1.33
+        month  = 6.8
+        second = 4.25
+        year   = 9.05
+      }
     }
     policy = "redis"
     redis = {
@@ -75,6 +82,7 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
     "..."
   ]
   updated_at = 9
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -87,18 +95,16 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -110,9 +116,22 @@ Optional:
 - `header_name` (String) The name of the response header used to increment the counters.
 - `hide_client_headers` (Boolean) Optionally hide informative response headers.
 - `limit_by` (String) The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`. must be one of ["consumer", "credential", "ip"]
-- `limits` (Map of String) A map that defines rate limits for the plugin.
+- `limits` (Attributes Map) (see [below for nested schema](#nestedatt--config--limits))
 - `policy` (String) The rate-limiting policies to use for retrieving and incrementing the limits. must be one of ["cluster", "local", "redis"]
 - `redis` (Attributes) Redis configuration (see [below for nested schema](#nestedatt--config--redis))
+
+<a id="nestedatt--config--limits"></a>
+### Nested Schema for `config.limits`
+
+Optional:
+
+- `day` (Number)
+- `hour` (Number)
+- `minute` (Number)
+- `month` (Number)
+- `second` (Number)
+- `year` (Number)
+
 
 <a id="nestedatt--config--redis"></a>
 ### Nested Schema for `config.redis`
@@ -169,8 +188,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -193,6 +212,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting ""
+terraform import kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

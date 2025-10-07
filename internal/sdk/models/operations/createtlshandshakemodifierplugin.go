@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateTlshandshakemodifierPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                  string                            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	TLSHandshakeModifierPlugin shared.TLSHandshakeModifierPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateTlshandshakemodifierPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateTlshandshakemodifierPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "TlsHandshakeModifierPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateTlshandshakemodifierPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateTlshandshakemodifierPluginRequest) GetTLSHandshakeModifierPlugin() shared.TLSHandshakeModifierPlugin {
+	if c == nil {
+		return shared.TLSHandshakeModifierPlugin{}
+	}
+	return c.TLSHandshakeModifierPlugin
+}
 
 type CreateTlshandshakemodifierPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateTlshandshakemodifierPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateTlshandshakemodifierPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateTlshandshakemodifierPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateTlshandshakemodifierPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateTlshandshakemodifierPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateTlshandshakemodifierPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateTlshandshakemodifierPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateTlshandshakemodifierPluginResponse) GetTLSHandshakeModifierPlugin() *shared.TLSHandshakeModifierPlugin {
-	if o == nil {
+func (c *CreateTlshandshakemodifierPluginResponse) GetTLSHandshakeModifierPlugin() *shared.TLSHandshakeModifierPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.TLSHandshakeModifierPlugin
+	return c.TLSHandshakeModifierPlugin
 }
 
-func (o *CreateTlshandshakemodifierPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateTlshandshakemodifierPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateResponsetransformeradvancedPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                         string                                   `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ResponseTransformerAdvancedPlugin shared.ResponseTransformerAdvancedPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateResponsetransformeradvancedPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateResponsetransformeradvancedPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ResponseTransformerAdvancedPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateResponsetransformeradvancedPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateResponsetransformeradvancedPluginRequest) GetResponseTransformerAdvancedPlugin() shared.ResponseTransformerAdvancedPlugin {
+	if c == nil {
+		return shared.ResponseTransformerAdvancedPlugin{}
+	}
+	return c.ResponseTransformerAdvancedPlugin
+}
 
 type CreateResponsetransformeradvancedPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateResponsetransformeradvancedPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateResponsetransformeradvancedPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateResponsetransformeradvancedPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateResponsetransformeradvancedPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateResponsetransformeradvancedPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateResponsetransformeradvancedPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateResponsetransformeradvancedPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateResponsetransformeradvancedPluginResponse) GetResponseTransformerAdvancedPlugin() *shared.ResponseTransformerAdvancedPlugin {
-	if o == nil {
+func (c *CreateResponsetransformeradvancedPluginResponse) GetResponseTransformerAdvancedPlugin() *shared.ResponseTransformerAdvancedPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ResponseTransformerAdvancedPlugin
+	return c.ResponseTransformerAdvancedPlugin
 }
 
-func (o *CreateResponsetransformeradvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateResponsetransformeradvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

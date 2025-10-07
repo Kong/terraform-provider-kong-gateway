@@ -3,11 +3,14 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
@@ -34,6 +37,7 @@ type KeySetResourceModel struct {
 	Name      types.String   `tfsdk:"name"`
 	Tags      []types.String `tfsdk:"tags"`
 	UpdatedAt types.Int64    `tfsdk:"updated_at"`
+	Workspace types.String   `tfsdk:"workspace"`
 }
 
 func (r *KeySetResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -50,22 +54,31 @@ func (r *KeySetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `The name to associate with the given key-set.`,
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
+				Description: `A set of strings representing tags.`,
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -109,7 +122,7 @@ func (r *KeySetResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	request, requestDiags := data.ToSharedKeySet(ctx)
+	request, requestDiags := data.ToOperationsCreateKeySetRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -309,5 +322,26 @@ func (r *KeySetResource) Delete(ctx context.Context, req resource.DeleteRequest,
 }
 
 func (r *KeySetResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "6cc34248-50b4-4a81-9201-3bdf7a83f712", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"6cc34248-50b4-4a81-9201-3bdf7a83f712"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

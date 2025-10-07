@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RequestTerminationPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestTerminationPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestTerminationPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestTerminationPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestTerminationPluginOrdering struct {
-	After  *RequestTerminationPluginAfter  `json:"after,omitempty"`
-	Before *RequestTerminationPluginBefore `json:"before,omitempty"`
-}
-
-func (o *RequestTerminationPluginOrdering) GetAfter() *RequestTerminationPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *RequestTerminationPluginOrdering) GetBefore() *RequestTerminationPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type RequestTerminationPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *RequestTerminationPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *RequestTerminationPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *RequestTerminationPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type RequestTerminationPluginConfig struct {
 	// The raw response body to send. This is mutually exclusive with the `config.message` field.
 	Body *string `json:"body,omitempty"`
@@ -91,46 +23,46 @@ type RequestTerminationPluginConfig struct {
 	Trigger *string `json:"trigger,omitempty"`
 }
 
-func (o *RequestTerminationPluginConfig) GetBody() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetBody() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Body
+	return r.Body
 }
 
-func (o *RequestTerminationPluginConfig) GetContentType() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetContentType() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ContentType
+	return r.ContentType
 }
 
-func (o *RequestTerminationPluginConfig) GetEcho() *bool {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetEcho() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Echo
+	return r.Echo
 }
 
-func (o *RequestTerminationPluginConfig) GetMessage() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetMessage() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Message
+	return r.Message
 }
 
-func (o *RequestTerminationPluginConfig) GetStatusCode() *int64 {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetStatusCode() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.StatusCode
+	return r.StatusCode
 }
 
-func (o *RequestTerminationPluginConfig) GetTrigger() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConfig) GetTrigger() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Trigger
+	return r.Trigger
 }
 
 // RequestTerminationPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -138,11 +70,11 @@ type RequestTerminationPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTerminationPluginConsumer) GetID() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConsumer) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestTerminationPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -150,11 +82,81 @@ type RequestTerminationPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTerminationPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (r *RequestTerminationPluginConsumerGroup) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
+}
+
+type RequestTerminationPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTerminationPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTerminationPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTerminationPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTerminationPluginOrdering struct {
+	After  *RequestTerminationPluginAfter  `json:"after,omitempty"`
+	Before *RequestTerminationPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestTerminationPluginOrdering) GetAfter() *RequestTerminationPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestTerminationPluginOrdering) GetBefore() *RequestTerminationPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestTerminationPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestTerminationPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestTerminationPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestTerminationPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
 }
 
 type RequestTerminationPluginProtocols string
@@ -194,11 +196,11 @@ type RequestTerminationPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTerminationPluginRoute) GetID() *string {
-	if o == nil {
+func (r *RequestTerminationPluginRoute) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestTerminationPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -206,39 +208,41 @@ type RequestTerminationPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTerminationPluginService) GetID() *string {
-	if o == nil {
+func (r *RequestTerminationPluginService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
-// RequestTerminationPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestTerminationPlugin struct {
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                              `json:"enabled,omitempty"`
-	ID           *string                            `json:"id,omitempty"`
-	InstanceName *string                            `json:"instance_name,omitempty"`
-	name         string                             `const:"request-termination" json:"name"`
-	Ordering     *RequestTerminationPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []RequestTerminationPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                          `json:"updated_at,omitempty"`
-	Config    *RequestTerminationPluginConfig `json:"config,omitempty"`
+	Config *RequestTerminationPluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *RequestTerminationPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *RequestTerminationPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                           `json:"instance_name,omitempty"`
+	name         string                            `const:"request-termination" json:"name"`
+	Ordering     *RequestTerminationPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []RequestTerminationPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RequestTerminationPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestTerminationPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestTerminationPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestTerminationPlugin) MarshalJSON() ([]byte, error) {
@@ -246,110 +250,110 @@ func (r RequestTerminationPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RequestTerminationPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *RequestTerminationPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetConfig() *RequestTerminationPluginConfig {
+	if r == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return r.Config
 }
 
-func (o *RequestTerminationPlugin) GetEnabled() *bool {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetConsumer() *RequestTerminationPluginConsumer {
+	if r == nil {
 		return nil
 	}
-	return o.Enabled
+	return r.Consumer
 }
 
-func (o *RequestTerminationPlugin) GetID() *string {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetConsumerGroup() *RequestTerminationPluginConsumerGroup {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ConsumerGroup
 }
 
-func (o *RequestTerminationPlugin) GetInstanceName() *string {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.InstanceName
+	return r.CreatedAt
 }
 
-func (o *RequestTerminationPlugin) GetName() string {
+func (r *RequestTerminationPlugin) GetEnabled() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.Enabled
+}
+
+func (r *RequestTerminationPlugin) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestTerminationPlugin) GetInstanceName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.InstanceName
+}
+
+func (r *RequestTerminationPlugin) GetName() string {
 	return "request-termination"
 }
 
-func (o *RequestTerminationPlugin) GetOrdering() *RequestTerminationPluginOrdering {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetOrdering() *RequestTerminationPluginOrdering {
+	if r == nil {
 		return nil
 	}
-	return o.Ordering
+	return r.Ordering
 }
 
-func (o *RequestTerminationPlugin) GetPartials() []RequestTerminationPluginPartials {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetPartials() []RequestTerminationPluginPartials {
+	if r == nil {
 		return nil
 	}
-	return o.Partials
+	return r.Partials
 }
 
-func (o *RequestTerminationPlugin) GetTags() []string {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetProtocols() []RequestTerminationPluginProtocols {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.Protocols
 }
 
-func (o *RequestTerminationPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetRoute() *RequestTerminationPluginRoute {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.Route
 }
 
-func (o *RequestTerminationPlugin) GetConfig() *RequestTerminationPluginConfig {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetService() *RequestTerminationPluginService {
+	if r == nil {
 		return nil
 	}
-	return o.Config
+	return r.Service
 }
 
-func (o *RequestTerminationPlugin) GetConsumer() *RequestTerminationPluginConsumer {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetTags() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Consumer
+	return r.Tags
 }
 
-func (o *RequestTerminationPlugin) GetConsumerGroup() *RequestTerminationPluginConsumerGroup {
-	if o == nil {
+func (r *RequestTerminationPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ConsumerGroup
-}
-
-func (o *RequestTerminationPlugin) GetProtocols() []RequestTerminationPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *RequestTerminationPlugin) GetRoute() *RequestTerminationPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *RequestTerminationPlugin) GetService() *RequestTerminationPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return r.UpdatedAt
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAiazurecontentsafetyPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                  string                            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiAzureContentSafetyPlugin shared.AiAzureContentSafetyPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAiazurecontentsafetyPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAiazurecontentsafetyPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiAzureContentSafetyPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAiazurecontentsafetyPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAiazurecontentsafetyPluginRequest) GetAiAzureContentSafetyPlugin() shared.AiAzureContentSafetyPlugin {
+	if c == nil {
+		return shared.AiAzureContentSafetyPlugin{}
+	}
+	return c.AiAzureContentSafetyPlugin
+}
 
 type CreateAiazurecontentsafetyPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAiazurecontentsafetyPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAiazurecontentsafetyPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAiazurecontentsafetyPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAiazurecontentsafetyPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAiazurecontentsafetyPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAiazurecontentsafetyPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAiazurecontentsafetyPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAiazurecontentsafetyPluginResponse) GetAiAzureContentSafetyPlugin() *shared.AiAzureContentSafetyPlugin {
-	if o == nil {
+func (c *CreateAiazurecontentsafetyPluginResponse) GetAiAzureContentSafetyPlugin() *shared.AiAzureContentSafetyPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiAzureContentSafetyPlugin
+	return c.AiAzureContentSafetyPlugin
 }
 
-func (o *CreateAiazurecontentsafetyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAiazurecontentsafetyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

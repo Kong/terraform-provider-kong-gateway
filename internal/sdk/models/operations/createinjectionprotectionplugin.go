@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateInjectionprotectionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	InjectionProtectionPlugin shared.InjectionProtectionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateInjectionprotectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateInjectionprotectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "InjectionProtectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateInjectionprotectionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateInjectionprotectionPluginRequest) GetInjectionProtectionPlugin() shared.InjectionProtectionPlugin {
+	if c == nil {
+		return shared.InjectionProtectionPlugin{}
+	}
+	return c.InjectionProtectionPlugin
+}
 
 type CreateInjectionprotectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateInjectionprotectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateInjectionprotectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateInjectionprotectionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateInjectionprotectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateInjectionprotectionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateInjectionprotectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateInjectionprotectionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateInjectionprotectionPluginResponse) GetInjectionProtectionPlugin() *shared.InjectionProtectionPlugin {
-	if o == nil {
+func (c *CreateInjectionprotectionPluginResponse) GetInjectionProtectionPlugin() *shared.InjectionProtectionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.InjectionProtectionPlugin
+	return c.InjectionProtectionPlugin
 }
 
-func (o *CreateInjectionprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateInjectionprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

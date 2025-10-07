@@ -11,99 +11,206 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginJqResourceModel) RefreshFromSharedJqPlugin(ctx context.Context, resp *shared.JqPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.JqPluginConfig{}
+			r.Config.RequestIfMediaType = make([]types.String, 0, len(resp.Config.RequestIfMediaType))
+			for _, v := range resp.Config.RequestIfMediaType {
+				r.Config.RequestIfMediaType = append(r.Config.RequestIfMediaType, types.StringValue(v))
+			}
+			r.Config.RequestJqProgram = types.StringPointerValue(resp.Config.RequestJqProgram)
+			if resp.Config.RequestJqProgramOptions == nil {
+				r.Config.RequestJqProgramOptions = nil
+			} else {
+				r.Config.RequestJqProgramOptions = &tfTypes.RequestJqProgramOptions{}
+				r.Config.RequestJqProgramOptions.ASCIIOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.ASCIIOutput)
+				r.Config.RequestJqProgramOptions.CompactOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.CompactOutput)
+				r.Config.RequestJqProgramOptions.JoinOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.JoinOutput)
+				r.Config.RequestJqProgramOptions.RawOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.RawOutput)
+				r.Config.RequestJqProgramOptions.SortKeys = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.SortKeys)
+			}
+			r.Config.ResponseIfMediaType = make([]types.String, 0, len(resp.Config.ResponseIfMediaType))
+			for _, v := range resp.Config.ResponseIfMediaType {
+				r.Config.ResponseIfMediaType = append(r.Config.ResponseIfMediaType, types.StringValue(v))
+			}
+			r.Config.ResponseIfStatusCode = make([]types.Int64, 0, len(resp.Config.ResponseIfStatusCode))
+			for _, v := range resp.Config.ResponseIfStatusCode {
+				r.Config.ResponseIfStatusCode = append(r.Config.ResponseIfStatusCode, types.Int64Value(v))
+			}
+			r.Config.ResponseJqProgram = types.StringPointerValue(resp.Config.ResponseJqProgram)
+			if resp.Config.ResponseJqProgramOptions == nil {
+				r.Config.ResponseJqProgramOptions = nil
+			} else {
+				r.Config.ResponseJqProgramOptions = &tfTypes.RequestJqProgramOptions{}
+				r.Config.ResponseJqProgramOptions.ASCIIOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.ASCIIOutput)
+				r.Config.ResponseJqProgramOptions.CompactOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.CompactOutput)
+				r.Config.ResponseJqProgramOptions.JoinOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.JoinOutput)
+				r.Config.ResponseJqProgramOptions.RawOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.RawOutput)
+				r.Config.ResponseJqProgramOptions.SortKeys = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.SortKeys)
+			}
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginJqResourceModel) ToOperationsCreateJqPluginRequest(ctx context.Context) (*operations.CreateJqPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jqPlugin, jqPluginDiags := r.ToSharedJqPlugin(ctx)
+	diags.Append(jqPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateJqPluginRequest{
+		Workspace: workspace,
+		JqPlugin:  *jqPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJqResourceModel) ToOperationsDeleteJqPluginRequest(ctx context.Context) (*operations.DeleteJqPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteJqPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJqResourceModel) ToOperationsGetJqPluginRequest(ctx context.Context) (*operations.GetJqPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetJqPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJqResourceModel) ToOperationsUpdateJqPluginRequest(ctx context.Context) (*operations.UpdateJqPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jqPlugin, jqPluginDiags := r.ToSharedJqPlugin(ctx)
+	diags.Append(jqPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateJqPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+		JqPlugin:  *jqPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginJqResourceModel) ToSharedJqPlugin(ctx context.Context) (*shared.JqPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.JqPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.JqPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.JqPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.JqPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.JqPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.JqPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.JqPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.JqPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.JqPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.JqPluginConfig
 	if r.Config != nil {
 		requestIfMediaType := make([]string, 0, len(r.Config.RequestIfMediaType))
@@ -222,14 +329,94 @@ func (r *PluginJqResourceModel) ToSharedJqPlugin(ctx context.Context) (*shared.J
 	}
 	var consumer *shared.JqPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.JqPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.JqPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.JqPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.JqPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.JqPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.JqPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.JqPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.JqPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.JqPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.JqPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.JqPluginProtocols, 0, len(r.Protocols))
@@ -260,189 +447,34 @@ func (r *PluginJqResourceModel) ToSharedJqPlugin(ctx context.Context) (*shared.J
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.JqPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginJqResourceModel) ToOperationsUpdateJqPluginRequest(ctx context.Context) (*operations.UpdateJqPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	jqPlugin, jqPluginDiags := r.ToSharedJqPlugin(ctx)
-	diags.Append(jqPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateJqPluginRequest{
-		PluginID: pluginID,
-		JqPlugin: *jqPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJqResourceModel) ToOperationsGetJqPluginRequest(ctx context.Context) (*operations.GetJqPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetJqPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJqResourceModel) ToOperationsDeleteJqPluginRequest(ctx context.Context) (*operations.DeleteJqPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteJqPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJqResourceModel) RefreshFromSharedJqPlugin(ctx context.Context, resp *shared.JqPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.JqPluginConfig{}
-			r.Config.RequestIfMediaType = make([]types.String, 0, len(resp.Config.RequestIfMediaType))
-			for _, v := range resp.Config.RequestIfMediaType {
-				r.Config.RequestIfMediaType = append(r.Config.RequestIfMediaType, types.StringValue(v))
-			}
-			r.Config.RequestJqProgram = types.StringPointerValue(resp.Config.RequestJqProgram)
-			if resp.Config.RequestJqProgramOptions == nil {
-				r.Config.RequestJqProgramOptions = nil
-			} else {
-				r.Config.RequestJqProgramOptions = &tfTypes.RequestJqProgramOptions{}
-				r.Config.RequestJqProgramOptions.ASCIIOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.ASCIIOutput)
-				r.Config.RequestJqProgramOptions.CompactOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.CompactOutput)
-				r.Config.RequestJqProgramOptions.JoinOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.JoinOutput)
-				r.Config.RequestJqProgramOptions.RawOutput = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.RawOutput)
-				r.Config.RequestJqProgramOptions.SortKeys = types.BoolPointerValue(resp.Config.RequestJqProgramOptions.SortKeys)
-			}
-			r.Config.ResponseIfMediaType = make([]types.String, 0, len(resp.Config.ResponseIfMediaType))
-			for _, v := range resp.Config.ResponseIfMediaType {
-				r.Config.ResponseIfMediaType = append(r.Config.ResponseIfMediaType, types.StringValue(v))
-			}
-			r.Config.ResponseIfStatusCode = make([]types.Int64, 0, len(resp.Config.ResponseIfStatusCode))
-			for _, v := range resp.Config.ResponseIfStatusCode {
-				r.Config.ResponseIfStatusCode = append(r.Config.ResponseIfStatusCode, types.Int64Value(v))
-			}
-			r.Config.ResponseJqProgram = types.StringPointerValue(resp.Config.ResponseJqProgram)
-			if resp.Config.ResponseJqProgramOptions == nil {
-				r.Config.ResponseJqProgramOptions = nil
-			} else {
-				r.Config.ResponseJqProgramOptions = &tfTypes.RequestJqProgramOptions{}
-				r.Config.ResponseJqProgramOptions.ASCIIOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.ASCIIOutput)
-				r.Config.ResponseJqProgramOptions.CompactOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.CompactOutput)
-				r.Config.ResponseJqProgramOptions.JoinOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.JoinOutput)
-				r.Config.ResponseJqProgramOptions.RawOutput = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.RawOutput)
-				r.Config.ResponseJqProgramOptions.SortKeys = types.BoolPointerValue(resp.Config.ResponseJqProgramOptions.SortKeys)
-			}
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

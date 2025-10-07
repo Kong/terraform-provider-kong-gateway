@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateDatadogPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	DatadogPlugin shared.DatadogPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateDatadogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateDatadogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "DatadogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateDatadogPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateDatadogPluginRequest) GetDatadogPlugin() shared.DatadogPlugin {
+	if c == nil {
+		return shared.DatadogPlugin{}
+	}
+	return c.DatadogPlugin
+}
 
 type CreateDatadogPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateDatadogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateDatadogPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateDatadogPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateDatadogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateDatadogPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateDatadogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateDatadogPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateDatadogPluginResponse) GetDatadogPlugin() *shared.DatadogPlugin {
-	if o == nil {
+func (c *CreateDatadogPluginResponse) GetDatadogPlugin() *shared.DatadogPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.DatadogPlugin
+	return c.DatadogPlugin
 }
 
-func (o *CreateDatadogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateDatadogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

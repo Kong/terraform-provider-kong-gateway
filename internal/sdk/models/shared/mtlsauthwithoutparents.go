@@ -6,72 +6,74 @@ type MTLSAuthWithoutParentsCaCertificate struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MTLSAuthWithoutParentsCaCertificate) GetID() *string {
-	if o == nil {
+func (m *MTLSAuthWithoutParentsCaCertificate) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 type MTLSAuthWithoutParentsConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MTLSAuthWithoutParentsConsumer) GetID() *string {
-	if o == nil {
+func (m *MTLSAuthWithoutParentsConsumer) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 type MTLSAuthWithoutParents struct {
 	CaCertificate *MTLSAuthWithoutParentsCaCertificate `json:"ca_certificate,omitempty"`
 	Consumer      *MTLSAuthWithoutParentsConsumer      `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt   *int64   `json:"created_at,omitempty"`
-	ID          *string  `json:"id,omitempty"`
-	SubjectName string   `json:"subject_name"`
-	Tags        []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID          *string `json:"id,omitempty"`
+	SubjectName string  `json:"subject_name"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 }
 
-func (o *MTLSAuthWithoutParents) GetCaCertificate() *MTLSAuthWithoutParentsCaCertificate {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetCaCertificate() *MTLSAuthWithoutParentsCaCertificate {
+	if m == nil {
 		return nil
 	}
-	return o.CaCertificate
+	return m.CaCertificate
 }
 
-func (o *MTLSAuthWithoutParents) GetConsumer() *MTLSAuthWithoutParentsConsumer {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetConsumer() *MTLSAuthWithoutParentsConsumer {
+	if m == nil {
 		return nil
 	}
-	return o.Consumer
+	return m.Consumer
 }
 
-func (o *MTLSAuthWithoutParents) GetCreatedAt() *int64 {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetCreatedAt() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return m.CreatedAt
 }
 
-func (o *MTLSAuthWithoutParents) GetID() *string {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
-func (o *MTLSAuthWithoutParents) GetSubjectName() string {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetSubjectName() string {
+	if m == nil {
 		return ""
 	}
-	return o.SubjectName
+	return m.SubjectName
 }
 
-func (o *MTLSAuthWithoutParents) GetTags() []string {
-	if o == nil {
+func (m *MTLSAuthWithoutParents) GetTags() []string {
+	if m == nil {
 		return nil
 	}
-	return o.Tags
+	return m.Tags
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateHttplogPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	HTTPLogPlugin shared.HTTPLogPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateHttplogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateHttplogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "HttpLogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateHttplogPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateHttplogPluginRequest) GetHTTPLogPlugin() shared.HTTPLogPlugin {
+	if c == nil {
+		return shared.HTTPLogPlugin{}
+	}
+	return c.HTTPLogPlugin
+}
 
 type CreateHttplogPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateHttplogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateHttplogPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateHttplogPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateHttplogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateHttplogPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateHttplogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateHttplogPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateHttplogPluginResponse) GetHTTPLogPlugin() *shared.HTTPLogPlugin {
-	if o == nil {
+func (c *CreateHttplogPluginResponse) GetHTTPLogPlugin() *shared.HTTPLogPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPLogPlugin
+	return c.HTTPLogPlugin
 }
 
-func (o *CreateHttplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateHttplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

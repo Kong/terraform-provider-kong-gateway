@@ -8,26 +8,65 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type JweDecryptPluginConfig struct {
+	// The name of the header that is used to set the decrypted value.
+	ForwardHeaderName *string `json:"forward_header_name,omitempty"`
+	// Denote the name or names of all Key Sets that should be inspected when trying to find a suitable key to decrypt the JWE token.
+	KeySets []string `json:"key_sets"`
+	// The name of the header to look for the JWE token.
+	LookupHeaderName *string `json:"lookup_header_name,omitempty"`
+	// Defines how the plugin behaves in cases where no token was found in the request. When using `strict` mode, the request requires a token to be present and subsequently raise an error if none could be found.
+	Strict *bool `json:"strict,omitempty"`
+}
+
+func (j *JweDecryptPluginConfig) GetForwardHeaderName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ForwardHeaderName
+}
+
+func (j *JweDecryptPluginConfig) GetKeySets() []string {
+	if j == nil {
+		return []string{}
+	}
+	return j.KeySets
+}
+
+func (j *JweDecryptPluginConfig) GetLookupHeaderName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.LookupHeaderName
+}
+
+func (j *JweDecryptPluginConfig) GetStrict() *bool {
+	if j == nil {
+		return nil
+	}
+	return j.Strict
+}
+
 type JweDecryptPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *JweDecryptPluginAfter) GetAccess() []string {
-	if o == nil {
+func (j *JweDecryptPluginAfter) GetAccess() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Access
+	return j.Access
 }
 
 type JweDecryptPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *JweDecryptPluginBefore) GetAccess() []string {
-	if o == nil {
+func (j *JweDecryptPluginBefore) GetAccess() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Access
+	return j.Access
 }
 
 type JweDecryptPluginOrdering struct {
@@ -35,84 +74,47 @@ type JweDecryptPluginOrdering struct {
 	Before *JweDecryptPluginBefore `json:"before,omitempty"`
 }
 
-func (o *JweDecryptPluginOrdering) GetAfter() *JweDecryptPluginAfter {
-	if o == nil {
+func (j *JweDecryptPluginOrdering) GetAfter() *JweDecryptPluginAfter {
+	if j == nil {
 		return nil
 	}
-	return o.After
+	return j.After
 }
 
-func (o *JweDecryptPluginOrdering) GetBefore() *JweDecryptPluginBefore {
-	if o == nil {
+func (j *JweDecryptPluginOrdering) GetBefore() *JweDecryptPluginBefore {
+	if j == nil {
 		return nil
 	}
-	return o.Before
+	return j.Before
 }
 
 type JweDecryptPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *JweDecryptPluginPartials) GetID() *string {
-	if o == nil {
+func (j *JweDecryptPluginPartials) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
-func (o *JweDecryptPluginPartials) GetName() *string {
-	if o == nil {
+func (j *JweDecryptPluginPartials) GetName() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Name
+	return j.Name
 }
 
-func (o *JweDecryptPluginPartials) GetPath() *string {
-	if o == nil {
+func (j *JweDecryptPluginPartials) GetPath() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Path
-}
-
-type JweDecryptPluginConfig struct {
-	// The name of the header that is used to set the decrypted value.
-	ForwardHeaderName *string `json:"forward_header_name,omitempty"`
-	// Denote the name or names of all Key Sets that should be inspected when trying to find a suitable key to decrypt the JWE token.
-	KeySets []string `json:"key_sets,omitempty"`
-	// The name of the header to look for the JWE token.
-	LookupHeaderName *string `json:"lookup_header_name,omitempty"`
-	// Defines how the plugin behaves in cases where no token was found in the request. When using `strict` mode, the request requires a token to be present and subsequently raise an error if none could be found.
-	Strict *bool `json:"strict,omitempty"`
-}
-
-func (o *JweDecryptPluginConfig) GetForwardHeaderName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ForwardHeaderName
-}
-
-func (o *JweDecryptPluginConfig) GetKeySets() []string {
-	if o == nil {
-		return nil
-	}
-	return o.KeySets
-}
-
-func (o *JweDecryptPluginConfig) GetLookupHeaderName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.LookupHeaderName
-}
-
-func (o *JweDecryptPluginConfig) GetStrict() *bool {
-	if o == nil {
-		return nil
-	}
-	return o.Strict
+	return j.Path
 }
 
 type JweDecryptPluginProtocols string
@@ -152,11 +154,11 @@ type JweDecryptPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JweDecryptPluginRoute) GetID() *string {
-	if o == nil {
+func (j *JweDecryptPluginRoute) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
 // JweDecryptPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -164,35 +166,37 @@ type JweDecryptPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JweDecryptPluginService) GetID() *string {
-	if o == nil {
+func (j *JweDecryptPluginService) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
-// JweDecryptPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JweDecryptPlugin struct {
+	Config *JweDecryptPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                      `json:"enabled,omitempty"`
-	ID           *string                    `json:"id,omitempty"`
-	InstanceName *string                    `json:"instance_name,omitempty"`
-	name         string                     `const:"jwe-decrypt" json:"name"`
-	Ordering     *JweDecryptPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []JweDecryptPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                  `json:"updated_at,omitempty"`
-	Config    *JweDecryptPluginConfig `json:"config,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                   `json:"instance_name,omitempty"`
+	name         string                    `const:"jwe-decrypt" json:"name"`
+	Ordering     *JweDecryptPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []JweDecryptPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []JweDecryptPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *JweDecryptPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *JweDecryptPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (j JweDecryptPlugin) MarshalJSON() ([]byte, error) {
@@ -200,96 +204,96 @@ func (j JweDecryptPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (j *JweDecryptPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &j, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *JweDecryptPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (j *JweDecryptPlugin) GetConfig() *JweDecryptPluginConfig {
+	if j == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return j.Config
 }
 
-func (o *JweDecryptPlugin) GetEnabled() *bool {
-	if o == nil {
+func (j *JweDecryptPlugin) GetCreatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Enabled
+	return j.CreatedAt
 }
 
-func (o *JweDecryptPlugin) GetID() *string {
-	if o == nil {
+func (j *JweDecryptPlugin) GetEnabled() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.Enabled
 }
 
-func (o *JweDecryptPlugin) GetInstanceName() *string {
-	if o == nil {
+func (j *JweDecryptPlugin) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.InstanceName
+	return j.ID
 }
 
-func (o *JweDecryptPlugin) GetName() string {
+func (j *JweDecryptPlugin) GetInstanceName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.InstanceName
+}
+
+func (j *JweDecryptPlugin) GetName() string {
 	return "jwe-decrypt"
 }
 
-func (o *JweDecryptPlugin) GetOrdering() *JweDecryptPluginOrdering {
-	if o == nil {
+func (j *JweDecryptPlugin) GetOrdering() *JweDecryptPluginOrdering {
+	if j == nil {
 		return nil
 	}
-	return o.Ordering
+	return j.Ordering
 }
 
-func (o *JweDecryptPlugin) GetPartials() []JweDecryptPluginPartials {
-	if o == nil {
+func (j *JweDecryptPlugin) GetPartials() []JweDecryptPluginPartials {
+	if j == nil {
 		return nil
 	}
-	return o.Partials
+	return j.Partials
 }
 
-func (o *JweDecryptPlugin) GetTags() []string {
-	if o == nil {
+func (j *JweDecryptPlugin) GetProtocols() []JweDecryptPluginProtocols {
+	if j == nil {
 		return nil
 	}
-	return o.Tags
+	return j.Protocols
 }
 
-func (o *JweDecryptPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (j *JweDecryptPlugin) GetRoute() *JweDecryptPluginRoute {
+	if j == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return j.Route
 }
 
-func (o *JweDecryptPlugin) GetConfig() *JweDecryptPluginConfig {
-	if o == nil {
+func (j *JweDecryptPlugin) GetService() *JweDecryptPluginService {
+	if j == nil {
 		return nil
 	}
-	return o.Config
+	return j.Service
 }
 
-func (o *JweDecryptPlugin) GetProtocols() []JweDecryptPluginProtocols {
-	if o == nil {
+func (j *JweDecryptPlugin) GetTags() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Protocols
+	return j.Tags
 }
 
-func (o *JweDecryptPlugin) GetRoute() *JweDecryptPluginRoute {
-	if o == nil {
+func (j *JweDecryptPlugin) GetUpdatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Route
-}
-
-func (o *JweDecryptPlugin) GetService() *JweDecryptPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return j.UpdatedAt
 }

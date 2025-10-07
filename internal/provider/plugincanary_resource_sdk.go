@@ -11,99 +11,185 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginCanaryResourceModel) RefreshFromSharedCanaryPlugin(ctx context.Context, resp *shared.CanaryPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.CanaryPluginConfig{}
+			r.Config.CanaryByHeaderName = types.StringPointerValue(resp.Config.CanaryByHeaderName)
+			r.Config.Duration = types.Float64PointerValue(resp.Config.Duration)
+			r.Config.Groups = make([]types.String, 0, len(resp.Config.Groups))
+			for _, v := range resp.Config.Groups {
+				r.Config.Groups = append(r.Config.Groups, types.StringValue(v))
+			}
+			if resp.Config.Hash != nil {
+				r.Config.Hash = types.StringValue(string(*resp.Config.Hash))
+			} else {
+				r.Config.Hash = types.StringNull()
+			}
+			r.Config.HashHeader = types.StringPointerValue(resp.Config.HashHeader)
+			r.Config.Percentage = types.Float64PointerValue(resp.Config.Percentage)
+			r.Config.Start = types.Float64PointerValue(resp.Config.Start)
+			r.Config.Steps = types.Float64PointerValue(resp.Config.Steps)
+			r.Config.UpstreamFallback = types.BoolPointerValue(resp.Config.UpstreamFallback)
+			r.Config.UpstreamHost = types.StringPointerValue(resp.Config.UpstreamHost)
+			r.Config.UpstreamPort = types.Int64PointerValue(resp.Config.UpstreamPort)
+			r.Config.UpstreamURI = types.StringPointerValue(resp.Config.UpstreamURI)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginCanaryResourceModel) ToOperationsCreateCanaryPluginRequest(ctx context.Context) (*operations.CreateCanaryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	canaryPlugin, canaryPluginDiags := r.ToSharedCanaryPlugin(ctx)
+	diags.Append(canaryPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateCanaryPluginRequest{
+		Workspace:    workspace,
+		CanaryPlugin: *canaryPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCanaryResourceModel) ToOperationsDeleteCanaryPluginRequest(ctx context.Context) (*operations.DeleteCanaryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteCanaryPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCanaryResourceModel) ToOperationsGetCanaryPluginRequest(ctx context.Context) (*operations.GetCanaryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetCanaryPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginCanaryResourceModel) ToOperationsUpdateCanaryPluginRequest(ctx context.Context) (*operations.UpdateCanaryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	canaryPlugin, canaryPluginDiags := r.ToSharedCanaryPlugin(ctx)
+	diags.Append(canaryPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateCanaryPluginRequest{
+		PluginID:     pluginID,
+		Workspace:    workspace,
+		CanaryPlugin: *canaryPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginCanaryResourceModel) ToSharedCanaryPlugin(ctx context.Context) (*shared.CanaryPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.CanaryPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.CanaryPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.CanaryPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.CanaryPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.CanaryPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.CanaryPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.CanaryPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.CanaryPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.CanaryPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.CanaryPluginConfig
 	if r.Config != nil {
 		canaryByHeaderName := new(string)
@@ -191,6 +277,86 @@ func (r *PluginCanaryResourceModel) ToSharedCanaryPlugin(ctx context.Context) (*
 			UpstreamURI:        upstreamURI,
 		}
 	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.CanaryPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.CanaryPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.CanaryPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.CanaryPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.CanaryPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.CanaryPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.CanaryPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.CanaryPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.CanaryPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
 	protocols := make([]shared.CanaryPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.CanaryPluginProtocols(protocolsItem.ValueString()))
@@ -219,167 +385,33 @@ func (r *PluginCanaryResourceModel) ToSharedCanaryPlugin(ctx context.Context) (*
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.CanaryPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginCanaryResourceModel) ToOperationsUpdateCanaryPluginRequest(ctx context.Context) (*operations.UpdateCanaryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	canaryPlugin, canaryPluginDiags := r.ToSharedCanaryPlugin(ctx)
-	diags.Append(canaryPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateCanaryPluginRequest{
-		PluginID:     pluginID,
-		CanaryPlugin: *canaryPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginCanaryResourceModel) ToOperationsGetCanaryPluginRequest(ctx context.Context) (*operations.GetCanaryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetCanaryPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginCanaryResourceModel) ToOperationsDeleteCanaryPluginRequest(ctx context.Context) (*operations.DeleteCanaryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteCanaryPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginCanaryResourceModel) RefreshFromSharedCanaryPlugin(ctx context.Context, resp *shared.CanaryPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.CanaryPluginConfig{}
-			r.Config.CanaryByHeaderName = types.StringPointerValue(resp.Config.CanaryByHeaderName)
-			r.Config.Duration = types.Float64PointerValue(resp.Config.Duration)
-			r.Config.Groups = make([]types.String, 0, len(resp.Config.Groups))
-			for _, v := range resp.Config.Groups {
-				r.Config.Groups = append(r.Config.Groups, types.StringValue(v))
-			}
-			if resp.Config.Hash != nil {
-				r.Config.Hash = types.StringValue(string(*resp.Config.Hash))
-			} else {
-				r.Config.Hash = types.StringNull()
-			}
-			r.Config.HashHeader = types.StringPointerValue(resp.Config.HashHeader)
-			r.Config.Percentage = types.Float64PointerValue(resp.Config.Percentage)
-			r.Config.Start = types.Float64PointerValue(resp.Config.Start)
-			r.Config.Steps = types.Float64PointerValue(resp.Config.Steps)
-			r.Config.UpstreamFallback = types.BoolPointerValue(resp.Config.UpstreamFallback)
-			r.Config.UpstreamHost = types.StringPointerValue(resp.Config.UpstreamHost)
-			r.Config.UpstreamPort = types.Int64PointerValue(resp.Config.UpstreamPort)
-			r.Config.UpstreamURI = types.StringPointerValue(resp.Config.UpstreamURI)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

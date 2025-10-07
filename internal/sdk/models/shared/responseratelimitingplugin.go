@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type ResponseRatelimitingPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ResponseRatelimitingPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ResponseRatelimitingPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ResponseRatelimitingPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ResponseRatelimitingPluginOrdering struct {
-	After  *ResponseRatelimitingPluginAfter  `json:"after,omitempty"`
-	Before *ResponseRatelimitingPluginBefore `json:"before,omitempty"`
-}
-
-func (o *ResponseRatelimitingPluginOrdering) GetAfter() *ResponseRatelimitingPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *ResponseRatelimitingPluginOrdering) GetBefore() *ResponseRatelimitingPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type ResponseRatelimitingPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *ResponseRatelimitingPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *ResponseRatelimitingPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *ResponseRatelimitingPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // ResponseRatelimitingPluginLimitBy - The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`.
 type ResponseRatelimitingPluginLimitBy string
 
@@ -104,6 +36,57 @@ func (e *ResponseRatelimitingPluginLimitBy) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("invalid value for ResponseRatelimitingPluginLimitBy: %v", v)
 	}
+}
+
+type Limits struct {
+	Day    *float64 `json:"day,omitempty"`
+	Hour   *float64 `json:"hour,omitempty"`
+	Minute *float64 `json:"minute,omitempty"`
+	Month  *float64 `json:"month,omitempty"`
+	Second *float64 `json:"second,omitempty"`
+	Year   *float64 `json:"year,omitempty"`
+}
+
+func (l *Limits) GetDay() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Day
+}
+
+func (l *Limits) GetHour() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Hour
+}
+
+func (l *Limits) GetMinute() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Minute
+}
+
+func (l *Limits) GetMonth() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Month
+}
+
+func (l *Limits) GetSecond() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Second
+}
+
+func (l *Limits) GetYear() *float64 {
+	if l == nil {
+		return nil
+	}
+	return l.Year
 }
 
 // ResponseRatelimitingPluginPolicy - The rate-limiting policies to use for retrieving and incrementing the limits.
@@ -158,67 +141,67 @@ type ResponseRatelimitingPluginRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetDatabase() *int64 {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetDatabase() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Database
+	return r.Database
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetHost() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetHost() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Host
+	return r.Host
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetPassword() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetPassword() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Password
+	return r.Password
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetPort() *int64 {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetPort() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Port
+	return r.Port
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetServerName() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetServerName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ServerName
+	return r.ServerName
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetSsl() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetSsl() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Ssl
+	return r.Ssl
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetSslVerify() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetSslVerify() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.SslVerify
+	return r.SslVerify
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetTimeout() *int64 {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetTimeout() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Timeout
+	return r.Timeout
 }
 
-func (o *ResponseRatelimitingPluginRedis) GetUsername() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRedis) GetUsername() *string {
+	if r == nil {
 		return nil
 	}
-	return o.Username
+	return r.Username
 }
 
 type ResponseRatelimitingPluginConfig struct {
@@ -232,68 +215,67 @@ type ResponseRatelimitingPluginConfig struct {
 	HideClientHeaders *bool `json:"hide_client_headers,omitempty"`
 	// The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`.
 	LimitBy *ResponseRatelimitingPluginLimitBy `json:"limit_by,omitempty"`
-	// A map that defines rate limits for the plugin.
-	Limits map[string]any `json:"limits,omitempty"`
+	Limits  map[string]Limits                  `json:"limits,omitempty"`
 	// The rate-limiting policies to use for retrieving and incrementing the limits.
 	Policy *ResponseRatelimitingPluginPolicy `json:"policy,omitempty"`
 	// Redis configuration
 	Redis *ResponseRatelimitingPluginRedis `json:"redis,omitempty"`
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetBlockOnFirstViolation() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetBlockOnFirstViolation() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.BlockOnFirstViolation
+	return r.BlockOnFirstViolation
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetFaultTolerant() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetFaultTolerant() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.FaultTolerant
+	return r.FaultTolerant
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetHeaderName() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetHeaderName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.HeaderName
+	return r.HeaderName
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetHideClientHeaders() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetHideClientHeaders() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.HideClientHeaders
+	return r.HideClientHeaders
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetLimitBy() *ResponseRatelimitingPluginLimitBy {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetLimitBy() *ResponseRatelimitingPluginLimitBy {
+	if r == nil {
 		return nil
 	}
-	return o.LimitBy
+	return r.LimitBy
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetLimits() map[string]any {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetLimits() map[string]Limits {
+	if r == nil {
 		return nil
 	}
-	return o.Limits
+	return r.Limits
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetPolicy() *ResponseRatelimitingPluginPolicy {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetPolicy() *ResponseRatelimitingPluginPolicy {
+	if r == nil {
 		return nil
 	}
-	return o.Policy
+	return r.Policy
 }
 
-func (o *ResponseRatelimitingPluginConfig) GetRedis() *ResponseRatelimitingPluginRedis {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConfig) GetRedis() *ResponseRatelimitingPluginRedis {
+	if r == nil {
 		return nil
 	}
-	return o.Redis
+	return r.Redis
 }
 
 // ResponseRatelimitingPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -301,11 +283,81 @@ type ResponseRatelimitingPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ResponseRatelimitingPluginConsumer) GetID() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginConsumer) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
+}
+
+type ResponseRatelimitingPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *ResponseRatelimitingPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type ResponseRatelimitingPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *ResponseRatelimitingPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type ResponseRatelimitingPluginOrdering struct {
+	After  *ResponseRatelimitingPluginAfter  `json:"after,omitempty"`
+	Before *ResponseRatelimitingPluginBefore `json:"before,omitempty"`
+}
+
+func (r *ResponseRatelimitingPluginOrdering) GetAfter() *ResponseRatelimitingPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *ResponseRatelimitingPluginOrdering) GetBefore() *ResponseRatelimitingPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type ResponseRatelimitingPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *ResponseRatelimitingPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *ResponseRatelimitingPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *ResponseRatelimitingPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
 }
 
 type ResponseRatelimitingPluginProtocols string
@@ -345,11 +397,11 @@ type ResponseRatelimitingPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ResponseRatelimitingPluginRoute) GetID() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginRoute) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // ResponseRatelimitingPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -357,37 +409,39 @@ type ResponseRatelimitingPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ResponseRatelimitingPluginService) GetID() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPluginService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
-// ResponseRatelimitingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ResponseRatelimitingPlugin struct {
+	Config *ResponseRatelimitingPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ResponseRatelimitingPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                                `json:"enabled,omitempty"`
-	ID           *string                              `json:"id,omitempty"`
-	InstanceName *string                              `json:"instance_name,omitempty"`
-	name         string                               `const:"response-ratelimiting" json:"name"`
-	Ordering     *ResponseRatelimitingPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []ResponseRatelimitingPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                            `json:"updated_at,omitempty"`
-	Config    *ResponseRatelimitingPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ResponseRatelimitingPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                             `json:"instance_name,omitempty"`
+	name         string                              `const:"response-ratelimiting" json:"name"`
+	Ordering     *ResponseRatelimitingPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []ResponseRatelimitingPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []ResponseRatelimitingPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ResponseRatelimitingPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ResponseRatelimitingPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r ResponseRatelimitingPlugin) MarshalJSON() ([]byte, error) {
@@ -395,103 +449,103 @@ func (r ResponseRatelimitingPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *ResponseRatelimitingPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *ResponseRatelimitingPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetConfig() *ResponseRatelimitingPluginConfig {
+	if r == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return r.Config
 }
 
-func (o *ResponseRatelimitingPlugin) GetEnabled() *bool {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetConsumer() *ResponseRatelimitingPluginConsumer {
+	if r == nil {
 		return nil
 	}
-	return o.Enabled
+	return r.Consumer
 }
 
-func (o *ResponseRatelimitingPlugin) GetID() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.CreatedAt
 }
 
-func (o *ResponseRatelimitingPlugin) GetInstanceName() *string {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetEnabled() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.InstanceName
+	return r.Enabled
 }
 
-func (o *ResponseRatelimitingPlugin) GetName() string {
+func (r *ResponseRatelimitingPlugin) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *ResponseRatelimitingPlugin) GetInstanceName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.InstanceName
+}
+
+func (r *ResponseRatelimitingPlugin) GetName() string {
 	return "response-ratelimiting"
 }
 
-func (o *ResponseRatelimitingPlugin) GetOrdering() *ResponseRatelimitingPluginOrdering {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetOrdering() *ResponseRatelimitingPluginOrdering {
+	if r == nil {
 		return nil
 	}
-	return o.Ordering
+	return r.Ordering
 }
 
-func (o *ResponseRatelimitingPlugin) GetPartials() []ResponseRatelimitingPluginPartials {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetPartials() []ResponseRatelimitingPluginPartials {
+	if r == nil {
 		return nil
 	}
-	return o.Partials
+	return r.Partials
 }
 
-func (o *ResponseRatelimitingPlugin) GetTags() []string {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetProtocols() []ResponseRatelimitingPluginProtocols {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.Protocols
 }
 
-func (o *ResponseRatelimitingPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetRoute() *ResponseRatelimitingPluginRoute {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.Route
 }
 
-func (o *ResponseRatelimitingPlugin) GetConfig() *ResponseRatelimitingPluginConfig {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetService() *ResponseRatelimitingPluginService {
+	if r == nil {
 		return nil
 	}
-	return o.Config
+	return r.Service
 }
 
-func (o *ResponseRatelimitingPlugin) GetConsumer() *ResponseRatelimitingPluginConsumer {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetTags() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Consumer
+	return r.Tags
 }
 
-func (o *ResponseRatelimitingPlugin) GetProtocols() []ResponseRatelimitingPluginProtocols {
-	if o == nil {
+func (r *ResponseRatelimitingPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *ResponseRatelimitingPlugin) GetRoute() *ResponseRatelimitingPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *ResponseRatelimitingPlugin) GetService() *ResponseRatelimitingPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return r.UpdatedAt
 }

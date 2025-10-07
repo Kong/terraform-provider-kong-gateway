@@ -3,9 +3,42 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateSniRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new SNI for creation
+	Sni shared.Sni `request:"mediaType=application/json"`
+}
+
+func (c CreateSniRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateSniRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "SNI"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateSniRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateSniRequest) GetSni() shared.Sni {
+	if c == nil {
+		return shared.Sni{}
+	}
+	return c.Sni
+}
 
 type CreateSniResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +53,37 @@ type CreateSniResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateSniResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateSniResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateSniResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateSniResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateSniResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateSniResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateSniResponse) GetSni() *shared.Sni {
-	if o == nil {
+func (c *CreateSniResponse) GetSni() *shared.Sni {
+	if c == nil {
 		return nil
 	}
-	return o.Sni
+	return c.Sni
 }
 
-func (o *CreateSniResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateSniResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

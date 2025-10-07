@@ -11,9 +11,228 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginRedirectResourceModel) RefreshFromSharedRedirectPlugin(ctx context.Context, resp *shared.RedirectPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.RedirectPluginConfig{}
+			r.Config.KeepIncomingPath = types.BoolPointerValue(resp.Config.KeepIncomingPath)
+			r.Config.Location = types.StringValue(resp.Config.Location)
+			r.Config.StatusCode = types.Int64PointerValue(resp.Config.StatusCode)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		if resp.ConsumerGroup == nil {
+			r.ConsumerGroup = nil
+		} else {
+			r.ConsumerGroup = &tfTypes.Set{}
+			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginRedirectResourceModel) ToOperationsCreateRedirectPluginRequest(ctx context.Context) (*operations.CreateRedirectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	redirectPlugin, redirectPluginDiags := r.ToSharedRedirectPlugin(ctx)
+	diags.Append(redirectPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateRedirectPluginRequest{
+		Workspace:      workspace,
+		RedirectPlugin: *redirectPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRedirectResourceModel) ToOperationsDeleteRedirectPluginRequest(ctx context.Context) (*operations.DeleteRedirectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteRedirectPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRedirectResourceModel) ToOperationsGetRedirectPluginRequest(ctx context.Context) (*operations.GetRedirectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetRedirectPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRedirectResourceModel) ToOperationsUpdateRedirectPluginRequest(ctx context.Context) (*operations.UpdateRedirectPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	redirectPlugin, redirectPluginDiags := r.ToSharedRedirectPlugin(ctx)
+	diags.Append(redirectPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRedirectPluginRequest{
+		PluginID:       pluginID,
+		Workspace:      workspace,
+		RedirectPlugin: *redirectPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context) (*shared.RedirectPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.RedirectPluginConfig
+	if r.Config != nil {
+		keepIncomingPath := new(bool)
+		if !r.Config.KeepIncomingPath.IsUnknown() && !r.Config.KeepIncomingPath.IsNull() {
+			*keepIncomingPath = r.Config.KeepIncomingPath.ValueBool()
+		} else {
+			keepIncomingPath = nil
+		}
+		var location string
+		location = r.Config.Location.ValueString()
+
+		statusCode := new(int64)
+		if !r.Config.StatusCode.IsUnknown() && !r.Config.StatusCode.IsNull() {
+			*statusCode = r.Config.StatusCode.ValueInt64()
+		} else {
+			statusCode = nil
+		}
+		config = &shared.RedirectPluginConfig{
+			KeepIncomingPath: keepIncomingPath,
+			Location:         location,
+			StatusCode:       statusCode,
+		}
+	}
+	var consumer *shared.RedirectPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.RedirectPluginConsumer{
+			ID: id,
+		}
+	}
+	var consumerGroup *shared.RedirectPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id1 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id1 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		consumerGroup = &shared.RedirectPluginConsumerGroup{
+			ID: id1,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -26,11 +245,11 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id2 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id2 = r.ID.ValueString()
 	} else {
-		id = nil
+		id2 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -69,11 +288,11 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 	if r.Partials != nil {
 		partials = make([]shared.RedirectPluginPartials, 0, len(r.Partials))
 		for _, partialsItem := range r.Partials {
-			id1 := new(string)
+			id3 := new(string)
 			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
+				*id3 = partialsItem.ID.ValueString()
 			} else {
-				id1 = nil
+				id3 = nil
 			}
 			name := new(string)
 			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
@@ -88,70 +307,10 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 				path = nil
 			}
 			partials = append(partials, shared.RedirectPluginPartials{
-				ID:   id1,
+				ID:   id3,
 				Name: name,
 				Path: path,
 			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.RedirectPluginConfig
-	if r.Config != nil {
-		keepIncomingPath := new(bool)
-		if !r.Config.KeepIncomingPath.IsUnknown() && !r.Config.KeepIncomingPath.IsNull() {
-			*keepIncomingPath = r.Config.KeepIncomingPath.ValueBool()
-		} else {
-			keepIncomingPath = nil
-		}
-		location := new(string)
-		if !r.Config.Location.IsUnknown() && !r.Config.Location.IsNull() {
-			*location = r.Config.Location.ValueString()
-		} else {
-			location = nil
-		}
-		statusCode := new(int64)
-		if !r.Config.StatusCode.IsUnknown() && !r.Config.StatusCode.IsNull() {
-			*statusCode = r.Config.StatusCode.ValueInt64()
-		} else {
-			statusCode = nil
-		}
-		config = &shared.RedirectPluginConfig{
-			KeepIncomingPath: keepIncomingPath,
-			Location:         location,
-			StatusCode:       statusCode,
-		}
-	}
-	var consumer *shared.RedirectPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.RedirectPluginConsumer{
-			ID: id2,
-		}
-	}
-	var consumerGroup *shared.RedirectPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id3 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id3 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		consumerGroup = &shared.RedirectPluginConsumerGroup{
-			ID: id3,
 		}
 	}
 	protocols := make([]shared.RedirectPluginProtocols, 0, len(r.Protocols))
@@ -182,165 +341,35 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 			ID: id5,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.RedirectPlugin{
-		CreatedAt:     createdAt,
-		Enabled:       enabled,
-		ID:            id,
-		InstanceName:  instanceName,
-		Ordering:      ordering,
-		Partials:      partials,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 		Config:        config,
 		Consumer:      consumer,
 		ConsumerGroup: consumerGroup,
+		CreatedAt:     createdAt,
+		Enabled:       enabled,
+		ID:            id2,
+		InstanceName:  instanceName,
+		Ordering:      ordering,
+		Partials:      partials,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginRedirectResourceModel) ToOperationsUpdateRedirectPluginRequest(ctx context.Context) (*operations.UpdateRedirectPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	redirectPlugin, redirectPluginDiags := r.ToSharedRedirectPlugin(ctx)
-	diags.Append(redirectPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateRedirectPluginRequest{
-		PluginID:       pluginID,
-		RedirectPlugin: *redirectPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRedirectResourceModel) ToOperationsGetRedirectPluginRequest(ctx context.Context) (*operations.GetRedirectPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetRedirectPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRedirectResourceModel) ToOperationsDeleteRedirectPluginRequest(ctx context.Context) (*operations.DeleteRedirectPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteRedirectPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRedirectResourceModel) RefreshFromSharedRedirectPlugin(ctx context.Context, resp *shared.RedirectPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.RedirectPluginConfig{}
-			r.Config.KeepIncomingPath = types.BoolPointerValue(resp.Config.KeepIncomingPath)
-			r.Config.Location = types.StringPointerValue(resp.Config.Location)
-			r.Config.StatusCode = types.Int64PointerValue(resp.Config.StatusCode)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		if resp.ConsumerGroup == nil {
-			r.ConsumerGroup = nil
-		} else {
-			r.ConsumerGroup = &tfTypes.ACLWithoutParentsConsumer{}
-			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

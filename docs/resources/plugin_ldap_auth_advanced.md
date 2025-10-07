@@ -79,6 +79,7 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
     "..."
   ]
   updated_at = 9
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -90,18 +91,16 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -109,8 +108,8 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_pluginldapauthadvanced" {
 Optional:
 
 - `anonymous` (String) An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Note that this value must refer to the consumer `id` or `username` attribute, and **not** its `custom_id`.
-- `attribute` (String) Attribute to be used to search the user; e.g., "cn".
-- `base_dn` (String) Base DN as the starting point for the search; e.g., 'dc=example,dc=com'.
+- `attribute` (String) Attribute to be used to search the user; e.g., "cn". Not Null
+- `base_dn` (String) Base DN as the starting point for the search; e.g., 'dc=example,dc=com'. Not Null
 - `bind_dn` (String) The DN to bind to. Used to perform LDAP search of user. This `bind_dn` should have permissions to search for the user being authenticated.
 - `cache_ttl` (Number) Cache expiry time in seconds.
 - `consumer_by` (List of String) Whether to authenticate consumers based on `username`, `custom_id`, or both.
@@ -122,7 +121,7 @@ Optional:
 - `header_type` (String) An optional string to use as part of the Authorization header. By default, a valid Authorization header looks like this: `Authorization: ldap base64(username:password)`. If `header_type` is set to "basic", then the Authorization header would be `Authorization: basic base64(username:password)`. Note that `header_type` can take any string, not just `'ldap'` and `'basic'`.
 - `hide_credentials` (Boolean) An optional boolean value telling the plugin to hide the credential to the upstream server. It will be removed by Kong before proxying the request.
 - `keepalive` (Number) An optional value in milliseconds that defines how long an idle connection to LDAP server will live before being closed.
-- `ldap_host` (String) Host on which the LDAP server is running.
+- `ldap_host` (String) Host on which the LDAP server is running. Not Null
 - `ldap_password` (String) The password to the LDAP server.
 - `ldap_port` (Number) TCP port where the LDAP server is listening. 389 is the default port for non-SSL LDAP and AD. 636 is the port required for SSL LDAP and AD. If `ldaps` is configured, you must use port 636.
 - `ldaps` (Boolean) Set it to `true` to use `ldaps`, a secure protocol (that can be configured to TLS) to connect to the LDAP server. When `ldaps` is configured, you must use port 636. If the `ldap` setting is enabled, ensure the `start_tls` setting is disabled.
@@ -163,8 +162,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -187,6 +186,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ldap_auth_advanced.my_kong-gateway_plugin_ldap_auth_advanced
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ldap_auth_advanced.my_kong-gateway_plugin_ldap_auth_advanced ""
+terraform import kong-gateway_plugin_ldap_auth_advanced.my_kong-gateway_plugin_ldap_auth_advanced '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

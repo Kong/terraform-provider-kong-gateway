@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateWebsocketvalidatorPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	WebsocketValidatorPlugin shared.WebsocketValidatorPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateWebsocketvalidatorPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateWebsocketvalidatorPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "WebsocketValidatorPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateWebsocketvalidatorPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateWebsocketvalidatorPluginRequest) GetWebsocketValidatorPlugin() shared.WebsocketValidatorPlugin {
+	if c == nil {
+		return shared.WebsocketValidatorPlugin{}
+	}
+	return c.WebsocketValidatorPlugin
+}
 
 type CreateWebsocketvalidatorPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateWebsocketvalidatorPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateWebsocketvalidatorPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateWebsocketvalidatorPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateWebsocketvalidatorPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateWebsocketvalidatorPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateWebsocketvalidatorPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateWebsocketvalidatorPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateWebsocketvalidatorPluginResponse) GetWebsocketValidatorPlugin() *shared.WebsocketValidatorPlugin {
-	if o == nil {
+func (c *CreateWebsocketvalidatorPluginResponse) GetWebsocketValidatorPlugin() *shared.WebsocketValidatorPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.WebsocketValidatorPlugin
+	return c.WebsocketValidatorPlugin
 }
 
-func (o *CreateWebsocketvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateWebsocketvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

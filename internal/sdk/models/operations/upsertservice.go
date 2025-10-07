@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertServiceRequest struct {
 	// ID or name of the Service to lookup
 	ServiceIDOrName string `pathParam:"style=simple,explode=false,name=ServiceIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Service
 	Service shared.Service `request:"mediaType=application/json"`
 }
 
-func (o *UpsertServiceRequest) GetServiceIDOrName() string {
-	if o == nil {
-		return ""
-	}
-	return o.ServiceIDOrName
+func (u UpsertServiceRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertServiceRequest) GetService() shared.Service {
-	if o == nil {
+func (u *UpsertServiceRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ServiceIdOrName", "workspace", "Service"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertServiceRequest) GetServiceIDOrName() string {
+	if u == nil {
+		return ""
+	}
+	return u.ServiceIDOrName
+}
+
+func (u *UpsertServiceRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertServiceRequest) GetService() shared.Service {
+	if u == nil {
 		return shared.Service{}
 	}
-	return o.Service
+	return u.Service
 }
 
 type UpsertServiceResponse struct {
@@ -41,37 +62,37 @@ type UpsertServiceResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertServiceResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertServiceResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertServiceResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertServiceResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertServiceResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertServiceResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertServiceResponse) GetService() *shared.ServiceOutput {
-	if o == nil {
+func (u *UpsertServiceResponse) GetService() *shared.ServiceOutput {
+	if u == nil {
 		return nil
 	}
-	return o.Service
+	return u.Service
 }
 
-func (o *UpsertServiceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertServiceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateLogglyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	LogglyPlugin shared.LogglyPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateLogglyPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateLogglyPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateLogglyPluginRequest) GetLogglyPlugin() shared.LogglyPlugin {
-	if o == nil {
+func (u *UpdateLogglyPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "LogglyPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateLogglyPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateLogglyPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateLogglyPluginRequest) GetLogglyPlugin() shared.LogglyPlugin {
+	if u == nil {
 		return shared.LogglyPlugin{}
 	}
-	return o.LogglyPlugin
+	return u.LogglyPlugin
 }
 
 type UpdateLogglyPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateLogglyPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateLogglyPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateLogglyPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateLogglyPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateLogglyPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateLogglyPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateLogglyPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateLogglyPluginResponse) GetLogglyPlugin() *shared.LogglyPlugin {
-	if o == nil {
+func (u *UpdateLogglyPluginResponse) GetLogglyPlugin() *shared.LogglyPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.LogglyPlugin
+	return u.LogglyPlugin
 }
 
-func (o *UpdateLogglyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateLogglyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

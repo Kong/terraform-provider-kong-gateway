@@ -155,7 +155,11 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     consumer_claim = [
       "..."
     ]
-    consumer_optional = true
+    consumer_groups_claim = [
+      "..."
+    ]
+    consumer_groups_optional = false
+    consumer_optional        = true
     credential_claim = [
       "..."
     ]
@@ -365,9 +369,12 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     scopes_required = [
       "..."
     ]
-    search_user_info                  = false
-    session_absolute_timeout          = 2.42
-    session_audience                  = "...my_session_audience..."
+    search_user_info         = false
+    session_absolute_timeout = 2.42
+    session_audience         = "...my_session_audience..."
+    session_bind = [
+      "user-agent"
+    ]
     session_cookie_domain             = "...my_session_cookie_domain..."
     session_cookie_http_only          = false
     session_cookie_name               = "...my_session_cookie_name..."
@@ -515,6 +522,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     "..."
   ]
   updated_at = 7
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -526,18 +534,16 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -586,6 +592,8 @@ Optional:
 - `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]
 - `consumer_by` (List of String) Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
 - `consumer_claim` (List of String) The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
+- `consumer_groups_claim` (List of String) The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
+- `consumer_groups_optional` (Boolean) Do not terminate the request if consumer groups mapping fails.
 - `consumer_optional` (Boolean) Do not terminate the request if consumer mapping fails.
 - `credential_claim` (List of String) The claim used to derive virtual credentials (e.g. to be consumed by the rate-limiting plugin), in case the consumer mapping is not used. If multiple values are set, it means the claim is inside a nested object of the token payload.
 - `disable_session` (List of String) Disable issuing the session cookie with the specified grants.
@@ -639,7 +647,7 @@ Optional:
 - `introspection_post_args_names` (List of String) Extra post argument names passed to the introspection endpoint.
 - `introspection_post_args_values` (List of String) Extra post argument values passed to the introspection endpoint.
 - `introspection_token_param_name` (String) Designate token's parameter name for introspection.
-- `issuer` (String) The discovery endpoint (or the issuer identifier). When there is no discovery endpoint, please also configure `config.using_pseudo_issuer=true`.
+- `issuer` (String) The discovery endpoint (or the issuer identifier). When there is no discovery endpoint, please also configure `config.using_pseudo_issuer=true`. Not Null
 - `issuers_allowed` (List of String) The issuers allowed to be present in the tokens (`iss` claim).
 - `jwt_session_claim` (String) The claim to match against the JWT session cookie.
 - `jwt_session_cookie` (String) The name of the JWT session cookie.
@@ -697,6 +705,7 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `search_user_info` (Boolean) Specify whether to use the user info endpoint to get additional claims for consumer mapping, credential mapping, authenticated groups, and upstream and downstream headers.
 - `session_absolute_timeout` (Number) Limits how long the session can be renewed in seconds, until re-authentication is required. 0 disables the checks.
 - `session_audience` (String) The session audience, which is the intended target application. For example `"my-application"`.
+- `session_bind` (List of String) Bind the session to data acquired from the HTTP request or connection.
 - `session_cookie_domain` (String) The session cookie Domain flag.
 - `session_cookie_http_only` (Boolean) Forbids JavaScript from accessing the cookie, for example, through the `Document.cookie` property.
 - `session_cookie_name` (String) The session cookie name.
@@ -925,8 +934,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -949,6 +958,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect ""
+terraform import kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateJsonthreatprotectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                   string                            `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                  string                            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	JSONThreatProtectionPlugin shared.JSONThreatProtectionPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateJsonthreatprotectionPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateJsonthreatprotectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateJsonthreatprotectionPluginRequest) GetJSONThreatProtectionPlugin() shared.JSONThreatProtectionPlugin {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "JsonThreatProtectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateJsonthreatprotectionPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateJsonthreatprotectionPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateJsonthreatprotectionPluginRequest) GetJSONThreatProtectionPlugin() shared.JSONThreatProtectionPlugin {
+	if u == nil {
 		return shared.JSONThreatProtectionPlugin{}
 	}
-	return o.JSONThreatProtectionPlugin
+	return u.JSONThreatProtectionPlugin
 }
 
 type UpdateJsonthreatprotectionPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateJsonthreatprotectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateJsonthreatprotectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateJsonthreatprotectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateJsonthreatprotectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateJsonthreatprotectionPluginResponse) GetJSONThreatProtectionPlugin() *shared.JSONThreatProtectionPlugin {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginResponse) GetJSONThreatProtectionPlugin() *shared.JSONThreatProtectionPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.JSONThreatProtectionPlugin
+	return u.JSONThreatProtectionPlugin
 }
 
-func (o *UpdateJsonthreatprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateJsonthreatprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

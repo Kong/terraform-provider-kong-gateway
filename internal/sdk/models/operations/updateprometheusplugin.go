@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdatePrometheusPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID         string                  `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace        string                  `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	PrometheusPlugin shared.PrometheusPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdatePrometheusPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdatePrometheusPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdatePrometheusPluginRequest) GetPrometheusPlugin() shared.PrometheusPlugin {
-	if o == nil {
+func (u *UpdatePrometheusPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "PrometheusPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdatePrometheusPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdatePrometheusPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdatePrometheusPluginRequest) GetPrometheusPlugin() shared.PrometheusPlugin {
+	if u == nil {
 		return shared.PrometheusPlugin{}
 	}
-	return o.PrometheusPlugin
+	return u.PrometheusPlugin
 }
 
 type UpdatePrometheusPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdatePrometheusPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdatePrometheusPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdatePrometheusPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdatePrometheusPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdatePrometheusPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdatePrometheusPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdatePrometheusPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdatePrometheusPluginResponse) GetPrometheusPlugin() *shared.PrometheusPlugin {
-	if o == nil {
+func (u *UpdatePrometheusPluginResponse) GetPrometheusPlugin() *shared.PrometheusPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.PrometheusPlugin
+	return u.PrometheusPlugin
 }
 
-func (o *UpdatePrometheusPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdatePrometheusPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertKeyRequest struct {
 	// ID or name of the Key to lookup
 	KeyIDOrName string `pathParam:"style=simple,explode=false,name=KeyIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Key
 	Key shared.Key `request:"mediaType=application/json"`
 }
 
-func (o *UpsertKeyRequest) GetKeyIDOrName() string {
-	if o == nil {
-		return ""
-	}
-	return o.KeyIDOrName
+func (u UpsertKeyRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertKeyRequest) GetKey() shared.Key {
-	if o == nil {
+func (u *UpsertKeyRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"KeyIdOrName", "workspace", "Key"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertKeyRequest) GetKeyIDOrName() string {
+	if u == nil {
+		return ""
+	}
+	return u.KeyIDOrName
+}
+
+func (u *UpsertKeyRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertKeyRequest) GetKey() shared.Key {
+	if u == nil {
 		return shared.Key{}
 	}
-	return o.Key
+	return u.Key
 }
 
 type UpsertKeyResponse struct {
@@ -41,37 +62,37 @@ type UpsertKeyResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertKeyResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertKeyResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertKeyResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertKeyResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertKeyResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertKeyResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertKeyResponse) GetKey() *shared.Key {
-	if o == nil {
+func (u *UpsertKeyResponse) GetKey() *shared.Key {
+	if u == nil {
 		return nil
 	}
-	return o.Key
+	return u.Key
 }
 
-func (o *UpsertKeyResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertKeyResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

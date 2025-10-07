@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateStatsdPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	StatsdPlugin shared.StatsdPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateStatsdPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateStatsdPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "StatsdPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateStatsdPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateStatsdPluginRequest) GetStatsdPlugin() shared.StatsdPlugin {
+	if c == nil {
+		return shared.StatsdPlugin{}
+	}
+	return c.StatsdPlugin
+}
 
 type CreateStatsdPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateStatsdPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateStatsdPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateStatsdPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateStatsdPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateStatsdPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateStatsdPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateStatsdPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateStatsdPluginResponse) GetStatsdPlugin() *shared.StatsdPlugin {
-	if o == nil {
+func (c *CreateStatsdPluginResponse) GetStatsdPlugin() *shared.StatsdPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.StatsdPlugin
+	return c.StatsdPlugin
 }
 
-func (o *CreateStatsdPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateStatsdPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -11,12 +13,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
+	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -36,19 +42,20 @@ type PluginAiSemanticCacheResource struct {
 // PluginAiSemanticCacheResourceModel describes the resource data model.
 type PluginAiSemanticCacheResourceModel struct {
 	Config        *tfTypes.AiSemanticCachePluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLWithoutParentsConsumer   `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer   `tfsdk:"consumer_group"`
+	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
 	CreatedAt     types.Int64                          `tfsdk:"created_at"`
 	Enabled       types.Bool                           `tfsdk:"enabled"`
 	ID            types.String                         `tfsdk:"id"`
 	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      *tfTypes.Ordering                    `tfsdk:"ordering"`
-	Partials      []tfTypes.Partials                   `tfsdk:"partials"`
+	Ordering      *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials          `tfsdk:"partials"`
 	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.ACLWithoutParentsConsumer   `tfsdk:"route"`
-	Service       *tfTypes.ACLWithoutParentsConsumer   `tfsdk:"service"`
+	Route         *tfTypes.Set                         `tfsdk:"route"`
+	Service       *tfTypes.Set                         `tfsdk:"service"`
 	Tags          []types.String                       `tfsdk:"tags"`
 	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
+	Workspace     types.String                         `tfsdk:"workspace"`
 }
 
 func (r *PluginAiSemanticCacheResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -166,7 +173,10 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 									"name": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Model name to execute.`,
+										Description: `Model name to execute. Not Null`,
+										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
+										},
 									},
 									"options": schema.SingleNestedAttribute{
 										Computed: true,
@@ -192,10 +202,6 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 														Description: `Instance name for Azure OpenAI hosted models.`,
 													},
 												},
-												Description: `Not Null`,
-												Validators: []validator.Object{
-													speakeasy_objectvalidators.NotNull(),
-												},
 											},
 											"bedrock": schema.SingleNestedAttribute{
 												Computed: true,
@@ -220,6 +226,16 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 														Computed:    true,
 														Optional:    true,
 														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+													"embeddings_normalize": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set to true to normalize the embeddings.`,
+													},
+													"performance_config_latency": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
 													},
 												},
 											},
@@ -271,8 +287,9 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 									"provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
+										Description: `AI provider format to use for embeddings API. Not Null; must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
 										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
 											stringvalidator.OneOf(
 												"azure",
 												"bedrock",
@@ -284,7 +301,15 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 										},
 									},
 								},
+								Description: `Not Null`,
+								Validators: []validator.Object{
+									speakeasy_objectvalidators.NotNull(),
+								},
 							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 					"exact_caching": schema.BoolAttribute{
@@ -310,11 +335,13 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 					"llm_format": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]`,
+						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"bedrock",
+								"cohere",
 								"gemini",
+								"huggingface",
 								"openai",
 							),
 						},
@@ -339,13 +366,17 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 							"dimensions": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `the desired dimensionality for the vectors`,
+								Description: `the desired dimensionality for the vectors. Not Null`,
+								Validators: []validator.Int64{
+									speakeasy_int64validators.NotNull(),
+								},
 							},
 							"distance_metric": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `the distance metric to use for vector searches. must be one of ["cosine", "euclidean"]`,
+								Description: `the distance metric to use for vector searches. Not Null; must be one of ["cosine", "euclidean"]`,
 								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"cosine",
 										"euclidean",
@@ -604,8 +635,9 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 							"strategy": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `which vector database driver to use. must be one of ["pgvector", "redis"]`,
+								Description: `which vector database driver to use. Not Null; must be one of ["pgvector", "redis"]`,
 								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"pgvector",
 										"redis",
@@ -615,8 +647,15 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 							"threshold": schema.Float64Attribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `the default similarity threshold for accepting semantic search results (float)`,
+								Description: `the default similarity threshold for accepting semantic search results (float). Not Null`,
+								Validators: []validator.Float64{
+									speakeasy_float64validators.NotNull(),
+								},
 							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 				},
@@ -654,12 +693,17 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -698,12 +742,17 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -711,8 +760,9 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -750,6 +800,12 @@ func (r *PluginAiSemanticCacheResource) Schema(ctx context.Context, req resource
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -793,7 +849,7 @@ func (r *PluginAiSemanticCacheResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	request, requestDiags := data.ToSharedAiSemanticCachePlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateAisemanticcachePluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -993,5 +1049,26 @@ func (r *PluginAiSemanticCacheResource) Delete(ctx context.Context, req resource
 }
 
 func (r *PluginAiSemanticCacheResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

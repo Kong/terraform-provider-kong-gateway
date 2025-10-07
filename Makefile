@@ -10,7 +10,7 @@ format:
 	@npx openapi-format --sortFile .openapi-format-sort.json openapi.yaml -o openapi.yaml
 
 speakeasy: check-speakeasy
-	speakeasy run -o console --skip-versioning
+	speakeasy run --skip-versioning --output console --minimal
 	@go generate .
 	@git clean -fd docs/data-sources examples > /dev/null
 	@git checkout -- README.md examples/README.md
@@ -18,6 +18,8 @@ speakeasy: check-speakeasy
 
 acceptance:
 	@TF_ACC=1 go test -v ./tests -count 1
+wip:
+	@TF_ACC=1 go test -v ./tests -count 1 -run TestSmoke
 
 check-speakeasy:
 	@command -v speakeasy >/dev/null 2>&1 || { echo >&2 "speakeasy CLI is not installed. Please install before continuing."; exit 1; }

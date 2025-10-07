@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreatePostfunctionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	PostFunctionPlugin shared.PostFunctionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreatePostfunctionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreatePostfunctionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "PostFunctionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreatePostfunctionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreatePostfunctionPluginRequest) GetPostFunctionPlugin() shared.PostFunctionPlugin {
+	if c == nil {
+		return shared.PostFunctionPlugin{}
+	}
+	return c.PostFunctionPlugin
+}
 
 type CreatePostfunctionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreatePostfunctionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreatePostfunctionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreatePostfunctionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreatePostfunctionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreatePostfunctionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreatePostfunctionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreatePostfunctionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreatePostfunctionPluginResponse) GetPostFunctionPlugin() *shared.PostFunctionPlugin {
-	if o == nil {
+func (c *CreatePostfunctionPluginResponse) GetPostFunctionPlugin() *shared.PostFunctionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.PostFunctionPlugin
+	return c.PostFunctionPlugin
 }
 
-func (o *CreatePostfunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreatePostfunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type JSONThreatProtectionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *JSONThreatProtectionPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type JSONThreatProtectionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *JSONThreatProtectionPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type JSONThreatProtectionPluginOrdering struct {
-	After  *JSONThreatProtectionPluginAfter  `json:"after,omitempty"`
-	Before *JSONThreatProtectionPluginBefore `json:"before,omitempty"`
-}
-
-func (o *JSONThreatProtectionPluginOrdering) GetAfter() *JSONThreatProtectionPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *JSONThreatProtectionPluginOrdering) GetBefore() *JSONThreatProtectionPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type JSONThreatProtectionPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *JSONThreatProtectionPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *JSONThreatProtectionPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *JSONThreatProtectionPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // JSONThreatProtectionPluginEnforcementMode - Enforcement mode of the security policy.
 type JSONThreatProtectionPluginEnforcementMode string
 
@@ -126,74 +58,144 @@ type JSONThreatProtectionPluginConfig struct {
 	MaxStringValueLength *int64 `json:"max_string_value_length,omitempty"`
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetAllowDuplicateObjectEntryName() *bool {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetAllowDuplicateObjectEntryName() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.AllowDuplicateObjectEntryName
+	return j.AllowDuplicateObjectEntryName
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetEnforcementMode() *JSONThreatProtectionPluginEnforcementMode {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetEnforcementMode() *JSONThreatProtectionPluginEnforcementMode {
+	if j == nil {
 		return nil
 	}
-	return o.EnforcementMode
+	return j.EnforcementMode
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetErrorMessage() *string {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetErrorMessage() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ErrorMessage
+	return j.ErrorMessage
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetErrorStatusCode() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetErrorStatusCode() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.ErrorStatusCode
+	return j.ErrorStatusCode
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxArrayElementCount() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxArrayElementCount() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxArrayElementCount
+	return j.MaxArrayElementCount
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxBodySize() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxBodySize() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxBodySize
+	return j.MaxBodySize
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxContainerDepth() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxContainerDepth() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxContainerDepth
+	return j.MaxContainerDepth
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxObjectEntryCount() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxObjectEntryCount() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxObjectEntryCount
+	return j.MaxObjectEntryCount
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxObjectEntryNameLength() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxObjectEntryNameLength() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxObjectEntryNameLength
+	return j.MaxObjectEntryNameLength
 }
 
-func (o *JSONThreatProtectionPluginConfig) GetMaxStringValueLength() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPluginConfig) GetMaxStringValueLength() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaxStringValueLength
+	return j.MaxStringValueLength
+}
+
+type JSONThreatProtectionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JSONThreatProtectionPluginAfter) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JSONThreatProtectionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JSONThreatProtectionPluginBefore) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JSONThreatProtectionPluginOrdering struct {
+	After  *JSONThreatProtectionPluginAfter  `json:"after,omitempty"`
+	Before *JSONThreatProtectionPluginBefore `json:"before,omitempty"`
+}
+
+func (j *JSONThreatProtectionPluginOrdering) GetAfter() *JSONThreatProtectionPluginAfter {
+	if j == nil {
+		return nil
+	}
+	return j.After
+}
+
+func (j *JSONThreatProtectionPluginOrdering) GetBefore() *JSONThreatProtectionPluginBefore {
+	if j == nil {
+		return nil
+	}
+	return j.Before
+}
+
+type JSONThreatProtectionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (j *JSONThreatProtectionPluginPartials) GetID() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ID
+}
+
+func (j *JSONThreatProtectionPluginPartials) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JSONThreatProtectionPluginPartials) GetPath() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Path
 }
 
 type JSONThreatProtectionPluginProtocols string
@@ -233,11 +235,11 @@ type JSONThreatProtectionPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JSONThreatProtectionPluginRoute) GetID() *string {
-	if o == nil {
+func (j *JSONThreatProtectionPluginRoute) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
 // JSONThreatProtectionPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -245,35 +247,37 @@ type JSONThreatProtectionPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JSONThreatProtectionPluginService) GetID() *string {
-	if o == nil {
+func (j *JSONThreatProtectionPluginService) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
-// JSONThreatProtectionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JSONThreatProtectionPlugin struct {
+	Config *JSONThreatProtectionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                                `json:"enabled,omitempty"`
-	ID           *string                              `json:"id,omitempty"`
-	InstanceName *string                              `json:"instance_name,omitempty"`
-	name         string                               `const:"json-threat-protection" json:"name"`
-	Ordering     *JSONThreatProtectionPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []JSONThreatProtectionPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                            `json:"updated_at,omitempty"`
-	Config    *JSONThreatProtectionPluginConfig `json:"config,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                             `json:"instance_name,omitempty"`
+	name         string                              `const:"json-threat-protection" json:"name"`
+	Ordering     *JSONThreatProtectionPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []JSONThreatProtectionPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []JSONThreatProtectionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *JSONThreatProtectionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *JSONThreatProtectionPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (j JSONThreatProtectionPlugin) MarshalJSON() ([]byte, error) {
@@ -281,96 +285,96 @@ func (j JSONThreatProtectionPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (j *JSONThreatProtectionPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &j, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *JSONThreatProtectionPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetConfig() *JSONThreatProtectionPluginConfig {
+	if j == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return j.Config
 }
 
-func (o *JSONThreatProtectionPlugin) GetEnabled() *bool {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetCreatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Enabled
+	return j.CreatedAt
 }
 
-func (o *JSONThreatProtectionPlugin) GetID() *string {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetEnabled() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.Enabled
 }
 
-func (o *JSONThreatProtectionPlugin) GetInstanceName() *string {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.InstanceName
+	return j.ID
 }
 
-func (o *JSONThreatProtectionPlugin) GetName() string {
+func (j *JSONThreatProtectionPlugin) GetInstanceName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.InstanceName
+}
+
+func (j *JSONThreatProtectionPlugin) GetName() string {
 	return "json-threat-protection"
 }
 
-func (o *JSONThreatProtectionPlugin) GetOrdering() *JSONThreatProtectionPluginOrdering {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetOrdering() *JSONThreatProtectionPluginOrdering {
+	if j == nil {
 		return nil
 	}
-	return o.Ordering
+	return j.Ordering
 }
 
-func (o *JSONThreatProtectionPlugin) GetPartials() []JSONThreatProtectionPluginPartials {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetPartials() []JSONThreatProtectionPluginPartials {
+	if j == nil {
 		return nil
 	}
-	return o.Partials
+	return j.Partials
 }
 
-func (o *JSONThreatProtectionPlugin) GetTags() []string {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetProtocols() []JSONThreatProtectionPluginProtocols {
+	if j == nil {
 		return nil
 	}
-	return o.Tags
+	return j.Protocols
 }
 
-func (o *JSONThreatProtectionPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetRoute() *JSONThreatProtectionPluginRoute {
+	if j == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return j.Route
 }
 
-func (o *JSONThreatProtectionPlugin) GetConfig() *JSONThreatProtectionPluginConfig {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetService() *JSONThreatProtectionPluginService {
+	if j == nil {
 		return nil
 	}
-	return o.Config
+	return j.Service
 }
 
-func (o *JSONThreatProtectionPlugin) GetProtocols() []JSONThreatProtectionPluginProtocols {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetTags() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Protocols
+	return j.Tags
 }
 
-func (o *JSONThreatProtectionPlugin) GetRoute() *JSONThreatProtectionPluginRoute {
-	if o == nil {
+func (j *JSONThreatProtectionPlugin) GetUpdatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Route
-}
-
-func (o *JSONThreatProtectionPlugin) GetService() *JSONThreatProtectionPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return j.UpdatedAt
 }

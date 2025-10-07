@@ -11,99 +11,235 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectionPlugin(ctx context.Context, resp *shared.ServiceProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.ServiceProtectionPluginConfig{}
+			r.Config.DictionaryName = types.StringPointerValue(resp.Config.DictionaryName)
+			r.Config.DisablePenalty = types.BoolPointerValue(resp.Config.DisablePenalty)
+			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
+			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
+			r.Config.HideClientHeaders = types.BoolPointerValue(resp.Config.HideClientHeaders)
+			r.Config.Limit = make([]types.Float64, 0, len(resp.Config.Limit))
+			for _, v := range resp.Config.Limit {
+				r.Config.Limit = append(r.Config.Limit, types.Float64Value(v))
+			}
+			r.Config.LockDictionaryName = types.StringPointerValue(resp.Config.LockDictionaryName)
+			r.Config.Namespace = types.StringPointerValue(resp.Config.Namespace)
+			if resp.Config.Redis == nil {
+				r.Config.Redis = nil
+			} else {
+				r.Config.Redis = &tfTypes.PartialRedisEeConfig{}
+				r.Config.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Redis.ClusterMaxRedirections)
+				r.Config.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
+
+				for _, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
+					var clusterNodes tfTypes.PartialRedisEeClusterNodes
+
+					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
+
+					r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
+				}
+				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
+				r.Config.Redis.ConnectionIsProxied = types.BoolPointerValue(resp.Config.Redis.ConnectionIsProxied)
+				r.Config.Redis.Database = types.Int64PointerValue(resp.Config.Redis.Database)
+				r.Config.Redis.Host = types.StringPointerValue(resp.Config.Redis.Host)
+				r.Config.Redis.KeepaliveBacklog = types.Int64PointerValue(resp.Config.Redis.KeepaliveBacklog)
+				r.Config.Redis.KeepalivePoolSize = types.Int64PointerValue(resp.Config.Redis.KeepalivePoolSize)
+				r.Config.Redis.Password = types.StringPointerValue(resp.Config.Redis.Password)
+				r.Config.Redis.Port = types.Int64PointerValue(resp.Config.Redis.Port)
+				r.Config.Redis.ReadTimeout = types.Int64PointerValue(resp.Config.Redis.ReadTimeout)
+				r.Config.Redis.SendTimeout = types.Int64PointerValue(resp.Config.Redis.SendTimeout)
+				r.Config.Redis.SentinelMaster = types.StringPointerValue(resp.Config.Redis.SentinelMaster)
+				r.Config.Redis.SentinelNodes = []tfTypes.PartialRedisEeSentinelNodes{}
+
+				for _, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
+					var sentinelNodes tfTypes.PartialRedisEeSentinelNodes
+
+					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+
+					r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
+				}
+				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
+				if resp.Config.Redis.SentinelRole != nil {
+					r.Config.Redis.SentinelRole = types.StringValue(string(*resp.Config.Redis.SentinelRole))
+				} else {
+					r.Config.Redis.SentinelRole = types.StringNull()
+				}
+				r.Config.Redis.SentinelUsername = types.StringPointerValue(resp.Config.Redis.SentinelUsername)
+				r.Config.Redis.ServerName = types.StringPointerValue(resp.Config.Redis.ServerName)
+				r.Config.Redis.Ssl = types.BoolPointerValue(resp.Config.Redis.Ssl)
+				r.Config.Redis.SslVerify = types.BoolPointerValue(resp.Config.Redis.SslVerify)
+				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
+			}
+			r.Config.RetryAfterJitterMax = types.Float64PointerValue(resp.Config.RetryAfterJitterMax)
+			if resp.Config.Strategy != nil {
+				r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
+			} else {
+				r.Config.Strategy = types.StringNull()
+			}
+			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
+			r.Config.WindowSize = make([]types.Float64, 0, len(resp.Config.WindowSize))
+			for _, v := range resp.Config.WindowSize {
+				r.Config.WindowSize = append(r.Config.WindowSize, types.Float64Value(v))
+			}
+			if resp.Config.WindowType != nil {
+				r.Config.WindowType = types.StringValue(string(*resp.Config.WindowType))
+			} else {
+				r.Config.WindowType = types.StringNull()
+			}
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsCreateServiceprotectionPluginRequest(ctx context.Context) (*operations.CreateServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	serviceProtectionPlugin, serviceProtectionPluginDiags := r.ToSharedServiceProtectionPlugin(ctx)
+	diags.Append(serviceProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateServiceprotectionPluginRequest{
+		Workspace:               workspace,
+		ServiceProtectionPlugin: *serviceProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsDeleteServiceprotectionPluginRequest(ctx context.Context) (*operations.DeleteServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteServiceprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsGetServiceprotectionPluginRequest(ctx context.Context) (*operations.GetServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetServiceprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginServiceProtectionResourceModel) ToOperationsUpdateServiceprotectionPluginRequest(ctx context.Context) (*operations.UpdateServiceprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	serviceProtectionPlugin, serviceProtectionPluginDiags := r.ToSharedServiceProtectionPlugin(ctx)
+	diags.Append(serviceProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateServiceprotectionPluginRequest{
+		PluginID:                pluginID,
+		Workspace:               workspace,
+		ServiceProtectionPlugin: *serviceProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin(ctx context.Context) (*shared.ServiceProtectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.ServiceProtectionPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.ServiceProtectionPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.ServiceProtectionPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.ServiceProtectionPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.ServiceProtectionPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.ServiceProtectionPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.ServiceProtectionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.ServiceProtectionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.ServiceProtectionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.ServiceProtectionPluginConfig
 	if r.Config != nil {
 		dictionaryName := new(string)
@@ -375,6 +511,86 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin(c
 			WindowType:          windowType,
 		}
 	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.ServiceProtectionPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.ServiceProtectionPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.ServiceProtectionPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.ServiceProtectionPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.ServiceProtectionPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.ServiceProtectionPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.ServiceProtectionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ServiceProtectionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ServiceProtectionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
 	protocols := make([]shared.ServiceProtectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.ServiceProtectionPluginProtocols(protocolsItem.ValueString()))
@@ -391,226 +607,32 @@ func (r *PluginServiceProtectionResourceModel) ToSharedServiceProtectionPlugin(c
 			ID: id2,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.ServiceProtectionPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginServiceProtectionResourceModel) ToOperationsUpdateServiceprotectionPluginRequest(ctx context.Context) (*operations.UpdateServiceprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	serviceProtectionPlugin, serviceProtectionPluginDiags := r.ToSharedServiceProtectionPlugin(ctx)
-	diags.Append(serviceProtectionPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateServiceprotectionPluginRequest{
-		PluginID:                pluginID,
-		ServiceProtectionPlugin: *serviceProtectionPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginServiceProtectionResourceModel) ToOperationsGetServiceprotectionPluginRequest(ctx context.Context) (*operations.GetServiceprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetServiceprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginServiceProtectionResourceModel) ToOperationsDeleteServiceprotectionPluginRequest(ctx context.Context) (*operations.DeleteServiceprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteServiceprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginServiceProtectionResourceModel) RefreshFromSharedServiceProtectionPlugin(ctx context.Context, resp *shared.ServiceProtectionPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.ServiceProtectionPluginConfig{}
-			r.Config.DictionaryName = types.StringPointerValue(resp.Config.DictionaryName)
-			r.Config.DisablePenalty = types.BoolPointerValue(resp.Config.DisablePenalty)
-			r.Config.ErrorCode = types.Float64PointerValue(resp.Config.ErrorCode)
-			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
-			r.Config.HideClientHeaders = types.BoolPointerValue(resp.Config.HideClientHeaders)
-			r.Config.Limit = make([]types.Float64, 0, len(resp.Config.Limit))
-			for _, v := range resp.Config.Limit {
-				r.Config.Limit = append(r.Config.Limit, types.Float64Value(v))
-			}
-			r.Config.LockDictionaryName = types.StringPointerValue(resp.Config.LockDictionaryName)
-			r.Config.Namespace = types.StringPointerValue(resp.Config.Namespace)
-			if resp.Config.Redis == nil {
-				r.Config.Redis = nil
-			} else {
-				r.Config.Redis = &tfTypes.AiProxyAdvancedPluginRedis{}
-				r.Config.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Redis.ClusterMaxRedirections)
-				r.Config.Redis.ClusterNodes = []tfTypes.AiProxyAdvancedPluginClusterNodes{}
-				if len(r.Config.Redis.ClusterNodes) > len(resp.Config.Redis.ClusterNodes) {
-					r.Config.Redis.ClusterNodes = r.Config.Redis.ClusterNodes[:len(resp.Config.Redis.ClusterNodes)]
-				}
-				for clusterNodesCount, clusterNodesItem := range resp.Config.Redis.ClusterNodes {
-					var clusterNodes tfTypes.AiProxyAdvancedPluginClusterNodes
-					clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
-					clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
-					if clusterNodesCount+1 > len(r.Config.Redis.ClusterNodes) {
-						r.Config.Redis.ClusterNodes = append(r.Config.Redis.ClusterNodes, clusterNodes)
-					} else {
-						r.Config.Redis.ClusterNodes[clusterNodesCount].IP = clusterNodes.IP
-						r.Config.Redis.ClusterNodes[clusterNodesCount].Port = clusterNodes.Port
-					}
-				}
-				r.Config.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Redis.ConnectTimeout)
-				r.Config.Redis.ConnectionIsProxied = types.BoolPointerValue(resp.Config.Redis.ConnectionIsProxied)
-				r.Config.Redis.Database = types.Int64PointerValue(resp.Config.Redis.Database)
-				r.Config.Redis.Host = types.StringPointerValue(resp.Config.Redis.Host)
-				r.Config.Redis.KeepaliveBacklog = types.Int64PointerValue(resp.Config.Redis.KeepaliveBacklog)
-				r.Config.Redis.KeepalivePoolSize = types.Int64PointerValue(resp.Config.Redis.KeepalivePoolSize)
-				r.Config.Redis.Password = types.StringPointerValue(resp.Config.Redis.Password)
-				r.Config.Redis.Port = types.Int64PointerValue(resp.Config.Redis.Port)
-				r.Config.Redis.ReadTimeout = types.Int64PointerValue(resp.Config.Redis.ReadTimeout)
-				r.Config.Redis.SendTimeout = types.Int64PointerValue(resp.Config.Redis.SendTimeout)
-				r.Config.Redis.SentinelMaster = types.StringPointerValue(resp.Config.Redis.SentinelMaster)
-				r.Config.Redis.SentinelNodes = []tfTypes.AiProxyAdvancedPluginSentinelNodes{}
-				if len(r.Config.Redis.SentinelNodes) > len(resp.Config.Redis.SentinelNodes) {
-					r.Config.Redis.SentinelNodes = r.Config.Redis.SentinelNodes[:len(resp.Config.Redis.SentinelNodes)]
-				}
-				for sentinelNodesCount, sentinelNodesItem := range resp.Config.Redis.SentinelNodes {
-					var sentinelNodes tfTypes.AiProxyAdvancedPluginSentinelNodes
-					sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
-					sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
-					if sentinelNodesCount+1 > len(r.Config.Redis.SentinelNodes) {
-						r.Config.Redis.SentinelNodes = append(r.Config.Redis.SentinelNodes, sentinelNodes)
-					} else {
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Host = sentinelNodes.Host
-						r.Config.Redis.SentinelNodes[sentinelNodesCount].Port = sentinelNodes.Port
-					}
-				}
-				r.Config.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Redis.SentinelPassword)
-				if resp.Config.Redis.SentinelRole != nil {
-					r.Config.Redis.SentinelRole = types.StringValue(string(*resp.Config.Redis.SentinelRole))
-				} else {
-					r.Config.Redis.SentinelRole = types.StringNull()
-				}
-				r.Config.Redis.SentinelUsername = types.StringPointerValue(resp.Config.Redis.SentinelUsername)
-				r.Config.Redis.ServerName = types.StringPointerValue(resp.Config.Redis.ServerName)
-				r.Config.Redis.Ssl = types.BoolPointerValue(resp.Config.Redis.Ssl)
-				r.Config.Redis.SslVerify = types.BoolPointerValue(resp.Config.Redis.SslVerify)
-				r.Config.Redis.Username = types.StringPointerValue(resp.Config.Redis.Username)
-			}
-			r.Config.RetryAfterJitterMax = types.Float64PointerValue(resp.Config.RetryAfterJitterMax)
-			if resp.Config.Strategy != nil {
-				r.Config.Strategy = types.StringValue(string(*resp.Config.Strategy))
-			} else {
-				r.Config.Strategy = types.StringNull()
-			}
-			r.Config.SyncRate = types.Float64PointerValue(resp.Config.SyncRate)
-			r.Config.WindowSize = make([]types.Float64, 0, len(resp.Config.WindowSize))
-			for _, v := range resp.Config.WindowSize {
-				r.Config.WindowSize = append(r.Config.WindowSize, types.Float64Value(v))
-			}
-			if resp.Config.WindowType != nil {
-				r.Config.WindowType = types.StringValue(string(*resp.Config.WindowType))
-			} else {
-				r.Config.WindowType = types.StringNull()
-			}
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

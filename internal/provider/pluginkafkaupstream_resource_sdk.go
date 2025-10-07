@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -11,99 +13,344 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(ctx context.Context, resp *shared.KafkaUpstreamPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
+			r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
+			for _, v := range resp.Config.AllowedTopics {
+				r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
+			}
+			if resp.Config.Authentication == nil {
+				r.Config.Authentication = nil
+			} else {
+				r.Config.Authentication = &tfTypes.Authentication{}
+				if resp.Config.Authentication.Mechanism != nil {
+					r.Config.Authentication.Mechanism = types.StringValue(string(*resp.Config.Authentication.Mechanism))
+				} else {
+					r.Config.Authentication.Mechanism = types.StringNull()
+				}
+				r.Config.Authentication.Password = types.StringPointerValue(resp.Config.Authentication.Password)
+				if resp.Config.Authentication.Strategy != nil {
+					r.Config.Authentication.Strategy = types.StringValue(string(*resp.Config.Authentication.Strategy))
+				} else {
+					r.Config.Authentication.Strategy = types.StringNull()
+				}
+				r.Config.Authentication.Tokenauth = types.BoolPointerValue(resp.Config.Authentication.Tokenauth)
+				r.Config.Authentication.User = types.StringPointerValue(resp.Config.Authentication.User)
+			}
+			r.Config.BootstrapServers = []tfTypes.BootstrapServers{}
+
+			for _, bootstrapServersItem := range resp.Config.BootstrapServers {
+				var bootstrapServers tfTypes.BootstrapServers
+
+				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
+				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
+
+				r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
+			}
+			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
+			r.Config.ForwardBody = types.BoolPointerValue(resp.Config.ForwardBody)
+			r.Config.ForwardHeaders = types.BoolPointerValue(resp.Config.ForwardHeaders)
+			r.Config.ForwardMethod = types.BoolPointerValue(resp.Config.ForwardMethod)
+			r.Config.ForwardURI = types.BoolPointerValue(resp.Config.ForwardURI)
+			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
+			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
+			r.Config.KeyQueryArg = types.StringPointerValue(resp.Config.KeyQueryArg)
+			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
+			for _, v := range resp.Config.MessageByLuaFunctions {
+				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
+			}
+			r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
+			r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
+			r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
+			if resp.Config.ProducerRequestAcks != nil {
+				r.Config.ProducerRequestAcks = types.Int64Value(int64(*resp.Config.ProducerRequestAcks))
+			} else {
+				r.Config.ProducerRequestAcks = types.Int64Null()
+			}
+			r.Config.ProducerRequestLimitsBytesPerRequest = types.Int64PointerValue(resp.Config.ProducerRequestLimitsBytesPerRequest)
+			r.Config.ProducerRequestLimitsMessagesPerRequest = types.Int64PointerValue(resp.Config.ProducerRequestLimitsMessagesPerRequest)
+			r.Config.ProducerRequestRetriesBackoffTimeout = types.Int64PointerValue(resp.Config.ProducerRequestRetriesBackoffTimeout)
+			r.Config.ProducerRequestRetriesMaxAttempts = types.Int64PointerValue(resp.Config.ProducerRequestRetriesMaxAttempts)
+			r.Config.ProducerRequestTimeout = types.Int64PointerValue(resp.Config.ProducerRequestTimeout)
+			if resp.Config.SchemaRegistry == nil {
+				r.Config.SchemaRegistry = nil
+			} else {
+				r.Config.SchemaRegistry = &tfTypes.SchemaRegistry{}
+				if resp.Config.SchemaRegistry.Confluent == nil {
+					r.Config.SchemaRegistry.Confluent = nil
+				} else {
+					r.Config.SchemaRegistry.Confluent = &tfTypes.Confluent{}
+					if resp.Config.SchemaRegistry.Confluent.Authentication == nil {
+						r.Config.SchemaRegistry.Confluent.Authentication = nil
+					} else {
+						r.Config.SchemaRegistry.Confluent.Authentication = &tfTypes.ConfluentPluginAuthentication{}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Basic == nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Basic = nil
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Basic = &tfTypes.Basic{}
+							r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Password)
+							r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Username)
+						}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Mode != nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Mode))
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringNull()
+						}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2 == nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = nil
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = &tfTypes.Oauth2{}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+							for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience, types.StringValue(v))
+							}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret)
+							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType != nil {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType))
+							} else {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringNull()
+							}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+							for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes, types.StringValue(v))
+							}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
+							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+								for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+									result, _ := json.Marshal(value)
+									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+								}
+							}
+							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+								for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+									result1, _ := json.Marshal(value1)
+									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+								}
+							}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
+						}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client == nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = nil
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = &tfTypes.Oauth2Client{}
+							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod != nil {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod))
+							} else {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringNull()
+							}
+							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg != nil {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg))
+							} else {
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringNull()
+							}
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout = types.Int64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout)
+						}
+					}
+					if resp.Config.SchemaRegistry.Confluent.KeySchema == nil {
+						r.Config.SchemaRegistry.Confluent.KeySchema = nil
+					} else {
+						r.Config.SchemaRegistry.Confluent.KeySchema = &tfTypes.KeySchema{}
+						r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion)
+						r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SubjectName)
+					}
+					r.Config.SchemaRegistry.Confluent.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.SslVerify)
+					r.Config.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.TTL)
+					r.Config.SchemaRegistry.Confluent.URL = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.URL)
+					if resp.Config.SchemaRegistry.Confluent.ValueSchema == nil {
+						r.Config.SchemaRegistry.Confluent.ValueSchema = nil
+					} else {
+						r.Config.SchemaRegistry.Confluent.ValueSchema = &tfTypes.KeySchema{}
+						r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion)
+						r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName)
+					}
+				}
+			}
+			if resp.Config.Security == nil {
+				r.Config.Security = nil
+			} else {
+				r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
+				r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
+				r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
+			}
+			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
+			r.Config.Topic = types.StringValue(resp.Config.Topic)
+			r.Config.TopicsQueryArg = types.StringPointerValue(resp.Config.TopicsQueryArg)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginKafkaUpstreamResourceModel) ToOperationsCreateKafkaupstreamPluginRequest(ctx context.Context) (*operations.CreateKafkaupstreamPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	kafkaUpstreamPlugin, kafkaUpstreamPluginDiags := r.ToSharedKafkaUpstreamPlugin(ctx)
+	diags.Append(kafkaUpstreamPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateKafkaupstreamPluginRequest{
+		Workspace:           workspace,
+		KafkaUpstreamPlugin: *kafkaUpstreamPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaUpstreamResourceModel) ToOperationsDeleteKafkaupstreamPluginRequest(ctx context.Context) (*operations.DeleteKafkaupstreamPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteKafkaupstreamPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaUpstreamResourceModel) ToOperationsGetKafkaupstreamPluginRequest(ctx context.Context) (*operations.GetKafkaupstreamPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetKafkaupstreamPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKafkaUpstreamResourceModel) ToOperationsUpdateKafkaupstreamPluginRequest(ctx context.Context) (*operations.UpdateKafkaupstreamPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	kafkaUpstreamPlugin, kafkaUpstreamPluginDiags := r.ToSharedKafkaUpstreamPlugin(ctx)
+	diags.Append(kafkaUpstreamPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateKafkaupstreamPluginRequest{
+		PluginID:            pluginID,
+		Workspace:           workspace,
+		KafkaUpstreamPlugin: *kafkaUpstreamPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx context.Context) (*shared.KafkaUpstreamPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.KafkaUpstreamPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.KafkaUpstreamPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.KafkaUpstreamPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.KafkaUpstreamPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.KafkaUpstreamPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.KafkaUpstreamPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.KafkaUpstreamPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.KafkaUpstreamPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.KafkaUpstreamPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.KafkaUpstreamPluginConfig
 	if r.Config != nil {
 		allowedTopics := make([]string, 0, len(r.Config.AllowedTopics))
@@ -205,6 +452,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		} else {
 			keepaliveEnabled = nil
 		}
+		keyQueryArg := new(string)
+		if !r.Config.KeyQueryArg.IsUnknown() && !r.Config.KeyQueryArg.IsNull() {
+			*keyQueryArg = r.Config.KeyQueryArg.ValueString()
+		} else {
+			keyQueryArg = nil
+		}
 		messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
 		for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
 			messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
@@ -263,6 +516,257 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		} else {
 			producerRequestTimeout = nil
 		}
+		var schemaRegistry *shared.KafkaUpstreamPluginSchemaRegistry
+		if r.Config.SchemaRegistry != nil {
+			var confluent *shared.KafkaUpstreamPluginConfluent
+			if r.Config.SchemaRegistry.Confluent != nil {
+				var authentication1 *shared.KafkaUpstreamPluginConfigAuthentication
+				if r.Config.SchemaRegistry.Confluent.Authentication != nil {
+					var basic *shared.KafkaUpstreamPluginBasic
+					if r.Config.SchemaRegistry.Confluent.Authentication.Basic != nil {
+						var password1 string
+						password1 = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password.ValueString()
+
+						var username string
+						username = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username.ValueString()
+
+						basic = &shared.KafkaUpstreamPluginBasic{
+							Password: password1,
+							Username: username,
+						}
+					}
+					mode := new(shared.KafkaUpstreamPluginMode)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
+						*mode = shared.KafkaUpstreamPluginMode(r.Config.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
+					} else {
+						mode = nil
+					}
+					var oauth2 *shared.KafkaUpstreamPluginOauth2
+					if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
+						audience := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+						for _, audienceItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+							audience = append(audience, audienceItem.ValueString())
+						}
+						clientID := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
+							*clientID = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.ValueString()
+						} else {
+							clientID = nil
+						}
+						clientSecret := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsNull() {
+							*clientSecret = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.ValueString()
+						} else {
+							clientSecret = nil
+						}
+						grantType := new(shared.KafkaUpstreamPluginGrantType)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsNull() {
+							*grantType = shared.KafkaUpstreamPluginGrantType(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.ValueString())
+						} else {
+							grantType = nil
+						}
+						password2 := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsNull() {
+							*password2 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.ValueString()
+						} else {
+							password2 = nil
+						}
+						scopes := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+						for _, scopesItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+							scopes = append(scopes, scopesItem.ValueString())
+						}
+						var tokenEndpoint string
+						tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
+
+						tokenHeaders := make(map[string]interface{})
+						for tokenHeadersKey, tokenHeadersValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+							var tokenHeadersInst interface{}
+							_ = json.Unmarshal([]byte(tokenHeadersValue.ValueString()), &tokenHeadersInst)
+							tokenHeaders[tokenHeadersKey] = tokenHeadersInst
+						}
+						tokenPostArgs := make(map[string]interface{})
+						for tokenPostArgsKey, tokenPostArgsValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+							var tokenPostArgsInst interface{}
+							_ = json.Unmarshal([]byte(tokenPostArgsValue.ValueString()), &tokenPostArgsInst)
+							tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
+						}
+						username1 := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsNull() {
+							*username1 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.ValueString()
+						} else {
+							username1 = nil
+						}
+						oauth2 = &shared.KafkaUpstreamPluginOauth2{
+							Audience:      audience,
+							ClientID:      clientID,
+							ClientSecret:  clientSecret,
+							GrantType:     grantType,
+							Password:      password2,
+							Scopes:        scopes,
+							TokenEndpoint: tokenEndpoint,
+							TokenHeaders:  tokenHeaders,
+							TokenPostArgs: tokenPostArgs,
+							Username:      username1,
+						}
+					}
+					var oauth2Client *shared.KafkaUpstreamPluginOauth2Client
+					if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client != nil {
+						authMethod := new(shared.KafkaUpstreamPluginAuthMethod)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsNull() {
+							*authMethod = shared.KafkaUpstreamPluginAuthMethod(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.ValueString())
+						} else {
+							authMethod = nil
+						}
+						clientSecretJwtAlg := new(shared.KafkaUpstreamPluginClientSecretJwtAlg)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsNull() {
+							*clientSecretJwtAlg = shared.KafkaUpstreamPluginClientSecretJwtAlg(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.ValueString())
+						} else {
+							clientSecretJwtAlg = nil
+						}
+						httpProxy := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsNull() {
+							*httpProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.ValueString()
+						} else {
+							httpProxy = nil
+						}
+						httpProxyAuthorization := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsNull() {
+							*httpProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.ValueString()
+						} else {
+							httpProxyAuthorization = nil
+						}
+						httpVersion := new(float64)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsNull() {
+							*httpVersion = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.ValueFloat64()
+						} else {
+							httpVersion = nil
+						}
+						httpsProxy := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsNull() {
+							*httpsProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.ValueString()
+						} else {
+							httpsProxy = nil
+						}
+						httpsProxyAuthorization := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsNull() {
+							*httpsProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.ValueString()
+						} else {
+							httpsProxyAuthorization = nil
+						}
+						keepAlive := new(bool)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsNull() {
+							*keepAlive = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.ValueBool()
+						} else {
+							keepAlive = nil
+						}
+						noProxy := new(string)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsNull() {
+							*noProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.ValueString()
+						} else {
+							noProxy = nil
+						}
+						sslVerify := new(bool)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
+							*sslVerify = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
+						} else {
+							sslVerify = nil
+						}
+						timeout := new(int64)
+						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
+							*timeout = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.ValueInt64()
+						} else {
+							timeout = nil
+						}
+						oauth2Client = &shared.KafkaUpstreamPluginOauth2Client{
+							AuthMethod:              authMethod,
+							ClientSecretJwtAlg:      clientSecretJwtAlg,
+							HTTPProxy:               httpProxy,
+							HTTPProxyAuthorization:  httpProxyAuthorization,
+							HTTPVersion:             httpVersion,
+							HTTPSProxy:              httpsProxy,
+							HTTPSProxyAuthorization: httpsProxyAuthorization,
+							KeepAlive:               keepAlive,
+							NoProxy:                 noProxy,
+							SslVerify:               sslVerify,
+							Timeout:                 timeout,
+						}
+					}
+					authentication1 = &shared.KafkaUpstreamPluginConfigAuthentication{
+						Basic:        basic,
+						Mode:         mode,
+						Oauth2:       oauth2,
+						Oauth2Client: oauth2Client,
+					}
+				}
+				var keySchema *shared.KafkaUpstreamPluginKeySchema
+				if r.Config.SchemaRegistry.Confluent.KeySchema != nil {
+					schemaVersion := new(string)
+					if !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsNull() {
+						*schemaVersion = r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.ValueString()
+					} else {
+						schemaVersion = nil
+					}
+					subjectName := new(string)
+					if !r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName.IsNull() {
+						*subjectName = r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName.ValueString()
+					} else {
+						subjectName = nil
+					}
+					keySchema = &shared.KafkaUpstreamPluginKeySchema{
+						SchemaVersion: schemaVersion,
+						SubjectName:   subjectName,
+					}
+				}
+				sslVerify1 := new(bool)
+				if !r.Config.SchemaRegistry.Confluent.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.SslVerify.IsNull() {
+					*sslVerify1 = r.Config.SchemaRegistry.Confluent.SslVerify.ValueBool()
+				} else {
+					sslVerify1 = nil
+				}
+				ttl := new(float64)
+				if !r.Config.SchemaRegistry.Confluent.TTL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.TTL.IsNull() {
+					*ttl = r.Config.SchemaRegistry.Confluent.TTL.ValueFloat64()
+				} else {
+					ttl = nil
+				}
+				url := new(string)
+				if !r.Config.SchemaRegistry.Confluent.URL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.URL.IsNull() {
+					*url = r.Config.SchemaRegistry.Confluent.URL.ValueString()
+				} else {
+					url = nil
+				}
+				var valueSchema *shared.KafkaUpstreamPluginValueSchema
+				if r.Config.SchemaRegistry.Confluent.ValueSchema != nil {
+					schemaVersion1 := new(string)
+					if !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsNull() {
+						*schemaVersion1 = r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.ValueString()
+					} else {
+						schemaVersion1 = nil
+					}
+					subjectName1 := new(string)
+					if !r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName.IsNull() {
+						*subjectName1 = r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName.ValueString()
+					} else {
+						subjectName1 = nil
+					}
+					valueSchema = &shared.KafkaUpstreamPluginValueSchema{
+						SchemaVersion: schemaVersion1,
+						SubjectName:   subjectName1,
+					}
+				}
+				confluent = &shared.KafkaUpstreamPluginConfluent{
+					Authentication: authentication1,
+					KeySchema:      keySchema,
+					SslVerify:      sslVerify1,
+					TTL:            ttl,
+					URL:            url,
+					ValueSchema:    valueSchema,
+				}
+			}
+			schemaRegistry = &shared.KafkaUpstreamPluginSchemaRegistry{
+				Confluent: confluent,
+			}
+		}
 		var security *shared.KafkaUpstreamPluginSecurity
 		if r.Config.Security != nil {
 			certificateID := new(string)
@@ -282,18 +786,15 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 				Ssl:           ssl,
 			}
 		}
-		timeout := new(int64)
+		timeout1 := new(int64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueInt64()
+			*timeout1 = r.Config.Timeout.ValueInt64()
 		} else {
-			timeout = nil
+			timeout1 = nil
 		}
-		topic := new(string)
-		if !r.Config.Topic.IsUnknown() && !r.Config.Topic.IsNull() {
-			*topic = r.Config.Topic.ValueString()
-		} else {
-			topic = nil
-		}
+		var topic string
+		topic = r.Config.Topic.ValueString()
+
 		topicsQueryArg := new(string)
 		if !r.Config.TopicsQueryArg.IsUnknown() && !r.Config.TopicsQueryArg.IsNull() {
 			*topicsQueryArg = r.Config.TopicsQueryArg.ValueString()
@@ -311,6 +812,7 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			ForwardURI:            forwardURI,
 			Keepalive:             keepalive,
 			KeepaliveEnabled:      keepaliveEnabled,
+			KeyQueryArg:           keyQueryArg,
 			MessageByLuaFunctions: messageByLuaFunctions,
 			ProducerAsync:         producerAsync,
 			ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
@@ -321,22 +823,103 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			ProducerRequestRetriesBackoffTimeout:         producerRequestRetriesBackoffTimeout,
 			ProducerRequestRetriesMaxAttempts:            producerRequestRetriesMaxAttempts,
 			ProducerRequestTimeout:                       producerRequestTimeout,
+			SchemaRegistry:                               schemaRegistry,
 			Security:                                     security,
-			Timeout:                                      timeout,
+			Timeout:                                      timeout1,
 			Topic:                                        topic,
 			TopicsQueryArg:                               topicsQueryArg,
 		}
 	}
 	var consumer *shared.KafkaUpstreamPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.KafkaUpstreamPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.KafkaUpstreamPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.KafkaUpstreamPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.KafkaUpstreamPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.KafkaUpstreamPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.KafkaUpstreamPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.KafkaUpstreamPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.KafkaUpstreamPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.KafkaUpstreamPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.KafkaUpstreamPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.KafkaUpstreamPluginProtocols, 0, len(r.Protocols))
@@ -367,226 +950,34 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.KafkaUpstreamPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginKafkaUpstreamResourceModel) ToOperationsUpdateKafkaupstreamPluginRequest(ctx context.Context) (*operations.UpdateKafkaupstreamPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	kafkaUpstreamPlugin, kafkaUpstreamPluginDiags := r.ToSharedKafkaUpstreamPlugin(ctx)
-	diags.Append(kafkaUpstreamPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateKafkaupstreamPluginRequest{
-		PluginID:            pluginID,
-		KafkaUpstreamPlugin: *kafkaUpstreamPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKafkaUpstreamResourceModel) ToOperationsGetKafkaupstreamPluginRequest(ctx context.Context) (*operations.GetKafkaupstreamPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetKafkaupstreamPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKafkaUpstreamResourceModel) ToOperationsDeleteKafkaupstreamPluginRequest(ctx context.Context) (*operations.DeleteKafkaupstreamPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteKafkaupstreamPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(ctx context.Context, resp *shared.KafkaUpstreamPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
-			r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
-			for _, v := range resp.Config.AllowedTopics {
-				r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
-			}
-			if resp.Config.Authentication == nil {
-				r.Config.Authentication = nil
-			} else {
-				r.Config.Authentication = &tfTypes.Authentication{}
-				if resp.Config.Authentication.Mechanism != nil {
-					r.Config.Authentication.Mechanism = types.StringValue(string(*resp.Config.Authentication.Mechanism))
-				} else {
-					r.Config.Authentication.Mechanism = types.StringNull()
-				}
-				r.Config.Authentication.Password = types.StringPointerValue(resp.Config.Authentication.Password)
-				if resp.Config.Authentication.Strategy != nil {
-					r.Config.Authentication.Strategy = types.StringValue(string(*resp.Config.Authentication.Strategy))
-				} else {
-					r.Config.Authentication.Strategy = types.StringNull()
-				}
-				r.Config.Authentication.Tokenauth = types.BoolPointerValue(resp.Config.Authentication.Tokenauth)
-				r.Config.Authentication.User = types.StringPointerValue(resp.Config.Authentication.User)
-			}
-			r.Config.BootstrapServers = []tfTypes.BootstrapServers{}
-			if len(r.Config.BootstrapServers) > len(resp.Config.BootstrapServers) {
-				r.Config.BootstrapServers = r.Config.BootstrapServers[:len(resp.Config.BootstrapServers)]
-			}
-			for bootstrapServersCount, bootstrapServersItem := range resp.Config.BootstrapServers {
-				var bootstrapServers tfTypes.BootstrapServers
-				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
-				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
-				if bootstrapServersCount+1 > len(r.Config.BootstrapServers) {
-					r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
-				} else {
-					r.Config.BootstrapServers[bootstrapServersCount].Host = bootstrapServers.Host
-					r.Config.BootstrapServers[bootstrapServersCount].Port = bootstrapServers.Port
-				}
-			}
-			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
-			r.Config.ForwardBody = types.BoolPointerValue(resp.Config.ForwardBody)
-			r.Config.ForwardHeaders = types.BoolPointerValue(resp.Config.ForwardHeaders)
-			r.Config.ForwardMethod = types.BoolPointerValue(resp.Config.ForwardMethod)
-			r.Config.ForwardURI = types.BoolPointerValue(resp.Config.ForwardURI)
-			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
-			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
-			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
-			for _, v := range resp.Config.MessageByLuaFunctions {
-				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
-			}
-			r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
-			r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
-			r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
-			if resp.Config.ProducerRequestAcks != nil {
-				r.Config.ProducerRequestAcks = types.Int64Value(int64(*resp.Config.ProducerRequestAcks))
-			} else {
-				r.Config.ProducerRequestAcks = types.Int64Null()
-			}
-			r.Config.ProducerRequestLimitsBytesPerRequest = types.Int64PointerValue(resp.Config.ProducerRequestLimitsBytesPerRequest)
-			r.Config.ProducerRequestLimitsMessagesPerRequest = types.Int64PointerValue(resp.Config.ProducerRequestLimitsMessagesPerRequest)
-			r.Config.ProducerRequestRetriesBackoffTimeout = types.Int64PointerValue(resp.Config.ProducerRequestRetriesBackoffTimeout)
-			r.Config.ProducerRequestRetriesMaxAttempts = types.Int64PointerValue(resp.Config.ProducerRequestRetriesMaxAttempts)
-			r.Config.ProducerRequestTimeout = types.Int64PointerValue(resp.Config.ProducerRequestTimeout)
-			if resp.Config.Security == nil {
-				r.Config.Security = nil
-			} else {
-				r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
-				r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
-				r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
-			}
-			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
-			r.Config.Topic = types.StringPointerValue(resp.Config.Topic)
-			r.Config.TopicsQueryArg = types.StringPointerValue(resp.Config.TopicsQueryArg)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

@@ -22,7 +22,8 @@ resource "kong-gateway_plugin_ai_prompt_guard" "my_pluginaipromptguard" {
     deny_patterns = [
       "..."
     ]
-    llm_format            = "openai"
+    genai_category        = "realtime/generation"
+    llm_format            = "huggingface"
     match_all_roles       = true
     max_request_body_size = 0
   }
@@ -68,6 +69,7 @@ resource "kong-gateway_plugin_ai_prompt_guard" "my_pluginaipromptguard" {
     "..."
   ]
   updated_at = 4
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -81,18 +83,16 @@ resource "kong-gateway_plugin_ai_prompt_guard" "my_pluginaipromptguard" {
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -102,9 +102,10 @@ Optional:
 - `allow_all_conversation_history` (Boolean) If true, will ignore all previous chat prompts from the conversation history.
 - `allow_patterns` (List of String) Array of valid regex patterns, or valid questions from the 'user' role in chat.
 - `deny_patterns` (List of String) Array of invalid regex patterns, or invalid questions from the 'user' role in chat.
-- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]
+- `genai_category` (String) Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation"]
+- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]
 - `match_all_roles` (Boolean) If true, will match all roles in addition to 'user' role in conversation history.
-- `max_request_body_size` (Number) max allowed body size allowed to be introspected
+- `max_request_body_size` (Number) max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 
 
 <a id="nestedatt--consumer"></a>
@@ -153,8 +154,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -177,6 +178,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ai_prompt_guard.my_kong-gateway_plugin_ai_prompt_guard
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ai_prompt_guard.my_kong-gateway_plugin_ai_prompt_guard ""
+terraform import kong-gateway_plugin_ai_prompt_guard.my_kong-gateway_plugin_ai_prompt_guard '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

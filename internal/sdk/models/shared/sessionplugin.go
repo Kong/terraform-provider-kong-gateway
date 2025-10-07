@@ -8,72 +8,33 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type SessionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
+type Bind string
 
-func (o *SessionPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
+const (
+	BindIP        Bind = "ip"
+	BindScheme    Bind = "scheme"
+	BindUserAgent Bind = "user-agent"
+)
+
+func (e Bind) ToPointer() *Bind {
+	return &e
+}
+func (e *Bind) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
 	}
-	return o.Access
-}
-
-type SessionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *SessionPluginBefore) GetAccess() []string {
-	if o == nil {
+	switch v {
+	case "ip":
+		fallthrough
+	case "scheme":
+		fallthrough
+	case "user-agent":
+		*e = Bind(v)
 		return nil
+	default:
+		return fmt.Errorf("invalid value for Bind: %v", v)
 	}
-	return o.Access
-}
-
-type SessionPluginOrdering struct {
-	After  *SessionPluginAfter  `json:"after,omitempty"`
-	Before *SessionPluginBefore `json:"before,omitempty"`
-}
-
-func (o *SessionPluginOrdering) GetAfter() *SessionPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *SessionPluginOrdering) GetBefore() *SessionPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type SessionPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *SessionPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *SessionPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *SessionPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
 }
 
 // CookieSameSite - Determines whether and how a cookie may be sent with cross-site requests.
@@ -252,6 +213,8 @@ type SessionPluginConfig struct {
 	AbsoluteTimeout *float64 `json:"absolute_timeout,omitempty"`
 	// The session audience, which is the intended target application. For example `"my-application"`.
 	Audience *string `json:"audience,omitempty"`
+	// Bind the session to data acquired from the HTTP request or connection.
+	Bind []Bind `json:"bind,omitempty"`
 	// The domain with which the cookie is intended to be exchanged.
 	CookieDomain *string `json:"cookie_domain,omitempty"`
 	// Applies the `HttpOnly` tag so that the cookie is sent only to a server.
@@ -299,179 +262,256 @@ type SessionPluginConfig struct {
 	StoreMetadata *bool `json:"store_metadata,omitempty"`
 }
 
-func (o *SessionPluginConfig) GetAbsoluteTimeout() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetAbsoluteTimeout() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.AbsoluteTimeout
+	return s.AbsoluteTimeout
 }
 
-func (o *SessionPluginConfig) GetAudience() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetAudience() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Audience
+	return s.Audience
 }
 
-func (o *SessionPluginConfig) GetCookieDomain() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetBind() []Bind {
+	if s == nil {
 		return nil
 	}
-	return o.CookieDomain
+	return s.Bind
 }
 
-func (o *SessionPluginConfig) GetCookieHTTPOnly() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookieDomain() *string {
+	if s == nil {
 		return nil
 	}
-	return o.CookieHTTPOnly
+	return s.CookieDomain
 }
 
-func (o *SessionPluginConfig) GetCookieName() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookieHTTPOnly() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.CookieName
+	return s.CookieHTTPOnly
 }
 
-func (o *SessionPluginConfig) GetCookiePath() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookieName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.CookiePath
+	return s.CookieName
 }
 
-func (o *SessionPluginConfig) GetCookieSameSite() *CookieSameSite {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookiePath() *string {
+	if s == nil {
 		return nil
 	}
-	return o.CookieSameSite
+	return s.CookiePath
 }
 
-func (o *SessionPluginConfig) GetCookieSecure() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookieSameSite() *CookieSameSite {
+	if s == nil {
 		return nil
 	}
-	return o.CookieSecure
+	return s.CookieSameSite
 }
 
-func (o *SessionPluginConfig) GetHashSubject() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetCookieSecure() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.HashSubject
+	return s.CookieSecure
 }
 
-func (o *SessionPluginConfig) GetIdlingTimeout() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetHashSubject() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.IdlingTimeout
+	return s.HashSubject
 }
 
-func (o *SessionPluginConfig) GetLogoutMethods() []SessionPluginLogoutMethods {
-	if o == nil {
+func (s *SessionPluginConfig) GetIdlingTimeout() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.LogoutMethods
+	return s.IdlingTimeout
 }
 
-func (o *SessionPluginConfig) GetLogoutPostArg() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetLogoutMethods() []SessionPluginLogoutMethods {
+	if s == nil {
 		return nil
 	}
-	return o.LogoutPostArg
+	return s.LogoutMethods
 }
 
-func (o *SessionPluginConfig) GetLogoutQueryArg() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetLogoutPostArg() *string {
+	if s == nil {
 		return nil
 	}
-	return o.LogoutQueryArg
+	return s.LogoutPostArg
 }
 
-func (o *SessionPluginConfig) GetReadBodyForLogout() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetLogoutQueryArg() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ReadBodyForLogout
+	return s.LogoutQueryArg
 }
 
-func (o *SessionPluginConfig) GetRemember() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetReadBodyForLogout() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.Remember
+	return s.ReadBodyForLogout
 }
 
-func (o *SessionPluginConfig) GetRememberAbsoluteTimeout() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetRemember() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.RememberAbsoluteTimeout
+	return s.Remember
 }
 
-func (o *SessionPluginConfig) GetRememberCookieName() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetRememberAbsoluteTimeout() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.RememberCookieName
+	return s.RememberAbsoluteTimeout
 }
 
-func (o *SessionPluginConfig) GetRememberRollingTimeout() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetRememberCookieName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.RememberRollingTimeout
+	return s.RememberCookieName
 }
 
-func (o *SessionPluginConfig) GetRequestHeaders() []RequestHeaders {
-	if o == nil {
+func (s *SessionPluginConfig) GetRememberRollingTimeout() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.RequestHeaders
+	return s.RememberRollingTimeout
 }
 
-func (o *SessionPluginConfig) GetResponseHeaders() []SessionPluginResponseHeaders {
-	if o == nil {
+func (s *SessionPluginConfig) GetRequestHeaders() []RequestHeaders {
+	if s == nil {
 		return nil
 	}
-	return o.ResponseHeaders
+	return s.RequestHeaders
 }
 
-func (o *SessionPluginConfig) GetRollingTimeout() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetResponseHeaders() []SessionPluginResponseHeaders {
+	if s == nil {
 		return nil
 	}
-	return o.RollingTimeout
+	return s.ResponseHeaders
 }
 
-func (o *SessionPluginConfig) GetSecret() *string {
-	if o == nil {
+func (s *SessionPluginConfig) GetRollingTimeout() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.Secret
+	return s.RollingTimeout
 }
 
-func (o *SessionPluginConfig) GetStaleTTL() *float64 {
-	if o == nil {
+func (s *SessionPluginConfig) GetSecret() *string {
+	if s == nil {
 		return nil
 	}
-	return o.StaleTTL
+	return s.Secret
 }
 
-func (o *SessionPluginConfig) GetStorage() *SessionPluginStorage {
-	if o == nil {
+func (s *SessionPluginConfig) GetStaleTTL() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.Storage
+	return s.StaleTTL
 }
 
-func (o *SessionPluginConfig) GetStoreMetadata() *bool {
-	if o == nil {
+func (s *SessionPluginConfig) GetStorage() *SessionPluginStorage {
+	if s == nil {
 		return nil
 	}
-	return o.StoreMetadata
+	return s.Storage
+}
+
+func (s *SessionPluginConfig) GetStoreMetadata() *bool {
+	if s == nil {
+		return nil
+	}
+	return s.StoreMetadata
+}
+
+type SessionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SessionPluginAfter) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SessionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SessionPluginBefore) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SessionPluginOrdering struct {
+	After  *SessionPluginAfter  `json:"after,omitempty"`
+	Before *SessionPluginBefore `json:"before,omitempty"`
+}
+
+func (s *SessionPluginOrdering) GetAfter() *SessionPluginAfter {
+	if s == nil {
+		return nil
+	}
+	return s.After
+}
+
+func (s *SessionPluginOrdering) GetBefore() *SessionPluginBefore {
+	if s == nil {
+		return nil
+	}
+	return s.Before
+}
+
+type SessionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (s *SessionPluginPartials) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *SessionPluginPartials) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *SessionPluginPartials) GetPath() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Path
 }
 
 // SessionPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -530,11 +570,11 @@ type SessionPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *SessionPluginRoute) GetID() *string {
-	if o == nil {
+func (s *SessionPluginRoute) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 // SessionPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -542,35 +582,37 @@ type SessionPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *SessionPluginService) GetID() *string {
-	if o == nil {
+func (s *SessionPluginService) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-// SessionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SessionPlugin struct {
+	Config *SessionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"session" json:"name"`
-	Ordering     *SessionPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []SessionPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *SessionPluginConfig `json:"config,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"session" json:"name"`
+	Ordering     *SessionPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []SessionPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []SessionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *SessionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *SessionPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s SessionPlugin) MarshalJSON() ([]byte, error) {
@@ -578,96 +620,96 @@ func (s SessionPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *SessionPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *SessionPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (s *SessionPlugin) GetConfig() *SessionPluginConfig {
+	if s == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return s.Config
 }
 
-func (o *SessionPlugin) GetEnabled() *bool {
-	if o == nil {
+func (s *SessionPlugin) GetCreatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Enabled
+	return s.CreatedAt
 }
 
-func (o *SessionPlugin) GetID() *string {
-	if o == nil {
+func (s *SessionPlugin) GetEnabled() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.Enabled
 }
 
-func (o *SessionPlugin) GetInstanceName() *string {
-	if o == nil {
+func (s *SessionPlugin) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.InstanceName
+	return s.ID
 }
 
-func (o *SessionPlugin) GetName() string {
+func (s *SessionPlugin) GetInstanceName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.InstanceName
+}
+
+func (s *SessionPlugin) GetName() string {
 	return "session"
 }
 
-func (o *SessionPlugin) GetOrdering() *SessionPluginOrdering {
-	if o == nil {
+func (s *SessionPlugin) GetOrdering() *SessionPluginOrdering {
+	if s == nil {
 		return nil
 	}
-	return o.Ordering
+	return s.Ordering
 }
 
-func (o *SessionPlugin) GetPartials() []SessionPluginPartials {
-	if o == nil {
+func (s *SessionPlugin) GetPartials() []SessionPluginPartials {
+	if s == nil {
 		return nil
 	}
-	return o.Partials
+	return s.Partials
 }
 
-func (o *SessionPlugin) GetTags() []string {
-	if o == nil {
+func (s *SessionPlugin) GetProtocols() []SessionPluginProtocols {
+	if s == nil {
 		return nil
 	}
-	return o.Tags
+	return s.Protocols
 }
 
-func (o *SessionPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (s *SessionPlugin) GetRoute() *SessionPluginRoute {
+	if s == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return s.Route
 }
 
-func (o *SessionPlugin) GetConfig() *SessionPluginConfig {
-	if o == nil {
+func (s *SessionPlugin) GetService() *SessionPluginService {
+	if s == nil {
 		return nil
 	}
-	return o.Config
+	return s.Service
 }
 
-func (o *SessionPlugin) GetProtocols() []SessionPluginProtocols {
-	if o == nil {
+func (s *SessionPlugin) GetTags() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Protocols
+	return s.Tags
 }
 
-func (o *SessionPlugin) GetRoute() *SessionPluginRoute {
-	if o == nil {
+func (s *SessionPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Route
-}
-
-func (o *SessionPlugin) GetService() *SessionPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return s.UpdatedAt
 }

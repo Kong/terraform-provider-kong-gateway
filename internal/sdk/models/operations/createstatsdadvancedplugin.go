@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateStatsdadvancedPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	StatsdAdvancedPlugin shared.StatsdAdvancedPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateStatsdadvancedPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateStatsdadvancedPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "StatsdAdvancedPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateStatsdadvancedPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateStatsdadvancedPluginRequest) GetStatsdAdvancedPlugin() shared.StatsdAdvancedPlugin {
+	if c == nil {
+		return shared.StatsdAdvancedPlugin{}
+	}
+	return c.StatsdAdvancedPlugin
+}
 
 type CreateStatsdadvancedPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateStatsdadvancedPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateStatsdadvancedPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateStatsdadvancedPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateStatsdadvancedPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateStatsdadvancedPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateStatsdadvancedPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateStatsdadvancedPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateStatsdadvancedPluginResponse) GetStatsdAdvancedPlugin() *shared.StatsdAdvancedPlugin {
-	if o == nil {
+func (c *CreateStatsdadvancedPluginResponse) GetStatsdAdvancedPlugin() *shared.StatsdAdvancedPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.StatsdAdvancedPlugin
+	return c.StatsdAdvancedPlugin
 }
 
-func (o *CreateStatsdadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateStatsdadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

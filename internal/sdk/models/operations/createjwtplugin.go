@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateJwtPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace string           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	JwtPlugin shared.JwtPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateJwtPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateJwtPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JwtPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateJwtPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateJwtPluginRequest) GetJwtPlugin() shared.JwtPlugin {
+	if c == nil {
+		return shared.JwtPlugin{}
+	}
+	return c.JwtPlugin
+}
 
 type CreateJwtPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateJwtPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateJwtPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateJwtPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateJwtPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateJwtPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateJwtPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateJwtPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateJwtPluginResponse) GetJwtPlugin() *shared.JwtPlugin {
-	if o == nil {
+func (c *CreateJwtPluginResponse) GetJwtPlugin() *shared.JwtPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.JwtPlugin
+	return c.JwtPlugin
 }
 
-func (o *CreateJwtPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateJwtPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

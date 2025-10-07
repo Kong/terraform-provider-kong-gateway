@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateRequestvalidatorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace              string                        `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RequestValidatorPlugin shared.RequestValidatorPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateRequestvalidatorPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateRequestvalidatorPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateRequestvalidatorPluginRequest) GetRequestValidatorPlugin() shared.RequestValidatorPlugin {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RequestValidatorPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateRequestvalidatorPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateRequestvalidatorPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateRequestvalidatorPluginRequest) GetRequestValidatorPlugin() shared.RequestValidatorPlugin {
+	if u == nil {
 		return shared.RequestValidatorPlugin{}
 	}
-	return o.RequestValidatorPlugin
+	return u.RequestValidatorPlugin
 }
 
 type UpdateRequestvalidatorPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateRequestvalidatorPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateRequestvalidatorPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateRequestvalidatorPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateRequestvalidatorPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateRequestvalidatorPluginResponse) GetRequestValidatorPlugin() *shared.RequestValidatorPlugin {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginResponse) GetRequestValidatorPlugin() *shared.RequestValidatorPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.RequestValidatorPlugin
+	return u.RequestValidatorPlugin
 }
 
-func (o *UpdateRequestvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateRequestvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

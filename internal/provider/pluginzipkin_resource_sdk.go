@@ -11,99 +11,256 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Context, resp *shared.ZipkinPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.ZipkinPluginConfig{}
+			r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
+			if resp.Config.DefaultHeaderType != nil {
+				r.Config.DefaultHeaderType = types.StringValue(string(*resp.Config.DefaultHeaderType))
+			} else {
+				r.Config.DefaultHeaderType = types.StringNull()
+			}
+			r.Config.DefaultServiceName = types.StringPointerValue(resp.Config.DefaultServiceName)
+			if resp.Config.HeaderType != nil {
+				r.Config.HeaderType = types.StringValue(string(*resp.Config.HeaderType))
+			} else {
+				r.Config.HeaderType = types.StringNull()
+			}
+			r.Config.HTTPEndpoint = types.StringPointerValue(resp.Config.HTTPEndpoint)
+			r.Config.HTTPResponseHeaderForTraceid = types.StringPointerValue(resp.Config.HTTPResponseHeaderForTraceid)
+			if resp.Config.HTTPSpanName != nil {
+				r.Config.HTTPSpanName = types.StringValue(string(*resp.Config.HTTPSpanName))
+			} else {
+				r.Config.HTTPSpanName = types.StringNull()
+			}
+			r.Config.IncludeCredential = types.BoolPointerValue(resp.Config.IncludeCredential)
+			r.Config.LocalServiceName = types.StringPointerValue(resp.Config.LocalServiceName)
+			if resp.Config.PhaseDurationFlavor != nil {
+				r.Config.PhaseDurationFlavor = types.StringValue(string(*resp.Config.PhaseDurationFlavor))
+			} else {
+				r.Config.PhaseDurationFlavor = types.StringNull()
+			}
+			if resp.Config.Propagation == nil {
+				r.Config.Propagation = nil
+			} else {
+				r.Config.Propagation = &tfTypes.Propagation{}
+				r.Config.Propagation.Clear = make([]types.String, 0, len(resp.Config.Propagation.Clear))
+				for _, v := range resp.Config.Propagation.Clear {
+					r.Config.Propagation.Clear = append(r.Config.Propagation.Clear, types.StringValue(v))
+				}
+				if resp.Config.Propagation.DefaultFormat != nil {
+					r.Config.Propagation.DefaultFormat = types.StringValue(string(*resp.Config.Propagation.DefaultFormat))
+				} else {
+					r.Config.Propagation.DefaultFormat = types.StringNull()
+				}
+				r.Config.Propagation.Extract = make([]types.String, 0, len(resp.Config.Propagation.Extract))
+				for _, v := range resp.Config.Propagation.Extract {
+					r.Config.Propagation.Extract = append(r.Config.Propagation.Extract, types.StringValue(string(v)))
+				}
+				r.Config.Propagation.Inject = make([]types.String, 0, len(resp.Config.Propagation.Inject))
+				for _, v := range resp.Config.Propagation.Inject {
+					r.Config.Propagation.Inject = append(r.Config.Propagation.Inject, types.StringValue(string(v)))
+				}
+			}
+			if resp.Config.Queue == nil {
+				r.Config.Queue = nil
+			} else {
+				r.Config.Queue = &tfTypes.Queue{}
+				if resp.Config.Queue.ConcurrencyLimit != nil {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
+				} else {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
+				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
+				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
+				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
+				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
+			}
+			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
+			r.Config.SampleRatio = types.Float64PointerValue(resp.Config.SampleRatio)
+			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
+			r.Config.StaticTags = []tfTypes.StaticTags{}
+
+			for _, staticTagsItem := range resp.Config.StaticTags {
+				var staticTags tfTypes.StaticTags
+
+				staticTags.Name = types.StringValue(staticTagsItem.Name)
+				staticTags.Value = types.StringValue(staticTagsItem.Value)
+
+				r.Config.StaticTags = append(r.Config.StaticTags, staticTags)
+			}
+			r.Config.TagsHeader = types.StringPointerValue(resp.Config.TagsHeader)
+			if resp.Config.TraceidByteCount != nil {
+				r.Config.TraceidByteCount = types.Int64Value(int64(*resp.Config.TraceidByteCount))
+			} else {
+				r.Config.TraceidByteCount = types.Int64Null()
+			}
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsCreateZipkinPluginRequest(ctx context.Context) (*operations.CreateZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	zipkinPlugin, zipkinPluginDiags := r.ToSharedZipkinPlugin(ctx)
+	diags.Append(zipkinPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateZipkinPluginRequest{
+		Workspace:    workspace,
+		ZipkinPlugin: *zipkinPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsDeleteZipkinPluginRequest(ctx context.Context) (*operations.DeleteZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteZipkinPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsGetZipkinPluginRequest(ctx context.Context) (*operations.GetZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetZipkinPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginZipkinResourceModel) ToOperationsUpdateZipkinPluginRequest(ctx context.Context) (*operations.UpdateZipkinPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	zipkinPlugin, zipkinPluginDiags := r.ToSharedZipkinPlugin(ctx)
+	diags.Append(zipkinPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateZipkinPluginRequest{
+		PluginID:     pluginID,
+		Workspace:    workspace,
+		ZipkinPlugin: *zipkinPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*shared.ZipkinPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.ZipkinPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.ZipkinPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.ZipkinPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.ZipkinPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.ZipkinPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.ZipkinPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.ZipkinPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.ZipkinPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.ZipkinPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.ZipkinPluginConfig
 	if r.Config != nil {
 		connectTimeout := new(int64)
@@ -172,7 +329,12 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 			for _, clearItem := range r.Config.Propagation.Clear {
 				clear = append(clear, clearItem.ValueString())
 			}
-			defaultFormat := shared.ZipkinPluginDefaultFormat(r.Config.Propagation.DefaultFormat.ValueString())
+			defaultFormat := new(shared.ZipkinPluginDefaultFormat)
+			if !r.Config.Propagation.DefaultFormat.IsUnknown() && !r.Config.Propagation.DefaultFormat.IsNull() {
+				*defaultFormat = shared.ZipkinPluginDefaultFormat(r.Config.Propagation.DefaultFormat.ValueString())
+			} else {
+				defaultFormat = nil
+			}
 			extract := make([]shared.ZipkinPluginExtract, 0, len(r.Config.Propagation.Extract))
 			for _, extractItem := range r.Config.Propagation.Extract {
 				extract = append(extract, shared.ZipkinPluginExtract(extractItem.ValueString()))
@@ -269,14 +431,14 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 		}
 		staticTags := make([]shared.StaticTags, 0, len(r.Config.StaticTags))
 		for _, staticTagsItem := range r.Config.StaticTags {
-			var name1 string
-			name1 = staticTagsItem.Name.ValueString()
+			var name string
+			name = staticTagsItem.Name.ValueString()
 
 			var value string
 			value = staticTagsItem.Value.ValueString()
 
 			staticTags = append(staticTags, shared.StaticTags{
-				Name:  name1,
+				Name:  name,
 				Value: value,
 			})
 		}
@@ -315,14 +477,94 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 	}
 	var consumer *shared.ZipkinPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.ZipkinPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.ZipkinPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.ZipkinPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.ZipkinPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.ZipkinPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.ZipkinPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.ZipkinPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.ZipkinPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.ZipkinPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name1 := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name1 = partialsItem.Name.ValueString()
+			} else {
+				name1 = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.ZipkinPluginPartials{
+				ID:   id2,
+				Name: name1,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.ZipkinPluginProtocols, 0, len(r.Protocols))
@@ -353,240 +595,34 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.ZipkinPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginZipkinResourceModel) ToOperationsUpdateZipkinPluginRequest(ctx context.Context) (*operations.UpdateZipkinPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	zipkinPlugin, zipkinPluginDiags := r.ToSharedZipkinPlugin(ctx)
-	diags.Append(zipkinPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateZipkinPluginRequest{
-		PluginID:     pluginID,
-		ZipkinPlugin: *zipkinPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginZipkinResourceModel) ToOperationsGetZipkinPluginRequest(ctx context.Context) (*operations.GetZipkinPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetZipkinPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginZipkinResourceModel) ToOperationsDeleteZipkinPluginRequest(ctx context.Context) (*operations.DeleteZipkinPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteZipkinPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Context, resp *shared.ZipkinPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.ZipkinPluginConfig{}
-			r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
-			if resp.Config.DefaultHeaderType != nil {
-				r.Config.DefaultHeaderType = types.StringValue(string(*resp.Config.DefaultHeaderType))
-			} else {
-				r.Config.DefaultHeaderType = types.StringNull()
-			}
-			r.Config.DefaultServiceName = types.StringPointerValue(resp.Config.DefaultServiceName)
-			if resp.Config.HeaderType != nil {
-				r.Config.HeaderType = types.StringValue(string(*resp.Config.HeaderType))
-			} else {
-				r.Config.HeaderType = types.StringNull()
-			}
-			r.Config.HTTPEndpoint = types.StringPointerValue(resp.Config.HTTPEndpoint)
-			r.Config.HTTPResponseHeaderForTraceid = types.StringPointerValue(resp.Config.HTTPResponseHeaderForTraceid)
-			if resp.Config.HTTPSpanName != nil {
-				r.Config.HTTPSpanName = types.StringValue(string(*resp.Config.HTTPSpanName))
-			} else {
-				r.Config.HTTPSpanName = types.StringNull()
-			}
-			r.Config.IncludeCredential = types.BoolPointerValue(resp.Config.IncludeCredential)
-			r.Config.LocalServiceName = types.StringPointerValue(resp.Config.LocalServiceName)
-			if resp.Config.PhaseDurationFlavor != nil {
-				r.Config.PhaseDurationFlavor = types.StringValue(string(*resp.Config.PhaseDurationFlavor))
-			} else {
-				r.Config.PhaseDurationFlavor = types.StringNull()
-			}
-			if resp.Config.Propagation == nil {
-				r.Config.Propagation = nil
-			} else {
-				r.Config.Propagation = &tfTypes.Propagation{}
-				r.Config.Propagation.Clear = make([]types.String, 0, len(resp.Config.Propagation.Clear))
-				for _, v := range resp.Config.Propagation.Clear {
-					r.Config.Propagation.Clear = append(r.Config.Propagation.Clear, types.StringValue(v))
-				}
-				r.Config.Propagation.DefaultFormat = types.StringValue(string(resp.Config.Propagation.DefaultFormat))
-				r.Config.Propagation.Extract = make([]types.String, 0, len(resp.Config.Propagation.Extract))
-				for _, v := range resp.Config.Propagation.Extract {
-					r.Config.Propagation.Extract = append(r.Config.Propagation.Extract, types.StringValue(string(v)))
-				}
-				r.Config.Propagation.Inject = make([]types.String, 0, len(resp.Config.Propagation.Inject))
-				for _, v := range resp.Config.Propagation.Inject {
-					r.Config.Propagation.Inject = append(r.Config.Propagation.Inject, types.StringValue(string(v)))
-				}
-			}
-			if resp.Config.Queue == nil {
-				r.Config.Queue = nil
-			} else {
-				r.Config.Queue = &tfTypes.Queue{}
-				if resp.Config.Queue.ConcurrencyLimit != nil {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
-				} else {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
-				}
-				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
-				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
-				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
-				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
-				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
-			}
-			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
-			r.Config.SampleRatio = types.Float64PointerValue(resp.Config.SampleRatio)
-			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
-			r.Config.StaticTags = []tfTypes.StaticTags{}
-			if len(r.Config.StaticTags) > len(resp.Config.StaticTags) {
-				r.Config.StaticTags = r.Config.StaticTags[:len(resp.Config.StaticTags)]
-			}
-			for staticTagsCount, staticTagsItem := range resp.Config.StaticTags {
-				var staticTags tfTypes.StaticTags
-				staticTags.Name = types.StringValue(staticTagsItem.Name)
-				staticTags.Value = types.StringValue(staticTagsItem.Value)
-				if staticTagsCount+1 > len(r.Config.StaticTags) {
-					r.Config.StaticTags = append(r.Config.StaticTags, staticTags)
-				} else {
-					r.Config.StaticTags[staticTagsCount].Name = staticTags.Name
-					r.Config.StaticTags[staticTagsCount].Value = staticTags.Value
-				}
-			}
-			r.Config.TagsHeader = types.StringPointerValue(resp.Config.TagsHeader)
-			if resp.Config.TraceidByteCount != nil {
-				r.Config.TraceidByteCount = types.Int64Value(int64(*resp.Config.TraceidByteCount))
-			} else {
-				r.Config.TraceidByteCount = types.Int64Null()
-			}
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

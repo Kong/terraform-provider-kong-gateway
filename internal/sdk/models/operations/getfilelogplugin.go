@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetFilelogPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetFilelogPluginRequest) GetPluginID() string {
-	if o == nil {
+func (g GetFilelogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetFilelogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetFilelogPluginRequest) GetPluginID() string {
+	if g == nil {
 		return ""
 	}
-	return o.PluginID
+	return g.PluginID
+}
+
+func (g *GetFilelogPluginRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetFilelogPluginResponse struct {
@@ -32,37 +53,37 @@ type GetFilelogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetFilelogPluginResponse) GetContentType() string {
-	if o == nil {
+func (g *GetFilelogPluginResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetFilelogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetFilelogPluginResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetFilelogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetFilelogPluginResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetFilelogPluginResponse) GetFileLogPlugin() *shared.FileLogPlugin {
-	if o == nil {
+func (g *GetFilelogPluginResponse) GetFileLogPlugin() *shared.FileLogPlugin {
+	if g == nil {
 		return nil
 	}
-	return o.FileLogPlugin
+	return g.FileLogPlugin
 }
 
-func (o *GetFilelogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetFilelogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

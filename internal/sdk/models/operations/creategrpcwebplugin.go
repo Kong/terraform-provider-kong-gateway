@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateGrpcwebPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	GrpcWebPlugin shared.GrpcWebPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateGrpcwebPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateGrpcwebPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GrpcWebPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateGrpcwebPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateGrpcwebPluginRequest) GetGrpcWebPlugin() shared.GrpcWebPlugin {
+	if c == nil {
+		return shared.GrpcWebPlugin{}
+	}
+	return c.GrpcWebPlugin
+}
 
 type CreateGrpcwebPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateGrpcwebPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateGrpcwebPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateGrpcwebPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateGrpcwebPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateGrpcwebPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateGrpcwebPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateGrpcwebPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateGrpcwebPluginResponse) GetGrpcWebPlugin() *shared.GrpcWebPlugin {
-	if o == nil {
+func (c *CreateGrpcwebPluginResponse) GetGrpcWebPlugin() *shared.GrpcWebPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.GrpcWebPlugin
+	return c.GrpcWebPlugin
 }
 
-func (o *CreateGrpcwebPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateGrpcwebPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

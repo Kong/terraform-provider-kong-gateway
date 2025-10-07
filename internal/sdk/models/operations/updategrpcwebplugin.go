@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateGrpcwebPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	GrpcWebPlugin shared.GrpcWebPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateGrpcwebPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateGrpcwebPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateGrpcwebPluginRequest) GetGrpcWebPlugin() shared.GrpcWebPlugin {
-	if o == nil {
+func (u *UpdateGrpcwebPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "GrpcWebPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateGrpcwebPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateGrpcwebPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateGrpcwebPluginRequest) GetGrpcWebPlugin() shared.GrpcWebPlugin {
+	if u == nil {
 		return shared.GrpcWebPlugin{}
 	}
-	return o.GrpcWebPlugin
+	return u.GrpcWebPlugin
 }
 
 type UpdateGrpcwebPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateGrpcwebPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateGrpcwebPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateGrpcwebPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateGrpcwebPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateGrpcwebPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateGrpcwebPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateGrpcwebPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateGrpcwebPluginResponse) GetGrpcWebPlugin() *shared.GrpcWebPlugin {
-	if o == nil {
+func (u *UpdateGrpcwebPluginResponse) GetGrpcWebPlugin() *shared.GrpcWebPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.GrpcWebPlugin
+	return u.GrpcWebPlugin
 }
 
-func (o *UpdateGrpcwebPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateGrpcwebPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

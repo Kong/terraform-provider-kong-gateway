@@ -3,17 +3,22 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -33,18 +38,19 @@ type PluginAzureFunctionsResource struct {
 // PluginAzureFunctionsResourceModel describes the resource data model.
 type PluginAzureFunctionsResourceModel struct {
 	Config       *tfTypes.AzureFunctionsPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.ACLWithoutParentsConsumer  `tfsdk:"consumer"`
+	Consumer     *tfTypes.Set                        `tfsdk:"consumer"`
 	CreatedAt    types.Int64                         `tfsdk:"created_at"`
 	Enabled      types.Bool                          `tfsdk:"enabled"`
 	ID           types.String                        `tfsdk:"id"`
 	InstanceName types.String                        `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                   `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                  `tfsdk:"partials"`
+	Ordering     *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials         `tfsdk:"partials"`
 	Protocols    []types.String                      `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer  `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer  `tfsdk:"service"`
+	Route        *tfTypes.Set                        `tfsdk:"route"`
+	Service      *tfTypes.Set                        `tfsdk:"service"`
 	Tags         []types.String                      `tfsdk:"tags"`
 	UpdatedAt    types.Int64                         `tfsdk:"updated_at"`
+	Workspace    types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginAzureFunctionsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -67,7 +73,10 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 					"appname": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The Azure app name.`,
+						Description: `The Azure app name. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"clientid": schema.StringAttribute{
 						Computed:    true,
@@ -77,7 +86,10 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 					"functionname": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Name of the Azure function to invoke.`,
+						Description: `Name of the Azure function to invoke. Not Null`,
+						Validators: []validator.String{
+							speakeasy_stringvalidators.NotNull(),
+						},
 					},
 					"hostdomain": schema.StringAttribute{
 						Computed:    true,
@@ -133,12 +145,17 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -177,12 +194,17 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -190,8 +212,9 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -229,6 +252,12 @@ func (r *PluginAzureFunctionsResource) Schema(ctx context.Context, req resource.
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -272,7 +301,7 @@ func (r *PluginAzureFunctionsResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	request, requestDiags := data.ToSharedAzureFunctionsPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateAzurefunctionsPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -472,5 +501,26 @@ func (r *PluginAzureFunctionsResource) Delete(ctx context.Context, req resource.
 }
 
 func (r *PluginAzureFunctionsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

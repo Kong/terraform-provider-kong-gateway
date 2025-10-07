@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRequestsizelimitingPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	RequestSizeLimitingPlugin shared.RequestSizeLimitingPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateRequestsizelimitingPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRequestsizelimitingPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RequestSizeLimitingPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRequestsizelimitingPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRequestsizelimitingPluginRequest) GetRequestSizeLimitingPlugin() shared.RequestSizeLimitingPlugin {
+	if c == nil {
+		return shared.RequestSizeLimitingPlugin{}
+	}
+	return c.RequestSizeLimitingPlugin
+}
 
 type CreateRequestsizelimitingPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateRequestsizelimitingPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRequestsizelimitingPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRequestsizelimitingPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRequestsizelimitingPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRequestsizelimitingPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRequestsizelimitingPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRequestsizelimitingPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRequestsizelimitingPluginResponse) GetRequestSizeLimitingPlugin() *shared.RequestSizeLimitingPlugin {
-	if o == nil {
+func (c *CreateRequestsizelimitingPluginResponse) GetRequestSizeLimitingPlugin() *shared.RequestSizeLimitingPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.RequestSizeLimitingPlugin
+	return c.RequestSizeLimitingPlugin
 }
 
-func (o *CreateRequestsizelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRequestsizelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

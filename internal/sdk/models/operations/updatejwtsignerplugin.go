@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateJwtsignerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID        string                 `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace       string                 `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	JwtSignerPlugin shared.JwtSignerPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateJwtsignerPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateJwtsignerPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateJwtsignerPluginRequest) GetJwtSignerPlugin() shared.JwtSignerPlugin {
-	if o == nil {
+func (u *UpdateJwtsignerPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "JwtSignerPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateJwtsignerPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateJwtsignerPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateJwtsignerPluginRequest) GetJwtSignerPlugin() shared.JwtSignerPlugin {
+	if u == nil {
 		return shared.JwtSignerPlugin{}
 	}
-	return o.JwtSignerPlugin
+	return u.JwtSignerPlugin
 }
 
 type UpdateJwtsignerPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateJwtsignerPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateJwtsignerPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateJwtsignerPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateJwtsignerPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateJwtsignerPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateJwtsignerPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateJwtsignerPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateJwtsignerPluginResponse) GetJwtSignerPlugin() *shared.JwtSignerPlugin {
-	if o == nil {
+func (u *UpdateJwtsignerPluginResponse) GetJwtSignerPlugin() *shared.JwtSignerPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.JwtSignerPlugin
+	return u.JwtSignerPlugin
 }
 
-func (o *UpdateJwtsignerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateJwtsignerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

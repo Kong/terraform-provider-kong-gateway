@@ -31,7 +31,8 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
       param_name                 = "...my_param_name..."
       param_value                = "...my_param_value..."
     }
-    llm_format = "openai"
+    genai_category = "audio/speech"
+    llm_format     = "openai"
     logging = {
       log_payloads   = false
       log_statistics = true
@@ -45,13 +46,21 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
         azure_deployment_id = "...my_azure_deployment_id..."
         azure_instance      = "...my_azure_instance..."
         bedrock = {
-          aws_assume_role_arn   = "...my_aws_assume_role_arn..."
-          aws_region            = "...my_aws_region..."
-          aws_role_session_name = "...my_aws_role_session_name..."
-          aws_sts_endpoint_url  = "...my_aws_sts_endpoint_url..."
+          aws_assume_role_arn        = "...my_aws_assume_role_arn..."
+          aws_region                 = "...my_aws_region..."
+          aws_role_session_name      = "...my_aws_role_session_name..."
+          aws_sts_endpoint_url       = "...my_aws_sts_endpoint_url..."
+          embeddings_normalize       = true
+          performance_config_latency = "...my_performance_config_latency..."
         }
+        cohere = {
+          embedding_input_type = "image"
+          wait_for_model       = false
+        }
+        embeddings_dimensions = 5
         gemini = {
           api_endpoint = "...my_api_endpoint..."
+          endpoint_id  = "...my_endpoint_id..."
           location_id  = "...my_location_id..."
           project_id   = "...my_project_id..."
         }
@@ -74,7 +83,7 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
     }
     model_name_header  = false
     response_streaming = "allow"
-    route_type         = "llm/v1/chat"
+    route_type         = "audio/v1/audio/transcriptions"
   }
   consumer = {
     id = "...my_id..."
@@ -106,7 +115,7 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
     }
   ]
   protocols = [
-    "grpcs"
+    "http"
   ]
   route = {
     id = "...my_id..."
@@ -118,6 +127,7 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
     "..."
   ]
   updated_at = 10
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -131,18 +141,16 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -150,13 +158,14 @@ resource "kong-gateway_plugin_ai_proxy" "my_pluginaiproxy" {
 Optional:
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--config--auth))
-- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]
+- `genai_category` (String) Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "text/embeddings", "text/generation"]
+- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]
 - `logging` (Attributes) (see [below for nested schema](#nestedatt--config--logging))
-- `max_request_body_size` (Number) max allowed body size allowed to be introspected
-- `model` (Attributes) (see [below for nested schema](#nestedatt--config--model))
+- `max_request_body_size` (Number) max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
+- `model` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--model))
 - `model_name_header` (Boolean) Display the model name selected in the X-Kong-LLM-Model response header
 - `response_streaming` (String) Whether to 'optionally allow', 'deny', or 'always' (force) the streaming of answers via server sent events. must be one of ["allow", "always", "deny"]
-- `route_type` (String) The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation. must be one of ["llm/v1/chat", "llm/v1/completions", "preserve"]
+- `route_type` (String) The model's operation implementation, for this provider. Not Null; must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]
 
 <a id="nestedatt--config--auth"></a>
 ### Nested Schema for `config.auth`
@@ -195,7 +204,7 @@ Optional:
 
 - `name` (String) Model name to execute.
 - `options` (Attributes) Key/value settings for the model (see [below for nested schema](#nestedatt--config--model--options))
-- `provider` (String) AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]
+- `provider` (String) AI provider request format - Kong translates requests to and from the specified backend compatible formats. Not Null; must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]
 
 <a id="nestedatt--config--model--options"></a>
 ### Nested Schema for `config.model.options`
@@ -207,6 +216,8 @@ Optional:
 - `azure_deployment_id` (String) Deployment ID for Azure OpenAI instances.
 - `azure_instance` (String) Instance name for Azure OpenAI hosted models.
 - `bedrock` (Attributes) (see [below for nested schema](#nestedatt--config--model--options--bedrock))
+- `cohere` (Attributes) (see [below for nested schema](#nestedatt--config--model--options--cohere))
+- `embeddings_dimensions` (Number) If using embeddings models, set the number of dimensions to generate.
 - `gemini` (Attributes) (see [below for nested schema](#nestedatt--config--model--options--gemini))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--config--model--options--huggingface))
 - `input_cost` (Number) Defines the cost per 1M tokens in your prompt.
@@ -229,6 +240,17 @@ Optional:
 - `aws_region` (String) If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
 - `aws_role_session_name` (String) If using AWS providers (Bedrock), set the identifier of the assumed role session.
 - `aws_sts_endpoint_url` (String) If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+- `embeddings_normalize` (Boolean) If using AWS providers (Bedrock), set to true to normalize the embeddings.
+- `performance_config_latency` (String) Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+
+
+<a id="nestedatt--config--model--options--cohere"></a>
+### Nested Schema for `config.model.options.cohere`
+
+Optional:
+
+- `embedding_input_type` (String) The purpose of the input text to calculate embedding vectors. must be one of ["classification", "clustering", "image", "search_document", "search_query"]
+- `wait_for_model` (Boolean) Wait for the model if it is not ready
 
 
 <a id="nestedatt--config--model--options--gemini"></a>
@@ -237,6 +259,7 @@ Optional:
 Optional:
 
 - `api_endpoint` (String) If running Gemini on Vertex, specify the regional API endpoint (hostname only).
+- `endpoint_id` (String) If running Gemini on Vertex Model Garden, specify the endpoint ID.
 - `location_id` (String) If running Gemini on Vertex, specify the location ID.
 - `project_id` (String) If running Gemini on Vertex, specify the project ID.
 
@@ -299,8 +322,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -323,6 +346,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ai_proxy.my_kong-gateway_plugin_ai_proxy
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ai_proxy.my_kong-gateway_plugin_ai_proxy ""
+terraform import kong-gateway_plugin_ai_proxy.my_kong-gateway_plugin_ai_proxy '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

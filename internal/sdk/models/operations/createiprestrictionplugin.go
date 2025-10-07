@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateIprestrictionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	IPRestrictionPlugin shared.IPRestrictionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateIprestrictionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateIprestrictionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "IpRestrictionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateIprestrictionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateIprestrictionPluginRequest) GetIPRestrictionPlugin() shared.IPRestrictionPlugin {
+	if c == nil {
+		return shared.IPRestrictionPlugin{}
+	}
+	return c.IPRestrictionPlugin
+}
 
 type CreateIprestrictionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateIprestrictionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateIprestrictionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateIprestrictionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateIprestrictionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateIprestrictionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateIprestrictionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateIprestrictionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateIprestrictionPluginResponse) GetIPRestrictionPlugin() *shared.IPRestrictionPlugin {
-	if o == nil {
+func (c *CreateIprestrictionPluginResponse) GetIPRestrictionPlugin() *shared.IPRestrictionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.IPRestrictionPlugin
+	return c.IPRestrictionPlugin
 }
 
-func (o *CreateIprestrictionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateIprestrictionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

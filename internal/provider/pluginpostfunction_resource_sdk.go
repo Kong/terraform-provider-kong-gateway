@@ -11,247 +11,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginPostFunctionResourceModel) ToSharedPostFunctionPlugin(ctx context.Context) (*shared.PostFunctionPlugin, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.PostFunctionPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.PostFunctionPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.PostFunctionPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.PostFunctionPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.PostFunctionPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.PostFunctionPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.PostFunctionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.PostFunctionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.PostFunctionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.PostFunctionPluginConfig
-	if r.Config != nil {
-		access2 := make([]string, 0, len(r.Config.Access))
-		for _, accessItem2 := range r.Config.Access {
-			access2 = append(access2, accessItem2.ValueString())
-		}
-		bodyFilter := make([]string, 0, len(r.Config.BodyFilter))
-		for _, bodyFilterItem := range r.Config.BodyFilter {
-			bodyFilter = append(bodyFilter, bodyFilterItem.ValueString())
-		}
-		certificate := make([]string, 0, len(r.Config.Certificate))
-		for _, certificateItem := range r.Config.Certificate {
-			certificate = append(certificate, certificateItem.ValueString())
-		}
-		headerFilter := make([]string, 0, len(r.Config.HeaderFilter))
-		for _, headerFilterItem := range r.Config.HeaderFilter {
-			headerFilter = append(headerFilter, headerFilterItem.ValueString())
-		}
-		log := make([]string, 0, len(r.Config.Log))
-		for _, logItem := range r.Config.Log {
-			log = append(log, logItem.ValueString())
-		}
-		rewrite := make([]string, 0, len(r.Config.Rewrite))
-		for _, rewriteItem := range r.Config.Rewrite {
-			rewrite = append(rewrite, rewriteItem.ValueString())
-		}
-		wsClientFrame := make([]string, 0, len(r.Config.WsClientFrame))
-		for _, wsClientFrameItem := range r.Config.WsClientFrame {
-			wsClientFrame = append(wsClientFrame, wsClientFrameItem.ValueString())
-		}
-		wsClose := make([]string, 0, len(r.Config.WsClose))
-		for _, wsCloseItem := range r.Config.WsClose {
-			wsClose = append(wsClose, wsCloseItem.ValueString())
-		}
-		wsHandshake := make([]string, 0, len(r.Config.WsHandshake))
-		for _, wsHandshakeItem := range r.Config.WsHandshake {
-			wsHandshake = append(wsHandshake, wsHandshakeItem.ValueString())
-		}
-		wsUpstreamFrame := make([]string, 0, len(r.Config.WsUpstreamFrame))
-		for _, wsUpstreamFrameItem := range r.Config.WsUpstreamFrame {
-			wsUpstreamFrame = append(wsUpstreamFrame, wsUpstreamFrameItem.ValueString())
-		}
-		config = &shared.PostFunctionPluginConfig{
-			Access:          access2,
-			BodyFilter:      bodyFilter,
-			Certificate:     certificate,
-			HeaderFilter:    headerFilter,
-			Log:             log,
-			Rewrite:         rewrite,
-			WsClientFrame:   wsClientFrame,
-			WsClose:         wsClose,
-			WsHandshake:     wsHandshake,
-			WsUpstreamFrame: wsUpstreamFrame,
-		}
-	}
-	protocols := make([]shared.PostFunctionPluginProtocols, 0, len(r.Protocols))
-	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.PostFunctionPluginProtocols(protocolsItem.ValueString()))
-	}
-	var route *shared.PostFunctionPluginRoute
-	if r.Route != nil {
-		id2 := new(string)
-		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id2 = r.Route.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		route = &shared.PostFunctionPluginRoute{
-			ID: id2,
-		}
-	}
-	var service *shared.PostFunctionPluginService
-	if r.Service != nil {
-		id3 := new(string)
-		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id3 = r.Service.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		service = &shared.PostFunctionPluginService{
-			ID: id3,
-		}
-	}
-	out := shared.PostFunctionPlugin{
-		CreatedAt:    createdAt,
-		Enabled:      enabled,
-		ID:           id,
-		InstanceName: instanceName,
-		Ordering:     ordering,
-		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Protocols:    protocols,
-		Route:        route,
-		Service:      service,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPostFunctionResourceModel) ToOperationsUpdatePostfunctionPluginRequest(ctx context.Context) (*operations.UpdatePostfunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	postFunctionPlugin, postFunctionPluginDiags := r.ToSharedPostFunctionPlugin(ctx)
-	diags.Append(postFunctionPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdatePostfunctionPluginRequest{
-		PluginID:           pluginID,
-		PostFunctionPlugin: *postFunctionPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPostFunctionResourceModel) ToOperationsGetPostfunctionPluginRequest(ctx context.Context) (*operations.GetPostfunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetPostfunctionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPostFunctionResourceModel) ToOperationsDeletePostfunctionPluginRequest(ctx context.Context) (*operations.DeletePostfunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeletePostfunctionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
 func (r *PluginPostFunctionResourceModel) RefreshFromSharedPostFunctionPlugin(ctx context.Context, resp *shared.PostFunctionPlugin) diag.Diagnostics {
 	var diags diag.Diagnostics
 
@@ -308,11 +67,11 @@ func (r *PluginPostFunctionResourceModel) RefreshFromSharedPostFunctionPlugin(ct
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.Ordering{}
+			r.Ordering = &tfTypes.AcePluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -321,7 +80,7 @@ func (r *PluginPostFunctionResourceModel) RefreshFromSharedPostFunctionPlugin(ct
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
@@ -329,22 +88,16 @@ func (r *PluginPostFunctionResourceModel) RefreshFromSharedPostFunctionPlugin(ct
 			}
 		}
 		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
 				partials.ID = types.StringPointerValue(partialsItem.ID)
 				partials.Name = types.StringPointerValue(partialsItem.Name)
 				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+
+				r.Partials = append(r.Partials, partials)
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
@@ -354,21 +107,300 @@ func (r *PluginPostFunctionResourceModel) RefreshFromSharedPostFunctionPlugin(ct
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Route = &tfTypes.Set{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Service = &tfTypes.Set{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
 
 	return diags
+}
+
+func (r *PluginPostFunctionResourceModel) ToOperationsCreatePostfunctionPluginRequest(ctx context.Context) (*operations.CreatePostfunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	postFunctionPlugin, postFunctionPluginDiags := r.ToSharedPostFunctionPlugin(ctx)
+	diags.Append(postFunctionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreatePostfunctionPluginRequest{
+		Workspace:          workspace,
+		PostFunctionPlugin: *postFunctionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPostFunctionResourceModel) ToOperationsDeletePostfunctionPluginRequest(ctx context.Context) (*operations.DeletePostfunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeletePostfunctionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPostFunctionResourceModel) ToOperationsGetPostfunctionPluginRequest(ctx context.Context) (*operations.GetPostfunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetPostfunctionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPostFunctionResourceModel) ToOperationsUpdatePostfunctionPluginRequest(ctx context.Context) (*operations.UpdatePostfunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	postFunctionPlugin, postFunctionPluginDiags := r.ToSharedPostFunctionPlugin(ctx)
+	diags.Append(postFunctionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdatePostfunctionPluginRequest{
+		PluginID:           pluginID,
+		Workspace:          workspace,
+		PostFunctionPlugin: *postFunctionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPostFunctionResourceModel) ToSharedPostFunctionPlugin(ctx context.Context) (*shared.PostFunctionPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var config *shared.PostFunctionPluginConfig
+	if r.Config != nil {
+		access := make([]string, 0, len(r.Config.Access))
+		for _, accessItem := range r.Config.Access {
+			access = append(access, accessItem.ValueString())
+		}
+		bodyFilter := make([]string, 0, len(r.Config.BodyFilter))
+		for _, bodyFilterItem := range r.Config.BodyFilter {
+			bodyFilter = append(bodyFilter, bodyFilterItem.ValueString())
+		}
+		certificate := make([]string, 0, len(r.Config.Certificate))
+		for _, certificateItem := range r.Config.Certificate {
+			certificate = append(certificate, certificateItem.ValueString())
+		}
+		headerFilter := make([]string, 0, len(r.Config.HeaderFilter))
+		for _, headerFilterItem := range r.Config.HeaderFilter {
+			headerFilter = append(headerFilter, headerFilterItem.ValueString())
+		}
+		log := make([]string, 0, len(r.Config.Log))
+		for _, logItem := range r.Config.Log {
+			log = append(log, logItem.ValueString())
+		}
+		rewrite := make([]string, 0, len(r.Config.Rewrite))
+		for _, rewriteItem := range r.Config.Rewrite {
+			rewrite = append(rewrite, rewriteItem.ValueString())
+		}
+		wsClientFrame := make([]string, 0, len(r.Config.WsClientFrame))
+		for _, wsClientFrameItem := range r.Config.WsClientFrame {
+			wsClientFrame = append(wsClientFrame, wsClientFrameItem.ValueString())
+		}
+		wsClose := make([]string, 0, len(r.Config.WsClose))
+		for _, wsCloseItem := range r.Config.WsClose {
+			wsClose = append(wsClose, wsCloseItem.ValueString())
+		}
+		wsHandshake := make([]string, 0, len(r.Config.WsHandshake))
+		for _, wsHandshakeItem := range r.Config.WsHandshake {
+			wsHandshake = append(wsHandshake, wsHandshakeItem.ValueString())
+		}
+		wsUpstreamFrame := make([]string, 0, len(r.Config.WsUpstreamFrame))
+		for _, wsUpstreamFrameItem := range r.Config.WsUpstreamFrame {
+			wsUpstreamFrame = append(wsUpstreamFrame, wsUpstreamFrameItem.ValueString())
+		}
+		config = &shared.PostFunctionPluginConfig{
+			Access:          access,
+			BodyFilter:      bodyFilter,
+			Certificate:     certificate,
+			HeaderFilter:    headerFilter,
+			Log:             log,
+			Rewrite:         rewrite,
+			WsClientFrame:   wsClientFrame,
+			WsClose:         wsClose,
+			WsHandshake:     wsHandshake,
+			WsUpstreamFrame: wsUpstreamFrame,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.PostFunctionPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.PostFunctionPluginAfter
+		if r.Ordering.After != nil {
+			access1 := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem1 := range r.Ordering.After.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			after = &shared.PostFunctionPluginAfter{
+				Access: access1,
+			}
+		}
+		var before *shared.PostFunctionPluginBefore
+		if r.Ordering.Before != nil {
+			access2 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem2 := range r.Ordering.Before.Access {
+				access2 = append(access2, accessItem2.ValueString())
+			}
+			before = &shared.PostFunctionPluginBefore{
+				Access: access2,
+			}
+		}
+		ordering = &shared.PostFunctionPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.PostFunctionPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.PostFunctionPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id1 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id1 = partialsItem.ID.ValueString()
+			} else {
+				id1 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.PostFunctionPluginPartials{
+				ID:   id1,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
+	protocols := make([]shared.PostFunctionPluginProtocols, 0, len(r.Protocols))
+	for _, protocolsItem := range r.Protocols {
+		protocols = append(protocols, shared.PostFunctionPluginProtocols(protocolsItem.ValueString()))
+	}
+	var route *shared.PostFunctionPluginRoute
+	if r.Route != nil {
+		id2 := new(string)
+		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
+			*id2 = r.Route.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		route = &shared.PostFunctionPluginRoute{
+			ID: id2,
+		}
+	}
+	var service *shared.PostFunctionPluginService
+	if r.Service != nil {
+		id3 := new(string)
+		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
+			*id3 = r.Service.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		service = &shared.PostFunctionPluginService{
+			ID: id3,
+		}
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.PostFunctionPlugin{
+		Config:       config,
+		CreatedAt:    createdAt,
+		Enabled:      enabled,
+		ID:           id,
+		InstanceName: instanceName,
+		Ordering:     ordering,
+		Partials:     partials,
+		Protocols:    protocols,
+		Route:        route,
+		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+	}
+
+	return &out, diags
 }

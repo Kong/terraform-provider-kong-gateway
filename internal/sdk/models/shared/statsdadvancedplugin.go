@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type StatsdAdvancedPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *StatsdAdvancedPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type StatsdAdvancedPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *StatsdAdvancedPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type StatsdAdvancedPluginOrdering struct {
-	After  *StatsdAdvancedPluginAfter  `json:"after,omitempty"`
-	Before *StatsdAdvancedPluginBefore `json:"before,omitempty"`
-}
-
-func (o *StatsdAdvancedPluginOrdering) GetAfter() *StatsdAdvancedPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *StatsdAdvancedPluginOrdering) GetBefore() *StatsdAdvancedPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type StatsdAdvancedPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *StatsdAdvancedPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *StatsdAdvancedPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *StatsdAdvancedPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // StatsdAdvancedPluginConsumerIdentifierDefault - The default consumer identifier for metrics. This will take effect when a metric's consumer identifier is omitted. Allowed values are `custom_id`, `consumer_id`, `username`.
 type StatsdAdvancedPluginConsumerIdentifierDefault string
 
@@ -305,46 +237,46 @@ type StatsdAdvancedPluginMetrics struct {
 	WorkspaceIdentifier *StatsdAdvancedPluginWorkspaceIdentifier `json:"workspace_identifier,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetConsumerIdentifier() *StatsdAdvancedPluginConsumerIdentifier {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetConsumerIdentifier() *StatsdAdvancedPluginConsumerIdentifier {
+	if s == nil {
 		return nil
 	}
-	return o.ConsumerIdentifier
+	return s.ConsumerIdentifier
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetName() StatsdAdvancedPluginName {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetName() StatsdAdvancedPluginName {
+	if s == nil {
 		return StatsdAdvancedPluginName("")
 	}
-	return o.Name
+	return s.Name
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetSampleRate() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetSampleRate() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.SampleRate
+	return s.SampleRate
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetServiceIdentifier() *StatsdAdvancedPluginServiceIdentifier {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetServiceIdentifier() *StatsdAdvancedPluginServiceIdentifier {
+	if s == nil {
 		return nil
 	}
-	return o.ServiceIdentifier
+	return s.ServiceIdentifier
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetStatType() StatsdAdvancedPluginStatType {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetStatType() StatsdAdvancedPluginStatType {
+	if s == nil {
 		return StatsdAdvancedPluginStatType("")
 	}
-	return o.StatType
+	return s.StatType
 }
 
-func (o *StatsdAdvancedPluginMetrics) GetWorkspaceIdentifier() *StatsdAdvancedPluginWorkspaceIdentifier {
-	if o == nil {
+func (s *StatsdAdvancedPluginMetrics) GetWorkspaceIdentifier() *StatsdAdvancedPluginWorkspaceIdentifier {
+	if s == nil {
 		return nil
 	}
-	return o.WorkspaceIdentifier
+	return s.WorkspaceIdentifier
 }
 
 // StatsdAdvancedPluginConcurrencyLimit - The number of of queue delivery timers. -1 indicates unlimited.
@@ -393,60 +325,60 @@ type StatsdAdvancedPluginQueue struct {
 	MaxRetryTime *float64 `json:"max_retry_time,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginQueue) GetConcurrencyLimit() *StatsdAdvancedPluginConcurrencyLimit {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetConcurrencyLimit() *StatsdAdvancedPluginConcurrencyLimit {
+	if s == nil {
 		return nil
 	}
-	return o.ConcurrencyLimit
+	return s.ConcurrencyLimit
 }
 
-func (o *StatsdAdvancedPluginQueue) GetInitialRetryDelay() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetInitialRetryDelay() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.InitialRetryDelay
+	return s.InitialRetryDelay
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxBatchSize() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxBatchSize() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxBatchSize
+	return s.MaxBatchSize
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxBytes() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxBytes() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxBytes
+	return s.MaxBytes
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxCoalescingDelay() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxCoalescingDelay() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxCoalescingDelay
+	return s.MaxCoalescingDelay
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxEntries() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxEntries() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxEntries
+	return s.MaxEntries
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxRetryDelay() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxRetryDelay() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxRetryDelay
+	return s.MaxRetryDelay
 }
 
-func (o *StatsdAdvancedPluginQueue) GetMaxRetryTime() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginQueue) GetMaxRetryTime() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.MaxRetryTime
+	return s.MaxRetryTime
 }
 
 // StatsdAdvancedPluginServiceIdentifierDefault - The default service identifier for metrics. This will take effect when a metric's service identifier is omitted. Allowed values are `service_name_or_host`, `service_id`, `service_name`, `service_host`.
@@ -535,88 +467,88 @@ type StatsdAdvancedPluginConfig struct {
 	WorkspaceIdentifierDefault *StatsdAdvancedPluginWorkspaceIdentifierDefault `json:"workspace_identifier_default,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginConfig) GetAllowStatusCodes() []string {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetAllowStatusCodes() []string {
+	if s == nil {
 		return nil
 	}
-	return o.AllowStatusCodes
+	return s.AllowStatusCodes
 }
 
-func (o *StatsdAdvancedPluginConfig) GetConsumerIdentifierDefault() *StatsdAdvancedPluginConsumerIdentifierDefault {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetConsumerIdentifierDefault() *StatsdAdvancedPluginConsumerIdentifierDefault {
+	if s == nil {
 		return nil
 	}
-	return o.ConsumerIdentifierDefault
+	return s.ConsumerIdentifierDefault
 }
 
-func (o *StatsdAdvancedPluginConfig) GetHost() *string {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetHost() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Host
+	return s.Host
 }
 
-func (o *StatsdAdvancedPluginConfig) GetHostnameInPrefix() *bool {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetHostnameInPrefix() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.HostnameInPrefix
+	return s.HostnameInPrefix
 }
 
-func (o *StatsdAdvancedPluginConfig) GetMetrics() []StatsdAdvancedPluginMetrics {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetMetrics() []StatsdAdvancedPluginMetrics {
+	if s == nil {
 		return nil
 	}
-	return o.Metrics
+	return s.Metrics
 }
 
-func (o *StatsdAdvancedPluginConfig) GetPort() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetPort() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Port
+	return s.Port
 }
 
-func (o *StatsdAdvancedPluginConfig) GetPrefix() *string {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetPrefix() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Prefix
+	return s.Prefix
 }
 
-func (o *StatsdAdvancedPluginConfig) GetQueue() *StatsdAdvancedPluginQueue {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetQueue() *StatsdAdvancedPluginQueue {
+	if s == nil {
 		return nil
 	}
-	return o.Queue
+	return s.Queue
 }
 
-func (o *StatsdAdvancedPluginConfig) GetServiceIdentifierDefault() *StatsdAdvancedPluginServiceIdentifierDefault {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetServiceIdentifierDefault() *StatsdAdvancedPluginServiceIdentifierDefault {
+	if s == nil {
 		return nil
 	}
-	return o.ServiceIdentifierDefault
+	return s.ServiceIdentifierDefault
 }
 
-func (o *StatsdAdvancedPluginConfig) GetUDPPacketSize() *float64 {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetUDPPacketSize() *float64 {
+	if s == nil {
 		return nil
 	}
-	return o.UDPPacketSize
+	return s.UDPPacketSize
 }
 
-func (o *StatsdAdvancedPluginConfig) GetUseTCP() *bool {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetUseTCP() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.UseTCP
+	return s.UseTCP
 }
 
-func (o *StatsdAdvancedPluginConfig) GetWorkspaceIdentifierDefault() *StatsdAdvancedPluginWorkspaceIdentifierDefault {
-	if o == nil {
+func (s *StatsdAdvancedPluginConfig) GetWorkspaceIdentifierDefault() *StatsdAdvancedPluginWorkspaceIdentifierDefault {
+	if s == nil {
 		return nil
 	}
-	return o.WorkspaceIdentifierDefault
+	return s.WorkspaceIdentifierDefault
 }
 
 // StatsdAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -624,11 +556,81 @@ type StatsdAdvancedPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginConsumer) GetID() *string {
-	if o == nil {
+func (s *StatsdAdvancedPluginConsumer) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
+}
+
+type StatsdAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginAfter) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type StatsdAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginBefore) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type StatsdAdvancedPluginOrdering struct {
+	After  *StatsdAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *StatsdAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginOrdering) GetAfter() *StatsdAdvancedPluginAfter {
+	if s == nil {
+		return nil
+	}
+	return s.After
+}
+
+func (s *StatsdAdvancedPluginOrdering) GetBefore() *StatsdAdvancedPluginBefore {
+	if s == nil {
+		return nil
+	}
+	return s.Before
+}
+
+type StatsdAdvancedPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginPartials) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *StatsdAdvancedPluginPartials) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *StatsdAdvancedPluginPartials) GetPath() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Path
 }
 
 // StatsdAdvancedPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -687,11 +689,11 @@ type StatsdAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginRoute) GetID() *string {
-	if o == nil {
+func (s *StatsdAdvancedPluginRoute) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 // StatsdAdvancedPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -699,37 +701,39 @@ type StatsdAdvancedPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StatsdAdvancedPluginService) GetID() *string {
-	if o == nil {
+func (s *StatsdAdvancedPluginService) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-// StatsdAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type StatsdAdvancedPlugin struct {
+	Config *StatsdAdvancedPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *StatsdAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                          `json:"enabled,omitempty"`
-	ID           *string                        `json:"id,omitempty"`
-	InstanceName *string                        `json:"instance_name,omitempty"`
-	name         string                         `const:"statsd-advanced" json:"name"`
-	Ordering     *StatsdAdvancedPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []StatsdAdvancedPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                      `json:"updated_at,omitempty"`
-	Config    *StatsdAdvancedPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *StatsdAdvancedPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                       `json:"instance_name,omitempty"`
+	name         string                        `const:"statsd-advanced" json:"name"`
+	Ordering     *StatsdAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []StatsdAdvancedPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []StatsdAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *StatsdAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *StatsdAdvancedPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s StatsdAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -737,103 +741,103 @@ func (s StatsdAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *StatsdAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *StatsdAdvancedPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetConfig() *StatsdAdvancedPluginConfig {
+	if s == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return s.Config
 }
 
-func (o *StatsdAdvancedPlugin) GetEnabled() *bool {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetConsumer() *StatsdAdvancedPluginConsumer {
+	if s == nil {
 		return nil
 	}
-	return o.Enabled
+	return s.Consumer
 }
 
-func (o *StatsdAdvancedPlugin) GetID() *string {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetCreatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.CreatedAt
 }
 
-func (o *StatsdAdvancedPlugin) GetInstanceName() *string {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetEnabled() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.InstanceName
+	return s.Enabled
 }
 
-func (o *StatsdAdvancedPlugin) GetName() string {
+func (s *StatsdAdvancedPlugin) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *StatsdAdvancedPlugin) GetInstanceName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.InstanceName
+}
+
+func (s *StatsdAdvancedPlugin) GetName() string {
 	return "statsd-advanced"
 }
 
-func (o *StatsdAdvancedPlugin) GetOrdering() *StatsdAdvancedPluginOrdering {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetOrdering() *StatsdAdvancedPluginOrdering {
+	if s == nil {
 		return nil
 	}
-	return o.Ordering
+	return s.Ordering
 }
 
-func (o *StatsdAdvancedPlugin) GetPartials() []StatsdAdvancedPluginPartials {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetPartials() []StatsdAdvancedPluginPartials {
+	if s == nil {
 		return nil
 	}
-	return o.Partials
+	return s.Partials
 }
 
-func (o *StatsdAdvancedPlugin) GetTags() []string {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetProtocols() []StatsdAdvancedPluginProtocols {
+	if s == nil {
 		return nil
 	}
-	return o.Tags
+	return s.Protocols
 }
 
-func (o *StatsdAdvancedPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetRoute() *StatsdAdvancedPluginRoute {
+	if s == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return s.Route
 }
 
-func (o *StatsdAdvancedPlugin) GetConfig() *StatsdAdvancedPluginConfig {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetService() *StatsdAdvancedPluginService {
+	if s == nil {
 		return nil
 	}
-	return o.Config
+	return s.Service
 }
 
-func (o *StatsdAdvancedPlugin) GetConsumer() *StatsdAdvancedPluginConsumer {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetTags() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Consumer
+	return s.Tags
 }
 
-func (o *StatsdAdvancedPlugin) GetProtocols() []StatsdAdvancedPluginProtocols {
-	if o == nil {
+func (s *StatsdAdvancedPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *StatsdAdvancedPlugin) GetRoute() *StatsdAdvancedPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *StatsdAdvancedPlugin) GetService() *StatsdAdvancedPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return s.UpdatedAt
 }

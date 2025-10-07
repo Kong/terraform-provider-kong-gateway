@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -12,20 +13,40 @@ type GetHmacAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the HMAC-auth credential to lookup
 	HMACAuthID string `pathParam:"style=simple,explode=false,name=HMACAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetHmacAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (g GetHmacAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
 }
 
-func (o *GetHmacAuthWithConsumerRequest) GetHMACAuthID() string {
-	if o == nil {
+func (g *GetHmacAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "HMACAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetHmacAuthWithConsumerRequest) GetConsumerID() string {
+	if g == nil {
 		return ""
 	}
-	return o.HMACAuthID
+	return g.ConsumerID
+}
+
+func (g *GetHmacAuthWithConsumerRequest) GetHMACAuthID() string {
+	if g == nil {
+		return ""
+	}
+	return g.HMACAuthID
+}
+
+func (g *GetHmacAuthWithConsumerRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetHmacAuthWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type GetHmacAuthWithConsumerResponse struct {
 	HMACAuth *shared.HMACAuth
 }
 
-func (o *GetHmacAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (g *GetHmacAuthWithConsumerResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetHmacAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetHmacAuthWithConsumerResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetHmacAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetHmacAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetHmacAuthWithConsumerResponse) GetHMACAuth() *shared.HMACAuth {
-	if o == nil {
+func (g *GetHmacAuthWithConsumerResponse) GetHMACAuth() *shared.HMACAuth {
+	if g == nil {
 		return nil
 	}
-	return o.HMACAuth
+	return g.HMACAuth
 }

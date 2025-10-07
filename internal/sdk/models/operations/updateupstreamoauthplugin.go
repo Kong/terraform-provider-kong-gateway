@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateUpstreamoauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	UpstreamOauthPlugin shared.UpstreamOauthPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateUpstreamoauthPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateUpstreamoauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateUpstreamoauthPluginRequest) GetUpstreamOauthPlugin() shared.UpstreamOauthPlugin {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "UpstreamOauthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateUpstreamoauthPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateUpstreamoauthPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateUpstreamoauthPluginRequest) GetUpstreamOauthPlugin() shared.UpstreamOauthPlugin {
+	if u == nil {
 		return shared.UpstreamOauthPlugin{}
 	}
-	return o.UpstreamOauthPlugin
+	return u.UpstreamOauthPlugin
 }
 
 type UpdateUpstreamoauthPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateUpstreamoauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateUpstreamoauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateUpstreamoauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateUpstreamoauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateUpstreamoauthPluginResponse) GetUpstreamOauthPlugin() *shared.UpstreamOauthPlugin {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginResponse) GetUpstreamOauthPlugin() *shared.UpstreamOauthPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.UpstreamOauthPlugin
+	return u.UpstreamOauthPlugin
 }
 
-func (o *UpdateUpstreamoauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateUpstreamoauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

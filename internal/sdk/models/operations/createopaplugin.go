@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateOpaPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace string           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	OpaPlugin shared.OpaPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateOpaPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOpaPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OpaPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateOpaPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateOpaPluginRequest) GetOpaPlugin() shared.OpaPlugin {
+	if c == nil {
+		return shared.OpaPlugin{}
+	}
+	return c.OpaPlugin
+}
 
 type CreateOpaPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateOpaPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateOpaPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateOpaPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateOpaPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateOpaPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateOpaPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateOpaPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateOpaPluginResponse) GetOpaPlugin() *shared.OpaPlugin {
-	if o == nil {
+func (c *CreateOpaPluginResponse) GetOpaPlugin() *shared.OpaPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.OpaPlugin
+	return c.OpaPlugin
 }
 
-func (o *CreateOpaPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateOpaPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

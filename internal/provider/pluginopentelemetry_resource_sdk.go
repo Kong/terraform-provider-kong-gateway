@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -12,99 +13,243 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginOpentelemetryResourceModel) RefreshFromSharedOpentelemetryPlugin(ctx context.Context, resp *shared.OpentelemetryPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.OpentelemetryPluginConfig{}
+			r.Config.BatchFlushDelay = types.Int64PointerValue(resp.Config.BatchFlushDelay)
+			r.Config.BatchSpanCount = types.Int64PointerValue(resp.Config.BatchSpanCount)
+			r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
+			if resp.Config.HeaderType != nil {
+				r.Config.HeaderType = types.StringValue(string(*resp.Config.HeaderType))
+			} else {
+				r.Config.HeaderType = types.StringNull()
+			}
+			if len(resp.Config.Headers) > 0 {
+				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
+				for key, value := range resp.Config.Headers {
+					r.Config.Headers[key] = types.StringValue(value)
+				}
+			}
+			r.Config.HTTPResponseHeaderForTraceid = types.StringPointerValue(resp.Config.HTTPResponseHeaderForTraceid)
+			r.Config.LogsEndpoint = types.StringPointerValue(resp.Config.LogsEndpoint)
+			if resp.Config.Propagation == nil {
+				r.Config.Propagation = nil
+			} else {
+				r.Config.Propagation = &tfTypes.Propagation{}
+				r.Config.Propagation.Clear = make([]types.String, 0, len(resp.Config.Propagation.Clear))
+				for _, v := range resp.Config.Propagation.Clear {
+					r.Config.Propagation.Clear = append(r.Config.Propagation.Clear, types.StringValue(v))
+				}
+				if resp.Config.Propagation.DefaultFormat != nil {
+					r.Config.Propagation.DefaultFormat = types.StringValue(string(*resp.Config.Propagation.DefaultFormat))
+				} else {
+					r.Config.Propagation.DefaultFormat = types.StringNull()
+				}
+				r.Config.Propagation.Extract = make([]types.String, 0, len(resp.Config.Propagation.Extract))
+				for _, v := range resp.Config.Propagation.Extract {
+					r.Config.Propagation.Extract = append(r.Config.Propagation.Extract, types.StringValue(string(v)))
+				}
+				r.Config.Propagation.Inject = make([]types.String, 0, len(resp.Config.Propagation.Inject))
+				for _, v := range resp.Config.Propagation.Inject {
+					r.Config.Propagation.Inject = append(r.Config.Propagation.Inject, types.StringValue(string(v)))
+				}
+			}
+			if resp.Config.Queue == nil {
+				r.Config.Queue = nil
+			} else {
+				r.Config.Queue = &tfTypes.Queue{}
+				if resp.Config.Queue.ConcurrencyLimit != nil {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
+				} else {
+					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
+				}
+				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
+				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
+				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
+				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
+				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
+				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
+				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
+			}
+			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
+			if len(resp.Config.ResourceAttributes) > 0 {
+				r.Config.ResourceAttributes = make(map[string]jsontypes.Normalized, len(resp.Config.ResourceAttributes))
+				for key1, value1 := range resp.Config.ResourceAttributes {
+					result, _ := json.Marshal(value1)
+					r.Config.ResourceAttributes[key1] = jsontypes.NewNormalizedValue(string(result))
+				}
+			}
+			r.Config.SamplingRate = types.Float64PointerValue(resp.Config.SamplingRate)
+			if resp.Config.SamplingStrategy != nil {
+				r.Config.SamplingStrategy = types.StringValue(string(*resp.Config.SamplingStrategy))
+			} else {
+				r.Config.SamplingStrategy = types.StringNull()
+			}
+			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
+			r.Config.TracesEndpoint = types.StringPointerValue(resp.Config.TracesEndpoint)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginOpentelemetryResourceModel) ToOperationsCreateOpentelemetryPluginRequest(ctx context.Context) (*operations.CreateOpentelemetryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	opentelemetryPlugin, opentelemetryPluginDiags := r.ToSharedOpentelemetryPlugin(ctx)
+	diags.Append(opentelemetryPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateOpentelemetryPluginRequest{
+		Workspace:           workspace,
+		OpentelemetryPlugin: *opentelemetryPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpentelemetryResourceModel) ToOperationsDeleteOpentelemetryPluginRequest(ctx context.Context) (*operations.DeleteOpentelemetryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteOpentelemetryPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpentelemetryResourceModel) ToOperationsGetOpentelemetryPluginRequest(ctx context.Context) (*operations.GetOpentelemetryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetOpentelemetryPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginOpentelemetryResourceModel) ToOperationsUpdateOpentelemetryPluginRequest(ctx context.Context) (*operations.UpdateOpentelemetryPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	opentelemetryPlugin, opentelemetryPluginDiags := r.ToSharedOpentelemetryPlugin(ctx)
+	diags.Append(opentelemetryPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateOpentelemetryPluginRequest{
+		PluginID:            pluginID,
+		Workspace:           workspace,
+		OpentelemetryPlugin: *opentelemetryPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx context.Context) (*shared.OpentelemetryPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.OpentelemetryPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.OpentelemetryPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.OpentelemetryPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.OpentelemetryPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.OpentelemetryPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.OpentelemetryPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.OpentelemetryPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.OpentelemetryPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.OpentelemetryPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	var config *shared.OpentelemetryPluginConfig
 	if r.Config != nil {
 		batchFlushDelay := new(int64)
@@ -131,10 +276,11 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 		} else {
 			headerType = nil
 		}
-		headers := make(map[string]interface{})
+		headers := make(map[string]string)
 		for headersKey, headersValue := range r.Config.Headers {
-			var headersInst interface{}
-			_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
+			var headersInst string
+			headersInst = headersValue.ValueString()
+
 			headers[headersKey] = headersInst
 		}
 		httpResponseHeaderForTraceid := new(string)
@@ -155,7 +301,12 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 			for _, clearItem := range r.Config.Propagation.Clear {
 				clear = append(clear, clearItem.ValueString())
 			}
-			defaultFormat := shared.DefaultFormat(r.Config.Propagation.DefaultFormat.ValueString())
+			defaultFormat := new(shared.DefaultFormat)
+			if !r.Config.Propagation.DefaultFormat.IsUnknown() && !r.Config.Propagation.DefaultFormat.IsNull() {
+				*defaultFormat = shared.DefaultFormat(r.Config.Propagation.DefaultFormat.ValueString())
+			} else {
+				defaultFormat = nil
+			}
 			extract := make([]shared.Extract, 0, len(r.Config.Propagation.Extract))
 			for _, extractItem := range r.Config.Propagation.Extract {
 				extract = append(extract, shared.Extract(extractItem.ValueString()))
@@ -250,6 +401,12 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 		} else {
 			samplingRate = nil
 		}
+		samplingStrategy := new(shared.SamplingStrategy)
+		if !r.Config.SamplingStrategy.IsUnknown() && !r.Config.SamplingStrategy.IsNull() {
+			*samplingStrategy = shared.SamplingStrategy(r.Config.SamplingStrategy.ValueString())
+		} else {
+			samplingStrategy = nil
+		}
 		sendTimeout := new(int64)
 		if !r.Config.SendTimeout.IsUnknown() && !r.Config.SendTimeout.IsNull() {
 			*sendTimeout = r.Config.SendTimeout.ValueInt64()
@@ -275,20 +432,101 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 			ReadTimeout:                  readTimeout,
 			ResourceAttributes:           resourceAttributes,
 			SamplingRate:                 samplingRate,
+			SamplingStrategy:             samplingStrategy,
 			SendTimeout:                  sendTimeout,
 			TracesEndpoint:               tracesEndpoint,
 		}
 	}
 	var consumer *shared.OpentelemetryPluginConsumer
 	if r.Consumer != nil {
-		id2 := new(string)
+		id := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
+			*id = r.Consumer.ID.ValueString()
 		} else {
-			id2 = nil
+			id = nil
 		}
 		consumer = &shared.OpentelemetryPluginConsumer{
-			ID: id2,
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.OpentelemetryPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.OpentelemetryPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.OpentelemetryPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.OpentelemetryPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.OpentelemetryPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.OpentelemetryPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.OpentelemetryPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.OpentelemetryPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.OpentelemetryPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
 		}
 	}
 	protocols := make([]shared.OpentelemetryPluginProtocols, 0, len(r.Protocols))
@@ -319,218 +557,34 @@ func (r *PluginOpentelemetryResourceModel) ToSharedOpentelemetryPlugin(ctx conte
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.OpentelemetryPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginOpentelemetryResourceModel) ToOperationsUpdateOpentelemetryPluginRequest(ctx context.Context) (*operations.UpdateOpentelemetryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	opentelemetryPlugin, opentelemetryPluginDiags := r.ToSharedOpentelemetryPlugin(ctx)
-	diags.Append(opentelemetryPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateOpentelemetryPluginRequest{
-		PluginID:            pluginID,
-		OpentelemetryPlugin: *opentelemetryPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOpentelemetryResourceModel) ToOperationsGetOpentelemetryPluginRequest(ctx context.Context) (*operations.GetOpentelemetryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetOpentelemetryPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOpentelemetryResourceModel) ToOperationsDeleteOpentelemetryPluginRequest(ctx context.Context) (*operations.DeleteOpentelemetryPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteOpentelemetryPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginOpentelemetryResourceModel) RefreshFromSharedOpentelemetryPlugin(ctx context.Context, resp *shared.OpentelemetryPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.OpentelemetryPluginConfig{}
-			r.Config.BatchFlushDelay = types.Int64PointerValue(resp.Config.BatchFlushDelay)
-			r.Config.BatchSpanCount = types.Int64PointerValue(resp.Config.BatchSpanCount)
-			r.Config.ConnectTimeout = types.Int64PointerValue(resp.Config.ConnectTimeout)
-			if resp.Config.HeaderType != nil {
-				r.Config.HeaderType = types.StringValue(string(*resp.Config.HeaderType))
-			} else {
-				r.Config.HeaderType = types.StringNull()
-			}
-			if len(resp.Config.Headers) > 0 {
-				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
-				for key, value := range resp.Config.Headers {
-					result, _ := json.Marshal(value)
-					r.Config.Headers[key] = types.StringValue(string(result))
-				}
-			}
-			r.Config.HTTPResponseHeaderForTraceid = types.StringPointerValue(resp.Config.HTTPResponseHeaderForTraceid)
-			r.Config.LogsEndpoint = types.StringPointerValue(resp.Config.LogsEndpoint)
-			if resp.Config.Propagation == nil {
-				r.Config.Propagation = nil
-			} else {
-				r.Config.Propagation = &tfTypes.Propagation{}
-				r.Config.Propagation.Clear = make([]types.String, 0, len(resp.Config.Propagation.Clear))
-				for _, v := range resp.Config.Propagation.Clear {
-					r.Config.Propagation.Clear = append(r.Config.Propagation.Clear, types.StringValue(v))
-				}
-				r.Config.Propagation.DefaultFormat = types.StringValue(string(resp.Config.Propagation.DefaultFormat))
-				r.Config.Propagation.Extract = make([]types.String, 0, len(resp.Config.Propagation.Extract))
-				for _, v := range resp.Config.Propagation.Extract {
-					r.Config.Propagation.Extract = append(r.Config.Propagation.Extract, types.StringValue(string(v)))
-				}
-				r.Config.Propagation.Inject = make([]types.String, 0, len(resp.Config.Propagation.Inject))
-				for _, v := range resp.Config.Propagation.Inject {
-					r.Config.Propagation.Inject = append(r.Config.Propagation.Inject, types.StringValue(string(v)))
-				}
-			}
-			if resp.Config.Queue == nil {
-				r.Config.Queue = nil
-			} else {
-				r.Config.Queue = &tfTypes.Queue{}
-				if resp.Config.Queue.ConcurrencyLimit != nil {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
-				} else {
-					r.Config.Queue.ConcurrencyLimit = types.Int64Null()
-				}
-				r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
-				r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
-				r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
-				r.Config.Queue.MaxCoalescingDelay = types.Float64PointerValue(resp.Config.Queue.MaxCoalescingDelay)
-				r.Config.Queue.MaxEntries = types.Int64PointerValue(resp.Config.Queue.MaxEntries)
-				r.Config.Queue.MaxRetryDelay = types.Float64PointerValue(resp.Config.Queue.MaxRetryDelay)
-				r.Config.Queue.MaxRetryTime = types.Float64PointerValue(resp.Config.Queue.MaxRetryTime)
-			}
-			r.Config.ReadTimeout = types.Int64PointerValue(resp.Config.ReadTimeout)
-			if len(resp.Config.ResourceAttributes) > 0 {
-				r.Config.ResourceAttributes = make(map[string]types.String, len(resp.Config.ResourceAttributes))
-				for key1, value1 := range resp.Config.ResourceAttributes {
-					result1, _ := json.Marshal(value1)
-					r.Config.ResourceAttributes[key1] = types.StringValue(string(result1))
-				}
-			}
-			r.Config.SamplingRate = types.Float64PointerValue(resp.Config.SamplingRate)
-			r.Config.SendTimeout = types.Int64PointerValue(resp.Config.SendTimeout)
-			r.Config.TracesEndpoint = types.StringPointerValue(resp.Config.TracesEndpoint)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

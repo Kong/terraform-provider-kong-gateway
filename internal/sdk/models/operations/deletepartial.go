@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeletePartialRequest struct {
 	// ID of the Partial to lookup
 	PartialID string `pathParam:"style=simple,explode=false,name=PartialId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeletePartialRequest) GetPartialID() string {
-	if o == nil {
+func (d DeletePartialRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeletePartialRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PartialId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeletePartialRequest) GetPartialID() string {
+	if d == nil {
 		return ""
 	}
-	return o.PartialID
+	return d.PartialID
+}
+
+func (d *DeletePartialRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeletePartialResponse struct {
@@ -30,30 +51,30 @@ type DeletePartialResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeletePartialResponse) GetContentType() string {
-	if o == nil {
+func (d *DeletePartialResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeletePartialResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeletePartialResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeletePartialResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeletePartialResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeletePartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeletePartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

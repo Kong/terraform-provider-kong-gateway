@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertConsumerRequest struct {
 	// ID or username of the Consumer to lookup
 	ConsumerIDOrUsername string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Consumer
 	Consumer shared.Consumer `request:"mediaType=application/json"`
 }
 
-func (o *UpsertConsumerRequest) GetConsumerIDOrUsername() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerIDOrUsername
+func (u UpsertConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertConsumerRequest) GetConsumer() shared.Consumer {
-	if o == nil {
+func (u *UpsertConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ConsumerIdOrUsername", "workspace", "Consumer"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertConsumerRequest) GetConsumerIDOrUsername() string {
+	if u == nil {
+		return ""
+	}
+	return u.ConsumerIDOrUsername
+}
+
+func (u *UpsertConsumerRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertConsumerRequest) GetConsumer() shared.Consumer {
+	if u == nil {
 		return shared.Consumer{}
 	}
-	return o.Consumer
+	return u.Consumer
 }
 
 type UpsertConsumerResponse struct {
@@ -41,37 +62,37 @@ type UpsertConsumerResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertConsumerResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertConsumerResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertConsumerResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertConsumerResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertConsumerResponse) GetConsumer() *shared.Consumer {
-	if o == nil {
+func (u *UpsertConsumerResponse) GetConsumer() *shared.Consumer {
+	if u == nil {
 		return nil
 	}
-	return o.Consumer
+	return u.Consumer
 }
 
-func (o *UpsertConsumerResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertConsumerResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

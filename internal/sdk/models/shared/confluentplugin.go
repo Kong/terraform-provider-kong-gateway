@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type ConfluentPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ConfluentPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ConfluentPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *ConfluentPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type ConfluentPluginOrdering struct {
-	After  *ConfluentPluginAfter  `json:"after,omitempty"`
-	Before *ConfluentPluginBefore `json:"before,omitempty"`
-}
-
-func (o *ConfluentPluginOrdering) GetAfter() *ConfluentPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *ConfluentPluginOrdering) GetBefore() *ConfluentPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type ConfluentPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *ConfluentPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *ConfluentPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *ConfluentPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type BootstrapServers struct {
 	// A string representing a host name, such as example.com.
 	Host string `json:"host"`
@@ -83,18 +15,18 @@ type BootstrapServers struct {
 	Port int64 `json:"port"`
 }
 
-func (o *BootstrapServers) GetHost() string {
-	if o == nil {
+func (b *BootstrapServers) GetHost() string {
+	if b == nil {
 		return ""
 	}
-	return o.Host
+	return b.Host
 }
 
-func (o *BootstrapServers) GetPort() int64 {
-	if o == nil {
+func (b *BootstrapServers) GetPort() int64 {
+	if b == nil {
 		return 0
 	}
-	return o.Port
+	return b.Port
 }
 
 // ProducerRequestAcks - The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
@@ -127,15 +59,490 @@ func (e *ProducerRequestAcks) UnmarshalJSON(data []byte) error {
 	}
 }
 
+type Basic struct {
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+func (b *Basic) GetPassword() string {
+	if b == nil {
+		return ""
+	}
+	return b.Password
+}
+
+func (b *Basic) GetUsername() string {
+	if b == nil {
+		return ""
+	}
+	return b.Username
+}
+
+// ConfluentPluginMode - Authentication mode to use with the schema registry.
+type ConfluentPluginMode string
+
+const (
+	ConfluentPluginModeBasic  ConfluentPluginMode = "basic"
+	ConfluentPluginModeNone   ConfluentPluginMode = "none"
+	ConfluentPluginModeOauth2 ConfluentPluginMode = "oauth2"
+)
+
+func (e ConfluentPluginMode) ToPointer() *ConfluentPluginMode {
+	return &e
+}
+func (e *ConfluentPluginMode) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "basic":
+		fallthrough
+	case "none":
+		fallthrough
+	case "oauth2":
+		*e = ConfluentPluginMode(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentPluginMode: %v", v)
+	}
+}
+
+// ConfluentPluginGrantType - The OAuth grant type to be used.
+type ConfluentPluginGrantType string
+
+const (
+	ConfluentPluginGrantTypeClientCredentials ConfluentPluginGrantType = "client_credentials"
+	ConfluentPluginGrantTypePassword          ConfluentPluginGrantType = "password"
+)
+
+func (e ConfluentPluginGrantType) ToPointer() *ConfluentPluginGrantType {
+	return &e
+}
+func (e *ConfluentPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = ConfluentPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentPluginGrantType: %v", v)
+	}
+}
+
+type Oauth2 struct {
+	// List of audiences passed to the IdP when obtaining a new token.
+	Audience []string `json:"audience,omitempty"`
+	// The client ID for the application registration in the IdP.
+	ClientID *string `json:"client_id,omitempty"`
+	// The client secret for the application registration in the IdP.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// The OAuth grant type to be used.
+	GrantType *ConfluentPluginGrantType `json:"grant_type,omitempty"`
+	// The password to use if `config.oauth.grant_type` is set to `password`.
+	Password *string `json:"password,omitempty"`
+	// List of scopes to request from the IdP when obtaining a new token.
+	Scopes []string `json:"scopes,omitempty"`
+	// The token endpoint URI.
+	TokenEndpoint string `json:"token_endpoint"`
+	// Extra headers to be passed in the token endpoint request.
+	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	// Extra post arguments to be passed in the token endpoint request.
+	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	// The username to use if `config.oauth.grant_type` is set to `password`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (o *Oauth2) GetAudience() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Audience
+}
+
+func (o *Oauth2) GetClientID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ClientID
+}
+
+func (o *Oauth2) GetClientSecret() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ClientSecret
+}
+
+func (o *Oauth2) GetGrantType() *ConfluentPluginGrantType {
+	if o == nil {
+		return nil
+	}
+	return o.GrantType
+}
+
+func (o *Oauth2) GetPassword() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Password
+}
+
+func (o *Oauth2) GetScopes() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Scopes
+}
+
+func (o *Oauth2) GetTokenEndpoint() string {
+	if o == nil {
+		return ""
+	}
+	return o.TokenEndpoint
+}
+
+func (o *Oauth2) GetTokenHeaders() map[string]any {
+	if o == nil {
+		return nil
+	}
+	return o.TokenHeaders
+}
+
+func (o *Oauth2) GetTokenPostArgs() map[string]any {
+	if o == nil {
+		return nil
+	}
+	return o.TokenPostArgs
+}
+
+func (o *Oauth2) GetUsername() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Username
+}
+
+// ConfluentPluginAuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+type ConfluentPluginAuthMethod string
+
+const (
+	ConfluentPluginAuthMethodClientSecretBasic ConfluentPluginAuthMethod = "client_secret_basic"
+	ConfluentPluginAuthMethodClientSecretJwt   ConfluentPluginAuthMethod = "client_secret_jwt"
+	ConfluentPluginAuthMethodClientSecretPost  ConfluentPluginAuthMethod = "client_secret_post"
+	ConfluentPluginAuthMethodNone              ConfluentPluginAuthMethod = "none"
+)
+
+func (e ConfluentPluginAuthMethod) ToPointer() *ConfluentPluginAuthMethod {
+	return &e
+}
+func (e *ConfluentPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		fallthrough
+	case "none":
+		*e = ConfluentPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentPluginAuthMethod: %v", v)
+	}
+}
+
+// ConfluentPluginClientSecretJwtAlg - The algorithm to use with JWT when using `client_secret_jwt` authentication.
+type ConfluentPluginClientSecretJwtAlg string
+
+const (
+	ConfluentPluginClientSecretJwtAlgHs256 ConfluentPluginClientSecretJwtAlg = "HS256"
+	ConfluentPluginClientSecretJwtAlgHs512 ConfluentPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e ConfluentPluginClientSecretJwtAlg) ToPointer() *ConfluentPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *ConfluentPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = ConfluentPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+type Oauth2Client struct {
+	// The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+	AuthMethod *ConfluentPluginAuthMethod `json:"auth_method,omitempty"`
+	// The algorithm to use with JWT when using `client_secret_jwt` authentication.
+	ClientSecretJwtAlg *ConfluentPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// The proxy to use when making HTTP requests to the IdP.
+	HTTPProxy *string `json:"http_proxy,omitempty"`
+	// The `Proxy-Authorization` header value to be used with `http_proxy`.
+	HTTPProxyAuthorization *string `json:"http_proxy_authorization,omitempty"`
+	// The HTTP version used for requests made by this plugin. Supported values: `1.1` for HTTP 1.1 and `1.0` for HTTP 1.0.
+	HTTPVersion *float64 `json:"http_version,omitempty"`
+	// The proxy to use when making HTTPS requests to the IdP.
+	HTTPSProxy *string `json:"https_proxy,omitempty"`
+	// The `Proxy-Authorization` header value to be used with `https_proxy`.
+	HTTPSProxyAuthorization *string `json:"https_proxy_authorization,omitempty"`
+	// Whether to use keepalive connections to the IdP.
+	KeepAlive *bool `json:"keep_alive,omitempty"`
+	// A comma-separated list of hosts that should not be proxied.
+	NoProxy *string `json:"no_proxy,omitempty"`
+	// Whether to verify the certificate presented by the IdP when using HTTPS.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Network I/O timeout for requests to the IdP in milliseconds.
+	Timeout *int64 `json:"timeout,omitempty"`
+}
+
+func (o *Oauth2Client) GetAuthMethod() *ConfluentPluginAuthMethod {
+	if o == nil {
+		return nil
+	}
+	return o.AuthMethod
+}
+
+func (o *Oauth2Client) GetClientSecretJwtAlg() *ConfluentPluginClientSecretJwtAlg {
+	if o == nil {
+		return nil
+	}
+	return o.ClientSecretJwtAlg
+}
+
+func (o *Oauth2Client) GetHTTPProxy() *string {
+	if o == nil {
+		return nil
+	}
+	return o.HTTPProxy
+}
+
+func (o *Oauth2Client) GetHTTPProxyAuthorization() *string {
+	if o == nil {
+		return nil
+	}
+	return o.HTTPProxyAuthorization
+}
+
+func (o *Oauth2Client) GetHTTPVersion() *float64 {
+	if o == nil {
+		return nil
+	}
+	return o.HTTPVersion
+}
+
+func (o *Oauth2Client) GetHTTPSProxy() *string {
+	if o == nil {
+		return nil
+	}
+	return o.HTTPSProxy
+}
+
+func (o *Oauth2Client) GetHTTPSProxyAuthorization() *string {
+	if o == nil {
+		return nil
+	}
+	return o.HTTPSProxyAuthorization
+}
+
+func (o *Oauth2Client) GetKeepAlive() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.KeepAlive
+}
+
+func (o *Oauth2Client) GetNoProxy() *string {
+	if o == nil {
+		return nil
+	}
+	return o.NoProxy
+}
+
+func (o *Oauth2Client) GetSslVerify() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.SslVerify
+}
+
+func (o *Oauth2Client) GetTimeout() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.Timeout
+}
+
+type ConfluentPluginAuthentication struct {
+	Basic *Basic `json:"basic,omitempty"`
+	// Authentication mode to use with the schema registry.
+	Mode         *ConfluentPluginMode `json:"mode,omitempty"`
+	Oauth2       *Oauth2              `json:"oauth2,omitempty"`
+	Oauth2Client *Oauth2Client        `json:"oauth2_client,omitempty"`
+}
+
+func (c *ConfluentPluginAuthentication) GetBasic() *Basic {
+	if c == nil {
+		return nil
+	}
+	return c.Basic
+}
+
+func (c *ConfluentPluginAuthentication) GetMode() *ConfluentPluginMode {
+	if c == nil {
+		return nil
+	}
+	return c.Mode
+}
+
+func (c *ConfluentPluginAuthentication) GetOauth2() *Oauth2 {
+	if c == nil {
+		return nil
+	}
+	return c.Oauth2
+}
+
+func (c *ConfluentPluginAuthentication) GetOauth2Client() *Oauth2Client {
+	if c == nil {
+		return nil
+	}
+	return c.Oauth2Client
+}
+
+type KeySchema struct {
+	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
+	SchemaVersion *string `json:"schema_version,omitempty"`
+	// The name of the subject
+	SubjectName *string `json:"subject_name,omitempty"`
+}
+
+func (k *KeySchema) GetSchemaVersion() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SchemaVersion
+}
+
+func (k *KeySchema) GetSubjectName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.SubjectName
+}
+
+type ValueSchema struct {
+	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
+	SchemaVersion *string `json:"schema_version,omitempty"`
+	// The name of the subject
+	SubjectName *string `json:"subject_name,omitempty"`
+}
+
+func (v *ValueSchema) GetSchemaVersion() *string {
+	if v == nil {
+		return nil
+	}
+	return v.SchemaVersion
+}
+
+func (v *ValueSchema) GetSubjectName() *string {
+	if v == nil {
+		return nil
+	}
+	return v.SubjectName
+}
+
+type Confluent struct {
+	Authentication *ConfluentPluginAuthentication `json:"authentication,omitempty"`
+	KeySchema      *KeySchema                     `json:"key_schema,omitempty"`
+	// Set to false to disable SSL certificate verification when connecting to the schema registry.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// The TTL in seconds for the schema registry cache.
+	TTL *float64 `json:"ttl,omitempty"`
+	// The URL of the schema registry.
+	URL         *string      `json:"url,omitempty"`
+	ValueSchema *ValueSchema `json:"value_schema,omitempty"`
+}
+
+func (c *Confluent) GetAuthentication() *ConfluentPluginAuthentication {
+	if c == nil {
+		return nil
+	}
+	return c.Authentication
+}
+
+func (c *Confluent) GetKeySchema() *KeySchema {
+	if c == nil {
+		return nil
+	}
+	return c.KeySchema
+}
+
+func (c *Confluent) GetSslVerify() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.SslVerify
+}
+
+func (c *Confluent) GetTTL() *float64 {
+	if c == nil {
+		return nil
+	}
+	return c.TTL
+}
+
+func (c *Confluent) GetURL() *string {
+	if c == nil {
+		return nil
+	}
+	return c.URL
+}
+
+func (c *Confluent) GetValueSchema() *ValueSchema {
+	if c == nil {
+		return nil
+	}
+	return c.ValueSchema
+}
+
+// SchemaRegistry - The plugin-global schema registry configuration. This can be overwritten by the topic configuration.
+type SchemaRegistry struct {
+	Confluent *Confluent `json:"confluent,omitempty"`
+}
+
+func (s *SchemaRegistry) GetConfluent() *Confluent {
+	if s == nil {
+		return nil
+	}
+	return s.Confluent
+}
+
 type ConfluentPluginConfig struct {
 	// The list of allowed topic names to which messages can be sent. The default topic configured in the `topic` field is always allowed, regardless of its inclusion in `allowed_topics`.
 	AllowedTopics []string `json:"allowed_topics,omitempty"`
 	// Set of bootstrap brokers in a `{host: host, port: port}` list format.
 	BootstrapServers []BootstrapServers `json:"bootstrap_servers,omitempty"`
 	// Username/Apikey for SASL authentication.
-	ClusterAPIKey *string `json:"cluster_api_key,omitempty"`
+	ClusterAPIKey string `json:"cluster_api_key"`
 	// Password/ApiSecret for SASL authentication.
-	ClusterAPISecret *string `json:"cluster_api_secret,omitempty"`
+	ClusterAPISecret string `json:"cluster_api_secret"`
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
 	ClusterName *string `json:"cluster_name,omitempty"`
 	// Apikey for authentication with Confluent Cloud. This allows for management tasks such as creating topics, ACLs, etc.
@@ -153,6 +560,8 @@ type ConfluentPluginConfig struct {
 	// Keepalive timeout in milliseconds.
 	Keepalive        *int64 `json:"keepalive,omitempty"`
 	KeepaliveEnabled *bool  `json:"keepalive_enabled,omitempty"`
+	// The request query parameter name that contains the Kafka message key. If specified, messages with the same key will be sent to the same Kafka partition, ensuring consistent ordering.
+	KeyQueryArg *string `json:"key_query_arg,omitempty"`
 	// The Lua functions that manipulates the message being sent to the Kafka topic.
 	MessageByLuaFunctions []string `json:"message_by_lua_functions,omitempty"`
 	// Flag to enable asynchronous mode.
@@ -173,194 +582,210 @@ type ConfluentPluginConfig struct {
 	ProducerRequestRetriesMaxAttempts *int64 `json:"producer_request_retries_max_attempts,omitempty"`
 	// Time to wait for a Produce response in milliseconds.
 	ProducerRequestTimeout *int64 `json:"producer_request_timeout,omitempty"`
+	// The plugin-global schema registry configuration. This can be overwritten by the topic configuration.
+	SchemaRegistry *SchemaRegistry `json:"schema_registry,omitempty"`
 	// Socket timeout in milliseconds.
 	Timeout *int64 `json:"timeout,omitempty"`
 	// The default Kafka topic to publish to if the query parameter defined in the `topics_query_arg` does not exist in the request
-	Topic *string `json:"topic,omitempty"`
+	Topic string `json:"topic"`
 	// The request query parameter name that contains the topics to publish to
 	TopicsQueryArg *string `json:"topics_query_arg,omitempty"`
 }
 
-func (o *ConfluentPluginConfig) GetAllowedTopics() []string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetAllowedTopics() []string {
+	if c == nil {
 		return nil
 	}
-	return o.AllowedTopics
+	return c.AllowedTopics
 }
 
-func (o *ConfluentPluginConfig) GetBootstrapServers() []BootstrapServers {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetBootstrapServers() []BootstrapServers {
+	if c == nil {
 		return nil
 	}
-	return o.BootstrapServers
+	return c.BootstrapServers
 }
 
-func (o *ConfluentPluginConfig) GetClusterAPIKey() *string {
-	if o == nil {
-		return nil
+func (c *ConfluentPluginConfig) GetClusterAPIKey() string {
+	if c == nil {
+		return ""
 	}
-	return o.ClusterAPIKey
+	return c.ClusterAPIKey
 }
 
-func (o *ConfluentPluginConfig) GetClusterAPISecret() *string {
-	if o == nil {
-		return nil
+func (c *ConfluentPluginConfig) GetClusterAPISecret() string {
+	if c == nil {
+		return ""
 	}
-	return o.ClusterAPISecret
+	return c.ClusterAPISecret
 }
 
-func (o *ConfluentPluginConfig) GetClusterName() *string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetClusterName() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ClusterName
+	return c.ClusterName
 }
 
-func (o *ConfluentPluginConfig) GetConfluentCloudAPIKey() *string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetConfluentCloudAPIKey() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ConfluentCloudAPIKey
+	return c.ConfluentCloudAPIKey
 }
 
-func (o *ConfluentPluginConfig) GetConfluentCloudAPISecret() *string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetConfluentCloudAPISecret() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ConfluentCloudAPISecret
+	return c.ConfluentCloudAPISecret
 }
 
-func (o *ConfluentPluginConfig) GetForwardBody() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetForwardBody() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ForwardBody
+	return c.ForwardBody
 }
 
-func (o *ConfluentPluginConfig) GetForwardHeaders() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetForwardHeaders() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ForwardHeaders
+	return c.ForwardHeaders
 }
 
-func (o *ConfluentPluginConfig) GetForwardMethod() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetForwardMethod() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ForwardMethod
+	return c.ForwardMethod
 }
 
-func (o *ConfluentPluginConfig) GetForwardURI() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetForwardURI() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ForwardURI
+	return c.ForwardURI
 }
 
-func (o *ConfluentPluginConfig) GetKeepalive() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetKeepalive() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Keepalive
+	return c.Keepalive
 }
 
-func (o *ConfluentPluginConfig) GetKeepaliveEnabled() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetKeepaliveEnabled() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.KeepaliveEnabled
+	return c.KeepaliveEnabled
 }
 
-func (o *ConfluentPluginConfig) GetMessageByLuaFunctions() []string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetKeyQueryArg() *string {
+	if c == nil {
 		return nil
 	}
-	return o.MessageByLuaFunctions
+	return c.KeyQueryArg
 }
 
-func (o *ConfluentPluginConfig) GetProducerAsync() *bool {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetMessageByLuaFunctions() []string {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerAsync
+	return c.MessageByLuaFunctions
 }
 
-func (o *ConfluentPluginConfig) GetProducerAsyncBufferingLimitsMessagesInMemory() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerAsync() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerAsyncBufferingLimitsMessagesInMemory
+	return c.ProducerAsync
 }
 
-func (o *ConfluentPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerAsyncBufferingLimitsMessagesInMemory() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerAsyncFlushTimeout
+	return c.ProducerAsyncBufferingLimitsMessagesInMemory
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestAcks() *ProducerRequestAcks {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestAcks
+	return c.ProducerAsyncFlushTimeout
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestLimitsBytesPerRequest() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestAcks() *ProducerRequestAcks {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestLimitsBytesPerRequest
+	return c.ProducerRequestAcks
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestLimitsMessagesPerRequest() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestLimitsBytesPerRequest() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestLimitsMessagesPerRequest
+	return c.ProducerRequestLimitsBytesPerRequest
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestRetriesBackoffTimeout() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestLimitsMessagesPerRequest() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestRetriesBackoffTimeout
+	return c.ProducerRequestLimitsMessagesPerRequest
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestRetriesMaxAttempts() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestRetriesBackoffTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestRetriesMaxAttempts
+	return c.ProducerRequestRetriesBackoffTimeout
 }
 
-func (o *ConfluentPluginConfig) GetProducerRequestTimeout() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestRetriesMaxAttempts() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ProducerRequestTimeout
+	return c.ProducerRequestRetriesMaxAttempts
 }
 
-func (o *ConfluentPluginConfig) GetTimeout() *int64 {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetProducerRequestTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Timeout
+	return c.ProducerRequestTimeout
 }
 
-func (o *ConfluentPluginConfig) GetTopic() *string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetSchemaRegistry() *SchemaRegistry {
+	if c == nil {
 		return nil
 	}
-	return o.Topic
+	return c.SchemaRegistry
 }
 
-func (o *ConfluentPluginConfig) GetTopicsQueryArg() *string {
-	if o == nil {
+func (c *ConfluentPluginConfig) GetTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.TopicsQueryArg
+	return c.Timeout
+}
+
+func (c *ConfluentPluginConfig) GetTopic() string {
+	if c == nil {
+		return ""
+	}
+	return c.Topic
+}
+
+func (c *ConfluentPluginConfig) GetTopicsQueryArg() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TopicsQueryArg
 }
 
 // ConfluentPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -368,11 +793,81 @@ type ConfluentPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ConfluentPluginConsumer) GetID() *string {
-	if o == nil {
+func (c *ConfluentPluginConsumer) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
+}
+
+type ConfluentPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentPluginAfter) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentPluginBefore) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentPluginOrdering struct {
+	After  *ConfluentPluginAfter  `json:"after,omitempty"`
+	Before *ConfluentPluginBefore `json:"before,omitempty"`
+}
+
+func (c *ConfluentPluginOrdering) GetAfter() *ConfluentPluginAfter {
+	if c == nil {
+		return nil
+	}
+	return c.After
+}
+
+func (c *ConfluentPluginOrdering) GetBefore() *ConfluentPluginBefore {
+	if c == nil {
+		return nil
+	}
+	return c.Before
+}
+
+type ConfluentPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (c *ConfluentPluginPartials) GetID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ID
+}
+
+func (c *ConfluentPluginPartials) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *ConfluentPluginPartials) GetPath() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Path
 }
 
 type ConfluentPluginProtocols string
@@ -412,11 +907,11 @@ type ConfluentPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ConfluentPluginRoute) GetID() *string {
-	if o == nil {
+func (c *ConfluentPluginRoute) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
 // ConfluentPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -424,37 +919,39 @@ type ConfluentPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ConfluentPluginService) GetID() *string {
-	if o == nil {
+func (c *ConfluentPluginService) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-// ConfluentPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ConfluentPlugin struct {
+	Config *ConfluentPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ConfluentPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                     `json:"enabled,omitempty"`
-	ID           *string                   `json:"id,omitempty"`
-	InstanceName *string                   `json:"instance_name,omitempty"`
-	name         string                    `const:"confluent" json:"name"`
-	Ordering     *ConfluentPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []ConfluentPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                 `json:"updated_at,omitempty"`
-	Config    *ConfluentPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ConfluentPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                  `json:"instance_name,omitempty"`
+	name         string                   `const:"confluent" json:"name"`
+	Ordering     *ConfluentPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []ConfluentPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []ConfluentPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ConfluentPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ConfluentPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (c ConfluentPlugin) MarshalJSON() ([]byte, error) {
@@ -462,103 +959,103 @@ func (c ConfluentPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *ConfluentPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (c *ConfluentPlugin) GetConfig() *ConfluentPluginConfig {
+	if c == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return c.Config
 }
 
-func (o *ConfluentPlugin) GetEnabled() *bool {
-	if o == nil {
+func (c *ConfluentPlugin) GetConsumer() *ConfluentPluginConsumer {
+	if c == nil {
 		return nil
 	}
-	return o.Enabled
+	return c.Consumer
 }
 
-func (o *ConfluentPlugin) GetID() *string {
-	if o == nil {
+func (c *ConfluentPlugin) GetCreatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.CreatedAt
 }
 
-func (o *ConfluentPlugin) GetInstanceName() *string {
-	if o == nil {
+func (c *ConfluentPlugin) GetEnabled() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.InstanceName
+	return c.Enabled
 }
 
-func (o *ConfluentPlugin) GetName() string {
+func (c *ConfluentPlugin) GetID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ID
+}
+
+func (c *ConfluentPlugin) GetInstanceName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.InstanceName
+}
+
+func (c *ConfluentPlugin) GetName() string {
 	return "confluent"
 }
 
-func (o *ConfluentPlugin) GetOrdering() *ConfluentPluginOrdering {
-	if o == nil {
+func (c *ConfluentPlugin) GetOrdering() *ConfluentPluginOrdering {
+	if c == nil {
 		return nil
 	}
-	return o.Ordering
+	return c.Ordering
 }
 
-func (o *ConfluentPlugin) GetPartials() []ConfluentPluginPartials {
-	if o == nil {
+func (c *ConfluentPlugin) GetPartials() []ConfluentPluginPartials {
+	if c == nil {
 		return nil
 	}
-	return o.Partials
+	return c.Partials
 }
 
-func (o *ConfluentPlugin) GetTags() []string {
-	if o == nil {
+func (c *ConfluentPlugin) GetProtocols() []ConfluentPluginProtocols {
+	if c == nil {
 		return nil
 	}
-	return o.Tags
+	return c.Protocols
 }
 
-func (o *ConfluentPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (c *ConfluentPlugin) GetRoute() *ConfluentPluginRoute {
+	if c == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return c.Route
 }
 
-func (o *ConfluentPlugin) GetConfig() *ConfluentPluginConfig {
-	if o == nil {
+func (c *ConfluentPlugin) GetService() *ConfluentPluginService {
+	if c == nil {
 		return nil
 	}
-	return o.Config
+	return c.Service
 }
 
-func (o *ConfluentPlugin) GetConsumer() *ConfluentPluginConsumer {
-	if o == nil {
+func (c *ConfluentPlugin) GetTags() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Consumer
+	return c.Tags
 }
 
-func (o *ConfluentPlugin) GetProtocols() []ConfluentPluginProtocols {
-	if o == nil {
+func (c *ConfluentPlugin) GetUpdatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *ConfluentPlugin) GetRoute() *ConfluentPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *ConfluentPlugin) GetService() *ConfluentPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return c.UpdatedAt
 }

@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type HTTPLogPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *HTTPLogPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type HTTPLogPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *HTTPLogPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type HTTPLogPluginOrdering struct {
-	After  *HTTPLogPluginAfter  `json:"after,omitempty"`
-	Before *HTTPLogPluginBefore `json:"before,omitempty"`
-}
-
-func (o *HTTPLogPluginOrdering) GetAfter() *HTTPLogPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *HTTPLogPluginOrdering) GetBefore() *HTTPLogPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type HTTPLogPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *HTTPLogPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *HTTPLogPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *HTTPLogPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 // ContentType - Indicates the type of data sent. The only available option is `application/json`.
 type ContentType string
 
@@ -179,73 +111,73 @@ type HTTPLogPluginQueue struct {
 	MaxRetryTime *float64 `json:"max_retry_time,omitempty"`
 }
 
-func (o *HTTPLogPluginQueue) GetConcurrencyLimit() *HTTPLogPluginConcurrencyLimit {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetConcurrencyLimit() *HTTPLogPluginConcurrencyLimit {
+	if h == nil {
 		return nil
 	}
-	return o.ConcurrencyLimit
+	return h.ConcurrencyLimit
 }
 
-func (o *HTTPLogPluginQueue) GetInitialRetryDelay() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetInitialRetryDelay() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.InitialRetryDelay
+	return h.InitialRetryDelay
 }
 
-func (o *HTTPLogPluginQueue) GetMaxBatchSize() *int64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxBatchSize() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxBatchSize
+	return h.MaxBatchSize
 }
 
-func (o *HTTPLogPluginQueue) GetMaxBytes() *int64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxBytes() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxBytes
+	return h.MaxBytes
 }
 
-func (o *HTTPLogPluginQueue) GetMaxCoalescingDelay() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxCoalescingDelay() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxCoalescingDelay
+	return h.MaxCoalescingDelay
 }
 
-func (o *HTTPLogPluginQueue) GetMaxEntries() *int64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxEntries() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxEntries
+	return h.MaxEntries
 }
 
-func (o *HTTPLogPluginQueue) GetMaxRetryDelay() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxRetryDelay() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxRetryDelay
+	return h.MaxRetryDelay
 }
 
-func (o *HTTPLogPluginQueue) GetMaxRetryTime() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginQueue) GetMaxRetryTime() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.MaxRetryTime
+	return h.MaxRetryTime
 }
 
 type HTTPLogPluginConfig struct {
 	// Indicates the type of data sent. The only available option is `application/json`.
 	ContentType *ContentType `json:"content_type,omitempty"`
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// Optional time in seconds. If `queue_size` > 1, this is the max idle time before sending a log with less than `queue_size` records.
 	FlushTimeout *float64 `json:"flush_timeout,omitempty"`
 	// An optional table of headers included in the HTTP message to the upstream server. Values are indexed by header name, and each header name accepts a single string.
-	Headers map[string]any `json:"headers,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
 	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
-	HTTPEndpoint *string `json:"http_endpoint,omitempty"`
+	HTTPEndpoint string `json:"http_endpoint"`
 	// An optional value in milliseconds that defines how long an idle connection will live before being closed.
 	Keepalive *float64 `json:"keepalive,omitempty"`
 	// An optional method used to send data to the HTTP server. Supported values are `POST` (default), `PUT`, and `PATCH`.
@@ -259,81 +191,81 @@ type HTTPLogPluginConfig struct {
 	Timeout *float64 `json:"timeout,omitempty"`
 }
 
-func (o *HTTPLogPluginConfig) GetContentType() *ContentType {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetContentType() *ContentType {
+	if h == nil {
 		return nil
 	}
-	return o.ContentType
+	return h.ContentType
 }
 
-func (o *HTTPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetCustomFieldsByLua() map[string]string {
+	if h == nil {
 		return nil
 	}
-	return o.CustomFieldsByLua
+	return h.CustomFieldsByLua
 }
 
-func (o *HTTPLogPluginConfig) GetFlushTimeout() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetFlushTimeout() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.FlushTimeout
+	return h.FlushTimeout
 }
 
-func (o *HTTPLogPluginConfig) GetHeaders() map[string]any {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetHeaders() map[string]string {
+	if h == nil {
 		return nil
 	}
-	return o.Headers
+	return h.Headers
 }
 
-func (o *HTTPLogPluginConfig) GetHTTPEndpoint() *string {
-	if o == nil {
-		return nil
+func (h *HTTPLogPluginConfig) GetHTTPEndpoint() string {
+	if h == nil {
+		return ""
 	}
-	return o.HTTPEndpoint
+	return h.HTTPEndpoint
 }
 
-func (o *HTTPLogPluginConfig) GetKeepalive() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetKeepalive() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.Keepalive
+	return h.Keepalive
 }
 
-func (o *HTTPLogPluginConfig) GetMethod() *Method {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetMethod() *Method {
+	if h == nil {
 		return nil
 	}
-	return o.Method
+	return h.Method
 }
 
-func (o *HTTPLogPluginConfig) GetQueue() *HTTPLogPluginQueue {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetQueue() *HTTPLogPluginQueue {
+	if h == nil {
 		return nil
 	}
-	return o.Queue
+	return h.Queue
 }
 
-func (o *HTTPLogPluginConfig) GetQueueSize() *int64 {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetQueueSize() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.QueueSize
+	return h.QueueSize
 }
 
-func (o *HTTPLogPluginConfig) GetRetryCount() *int64 {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetRetryCount() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.RetryCount
+	return h.RetryCount
 }
 
-func (o *HTTPLogPluginConfig) GetTimeout() *float64 {
-	if o == nil {
+func (h *HTTPLogPluginConfig) GetTimeout() *float64 {
+	if h == nil {
 		return nil
 	}
-	return o.Timeout
+	return h.Timeout
 }
 
 // HTTPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -341,11 +273,81 @@ type HTTPLogPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *HTTPLogPluginConsumer) GetID() *string {
-	if o == nil {
+func (h *HTTPLogPluginConsumer) GetID() *string {
+	if h == nil {
 		return nil
 	}
-	return o.ID
+	return h.ID
+}
+
+type HTTPLogPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HTTPLogPluginAfter) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HTTPLogPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (h *HTTPLogPluginBefore) GetAccess() []string {
+	if h == nil {
+		return nil
+	}
+	return h.Access
+}
+
+type HTTPLogPluginOrdering struct {
+	After  *HTTPLogPluginAfter  `json:"after,omitempty"`
+	Before *HTTPLogPluginBefore `json:"before,omitempty"`
+}
+
+func (h *HTTPLogPluginOrdering) GetAfter() *HTTPLogPluginAfter {
+	if h == nil {
+		return nil
+	}
+	return h.After
+}
+
+func (h *HTTPLogPluginOrdering) GetBefore() *HTTPLogPluginBefore {
+	if h == nil {
+		return nil
+	}
+	return h.Before
+}
+
+type HTTPLogPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (h *HTTPLogPluginPartials) GetID() *string {
+	if h == nil {
+		return nil
+	}
+	return h.ID
+}
+
+func (h *HTTPLogPluginPartials) GetName() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Name
+}
+
+func (h *HTTPLogPluginPartials) GetPath() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Path
 }
 
 // HTTPLogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -404,11 +406,11 @@ type HTTPLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *HTTPLogPluginRoute) GetID() *string {
-	if o == nil {
+func (h *HTTPLogPluginRoute) GetID() *string {
+	if h == nil {
 		return nil
 	}
-	return o.ID
+	return h.ID
 }
 
 // HTTPLogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -416,37 +418,39 @@ type HTTPLogPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *HTTPLogPluginService) GetID() *string {
-	if o == nil {
+func (h *HTTPLogPluginService) GetID() *string {
+	if h == nil {
 		return nil
 	}
-	return o.ID
+	return h.ID
 }
 
-// HTTPLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HTTPLogPlugin struct {
+	Config *HTTPLogPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *HTTPLogPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"http-log" json:"name"`
-	Ordering     *HTTPLogPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []HTTPLogPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *HTTPLogPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *HTTPLogPluginConsumer `json:"consumer,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"http-log" json:"name"`
+	Ordering     *HTTPLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []HTTPLogPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []HTTPLogPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *HTTPLogPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *HTTPLogPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (h HTTPLogPlugin) MarshalJSON() ([]byte, error) {
@@ -454,103 +458,103 @@ func (h HTTPLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (h *HTTPLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *HTTPLogPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (h *HTTPLogPlugin) GetConfig() *HTTPLogPluginConfig {
+	if h == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return h.Config
 }
 
-func (o *HTTPLogPlugin) GetEnabled() *bool {
-	if o == nil {
+func (h *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
+	if h == nil {
 		return nil
 	}
-	return o.Enabled
+	return h.Consumer
 }
 
-func (o *HTTPLogPlugin) GetID() *string {
-	if o == nil {
+func (h *HTTPLogPlugin) GetCreatedAt() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.ID
+	return h.CreatedAt
 }
 
-func (o *HTTPLogPlugin) GetInstanceName() *string {
-	if o == nil {
+func (h *HTTPLogPlugin) GetEnabled() *bool {
+	if h == nil {
 		return nil
 	}
-	return o.InstanceName
+	return h.Enabled
 }
 
-func (o *HTTPLogPlugin) GetName() string {
+func (h *HTTPLogPlugin) GetID() *string {
+	if h == nil {
+		return nil
+	}
+	return h.ID
+}
+
+func (h *HTTPLogPlugin) GetInstanceName() *string {
+	if h == nil {
+		return nil
+	}
+	return h.InstanceName
+}
+
+func (h *HTTPLogPlugin) GetName() string {
 	return "http-log"
 }
 
-func (o *HTTPLogPlugin) GetOrdering() *HTTPLogPluginOrdering {
-	if o == nil {
+func (h *HTTPLogPlugin) GetOrdering() *HTTPLogPluginOrdering {
+	if h == nil {
 		return nil
 	}
-	return o.Ordering
+	return h.Ordering
 }
 
-func (o *HTTPLogPlugin) GetPartials() []HTTPLogPluginPartials {
-	if o == nil {
+func (h *HTTPLogPlugin) GetPartials() []HTTPLogPluginPartials {
+	if h == nil {
 		return nil
 	}
-	return o.Partials
+	return h.Partials
 }
 
-func (o *HTTPLogPlugin) GetTags() []string {
-	if o == nil {
+func (h *HTTPLogPlugin) GetProtocols() []HTTPLogPluginProtocols {
+	if h == nil {
 		return nil
 	}
-	return o.Tags
+	return h.Protocols
 }
 
-func (o *HTTPLogPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (h *HTTPLogPlugin) GetRoute() *HTTPLogPluginRoute {
+	if h == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return h.Route
 }
 
-func (o *HTTPLogPlugin) GetConfig() *HTTPLogPluginConfig {
-	if o == nil {
+func (h *HTTPLogPlugin) GetService() *HTTPLogPluginService {
+	if h == nil {
 		return nil
 	}
-	return o.Config
+	return h.Service
 }
 
-func (o *HTTPLogPlugin) GetConsumer() *HTTPLogPluginConsumer {
-	if o == nil {
+func (h *HTTPLogPlugin) GetTags() []string {
+	if h == nil {
 		return nil
 	}
-	return o.Consumer
+	return h.Tags
 }
 
-func (o *HTTPLogPlugin) GetProtocols() []HTTPLogPluginProtocols {
-	if o == nil {
+func (h *HTTPLogPlugin) GetUpdatedAt() *int64 {
+	if h == nil {
 		return nil
 	}
-	return o.Protocols
-}
-
-func (o *HTTPLogPlugin) GetRoute() *HTTPLogPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *HTTPLogPlugin) GetService() *HTTPLogPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return h.UpdatedAt
 }

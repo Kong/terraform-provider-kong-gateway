@@ -26,7 +26,7 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
       read_timeout          = 1231607071
       retries               = 7527
       slots                 = 15983
-      tokens_count_strategy = "prompt-tokens"
+      tokens_count_strategy = "llm-accuracy"
       write_timeout         = 1922410764
     }
     embeddings = {
@@ -55,10 +55,12 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
             instance      = "...my_instance..."
           }
           bedrock = {
-            aws_assume_role_arn   = "...my_aws_assume_role_arn..."
-            aws_region            = "...my_aws_region..."
-            aws_role_session_name = "...my_aws_role_session_name..."
-            aws_sts_endpoint_url  = "...my_aws_sts_endpoint_url..."
+            aws_assume_role_arn        = "...my_aws_assume_role_arn..."
+            aws_region                 = "...my_aws_region..."
+            aws_role_session_name      = "...my_aws_role_session_name..."
+            aws_sts_endpoint_url       = "...my_aws_sts_endpoint_url..."
+            embeddings_normalize       = false
+            performance_config_latency = "...my_performance_config_latency..."
           }
           gemini = {
             api_endpoint = "...my_api_endpoint..."
@@ -74,6 +76,7 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
         provider = "bedrock"
       }
     }
+    genai_category        = "realtime/generation"
     llm_format            = "openai"
     max_request_body_size = 2
     model_name_header     = true
@@ -109,13 +112,21 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
             azure_deployment_id = "...my_azure_deployment_id..."
             azure_instance      = "...my_azure_instance..."
             bedrock = {
-              aws_assume_role_arn   = "...my_aws_assume_role_arn..."
-              aws_region            = "...my_aws_region..."
-              aws_role_session_name = "...my_aws_role_session_name..."
-              aws_sts_endpoint_url  = "...my_aws_sts_endpoint_url..."
+              aws_assume_role_arn        = "...my_aws_assume_role_arn..."
+              aws_region                 = "...my_aws_region..."
+              aws_role_session_name      = "...my_aws_role_session_name..."
+              aws_sts_endpoint_url       = "...my_aws_sts_endpoint_url..."
+              embeddings_normalize       = false
+              performance_config_latency = "...my_performance_config_latency..."
             }
+            cohere = {
+              embedding_input_type = "clustering"
+              wait_for_model       = true
+            }
+            embeddings_dimensions = 5
             gemini = {
               api_endpoint = "...my_api_endpoint..."
+              endpoint_id  = "...my_endpoint_id..."
               location_id  = "...my_location_id..."
               project_id   = "...my_project_id..."
             }
@@ -136,7 +147,7 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
           }
           provider = "bedrock"
         }
-        route_type = "llm/v1/chat"
+        route_type = "audio/v1/audio/transcriptions"
         weight     = 7898
       }
     ]
@@ -224,7 +235,7 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
     }
   ]
   protocols = [
-    "grpcs"
+    "http"
   ]
   route = {
     id = "...my_id..."
@@ -236,6 +247,7 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
     "..."
   ]
   updated_at = 10
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -249,18 +261,16 @@ resource "kong-gateway_plugin_ai_proxy_advanced" "my_pluginaiproxyadvanced" {
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -269,11 +279,12 @@ Optional:
 
 - `balancer` (Attributes) (see [below for nested schema](#nestedatt--config--balancer))
 - `embeddings` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings))
-- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "gemini", "openai"]
-- `max_request_body_size` (Number) max allowed body size allowed to be introspected
+- `genai_category` (String) Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation"]
+- `llm_format` (String) LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]
+- `max_request_body_size` (Number) max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 - `model_name_header` (Boolean) Display the model name selected in the X-Kong-LLM-Model response header
 - `response_streaming` (String) Whether to 'optionally allow', 'deny', or 'always' (force) the streaming of answers via server sent events. must be one of ["allow", "always", "deny"]
-- `targets` (Attributes List) (see [below for nested schema](#nestedatt--config--targets))
+- `targets` (Attributes List) Not Null (see [below for nested schema](#nestedatt--config--targets))
 - `vectordb` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb))
 
 <a id="nestedatt--config--balancer"></a>
@@ -289,7 +300,7 @@ Optional:
 - `read_timeout` (Number)
 - `retries` (Number) The number of retries to execute upon failure to proxy.
 - `slots` (Number) The number of slots in the load balancer algorithm.
-- `tokens_count_strategy` (String) What tokens to use for usage calculation. Available values are: `total_tokens` `prompt_tokens`, `completion_tokens` and `cost`. must be one of ["completion-tokens", "cost", "prompt-tokens", "total-tokens"]
+- `tokens_count_strategy` (String) What tokens to use for usage calculation. Available values are: `total_tokens` `prompt_tokens`, `completion_tokens` and `cost`. must be one of ["completion-tokens", "cost", "llm-accuracy", "prompt-tokens", "total-tokens"]
 - `write_timeout` (Number)
 
 
@@ -336,7 +347,7 @@ Optional:
 
 Optional:
 
-- `azure` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--embeddings--model--options--azure))
+- `azure` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--azure))
 - `bedrock` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--bedrock))
 - `gemini` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--gemini))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--config--embeddings--model--options--huggingface))
@@ -361,6 +372,8 @@ Optional:
 - `aws_region` (String) If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
 - `aws_role_session_name` (String) If using AWS providers (Bedrock), set the identifier of the assumed role session.
 - `aws_sts_endpoint_url` (String) If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+- `embeddings_normalize` (Boolean) If using AWS providers (Bedrock), set to true to normalize the embeddings.
+- `performance_config_latency` (String) Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 
 
 <a id="nestedatt--config--embeddings--model--options--gemini"></a>
@@ -392,9 +405,9 @@ Optional:
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--config--targets--auth))
 - `description` (String) The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold.
-- `logging` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--targets--logging))
+- `logging` (Attributes) (see [below for nested schema](#nestedatt--config--targets--logging))
 - `model` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--targets--model))
-- `route_type` (String) The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation. Not Null; must be one of ["llm/v1/chat", "llm/v1/completions", "preserve"]
+- `route_type` (String) The model's operation implementation, for this provider. Not Null; must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]
 - `weight` (Number) The weight this target gets within the upstream loadbalancer (1-65535).
 
 <a id="nestedatt--config--targets--auth"></a>
@@ -446,6 +459,8 @@ Optional:
 - `azure_deployment_id` (String) Deployment ID for Azure OpenAI instances.
 - `azure_instance` (String) Instance name for Azure OpenAI hosted models.
 - `bedrock` (Attributes) (see [below for nested schema](#nestedatt--config--targets--model--options--bedrock))
+- `cohere` (Attributes) (see [below for nested schema](#nestedatt--config--targets--model--options--cohere))
+- `embeddings_dimensions` (Number) If using embeddings models, set the number of dimensions to generate.
 - `gemini` (Attributes) (see [below for nested schema](#nestedatt--config--targets--model--options--gemini))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--config--targets--model--options--huggingface))
 - `input_cost` (Number) Defines the cost per 1M tokens in your prompt.
@@ -468,6 +483,17 @@ Optional:
 - `aws_region` (String) If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
 - `aws_role_session_name` (String) If using AWS providers (Bedrock), set the identifier of the assumed role session.
 - `aws_sts_endpoint_url` (String) If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+- `embeddings_normalize` (Boolean) If using AWS providers (Bedrock), set to true to normalize the embeddings.
+- `performance_config_latency` (String) Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+
+
+<a id="nestedatt--config--targets--model--options--cohere"></a>
+### Nested Schema for `config.targets.model.options.cohere`
+
+Optional:
+
+- `embedding_input_type` (String) The purpose of the input text to calculate embedding vectors. must be one of ["classification", "clustering", "image", "search_document", "search_query"]
+- `wait_for_model` (Boolean) Wait for the model if it is not ready
 
 
 <a id="nestedatt--config--targets--model--options--gemini"></a>
@@ -476,6 +502,7 @@ Optional:
 Optional:
 
 - `api_endpoint` (String) If running Gemini on Vertex, specify the regional API endpoint (hostname only).
+- `endpoint_id` (String) If running Gemini on Vertex Model Garden, specify the endpoint ID.
 - `location_id` (String) If running Gemini on Vertex, specify the location ID.
 - `project_id` (String) If running Gemini on Vertex, specify the project ID.
 
@@ -499,8 +526,8 @@ Optional:
 
 - `dimensions` (Number) the desired dimensionality for the vectors. Not Null
 - `distance_metric` (String) the distance metric to use for vector searches. Not Null; must be one of ["cosine", "euclidean"]
-- `pgvector` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--vectordb--pgvector))
-- `redis` (Attributes) Not Null (see [below for nested schema](#nestedatt--config--vectordb--redis))
+- `pgvector` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb--pgvector))
+- `redis` (Attributes) (see [below for nested schema](#nestedatt--config--vectordb--redis))
 - `strategy` (String) which vector database driver to use. Not Null; must be one of ["pgvector", "redis"]
 - `threshold` (Number) the default similarity threshold for accepting semantic search results (float). Not Null
 
@@ -617,8 +644,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -641,6 +668,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ai_proxy_advanced.my_kong-gateway_plugin_ai_proxy_advanced
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ai_proxy_advanced.my_kong-gateway_plugin_ai_proxy_advanced ""
+terraform import kong-gateway_plugin_ai_proxy_advanced.my_kong-gateway_plugin_ai_proxy_advanced '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

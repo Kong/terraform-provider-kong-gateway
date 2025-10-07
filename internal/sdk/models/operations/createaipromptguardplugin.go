@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAipromptguardPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiPromptGuardPlugin shared.AiPromptGuardPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAipromptguardPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAipromptguardPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiPromptGuardPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAipromptguardPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAipromptguardPluginRequest) GetAiPromptGuardPlugin() shared.AiPromptGuardPlugin {
+	if c == nil {
+		return shared.AiPromptGuardPlugin{}
+	}
+	return c.AiPromptGuardPlugin
+}
 
 type CreateAipromptguardPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAipromptguardPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAipromptguardPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAipromptguardPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAipromptguardPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAipromptguardPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAipromptguardPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAipromptguardPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAipromptguardPluginResponse) GetAiPromptGuardPlugin() *shared.AiPromptGuardPlugin {
-	if o == nil {
+func (c *CreateAipromptguardPluginResponse) GetAiPromptGuardPlugin() *shared.AiPromptGuardPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiPromptGuardPlugin
+	return c.AiPromptGuardPlugin
 }
 
-func (o *CreateAipromptguardPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAipromptguardPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

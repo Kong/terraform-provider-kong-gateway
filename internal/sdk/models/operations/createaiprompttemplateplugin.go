@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAiprompttemplatePluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace              string                        `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiPromptTemplatePlugin shared.AiPromptTemplatePlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAiprompttemplatePluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAiprompttemplatePluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiPromptTemplatePlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAiprompttemplatePluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAiprompttemplatePluginRequest) GetAiPromptTemplatePlugin() shared.AiPromptTemplatePlugin {
+	if c == nil {
+		return shared.AiPromptTemplatePlugin{}
+	}
+	return c.AiPromptTemplatePlugin
+}
 
 type CreateAiprompttemplatePluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAiprompttemplatePluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAiprompttemplatePluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAiprompttemplatePluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAiprompttemplatePluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAiprompttemplatePluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAiprompttemplatePluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAiprompttemplatePluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAiprompttemplatePluginResponse) GetAiPromptTemplatePlugin() *shared.AiPromptTemplatePlugin {
-	if o == nil {
+func (c *CreateAiprompttemplatePluginResponse) GetAiPromptTemplatePlugin() *shared.AiPromptTemplatePlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiPromptTemplatePlugin
+	return c.AiPromptTemplatePlugin
 }
 
-func (o *CreateAiprompttemplatePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAiprompttemplatePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

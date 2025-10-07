@@ -10,9 +10,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
+	speakeasy_int64planmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/int64planmodifier"
+	speakeasy_listplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/listplanmodifier"
+	speakeasy_stringplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/stringplanmodifier"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 )
 
@@ -32,13 +39,13 @@ type HMACAuthResource struct {
 
 // HMACAuthResourceModel describes the resource data model.
 type HMACAuthResourceModel struct {
-	Consumer   *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
-	ConsumerID types.String                       `tfsdk:"consumer_id"`
-	CreatedAt  types.Int64                        `tfsdk:"created_at"`
-	ID         types.String                       `tfsdk:"id"`
-	Secret     types.String                       `tfsdk:"secret"`
-	Tags       []types.String                     `tfsdk:"tags"`
-	Username   types.String                       `tfsdk:"username"`
+	ConsumerID types.String   `tfsdk:"consumer_id"`
+	CreatedAt  types.Int64    `tfsdk:"created_at"`
+	ID         types.String   `tfsdk:"id"`
+	Secret     types.String   `tfsdk:"secret"`
+	Tags       []types.String `tfsdk:"tags"`
+	Username   types.String   `tfsdk:"username"`
+	Workspace  types.String   `tfsdk:"workspace"`
 }
 
 func (r *HMACAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -49,40 +56,66 @@ func (r *HMACAuthResource) Schema(ctx context.Context, req resource.SchemaReques
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "HMACAuth Resource",
 		Attributes: map[string]schema.Attribute{
-			"consumer": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
-				Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-						Computed: true,
-						Optional: true,
-					},
-				},
-			},
 			"consumer_id": schema.StringAttribute{
-				Required:    true,
-				Description: `Consumer ID for nested entities`,
+				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Description: `Consumer ID for nested entities. Requires replacement if changed.`,
 			},
 			"created_at": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: `Unix epoch when the resource was created.`,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_int64planmodifier.SuppressDiff(speakeasy_int64planmodifier.ExplicitSuppress),
+				},
+				Description: `Unix epoch when the resource was created. Requires replacement if changed.`,
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `A string representing a UUID (universally unique identifier). Requires replacement if changed.`,
 			},
 			"secret": schema.StringAttribute{
 				Computed: true,
 				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `Requires replacement if changed.`,
 			},
 			"tags": schema.ListAttribute{
-				Computed:    true,
-				Optional:    true,
+				Computed: true,
+				Optional: true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_listplanmodifier.SuppressDiff(speakeasy_listplanmodifier.ExplicitSuppress),
+				},
 				ElementType: types.StringType,
+				Description: `A set of strings representing tags. Requires replacement if changed.`,
 			},
 			"username": schema.StringAttribute{
 				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+					speakeasy_stringplanmodifier.SuppressDiff(speakeasy_stringplanmodifier.ExplicitSuppress),
+				},
+				Description: `Requires replacement if changed.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString(`default`),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
+				Description: `The name or UUID of the workspace. Default: "default"; Requires replacement if changed.`,
 			},
 		},
 	}
@@ -240,43 +273,7 @@ func (r *HMACAuthResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	request, requestDiags := data.ToOperationsUpdateHmacAuthWithConsumerRequest(ctx)
-	resp.Diagnostics.Append(requestDiags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	res, err := r.client.HMACAuthCredentials.UpdateHmacAuthWithConsumer(ctx, *request)
-	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
-		if res != nil && res.RawResponse != nil {
-			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
-		}
-		return
-	}
-	if res == nil {
-		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
-		return
-	}
-	if res.StatusCode != 200 {
-		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
-		return
-	}
-	if !(res.HMACAuth != nil) {
-		resp.Diagnostics.AddError("unexpected response from API. Got an unexpected response body", debugResponse(res.RawResponse))
-		return
-	}
-	resp.Diagnostics.Append(data.RefreshFromSharedHMACAuth(ctx, res.HMACAuth)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	resp.Diagnostics.Append(refreshPlan(ctx, plan, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	// Not Implemented; all attributes marked as RequiresReplace
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -331,10 +328,11 @@ func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportS
 	var data struct {
 		ConsumerID string `json:"consumer_id"`
 		ID         string `json:"id"`
+		Workspace  string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "70e7b00b-72f2-471b-a5ce-9c4171775360"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "70e7b00b-72f2-471b-a5ce-9c4171775360", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
 		return
 	}
 
@@ -348,4 +346,9 @@ func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportS
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

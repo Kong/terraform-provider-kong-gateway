@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateCorrelationidPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	CorrelationIDPlugin shared.CorrelationIDPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateCorrelationidPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateCorrelationidPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateCorrelationidPluginRequest) GetCorrelationIDPlugin() shared.CorrelationIDPlugin {
-	if o == nil {
+func (u *UpdateCorrelationidPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "CorrelationIdPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateCorrelationidPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateCorrelationidPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateCorrelationidPluginRequest) GetCorrelationIDPlugin() shared.CorrelationIDPlugin {
+	if u == nil {
 		return shared.CorrelationIDPlugin{}
 	}
-	return o.CorrelationIDPlugin
+	return u.CorrelationIDPlugin
 }
 
 type UpdateCorrelationidPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateCorrelationidPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateCorrelationidPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateCorrelationidPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateCorrelationidPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateCorrelationidPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateCorrelationidPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateCorrelationidPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateCorrelationidPluginResponse) GetCorrelationIDPlugin() *shared.CorrelationIDPlugin {
-	if o == nil {
+func (u *UpdateCorrelationidPluginResponse) GetCorrelationIDPlugin() *shared.CorrelationIDPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.CorrelationIDPlugin
+	return u.CorrelationIDPlugin
 }
 
-func (o *UpdateCorrelationidPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateCorrelationidPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

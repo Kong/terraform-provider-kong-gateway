@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateRequestterminationPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RequestTerminationPlugin shared.RequestTerminationPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateRequestterminationPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateRequestterminationPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateRequestterminationPluginRequest) GetRequestTerminationPlugin() shared.RequestTerminationPlugin {
-	if o == nil {
+func (u *UpdateRequestterminationPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RequestTerminationPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateRequestterminationPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateRequestterminationPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateRequestterminationPluginRequest) GetRequestTerminationPlugin() shared.RequestTerminationPlugin {
+	if u == nil {
 		return shared.RequestTerminationPlugin{}
 	}
-	return o.RequestTerminationPlugin
+	return u.RequestTerminationPlugin
 }
 
 type UpdateRequestterminationPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateRequestterminationPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateRequestterminationPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateRequestterminationPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateRequestterminationPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateRequestterminationPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateRequestterminationPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateRequestterminationPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateRequestterminationPluginResponse) GetRequestTerminationPlugin() *shared.RequestTerminationPlugin {
-	if o == nil {
+func (u *UpdateRequestterminationPluginResponse) GetRequestTerminationPlugin() *shared.RequestTerminationPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.RequestTerminationPlugin
+	return u.RequestTerminationPlugin
 }
 
-func (o *UpdateRequestterminationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateRequestterminationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

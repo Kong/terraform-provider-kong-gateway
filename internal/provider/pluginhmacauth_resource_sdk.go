@@ -11,9 +11,229 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(ctx context.Context, resp *shared.HmacAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.HmacAuthPluginConfig{}
+			r.Config.Algorithms = make([]types.String, 0, len(resp.Config.Algorithms))
+			for _, v := range resp.Config.Algorithms {
+				r.Config.Algorithms = append(r.Config.Algorithms, types.StringValue(string(v)))
+			}
+			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+			r.Config.ClockSkew = types.Float64PointerValue(resp.Config.ClockSkew)
+			r.Config.EnforceHeaders = make([]types.String, 0, len(resp.Config.EnforceHeaders))
+			for _, v := range resp.Config.EnforceHeaders {
+				r.Config.EnforceHeaders = append(r.Config.EnforceHeaders, types.StringValue(v))
+			}
+			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+			r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsCreateHmacauthPluginRequest(ctx context.Context) (*operations.CreateHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	hmacAuthPlugin, hmacAuthPluginDiags := r.ToSharedHmacAuthPlugin(ctx)
+	diags.Append(hmacAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateHmacauthPluginRequest{
+		Workspace:      workspace,
+		HmacAuthPlugin: *hmacAuthPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsDeleteHmacauthPluginRequest(ctx context.Context) (*operations.DeleteHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteHmacauthPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsGetHmacauthPluginRequest(ctx context.Context) (*operations.GetHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetHmacauthPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginHmacAuthResourceModel) ToOperationsUpdateHmacauthPluginRequest(ctx context.Context) (*operations.UpdateHmacauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	hmacAuthPlugin, hmacAuthPluginDiags := r.ToSharedHmacAuthPlugin(ctx)
+	diags.Append(hmacAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateHmacauthPluginRequest{
+		PluginID:       pluginID,
+		Workspace:      workspace,
+		HmacAuthPlugin: *hmacAuthPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context) (*shared.HmacAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.HmacAuthPluginConfig
+	if r.Config != nil {
+		algorithms := make([]shared.Algorithms, 0, len(r.Config.Algorithms))
+		for _, algorithmsItem := range r.Config.Algorithms {
+			algorithms = append(algorithms, shared.Algorithms(algorithmsItem.ValueString()))
+		}
+		anonymous := new(string)
+		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+			*anonymous = r.Config.Anonymous.ValueString()
+		} else {
+			anonymous = nil
+		}
+		clockSkew := new(float64)
+		if !r.Config.ClockSkew.IsUnknown() && !r.Config.ClockSkew.IsNull() {
+			*clockSkew = r.Config.ClockSkew.ValueFloat64()
+		} else {
+			clockSkew = nil
+		}
+		enforceHeaders := make([]string, 0, len(r.Config.EnforceHeaders))
+		for _, enforceHeadersItem := range r.Config.EnforceHeaders {
+			enforceHeaders = append(enforceHeaders, enforceHeadersItem.ValueString())
+		}
+		hideCredentials := new(bool)
+		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
+			*hideCredentials = r.Config.HideCredentials.ValueBool()
+		} else {
+			hideCredentials = nil
+		}
+		realm := new(string)
+		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
+			*realm = r.Config.Realm.ValueString()
+		} else {
+			realm = nil
+		}
+		validateRequestBody := new(bool)
+		if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
+			*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
+		} else {
+			validateRequestBody = nil
+		}
+		config = &shared.HmacAuthPluginConfig{
+			Algorithms:          algorithms,
+			Anonymous:           anonymous,
+			ClockSkew:           clockSkew,
+			EnforceHeaders:      enforceHeaders,
+			HideCredentials:     hideCredentials,
+			Realm:               realm,
+			ValidateRequestBody: validateRequestBody,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -94,66 +314,6 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context
 			})
 		}
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.HmacAuthPluginConfig
-	if r.Config != nil {
-		algorithms := make([]shared.Algorithms, 0, len(r.Config.Algorithms))
-		for _, algorithmsItem := range r.Config.Algorithms {
-			algorithms = append(algorithms, shared.Algorithms(algorithmsItem.ValueString()))
-		}
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		clockSkew := new(float64)
-		if !r.Config.ClockSkew.IsUnknown() && !r.Config.ClockSkew.IsNull() {
-			*clockSkew = r.Config.ClockSkew.ValueFloat64()
-		} else {
-			clockSkew = nil
-		}
-		enforceHeaders := make([]string, 0, len(r.Config.EnforceHeaders))
-		for _, enforceHeadersItem := range r.Config.EnforceHeaders {
-			enforceHeaders = append(enforceHeaders, enforceHeadersItem.ValueString())
-		}
-		hideCredentials := new(bool)
-		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
-			*hideCredentials = r.Config.HideCredentials.ValueBool()
-		} else {
-			hideCredentials = nil
-		}
-		realm := new(string)
-		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
-			*realm = r.Config.Realm.ValueString()
-		} else {
-			realm = nil
-		}
-		validateRequestBody := new(bool)
-		if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
-			*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
-		} else {
-			validateRequestBody = nil
-		}
-		config = &shared.HmacAuthPluginConfig{
-			Algorithms:          algorithms,
-			Anonymous:           anonymous,
-			ClockSkew:           clockSkew,
-			EnforceHeaders:      enforceHeaders,
-			HideCredentials:     hideCredentials,
-			Realm:               realm,
-			ValidateRequestBody: validateRequestBody,
-		}
-	}
 	protocols := make([]shared.HmacAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.HmacAuthPluginProtocols(protocolsItem.ValueString()))
@@ -182,161 +342,33 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.HmacAuthPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginHmacAuthResourceModel) ToOperationsUpdateHmacauthPluginRequest(ctx context.Context) (*operations.UpdateHmacauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	hmacAuthPlugin, hmacAuthPluginDiags := r.ToSharedHmacAuthPlugin(ctx)
-	diags.Append(hmacAuthPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateHmacauthPluginRequest{
-		PluginID:       pluginID,
-		HmacAuthPlugin: *hmacAuthPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginHmacAuthResourceModel) ToOperationsGetHmacauthPluginRequest(ctx context.Context) (*operations.GetHmacauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetHmacauthPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginHmacAuthResourceModel) ToOperationsDeleteHmacauthPluginRequest(ctx context.Context) (*operations.DeleteHmacauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteHmacauthPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(ctx context.Context, resp *shared.HmacAuthPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.HmacAuthPluginConfig{}
-			r.Config.Algorithms = make([]types.String, 0, len(resp.Config.Algorithms))
-			for _, v := range resp.Config.Algorithms {
-				r.Config.Algorithms = append(r.Config.Algorithms, types.StringValue(string(v)))
-			}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.ClockSkew = types.Float64PointerValue(resp.Config.ClockSkew)
-			r.Config.EnforceHeaders = make([]types.String, 0, len(resp.Config.EnforceHeaders))
-			for _, v := range resp.Config.EnforceHeaders {
-				r.Config.EnforceHeaders = append(r.Config.EnforceHeaders, types.StringValue(v))
-			}
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

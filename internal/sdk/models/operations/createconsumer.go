@@ -3,9 +3,42 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateConsumerRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new Consumer for creation
+	Consumer shared.Consumer `request:"mediaType=application/json"`
+}
+
+func (c CreateConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Consumer"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateConsumerRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateConsumerRequest) GetConsumer() shared.Consumer {
+	if c == nil {
+		return shared.Consumer{}
+	}
+	return c.Consumer
+}
 
 type CreateConsumerResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +53,37 @@ type CreateConsumerResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateConsumerResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateConsumerResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateConsumerResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateConsumerResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateConsumerResponse) GetConsumer() *shared.Consumer {
-	if o == nil {
+func (c *CreateConsumerResponse) GetConsumer() *shared.Consumer {
+	if c == nil {
 		return nil
 	}
-	return o.Consumer
+	return c.Consumer
 }
 
-func (o *CreateConsumerResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateConsumerResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

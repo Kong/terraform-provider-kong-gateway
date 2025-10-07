@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateOpentelemetryPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	OpentelemetryPlugin shared.OpentelemetryPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateOpentelemetryPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateOpentelemetryPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateOpentelemetryPluginRequest) GetOpentelemetryPlugin() shared.OpentelemetryPlugin {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "OpentelemetryPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateOpentelemetryPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateOpentelemetryPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateOpentelemetryPluginRequest) GetOpentelemetryPlugin() shared.OpentelemetryPlugin {
+	if u == nil {
 		return shared.OpentelemetryPlugin{}
 	}
-	return o.OpentelemetryPlugin
+	return u.OpentelemetryPlugin
 }
 
 type UpdateOpentelemetryPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateOpentelemetryPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateOpentelemetryPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateOpentelemetryPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateOpentelemetryPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateOpentelemetryPluginResponse) GetOpentelemetryPlugin() *shared.OpentelemetryPlugin {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginResponse) GetOpentelemetryPlugin() *shared.OpentelemetryPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.OpentelemetryPlugin
+	return u.OpentelemetryPlugin
 }
 
-func (o *UpdateOpentelemetryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateOpentelemetryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

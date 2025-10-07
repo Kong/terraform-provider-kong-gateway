@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAzurefunctionsPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AzureFunctionsPlugin shared.AzureFunctionsPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAzurefunctionsPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAzurefunctionsPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AzureFunctionsPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAzurefunctionsPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAzurefunctionsPluginRequest) GetAzureFunctionsPlugin() shared.AzureFunctionsPlugin {
+	if c == nil {
+		return shared.AzureFunctionsPlugin{}
+	}
+	return c.AzureFunctionsPlugin
+}
 
 type CreateAzurefunctionsPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAzurefunctionsPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAzurefunctionsPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAzurefunctionsPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAzurefunctionsPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAzurefunctionsPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAzurefunctionsPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAzurefunctionsPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAzurefunctionsPluginResponse) GetAzureFunctionsPlugin() *shared.AzureFunctionsPlugin {
-	if o == nil {
+func (c *CreateAzurefunctionsPluginResponse) GetAzureFunctionsPlugin() *shared.AzureFunctionsPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AzureFunctionsPlugin
+	return c.AzureFunctionsPlugin
 }
 
-func (o *CreateAzurefunctionsPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAzurefunctionsPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateCanaryPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	CanaryPlugin shared.CanaryPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateCanaryPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateCanaryPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "CanaryPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateCanaryPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateCanaryPluginRequest) GetCanaryPlugin() shared.CanaryPlugin {
+	if c == nil {
+		return shared.CanaryPlugin{}
+	}
+	return c.CanaryPlugin
+}
 
 type CreateCanaryPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateCanaryPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateCanaryPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateCanaryPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateCanaryPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateCanaryPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateCanaryPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateCanaryPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateCanaryPluginResponse) GetCanaryPlugin() *shared.CanaryPlugin {
-	if o == nil {
+func (c *CreateCanaryPluginResponse) GetCanaryPlugin() *shared.CanaryPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.CanaryPlugin
+	return c.CanaryPlugin
 }
 
-func (o *CreateCanaryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateCanaryPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

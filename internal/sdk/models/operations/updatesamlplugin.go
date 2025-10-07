@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateSamlPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID   string            `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace  string            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	SamlPlugin shared.SamlPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateSamlPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateSamlPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateSamlPluginRequest) GetSamlPlugin() shared.SamlPlugin {
-	if o == nil {
+func (u *UpdateSamlPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SamlPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateSamlPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateSamlPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateSamlPluginRequest) GetSamlPlugin() shared.SamlPlugin {
+	if u == nil {
 		return shared.SamlPlugin{}
 	}
-	return o.SamlPlugin
+	return u.SamlPlugin
 }
 
 type UpdateSamlPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateSamlPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateSamlPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateSamlPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateSamlPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateSamlPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateSamlPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateSamlPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateSamlPluginResponse) GetSamlPlugin() *shared.SamlPlugin {
-	if o == nil {
+func (u *UpdateSamlPluginResponse) GetSamlPlugin() *shared.SamlPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.SamlPlugin
+	return u.SamlPlugin
 }
 
-func (o *UpdateSamlPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateSamlPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

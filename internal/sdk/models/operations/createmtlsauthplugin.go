@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateMtlsauthPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	MtlsAuthPlugin shared.MtlsAuthPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateMtlsauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateMtlsauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "MtlsAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateMtlsauthPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateMtlsauthPluginRequest) GetMtlsAuthPlugin() shared.MtlsAuthPlugin {
+	if c == nil {
+		return shared.MtlsAuthPlugin{}
+	}
+	return c.MtlsAuthPlugin
+}
 
 type CreateMtlsauthPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateMtlsauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateMtlsauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateMtlsauthPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateMtlsauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateMtlsauthPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateMtlsauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateMtlsauthPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateMtlsauthPluginResponse) GetMtlsAuthPlugin() *shared.MtlsAuthPlugin {
-	if o == nil {
+func (c *CreateMtlsauthPluginResponse) GetMtlsAuthPlugin() *shared.MtlsAuthPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.MtlsAuthPlugin
+	return c.MtlsAuthPlugin
 }
 
-func (o *CreateMtlsauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateMtlsauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

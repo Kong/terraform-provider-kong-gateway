@@ -8,74 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type JwtPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *JwtPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type JwtPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *JwtPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type JwtPluginOrdering struct {
-	After  *JwtPluginAfter  `json:"after,omitempty"`
-	Before *JwtPluginBefore `json:"before,omitempty"`
-}
-
-func (o *JwtPluginOrdering) GetAfter() *JwtPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *JwtPluginOrdering) GetBefore() *JwtPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type JwtPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *JwtPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *JwtPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *JwtPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type ClaimsToVerify string
 
 const (
@@ -125,74 +57,144 @@ type JwtPluginConfig struct {
 	URIParamNames []string `json:"uri_param_names,omitempty"`
 }
 
-func (o *JwtPluginConfig) GetAnonymous() *string {
-	if o == nil {
+func (j *JwtPluginConfig) GetAnonymous() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Anonymous
+	return j.Anonymous
 }
 
-func (o *JwtPluginConfig) GetClaimsToVerify() []ClaimsToVerify {
-	if o == nil {
+func (j *JwtPluginConfig) GetClaimsToVerify() []ClaimsToVerify {
+	if j == nil {
 		return nil
 	}
-	return o.ClaimsToVerify
+	return j.ClaimsToVerify
 }
 
-func (o *JwtPluginConfig) GetCookieNames() []string {
-	if o == nil {
+func (j *JwtPluginConfig) GetCookieNames() []string {
+	if j == nil {
 		return nil
 	}
-	return o.CookieNames
+	return j.CookieNames
 }
 
-func (o *JwtPluginConfig) GetHeaderNames() []string {
-	if o == nil {
+func (j *JwtPluginConfig) GetHeaderNames() []string {
+	if j == nil {
 		return nil
 	}
-	return o.HeaderNames
+	return j.HeaderNames
 }
 
-func (o *JwtPluginConfig) GetKeyClaimName() *string {
-	if o == nil {
+func (j *JwtPluginConfig) GetKeyClaimName() *string {
+	if j == nil {
 		return nil
 	}
-	return o.KeyClaimName
+	return j.KeyClaimName
 }
 
-func (o *JwtPluginConfig) GetMaximumExpiration() *float64 {
-	if o == nil {
+func (j *JwtPluginConfig) GetMaximumExpiration() *float64 {
+	if j == nil {
 		return nil
 	}
-	return o.MaximumExpiration
+	return j.MaximumExpiration
 }
 
-func (o *JwtPluginConfig) GetRealm() *string {
-	if o == nil {
+func (j *JwtPluginConfig) GetRealm() *string {
+	if j == nil {
 		return nil
 	}
-	return o.Realm
+	return j.Realm
 }
 
-func (o *JwtPluginConfig) GetRunOnPreflight() *bool {
-	if o == nil {
+func (j *JwtPluginConfig) GetRunOnPreflight() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.RunOnPreflight
+	return j.RunOnPreflight
 }
 
-func (o *JwtPluginConfig) GetSecretIsBase64() *bool {
-	if o == nil {
+func (j *JwtPluginConfig) GetSecretIsBase64() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.SecretIsBase64
+	return j.SecretIsBase64
 }
 
-func (o *JwtPluginConfig) GetURIParamNames() []string {
-	if o == nil {
+func (j *JwtPluginConfig) GetURIParamNames() []string {
+	if j == nil {
 		return nil
 	}
-	return o.URIParamNames
+	return j.URIParamNames
+}
+
+type JwtPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JwtPluginAfter) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JwtPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JwtPluginBefore) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JwtPluginOrdering struct {
+	After  *JwtPluginAfter  `json:"after,omitempty"`
+	Before *JwtPluginBefore `json:"before,omitempty"`
+}
+
+func (j *JwtPluginOrdering) GetAfter() *JwtPluginAfter {
+	if j == nil {
+		return nil
+	}
+	return j.After
+}
+
+func (j *JwtPluginOrdering) GetBefore() *JwtPluginBefore {
+	if j == nil {
+		return nil
+	}
+	return j.Before
+}
+
+type JwtPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (j *JwtPluginPartials) GetID() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ID
+}
+
+func (j *JwtPluginPartials) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JwtPluginPartials) GetPath() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Path
 }
 
 type JwtPluginProtocols string
@@ -232,11 +234,11 @@ type JwtPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JwtPluginRoute) GetID() *string {
-	if o == nil {
+func (j *JwtPluginRoute) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
 // JwtPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -244,35 +246,37 @@ type JwtPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *JwtPluginService) GetID() *string {
-	if o == nil {
+func (j *JwtPluginService) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.ID
 }
 
-// JwtPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JwtPlugin struct {
+	Config *JwtPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool               `json:"enabled,omitempty"`
-	ID           *string             `json:"id,omitempty"`
-	InstanceName *string             `json:"instance_name,omitempty"`
-	name         string              `const:"jwt" json:"name"`
-	Ordering     *JwtPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []JwtPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64           `json:"updated_at,omitempty"`
-	Config    *JwtPluginConfig `json:"config,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string            `json:"instance_name,omitempty"`
+	name         string             `const:"jwt" json:"name"`
+	Ordering     *JwtPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []JwtPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []JwtPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *JwtPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *JwtPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (j JwtPlugin) MarshalJSON() ([]byte, error) {
@@ -280,96 +284,96 @@ func (j JwtPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (j *JwtPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &j, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *JwtPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (j *JwtPlugin) GetConfig() *JwtPluginConfig {
+	if j == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return j.Config
 }
 
-func (o *JwtPlugin) GetEnabled() *bool {
-	if o == nil {
+func (j *JwtPlugin) GetCreatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Enabled
+	return j.CreatedAt
 }
 
-func (o *JwtPlugin) GetID() *string {
-	if o == nil {
+func (j *JwtPlugin) GetEnabled() *bool {
+	if j == nil {
 		return nil
 	}
-	return o.ID
+	return j.Enabled
 }
 
-func (o *JwtPlugin) GetInstanceName() *string {
-	if o == nil {
+func (j *JwtPlugin) GetID() *string {
+	if j == nil {
 		return nil
 	}
-	return o.InstanceName
+	return j.ID
 }
 
-func (o *JwtPlugin) GetName() string {
+func (j *JwtPlugin) GetInstanceName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.InstanceName
+}
+
+func (j *JwtPlugin) GetName() string {
 	return "jwt"
 }
 
-func (o *JwtPlugin) GetOrdering() *JwtPluginOrdering {
-	if o == nil {
+func (j *JwtPlugin) GetOrdering() *JwtPluginOrdering {
+	if j == nil {
 		return nil
 	}
-	return o.Ordering
+	return j.Ordering
 }
 
-func (o *JwtPlugin) GetPartials() []JwtPluginPartials {
-	if o == nil {
+func (j *JwtPlugin) GetPartials() []JwtPluginPartials {
+	if j == nil {
 		return nil
 	}
-	return o.Partials
+	return j.Partials
 }
 
-func (o *JwtPlugin) GetTags() []string {
-	if o == nil {
+func (j *JwtPlugin) GetProtocols() []JwtPluginProtocols {
+	if j == nil {
 		return nil
 	}
-	return o.Tags
+	return j.Protocols
 }
 
-func (o *JwtPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (j *JwtPlugin) GetRoute() *JwtPluginRoute {
+	if j == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return j.Route
 }
 
-func (o *JwtPlugin) GetConfig() *JwtPluginConfig {
-	if o == nil {
+func (j *JwtPlugin) GetService() *JwtPluginService {
+	if j == nil {
 		return nil
 	}
-	return o.Config
+	return j.Service
 }
 
-func (o *JwtPlugin) GetProtocols() []JwtPluginProtocols {
-	if o == nil {
+func (j *JwtPlugin) GetTags() []string {
+	if j == nil {
 		return nil
 	}
-	return o.Protocols
+	return j.Tags
 }
 
-func (o *JwtPlugin) GetRoute() *JwtPluginRoute {
-	if o == nil {
+func (j *JwtPlugin) GetUpdatedAt() *int64 {
+	if j == nil {
 		return nil
 	}
-	return o.Route
-}
-
-func (o *JwtPlugin) GetService() *JwtPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return j.UpdatedAt
 }

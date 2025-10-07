@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateKafkaupstreamPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	KafkaUpstreamPlugin shared.KafkaUpstreamPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateKafkaupstreamPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateKafkaupstreamPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateKafkaupstreamPluginRequest) GetKafkaUpstreamPlugin() shared.KafkaUpstreamPlugin {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "KafkaUpstreamPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateKafkaupstreamPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateKafkaupstreamPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateKafkaupstreamPluginRequest) GetKafkaUpstreamPlugin() shared.KafkaUpstreamPlugin {
+	if u == nil {
 		return shared.KafkaUpstreamPlugin{}
 	}
-	return o.KafkaUpstreamPlugin
+	return u.KafkaUpstreamPlugin
 }
 
 type UpdateKafkaupstreamPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateKafkaupstreamPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateKafkaupstreamPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateKafkaupstreamPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateKafkaupstreamPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateKafkaupstreamPluginResponse) GetKafkaUpstreamPlugin() *shared.KafkaUpstreamPlugin {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginResponse) GetKafkaUpstreamPlugin() *shared.KafkaUpstreamPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.KafkaUpstreamPlugin
+	return u.KafkaUpstreamPlugin
 }
 
-func (o *UpdateKafkaupstreamPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateKafkaupstreamPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

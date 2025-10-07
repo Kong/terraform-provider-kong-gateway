@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateOauth2introspectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                  string                           `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	Oauth2IntrospectionPlugin shared.Oauth2IntrospectionPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateOauth2introspectionPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateOauth2introspectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() shared.Oauth2IntrospectionPlugin {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "Oauth2IntrospectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateOauth2introspectionPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateOauth2introspectionPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() shared.Oauth2IntrospectionPlugin {
+	if u == nil {
 		return shared.Oauth2IntrospectionPlugin{}
 	}
-	return o.Oauth2IntrospectionPlugin
+	return u.Oauth2IntrospectionPlugin
 }
 
 type UpdateOauth2introspectionPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateOauth2introspectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateOauth2introspectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateOauth2introspectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateOauth2introspectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateOauth2introspectionPluginResponse) GetOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPlugin {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginResponse) GetOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.Oauth2IntrospectionPlugin
+	return u.Oauth2IntrospectionPlugin
 }
 
-func (o *UpdateOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

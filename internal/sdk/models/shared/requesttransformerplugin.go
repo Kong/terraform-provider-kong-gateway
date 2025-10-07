@@ -8,99 +8,31 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RequestTransformerPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestTransformerPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestTransformerPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *RequestTransformerPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type RequestTransformerPluginOrdering struct {
-	After  *RequestTransformerPluginAfter  `json:"after,omitempty"`
-	Before *RequestTransformerPluginBefore `json:"before,omitempty"`
-}
-
-func (o *RequestTransformerPluginOrdering) GetAfter() *RequestTransformerPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *RequestTransformerPluginOrdering) GetBefore() *RequestTransformerPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type RequestTransformerPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *RequestTransformerPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *RequestTransformerPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *RequestTransformerPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type Add struct {
 	Body        []string `json:"body,omitempty"`
 	Headers     []string `json:"headers,omitempty"`
 	Querystring []string `json:"querystring,omitempty"`
 }
 
-func (o *Add) GetBody() []string {
-	if o == nil {
+func (a *Add) GetBody() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Body
+	return a.Body
 }
 
-func (o *Add) GetHeaders() []string {
-	if o == nil {
+func (a *Add) GetHeaders() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Headers
+	return a.Headers
 }
 
-func (o *Add) GetQuerystring() []string {
-	if o == nil {
+func (a *Add) GetQuerystring() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Querystring
+	return a.Querystring
 }
 
 type Append struct {
@@ -109,25 +41,25 @@ type Append struct {
 	Querystring []string `json:"querystring,omitempty"`
 }
 
-func (o *Append) GetBody() []string {
-	if o == nil {
+func (a *Append) GetBody() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Body
+	return a.Body
 }
 
-func (o *Append) GetHeaders() []string {
-	if o == nil {
+func (a *Append) GetHeaders() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Headers
+	return a.Headers
 }
 
-func (o *Append) GetQuerystring() []string {
-	if o == nil {
+func (a *Append) GetQuerystring() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Querystring
+	return a.Querystring
 }
 
 type Remove struct {
@@ -136,25 +68,25 @@ type Remove struct {
 	Querystring []string `json:"querystring,omitempty"`
 }
 
-func (o *Remove) GetBody() []string {
-	if o == nil {
+func (r *Remove) GetBody() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Body
+	return r.Body
 }
 
-func (o *Remove) GetHeaders() []string {
-	if o == nil {
+func (r *Remove) GetHeaders() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Headers
+	return r.Headers
 }
 
-func (o *Remove) GetQuerystring() []string {
-	if o == nil {
+func (r *Remove) GetQuerystring() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Querystring
+	return r.Querystring
 }
 
 type Rename struct {
@@ -163,25 +95,25 @@ type Rename struct {
 	Querystring []string `json:"querystring,omitempty"`
 }
 
-func (o *Rename) GetBody() []string {
-	if o == nil {
+func (r *Rename) GetBody() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Body
+	return r.Body
 }
 
-func (o *Rename) GetHeaders() []string {
-	if o == nil {
+func (r *Rename) GetHeaders() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Headers
+	return r.Headers
 }
 
-func (o *Rename) GetQuerystring() []string {
-	if o == nil {
+func (r *Rename) GetQuerystring() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Querystring
+	return r.Querystring
 }
 
 type Replace struct {
@@ -191,32 +123,32 @@ type Replace struct {
 	URI         *string  `json:"uri,omitempty"`
 }
 
-func (o *Replace) GetBody() []string {
-	if o == nil {
+func (r *Replace) GetBody() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Body
+	return r.Body
 }
 
-func (o *Replace) GetHeaders() []string {
-	if o == nil {
+func (r *Replace) GetHeaders() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Headers
+	return r.Headers
 }
 
-func (o *Replace) GetQuerystring() []string {
-	if o == nil {
+func (r *Replace) GetQuerystring() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Querystring
+	return r.Querystring
 }
 
-func (o *Replace) GetURI() *string {
-	if o == nil {
+func (r *Replace) GetURI() *string {
+	if r == nil {
 		return nil
 	}
-	return o.URI
+	return r.URI
 }
 
 type RequestTransformerPluginConfig struct {
@@ -229,46 +161,46 @@ type RequestTransformerPluginConfig struct {
 	Replace    *Replace `json:"replace,omitempty"`
 }
 
-func (o *RequestTransformerPluginConfig) GetAdd() *Add {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetAdd() *Add {
+	if r == nil {
 		return nil
 	}
-	return o.Add
+	return r.Add
 }
 
-func (o *RequestTransformerPluginConfig) GetAppend() *Append {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetAppend() *Append {
+	if r == nil {
 		return nil
 	}
-	return o.Append
+	return r.Append
 }
 
-func (o *RequestTransformerPluginConfig) GetHTTPMethod() *string {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetHTTPMethod() *string {
+	if r == nil {
 		return nil
 	}
-	return o.HTTPMethod
+	return r.HTTPMethod
 }
 
-func (o *RequestTransformerPluginConfig) GetRemove() *Remove {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetRemove() *Remove {
+	if r == nil {
 		return nil
 	}
-	return o.Remove
+	return r.Remove
 }
 
-func (o *RequestTransformerPluginConfig) GetRename() *Rename {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetRename() *Rename {
+	if r == nil {
 		return nil
 	}
-	return o.Rename
+	return r.Rename
 }
 
-func (o *RequestTransformerPluginConfig) GetReplace() *Replace {
-	if o == nil {
+func (r *RequestTransformerPluginConfig) GetReplace() *Replace {
+	if r == nil {
 		return nil
 	}
-	return o.Replace
+	return r.Replace
 }
 
 // RequestTransformerPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -276,11 +208,11 @@ type RequestTransformerPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTransformerPluginConsumer) GetID() *string {
-	if o == nil {
+func (r *RequestTransformerPluginConsumer) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestTransformerPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -288,11 +220,81 @@ type RequestTransformerPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTransformerPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (r *RequestTransformerPluginConsumerGroup) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
+}
+
+type RequestTransformerPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTransformerPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTransformerPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTransformerPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTransformerPluginOrdering struct {
+	After  *RequestTransformerPluginAfter  `json:"after,omitempty"`
+	Before *RequestTransformerPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestTransformerPluginOrdering) GetAfter() *RequestTransformerPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestTransformerPluginOrdering) GetBefore() *RequestTransformerPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestTransformerPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestTransformerPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestTransformerPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestTransformerPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
 }
 
 // RequestTransformerPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -351,11 +353,11 @@ type RequestTransformerPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTransformerPluginRoute) GetID() *string {
-	if o == nil {
+func (r *RequestTransformerPluginRoute) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RequestTransformerPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -363,39 +365,41 @@ type RequestTransformerPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RequestTransformerPluginService) GetID() *string {
-	if o == nil {
+func (r *RequestTransformerPluginService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
-// RequestTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestTransformerPlugin struct {
-	// Unix epoch when the resource was created.
-	CreatedAt *int64 `json:"created_at,omitempty"`
-	// Whether the plugin is applied.
-	Enabled      *bool                              `json:"enabled,omitempty"`
-	ID           *string                            `json:"id,omitempty"`
-	InstanceName *string                            `json:"instance_name,omitempty"`
-	name         string                             `const:"request-transformer" json:"name"`
-	Ordering     *RequestTransformerPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []RequestTransformerPluginPartials `json:"partials,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                          `json:"updated_at,omitempty"`
-	Config    *RequestTransformerPluginConfig `json:"config,omitempty"`
+	Config *RequestTransformerPluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *RequestTransformerPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *RequestTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// Whether the plugin is applied.
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                           `json:"instance_name,omitempty"`
+	name         string                            `const:"request-transformer" json:"name"`
+	Ordering     *RequestTransformerPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []RequestTransformerPluginPartials `json:"partials,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []RequestTransformerPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestTransformerPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestTransformerPluginService `json:"service,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestTransformerPlugin) MarshalJSON() ([]byte, error) {
@@ -403,110 +407,110 @@ func (r RequestTransformerPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RequestTransformerPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *RequestTransformerPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetConfig() *RequestTransformerPluginConfig {
+	if r == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return r.Config
 }
 
-func (o *RequestTransformerPlugin) GetEnabled() *bool {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetConsumer() *RequestTransformerPluginConsumer {
+	if r == nil {
 		return nil
 	}
-	return o.Enabled
+	return r.Consumer
 }
 
-func (o *RequestTransformerPlugin) GetID() *string {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetConsumerGroup() *RequestTransformerPluginConsumerGroup {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ConsumerGroup
 }
 
-func (o *RequestTransformerPlugin) GetInstanceName() *string {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.InstanceName
+	return r.CreatedAt
 }
 
-func (o *RequestTransformerPlugin) GetName() string {
+func (r *RequestTransformerPlugin) GetEnabled() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.Enabled
+}
+
+func (r *RequestTransformerPlugin) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestTransformerPlugin) GetInstanceName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.InstanceName
+}
+
+func (r *RequestTransformerPlugin) GetName() string {
 	return "request-transformer"
 }
 
-func (o *RequestTransformerPlugin) GetOrdering() *RequestTransformerPluginOrdering {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetOrdering() *RequestTransformerPluginOrdering {
+	if r == nil {
 		return nil
 	}
-	return o.Ordering
+	return r.Ordering
 }
 
-func (o *RequestTransformerPlugin) GetPartials() []RequestTransformerPluginPartials {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetPartials() []RequestTransformerPluginPartials {
+	if r == nil {
 		return nil
 	}
-	return o.Partials
+	return r.Partials
 }
 
-func (o *RequestTransformerPlugin) GetTags() []string {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetProtocols() []RequestTransformerPluginProtocols {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.Protocols
 }
 
-func (o *RequestTransformerPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetRoute() *RequestTransformerPluginRoute {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.Route
 }
 
-func (o *RequestTransformerPlugin) GetConfig() *RequestTransformerPluginConfig {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetService() *RequestTransformerPluginService {
+	if r == nil {
 		return nil
 	}
-	return o.Config
+	return r.Service
 }
 
-func (o *RequestTransformerPlugin) GetConsumer() *RequestTransformerPluginConsumer {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetTags() []string {
+	if r == nil {
 		return nil
 	}
-	return o.Consumer
+	return r.Tags
 }
 
-func (o *RequestTransformerPlugin) GetConsumerGroup() *RequestTransformerPluginConsumerGroup {
-	if o == nil {
+func (r *RequestTransformerPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.ConsumerGroup
-}
-
-func (o *RequestTransformerPlugin) GetProtocols() []RequestTransformerPluginProtocols {
-	if o == nil {
-		return nil
-	}
-	return o.Protocols
-}
-
-func (o *RequestTransformerPlugin) GetRoute() *RequestTransformerPluginRoute {
-	if o == nil {
-		return nil
-	}
-	return o.Route
-}
-
-func (o *RequestTransformerPlugin) GetService() *RequestTransformerPluginService {
-	if o == nil {
-		return nil
-	}
-	return o.Service
+	return r.UpdatedAt
 }

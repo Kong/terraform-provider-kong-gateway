@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetJwedecryptPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetJwedecryptPluginRequest) GetPluginID() string {
-	if o == nil {
+func (g GetJwedecryptPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetJwedecryptPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetJwedecryptPluginRequest) GetPluginID() string {
+	if g == nil {
 		return ""
 	}
-	return o.PluginID
+	return g.PluginID
+}
+
+func (g *GetJwedecryptPluginRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetJwedecryptPluginResponse struct {
@@ -32,37 +53,37 @@ type GetJwedecryptPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetJwedecryptPluginResponse) GetContentType() string {
-	if o == nil {
+func (g *GetJwedecryptPluginResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetJwedecryptPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetJwedecryptPluginResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetJwedecryptPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetJwedecryptPluginResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetJwedecryptPluginResponse) GetJweDecryptPlugin() *shared.JweDecryptPlugin {
-	if o == nil {
+func (g *GetJwedecryptPluginResponse) GetJweDecryptPlugin() *shared.JweDecryptPlugin {
+	if g == nil {
 		return nil
 	}
-	return o.JweDecryptPlugin
+	return g.JweDecryptPlugin
 }
 
-func (o *GetJwedecryptPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetJwedecryptPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

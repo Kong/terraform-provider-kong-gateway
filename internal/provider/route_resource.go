@@ -3,13 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -34,27 +37,27 @@ type RouteResource struct {
 
 // RouteResourceModel describes the resource data model.
 type RouteResourceModel struct {
-	CreatedAt               types.Int64                                 `tfsdk:"created_at"`
-	Destinations            []tfTypes.AiProxyAdvancedPluginClusterNodes `tfsdk:"destinations"`
-	Headers                 map[string][]types.String                   `tfsdk:"headers"`
-	Hosts                   []types.String                              `tfsdk:"hosts"`
-	HTTPSRedirectStatusCode types.Int64                                 `tfsdk:"https_redirect_status_code"`
-	ID                      types.String                                `tfsdk:"id"`
-	Methods                 []types.String                              `tfsdk:"methods"`
-	Name                    types.String                                `tfsdk:"name"`
-	PathHandling            types.String                                `tfsdk:"path_handling"`
-	Paths                   []types.String                              `tfsdk:"paths"`
-	PreserveHost            types.Bool                                  `tfsdk:"preserve_host"`
-	Protocols               []types.String                              `tfsdk:"protocols"`
-	RegexPriority           types.Int64                                 `tfsdk:"regex_priority"`
-	RequestBuffering        types.Bool                                  `tfsdk:"request_buffering"`
-	ResponseBuffering       types.Bool                                  `tfsdk:"response_buffering"`
-	Service                 *tfTypes.ACLWithoutParentsConsumer          `tfsdk:"service"`
-	Snis                    []types.String                              `tfsdk:"snis"`
-	Sources                 []tfTypes.AiProxyAdvancedPluginClusterNodes `tfsdk:"sources"`
-	StripPath               types.Bool                                  `tfsdk:"strip_path"`
-	Tags                    []types.String                              `tfsdk:"tags"`
-	UpdatedAt               types.Int64                                 `tfsdk:"updated_at"`
+	CreatedAt               types.Int64                          `tfsdk:"created_at"`
+	Destinations            []tfTypes.PartialRedisEeClusterNodes `tfsdk:"destinations"`
+	Hosts                   []types.String                       `tfsdk:"hosts"`
+	HTTPSRedirectStatusCode types.Int64                          `tfsdk:"https_redirect_status_code"`
+	ID                      types.String                         `tfsdk:"id"`
+	Methods                 []types.String                       `tfsdk:"methods"`
+	Name                    types.String                         `tfsdk:"name"`
+	PathHandling            types.String                         `tfsdk:"path_handling"`
+	Paths                   []types.String                       `tfsdk:"paths"`
+	PreserveHost            types.Bool                           `tfsdk:"preserve_host"`
+	Protocols               []types.String                       `tfsdk:"protocols"`
+	RegexPriority           types.Int64                          `tfsdk:"regex_priority"`
+	RequestBuffering        types.Bool                           `tfsdk:"request_buffering"`
+	ResponseBuffering       types.Bool                           `tfsdk:"response_buffering"`
+	Service                 *tfTypes.Set                         `tfsdk:"service"`
+	Snis                    []types.String                       `tfsdk:"snis"`
+	Sources                 []tfTypes.PartialRedisEeClusterNodes `tfsdk:"sources"`
+	StripPath               types.Bool                           `tfsdk:"strip_path"`
+	Tags                    []types.String                       `tfsdk:"tags"`
+	UpdatedAt               types.Int64                          `tfsdk:"updated_at"`
+	Workspace               types.String                         `tfsdk:"workspace"`
 }
 
 func (r *RouteResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -79,24 +82,21 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					},
 					Attributes: map[string]schema.Attribute{
 						"ip": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing an IP address or CIDR block, such as 192.168.1.1 or 192.168.0.0/16.`,
 						},
 						"port": schema.Int64Attribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+							Validators: []validator.Int64{
+								int64validator.AtMost(65535),
+							},
 						},
 					},
 				},
 				Description: `A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".`,
-			},
-			"headers": schema.MapAttribute{
-				Computed: true,
-				Optional: true,
-				ElementType: types.ListType{
-					ElemType: types.StringType,
-				},
-				Description: `One or more lists of values indexed by header name that will cause this Route to match if present in the request. The ` + "`" + `Host` + "`" + ` header cannot be used with this attribute: hosts should be specified using the ` + "`" + `hosts` + "`" + ` attribute. When ` + "`" + `headers` + "`" + ` contains only one value and that value starts with the special prefix ` + "`" + `~*` + "`" + `, the value is interpreted as a regular expression.`,
 			},
 			"hosts": schema.ListAttribute{
 				Computed:    true,
@@ -107,20 +107,21 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"https_redirect_status_code": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of ["426", "301", "302", "307", "308"]`,
+				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of ["301", "302", "307", "308", "426"]`,
 				Validators: []validator.Int64{
 					int64validator.OneOf(
-						426,
 						301,
 						302,
 						307,
 						308,
+						426,
 					),
 				},
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"methods": schema.ListAttribute{
 				Computed:    true,
@@ -199,12 +200,17 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					},
 					Attributes: map[string]schema.Attribute{
 						"ip": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing an IP address or CIDR block, such as 192.168.1.1 or 192.168.0.0/16.`,
 						},
 						"port": schema.Int64Attribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+							Validators: []validator.Int64{
+								int64validator.AtMost(65535),
+							},
 						},
 					},
 				},
@@ -225,6 +231,12 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -268,7 +280,7 @@ func (r *RouteResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	request, requestDiags := data.ToSharedRouteJSON(ctx)
+	request, requestDiags := data.ToOperationsCreateRouteRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -468,5 +480,26 @@ func (r *RouteResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 }
 
 func (r *RouteResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

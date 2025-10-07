@@ -4,7 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -12,9 +11,222 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(ctx context.Context, resp *shared.RouteByHeaderPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.RouteByHeaderPluginConfig{}
+			r.Config.Rules = []tfTypes.RouteByHeaderPluginRules{}
+
+			for _, rulesItem := range resp.Config.Rules {
+				var rules tfTypes.RouteByHeaderPluginRules
+
+				if len(rulesItem.Condition) > 0 {
+					rules.Condition = make(map[string]types.String, len(rulesItem.Condition))
+					for key, value := range rulesItem.Condition {
+						rules.Condition[key] = types.StringValue(value)
+					}
+				}
+				rules.UpstreamName = types.StringValue(rulesItem.UpstreamName)
+
+				r.Config.Rules = append(r.Config.Rules, rules)
+			}
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsCreateRoutebyheaderPluginRequest(ctx context.Context) (*operations.CreateRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	routeByHeaderPlugin, routeByHeaderPluginDiags := r.ToSharedRouteByHeaderPlugin(ctx)
+	diags.Append(routeByHeaderPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateRoutebyheaderPluginRequest{
+		Workspace:           workspace,
+		RouteByHeaderPlugin: *routeByHeaderPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsDeleteRoutebyheaderPluginRequest(ctx context.Context) (*operations.DeleteRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteRoutebyheaderPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsGetRoutebyheaderPluginRequest(ctx context.Context) (*operations.GetRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetRoutebyheaderPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginRouteByHeaderResourceModel) ToOperationsUpdateRoutebyheaderPluginRequest(ctx context.Context) (*operations.UpdateRoutebyheaderPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	routeByHeaderPlugin, routeByHeaderPluginDiags := r.ToSharedRouteByHeaderPlugin(ctx)
+	diags.Append(routeByHeaderPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateRoutebyheaderPluginRequest{
+		PluginID:            pluginID,
+		Workspace:           workspace,
+		RouteByHeaderPlugin: *routeByHeaderPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx context.Context) (*shared.RouteByHeaderPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.RouteByHeaderPluginConfig
+	if r.Config != nil {
+		rules := make([]shared.RouteByHeaderPluginRules, 0, len(r.Config.Rules))
+		for _, rulesItem := range r.Config.Rules {
+			condition := make(map[string]string)
+			for conditionKey, conditionValue := range rulesItem.Condition {
+				var conditionInst string
+				conditionInst = conditionValue.ValueString()
+
+				condition[conditionKey] = conditionInst
+			}
+			var upstreamName string
+			upstreamName = rulesItem.UpstreamName.ValueString()
+
+			rules = append(rules, shared.RouteByHeaderPluginRules{
+				Condition:    condition,
+				UpstreamName: upstreamName,
+			})
+		}
+		config = &shared.RouteByHeaderPluginConfig{
+			Rules: rules,
+		}
+	}
+	var consumer *shared.RouteByHeaderPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.RouteByHeaderPluginConsumer{
+			ID: id,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -27,11 +239,11 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 	} else {
 		enabled = nil
 	}
-	id := new(string)
+	id1 := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
+		*id1 = r.ID.ValueString()
 	} else {
-		id = nil
+		id1 = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -70,11 +282,11 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 	if r.Partials != nil {
 		partials = make([]shared.RouteByHeaderPluginPartials, 0, len(r.Partials))
 		for _, partialsItem := range r.Partials {
-			id1 := new(string)
+			id2 := new(string)
 			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
+				*id2 = partialsItem.ID.ValueString()
 			} else {
-				id1 = nil
+				id2 = nil
 			}
 			name := new(string)
 			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
@@ -89,54 +301,10 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 				path = nil
 			}
 			partials = append(partials, shared.RouteByHeaderPluginPartials{
-				ID:   id1,
+				ID:   id2,
 				Name: name,
 				Path: path,
 			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.RouteByHeaderPluginConfig
-	if r.Config != nil {
-		rules := make([]shared.RouteByHeaderPluginRules, 0, len(r.Config.Rules))
-		for _, rulesItem := range r.Config.Rules {
-			condition := make(map[string]interface{})
-			for conditionKey, conditionValue := range rulesItem.Condition {
-				var conditionInst interface{}
-				_ = json.Unmarshal([]byte(conditionValue.ValueString()), &conditionInst)
-				condition[conditionKey] = conditionInst
-			}
-			var upstreamName string
-			upstreamName = rulesItem.UpstreamName.ValueString()
-
-			rules = append(rules, shared.RouteByHeaderPluginRules{
-				Condition:    condition,
-				UpstreamName: upstreamName,
-			})
-		}
-		config = &shared.RouteByHeaderPluginConfig{
-			Rules: rules,
-		}
-	}
-	var consumer *shared.RouteByHeaderPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.RouteByHeaderPluginConsumer{
-			ID: id2,
 		}
 	}
 	protocols := make([]shared.RouteByHeaderPluginProtocols, 0, len(r.Protocols))
@@ -167,176 +335,34 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 			ID: id4,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.RouteByHeaderPlugin{
+		Config:       config,
+		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id,
+		ID:           id1,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginRouteByHeaderResourceModel) ToOperationsUpdateRoutebyheaderPluginRequest(ctx context.Context) (*operations.UpdateRoutebyheaderPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	routeByHeaderPlugin, routeByHeaderPluginDiags := r.ToSharedRouteByHeaderPlugin(ctx)
-	diags.Append(routeByHeaderPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateRoutebyheaderPluginRequest{
-		PluginID:            pluginID,
-		RouteByHeaderPlugin: *routeByHeaderPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRouteByHeaderResourceModel) ToOperationsGetRoutebyheaderPluginRequest(ctx context.Context) (*operations.GetRoutebyheaderPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetRoutebyheaderPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRouteByHeaderResourceModel) ToOperationsDeleteRoutebyheaderPluginRequest(ctx context.Context) (*operations.DeleteRoutebyheaderPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteRoutebyheaderPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(ctx context.Context, resp *shared.RouteByHeaderPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.RouteByHeaderPluginConfig{}
-			r.Config.Rules = []tfTypes.RouteByHeaderPluginRules{}
-			if len(r.Config.Rules) > len(resp.Config.Rules) {
-				r.Config.Rules = r.Config.Rules[:len(resp.Config.Rules)]
-			}
-			for rulesCount, rulesItem := range resp.Config.Rules {
-				var rules tfTypes.RouteByHeaderPluginRules
-				if len(rulesItem.Condition) > 0 {
-					rules.Condition = make(map[string]types.String, len(rulesItem.Condition))
-					for key, value := range rulesItem.Condition {
-						result, _ := json.Marshal(value)
-						rules.Condition[key] = types.StringValue(string(result))
-					}
-				}
-				rules.UpstreamName = types.StringValue(rulesItem.UpstreamName)
-				if rulesCount+1 > len(r.Config.Rules) {
-					r.Config.Rules = append(r.Config.Rules, rules)
-				} else {
-					r.Config.Rules[rulesCount].Condition = rules.Condition
-					r.Config.Rules[rulesCount].UpstreamName = rules.UpstreamName
-				}
-			}
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

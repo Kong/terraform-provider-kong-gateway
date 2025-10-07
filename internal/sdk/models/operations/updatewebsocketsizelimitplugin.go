@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateWebsocketsizelimitPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	WebsocketSizeLimitPlugin shared.WebsocketSizeLimitPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateWebsocketsizelimitPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateWebsocketsizelimitPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateWebsocketsizelimitPluginRequest) GetWebsocketSizeLimitPlugin() shared.WebsocketSizeLimitPlugin {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "WebsocketSizeLimitPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateWebsocketsizelimitPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateWebsocketsizelimitPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateWebsocketsizelimitPluginRequest) GetWebsocketSizeLimitPlugin() shared.WebsocketSizeLimitPlugin {
+	if u == nil {
 		return shared.WebsocketSizeLimitPlugin{}
 	}
-	return o.WebsocketSizeLimitPlugin
+	return u.WebsocketSizeLimitPlugin
 }
 
 type UpdateWebsocketsizelimitPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateWebsocketsizelimitPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateWebsocketsizelimitPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateWebsocketsizelimitPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateWebsocketsizelimitPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateWebsocketsizelimitPluginResponse) GetWebsocketSizeLimitPlugin() *shared.WebsocketSizeLimitPlugin {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginResponse) GetWebsocketSizeLimitPlugin() *shared.WebsocketSizeLimitPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.WebsocketSizeLimitPlugin
+	return u.WebsocketSizeLimitPlugin
 }
 
-func (o *UpdateWebsocketsizelimitPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateWebsocketsizelimitPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

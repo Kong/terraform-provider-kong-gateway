@@ -11,9 +11,255 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context, resp *shared.JwtPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.JwtPluginConfig{}
+			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+			r.Config.ClaimsToVerify = make([]types.String, 0, len(resp.Config.ClaimsToVerify))
+			for _, v := range resp.Config.ClaimsToVerify {
+				r.Config.ClaimsToVerify = append(r.Config.ClaimsToVerify, types.StringValue(string(v)))
+			}
+			r.Config.CookieNames = make([]types.String, 0, len(resp.Config.CookieNames))
+			for _, v := range resp.Config.CookieNames {
+				r.Config.CookieNames = append(r.Config.CookieNames, types.StringValue(v))
+			}
+			r.Config.HeaderNames = make([]types.String, 0, len(resp.Config.HeaderNames))
+			for _, v := range resp.Config.HeaderNames {
+				r.Config.HeaderNames = append(r.Config.HeaderNames, types.StringValue(v))
+			}
+			r.Config.KeyClaimName = types.StringPointerValue(resp.Config.KeyClaimName)
+			r.Config.MaximumExpiration = types.Float64PointerValue(resp.Config.MaximumExpiration)
+			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
+			r.Config.SecretIsBase64 = types.BoolPointerValue(resp.Config.SecretIsBase64)
+			r.Config.URIParamNames = make([]types.String, 0, len(resp.Config.URIParamNames))
+			for _, v := range resp.Config.URIParamNames {
+				r.Config.URIParamNames = append(r.Config.URIParamNames, types.StringValue(v))
+			}
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		if resp.Partials != nil {
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
+				partials.ID = types.StringPointerValue(partialsItem.ID)
+				partials.Name = types.StringPointerValue(partialsItem.Name)
+				partials.Path = types.StringPointerValue(partialsItem.Path)
+
+				r.Partials = append(r.Partials, partials)
+			}
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsCreateJwtPluginRequest(ctx context.Context) (*operations.CreateJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jwtPlugin, jwtPluginDiags := r.ToSharedJwtPlugin(ctx)
+	diags.Append(jwtPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateJwtPluginRequest{
+		Workspace: workspace,
+		JwtPlugin: *jwtPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsDeleteJwtPluginRequest(ctx context.Context) (*operations.DeleteJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteJwtPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsGetJwtPluginRequest(ctx context.Context) (*operations.GetJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetJwtPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJwtResourceModel) ToOperationsUpdateJwtPluginRequest(ctx context.Context) (*operations.UpdateJwtPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jwtPlugin, jwtPluginDiags := r.ToSharedJwtPlugin(ctx)
+	diags.Append(jwtPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateJwtPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+		JwtPlugin: *jwtPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared.JwtPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var config *shared.JwtPluginConfig
+	if r.Config != nil {
+		anonymous := new(string)
+		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+			*anonymous = r.Config.Anonymous.ValueString()
+		} else {
+			anonymous = nil
+		}
+		claimsToVerify := make([]shared.ClaimsToVerify, 0, len(r.Config.ClaimsToVerify))
+		for _, claimsToVerifyItem := range r.Config.ClaimsToVerify {
+			claimsToVerify = append(claimsToVerify, shared.ClaimsToVerify(claimsToVerifyItem.ValueString()))
+		}
+		cookieNames := make([]string, 0, len(r.Config.CookieNames))
+		for _, cookieNamesItem := range r.Config.CookieNames {
+			cookieNames = append(cookieNames, cookieNamesItem.ValueString())
+		}
+		headerNames := make([]string, 0, len(r.Config.HeaderNames))
+		for _, headerNamesItem := range r.Config.HeaderNames {
+			headerNames = append(headerNames, headerNamesItem.ValueString())
+		}
+		keyClaimName := new(string)
+		if !r.Config.KeyClaimName.IsUnknown() && !r.Config.KeyClaimName.IsNull() {
+			*keyClaimName = r.Config.KeyClaimName.ValueString()
+		} else {
+			keyClaimName = nil
+		}
+		maximumExpiration := new(float64)
+		if !r.Config.MaximumExpiration.IsUnknown() && !r.Config.MaximumExpiration.IsNull() {
+			*maximumExpiration = r.Config.MaximumExpiration.ValueFloat64()
+		} else {
+			maximumExpiration = nil
+		}
+		realm := new(string)
+		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
+			*realm = r.Config.Realm.ValueString()
+		} else {
+			realm = nil
+		}
+		runOnPreflight := new(bool)
+		if !r.Config.RunOnPreflight.IsUnknown() && !r.Config.RunOnPreflight.IsNull() {
+			*runOnPreflight = r.Config.RunOnPreflight.ValueBool()
+		} else {
+			runOnPreflight = nil
+		}
+		secretIsBase64 := new(bool)
+		if !r.Config.SecretIsBase64.IsUnknown() && !r.Config.SecretIsBase64.IsNull() {
+			*secretIsBase64 = r.Config.SecretIsBase64.ValueBool()
+		} else {
+			secretIsBase64 = nil
+		}
+		uriParamNames := make([]string, 0, len(r.Config.URIParamNames))
+		for _, uriParamNamesItem := range r.Config.URIParamNames {
+			uriParamNames = append(uriParamNames, uriParamNamesItem.ValueString())
+		}
+		config = &shared.JwtPluginConfig{
+			Anonymous:         anonymous,
+			ClaimsToVerify:    claimsToVerify,
+			CookieNames:       cookieNames,
+			HeaderNames:       headerNames,
+			KeyClaimName:      keyClaimName,
+			MaximumExpiration: maximumExpiration,
+			Realm:             realm,
+			RunOnPreflight:    runOnPreflight,
+			SecretIsBase64:    secretIsBase64,
+			URIParamNames:     uriParamNames,
+		}
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -94,83 +340,6 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 			})
 		}
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.JwtPluginConfig
-	if r.Config != nil {
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		claimsToVerify := make([]shared.ClaimsToVerify, 0, len(r.Config.ClaimsToVerify))
-		for _, claimsToVerifyItem := range r.Config.ClaimsToVerify {
-			claimsToVerify = append(claimsToVerify, shared.ClaimsToVerify(claimsToVerifyItem.ValueString()))
-		}
-		cookieNames := make([]string, 0, len(r.Config.CookieNames))
-		for _, cookieNamesItem := range r.Config.CookieNames {
-			cookieNames = append(cookieNames, cookieNamesItem.ValueString())
-		}
-		headerNames := make([]string, 0, len(r.Config.HeaderNames))
-		for _, headerNamesItem := range r.Config.HeaderNames {
-			headerNames = append(headerNames, headerNamesItem.ValueString())
-		}
-		keyClaimName := new(string)
-		if !r.Config.KeyClaimName.IsUnknown() && !r.Config.KeyClaimName.IsNull() {
-			*keyClaimName = r.Config.KeyClaimName.ValueString()
-		} else {
-			keyClaimName = nil
-		}
-		maximumExpiration := new(float64)
-		if !r.Config.MaximumExpiration.IsUnknown() && !r.Config.MaximumExpiration.IsNull() {
-			*maximumExpiration = r.Config.MaximumExpiration.ValueFloat64()
-		} else {
-			maximumExpiration = nil
-		}
-		realm := new(string)
-		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
-			*realm = r.Config.Realm.ValueString()
-		} else {
-			realm = nil
-		}
-		runOnPreflight := new(bool)
-		if !r.Config.RunOnPreflight.IsUnknown() && !r.Config.RunOnPreflight.IsNull() {
-			*runOnPreflight = r.Config.RunOnPreflight.ValueBool()
-		} else {
-			runOnPreflight = nil
-		}
-		secretIsBase64 := new(bool)
-		if !r.Config.SecretIsBase64.IsUnknown() && !r.Config.SecretIsBase64.IsNull() {
-			*secretIsBase64 = r.Config.SecretIsBase64.ValueBool()
-		} else {
-			secretIsBase64 = nil
-		}
-		uriParamNames := make([]string, 0, len(r.Config.URIParamNames))
-		for _, uriParamNamesItem := range r.Config.URIParamNames {
-			uriParamNames = append(uriParamNames, uriParamNamesItem.ValueString())
-		}
-		config = &shared.JwtPluginConfig{
-			Anonymous:         anonymous,
-			ClaimsToVerify:    claimsToVerify,
-			CookieNames:       cookieNames,
-			HeaderNames:       headerNames,
-			KeyClaimName:      keyClaimName,
-			MaximumExpiration: maximumExpiration,
-			Realm:             realm,
-			RunOnPreflight:    runOnPreflight,
-			SecretIsBase64:    secretIsBase64,
-			URIParamNames:     uriParamNames,
-		}
-	}
 	protocols := make([]shared.JwtPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
 		protocols = append(protocols, shared.JwtPluginProtocols(protocolsItem.ValueString()))
@@ -199,170 +368,33 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 			ID: id3,
 		}
 	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	out := shared.JwtPlugin{
+		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags
-}
-
-func (r *PluginJwtResourceModel) ToOperationsUpdateJwtPluginRequest(ctx context.Context) (*operations.UpdateJwtPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	jwtPlugin, jwtPluginDiags := r.ToSharedJwtPlugin(ctx)
-	diags.Append(jwtPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateJwtPluginRequest{
-		PluginID:  pluginID,
-		JwtPlugin: *jwtPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJwtResourceModel) ToOperationsGetJwtPluginRequest(ctx context.Context) (*operations.GetJwtPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetJwtPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJwtResourceModel) ToOperationsDeleteJwtPluginRequest(ctx context.Context) (*operations.DeleteJwtPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteJwtPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context, resp *shared.JwtPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.JwtPluginConfig{}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.ClaimsToVerify = make([]types.String, 0, len(resp.Config.ClaimsToVerify))
-			for _, v := range resp.Config.ClaimsToVerify {
-				r.Config.ClaimsToVerify = append(r.Config.ClaimsToVerify, types.StringValue(string(v)))
-			}
-			r.Config.CookieNames = make([]types.String, 0, len(resp.Config.CookieNames))
-			for _, v := range resp.Config.CookieNames {
-				r.Config.CookieNames = append(r.Config.CookieNames, types.StringValue(v))
-			}
-			r.Config.HeaderNames = make([]types.String, 0, len(resp.Config.HeaderNames))
-			for _, v := range resp.Config.HeaderNames {
-				r.Config.HeaderNames = append(r.Config.HeaderNames, types.StringValue(v))
-			}
-			r.Config.KeyClaimName = types.StringPointerValue(resp.Config.KeyClaimName)
-			r.Config.MaximumExpiration = types.Float64PointerValue(resp.Config.MaximumExpiration)
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
-			r.Config.SecretIsBase64 = types.BoolPointerValue(resp.Config.SecretIsBase64)
-			r.Config.URIParamNames = make([]types.String, 0, len(resp.Config.URIParamNames))
-			for _, v := range resp.Config.URIParamNames {
-				r.Config.URIParamNames = append(r.Config.URIParamNames, types.StringValue(v))
-			}
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

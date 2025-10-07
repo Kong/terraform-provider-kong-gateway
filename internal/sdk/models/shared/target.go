@@ -2,78 +2,90 @@
 
 package shared
 
+// TargetUpstream - The unique identifier or the name of the upstream for which to update the target.
 type TargetUpstream struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *TargetUpstream) GetID() *string {
-	if o == nil {
+func (t *TargetUpstream) GetID() *string {
+	if t == nil {
 		return nil
 	}
-	return o.ID
+	return t.ID
 }
 
 // Target - A target is an ip address/hostname with a port that identifies an instance of a backend service. Every upstream can have many targets, and the targets can be dynamically added, modified, or deleted. Changes take effect on the fly. To disable a target, post a new one with `weight=0`; alternatively, use the `DELETE` convenience method to accomplish the same. The current target object definition is the one with the latest `created_at`.
 type Target struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *float64 `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
+	// Whether to use this target only as backup or not.
+	Failover *bool `json:"failover,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// An optional set of strings associated with the Target for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// The target address (ip or hostname) and port. If the hostname resolves to an SRV record, the `port` value will be overridden by the value from the DNS record.
-	Target *string `json:"target,omitempty"`
+	Target *string `json:"target"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *float64        `json:"updated_at,omitempty"`
-	Upstream  *TargetUpstream `json:"upstream,omitempty"`
+	UpdatedAt *float64 `json:"updated_at,omitempty"`
+	// The unique identifier or the name of the upstream for which to update the target.
+	Upstream *TargetUpstream `json:"upstream,omitempty"`
 	// The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.
 	Weight *int64 `json:"weight,omitempty"`
 }
 
-func (o *Target) GetCreatedAt() *float64 {
-	if o == nil {
+func (t *Target) GetCreatedAt() *float64 {
+	if t == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return t.CreatedAt
 }
 
-func (o *Target) GetID() *string {
-	if o == nil {
+func (t *Target) GetFailover() *bool {
+	if t == nil {
 		return nil
 	}
-	return o.ID
+	return t.Failover
 }
 
-func (o *Target) GetTags() []string {
-	if o == nil {
+func (t *Target) GetID() *string {
+	if t == nil {
 		return nil
 	}
-	return o.Tags
+	return t.ID
 }
 
-func (o *Target) GetTarget() *string {
-	if o == nil {
+func (t *Target) GetTags() []string {
+	if t == nil {
 		return nil
 	}
-	return o.Target
+	return t.Tags
 }
 
-func (o *Target) GetUpdatedAt() *float64 {
-	if o == nil {
+func (t *Target) GetTarget() *string {
+	if t == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return t.Target
 }
 
-func (o *Target) GetUpstream() *TargetUpstream {
-	if o == nil {
+func (t *Target) GetUpdatedAt() *float64 {
+	if t == nil {
 		return nil
 	}
-	return o.Upstream
+	return t.UpdatedAt
 }
 
-func (o *Target) GetWeight() *int64 {
-	if o == nil {
+func (t *Target) GetUpstream() *TargetUpstream {
+	if t == nil {
 		return nil
 	}
-	return o.Weight
+	return t.Upstream
+}
+
+func (t *Target) GetWeight() *int64 {
+	if t == nil {
+		return nil
+	}
+	return t.Weight
 }

@@ -15,33 +15,34 @@ PluginAwsLambda Resource
 ```terraform
 resource "kong-gateway_plugin_aws_lambda" "my_pluginawslambda" {
   config = {
-    aws_assume_role_arn       = "...my_aws_assume_role_arn..."
-    aws_imds_protocol_version = "v2"
-    aws_key                   = "...my_aws_key..."
-    aws_region                = "...my_aws_region..."
-    aws_role_session_name     = "...my_aws_role_session_name..."
-    aws_secret                = "...my_aws_secret..."
-    aws_sts_endpoint_url      = "...my_aws_sts_endpoint_url..."
-    awsgateway_compatible     = false
-    base64_encode_body        = true
-    disable_https             = true
-    empty_arrays_mode         = "legacy"
-    forward_request_body      = true
-    forward_request_headers   = false
-    forward_request_method    = false
-    forward_request_uri       = true
-    function_name             = "...my_function_name..."
-    host                      = "...my_host..."
-    invocation_type           = "RequestResponse"
-    is_proxy_integration      = true
-    keepalive                 = 5.55
-    log_type                  = "Tail"
-    port                      = 36372
-    proxy_url                 = "...my_proxy_url..."
-    qualifier                 = "...my_qualifier..."
-    skip_large_bodies         = true
-    timeout                   = 6.58
-    unhandled_status          = 443
+    aws_assume_role_arn                   = "...my_aws_assume_role_arn..."
+    aws_imds_protocol_version             = "v2"
+    aws_key                               = "...my_aws_key..."
+    aws_region                            = "...my_aws_region..."
+    aws_role_session_name                 = "...my_aws_role_session_name..."
+    aws_secret                            = "...my_aws_secret..."
+    aws_sts_endpoint_url                  = "...my_aws_sts_endpoint_url..."
+    awsgateway_compatible                 = false
+    awsgateway_compatible_payload_version = "1.0"
+    base64_encode_body                    = true
+    disable_https                         = true
+    empty_arrays_mode                     = "legacy"
+    forward_request_body                  = true
+    forward_request_headers               = false
+    forward_request_method                = false
+    forward_request_uri                   = true
+    function_name                         = "...my_function_name..."
+    host                                  = "...my_host..."
+    invocation_type                       = "RequestResponse"
+    is_proxy_integration                  = true
+    keepalive                             = 5.55
+    log_type                              = "Tail"
+    port                                  = 36372
+    proxy_url                             = "...my_proxy_url..."
+    qualifier                             = "...my_qualifier..."
+    skip_large_bodies                     = true
+    timeout                               = 6.58
+    unhandled_status                      = 443
   }
   consumer = {
     id = "...my_id..."
@@ -82,6 +83,7 @@ resource "kong-gateway_plugin_aws_lambda" "my_pluginawslambda" {
     "..."
   ]
   updated_at = 5
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -94,18 +96,16 @@ resource "kong-gateway_plugin_aws_lambda" "my_pluginawslambda" {
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -120,6 +120,7 @@ Optional:
 - `aws_secret` (String) The AWS secret credential to be used when invoking the function.
 - `aws_sts_endpoint_url` (String) A string representing a URL, such as https://example.com/path/to/resource?q=search.
 - `awsgateway_compatible` (Boolean) An optional value that defines whether the plugin should wrap requests into the Amazon API gateway.
+- `awsgateway_compatible_payload_version` (String) An optional value that defines which version will be used to generate the AWS API Gateway compatible payload. The default will be `1.0`. must be one of ["1.0", "2.0"]
 - `base64_encode_body` (Boolean) An optional value that Base64-encodes the request body.
 - `disable_https` (Boolean)
 - `empty_arrays_mode` (String) An optional value that defines whether Kong should send empty arrays (returned by Lambda function) as `[]` arrays or `{}` objects in JSON responses. The value `legacy` means Kong will send empty arrays as `{}` objects in response. must be one of ["correct", "legacy"]
@@ -179,8 +180,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -203,6 +204,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_aws_lambda.my_kong-gateway_plugin_aws_lambda
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_aws_lambda.my_kong-gateway_plugin_aws_lambda ""
+terraform import kong-gateway_plugin_aws_lambda.my_kong-gateway_plugin_aws_lambda '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

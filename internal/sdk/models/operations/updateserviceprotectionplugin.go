@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateServiceprotectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                string                         `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace               string                         `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	ServiceProtectionPlugin shared.ServiceProtectionPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateServiceprotectionPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateServiceprotectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateServiceprotectionPluginRequest) GetServiceProtectionPlugin() shared.ServiceProtectionPlugin {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ServiceProtectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateServiceprotectionPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateServiceprotectionPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateServiceprotectionPluginRequest) GetServiceProtectionPlugin() shared.ServiceProtectionPlugin {
+	if u == nil {
 		return shared.ServiceProtectionPlugin{}
 	}
-	return o.ServiceProtectionPlugin
+	return u.ServiceProtectionPlugin
 }
 
 type UpdateServiceprotectionPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateServiceprotectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateServiceprotectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateServiceprotectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateServiceprotectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateServiceprotectionPluginResponse) GetServiceProtectionPlugin() *shared.ServiceProtectionPlugin {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginResponse) GetServiceProtectionPlugin() *shared.ServiceProtectionPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.ServiceProtectionPlugin
+	return u.ServiceProtectionPlugin
 }
 
-func (o *UpdateServiceprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateServiceprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

@@ -2,63 +2,624 @@
 
 package shared
 
-type Partial struct {
-	Config map[string]any `json:"config"`
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
+type PartialRedisEeClusterNodes struct {
+	// A string representing a host name, such as example.com.
+	IP *string `json:"ip,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (p PartialRedisEeClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisEeClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEeClusterNodes) GetIP() *string {
+	if p == nil {
+		return nil
+	}
+	return p.IP
+}
+
+func (p *PartialRedisEeClusterNodes) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+type PartialRedisEeSentinelNodes struct {
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (p PartialRedisEeSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisEeSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEeSentinelNodes) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialRedisEeSentinelNodes) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+// PartialRedisEeSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+type PartialRedisEeSentinelRole string
+
+const (
+	PartialRedisEeSentinelRoleAny    PartialRedisEeSentinelRole = "any"
+	PartialRedisEeSentinelRoleMaster PartialRedisEeSentinelRole = "master"
+	PartialRedisEeSentinelRoleSlave  PartialRedisEeSentinelRole = "slave"
+)
+
+func (e PartialRedisEeSentinelRole) ToPointer() *PartialRedisEeSentinelRole {
+	return &e
+}
+func (e *PartialRedisEeSentinelRole) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "any":
+		fallthrough
+	case "master":
+		fallthrough
+	case "slave":
+		*e = PartialRedisEeSentinelRole(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisEeSentinelRole: %v", v)
+	}
+}
+
+type PartialRedisEeConfig struct {
+	// Maximum retry attempts for redirection.
+	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
+	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
+	ClusterNodes []PartialRedisEeClusterNodes `json:"cluster_nodes,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
+	// If the connection to Redis is proxied (e.g. Envoy), set it `true`. Set the `host` and `port` to point to the proxy address.
+	ConnectionIsProxied *bool `json:"connection_is_proxied,omitempty"`
+	// Database to use for the Redis connection when using the `redis` strategy
+	Database *int64 `json:"database,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return `nil`. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than `keepalive_pool_size`. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than `keepalive_pool_size`.
+	KeepaliveBacklog *int64 `json:"keepalive_backlog,omitempty"`
+	// The size limit for every cosocket connection pool associated with every remote server, per worker process. If neither `keepalive_pool_size` nor `keepalive_backlog` is specified, no pool is created. If `keepalive_pool_size` isn't specified but `keepalive_backlog` is specified, then the pool uses the default value. Try to increase (e.g. 512) this value if latency is high or throughput is low.
+	KeepalivePoolSize *int64 `json:"keepalive_pool_size,omitempty"`
+	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+	Password *string `json:"password,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ReadTimeout *int64 `json:"read_timeout,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	SendTimeout *int64 `json:"send_timeout,omitempty"`
+	// Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
+	SentinelMaster *string `json:"sentinel_master,omitempty"`
+	// Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.
+	SentinelNodes []PartialRedisEeSentinelNodes `json:"sentinel_nodes,omitempty"`
+	// Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.
+	SentinelPassword *string `json:"sentinel_password,omitempty"`
+	// Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+	SentinelRole *PartialRedisEeSentinelRole `json:"sentinel_role,omitempty"`
+	// Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.
+	SentinelUsername *string `json:"sentinel_username,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	ServerName *string `json:"server_name,omitempty"`
+	// If set to true, uses SSL to connect to Redis.
+	Ssl *bool `json:"ssl,omitempty"`
+	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialRedisEeConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisEeConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEeConfig) GetClusterMaxRedirections() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ClusterMaxRedirections
+}
+
+func (p *PartialRedisEeConfig) GetClusterNodes() []PartialRedisEeClusterNodes {
+	if p == nil {
+		return nil
+	}
+	return p.ClusterNodes
+}
+
+func (p *PartialRedisEeConfig) GetConnectTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ConnectTimeout
+}
+
+func (p *PartialRedisEeConfig) GetConnectionIsProxied() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.ConnectionIsProxied
+}
+
+func (p *PartialRedisEeConfig) GetDatabase() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Database
+}
+
+func (p *PartialRedisEeConfig) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialRedisEeConfig) GetKeepaliveBacklog() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.KeepaliveBacklog
+}
+
+func (p *PartialRedisEeConfig) GetKeepalivePoolSize() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.KeepalivePoolSize
+}
+
+func (p *PartialRedisEeConfig) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialRedisEeConfig) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+func (p *PartialRedisEeConfig) GetReadTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ReadTimeout
+}
+
+func (p *PartialRedisEeConfig) GetSendTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.SendTimeout
+}
+
+func (p *PartialRedisEeConfig) GetSentinelMaster() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelMaster
+}
+
+func (p *PartialRedisEeConfig) GetSentinelNodes() []PartialRedisEeSentinelNodes {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelNodes
+}
+
+func (p *PartialRedisEeConfig) GetSentinelPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelPassword
+}
+
+func (p *PartialRedisEeConfig) GetSentinelRole() *PartialRedisEeSentinelRole {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelRole
+}
+
+func (p *PartialRedisEeConfig) GetSentinelUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelUsername
+}
+
+func (p *PartialRedisEeConfig) GetServerName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ServerName
+}
+
+func (p *PartialRedisEeConfig) GetSsl() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.Ssl
+}
+
+func (p *PartialRedisEeConfig) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialRedisEeConfig) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
+}
+
+type PartialRedisEe struct {
+	Config PartialRedisEeConfig `json:"config"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
-	Name      *string  `json:"name,omitempty"`
-	Tags      []string `json:"tags,omitempty"`
-	Type      string   `json:"type"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags  []string `json:"tags,omitempty"`
+	type_ string   `const:"redis-ee" json:"type"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *Partial) GetConfig() map[string]any {
-	if o == nil {
-		return map[string]any{}
-	}
-	return o.Config
+func (p PartialRedisEe) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
 }
 
-func (o *Partial) GetCreatedAt() *int64 {
-	if o == nil {
+func (p *PartialRedisEe) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEe) GetConfig() PartialRedisEeConfig {
+	if p == nil {
+		return PartialRedisEeConfig{}
+	}
+	return p.Config
+}
+
+func (p *PartialRedisEe) GetCreatedAt() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return p.CreatedAt
 }
 
-func (o *Partial) GetID() *string {
-	if o == nil {
+func (p *PartialRedisEe) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
-func (o *Partial) GetName() *string {
-	if o == nil {
+func (p *PartialRedisEe) GetName() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Name
+	return p.Name
 }
 
-func (o *Partial) GetTags() []string {
-	if o == nil {
+func (p *PartialRedisEe) GetTags() []string {
+	if p == nil {
 		return nil
 	}
-	return o.Tags
+	return p.Tags
 }
 
-func (o *Partial) GetType() string {
-	if o == nil {
-		return ""
-	}
-	return o.Type
+func (p *PartialRedisEe) GetType() string {
+	return "redis-ee"
 }
 
-func (o *Partial) GetUpdatedAt() *int64 {
-	if o == nil {
+func (p *PartialRedisEe) GetUpdatedAt() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return p.UpdatedAt
+}
+
+type PartialRedisCeConfig struct {
+	// Database to use for the Redis connection when using the `redis` strategy
+	Database *int64 `json:"database,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+	Password *string `json:"password,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	ServerName *string `json:"server_name,omitempty"`
+	// If set to true, uses SSL to connect to Redis.
+	Ssl *bool `json:"ssl,omitempty"`
+	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialRedisCeConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisCeConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisCeConfig) GetDatabase() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Database
+}
+
+func (p *PartialRedisCeConfig) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialRedisCeConfig) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialRedisCeConfig) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+func (p *PartialRedisCeConfig) GetServerName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ServerName
+}
+
+func (p *PartialRedisCeConfig) GetSsl() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.Ssl
+}
+
+func (p *PartialRedisCeConfig) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialRedisCeConfig) GetTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Timeout
+}
+
+func (p *PartialRedisCeConfig) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
+}
+
+type PartialRedisCe struct {
+	Config PartialRedisCeConfig `json:"config"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags  []string `json:"tags,omitempty"`
+	type_ string   `const:"redis-ce" json:"type"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (p PartialRedisCe) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisCe) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisCe) GetConfig() PartialRedisCeConfig {
+	if p == nil {
+		return PartialRedisCeConfig{}
+	}
+	return p.Config
+}
+
+func (p *PartialRedisCe) GetCreatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.CreatedAt
+}
+
+func (p *PartialRedisCe) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *PartialRedisCe) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PartialRedisCe) GetTags() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Tags
+}
+
+func (p *PartialRedisCe) GetType() string {
+	return "redis-ce"
+}
+
+func (p *PartialRedisCe) GetUpdatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.UpdatedAt
+}
+
+type PartialType string
+
+const (
+	PartialTypeRedisCe PartialType = "redis-ce"
+	PartialTypeRedisEe PartialType = "redis-ee"
+)
+
+type Partial struct {
+	PartialRedisCe *PartialRedisCe `queryParam:"inline,name=Partial"`
+	PartialRedisEe *PartialRedisEe `queryParam:"inline,name=Partial"`
+
+	Type PartialType
+}
+
+func CreatePartialRedisCe(redisCe PartialRedisCe) Partial {
+	typ := PartialTypeRedisCe
+
+	return Partial{
+		PartialRedisCe: &redisCe,
+		Type:           typ,
+	}
+}
+
+func CreatePartialRedisEe(redisEe PartialRedisEe) Partial {
+	typ := PartialTypeRedisEe
+
+	return Partial{
+		PartialRedisEe: &redisEe,
+		Type:           typ,
+	}
+}
+
+func (u *Partial) UnmarshalJSON(data []byte) error {
+
+	type discriminator struct {
+		Type string `json:"type"`
+	}
+
+	dis := new(discriminator)
+	if err := json.Unmarshal(data, &dis); err != nil {
+		return fmt.Errorf("could not unmarshal discriminator: %w", err)
+	}
+
+	switch dis.Type {
+	case "redis-ce":
+		partialRedisCe := new(PartialRedisCe)
+		if err := utils.UnmarshalJSON(data, &partialRedisCe, "", true, nil); err != nil {
+			return fmt.Errorf("could not unmarshal `%s` into expected (Type == redis-ce) type PartialRedisCe within Partial: %w", string(data), err)
+		}
+
+		u.PartialRedisCe = partialRedisCe
+		u.Type = PartialTypeRedisCe
+		return nil
+	case "redis-ee":
+		partialRedisEe := new(PartialRedisEe)
+		if err := utils.UnmarshalJSON(data, &partialRedisEe, "", true, nil); err != nil {
+			return fmt.Errorf("could not unmarshal `%s` into expected (Type == redis-ee) type PartialRedisEe within Partial: %w", string(data), err)
+		}
+
+		u.PartialRedisEe = partialRedisEe
+		u.Type = PartialTypeRedisEe
+		return nil
+	}
+
+	return fmt.Errorf("could not unmarshal `%s` into any supported union types for Partial", string(data))
+}
+
+func (u Partial) MarshalJSON() ([]byte, error) {
+	if u.PartialRedisCe != nil {
+		return utils.MarshalJSON(u.PartialRedisCe, "", true)
+	}
+
+	if u.PartialRedisEe != nil {
+		return utils.MarshalJSON(u.PartialRedisEe, "", true)
+	}
+
+	return nil, errors.New("could not marshal union type Partial: all fields are null")
 }

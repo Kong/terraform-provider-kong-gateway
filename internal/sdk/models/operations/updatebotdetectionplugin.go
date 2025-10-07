@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateBotdetectionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	BotDetectionPlugin shared.BotDetectionPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateBotdetectionPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateBotdetectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateBotdetectionPluginRequest) GetBotDetectionPlugin() shared.BotDetectionPlugin {
-	if o == nil {
+func (u *UpdateBotdetectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "BotDetectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateBotdetectionPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateBotdetectionPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateBotdetectionPluginRequest) GetBotDetectionPlugin() shared.BotDetectionPlugin {
+	if u == nil {
 		return shared.BotDetectionPlugin{}
 	}
-	return o.BotDetectionPlugin
+	return u.BotDetectionPlugin
 }
 
 type UpdateBotdetectionPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateBotdetectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateBotdetectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateBotdetectionPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateBotdetectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateBotdetectionPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateBotdetectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateBotdetectionPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateBotdetectionPluginResponse) GetBotDetectionPlugin() *shared.BotDetectionPlugin {
-	if o == nil {
+func (u *UpdateBotdetectionPluginResponse) GetBotDetectionPlugin() *shared.BotDetectionPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.BotDetectionPlugin
+	return u.BotDetectionPlugin
 }
 
-func (o *UpdateBotdetectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateBotdetectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

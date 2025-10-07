@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateLdapauthadvancedPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID               string                        `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace              string                        `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	LdapAuthAdvancedPlugin shared.LdapAuthAdvancedPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateLdapauthadvancedPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateLdapauthadvancedPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateLdapauthadvancedPluginRequest) GetLdapAuthAdvancedPlugin() shared.LdapAuthAdvancedPlugin {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "LdapAuthAdvancedPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateLdapauthadvancedPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateLdapauthadvancedPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateLdapauthadvancedPluginRequest) GetLdapAuthAdvancedPlugin() shared.LdapAuthAdvancedPlugin {
+	if u == nil {
 		return shared.LdapAuthAdvancedPlugin{}
 	}
-	return o.LdapAuthAdvancedPlugin
+	return u.LdapAuthAdvancedPlugin
 }
 
 type UpdateLdapauthadvancedPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateLdapauthadvancedPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateLdapauthadvancedPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateLdapauthadvancedPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateLdapauthadvancedPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateLdapauthadvancedPluginResponse) GetLdapAuthAdvancedPlugin() *shared.LdapAuthAdvancedPlugin {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginResponse) GetLdapAuthAdvancedPlugin() *shared.LdapAuthAdvancedPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.LdapAuthAdvancedPlugin
+	return u.LdapAuthAdvancedPlugin
 }
 
-func (o *UpdateLdapauthadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateLdapauthadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

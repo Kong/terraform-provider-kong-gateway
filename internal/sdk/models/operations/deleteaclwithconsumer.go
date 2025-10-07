@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteACLWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the ACL to lookup
 	ACLID string `pathParam:"style=simple,explode=false,name=ACLId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteACLWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteACLWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteACLWithConsumerRequest) GetACLID() string {
-	if o == nil {
+func (d *DeleteACLWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "ACLId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteACLWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.ACLID
+	return d.ConsumerID
+}
+
+func (d *DeleteACLWithConsumerRequest) GetACLID() string {
+	if d == nil {
+		return ""
+	}
+	return d.ACLID
+}
+
+func (d *DeleteACLWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteACLWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteACLWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteACLWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteACLWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteACLWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteACLWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteACLWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteACLWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

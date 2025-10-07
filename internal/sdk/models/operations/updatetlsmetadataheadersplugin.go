@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateTlsmetadataheadersPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	TLSMetadataHeadersPlugin shared.TLSMetadataHeadersPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateTlsmetadataheadersPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateTlsmetadataheadersPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateTlsmetadataheadersPluginRequest) GetTLSMetadataHeadersPlugin() shared.TLSMetadataHeadersPlugin {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "TlsMetadataHeadersPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateTlsmetadataheadersPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateTlsmetadataheadersPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateTlsmetadataheadersPluginRequest) GetTLSMetadataHeadersPlugin() shared.TLSMetadataHeadersPlugin {
+	if u == nil {
 		return shared.TLSMetadataHeadersPlugin{}
 	}
-	return o.TLSMetadataHeadersPlugin
+	return u.TLSMetadataHeadersPlugin
 }
 
 type UpdateTlsmetadataheadersPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateTlsmetadataheadersPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateTlsmetadataheadersPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateTlsmetadataheadersPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateTlsmetadataheadersPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateTlsmetadataheadersPluginResponse) GetTLSMetadataHeadersPlugin() *shared.TLSMetadataHeadersPlugin {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginResponse) GetTLSMetadataHeadersPlugin() *shared.TLSMetadataHeadersPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.TLSMetadataHeadersPlugin
+	return u.TLSMetadataHeadersPlugin
 }
 
-func (o *UpdateTlsmetadataheadersPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateTlsmetadataheadersPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

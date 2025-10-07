@@ -18,6 +18,7 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
     anonymize = [
       "ssn"
     ]
+    block_if_detected = false
     custom_patterns = [
       {
         name  = "...my_name..."
@@ -30,6 +31,7 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
     port              = 5.24
     recover_redacted  = true
     redact_type       = "placeholder"
+    sanitization_mode = "INPUT"
     scheme            = "...my_scheme..."
     stop_on_error     = false
     timeout           = 3.64
@@ -76,6 +78,7 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
     "..."
   ]
   updated_at = 0
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -89,18 +92,16 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -108,14 +109,16 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
 Optional:
 
 - `anonymize` (List of String) List of types to be anonymized
+- `block_if_detected` (Boolean) Whether to block requests containing PII data
 - `custom_patterns` (Attributes List) List of custom patterns to be used for anonymization (see [below for nested schema](#nestedatt--config--custom_patterns))
 - `host` (String) The host of the sanitizer
 - `keepalive_timeout` (Number) The keepalive timeout for the established http connnection
 - `port` (Number) The port of the sanitizer
-- `recover_redacted` (Boolean) Whether to recover redacted data
+- `recover_redacted` (Boolean) Whether to recover redacted data. This doesn't apply to the redacted output.
 - `redact_type` (String) What value to be used to redacted to. must be one of ["placeholder", "synthetic"]
+- `sanitization_mode` (String) The sanitization mode to use for the request. must be one of ["BOTH", "INPUT", "OUTPUT"]
 - `scheme` (String) The protocol can be http and https
-- `stop_on_error` (Boolean) Stop processing if an error occurs
+- `stop_on_error` (Boolean) Stop processing if an error occurs.
 - `timeout` (Number) Connection timeout with the sanitizer
 
 <a id="nestedatt--config--custom_patterns"></a>
@@ -175,8 +178,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -199,6 +202,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer ""
+terraform import kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

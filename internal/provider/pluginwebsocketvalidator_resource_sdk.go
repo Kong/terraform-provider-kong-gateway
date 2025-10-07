@@ -11,270 +11,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
-func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin(ctx context.Context) (*shared.WebsocketValidatorPlugin, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id = r.ID.ValueString()
-	} else {
-		id = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.WebsocketValidatorPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.WebsocketValidatorPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.WebsocketValidatorPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.WebsocketValidatorPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.WebsocketValidatorPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.WebsocketValidatorPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.WebsocketValidatorPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.WebsocketValidatorPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.WebsocketValidatorPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
-		}
-	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
-	var config *shared.WebsocketValidatorPluginConfig
-	if r.Config != nil {
-		var client *shared.WebsocketValidatorPluginClient
-		if r.Config.Client != nil {
-			var binary *shared.Binary
-			if r.Config.Client.Binary != nil {
-				var schema string
-				schema = r.Config.Client.Binary.Schema.ValueString()
-
-				typeVar := shared.WebsocketValidatorPluginConfigClientType(r.Config.Client.Binary.Type.ValueString())
-				binary = &shared.Binary{
-					Schema: schema,
-					Type:   typeVar,
-				}
-			}
-			var text *shared.Text
-			if r.Config.Client.Text != nil {
-				var schema1 string
-				schema1 = r.Config.Client.Text.Schema.ValueString()
-
-				typeVar1 := shared.WebsocketValidatorPluginType(r.Config.Client.Text.Type.ValueString())
-				text = &shared.Text{
-					Schema: schema1,
-					Type:   typeVar1,
-				}
-			}
-			client = &shared.WebsocketValidatorPluginClient{
-				Binary: binary,
-				Text:   text,
-			}
-		}
-		var upstream *shared.WebsocketValidatorPluginUpstream
-		if r.Config.Upstream != nil {
-			var binary1 *shared.WebsocketValidatorPluginBinary
-			if r.Config.Upstream.Binary != nil {
-				var schema2 string
-				schema2 = r.Config.Upstream.Binary.Schema.ValueString()
-
-				typeVar2 := shared.WebsocketValidatorPluginConfigType(r.Config.Upstream.Binary.Type.ValueString())
-				binary1 = &shared.WebsocketValidatorPluginBinary{
-					Schema: schema2,
-					Type:   typeVar2,
-				}
-			}
-			var text1 *shared.WebsocketValidatorPluginText
-			if r.Config.Upstream.Text != nil {
-				var schema3 string
-				schema3 = r.Config.Upstream.Text.Schema.ValueString()
-
-				typeVar3 := shared.WebsocketValidatorPluginConfigUpstreamType(r.Config.Upstream.Text.Type.ValueString())
-				text1 = &shared.WebsocketValidatorPluginText{
-					Schema: schema3,
-					Type:   typeVar3,
-				}
-			}
-			upstream = &shared.WebsocketValidatorPluginUpstream{
-				Binary: binary1,
-				Text:   text1,
-			}
-		}
-		config = &shared.WebsocketValidatorPluginConfig{
-			Client:   client,
-			Upstream: upstream,
-		}
-	}
-	var consumer *shared.WebsocketValidatorPluginConsumer
-	if r.Consumer != nil {
-		id2 := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id2 = r.Consumer.ID.ValueString()
-		} else {
-			id2 = nil
-		}
-		consumer = &shared.WebsocketValidatorPluginConsumer{
-			ID: id2,
-		}
-	}
-	protocols := make([]shared.WebsocketValidatorPluginProtocols, 0, len(r.Protocols))
-	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.WebsocketValidatorPluginProtocols(protocolsItem.ValueString()))
-	}
-	var route *shared.WebsocketValidatorPluginRoute
-	if r.Route != nil {
-		id3 := new(string)
-		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
-			*id3 = r.Route.ID.ValueString()
-		} else {
-			id3 = nil
-		}
-		route = &shared.WebsocketValidatorPluginRoute{
-			ID: id3,
-		}
-	}
-	var service *shared.WebsocketValidatorPluginService
-	if r.Service != nil {
-		id4 := new(string)
-		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
-			*id4 = r.Service.ID.ValueString()
-		} else {
-			id4 = nil
-		}
-		service = &shared.WebsocketValidatorPluginService{
-			ID: id4,
-		}
-	}
-	out := shared.WebsocketValidatorPlugin{
-		CreatedAt:    createdAt,
-		Enabled:      enabled,
-		ID:           id,
-		InstanceName: instanceName,
-		Ordering:     ordering,
-		Partials:     partials,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
-		Config:       config,
-		Consumer:     consumer,
-		Protocols:    protocols,
-		Route:        route,
-		Service:      service,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsUpdateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.UpdateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
-	diags.Append(websocketValidatorPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateWebsocketvalidatorPluginRequest{
-		PluginID:                 pluginID,
-		WebsocketValidatorPlugin: *websocketValidatorPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsGetWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.GetWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsDeleteWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.DeleteWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
 func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValidatorPlugin(ctx context.Context, resp *shared.WebsocketValidatorPlugin) diag.Diagnostics {
 	var diags diag.Diagnostics
 
@@ -325,7 +61,7 @@ func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValida
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Consumer = &tfTypes.Set{}
 			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -335,11 +71,11 @@ func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValida
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.Ordering{}
+			r.Ordering = &tfTypes.AcePluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.After{}
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -348,7 +84,7 @@ func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValida
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.After{}
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
@@ -356,22 +92,16 @@ func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValida
 			}
 		}
 		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
+			r.Partials = []tfTypes.AcePluginPartials{}
+
+			for _, partialsItem := range resp.Partials {
+				var partials tfTypes.AcePluginPartials
+
 				partials.ID = types.StringPointerValue(partialsItem.ID)
 				partials.Name = types.StringPointerValue(partialsItem.Name)
 				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
+
+				r.Partials = append(r.Partials, partials)
 			}
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
@@ -381,21 +111,323 @@ func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValida
 		if resp.Route == nil {
 			r.Route = nil
 		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Route = &tfTypes.Set{}
 			r.Route.ID = types.StringPointerValue(resp.Route.ID)
 		}
 		if resp.Service == nil {
 			r.Service = nil
 		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
+			r.Service = &tfTypes.Set{}
 			r.Service.ID = types.StringPointerValue(resp.Service.ID)
 		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
 
 	return diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsCreateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.CreateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
+	diags.Append(websocketValidatorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateWebsocketvalidatorPluginRequest{
+		Workspace:                workspace,
+		WebsocketValidatorPlugin: *websocketValidatorPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsDeleteWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.DeleteWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteWebsocketvalidatorPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsGetWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.GetWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetWebsocketvalidatorPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsUpdateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.UpdateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
+	diags.Append(websocketValidatorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateWebsocketvalidatorPluginRequest{
+		PluginID:                 pluginID,
+		Workspace:                workspace,
+		WebsocketValidatorPlugin: *websocketValidatorPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin(ctx context.Context) (*shared.WebsocketValidatorPlugin, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var config *shared.WebsocketValidatorPluginConfig
+	if r.Config != nil {
+		var client *shared.WebsocketValidatorPluginClient
+		if r.Config.Client != nil {
+			var binary *shared.Binary
+			if r.Config.Client.Binary != nil {
+				var schema string
+				schema = r.Config.Client.Binary.Schema.ValueString()
+
+				typeVar := shared.WebsocketValidatorPluginType(r.Config.Client.Binary.Type.ValueString())
+				binary = &shared.Binary{
+					Schema: schema,
+					Type:   typeVar,
+				}
+			}
+			var text *shared.Text
+			if r.Config.Client.Text != nil {
+				var schema1 string
+				schema1 = r.Config.Client.Text.Schema.ValueString()
+
+				typeVar1 := shared.WebsocketValidatorPluginConfigType(r.Config.Client.Text.Type.ValueString())
+				text = &shared.Text{
+					Schema: schema1,
+					Type:   typeVar1,
+				}
+			}
+			client = &shared.WebsocketValidatorPluginClient{
+				Binary: binary,
+				Text:   text,
+			}
+		}
+		var upstream *shared.WebsocketValidatorPluginUpstream
+		if r.Config.Upstream != nil {
+			var binary1 *shared.WebsocketValidatorPluginBinary
+			if r.Config.Upstream.Binary != nil {
+				var schema2 string
+				schema2 = r.Config.Upstream.Binary.Schema.ValueString()
+
+				typeVar2 := shared.WebsocketValidatorPluginConfigUpstreamType(r.Config.Upstream.Binary.Type.ValueString())
+				binary1 = &shared.WebsocketValidatorPluginBinary{
+					Schema: schema2,
+					Type:   typeVar2,
+				}
+			}
+			var text1 *shared.WebsocketValidatorPluginText
+			if r.Config.Upstream.Text != nil {
+				var schema3 string
+				schema3 = r.Config.Upstream.Text.Schema.ValueString()
+
+				typeVar3 := shared.WebsocketValidatorPluginConfigUpstreamTextType(r.Config.Upstream.Text.Type.ValueString())
+				text1 = &shared.WebsocketValidatorPluginText{
+					Schema: schema3,
+					Type:   typeVar3,
+				}
+			}
+			upstream = &shared.WebsocketValidatorPluginUpstream{
+				Binary: binary1,
+				Text:   text1,
+			}
+		}
+		config = &shared.WebsocketValidatorPluginConfig{
+			Client:   client,
+			Upstream: upstream,
+		}
+	}
+	var consumer *shared.WebsocketValidatorPluginConsumer
+	if r.Consumer != nil {
+		id := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id = r.Consumer.ID.ValueString()
+		} else {
+			id = nil
+		}
+		consumer = &shared.WebsocketValidatorPluginConsumer{
+			ID: id,
+		}
+	}
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id1 := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id1 = r.ID.ValueString()
+	} else {
+		id1 = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.WebsocketValidatorPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.WebsocketValidatorPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.WebsocketValidatorPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.WebsocketValidatorPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.WebsocketValidatorPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.WebsocketValidatorPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	var partials []shared.WebsocketValidatorPluginPartials
+	if r.Partials != nil {
+		partials = make([]shared.WebsocketValidatorPluginPartials, 0, len(r.Partials))
+		for _, partialsItem := range r.Partials {
+			id2 := new(string)
+			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+				*id2 = partialsItem.ID.ValueString()
+			} else {
+				id2 = nil
+			}
+			name := new(string)
+			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+				*name = partialsItem.Name.ValueString()
+			} else {
+				name = nil
+			}
+			path := new(string)
+			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+				*path = partialsItem.Path.ValueString()
+			} else {
+				path = nil
+			}
+			partials = append(partials, shared.WebsocketValidatorPluginPartials{
+				ID:   id2,
+				Name: name,
+				Path: path,
+			})
+		}
+	}
+	protocols := make([]shared.WebsocketValidatorPluginProtocols, 0, len(r.Protocols))
+	for _, protocolsItem := range r.Protocols {
+		protocols = append(protocols, shared.WebsocketValidatorPluginProtocols(protocolsItem.ValueString()))
+	}
+	var route *shared.WebsocketValidatorPluginRoute
+	if r.Route != nil {
+		id3 := new(string)
+		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
+			*id3 = r.Route.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		route = &shared.WebsocketValidatorPluginRoute{
+			ID: id3,
+		}
+	}
+	var service *shared.WebsocketValidatorPluginService
+	if r.Service != nil {
+		id4 := new(string)
+		if !r.Service.ID.IsUnknown() && !r.Service.ID.IsNull() {
+			*id4 = r.Service.ID.ValueString()
+		} else {
+			id4 = nil
+		}
+		service = &shared.WebsocketValidatorPluginService{
+			ID: id4,
+		}
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	out := shared.WebsocketValidatorPlugin{
+		Config:       config,
+		Consumer:     consumer,
+		CreatedAt:    createdAt,
+		Enabled:      enabled,
+		ID:           id1,
+		InstanceName: instanceName,
+		Ordering:     ordering,
+		Partials:     partials,
+		Protocols:    protocols,
+		Route:        route,
+		Service:      service,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+	}
+
+	return &out, diags
 }

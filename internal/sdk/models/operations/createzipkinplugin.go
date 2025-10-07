@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateZipkinPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ZipkinPlugin shared.ZipkinPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateZipkinPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateZipkinPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ZipkinPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateZipkinPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateZipkinPluginRequest) GetZipkinPlugin() shared.ZipkinPlugin {
+	if c == nil {
+		return shared.ZipkinPlugin{}
+	}
+	return c.ZipkinPlugin
+}
 
 type CreateZipkinPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateZipkinPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateZipkinPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateZipkinPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateZipkinPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateZipkinPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateZipkinPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateZipkinPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateZipkinPluginResponse) GetZipkinPlugin() *shared.ZipkinPlugin {
-	if o == nil {
+func (c *CreateZipkinPluginResponse) GetZipkinPlugin() *shared.ZipkinPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ZipkinPlugin
+	return c.ZipkinPlugin
 }
 
-func (o *CreateZipkinPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateZipkinPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

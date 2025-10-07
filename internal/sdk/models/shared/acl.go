@@ -6,53 +6,55 @@ type ACLConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ACLConsumer) GetID() *string {
-	if o == nil {
+func (a *ACLConsumer) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 type ACL struct {
 	Consumer *ACLConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	Group     string   `json:"group"`
-	ID        *string  `json:"id,omitempty"`
-	Tags      []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	Group     string `json:"group"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 }
 
-func (o *ACL) GetConsumer() *ACLConsumer {
-	if o == nil {
+func (a *ACL) GetConsumer() *ACLConsumer {
+	if a == nil {
 		return nil
 	}
-	return o.Consumer
+	return a.Consumer
 }
 
-func (o *ACL) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *ACL) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.CreatedAt
 }
 
-func (o *ACL) GetGroup() string {
-	if o == nil {
+func (a *ACL) GetGroup() string {
+	if a == nil {
 		return ""
 	}
-	return o.Group
+	return a.Group
 }
 
-func (o *ACL) GetID() *string {
-	if o == nil {
+func (a *ACL) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *ACL) GetTags() []string {
-	if o == nil {
+func (a *ACL) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Tags
 }

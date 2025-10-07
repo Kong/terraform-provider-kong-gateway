@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRequestterminationPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	RequestTerminationPlugin shared.RequestTerminationPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateRequestterminationPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRequestterminationPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RequestTerminationPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRequestterminationPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRequestterminationPluginRequest) GetRequestTerminationPlugin() shared.RequestTerminationPlugin {
+	if c == nil {
+		return shared.RequestTerminationPlugin{}
+	}
+	return c.RequestTerminationPlugin
+}
 
 type CreateRequestterminationPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateRequestterminationPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRequestterminationPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRequestterminationPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRequestterminationPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRequestterminationPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRequestterminationPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRequestterminationPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRequestterminationPluginResponse) GetRequestTerminationPlugin() *shared.RequestTerminationPlugin {
-	if o == nil {
+func (c *CreateRequestterminationPluginResponse) GetRequestTerminationPlugin() *shared.RequestTerminationPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.RequestTerminationPlugin
+	return c.RequestTerminationPlugin
 }
 
-func (o *CreateRequestterminationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRequestterminationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

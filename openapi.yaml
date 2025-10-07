@@ -29593,7 +29593,8 @@ components:
                 - ip
               type: string
             limits:
-              additionalProperties: true
+              additionalProperties:
+                type: number
               description: A map that defines rate limits for the plugin.
               minLength: 1
               type: object

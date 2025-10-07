@@ -21,10 +21,10 @@ func TestSmoke(t *testing.T) {
 		//	name:    "3.10",
 		//	runWhen: ptr("3.10"),
 		//},
-		//{
-		//	name:    "3.11",
-		//	runWhen: ptr("3.11"),
-		//},
+		{
+			name:    "3.11",
+			runWhen: ptr("3.11"),
+		},
 		{
 			name:    "3.12",
 			runWhen: ptr("3.12"),

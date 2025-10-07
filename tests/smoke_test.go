@@ -14,7 +14,6 @@ type TestCase struct {
 }
 
 func TestSmoke(t *testing.T) {
-	t.Parallel()
 
 	var testCases = []TestCase{
 		{

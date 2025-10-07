@@ -149,6 +149,7 @@ type KongGateway struct {
 	// A CA certificate object represents a trusted certificate authority.
 	// These objects are used by Kong Gateway to verify the validity of a client or server certificate.
 	CACertificates *CACertificates
+	Schemas        *Schemas
 	// The workspace object describes the workspace entity, which has an ID and a name.
 	// <br><br>
 	// Workspaces provide a way to segment Kong Gateway entities. Entities in a workspace are isolated from those in other workspaces.
@@ -359,6 +360,7 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk.Targets = newTargets(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Vaults = newVaults(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.CACertificates = newCACertificates(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Schemas = newSchemas(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Workspaces = newWorkspaces(sdk, sdk.sdkConfiguration, sdk.hooks)
 
 	return sdk

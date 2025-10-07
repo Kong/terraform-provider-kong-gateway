@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type UpdatePluginInWorkspaceRequest struct {
+type UpdatePluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
 	// The name or UUID of the workspace
@@ -17,39 +17,39 @@ type UpdatePluginInWorkspaceRequest struct {
 	Plugin shared.Plugin `request:"mediaType=application/json"`
 }
 
-func (u UpdatePluginInWorkspaceRequest) MarshalJSON() ([]byte, error) {
+func (u UpdatePluginRequest) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(u, "", false)
 }
 
-func (u *UpdatePluginInWorkspaceRequest) UnmarshalJSON(data []byte) error {
+func (u *UpdatePluginRequest) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "Plugin"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *UpdatePluginInWorkspaceRequest) GetPluginID() string {
+func (u *UpdatePluginRequest) GetPluginID() string {
 	if u == nil {
 		return ""
 	}
 	return u.PluginID
 }
 
-func (u *UpdatePluginInWorkspaceRequest) GetWorkspace() string {
+func (u *UpdatePluginRequest) GetWorkspace() string {
 	if u == nil {
 		return ""
 	}
 	return u.Workspace
 }
 
-func (u *UpdatePluginInWorkspaceRequest) GetPlugin() shared.Plugin {
+func (u *UpdatePluginRequest) GetPlugin() shared.Plugin {
 	if u == nil {
 		return shared.Plugin{}
 	}
 	return u.Plugin
 }
 
-type UpdatePluginInWorkspaceResponse struct {
+type UpdatePluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
 	// HTTP response status code for this operation
@@ -62,35 +62,35 @@ type UpdatePluginInWorkspaceResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (u *UpdatePluginInWorkspaceResponse) GetContentType() string {
+func (u *UpdatePluginResponse) GetContentType() string {
 	if u == nil {
 		return ""
 	}
 	return u.ContentType
 }
 
-func (u *UpdatePluginInWorkspaceResponse) GetStatusCode() int {
+func (u *UpdatePluginResponse) GetStatusCode() int {
 	if u == nil {
 		return 0
 	}
 	return u.StatusCode
 }
 
-func (u *UpdatePluginInWorkspaceResponse) GetRawResponse() *http.Response {
+func (u *UpdatePluginResponse) GetRawResponse() *http.Response {
 	if u == nil {
 		return nil
 	}
 	return u.RawResponse
 }
 
-func (u *UpdatePluginInWorkspaceResponse) GetPlugin() *shared.Plugin {
+func (u *UpdatePluginResponse) GetPlugin() *shared.Plugin {
 	if u == nil {
 		return nil
 	}
 	return u.Plugin
 }
 
-func (u *UpdatePluginInWorkspaceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+func (u *UpdatePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if u == nil {
 		return nil
 	}

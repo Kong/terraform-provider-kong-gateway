@@ -8,39 +8,39 @@ import (
 	"net/http"
 )
 
-type GetPluginInWorkspaceRequest struct {
+type GetPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
 	// The name or UUID of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (g GetPluginInWorkspaceRequest) MarshalJSON() ([]byte, error) {
+func (g GetPluginRequest) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(g, "", false)
 }
 
-func (g *GetPluginInWorkspaceRequest) UnmarshalJSON(data []byte) error {
+func (g *GetPluginRequest) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (g *GetPluginInWorkspaceRequest) GetPluginID() string {
+func (g *GetPluginRequest) GetPluginID() string {
 	if g == nil {
 		return ""
 	}
 	return g.PluginID
 }
 
-func (g *GetPluginInWorkspaceRequest) GetWorkspace() string {
+func (g *GetPluginRequest) GetWorkspace() string {
 	if g == nil {
 		return ""
 	}
 	return g.Workspace
 }
 
-type GetPluginInWorkspaceResponse struct {
+type GetPluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
 	// HTTP response status code for this operation
@@ -53,35 +53,35 @@ type GetPluginInWorkspaceResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (g *GetPluginInWorkspaceResponse) GetContentType() string {
+func (g *GetPluginResponse) GetContentType() string {
 	if g == nil {
 		return ""
 	}
 	return g.ContentType
 }
 
-func (g *GetPluginInWorkspaceResponse) GetStatusCode() int {
+func (g *GetPluginResponse) GetStatusCode() int {
 	if g == nil {
 		return 0
 	}
 	return g.StatusCode
 }
 
-func (g *GetPluginInWorkspaceResponse) GetRawResponse() *http.Response {
+func (g *GetPluginResponse) GetRawResponse() *http.Response {
 	if g == nil {
 		return nil
 	}
 	return g.RawResponse
 }
 
-func (g *GetPluginInWorkspaceResponse) GetPlugin() *shared.Plugin {
+func (g *GetPluginResponse) GetPlugin() *shared.Plugin {
 	if g == nil {
 		return nil
 	}
 	return g.Plugin
 }
 
-func (g *GetPluginInWorkspaceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+func (g *GetPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if g == nil {
 		return nil
 	}

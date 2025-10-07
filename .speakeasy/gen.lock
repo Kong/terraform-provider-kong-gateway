@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: d3dfb92b3abb19e599ef6e65c82cef09
+  docChecksum: 869baa2e9d1acee4e297e763ac7e1fd9
   docVersion: 0.0.1
   speakeasyVersion: 1.634.1
   generationVersion: 2.721.0
   releaseVersion: 0.5.2
-  configChecksum: 14ef510f45dd458125df412fafe199ec
+  configChecksum: d42115db5b0ff0f030b9e5bc0d02a28c
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -1061,7 +1061,7 @@ generatedFiles:
   - internal/sdk/models/operations/createopenidconnectplugin.go
   - internal/sdk/models/operations/createopentelemetryplugin.go
   - internal/sdk/models/operations/createpartial.go
-  - internal/sdk/models/operations/createplugininworkspace.go
+  - internal/sdk/models/operations/createplugin.go
   - internal/sdk/models/operations/createpostfunctionplugin.go
   - internal/sdk/models/operations/createprefunctionplugin.go
   - internal/sdk/models/operations/createprometheusplugin.go
@@ -1192,7 +1192,7 @@ generatedFiles:
   - internal/sdk/models/operations/deleteopenidconnectplugin.go
   - internal/sdk/models/operations/deleteopentelemetryplugin.go
   - internal/sdk/models/operations/deletepartial.go
-  - internal/sdk/models/operations/deleteplugininworkspace.go
+  - internal/sdk/models/operations/deleteplugin.go
   - internal/sdk/models/operations/deletepostfunctionplugin.go
   - internal/sdk/models/operations/deleteprefunctionplugin.go
   - internal/sdk/models/operations/deleteprometheusplugin.go
@@ -1240,6 +1240,8 @@ generatedFiles:
   - internal/sdk/models/operations/deleteworkspace.go
   - internal/sdk/models/operations/deletexmlthreatprotectionplugin.go
   - internal/sdk/models/operations/deletezipkinplugin.go
+  - internal/sdk/models/operations/fetchpartialschema.go
+  - internal/sdk/models/operations/fetchpluginschema.go
   - internal/sdk/models/operations/getaceplugin.go
   - internal/sdk/models/operations/getaclplugin.go
   - internal/sdk/models/operations/getaclwithconsumer.go
@@ -1322,7 +1324,7 @@ generatedFiles:
   - internal/sdk/models/operations/getopenidconnectplugin.go
   - internal/sdk/models/operations/getopentelemetryplugin.go
   - internal/sdk/models/operations/getpartial.go
-  - internal/sdk/models/operations/getplugininworkspace.go
+  - internal/sdk/models/operations/getplugin.go
   - internal/sdk/models/operations/getpostfunctionplugin.go
   - internal/sdk/models/operations/getprefunctionplugin.go
   - internal/sdk/models/operations/getprometheusplugin.go
@@ -1383,7 +1385,7 @@ generatedFiles:
   - internal/sdk/models/operations/listkeyset.go
   - internal/sdk/models/operations/listmtlsauthwithconsumer.go
   - internal/sdk/models/operations/listpartial.go
-  - internal/sdk/models/operations/listplugininworkspace.go
+  - internal/sdk/models/operations/listplugin.go
   - internal/sdk/models/operations/listroute.go
   - internal/sdk/models/operations/listservice.go
   - internal/sdk/models/operations/listsni.go
@@ -1462,7 +1464,7 @@ generatedFiles:
   - internal/sdk/models/operations/updateopaplugin.go
   - internal/sdk/models/operations/updateopenidconnectplugin.go
   - internal/sdk/models/operations/updateopentelemetryplugin.go
-  - internal/sdk/models/operations/updateplugininworkspace.go
+  - internal/sdk/models/operations/updateplugin.go
   - internal/sdk/models/operations/updatepostfunctionplugin.go
   - internal/sdk/models/operations/updateprefunctionplugin.go
   - internal/sdk/models/operations/updateprometheusplugin.go
@@ -1516,7 +1518,7 @@ generatedFiles:
   - internal/sdk/models/operations/upsertkeyset.go
   - internal/sdk/models/operations/upsertmtlsauthwithconsumer.go
   - internal/sdk/models/operations/upsertpartial.go
-  - internal/sdk/models/operations/upsertplugininworkspace.go
+  - internal/sdk/models/operations/upsertplugin.go
   - internal/sdk/models/operations/upsertroute.go
   - internal/sdk/models/operations/upsertrouterouteexpression.go
   - internal/sdk/models/operations/upsertservice.go
@@ -1524,6 +1526,7 @@ generatedFiles:
   - internal/sdk/models/operations/upsertupstream.go
   - internal/sdk/models/operations/upsertvault.go
   - internal/sdk/models/operations/upsertworkspace.go
+  - internal/sdk/models/operations/validateentityschema.go
   - internal/sdk/models/shared/aceplugin.go
   - internal/sdk/models/shared/acl.go
   - internal/sdk/models/shared/aclplugin.go
@@ -1573,6 +1576,8 @@ generatedFiles:
   - internal/sdk/models/shared/filelogplugin.go
   - internal/sdk/models/shared/forwardproxyplugin.go
   - internal/sdk/models/shared/gatewayunauthorizederror.go
+  - internal/sdk/models/shared/getpartialschemaresponse.go
+  - internal/sdk/models/shared/getpluginschemaresponse.go
   - internal/sdk/models/shared/graphqlproxycacheadvancedplugin.go
   - internal/sdk/models/shared/graphqlratelimitingadvancedplugin.go
   - internal/sdk/models/shared/grpcgatewayplugin.go
@@ -1659,6 +1664,7 @@ generatedFiles:
   - internal/sdk/models/shared/upstream.go
   - internal/sdk/models/shared/upstreamoauthplugin.go
   - internal/sdk/models/shared/upstreamtimeoutplugin.go
+  - internal/sdk/models/shared/validateentityresponse.go
   - internal/sdk/models/shared/vault.go
   - internal/sdk/models/shared/vaultauthplugin.go
   - internal/sdk/models/shared/websocketsizelimitplugin.go
@@ -1673,6 +1679,7 @@ generatedFiles:
   - internal/sdk/plugins.go
   - internal/sdk/retry/config.go
   - internal/sdk/routes.go
+  - internal/sdk/schemas.go
   - internal/sdk/services.go
   - internal/sdk/snis.go
   - internal/sdk/targets.go
@@ -20277,5 +20284,254 @@ examples:
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
+  list-plugin:
+    speakeasy-default-list-plugin:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+        query:
+          size: 100
+          tags: "tag1,tag2"
+      responses:
+        "200":
+          application/json: {"data": [{"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}]}
+        "401":
+          application/json: {"message": "<value>", "status": 240713}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+        query:
+          size: 100
+          tags: "tag1,tag2"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+        query:
+          size: 100
+          tags: "tag1,tag2"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+        query:
+          size: 100
+          tags: "tag1,tag2"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-plugin:
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-plugin:
+    speakeasy-default-delete-plugin:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 228522}
+    DuplicateApiKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  get-plugin:
+    speakeasy-default-get-plugin:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "200":
+          application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+        "401":
+          application/json: {"message": "<value>", "status": 939243}
+    DuplicateApiKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  update-plugin:
+    speakeasy-default-update-plugin:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "200":
+          application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+        "401":
+          application/json: {"message": "<value>", "status": 947124}
+    DuplicateApiKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  upsert-plugin:
+    speakeasy-default-upsert-plugin:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "200":
+          application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+        "401":
+          application/json: {"message": "<value>", "status": 294960}
+    DuplicateApiKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          PluginId: "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+          workspace: "747d1e5-8246-4f65-a939-b392f1ee17f8"
+      requestBody:
+        application/json: {"config": {"anonymous": "<value>", "hide_credentials": false, "key_in_body": false, "key_in_header": true, "key_in_query": true, "key_names": ["apikey"], "run_on_preflight": true}, "enabled": true, "id": "3fd1eea1-885a-4011-b986-289943ff8177", "name": "key-auth", "partials": [{"id": "cff1230a-00f7-4ae8-b376-c370f0eb4dae", "name": "foo-partial", "path": "config.redis"}, {"id": "129ee345-cba8-4e55-9d6d-93c223ff91ae", "name": "bar-partial", "path": "config.redis"}], "protocols": ["grpc", "grpcs", "http", "https"]}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  fetch-plugin-schema:
+    speakeasy-default-fetch-plugin-schema:
+      parameters:
+        path:
+          pluginName: "<value>"
+      responses:
+        "200":
+          application/json: {}
+  validate-entity-schema:
+    speakeasy-default-validate-entity-schema:
+      parameters:
+        path:
+          entityName: "<value>"
+      responses:
+        "200":
+          application/json: {}
+  fetch-partial-schema:
+    speakeasy-default-fetch-partial-schema:
+      parameters:
+        path:
+          partialType: "<value>"
+      responses:
+        "200":
+          application/json: {}
 examplesVersion: 1.0.2
 generatedTests: {}

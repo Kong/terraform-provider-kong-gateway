@@ -8,7 +8,6 @@ import (
 )
 
 func TestFileLogPlugin(t *testing.T) {
-	t.Parallel()
 	t.Run("stdout is valid path", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			Steps: []resource.TestStep{

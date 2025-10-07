@@ -22,8 +22,8 @@ jobs:
           - "1.11.*"
         kong-gateway-version:
           - "3.12"
-          #- "3.11"
-          #- "3.10"
+          - "3.11"
+          - "3.10"
     steps:
       - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: actions/setup-go@cd53bc84d5e2fd85362f4cb840513e06427082d3 # v4
@@ -43,6 +43,8 @@ jobs:
         run: |
           curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }} -e KONG_LICENSE_DATA
       - run: make acceptance
+        env:
+          KONG_VERSION: ${{ matrix.kong-gateway-version }}
       - name: Tear Down Kong Gateway
         run: |
           curl -Ls https://get.konghq.com/quickstart | bash -s -- -d

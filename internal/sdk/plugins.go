@@ -6,14 +6,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"net/http"
-
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/config"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/hooks"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/errors"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
+	"net/http"
 )
 
 // Plugins - A plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. Plugins let you add functionality to services that run behind a Kong Gateway instance, like authentication or rate limiting.
@@ -340,7 +339,7 @@ func (s *Plugins) CreatePlugin(ctx context.Context, request operations.CreatePlu
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.NewSDKError("33 unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
+		return nil, errors.NewSDKError("unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
 	}
 
 	return res, nil
@@ -66361,7 +66360,7 @@ func (s *Plugins) FetchPluginSchema(ctx context.Context, request operations.Fetc
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.NewSDKError("22 unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
+		return nil, errors.NewSDKError("unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
 	}
 
 	return res, nil

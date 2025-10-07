@@ -309,9 +309,9 @@ func WithTimeout(timeout time.Duration) SDKOption {
 // New creates a new instance of the SDK with the provided options
 func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
-		SDKVersion: "0.5.2",
+		SDKVersion: "0.6.0",
 		sdkConfiguration: config.SDKConfiguration{
-			UserAgent:  "speakeasy-sdk/terraform 0.5.2 2.721.0 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			UserAgent:  "speakeasy-sdk/terraform 0.6.0 2.721.0 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerList: ServerList,
 			ServerVariables: []map[string]string{
 				{

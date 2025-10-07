@@ -16,12 +16,13 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
+    hoistGlobalSecurity: true
   tests:
     generateTests: true
     generateNewTests: false
     skipResponseBodyAssertions: false
 terraform:
-  version: 0.5.2
+  version: 0.6.0
   additionalDataSources: []
   additionalDependencies: {}
   additionalEphemeralResources: []

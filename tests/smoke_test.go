@@ -17,10 +17,10 @@ func TestSmoke(t *testing.T) {
 	t.Parallel()
 
 	var testCases = []TestCase{
-		//{
-		//	name:    "3.10",
-		//	runWhen: ptr("3.10"),
-		//},
+		{
+			name:    "3.10",
+			runWhen: ptr("3.10"),
+		},
 		{
 			name:    "3.11",
 			runWhen: ptr("3.11"),

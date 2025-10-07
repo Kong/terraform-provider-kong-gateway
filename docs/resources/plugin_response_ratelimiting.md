@@ -21,7 +21,14 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
     hide_client_headers      = false
     limit_by                 = "consumer"
     limits = {
-      key = jsonencode("value")
+      key = {
+        day    = 9.24
+        hour   = 3.49
+        minute = 1.33
+        month  = 6.8
+        second = 4.25
+        year   = 9.05
+      }
     }
     policy = "redis"
     redis = {
@@ -109,9 +116,22 @@ Optional:
 - `header_name` (String) The name of the response header used to increment the counters.
 - `hide_client_headers` (Boolean) Optionally hide informative response headers.
 - `limit_by` (String) The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`. must be one of ["consumer", "credential", "ip"]
-- `limits` (Map of String) A map that defines rate limits for the plugin.
+- `limits` (Attributes Map) (see [below for nested schema](#nestedatt--config--limits))
 - `policy` (String) The rate-limiting policies to use for retrieving and incrementing the limits. must be one of ["cluster", "local", "redis"]
 - `redis` (Attributes) Redis configuration (see [below for nested schema](#nestedatt--config--redis))
+
+<a id="nestedatt--config--limits"></a>
+### Nested Schema for `config.limits`
+
+Optional:
+
+- `day` (Number)
+- `hour` (Number)
+- `minute` (Number)
+- `month` (Number)
+- `second` (Number)
+- `year` (Number)
+
 
 <a id="nestedatt--config--redis"></a>
 ### Nested Schema for `config.redis`

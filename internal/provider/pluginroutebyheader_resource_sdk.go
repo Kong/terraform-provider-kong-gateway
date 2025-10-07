@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -27,10 +25,9 @@ func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(
 				var rules tfTypes.RouteByHeaderPluginRules
 
 				if len(rulesItem.Condition) > 0 {
-					rules.Condition = make(map[string]jsontypes.Normalized, len(rulesItem.Condition))
+					rules.Condition = make(map[string]types.String, len(rulesItem.Condition))
 					for key, value := range rulesItem.Condition {
-						result, _ := json.Marshal(value)
-						rules.Condition[key] = jsontypes.NewNormalizedValue(string(result))
+						rules.Condition[key] = types.StringValue(value)
 					}
 				}
 				rules.UpstreamName = types.StringValue(rulesItem.UpstreamName)
@@ -199,10 +196,11 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 	if r.Config != nil {
 		rules := make([]shared.RouteByHeaderPluginRules, 0, len(r.Config.Rules))
 		for _, rulesItem := range r.Config.Rules {
-			condition := make(map[string]interface{})
+			condition := make(map[string]string)
 			for conditionKey, conditionValue := range rulesItem.Condition {
-				var conditionInst interface{}
-				_ = json.Unmarshal([]byte(conditionValue.ValueString()), &conditionInst)
+				var conditionInst string
+				conditionInst = conditionValue.ValueString()
+
 				condition[conditionKey] = conditionInst
 			}
 			var upstreamName string

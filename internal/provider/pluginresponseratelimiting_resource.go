@@ -7,9 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -100,13 +97,39 @@ func (r *PluginResponseRatelimitingResource) Schema(ctx context.Context, req res
 							),
 						},
 					},
-					"limits": schema.MapAttribute{
-						Computed:    true,
-						Optional:    true,
-						ElementType: jsontypes.NormalizedType{},
-						Description: `A map that defines rate limits for the plugin.`,
-						Validators: []validator.Map{
-							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+					"limits": schema.MapNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Validators: []validator.Object{
+								speakeasy_objectvalidators.NotNull(),
+							},
+							Attributes: map[string]schema.Attribute{
+								"day": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+								"hour": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+								"minute": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+								"month": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+								"second": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+								"year": schema.Float64Attribute{
+									Computed: true,
+									Optional: true,
+								},
+							},
 						},
 					},
 					"policy": schema.StringAttribute{

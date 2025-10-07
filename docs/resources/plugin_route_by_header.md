@@ -18,7 +18,7 @@ resource "kong-gateway_plugin_route_by_header" "my_pluginroutebyheader" {
     rules = [
       {
         condition = {
-          key = jsonencode("value")
+          key = "value"
         }
         upstream_name = "...my_upstream_name..."
       }

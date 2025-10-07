@@ -1,7 +1,7 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: 3068f997c5d0b0ffa2ee98513b7e2efe
+  docChecksum: d3dfb92b3abb19e599ef6e65c82cef09
   docVersion: 0.0.1
   speakeasyVersion: 1.634.1
   generationVersion: 2.721.0
@@ -819,6 +819,7 @@ generatedFiles:
   - internal/provider/types/key_schema.go
   - internal/provider/types/ldap_auth_advanced_plugin_config.go
   - internal/provider/types/ldap_auth_plugin_config.go
+  - internal/provider/types/limits.go
   - internal/provider/types/llm.go
   - internal/provider/types/llm_providers.go
   - internal/provider/types/loggly_plugin_config.go

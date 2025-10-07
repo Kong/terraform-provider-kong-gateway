@@ -29594,9 +29594,20 @@ components:
               type: string
             limits:
               additionalProperties:
-                type: number
-              description: A map that defines rate limits for the plugin.
-              minLength: 1
+                properties:
+                  day:
+                    type: number
+                  hour:
+                    type: number
+                  minute:
+                    type: number
+                  month:
+                    type: number
+                  second:
+                    type: number
+                  year:
+                    type: number
+                type: object
               type: object
             policy:
               default: local
@@ -30337,7 +30348,8 @@ components:
               items:
                 properties:
                   condition:
-                    additionalProperties: true
+                    additionalProperties:
+                      type: string
                     minLength: 1
                     type: object
                   upstream_name:

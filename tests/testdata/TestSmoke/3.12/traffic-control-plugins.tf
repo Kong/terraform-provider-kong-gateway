@@ -379,6 +379,10 @@ resource "kong-gateway_plugin_rate_limiting" "my_rate_limiting" {
     hour   = 1000
     policy = "local"
   }
+
+  service = {
+    id = kong-gateway_service.httpbin.id
+  }
 }
 
 resource "kong-gateway_plugin_rate_limiting_advanced" "my_rate_limiting_advanced" {

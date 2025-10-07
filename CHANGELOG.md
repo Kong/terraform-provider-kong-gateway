@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.6.0
-> Released on 2025/??/??
+> Released on 2025/10/08
 
 ### BREAKING CHANGES
 
@@ -14,6 +14,7 @@
 
 * All resources now support workspaces (with a default value `default`)
 * You can now pass arbitrary `http_headers` to the provider setup block
+* The `custom_plugin` resource has been added
 
 ## 0.5.2
 > Released on 2025/07/14

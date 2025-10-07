@@ -13572,7 +13572,8 @@ components:
         config:
           properties:
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             path:
@@ -15488,7 +15489,8 @@ components:
                 - application/json; charset=utf-8
               type: string
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             flush_timeout:
@@ -18972,7 +18974,8 @@ components:
                 of the cluster.
               type: string
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             keepalive:
@@ -21000,7 +21003,8 @@ components:
                 - warning
               type: string
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             host:
@@ -34376,7 +34380,8 @@ components:
                 - warning
               type: string
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             facility:
@@ -34722,7 +34727,8 @@ components:
         config:
           properties:
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: >-
                 A list of key-value pairs, where the key is the name of a log
                 field and the value is a chunk of Lua code, whose return value
@@ -35170,7 +35176,8 @@ components:
         config:
           properties:
             custom_fields_by_lua:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: Lua code as a key-value map
               type: object
             host:

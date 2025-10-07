@@ -21,7 +21,7 @@ resource "kong-gateway_plugin_http_log" "my_pluginhttplog" {
     }
     flush_timeout = 8.6
     headers = {
-      key = jsonencode("value")
+      key = "value"
     }
     http_endpoint = "...my_http_endpoint..."
     keepalive     = 4.44

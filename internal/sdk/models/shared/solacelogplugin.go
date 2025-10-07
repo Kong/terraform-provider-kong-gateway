@@ -88,7 +88,7 @@ type Message struct {
 	// When using a non-DIRECT guaranteed delivery mode, this property sets the log message acknowledgement timeout (waiting time).
 	AckTimeout *int64 `json:"ack_timeout,omitempty"`
 	// A key-value map that dynamically modifies log fields using Lua code.
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// Sets the log message delivery mode.
 	DeliveryMode *DeliveryMode `json:"delivery_mode,omitempty"`
 	// The log message destinations.
@@ -114,7 +114,7 @@ func (m *Message) GetAckTimeout() *int64 {
 	return m.AckTimeout
 }
 
-func (m *Message) GetCustomFieldsByLua() map[string]any {
+func (m *Message) GetCustomFieldsByLua() map[string]string {
 	if m == nil {
 		return nil
 	}

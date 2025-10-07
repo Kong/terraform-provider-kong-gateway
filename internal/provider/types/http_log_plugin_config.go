@@ -11,7 +11,7 @@ type HTTPLogPluginConfig struct {
 	ContentType       types.String                    `tfsdk:"content_type"`
 	CustomFieldsByLua map[string]jsontypes.Normalized `tfsdk:"custom_fields_by_lua"`
 	FlushTimeout      types.Float64                   `tfsdk:"flush_timeout"`
-	Headers           map[string]jsontypes.Normalized `tfsdk:"headers"`
+	Headers           map[string]types.String         `tfsdk:"headers"`
 	HTTPEndpoint      types.String                    `tfsdk:"http_endpoint"`
 	Keepalive         types.Float64                   `tfsdk:"keepalive"`
 	Method            types.String                    `tfsdk:"method"`

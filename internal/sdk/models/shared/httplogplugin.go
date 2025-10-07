@@ -175,7 +175,7 @@ type HTTPLogPluginConfig struct {
 	// Optional time in seconds. If `queue_size` > 1, this is the max idle time before sending a log with less than `queue_size` records.
 	FlushTimeout *float64 `json:"flush_timeout,omitempty"`
 	// An optional table of headers included in the HTTP message to the upstream server. Values are indexed by header name, and each header name accepts a single string.
-	Headers map[string]any `json:"headers,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
 	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
 	HTTPEndpoint string `json:"http_endpoint"`
 	// An optional value in milliseconds that defines how long an idle connection will live before being closed.
@@ -212,7 +212,7 @@ func (h *HTTPLogPluginConfig) GetFlushTimeout() *float64 {
 	return h.FlushTimeout
 }
 
-func (h *HTTPLogPluginConfig) GetHeaders() map[string]any {
+func (h *HTTPLogPluginConfig) GetHeaders() map[string]string {
 	if h == nil {
 		return nil
 	}

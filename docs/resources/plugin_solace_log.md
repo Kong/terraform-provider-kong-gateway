@@ -18,7 +18,7 @@ resource "kong-gateway_plugin_solace_log" "my_pluginsolacelog" {
     message = {
       ack_timeout = 35990
       custom_fields_by_lua = {
-        key = jsonencode("value")
+        key = "value"
       }
       delivery_mode = "DIRECT"
       destinations = [

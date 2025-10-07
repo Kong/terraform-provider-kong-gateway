@@ -18,6 +18,8 @@ speakeasy: check-speakeasy
 
 acceptance:
 	@TF_ACC=1 go test -v ./tests -count 1
+wip:
+	@TF_ACC=1 go test -v ./tests -count 1 -run TestSmoke
 
 check-speakeasy:
 	@command -v speakeasy >/dev/null 2>&1 || { echo >&2 "speakeasy CLI is not installed. Please install before continuing."; exit 1; }

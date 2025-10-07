@@ -84,11 +84,8 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 							"custom_fields_by_lua": schema.MapAttribute{
 								Computed:    true,
 								Optional:    true,
-								ElementType: jsontypes.NormalizedType{},
+								ElementType: types.StringType,
 								Description: `A key-value map that dynamically modifies log fields using Lua code.`,
-								Validators: []validator.Map{
-									mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-								},
 							},
 							"delivery_mode": schema.StringAttribute{
 								Computed:    true,

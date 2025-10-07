@@ -98,11 +98,8 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 					"headers": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: jsontypes.NormalizedType{},
+						ElementType: types.StringType,
 						Description: `An optional table of headers included in the HTTP message to the upstream server. Values are indexed by header name, and each header name accepts a single string.`,
-						Validators: []validator.Map{
-							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-						},
 					},
 					"http_endpoint": schema.StringAttribute{
 						Computed:    true,

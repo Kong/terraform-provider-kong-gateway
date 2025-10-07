@@ -23,10 +23,9 @@ func (r *PluginSolaceLogResourceModel) RefreshFromSharedSolaceLogPlugin(ctx cont
 			r.Config = &tfTypes.SolaceLogPluginConfig{}
 			r.Config.Message.AckTimeout = types.Int64PointerValue(resp.Config.Message.AckTimeout)
 			if len(resp.Config.Message.CustomFieldsByLua) > 0 {
-				r.Config.Message.CustomFieldsByLua = make(map[string]jsontypes.Normalized, len(resp.Config.Message.CustomFieldsByLua))
+				r.Config.Message.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.Message.CustomFieldsByLua))
 				for key, value := range resp.Config.Message.CustomFieldsByLua {
-					result, _ := json.Marshal(value)
-					r.Config.Message.CustomFieldsByLua[key] = jsontypes.NewNormalizedValue(string(result))
+					r.Config.Message.CustomFieldsByLua[key] = types.StringValue(value)
 				}
 			}
 			if resp.Config.Message.DeliveryMode != nil {
@@ -80,8 +79,8 @@ func (r *PluginSolaceLogResourceModel) RefreshFromSharedSolaceLogPlugin(ctx cont
 			if len(resp.Config.Session.Properties) > 0 {
 				r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
 				for key1, value1 := range resp.Config.Session.Properties {
-					result1, _ := json.Marshal(value1)
-					r.Config.Session.Properties[key1] = jsontypes.NewNormalizedValue(string(result1))
+					result, _ := json.Marshal(value1)
+					r.Config.Session.Properties[key1] = jsontypes.NewNormalizedValue(string(result))
 				}
 			}
 			r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
@@ -246,10 +245,11 @@ func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Conte
 		} else {
 			ackTimeout = nil
 		}
-		customFieldsByLua := make(map[string]interface{})
+		customFieldsByLua := make(map[string]string)
 		for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.Message.CustomFieldsByLua {
-			var customFieldsByLuaInst interface{}
-			_ = json.Unmarshal([]byte(customFieldsByLuaValue.ValueString()), &customFieldsByLuaInst)
+			var customFieldsByLuaInst string
+			customFieldsByLuaInst = customFieldsByLuaValue.ValueString()
+
 			customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
 		}
 		deliveryMode := new(shared.DeliveryMode)

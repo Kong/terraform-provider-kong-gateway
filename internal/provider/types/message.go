@@ -3,19 +3,18 @@
 package types
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type Message struct {
-	AckTimeout        types.Int64                     `tfsdk:"ack_timeout"`
-	CustomFieldsByLua map[string]jsontypes.Normalized `tfsdk:"custom_fields_by_lua"`
-	DeliveryMode      types.String                    `tfsdk:"delivery_mode"`
-	Destinations      []Binds                         `tfsdk:"destinations"`
-	DmqEligible       types.Bool                      `tfsdk:"dmq_eligible"`
-	Priority          types.Int64                     `tfsdk:"priority"`
-	SenderID          types.String                    `tfsdk:"sender_id"`
-	Tracing           types.Bool                      `tfsdk:"tracing"`
-	TracingSampled    types.Bool                      `tfsdk:"tracing_sampled"`
-	TTL               types.Int64                     `tfsdk:"ttl"`
+	AckTimeout        types.Int64             `tfsdk:"ack_timeout"`
+	CustomFieldsByLua map[string]types.String `tfsdk:"custom_fields_by_lua"`
+	DeliveryMode      types.String            `tfsdk:"delivery_mode"`
+	Destinations      []Binds                 `tfsdk:"destinations"`
+	DmqEligible       types.Bool              `tfsdk:"dmq_eligible"`
+	Priority          types.Int64             `tfsdk:"priority"`
+	SenderID          types.String            `tfsdk:"sender_id"`
+	Tracing           types.Bool              `tfsdk:"tracing"`
+	TracingSampled    types.Bool              `tfsdk:"tracing_sampled"`
+	TTL               types.Int64             `tfsdk:"ttl"`
 }

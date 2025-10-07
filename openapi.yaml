@@ -15498,7 +15498,8 @@ components:
                 records.
               type: number
             headers:
-              additionalProperties: true
+              additionalProperties:
+                type: string
               description: >-
                 An optional table of headers included in the HTTP message to the
                 upstream server. Values are indexed by header name, and each
@@ -32912,7 +32913,8 @@ components:
                   minimum: 1
                   type: integer
                 custom_fields_by_lua:
-                  additionalProperties: true
+                  additionalProperties:
+                    type: string
                   description: >-
                     A key-value map that dynamically modifies log fields using
                     Lua code.

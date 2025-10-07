@@ -35,10 +35,9 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(ctx context.
 			}
 			r.Config.FlushTimeout = types.Float64PointerValue(resp.Config.FlushTimeout)
 			if len(resp.Config.Headers) > 0 {
-				r.Config.Headers = make(map[string]jsontypes.Normalized, len(resp.Config.Headers))
+				r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
 				for key1, value1 := range resp.Config.Headers {
-					result1, _ := json.Marshal(value1)
-					r.Config.Headers[key1] = jsontypes.NewNormalizedValue(string(result1))
+					r.Config.Headers[key1] = types.StringValue(value1)
 				}
 			}
 			r.Config.HTTPEndpoint = types.StringValue(resp.Config.HTTPEndpoint)
@@ -246,10 +245,11 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) 
 		} else {
 			flushTimeout = nil
 		}
-		headers := make(map[string]interface{})
+		headers := make(map[string]string)
 		for headersKey, headersValue := range r.Config.Headers {
-			var headersInst interface{}
-			_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
+			var headersInst string
+			headersInst = headersValue.ValueString()
+
 			headers[headersKey] = headersInst
 		}
 		var httpEndpoint string

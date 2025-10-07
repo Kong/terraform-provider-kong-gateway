@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
+	custom "github.com/kong/terraform-provider-kong-gateway/src"
 	"net/http"
 )
 
@@ -295,6 +296,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewUpstreamResource,
 		NewVaultResource,
 		NewWorkspaceResource,
+		custom.NewCustomPluginResource,
 	}
 }
 

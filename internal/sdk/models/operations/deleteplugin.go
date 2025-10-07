@@ -8,39 +8,39 @@ import (
 	"net/http"
 )
 
-type DeletePluginInWorkspaceRequest struct {
+type DeletePluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
 	// The name or UUID of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (d DeletePluginInWorkspaceRequest) MarshalJSON() ([]byte, error) {
+func (d DeletePluginRequest) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(d, "", false)
 }
 
-func (d *DeletePluginInWorkspaceRequest) UnmarshalJSON(data []byte) error {
+func (d *DeletePluginRequest) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (d *DeletePluginInWorkspaceRequest) GetPluginID() string {
+func (d *DeletePluginRequest) GetPluginID() string {
 	if d == nil {
 		return ""
 	}
 	return d.PluginID
 }
 
-func (d *DeletePluginInWorkspaceRequest) GetWorkspace() string {
+func (d *DeletePluginRequest) GetWorkspace() string {
 	if d == nil {
 		return ""
 	}
 	return d.Workspace
 }
 
-type DeletePluginInWorkspaceResponse struct {
+type DeletePluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
 	// HTTP response status code for this operation
@@ -51,28 +51,28 @@ type DeletePluginInWorkspaceResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (d *DeletePluginInWorkspaceResponse) GetContentType() string {
+func (d *DeletePluginResponse) GetContentType() string {
 	if d == nil {
 		return ""
 	}
 	return d.ContentType
 }
 
-func (d *DeletePluginInWorkspaceResponse) GetStatusCode() int {
+func (d *DeletePluginResponse) GetStatusCode() int {
 	if d == nil {
 		return 0
 	}
 	return d.StatusCode
 }
 
-func (d *DeletePluginInWorkspaceResponse) GetRawResponse() *http.Response {
+func (d *DeletePluginResponse) GetRawResponse() *http.Response {
 	if d == nil {
 		return nil
 	}
 	return d.RawResponse
 }
 
-func (d *DeletePluginInWorkspaceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+func (d *DeletePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if d == nil {
 		return nil
 	}

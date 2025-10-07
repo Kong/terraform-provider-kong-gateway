@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type ListPluginInWorkspaceRequest struct {
+type ListPluginRequest struct {
 	// Number of resources to be returned.
 	Size *int64 `default:"100" queryParam:"style=form,explode=true,name=size"`
 	// Offset from which to return the next set of resources. Use the value of the 'offset' field from the response of a list operation as input here to paginate through all the resources
@@ -19,47 +19,47 @@ type ListPluginInWorkspaceRequest struct {
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (l ListPluginInWorkspaceRequest) MarshalJSON() ([]byte, error) {
+func (l ListPluginRequest) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(l, "", false)
 }
 
-func (l *ListPluginInWorkspaceRequest) UnmarshalJSON(data []byte) error {
+func (l *ListPluginRequest) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"workspace"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (l *ListPluginInWorkspaceRequest) GetSize() *int64 {
+func (l *ListPluginRequest) GetSize() *int64 {
 	if l == nil {
 		return nil
 	}
 	return l.Size
 }
 
-func (l *ListPluginInWorkspaceRequest) GetOffset() *string {
+func (l *ListPluginRequest) GetOffset() *string {
 	if l == nil {
 		return nil
 	}
 	return l.Offset
 }
 
-func (l *ListPluginInWorkspaceRequest) GetTags() *string {
+func (l *ListPluginRequest) GetTags() *string {
 	if l == nil {
 		return nil
 	}
 	return l.Tags
 }
 
-func (l *ListPluginInWorkspaceRequest) GetWorkspace() string {
+func (l *ListPluginRequest) GetWorkspace() string {
 	if l == nil {
 		return ""
 	}
 	return l.Workspace
 }
 
-// ListPluginInWorkspaceResponseBody - A successful response listing Plugins
-type ListPluginInWorkspaceResponseBody struct {
+// ListPluginResponseBody - A successful response listing Plugins
+type ListPluginResponseBody struct {
 	Data []shared.Plugin `json:"data,omitempty"`
 	// URI to the next page (may be null)
 	Next *string `json:"next,omitempty"`
@@ -67,28 +67,28 @@ type ListPluginInWorkspaceResponseBody struct {
 	Offset *string `json:"offset,omitempty"`
 }
 
-func (l *ListPluginInWorkspaceResponseBody) GetData() []shared.Plugin {
+func (l *ListPluginResponseBody) GetData() []shared.Plugin {
 	if l == nil {
 		return nil
 	}
 	return l.Data
 }
 
-func (l *ListPluginInWorkspaceResponseBody) GetNext() *string {
+func (l *ListPluginResponseBody) GetNext() *string {
 	if l == nil {
 		return nil
 	}
 	return l.Next
 }
 
-func (l *ListPluginInWorkspaceResponseBody) GetOffset() *string {
+func (l *ListPluginResponseBody) GetOffset() *string {
 	if l == nil {
 		return nil
 	}
 	return l.Offset
 }
 
-type ListPluginInWorkspaceResponse struct {
+type ListPluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
 	// HTTP response status code for this operation
@@ -96,40 +96,40 @@ type ListPluginInWorkspaceResponse struct {
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
 	// A successful response listing Plugins
-	Object *ListPluginInWorkspaceResponseBody
+	Object *ListPluginResponseBody
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (l *ListPluginInWorkspaceResponse) GetContentType() string {
+func (l *ListPluginResponse) GetContentType() string {
 	if l == nil {
 		return ""
 	}
 	return l.ContentType
 }
 
-func (l *ListPluginInWorkspaceResponse) GetStatusCode() int {
+func (l *ListPluginResponse) GetStatusCode() int {
 	if l == nil {
 		return 0
 	}
 	return l.StatusCode
 }
 
-func (l *ListPluginInWorkspaceResponse) GetRawResponse() *http.Response {
+func (l *ListPluginResponse) GetRawResponse() *http.Response {
 	if l == nil {
 		return nil
 	}
 	return l.RawResponse
 }
 
-func (l *ListPluginInWorkspaceResponse) GetObject() *ListPluginInWorkspaceResponseBody {
+func (l *ListPluginResponse) GetObject() *ListPluginResponseBody {
 	if l == nil {
 		return nil
 	}
 	return l.Object
 }
 
-func (l *ListPluginInWorkspaceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+func (l *ListPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if l == nil {
 		return nil
 	}

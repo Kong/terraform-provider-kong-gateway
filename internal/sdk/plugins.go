@@ -6,13 +6,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/config"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/hooks"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/errors"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
-	"net/http"
 )
 
 // Plugins - A plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. Plugins let you add functionality to services that run behind a Kong Gateway instance, like authentication or rate limiting.
@@ -33,9 +34,9 @@ func newPlugins(rootSDK *KongGateway, sdkConfig config.SDKConfiguration, hooks *
 	}
 }
 
-// ListPluginInWorkspace - List all Plugins in a workspace
-// List all Plugins in a workspace
-func (s *Plugins) ListPluginInWorkspace(ctx context.Context, request operations.ListPluginInWorkspaceRequest, opts ...operations.Option) (*operations.ListPluginInWorkspaceResponse, error) {
+// ListPlugin - List all Plugins
+// List all Plugins
+func (s *Plugins) ListPlugin(ctx context.Context, request operations.ListPluginRequest, opts ...operations.Option) (*operations.ListPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -63,7 +64,7 @@ func (s *Plugins) ListPluginInWorkspace(ctx context.Context, request operations.
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "list-plugin-in-workspace",
+		OperationID:      "list-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -127,7 +128,7 @@ func (s *Plugins) ListPluginInWorkspace(ctx context.Context, request operations.
 		}
 	}
 
-	res := &operations.ListPluginInWorkspaceResponse{
+	res := &operations.ListPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -142,7 +143,7 @@ func (s *Plugins) ListPluginInWorkspace(ctx context.Context, request operations.
 				return nil, err
 			}
 
-			var out operations.ListPluginInWorkspaceResponseBody
+			var out operations.ListPluginResponseBody
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
@@ -188,9 +189,9 @@ func (s *Plugins) ListPluginInWorkspace(ctx context.Context, request operations.
 
 }
 
-// CreatePluginInWorkspace - Create a new Plugin in a workspace
-// Create a new Plugin in a workspace
-func (s *Plugins) CreatePluginInWorkspace(ctx context.Context, request operations.CreatePluginInWorkspaceRequest, opts ...operations.Option) (*operations.CreatePluginInWorkspaceResponse, error) {
+// CreatePlugin - Create a new Plugin
+// Create a new Plugin
+func (s *Plugins) CreatePlugin(ctx context.Context, request operations.CreatePluginRequest, opts ...operations.Option) (*operations.CreatePluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -218,7 +219,7 @@ func (s *Plugins) CreatePluginInWorkspace(ctx context.Context, request operation
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "create-plugin-in-workspace",
+		OperationID:      "create-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -285,7 +286,7 @@ func (s *Plugins) CreatePluginInWorkspace(ctx context.Context, request operation
 		}
 	}
 
-	res := &operations.CreatePluginInWorkspaceResponse{
+	res := &operations.CreatePluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -339,7 +340,7 @@ func (s *Plugins) CreatePluginInWorkspace(ctx context.Context, request operation
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.NewSDKError("unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
+		return nil, errors.NewSDKError("33 unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
 	}
 
 	return res, nil
@@ -17568,9 +17569,9 @@ func (s *Plugins) CreateZipkinPlugin(ctx context.Context, request operations.Cre
 
 }
 
-// DeletePluginInWorkspace - Delete a Plugin in a workspace
-// Delete a Plugin in a workspace
-func (s *Plugins) DeletePluginInWorkspace(ctx context.Context, request operations.DeletePluginInWorkspaceRequest, opts ...operations.Option) (*operations.DeletePluginInWorkspaceResponse, error) {
+// DeletePlugin - Delete a Plugin
+// Delete a Plugin
+func (s *Plugins) DeletePlugin(ctx context.Context, request operations.DeletePluginRequest, opts ...operations.Option) (*operations.DeletePluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -17598,7 +17599,7 @@ func (s *Plugins) DeletePluginInWorkspace(ctx context.Context, request operation
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "delete-plugin-in-workspace",
+		OperationID:      "delete-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -17658,7 +17659,7 @@ func (s *Plugins) DeletePluginInWorkspace(ctx context.Context, request operation
 		}
 	}
 
-	res := &operations.DeletePluginInWorkspaceResponse{
+	res := &operations.DeletePluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -17699,9 +17700,9 @@ func (s *Plugins) DeletePluginInWorkspace(ctx context.Context, request operation
 
 }
 
-// GetPluginInWorkspace - Fetch a Plugin in a workspace
-// Get a Plugin using ID in a workspace.
-func (s *Plugins) GetPluginInWorkspace(ctx context.Context, request operations.GetPluginInWorkspaceRequest, opts ...operations.Option) (*operations.GetPluginInWorkspaceResponse, error) {
+// GetPlugin - Fetch a Plugin
+// Get a Plugin using ID.
+func (s *Plugins) GetPlugin(ctx context.Context, request operations.GetPluginRequest, opts ...operations.Option) (*operations.GetPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -17729,7 +17730,7 @@ func (s *Plugins) GetPluginInWorkspace(ctx context.Context, request operations.G
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "get-plugin-in-workspace",
+		OperationID:      "get-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -17789,7 +17790,7 @@ func (s *Plugins) GetPluginInWorkspace(ctx context.Context, request operations.G
 		}
 	}
 
-	res := &operations.GetPluginInWorkspaceResponse{
+	res := &operations.GetPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -17851,9 +17852,9 @@ func (s *Plugins) GetPluginInWorkspace(ctx context.Context, request operations.G
 
 }
 
-// UpdatePluginInWorkspace - Update a Plugin in a workspace
-// Update a Plugin in a workspace
-func (s *Plugins) UpdatePluginInWorkspace(ctx context.Context, request operations.UpdatePluginInWorkspaceRequest, opts ...operations.Option) (*operations.UpdatePluginInWorkspaceResponse, error) {
+// UpdatePlugin - Update a Plugin
+// Update a Plugin
+func (s *Plugins) UpdatePlugin(ctx context.Context, request operations.UpdatePluginRequest, opts ...operations.Option) (*operations.UpdatePluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -17881,7 +17882,7 @@ func (s *Plugins) UpdatePluginInWorkspace(ctx context.Context, request operation
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "update-plugin-in-workspace",
+		OperationID:      "update-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -17948,7 +17949,7 @@ func (s *Plugins) UpdatePluginInWorkspace(ctx context.Context, request operation
 		}
 	}
 
-	res := &operations.UpdatePluginInWorkspaceResponse{
+	res := &operations.UpdatePluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -18010,9 +18011,9 @@ func (s *Plugins) UpdatePluginInWorkspace(ctx context.Context, request operation
 
 }
 
-// UpsertPluginInWorkspace - Upsert a Plugin in a workspace
-// Create or Update Plugin using ID in a workspace.
-func (s *Plugins) UpsertPluginInWorkspace(ctx context.Context, request operations.UpsertPluginInWorkspaceRequest, opts ...operations.Option) (*operations.UpsertPluginInWorkspaceResponse, error) {
+// UpsertPlugin - Upsert a Plugin
+// Create or Update Plugin using ID.
+func (s *Plugins) UpsertPlugin(ctx context.Context, request operations.UpsertPluginRequest, opts ...operations.Option) (*operations.UpsertPluginResponse, error) {
 	o := operations.Options{}
 	supportedOptions := []string{
 		operations.SupportedOptionTimeout,
@@ -18040,7 +18041,7 @@ func (s *Plugins) UpsertPluginInWorkspace(ctx context.Context, request operation
 		SDKConfiguration: s.sdkConfiguration,
 		BaseURL:          baseURL,
 		Context:          ctx,
-		OperationID:      "upsert-plugin-in-workspace",
+		OperationID:      "upsert-plugin",
 		OAuth2Scopes:     []string{},
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
@@ -18107,7 +18108,7 @@ func (s *Plugins) UpsertPluginInWorkspace(ctx context.Context, request operation
 		}
 	}
 
-	res := &operations.UpsertPluginInWorkspaceResponse{
+	res := &operations.UpsertPluginResponse{
 		StatusCode:  httpRes.StatusCode,
 		ContentType: httpRes.Header.Get("Content-Type"),
 		RawResponse: httpRes,
@@ -66231,6 +66232,136 @@ func (s *Plugins) UpdateZipkinPlugin(ctx context.Context, request operations.Upd
 			return nil, err
 		}
 		return nil, errors.NewSDKError("unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
+	}
+
+	return res, nil
+
+}
+
+// FetchPluginSchema - Fetch plugin schema
+// Get the schema for a plugin
+func (s *Plugins) FetchPluginSchema(ctx context.Context, request operations.FetchPluginSchemaRequest, opts ...operations.Option) (*operations.FetchPluginSchemaResponse, error) {
+	o := operations.Options{}
+	supportedOptions := []string{
+		operations.SupportedOptionTimeout,
+	}
+
+	for _, opt := range opts {
+		if err := opt(&o, supportedOptions...); err != nil {
+			return nil, fmt.Errorf("error applying option: %w", err)
+		}
+	}
+
+	var baseURL string
+	if o.ServerURL == nil {
+		baseURL = utils.ReplaceParameters(s.sdkConfiguration.GetServerDetails())
+	} else {
+		baseURL = *o.ServerURL
+	}
+	opURL, err := utils.GenerateURL(ctx, baseURL, "/schemas/plugins/{pluginName}", request, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error generating URL: %w", err)
+	}
+
+	hookCtx := hooks.HookContext{
+		SDK:              s.rootSDK,
+		SDKConfiguration: s.sdkConfiguration,
+		BaseURL:          baseURL,
+		Context:          ctx,
+		OperationID:      "fetch-plugin-schema",
+		OAuth2Scopes:     []string{},
+		SecuritySource:   s.sdkConfiguration.Security,
+	}
+
+	timeout := o.Timeout
+	if timeout == nil {
+		timeout = s.sdkConfiguration.Timeout
+	}
+
+	if timeout != nil {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, *timeout)
+		defer cancel()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", opURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", s.sdkConfiguration.UserAgent)
+
+	if err := utils.PopulateSecurity(ctx, req, s.sdkConfiguration.Security); err != nil {
+		return nil, err
+	}
+
+	for k, v := range o.SetHeaders {
+		req.Header.Set(k, v)
+	}
+
+	req, err = s.hooks.BeforeRequest(hooks.BeforeRequestContext{HookContext: hookCtx}, req)
+	if err != nil {
+		return nil, err
+	}
+
+	httpRes, err := s.sdkConfiguration.Client.Do(req)
+	if err != nil || httpRes == nil {
+		if err != nil {
+			err = fmt.Errorf("error sending request: %w", err)
+		} else {
+			err = fmt.Errorf("error sending request: no response")
+		}
+
+		_, err = s.hooks.AfterError(hooks.AfterErrorContext{HookContext: hookCtx}, nil, err)
+		return nil, err
+	} else if utils.MatchStatusCodes([]string{}, httpRes.StatusCode) {
+		_httpRes, err := s.hooks.AfterError(hooks.AfterErrorContext{HookContext: hookCtx}, httpRes, nil)
+		if err != nil {
+			return nil, err
+		} else if _httpRes != nil {
+			httpRes = _httpRes
+		}
+	} else {
+		httpRes, err = s.hooks.AfterSuccess(hooks.AfterSuccessContext{HookContext: hookCtx}, httpRes)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	res := &operations.FetchPluginSchemaResponse{
+		StatusCode:  httpRes.StatusCode,
+		ContentType: httpRes.Header.Get("Content-Type"),
+		RawResponse: httpRes,
+	}
+
+	switch {
+	case httpRes.StatusCode == 200:
+		switch {
+		case utils.MatchContentType(httpRes.Header.Get("Content-Type"), `application/json`):
+			rawBody, err := utils.ConsumeRawBody(httpRes)
+			if err != nil {
+				return nil, err
+			}
+
+			var out shared.GetPluginSchemaResponse
+			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
+				return nil, err
+			}
+
+			res.GetPluginSchemaResponse = &out
+		default:
+			rawBody, err := utils.ConsumeRawBody(httpRes)
+			if err != nil {
+				return nil, err
+			}
+			return nil, errors.NewSDKError(fmt.Sprintf("unknown content-type received: %s", httpRes.Header.Get("Content-Type")), httpRes.StatusCode, string(rawBody), httpRes)
+		}
+	default:
+		rawBody, err := utils.ConsumeRawBody(httpRes)
+		if err != nil {
+			return nil, err
+		}
+		return nil, errors.NewSDKError("22 unknown status code returned", httpRes.StatusCode, string(rawBody), httpRes)
 	}
 
 	return res, nil

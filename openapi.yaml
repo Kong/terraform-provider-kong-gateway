@@ -246,6 +246,30 @@ components:
         type: string
       x-speakeasy-match: id
   responses:
+    GetPartialSchemaResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              fields:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+            type: object
+      description: The schema for a partial
+    GetPluginSchemaResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              fields:
+                items:
+                  additionalProperties: true
+                  type: object
+                type: array
+            type: object
+      description: The schema for the plugin
     HTTP401Error:
       content:
         application/json:
@@ -268,6 +292,15 @@ components:
           schema:
             $ref: '#/components/schemas/GatewayUnauthorizedError'
       description: Unauthorized
+    ValidateEntityResponse:
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+      description: Validation result of the request against a schema
   schemas:
     ACL:
       additionalProperties: false
@@ -39584,8 +39617,8 @@ paths:
         terraform-resource: Partial#update
   /{workspace}/plugins:
     get:
-      description: List all Plugins in a workspace
-      operationId: list-plugin-in-workspace
+      description: List all Plugins
+      operationId: list-plugin
       parameters:
         - $ref: '#/components/parameters/PaginationSize'
         - $ref: '#/components/parameters/PaginationOffset'
@@ -39609,12 +39642,12 @@ paths:
           description: A successful response listing Plugins
         '401':
           $ref: '#/components/responses/HTTP401Error'
-      summary: List all Plugins in a workspace
+      summary: List all Plugins
       tags:
         - Plugins
     post:
-      description: Create a new Plugin in a workspace
-      operationId: create-plugin-in-workspace
+      description: Create a new Plugin
+      operationId: create-plugin
       parameters:
         - $ref: '#/components/parameters/Workspace'
       requestBody:
@@ -39633,7 +39666,7 @@ paths:
           description: Successfully created Plugin
         '401':
           $ref: '#/components/responses/HTTP401Error'
-      summary: Create a new Plugin in a workspace
+      summary: Create a new Plugin
       tags:
         - Plugins
   /{workspace}/plugins#ACL:
@@ -42581,8 +42614,8 @@ paths:
         terraform-resource: PluginZipkin#create
   /{workspace}/plugins/{PluginId}:
     delete:
-      description: Delete a Plugin in a workspace
-      operationId: delete-plugin-in-workspace
+      description: Delete a Plugin
+      operationId: delete-plugin
       parameters:
         - $ref: '#/components/parameters/PluginId'
         - $ref: '#/components/parameters/Workspace'
@@ -42591,12 +42624,12 @@ paths:
           description: Successfully deleted Plugin or the resource didn't exist
         '401':
           $ref: '#/components/responses/HTTP401Error'
-      summary: Delete a Plugin in a workspace
+      summary: Delete a Plugin
       tags:
         - Plugins
     get:
-      description: Get a Plugin using ID in a workspace.
-      operationId: get-plugin-in-workspace
+      description: Get a Plugin using ID.
+      operationId: get-plugin
       parameters:
         - $ref: '#/components/parameters/Workspace'
       responses:
@@ -42610,14 +42643,14 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
         '404':
           description: Resource does not exist
-      summary: Fetch a Plugin in a workspace
+      summary: Fetch a Plugin
       tags:
         - Plugins
     parameters:
       - $ref: '#/components/parameters/PluginId'
     patch:
-      description: Update a Plugin in a workspace
-      operationId: update-plugin-in-workspace
+      description: Update a Plugin
+      operationId: update-plugin
       parameters:
         - $ref: '#/components/parameters/Workspace'
       requestBody:
@@ -42638,12 +42671,12 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
         '404':
           description: Resource does not exist
-      summary: Update a Plugin in a workspace
+      summary: Update a Plugin
       tags:
         - Plugins
     put:
-      description: Create or Update Plugin using ID in a workspace.
-      operationId: upsert-plugin-in-workspace
+      description: Create or Update Plugin using ID.
+      operationId: upsert-plugin
       parameters:
         - $ref: '#/components/parameters/Workspace'
       requestBody:
@@ -42662,7 +42695,7 @@ paths:
           description: Successfully upserted Plugin
         '401':
           $ref: '#/components/responses/HTTP401Error'
-      summary: Upsert a Plugin in a workspace
+      summary: Upsert a Plugin
       tags:
         - Plugins
   /{workspace}/plugins/{PluginId}#ACL:
@@ -50323,6 +50356,64 @@ paths:
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: CACertificate#update
+  /schemas/{entityName}/validate:
+    parameters:
+      - description: The name of the entity
+        in: path
+        name: entityName
+        required: true
+        schema:
+          type: string
+    post:
+      description: Validate schema for an entity
+      operationId: validate-entity-schema
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: true
+              type: object
+        description: Request body of a Koko entity to validate against its schema
+      responses:
+        '200':
+          $ref: '#/components/responses/ValidateEntityResponse'
+      summary: Validate entity schema
+      tags:
+        - Schemas
+  /schemas/partials/{partialType}:
+    get:
+      description: Get the schema for a partial
+      operationId: fetch-partial-schema
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPartialSchemaResponse'
+      summary: Fetch partial schema
+      tags:
+        - Schemas
+    parameters:
+      - description: The type of a partial
+        in: path
+        name: partialType
+        required: true
+        schema:
+          type: string
+  /schemas/plugins/{pluginName}:
+    get:
+      description: Get the schema for a plugin
+      operationId: fetch-plugin-schema
+      responses:
+        '200':
+          $ref: '#/components/responses/GetPluginSchemaResponse'
+      summary: Fetch plugin schema
+      tags:
+        - Plugins
+    parameters:
+      - description: The name of the plugin
+        in: path
+        name: pluginName
+        required: true
+        schema:
+          type: string
   /workspaces:
     get:
       description: List all Workspaces
@@ -50599,6 +50690,7 @@ tags:
       to look up the certificate object based on the SNI associated with the
       certificate.
     name: SNIs
+  - name: Schemas
   - description: >
       Service entities are abstractions of your microservice interfaces or
       formal APIs. For example, a service could be a data transformation

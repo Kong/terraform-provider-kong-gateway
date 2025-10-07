@@ -16,7 +16,6 @@ generation:
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
-    hoistGlobalSecurity: true
   tests:
     generateTests: true
     generateNewTests: false
@@ -29,7 +28,10 @@ terraform:
   additionalProviderAttributes:
     httpHeaders: http_headers
     tlsSkipVerify: ""
-  additionalResources: []
+  additionalResources:
+    - importAlias: custom
+      importLocation: github.com/kong/terraform-provider-kong-gateway/src
+      resource: custom.NewCustomPluginResource
   allowUnknownFieldsInWeakUnions: false
   author: kong
   baseErrorName: KongGatewayError

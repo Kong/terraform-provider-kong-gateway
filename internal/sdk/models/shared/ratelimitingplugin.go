@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type RateLimitingPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RateLimitingPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RateLimitingPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RateLimitingPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RateLimitingPluginOrdering struct {
+	After  *RateLimitingPluginAfter  `json:"after,omitempty"`
+	Before *RateLimitingPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RateLimitingPluginOrdering) GetAfter() *RateLimitingPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RateLimitingPluginOrdering) GetBefore() *RateLimitingPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RateLimitingPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RateLimitingPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RateLimitingPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RateLimitingPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
 // LimitBy - The entity that is used when aggregating the limits.
 type LimitBy string
 
@@ -336,76 +406,6 @@ func (r *RateLimitingPluginConsumerGroup) GetID() *string {
 	return r.ID
 }
 
-type RateLimitingPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RateLimitingPluginAfter) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RateLimitingPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RateLimitingPluginBefore) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RateLimitingPluginOrdering struct {
-	After  *RateLimitingPluginAfter  `json:"after,omitempty"`
-	Before *RateLimitingPluginBefore `json:"before,omitempty"`
-}
-
-func (r *RateLimitingPluginOrdering) GetAfter() *RateLimitingPluginAfter {
-	if r == nil {
-		return nil
-	}
-	return r.After
-}
-
-func (r *RateLimitingPluginOrdering) GetBefore() *RateLimitingPluginBefore {
-	if r == nil {
-		return nil
-	}
-	return r.Before
-}
-
-type RateLimitingPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (r *RateLimitingPluginPartials) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-func (r *RateLimitingPluginPartials) GetName() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Name
-}
-
-func (r *RateLimitingPluginPartials) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
 type RateLimitingPluginProtocols string
 
 const (
@@ -462,12 +462,8 @@ func (r *RateLimitingPluginService) GetID() *string {
 	return r.ID
 }
 
+// RateLimitingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RateLimitingPlugin struct {
-	Config *RateLimitingPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RateLimitingPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *RateLimitingPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -480,16 +476,21 @@ type RateLimitingPlugin struct {
 	Ordering     *RateLimitingPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RateLimitingPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    *RateLimitingPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RateLimitingPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *RateLimitingPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RateLimitingPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RateLimitingPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RateLimitingPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RateLimitingPlugin) MarshalJSON() ([]byte, error) {
@@ -501,27 +502,6 @@ func (r *RateLimitingPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (r *RateLimitingPlugin) GetConfig() *RateLimitingPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *RateLimitingPlugin) GetConsumer() *RateLimitingPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
-func (r *RateLimitingPlugin) GetConsumerGroup() *RateLimitingPluginConsumerGroup {
-	if r == nil {
-		return nil
-	}
-	return r.ConsumerGroup
 }
 
 func (r *RateLimitingPlugin) GetCreatedAt() *int64 {
@@ -570,6 +550,41 @@ func (r *RateLimitingPlugin) GetPartials() []RateLimitingPluginPartials {
 	return r.Partials
 }
 
+func (r *RateLimitingPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RateLimitingPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
+}
+
+func (r *RateLimitingPlugin) GetConfig() *RateLimitingPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RateLimitingPlugin) GetConsumer() *RateLimitingPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
+func (r *RateLimitingPlugin) GetConsumerGroup() *RateLimitingPluginConsumerGroup {
+	if r == nil {
+		return nil
+	}
+	return r.ConsumerGroup
+}
+
 func (r *RateLimitingPlugin) GetProtocols() []RateLimitingPluginProtocols {
 	if r == nil {
 		return nil
@@ -589,18 +604,4 @@ func (r *RateLimitingPlugin) GetService() *RateLimitingPluginService {
 		return nil
 	}
 	return r.Service
-}
-
-func (r *RateLimitingPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RateLimitingPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
 }

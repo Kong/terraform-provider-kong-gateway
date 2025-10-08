@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type MtlsAuthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (m *MtlsAuthPluginAfter) GetAccess() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Access
+}
+
+type MtlsAuthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (m *MtlsAuthPluginBefore) GetAccess() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Access
+}
+
+type MtlsAuthPluginOrdering struct {
+	After  *MtlsAuthPluginAfter  `json:"after,omitempty"`
+	Before *MtlsAuthPluginBefore `json:"before,omitempty"`
+}
+
+func (m *MtlsAuthPluginOrdering) GetAfter() *MtlsAuthPluginAfter {
+	if m == nil {
+		return nil
+	}
+	return m.After
+}
+
+func (m *MtlsAuthPluginOrdering) GetBefore() *MtlsAuthPluginBefore {
+	if m == nil {
+		return nil
+	}
+	return m.Before
+}
+
+type MtlsAuthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (m *MtlsAuthPluginPartials) GetID() *string {
+	if m == nil {
+		return nil
+	}
+	return m.ID
+}
+
+func (m *MtlsAuthPluginPartials) GetName() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Name
+}
+
+func (m *MtlsAuthPluginPartials) GetPath() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Path
+}
+
 // MtlsAuthPluginAuthenticatedGroupBy - Certificate property to use as the authenticated group. Valid values are `CN` (Common Name) or `DN` (Distinguished Name). Once `skip_consumer_lookup` is applied, any client with a valid certificate can access the Service/API. To restrict usage to only some of the authenticated users, also add the ACL plugin (not covered here) and create allowed or denied groups of users.
 type MtlsAuthPluginAuthenticatedGroupBy string
 
@@ -238,76 +308,6 @@ func (m *MtlsAuthPluginConfig) GetSkipConsumerLookup() *bool {
 	return m.SkipConsumerLookup
 }
 
-type MtlsAuthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (m *MtlsAuthPluginAfter) GetAccess() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Access
-}
-
-type MtlsAuthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (m *MtlsAuthPluginBefore) GetAccess() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Access
-}
-
-type MtlsAuthPluginOrdering struct {
-	After  *MtlsAuthPluginAfter  `json:"after,omitempty"`
-	Before *MtlsAuthPluginBefore `json:"before,omitempty"`
-}
-
-func (m *MtlsAuthPluginOrdering) GetAfter() *MtlsAuthPluginAfter {
-	if m == nil {
-		return nil
-	}
-	return m.After
-}
-
-func (m *MtlsAuthPluginOrdering) GetBefore() *MtlsAuthPluginBefore {
-	if m == nil {
-		return nil
-	}
-	return m.Before
-}
-
-type MtlsAuthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (m *MtlsAuthPluginPartials) GetID() *string {
-	if m == nil {
-		return nil
-	}
-	return m.ID
-}
-
-func (m *MtlsAuthPluginPartials) GetName() *string {
-	if m == nil {
-		return nil
-	}
-	return m.Name
-}
-
-func (m *MtlsAuthPluginPartials) GetPath() *string {
-	if m == nil {
-		return nil
-	}
-	return m.Path
-}
-
 type MtlsAuthPluginProtocols string
 
 const (
@@ -364,8 +364,8 @@ func (m *MtlsAuthPluginService) GetID() *string {
 	return m.ID
 }
 
+// MtlsAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type MtlsAuthPlugin struct {
-	Config *MtlsAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -378,16 +378,17 @@ type MtlsAuthPlugin struct {
 	Ordering     *MtlsAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []MtlsAuthPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64               `json:"updated_at,omitempty"`
+	Config    MtlsAuthPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []MtlsAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *MtlsAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *MtlsAuthPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (m MtlsAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -395,17 +396,10 @@ func (m MtlsAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (m *MtlsAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (m *MtlsAuthPlugin) GetConfig() *MtlsAuthPluginConfig {
-	if m == nil {
-		return nil
-	}
-	return m.Config
 }
 
 func (m *MtlsAuthPlugin) GetCreatedAt() *int64 {
@@ -454,6 +448,27 @@ func (m *MtlsAuthPlugin) GetPartials() []MtlsAuthPluginPartials {
 	return m.Partials
 }
 
+func (m *MtlsAuthPlugin) GetTags() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Tags
+}
+
+func (m *MtlsAuthPlugin) GetUpdatedAt() *int64 {
+	if m == nil {
+		return nil
+	}
+	return m.UpdatedAt
+}
+
+func (m *MtlsAuthPlugin) GetConfig() MtlsAuthPluginConfig {
+	if m == nil {
+		return MtlsAuthPluginConfig{}
+	}
+	return m.Config
+}
+
 func (m *MtlsAuthPlugin) GetProtocols() []MtlsAuthPluginProtocols {
 	if m == nil {
 		return nil
@@ -473,18 +488,4 @@ func (m *MtlsAuthPlugin) GetService() *MtlsAuthPluginService {
 		return nil
 	}
 	return m.Service
-}
-
-func (m *MtlsAuthPlugin) GetTags() []string {
-	if m == nil {
-		return nil
-	}
-	return m.Tags
-}
-
-func (m *MtlsAuthPlugin) GetUpdatedAt() *int64 {
-	if m == nil {
-		return nil
-	}
-	return m.UpdatedAt
 }

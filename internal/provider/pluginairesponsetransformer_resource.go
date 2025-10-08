@@ -20,7 +20,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -39,21 +38,21 @@ type PluginAiResponseTransformerResource struct {
 
 // PluginAiResponseTransformerResourceModel describes the resource data model.
 type PluginAiResponseTransformerResourceModel struct {
-	Config        *tfTypes.AiResponseTransformerPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                               `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                               `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                                `tfsdk:"created_at"`
-	Enabled       types.Bool                                 `tfsdk:"enabled"`
-	ID            types.String                               `tfsdk:"id"`
-	InstanceName  types.String                               `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering                 `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials                `tfsdk:"partials"`
-	Protocols     []types.String                             `tfsdk:"protocols"`
-	Route         *tfTypes.Set                               `tfsdk:"route"`
-	Service       *tfTypes.Set                               `tfsdk:"service"`
-	Tags          []types.String                             `tfsdk:"tags"`
-	UpdatedAt     types.Int64                                `tfsdk:"updated_at"`
-	Workspace     types.String                               `tfsdk:"workspace"`
+	Config        tfTypes.AiResponseTransformerPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                              `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                               `tfsdk:"created_at"`
+	Enabled       types.Bool                                `tfsdk:"enabled"`
+	ID            types.String                              `tfsdk:"id"`
+	InstanceName  types.String                              `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering                `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials               `tfsdk:"partials"`
+	Protocols     []types.String                            `tfsdk:"protocols"`
+	Route         *tfTypes.Set                              `tfsdk:"route"`
+	Service       *tfTypes.Set                              `tfsdk:"service"`
+	Tags          []types.String                            `tfsdk:"tags"`
+	UpdatedAt     types.Int64                               `tfsdk:"updated_at"`
+	Workspace     types.String                              `tfsdk:"workspace"`
 }
 
 func (r *PluginAiResponseTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,8 +64,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 		MarkdownDescription: "PluginAiResponseTransformer Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"http_proxy_host": schema.StringAttribute{
 						Computed:    true,
@@ -105,8 +103,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 						Description: `Verify the TLS certificate of the AI upstream service.`,
 					},
 					"llm": schema.SingleNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"auth": schema.SingleNestedAttribute{
 								Computed: true,
@@ -207,8 +204,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 								},
 							},
 							"model": schema.SingleNestedAttribute{
-								Computed: true,
-								Optional: true,
+								Required: true,
 								Attributes: map[string]schema.Attribute{
 									"name": schema.StringAttribute{
 										Computed:    true,
@@ -423,11 +419,9 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 										Description: `Key/value settings for the model`,
 									},
 									"provider": schema.StringAttribute{
-										Computed:    true,
-										Optional:    true,
-										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. Not Null; must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
+										Required:    true,
+										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
 										Validators: []validator.String{
-											speakeasy_stringvalidators.NotNull(),
 											stringvalidator.OneOf(
 												"anthropic",
 												"azure",
@@ -442,17 +436,11 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 										},
 									},
 								},
-								Description: `Not Null`,
-								Validators: []validator.Object{
-									speakeasy_objectvalidators.NotNull(),
-								},
 							},
 							"route_type": schema.StringAttribute{
-								Computed:    true,
-								Optional:    true,
-								Description: `The model's operation implementation, for this provider. Not Null; must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]`,
+								Required:    true,
+								Description: `The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]`,
 								Validators: []validator.String{
-									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"audio/v1/audio/speech",
 										"audio/v1/audio/transcriptions",
@@ -472,10 +460,6 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 								},
 							},
 						},
-						Description: `Not Null`,
-						Validators: []validator.Object{
-							speakeasy_objectvalidators.NotNull(),
-						},
 					},
 					"max_request_body_size": schema.Int64Attribute{
 						Computed:    true,
@@ -488,12 +472,8 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 						Description: `Set true to read specific response format from the LLM, and accordingly set the status code / body / headers that proxy back to the client. You need to engineer your LLM prompt to return the correct format, see plugin docs 'Overview' page for usage instructions.`,
 					},
 					"prompt": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting.`,
 					},
 					"transformation_extract_pattern": schema.StringAttribute{
 						Computed:    true,

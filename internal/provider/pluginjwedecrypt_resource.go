@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -37,19 +36,19 @@ type PluginJweDecryptResource struct {
 
 // PluginJweDecryptResourceModel describes the resource data model.
 type PluginJweDecryptResourceModel struct {
-	Config       *tfTypes.JweDecryptPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                     `tfsdk:"created_at"`
-	Enabled      types.Bool                      `tfsdk:"enabled"`
-	ID           types.String                    `tfsdk:"id"`
-	InstanceName types.String                    `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering      `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials     `tfsdk:"partials"`
-	Protocols    []types.String                  `tfsdk:"protocols"`
-	Route        *tfTypes.Set                    `tfsdk:"route"`
-	Service      *tfTypes.Set                    `tfsdk:"service"`
-	Tags         []types.String                  `tfsdk:"tags"`
-	UpdatedAt    types.Int64                     `tfsdk:"updated_at"`
-	Workspace    types.String                    `tfsdk:"workspace"`
+	Config       tfTypes.JweDecryptPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                    `tfsdk:"created_at"`
+	Enabled      types.Bool                     `tfsdk:"enabled"`
+	ID           types.String                   `tfsdk:"id"`
+	InstanceName types.String                   `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials    `tfsdk:"partials"`
+	Protocols    []types.String                 `tfsdk:"protocols"`
+	Route        *tfTypes.Set                   `tfsdk:"route"`
+	Service      *tfTypes.Set                   `tfsdk:"service"`
+	Tags         []types.String                 `tfsdk:"tags"`
+	UpdatedAt    types.Int64                    `tfsdk:"updated_at"`
+	Workspace    types.String                   `tfsdk:"workspace"`
 }
 
 func (r *PluginJweDecryptResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,8 +60,7 @@ func (r *PluginJweDecryptResource) Schema(ctx context.Context, req resource.Sche
 		MarkdownDescription: "PluginJweDecrypt Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"forward_header_name": schema.StringAttribute{
 						Computed:    true,
@@ -70,13 +68,9 @@ func (r *PluginJweDecryptResource) Schema(ctx context.Context, req resource.Sche
 						Description: `The name of the header that is used to set the decrypted value.`,
 					},
 					"key_sets": schema.ListAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						ElementType: types.StringType,
-						Description: `Denote the name or names of all Key Sets that should be inspected when trying to find a suitable key to decrypt the JWE token. Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
-						},
+						Description: `Denote the name or names of all Key Sets that should be inspected when trying to find a suitable key to decrypt the JWE token.`,
 					},
 					"lookup_header_name": schema.StringAttribute{
 						Computed:    true,

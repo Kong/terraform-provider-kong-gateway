@@ -43,20 +43,20 @@ type PluginKafkaLogResource struct {
 
 // PluginKafkaLogResourceModel describes the resource data model.
 type PluginKafkaLogResourceModel struct {
-	Config       *tfTypes.KafkaLogPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                  `tfsdk:"consumer"`
-	CreatedAt    types.Int64                   `tfsdk:"created_at"`
-	Enabled      types.Bool                    `tfsdk:"enabled"`
-	ID           types.String                  `tfsdk:"id"`
-	InstanceName types.String                  `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering    `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials   `tfsdk:"partials"`
-	Protocols    []types.String                `tfsdk:"protocols"`
-	Route        *tfTypes.Set                  `tfsdk:"route"`
-	Service      *tfTypes.Set                  `tfsdk:"service"`
-	Tags         []types.String                `tfsdk:"tags"`
-	UpdatedAt    types.Int64                   `tfsdk:"updated_at"`
-	Workspace    types.String                  `tfsdk:"workspace"`
+	Config       tfTypes.KafkaLogPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                 `tfsdk:"consumer"`
+	CreatedAt    types.Int64                  `tfsdk:"created_at"`
+	Enabled      types.Bool                   `tfsdk:"enabled"`
+	ID           types.String                 `tfsdk:"id"`
+	InstanceName types.String                 `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials  `tfsdk:"partials"`
+	Protocols    []types.String               `tfsdk:"protocols"`
+	Route        *tfTypes.Set                 `tfsdk:"route"`
+	Service      *tfTypes.Set                 `tfsdk:"service"`
+	Tags         []types.String               `tfsdk:"tags"`
+	UpdatedAt    types.Int64                  `tfsdk:"updated_at"`
+	Workspace    types.String                 `tfsdk:"workspace"`
 }
 
 func (r *PluginKafkaLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -68,8 +68,7 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 		MarkdownDescription: "PluginKafkaLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"authentication": schema.SingleNestedAttribute{
 						Computed: true,
@@ -491,12 +490,8 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 						Description: `Socket timeout in milliseconds.`,
 					},
 					"topic": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The Kafka topic to publish to. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The Kafka topic to publish to.`,
 					},
 				},
 			},

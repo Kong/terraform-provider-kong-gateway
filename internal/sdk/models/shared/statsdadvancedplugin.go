@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type StatsdAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginAfter) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type StatsdAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginBefore) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type StatsdAdvancedPluginOrdering struct {
+	After  *StatsdAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *StatsdAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginOrdering) GetAfter() *StatsdAdvancedPluginAfter {
+	if s == nil {
+		return nil
+	}
+	return s.After
+}
+
+func (s *StatsdAdvancedPluginOrdering) GetBefore() *StatsdAdvancedPluginBefore {
+	if s == nil {
+		return nil
+	}
+	return s.Before
+}
+
+type StatsdAdvancedPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (s *StatsdAdvancedPluginPartials) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *StatsdAdvancedPluginPartials) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *StatsdAdvancedPluginPartials) GetPath() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Path
+}
+
 // StatsdAdvancedPluginConsumerIdentifierDefault - The default consumer identifier for metrics. This will take effect when a metric's consumer identifier is omitted. Allowed values are `custom_id`, `consumer_id`, `username`.
 type StatsdAdvancedPluginConsumerIdentifierDefault string
 
@@ -563,76 +633,6 @@ func (s *StatsdAdvancedPluginConsumer) GetID() *string {
 	return s.ID
 }
 
-type StatsdAdvancedPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *StatsdAdvancedPluginAfter) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type StatsdAdvancedPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *StatsdAdvancedPluginBefore) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type StatsdAdvancedPluginOrdering struct {
-	After  *StatsdAdvancedPluginAfter  `json:"after,omitempty"`
-	Before *StatsdAdvancedPluginBefore `json:"before,omitempty"`
-}
-
-func (s *StatsdAdvancedPluginOrdering) GetAfter() *StatsdAdvancedPluginAfter {
-	if s == nil {
-		return nil
-	}
-	return s.After
-}
-
-func (s *StatsdAdvancedPluginOrdering) GetBefore() *StatsdAdvancedPluginBefore {
-	if s == nil {
-		return nil
-	}
-	return s.Before
-}
-
-type StatsdAdvancedPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (s *StatsdAdvancedPluginPartials) GetID() *string {
-	if s == nil {
-		return nil
-	}
-	return s.ID
-}
-
-func (s *StatsdAdvancedPluginPartials) GetName() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Name
-}
-
-func (s *StatsdAdvancedPluginPartials) GetPath() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Path
-}
-
 // StatsdAdvancedPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type StatsdAdvancedPluginProtocols string
 
@@ -708,10 +708,8 @@ func (s *StatsdAdvancedPluginService) GetID() *string {
 	return s.ID
 }
 
+// StatsdAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type StatsdAdvancedPlugin struct {
-	Config *StatsdAdvancedPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *StatsdAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -724,16 +722,19 @@ type StatsdAdvancedPlugin struct {
 	Ordering     *StatsdAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []StatsdAdvancedPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                      `json:"updated_at,omitempty"`
+	Config    *StatsdAdvancedPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *StatsdAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []StatsdAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *StatsdAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *StatsdAdvancedPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s StatsdAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -745,20 +746,6 @@ func (s *StatsdAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (s *StatsdAdvancedPlugin) GetConfig() *StatsdAdvancedPluginConfig {
-	if s == nil {
-		return nil
-	}
-	return s.Config
-}
-
-func (s *StatsdAdvancedPlugin) GetConsumer() *StatsdAdvancedPluginConsumer {
-	if s == nil {
-		return nil
-	}
-	return s.Consumer
 }
 
 func (s *StatsdAdvancedPlugin) GetCreatedAt() *int64 {
@@ -807,6 +794,34 @@ func (s *StatsdAdvancedPlugin) GetPartials() []StatsdAdvancedPluginPartials {
 	return s.Partials
 }
 
+func (s *StatsdAdvancedPlugin) GetTags() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Tags
+}
+
+func (s *StatsdAdvancedPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.UpdatedAt
+}
+
+func (s *StatsdAdvancedPlugin) GetConfig() *StatsdAdvancedPluginConfig {
+	if s == nil {
+		return nil
+	}
+	return s.Config
+}
+
+func (s *StatsdAdvancedPlugin) GetConsumer() *StatsdAdvancedPluginConsumer {
+	if s == nil {
+		return nil
+	}
+	return s.Consumer
+}
+
 func (s *StatsdAdvancedPlugin) GetProtocols() []StatsdAdvancedPluginProtocols {
 	if s == nil {
 		return nil
@@ -826,18 +841,4 @@ func (s *StatsdAdvancedPlugin) GetService() *StatsdAdvancedPluginService {
 		return nil
 	}
 	return s.Service
-}
-
-func (s *StatsdAdvancedPlugin) GetTags() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Tags
-}
-
-func (s *StatsdAdvancedPlugin) GetUpdatedAt() *int64 {
-	if s == nil {
-		return nil
-	}
-	return s.UpdatedAt
 }

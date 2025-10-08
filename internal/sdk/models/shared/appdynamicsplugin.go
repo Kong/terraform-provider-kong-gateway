@@ -8,18 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-// AppDynamicsPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type AppDynamicsPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (a *AppDynamicsPluginConsumer) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
 type AppDynamicsPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -90,6 +78,18 @@ func (a *AppDynamicsPluginPartials) GetPath() *string {
 	return a.Path
 }
 
+// AppDynamicsPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type AppDynamicsPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (a *AppDynamicsPluginConsumer) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
 type AppDynamicsPluginProtocols string
 
 const (
@@ -146,10 +146,8 @@ func (a *AppDynamicsPluginService) GetID() *string {
 	return a.ID
 }
 
+// AppDynamicsPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AppDynamicsPlugin struct {
-	Config map[string]any `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AppDynamicsPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -162,16 +160,19 @@ type AppDynamicsPlugin struct {
 	Ordering     *AppDynamicsPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AppDynamicsPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64         `json:"updated_at,omitempty"`
+	Config    map[string]any `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AppDynamicsPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AppDynamicsPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AppDynamicsPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AppDynamicsPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AppDynamicsPlugin) MarshalJSON() ([]byte, error) {
@@ -183,20 +184,6 @@ func (a *AppDynamicsPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (a *AppDynamicsPlugin) GetConfig() map[string]any {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
-func (a *AppDynamicsPlugin) GetConsumer() *AppDynamicsPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
 }
 
 func (a *AppDynamicsPlugin) GetCreatedAt() *int64 {
@@ -245,6 +232,34 @@ func (a *AppDynamicsPlugin) GetPartials() []AppDynamicsPluginPartials {
 	return a.Partials
 }
 
+func (a *AppDynamicsPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AppDynamicsPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AppDynamicsPlugin) GetConfig() map[string]any {
+	if a == nil {
+		return nil
+	}
+	return a.Config
+}
+
+func (a *AppDynamicsPlugin) GetConsumer() *AppDynamicsPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
 func (a *AppDynamicsPlugin) GetProtocols() []AppDynamicsPluginProtocols {
 	if a == nil {
 		return nil
@@ -264,18 +279,4 @@ func (a *AppDynamicsPlugin) GetService() *AppDynamicsPluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AppDynamicsPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AppDynamicsPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

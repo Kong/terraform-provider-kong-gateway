@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type ConfluentPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentPluginAfter) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *ConfluentPluginBefore) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type ConfluentPluginOrdering struct {
+	After  *ConfluentPluginAfter  `json:"after,omitempty"`
+	Before *ConfluentPluginBefore `json:"before,omitempty"`
+}
+
+func (c *ConfluentPluginOrdering) GetAfter() *ConfluentPluginAfter {
+	if c == nil {
+		return nil
+	}
+	return c.After
+}
+
+func (c *ConfluentPluginOrdering) GetBefore() *ConfluentPluginBefore {
+	if c == nil {
+		return nil
+	}
+	return c.Before
+}
+
+type ConfluentPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (c *ConfluentPluginPartials) GetID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ID
+}
+
+func (c *ConfluentPluginPartials) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *ConfluentPluginPartials) GetPath() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Path
+}
+
 type BootstrapServers struct {
 	// A string representing a host name, such as example.com.
 	Host string `json:"host"`
@@ -800,76 +870,6 @@ func (c *ConfluentPluginConsumer) GetID() *string {
 	return c.ID
 }
 
-type ConfluentPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *ConfluentPluginAfter) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type ConfluentPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *ConfluentPluginBefore) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type ConfluentPluginOrdering struct {
-	After  *ConfluentPluginAfter  `json:"after,omitempty"`
-	Before *ConfluentPluginBefore `json:"before,omitempty"`
-}
-
-func (c *ConfluentPluginOrdering) GetAfter() *ConfluentPluginAfter {
-	if c == nil {
-		return nil
-	}
-	return c.After
-}
-
-func (c *ConfluentPluginOrdering) GetBefore() *ConfluentPluginBefore {
-	if c == nil {
-		return nil
-	}
-	return c.Before
-}
-
-type ConfluentPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (c *ConfluentPluginPartials) GetID() *string {
-	if c == nil {
-		return nil
-	}
-	return c.ID
-}
-
-func (c *ConfluentPluginPartials) GetName() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Name
-}
-
-func (c *ConfluentPluginPartials) GetPath() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Path
-}
-
 type ConfluentPluginProtocols string
 
 const (
@@ -926,10 +926,8 @@ func (c *ConfluentPluginService) GetID() *string {
 	return c.ID
 }
 
+// ConfluentPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ConfluentPlugin struct {
-	Config *ConfluentPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ConfluentPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -942,16 +940,19 @@ type ConfluentPlugin struct {
 	Ordering     *ConfluentPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ConfluentPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                `json:"updated_at,omitempty"`
+	Config    ConfluentPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ConfluentPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []ConfluentPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ConfluentPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ConfluentPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (c ConfluentPlugin) MarshalJSON() ([]byte, error) {
@@ -959,24 +960,10 @@ func (c ConfluentPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (c *ConfluentPlugin) GetConfig() *ConfluentPluginConfig {
-	if c == nil {
-		return nil
-	}
-	return c.Config
-}
-
-func (c *ConfluentPlugin) GetConsumer() *ConfluentPluginConsumer {
-	if c == nil {
-		return nil
-	}
-	return c.Consumer
 }
 
 func (c *ConfluentPlugin) GetCreatedAt() *int64 {
@@ -1025,6 +1012,34 @@ func (c *ConfluentPlugin) GetPartials() []ConfluentPluginPartials {
 	return c.Partials
 }
 
+func (c *ConfluentPlugin) GetTags() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Tags
+}
+
+func (c *ConfluentPlugin) GetUpdatedAt() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.UpdatedAt
+}
+
+func (c *ConfluentPlugin) GetConfig() ConfluentPluginConfig {
+	if c == nil {
+		return ConfluentPluginConfig{}
+	}
+	return c.Config
+}
+
+func (c *ConfluentPlugin) GetConsumer() *ConfluentPluginConsumer {
+	if c == nil {
+		return nil
+	}
+	return c.Consumer
+}
+
 func (c *ConfluentPlugin) GetProtocols() []ConfluentPluginProtocols {
 	if c == nil {
 		return nil
@@ -1044,18 +1059,4 @@ func (c *ConfluentPlugin) GetService() *ConfluentPluginService {
 		return nil
 	}
 	return c.Service
-}
-
-func (c *ConfluentPlugin) GetTags() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Tags
-}
-
-func (c *ConfluentPlugin) GetUpdatedAt() *int64 {
-	if c == nil {
-		return nil
-	}
-	return c.UpdatedAt
 }

@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type JwtPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JwtPluginAfter) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JwtPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JwtPluginBefore) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JwtPluginOrdering struct {
+	After  *JwtPluginAfter  `json:"after,omitempty"`
+	Before *JwtPluginBefore `json:"before,omitempty"`
+}
+
+func (j *JwtPluginOrdering) GetAfter() *JwtPluginAfter {
+	if j == nil {
+		return nil
+	}
+	return j.After
+}
+
+func (j *JwtPluginOrdering) GetBefore() *JwtPluginBefore {
+	if j == nil {
+		return nil
+	}
+	return j.Before
+}
+
+type JwtPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (j *JwtPluginPartials) GetID() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ID
+}
+
+func (j *JwtPluginPartials) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JwtPluginPartials) GetPath() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Path
+}
+
 type ClaimsToVerify string
 
 const (
@@ -127,76 +197,6 @@ func (j *JwtPluginConfig) GetURIParamNames() []string {
 	return j.URIParamNames
 }
 
-type JwtPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (j *JwtPluginAfter) GetAccess() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Access
-}
-
-type JwtPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (j *JwtPluginBefore) GetAccess() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Access
-}
-
-type JwtPluginOrdering struct {
-	After  *JwtPluginAfter  `json:"after,omitempty"`
-	Before *JwtPluginBefore `json:"before,omitempty"`
-}
-
-func (j *JwtPluginOrdering) GetAfter() *JwtPluginAfter {
-	if j == nil {
-		return nil
-	}
-	return j.After
-}
-
-func (j *JwtPluginOrdering) GetBefore() *JwtPluginBefore {
-	if j == nil {
-		return nil
-	}
-	return j.Before
-}
-
-type JwtPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (j *JwtPluginPartials) GetID() *string {
-	if j == nil {
-		return nil
-	}
-	return j.ID
-}
-
-func (j *JwtPluginPartials) GetName() *string {
-	if j == nil {
-		return nil
-	}
-	return j.Name
-}
-
-func (j *JwtPluginPartials) GetPath() *string {
-	if j == nil {
-		return nil
-	}
-	return j.Path
-}
-
 type JwtPluginProtocols string
 
 const (
@@ -253,8 +253,8 @@ func (j *JwtPluginService) GetID() *string {
 	return j.ID
 }
 
+// JwtPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JwtPlugin struct {
-	Config *JwtPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -267,16 +267,17 @@ type JwtPlugin struct {
 	Ordering     *JwtPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []JwtPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64           `json:"updated_at,omitempty"`
+	Config    *JwtPluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []JwtPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *JwtPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *JwtPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (j JwtPlugin) MarshalJSON() ([]byte, error) {
@@ -288,13 +289,6 @@ func (j *JwtPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (j *JwtPlugin) GetConfig() *JwtPluginConfig {
-	if j == nil {
-		return nil
-	}
-	return j.Config
 }
 
 func (j *JwtPlugin) GetCreatedAt() *int64 {
@@ -343,6 +337,27 @@ func (j *JwtPlugin) GetPartials() []JwtPluginPartials {
 	return j.Partials
 }
 
+func (j *JwtPlugin) GetTags() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Tags
+}
+
+func (j *JwtPlugin) GetUpdatedAt() *int64 {
+	if j == nil {
+		return nil
+	}
+	return j.UpdatedAt
+}
+
+func (j *JwtPlugin) GetConfig() *JwtPluginConfig {
+	if j == nil {
+		return nil
+	}
+	return j.Config
+}
+
 func (j *JwtPlugin) GetProtocols() []JwtPluginProtocols {
 	if j == nil {
 		return nil
@@ -362,18 +377,4 @@ func (j *JwtPlugin) GetService() *JwtPluginService {
 		return nil
 	}
 	return j.Service
-}
-
-func (j *JwtPlugin) GetTags() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Tags
-}
-
-func (j *JwtPlugin) GetUpdatedAt() *int64 {
-	if j == nil {
-		return nil
-	}
-	return j.UpdatedAt
 }

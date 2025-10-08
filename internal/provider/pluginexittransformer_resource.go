@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -37,20 +36,20 @@ type PluginExitTransformerResource struct {
 
 // PluginExitTransformerResourceModel describes the resource data model.
 type PluginExitTransformerResourceModel struct {
-	Config       *tfTypes.ExitTransformerPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                         `tfsdk:"consumer"`
-	CreatedAt    types.Int64                          `tfsdk:"created_at"`
-	Enabled      types.Bool                           `tfsdk:"enabled"`
-	ID           types.String                         `tfsdk:"id"`
-	InstanceName types.String                         `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials          `tfsdk:"partials"`
-	Protocols    []types.String                       `tfsdk:"protocols"`
-	Route        *tfTypes.Set                         `tfsdk:"route"`
-	Service      *tfTypes.Set                         `tfsdk:"service"`
-	Tags         []types.String                       `tfsdk:"tags"`
-	UpdatedAt    types.Int64                          `tfsdk:"updated_at"`
-	Workspace    types.String                         `tfsdk:"workspace"`
+	Config       tfTypes.ExitTransformerPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                        `tfsdk:"consumer"`
+	CreatedAt    types.Int64                         `tfsdk:"created_at"`
+	Enabled      types.Bool                          `tfsdk:"enabled"`
+	ID           types.String                        `tfsdk:"id"`
+	InstanceName types.String                        `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols    []types.String                      `tfsdk:"protocols"`
+	Route        *tfTypes.Set                        `tfsdk:"route"`
+	Service      *tfTypes.Set                        `tfsdk:"service"`
+	Tags         []types.String                      `tfsdk:"tags"`
+	UpdatedAt    types.Int64                         `tfsdk:"updated_at"`
+	Workspace    types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginExitTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,17 +61,11 @@ func (r *PluginExitTransformerResource) Schema(ctx context.Context, req resource
 		MarkdownDescription: "PluginExitTransformer Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"functions": schema.ListAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						ElementType: types.StringType,
-						Description: `Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
-						},
 					},
 					"handle_unexpected": schema.BoolAttribute{
 						Computed:    true,

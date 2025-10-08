@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AiGcpModelArmorPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiGcpModelArmorPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiGcpModelArmorPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiGcpModelArmorPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiGcpModelArmorPluginOrdering struct {
+	After  *AiGcpModelArmorPluginAfter  `json:"after,omitempty"`
+	Before *AiGcpModelArmorPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiGcpModelArmorPluginOrdering) GetAfter() *AiGcpModelArmorPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiGcpModelArmorPluginOrdering) GetBefore() *AiGcpModelArmorPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiGcpModelArmorPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiGcpModelArmorPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiGcpModelArmorPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiGcpModelArmorPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 // AiGcpModelArmorPluginGuardingMode - The guardrail mode to use for the request
 type AiGcpModelArmorPluginGuardingMode string
 
@@ -230,76 +300,6 @@ func (a *AiGcpModelArmorPluginConsumerGroup) GetID() *string {
 	return a.ID
 }
 
-type AiGcpModelArmorPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiGcpModelArmorPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiGcpModelArmorPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiGcpModelArmorPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiGcpModelArmorPluginOrdering struct {
-	After  *AiGcpModelArmorPluginAfter  `json:"after,omitempty"`
-	Before *AiGcpModelArmorPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiGcpModelArmorPluginOrdering) GetAfter() *AiGcpModelArmorPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiGcpModelArmorPluginOrdering) GetBefore() *AiGcpModelArmorPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiGcpModelArmorPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiGcpModelArmorPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiGcpModelArmorPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiGcpModelArmorPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type AiGcpModelArmorPluginProtocols string
 
 const (
@@ -356,12 +356,8 @@ func (a *AiGcpModelArmorPluginService) GetID() *string {
 	return a.ID
 }
 
+// AiGcpModelArmorPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiGcpModelArmorPlugin struct {
-	Config *AiGcpModelArmorPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AiGcpModelArmorPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *AiGcpModelArmorPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -374,16 +370,21 @@ type AiGcpModelArmorPlugin struct {
 	Ordering     *AiGcpModelArmorPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiGcpModelArmorPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                      `json:"updated_at,omitempty"`
+	Config    AiGcpModelArmorPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AiGcpModelArmorPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *AiGcpModelArmorPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiGcpModelArmorPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiGcpModelArmorPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiGcpModelArmorPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiGcpModelArmorPlugin) MarshalJSON() ([]byte, error) {
@@ -391,31 +392,10 @@ func (a AiGcpModelArmorPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiGcpModelArmorPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (a *AiGcpModelArmorPlugin) GetConfig() *AiGcpModelArmorPluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
-func (a *AiGcpModelArmorPlugin) GetConsumer() *AiGcpModelArmorPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
-}
-
-func (a *AiGcpModelArmorPlugin) GetConsumerGroup() *AiGcpModelArmorPluginConsumerGroup {
-	if a == nil {
-		return nil
-	}
-	return a.ConsumerGroup
 }
 
 func (a *AiGcpModelArmorPlugin) GetCreatedAt() *int64 {
@@ -464,6 +444,41 @@ func (a *AiGcpModelArmorPlugin) GetPartials() []AiGcpModelArmorPluginPartials {
 	return a.Partials
 }
 
+func (a *AiGcpModelArmorPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiGcpModelArmorPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AiGcpModelArmorPlugin) GetConfig() AiGcpModelArmorPluginConfig {
+	if a == nil {
+		return AiGcpModelArmorPluginConfig{}
+	}
+	return a.Config
+}
+
+func (a *AiGcpModelArmorPlugin) GetConsumer() *AiGcpModelArmorPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
+func (a *AiGcpModelArmorPlugin) GetConsumerGroup() *AiGcpModelArmorPluginConsumerGroup {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerGroup
+}
+
 func (a *AiGcpModelArmorPlugin) GetProtocols() []AiGcpModelArmorPluginProtocols {
 	if a == nil {
 		return nil
@@ -483,18 +498,4 @@ func (a *AiGcpModelArmorPlugin) GetService() *AiGcpModelArmorPluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AiGcpModelArmorPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiGcpModelArmorPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

@@ -60,18 +60,16 @@ func (r *PluginHmacAuthResourceModel) RefreshFromSharedHmacAuthPlugin(ctx contex
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -184,56 +182,6 @@ func (r *PluginHmacAuthResourceModel) ToOperationsUpdateHmacauthPluginRequest(ct
 func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context) (*shared.HmacAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.HmacAuthPluginConfig
-	if r.Config != nil {
-		algorithms := make([]shared.Algorithms, 0, len(r.Config.Algorithms))
-		for _, algorithmsItem := range r.Config.Algorithms {
-			algorithms = append(algorithms, shared.Algorithms(algorithmsItem.ValueString()))
-		}
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		clockSkew := new(float64)
-		if !r.Config.ClockSkew.IsUnknown() && !r.Config.ClockSkew.IsNull() {
-			*clockSkew = r.Config.ClockSkew.ValueFloat64()
-		} else {
-			clockSkew = nil
-		}
-		enforceHeaders := make([]string, 0, len(r.Config.EnforceHeaders))
-		for _, enforceHeadersItem := range r.Config.EnforceHeaders {
-			enforceHeaders = append(enforceHeaders, enforceHeadersItem.ValueString())
-		}
-		hideCredentials := new(bool)
-		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
-			*hideCredentials = r.Config.HideCredentials.ValueBool()
-		} else {
-			hideCredentials = nil
-		}
-		realm := new(string)
-		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
-			*realm = r.Config.Realm.ValueString()
-		} else {
-			realm = nil
-		}
-		validateRequestBody := new(bool)
-		if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
-			*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
-		} else {
-			validateRequestBody = nil
-		}
-		config = &shared.HmacAuthPluginConfig{
-			Algorithms:          algorithms,
-			Anonymous:           anonymous,
-			ClockSkew:           clockSkew,
-			EnforceHeaders:      enforceHeaders,
-			HideCredentials:     hideCredentials,
-			Realm:               realm,
-			ValidateRequestBody: validateRequestBody,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -285,33 +233,93 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context
 			Before: before,
 		}
 	}
-	var partials []shared.HmacAuthPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.HmacAuthPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.HmacAuthPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.HmacAuthPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.HmacAuthPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.HmacAuthPluginConfig
+	if r.Config != nil {
+		algorithms := make([]shared.Algorithms, 0, len(r.Config.Algorithms))
+		for _, algorithmsItem := range r.Config.Algorithms {
+			algorithms = append(algorithms, shared.Algorithms(algorithmsItem.ValueString()))
+		}
+		anonymous := new(string)
+		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+			*anonymous = r.Config.Anonymous.ValueString()
+		} else {
+			anonymous = nil
+		}
+		clockSkew := new(float64)
+		if !r.Config.ClockSkew.IsUnknown() && !r.Config.ClockSkew.IsNull() {
+			*clockSkew = r.Config.ClockSkew.ValueFloat64()
+		} else {
+			clockSkew = nil
+		}
+		enforceHeaders := make([]string, 0, len(r.Config.EnforceHeaders))
+		for _, enforceHeadersItem := range r.Config.EnforceHeaders {
+			enforceHeaders = append(enforceHeaders, enforceHeadersItem.ValueString())
+		}
+		hideCredentials := new(bool)
+		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
+			*hideCredentials = r.Config.HideCredentials.ValueBool()
+		} else {
+			hideCredentials = nil
+		}
+		realm := new(string)
+		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
+			*realm = r.Config.Realm.ValueString()
+		} else {
+			realm = nil
+		}
+		validateRequestBody := new(bool)
+		if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
+			*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
+		} else {
+			validateRequestBody = nil
+		}
+		config = &shared.HmacAuthPluginConfig{
+			Algorithms:          algorithms,
+			Anonymous:           anonymous,
+			ClockSkew:           clockSkew,
+			EnforceHeaders:      enforceHeaders,
+			HideCredentials:     hideCredentials,
+			Realm:               realm,
+			ValidateRequestBody: validateRequestBody,
 		}
 	}
 	protocols := make([]shared.HmacAuthPluginProtocols, 0, len(r.Protocols))
@@ -342,32 +350,19 @@ func (r *PluginHmacAuthResourceModel) ToSharedHmacAuthPlugin(ctx context.Context
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.HmacAuthPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

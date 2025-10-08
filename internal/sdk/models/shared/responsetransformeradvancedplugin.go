@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type ResponseTransformerAdvancedPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *ResponseTransformerAdvancedPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type ResponseTransformerAdvancedPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *ResponseTransformerAdvancedPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type ResponseTransformerAdvancedPluginOrdering struct {
+	After  *ResponseTransformerAdvancedPluginAfter  `json:"after,omitempty"`
+	Before *ResponseTransformerAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (r *ResponseTransformerAdvancedPluginOrdering) GetAfter() *ResponseTransformerAdvancedPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *ResponseTransformerAdvancedPluginOrdering) GetBefore() *ResponseTransformerAdvancedPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type ResponseTransformerAdvancedPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *ResponseTransformerAdvancedPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *ResponseTransformerAdvancedPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *ResponseTransformerAdvancedPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
 type ResponseTransformerAdvancedPluginJSONTypes string
 
 const (
@@ -385,76 +455,6 @@ func (r *ResponseTransformerAdvancedPluginConsumerGroup) GetID() *string {
 	return r.ID
 }
 
-type ResponseTransformerAdvancedPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *ResponseTransformerAdvancedPluginAfter) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type ResponseTransformerAdvancedPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *ResponseTransformerAdvancedPluginBefore) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type ResponseTransformerAdvancedPluginOrdering struct {
-	After  *ResponseTransformerAdvancedPluginAfter  `json:"after,omitempty"`
-	Before *ResponseTransformerAdvancedPluginBefore `json:"before,omitempty"`
-}
-
-func (r *ResponseTransformerAdvancedPluginOrdering) GetAfter() *ResponseTransformerAdvancedPluginAfter {
-	if r == nil {
-		return nil
-	}
-	return r.After
-}
-
-func (r *ResponseTransformerAdvancedPluginOrdering) GetBefore() *ResponseTransformerAdvancedPluginBefore {
-	if r == nil {
-		return nil
-	}
-	return r.Before
-}
-
-type ResponseTransformerAdvancedPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (r *ResponseTransformerAdvancedPluginPartials) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-func (r *ResponseTransformerAdvancedPluginPartials) GetName() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Name
-}
-
-func (r *ResponseTransformerAdvancedPluginPartials) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
 type ResponseTransformerAdvancedPluginProtocols string
 
 const (
@@ -511,12 +511,8 @@ func (r *ResponseTransformerAdvancedPluginService) GetID() *string {
 	return r.ID
 }
 
+// ResponseTransformerAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ResponseTransformerAdvancedPlugin struct {
-	Config *ResponseTransformerAdvancedPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *ResponseTransformerAdvancedPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *ResponseTransformerAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -529,16 +525,21 @@ type ResponseTransformerAdvancedPlugin struct {
 	Ordering     *ResponseTransformerAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ResponseTransformerAdvancedPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                                   `json:"updated_at,omitempty"`
+	Config    *ResponseTransformerAdvancedPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *ResponseTransformerAdvancedPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *ResponseTransformerAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []ResponseTransformerAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *ResponseTransformerAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ResponseTransformerAdvancedPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r ResponseTransformerAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -550,27 +551,6 @@ func (r *ResponseTransformerAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (r *ResponseTransformerAdvancedPlugin) GetConfig() *ResponseTransformerAdvancedPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *ResponseTransformerAdvancedPlugin) GetConsumer() *ResponseTransformerAdvancedPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
-func (r *ResponseTransformerAdvancedPlugin) GetConsumerGroup() *ResponseTransformerAdvancedPluginConsumerGroup {
-	if r == nil {
-		return nil
-	}
-	return r.ConsumerGroup
 }
 
 func (r *ResponseTransformerAdvancedPlugin) GetCreatedAt() *int64 {
@@ -619,6 +599,41 @@ func (r *ResponseTransformerAdvancedPlugin) GetPartials() []ResponseTransformerA
 	return r.Partials
 }
 
+func (r *ResponseTransformerAdvancedPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *ResponseTransformerAdvancedPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
+}
+
+func (r *ResponseTransformerAdvancedPlugin) GetConfig() *ResponseTransformerAdvancedPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *ResponseTransformerAdvancedPlugin) GetConsumer() *ResponseTransformerAdvancedPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
+func (r *ResponseTransformerAdvancedPlugin) GetConsumerGroup() *ResponseTransformerAdvancedPluginConsumerGroup {
+	if r == nil {
+		return nil
+	}
+	return r.ConsumerGroup
+}
+
 func (r *ResponseTransformerAdvancedPlugin) GetProtocols() []ResponseTransformerAdvancedPluginProtocols {
 	if r == nil {
 		return nil
@@ -638,18 +653,4 @@ func (r *ResponseTransformerAdvancedPlugin) GetService() *ResponseTransformerAdv
 		return nil
 	}
 	return r.Service
-}
-
-func (r *ResponseTransformerAdvancedPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *ResponseTransformerAdvancedPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
 }

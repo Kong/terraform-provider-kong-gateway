@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AiSanitizerPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiSanitizerPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiSanitizerPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiSanitizerPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiSanitizerPluginOrdering struct {
+	After  *AiSanitizerPluginAfter  `json:"after,omitempty"`
+	Before *AiSanitizerPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiSanitizerPluginOrdering) GetAfter() *AiSanitizerPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiSanitizerPluginOrdering) GetBefore() *AiSanitizerPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiSanitizerPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiSanitizerPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiSanitizerPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiSanitizerPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type Anonymize string
 
 const (
@@ -307,76 +377,6 @@ func (a *AiSanitizerPluginConsumerGroup) GetID() *string {
 	return a.ID
 }
 
-type AiSanitizerPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiSanitizerPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiSanitizerPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiSanitizerPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiSanitizerPluginOrdering struct {
-	After  *AiSanitizerPluginAfter  `json:"after,omitempty"`
-	Before *AiSanitizerPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiSanitizerPluginOrdering) GetAfter() *AiSanitizerPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiSanitizerPluginOrdering) GetBefore() *AiSanitizerPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiSanitizerPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiSanitizerPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiSanitizerPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiSanitizerPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type AiSanitizerPluginProtocols string
 
 const (
@@ -433,12 +433,8 @@ func (a *AiSanitizerPluginService) GetID() *string {
 	return a.ID
 }
 
+// AiSanitizerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiSanitizerPlugin struct {
-	Config *AiSanitizerPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AiSanitizerPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *AiSanitizerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -451,16 +447,21 @@ type AiSanitizerPlugin struct {
 	Ordering     *AiSanitizerPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiSanitizerPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                   `json:"updated_at,omitempty"`
+	Config    *AiSanitizerPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AiSanitizerPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *AiSanitizerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiSanitizerPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiSanitizerPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiSanitizerPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiSanitizerPlugin) MarshalJSON() ([]byte, error) {
@@ -472,27 +473,6 @@ func (a *AiSanitizerPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (a *AiSanitizerPlugin) GetConfig() *AiSanitizerPluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
-func (a *AiSanitizerPlugin) GetConsumer() *AiSanitizerPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
-}
-
-func (a *AiSanitizerPlugin) GetConsumerGroup() *AiSanitizerPluginConsumerGroup {
-	if a == nil {
-		return nil
-	}
-	return a.ConsumerGroup
 }
 
 func (a *AiSanitizerPlugin) GetCreatedAt() *int64 {
@@ -541,6 +521,41 @@ func (a *AiSanitizerPlugin) GetPartials() []AiSanitizerPluginPartials {
 	return a.Partials
 }
 
+func (a *AiSanitizerPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiSanitizerPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AiSanitizerPlugin) GetConfig() *AiSanitizerPluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
+}
+
+func (a *AiSanitizerPlugin) GetConsumer() *AiSanitizerPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
+func (a *AiSanitizerPlugin) GetConsumerGroup() *AiSanitizerPluginConsumerGroup {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerGroup
+}
+
 func (a *AiSanitizerPlugin) GetProtocols() []AiSanitizerPluginProtocols {
 	if a == nil {
 		return nil
@@ -560,18 +575,4 @@ func (a *AiSanitizerPlugin) GetService() *AiSanitizerPluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AiSanitizerPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiSanitizerPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

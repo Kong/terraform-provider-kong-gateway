@@ -20,7 +20,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -39,20 +38,20 @@ type PluginHTTPLogResource struct {
 
 // PluginHTTPLogResourceModel describes the resource data model.
 type PluginHTTPLogResourceModel struct {
-	Config       *tfTypes.HTTPLogPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                 `tfsdk:"consumer"`
-	CreatedAt    types.Int64                  `tfsdk:"created_at"`
-	Enabled      types.Bool                   `tfsdk:"enabled"`
-	ID           types.String                 `tfsdk:"id"`
-	InstanceName types.String                 `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials  `tfsdk:"partials"`
-	Protocols    []types.String               `tfsdk:"protocols"`
-	Route        *tfTypes.Set                 `tfsdk:"route"`
-	Service      *tfTypes.Set                 `tfsdk:"service"`
-	Tags         []types.String               `tfsdk:"tags"`
-	UpdatedAt    types.Int64                  `tfsdk:"updated_at"`
-	Workspace    types.String                 `tfsdk:"workspace"`
+	Config       tfTypes.HTTPLogPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
+	CreatedAt    types.Int64                 `tfsdk:"created_at"`
+	Enabled      types.Bool                  `tfsdk:"enabled"`
+	ID           types.String                `tfsdk:"id"`
+	InstanceName types.String                `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Protocols    []types.String              `tfsdk:"protocols"`
+	Route        *tfTypes.Set                `tfsdk:"route"`
+	Service      *tfTypes.Set                `tfsdk:"service"`
+	Tags         []types.String              `tfsdk:"tags"`
+	UpdatedAt    types.Int64                 `tfsdk:"updated_at"`
+	Workspace    types.String                `tfsdk:"workspace"`
 }
 
 func (r *PluginHTTPLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,8 +63,7 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "PluginHTTPLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"content_type": schema.StringAttribute{
 						Computed:    true,
@@ -96,12 +94,8 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 						Description: `An optional table of headers included in the HTTP message to the upstream server. Values are indexed by header name, and each header name accepts a single string.`,
 					},
 					"http_endpoint": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search.`,
 					},
 					"keepalive": schema.Float64Attribute{
 						Computed:    true,

@@ -15,18 +15,13 @@ func (r *PluginJweDecryptResourceModel) RefreshFromSharedJweDecryptPlugin(ctx co
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.JweDecryptPluginConfig{}
-			r.Config.ForwardHeaderName = types.StringPointerValue(resp.Config.ForwardHeaderName)
-			r.Config.KeySets = make([]types.String, 0, len(resp.Config.KeySets))
-			for _, v := range resp.Config.KeySets {
-				r.Config.KeySets = append(r.Config.KeySets, types.StringValue(v))
-			}
-			r.Config.LookupHeaderName = types.StringPointerValue(resp.Config.LookupHeaderName)
-			r.Config.Strict = types.BoolPointerValue(resp.Config.Strict)
+		r.Config.ForwardHeaderName = types.StringPointerValue(resp.Config.ForwardHeaderName)
+		r.Config.KeySets = make([]types.String, 0, len(resp.Config.KeySets))
+		for _, v := range resp.Config.KeySets {
+			r.Config.KeySets = append(r.Config.KeySets, types.StringValue(v))
 		}
+		r.Config.LookupHeaderName = types.StringPointerValue(resp.Config.LookupHeaderName)
+		r.Config.Strict = types.BoolPointerValue(resp.Config.Strict)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -54,18 +49,16 @@ func (r *PluginJweDecryptResourceModel) RefreshFromSharedJweDecryptPlugin(ctx co
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -178,37 +171,6 @@ func (r *PluginJweDecryptResourceModel) ToOperationsUpdateJwedecryptPluginReques
 func (r *PluginJweDecryptResourceModel) ToSharedJweDecryptPlugin(ctx context.Context) (*shared.JweDecryptPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.JweDecryptPluginConfig
-	if r.Config != nil {
-		forwardHeaderName := new(string)
-		if !r.Config.ForwardHeaderName.IsUnknown() && !r.Config.ForwardHeaderName.IsNull() {
-			*forwardHeaderName = r.Config.ForwardHeaderName.ValueString()
-		} else {
-			forwardHeaderName = nil
-		}
-		keySets := make([]string, 0, len(r.Config.KeySets))
-		for _, keySetsItem := range r.Config.KeySets {
-			keySets = append(keySets, keySetsItem.ValueString())
-		}
-		lookupHeaderName := new(string)
-		if !r.Config.LookupHeaderName.IsUnknown() && !r.Config.LookupHeaderName.IsNull() {
-			*lookupHeaderName = r.Config.LookupHeaderName.ValueString()
-		} else {
-			lookupHeaderName = nil
-		}
-		strict := new(bool)
-		if !r.Config.Strict.IsUnknown() && !r.Config.Strict.IsNull() {
-			*strict = r.Config.Strict.ValueBool()
-		} else {
-			strict = nil
-		}
-		config = &shared.JweDecryptPluginConfig{
-			ForwardHeaderName: forwardHeaderName,
-			KeySets:           keySets,
-			LookupHeaderName:  lookupHeaderName,
-			Strict:            strict,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -260,34 +222,72 @@ func (r *PluginJweDecryptResourceModel) ToSharedJweDecryptPlugin(ctx context.Con
 			Before: before,
 		}
 	}
-	var partials []shared.JweDecryptPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.JweDecryptPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.JweDecryptPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.JweDecryptPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.JweDecryptPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	forwardHeaderName := new(string)
+	if !r.Config.ForwardHeaderName.IsUnknown() && !r.Config.ForwardHeaderName.IsNull() {
+		*forwardHeaderName = r.Config.ForwardHeaderName.ValueString()
+	} else {
+		forwardHeaderName = nil
+	}
+	keySets := make([]string, 0, len(r.Config.KeySets))
+	for _, keySetsItem := range r.Config.KeySets {
+		keySets = append(keySets, keySetsItem.ValueString())
+	}
+	lookupHeaderName := new(string)
+	if !r.Config.LookupHeaderName.IsUnknown() && !r.Config.LookupHeaderName.IsNull() {
+		*lookupHeaderName = r.Config.LookupHeaderName.ValueString()
+	} else {
+		lookupHeaderName = nil
+	}
+	strict := new(bool)
+	if !r.Config.Strict.IsUnknown() && !r.Config.Strict.IsNull() {
+		*strict = r.Config.Strict.ValueBool()
+	} else {
+		strict = nil
+	}
+	config := shared.JweDecryptPluginConfig{
+		ForwardHeaderName: forwardHeaderName,
+		KeySets:           keySets,
+		LookupHeaderName:  lookupHeaderName,
+		Strict:            strict,
 	}
 	protocols := make([]shared.JweDecryptPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -317,32 +317,19 @@ func (r *PluginJweDecryptResourceModel) ToSharedJweDecryptPlugin(ctx context.Con
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.JweDecryptPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

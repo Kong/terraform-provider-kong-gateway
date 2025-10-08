@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type OpenidConnectPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *OpenidConnectPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type OpenidConnectPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *OpenidConnectPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type OpenidConnectPluginOrdering struct {
+	After  *OpenidConnectPluginAfter  `json:"after,omitempty"`
+	Before *OpenidConnectPluginBefore `json:"before,omitempty"`
+}
+
+func (o *OpenidConnectPluginOrdering) GetAfter() *OpenidConnectPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *OpenidConnectPluginOrdering) GetBefore() *OpenidConnectPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type OpenidConnectPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *OpenidConnectPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *OpenidConnectPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *OpenidConnectPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 type AuthMethods string
 
 const (
@@ -3952,76 +4022,6 @@ func (o *OpenidConnectPluginConfig) GetVerifySignature() *bool {
 	return o.VerifySignature
 }
 
-type OpenidConnectPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *OpenidConnectPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type OpenidConnectPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *OpenidConnectPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type OpenidConnectPluginOrdering struct {
-	After  *OpenidConnectPluginAfter  `json:"after,omitempty"`
-	Before *OpenidConnectPluginBefore `json:"before,omitempty"`
-}
-
-func (o *OpenidConnectPluginOrdering) GetAfter() *OpenidConnectPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *OpenidConnectPluginOrdering) GetBefore() *OpenidConnectPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type OpenidConnectPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *OpenidConnectPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *OpenidConnectPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *OpenidConnectPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type OpenidConnectPluginProtocols string
 
 const (
@@ -4078,8 +4078,8 @@ func (o *OpenidConnectPluginService) GetID() *string {
 	return o.ID
 }
 
+// OpenidConnectPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type OpenidConnectPlugin struct {
-	Config *OpenidConnectPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -4092,16 +4092,17 @@ type OpenidConnectPlugin struct {
 	Ordering     *OpenidConnectPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []OpenidConnectPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    OpenidConnectPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []OpenidConnectPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *OpenidConnectPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *OpenidConnectPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (o OpenidConnectPlugin) MarshalJSON() ([]byte, error) {
@@ -4109,17 +4110,10 @@ func (o OpenidConnectPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpenidConnectPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (o *OpenidConnectPlugin) GetConfig() *OpenidConnectPluginConfig {
-	if o == nil {
-		return nil
-	}
-	return o.Config
 }
 
 func (o *OpenidConnectPlugin) GetCreatedAt() *int64 {
@@ -4168,6 +4162,27 @@ func (o *OpenidConnectPlugin) GetPartials() []OpenidConnectPluginPartials {
 	return o.Partials
 }
 
+func (o *OpenidConnectPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *OpenidConnectPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *OpenidConnectPlugin) GetConfig() OpenidConnectPluginConfig {
+	if o == nil {
+		return OpenidConnectPluginConfig{}
+	}
+	return o.Config
+}
+
 func (o *OpenidConnectPlugin) GetProtocols() []OpenidConnectPluginProtocols {
 	if o == nil {
 		return nil
@@ -4187,18 +4202,4 @@ func (o *OpenidConnectPlugin) GetService() *OpenidConnectPluginService {
 		return nil
 	}
 	return o.Service
-}
-
-func (o *OpenidConnectPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *OpenidConnectPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
 }

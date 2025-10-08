@@ -60,18 +60,16 @@ func (r *PluginCorrelationIDResourceModel) RefreshFromSharedCorrelationIDPlugin(
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -184,44 +182,6 @@ func (r *PluginCorrelationIDResourceModel) ToOperationsUpdateCorrelationidPlugin
 func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx context.Context) (*shared.CorrelationIDPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.CorrelationIDPluginConfig
-	if r.Config != nil {
-		echoDownstream := new(bool)
-		if !r.Config.EchoDownstream.IsUnknown() && !r.Config.EchoDownstream.IsNull() {
-			*echoDownstream = r.Config.EchoDownstream.ValueBool()
-		} else {
-			echoDownstream = nil
-		}
-		generator := new(shared.Generator)
-		if !r.Config.Generator.IsUnknown() && !r.Config.Generator.IsNull() {
-			*generator = shared.Generator(r.Config.Generator.ValueString())
-		} else {
-			generator = nil
-		}
-		headerName := new(string)
-		if !r.Config.HeaderName.IsUnknown() && !r.Config.HeaderName.IsNull() {
-			*headerName = r.Config.HeaderName.ValueString()
-		} else {
-			headerName = nil
-		}
-		config = &shared.CorrelationIDPluginConfig{
-			EchoDownstream: echoDownstream,
-			Generator:      generator,
-			HeaderName:     headerName,
-		}
-	}
-	var consumer *shared.CorrelationIDPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.CorrelationIDPluginConsumer{
-			ID: id,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -234,11 +194,11 @@ func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx conte
 	} else {
 		enabled = nil
 	}
-	id1 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id1 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -273,33 +233,81 @@ func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx conte
 			Before: before,
 		}
 	}
-	var partials []shared.CorrelationIDPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.CorrelationIDPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.CorrelationIDPluginPartials{
-				ID:   id2,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.CorrelationIDPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.CorrelationIDPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.CorrelationIDPluginConfig
+	if r.Config != nil {
+		echoDownstream := new(bool)
+		if !r.Config.EchoDownstream.IsUnknown() && !r.Config.EchoDownstream.IsNull() {
+			*echoDownstream = r.Config.EchoDownstream.ValueBool()
+		} else {
+			echoDownstream = nil
+		}
+		generator := new(shared.Generator)
+		if !r.Config.Generator.IsUnknown() && !r.Config.Generator.IsNull() {
+			*generator = shared.Generator(r.Config.Generator.ValueString())
+		} else {
+			generator = nil
+		}
+		headerName := new(string)
+		if !r.Config.HeaderName.IsUnknown() && !r.Config.HeaderName.IsNull() {
+			*headerName = r.Config.HeaderName.ValueString()
+		} else {
+			headerName = nil
+		}
+		config = &shared.CorrelationIDPluginConfig{
+			EchoDownstream: echoDownstream,
+			Generator:      generator,
+			HeaderName:     headerName,
+		}
+	}
+	var consumer *shared.CorrelationIDPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.CorrelationIDPluginConsumer{
+			ID: id2,
 		}
 	}
 	protocols := make([]shared.CorrelationIDPluginProtocols, 0, len(r.Protocols))
@@ -330,33 +338,20 @@ func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx conte
 			ID: id4,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.CorrelationIDPlugin{
-		Config:       config,
-		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

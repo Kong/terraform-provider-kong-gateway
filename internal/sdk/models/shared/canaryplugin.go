@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type CanaryPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *CanaryPluginAfter) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type CanaryPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (c *CanaryPluginBefore) GetAccess() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Access
+}
+
+type CanaryPluginOrdering struct {
+	After  *CanaryPluginAfter  `json:"after,omitempty"`
+	Before *CanaryPluginBefore `json:"before,omitempty"`
+}
+
+func (c *CanaryPluginOrdering) GetAfter() *CanaryPluginAfter {
+	if c == nil {
+		return nil
+	}
+	return c.After
+}
+
+func (c *CanaryPluginOrdering) GetBefore() *CanaryPluginBefore {
+	if c == nil {
+		return nil
+	}
+	return c.Before
+}
+
+type CanaryPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (c *CanaryPluginPartials) GetID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ID
+}
+
+func (c *CanaryPluginPartials) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *CanaryPluginPartials) GetPath() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Path
+}
+
 // Hash algorithm to be used for canary release.
 //
 // * `consumer`: The hash will be based on the consumer.
@@ -172,76 +242,6 @@ func (c *CanaryPluginConfig) GetUpstreamURI() *string {
 	return c.UpstreamURI
 }
 
-type CanaryPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *CanaryPluginAfter) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type CanaryPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (c *CanaryPluginBefore) GetAccess() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Access
-}
-
-type CanaryPluginOrdering struct {
-	After  *CanaryPluginAfter  `json:"after,omitempty"`
-	Before *CanaryPluginBefore `json:"before,omitempty"`
-}
-
-func (c *CanaryPluginOrdering) GetAfter() *CanaryPluginAfter {
-	if c == nil {
-		return nil
-	}
-	return c.After
-}
-
-func (c *CanaryPluginOrdering) GetBefore() *CanaryPluginBefore {
-	if c == nil {
-		return nil
-	}
-	return c.Before
-}
-
-type CanaryPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (c *CanaryPluginPartials) GetID() *string {
-	if c == nil {
-		return nil
-	}
-	return c.ID
-}
-
-func (c *CanaryPluginPartials) GetName() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Name
-}
-
-func (c *CanaryPluginPartials) GetPath() *string {
-	if c == nil {
-		return nil
-	}
-	return c.Path
-}
-
 type CanaryPluginProtocols string
 
 const (
@@ -298,8 +298,8 @@ func (c *CanaryPluginService) GetID() *string {
 	return c.ID
 }
 
+// CanaryPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type CanaryPlugin struct {
-	Config *CanaryPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -312,16 +312,17 @@ type CanaryPlugin struct {
 	Ordering     *CanaryPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []CanaryPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64              `json:"updated_at,omitempty"`
+	Config    *CanaryPluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []CanaryPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *CanaryPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *CanaryPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (c CanaryPlugin) MarshalJSON() ([]byte, error) {
@@ -333,13 +334,6 @@ func (c *CanaryPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (c *CanaryPlugin) GetConfig() *CanaryPluginConfig {
-	if c == nil {
-		return nil
-	}
-	return c.Config
 }
 
 func (c *CanaryPlugin) GetCreatedAt() *int64 {
@@ -388,6 +382,27 @@ func (c *CanaryPlugin) GetPartials() []CanaryPluginPartials {
 	return c.Partials
 }
 
+func (c *CanaryPlugin) GetTags() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Tags
+}
+
+func (c *CanaryPlugin) GetUpdatedAt() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.UpdatedAt
+}
+
+func (c *CanaryPlugin) GetConfig() *CanaryPluginConfig {
+	if c == nil {
+		return nil
+	}
+	return c.Config
+}
+
 func (c *CanaryPlugin) GetProtocols() []CanaryPluginProtocols {
 	if c == nil {
 		return nil
@@ -407,18 +422,4 @@ func (c *CanaryPlugin) GetService() *CanaryPluginService {
 		return nil
 	}
 	return c.Service
-}
-
-func (c *CanaryPlugin) GetTags() []string {
-	if c == nil {
-		return nil
-	}
-	return c.Tags
-}
-
-func (c *CanaryPlugin) GetUpdatedAt() *int64 {
-	if c == nil {
-		return nil
-	}
-	return c.UpdatedAt
 }

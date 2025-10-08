@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type Oauth2IntrospectionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2IntrospectionPluginAfter) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2IntrospectionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (o *Oauth2IntrospectionPluginBefore) GetAccess() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Access
+}
+
+type Oauth2IntrospectionPluginOrdering struct {
+	After  *Oauth2IntrospectionPluginAfter  `json:"after,omitempty"`
+	Before *Oauth2IntrospectionPluginBefore `json:"before,omitempty"`
+}
+
+func (o *Oauth2IntrospectionPluginOrdering) GetAfter() *Oauth2IntrospectionPluginAfter {
+	if o == nil {
+		return nil
+	}
+	return o.After
+}
+
+func (o *Oauth2IntrospectionPluginOrdering) GetBefore() *Oauth2IntrospectionPluginBefore {
+	if o == nil {
+		return nil
+	}
+	return o.Before
+}
+
+type Oauth2IntrospectionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (o *Oauth2IntrospectionPluginPartials) GetID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.ID
+}
+
+func (o *Oauth2IntrospectionPluginPartials) GetName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Name
+}
+
+func (o *Oauth2IntrospectionPluginPartials) GetPath() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Path
+}
+
 // Oauth2IntrospectionPluginConsumerBy - A string indicating whether to associate OAuth2 `username` or `client_id` with the consumer's username. OAuth2 `username` is mapped to a consumer's `username` field, while an OAuth2 `client_id` maps to a consumer's `custom_id`.
 type Oauth2IntrospectionPluginConsumerBy string
 
@@ -155,76 +225,6 @@ func (o *Oauth2IntrospectionPluginConfig) GetTTL() *float64 {
 	return o.TTL
 }
 
-type Oauth2IntrospectionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *Oauth2IntrospectionPluginAfter) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type Oauth2IntrospectionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (o *Oauth2IntrospectionPluginBefore) GetAccess() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Access
-}
-
-type Oauth2IntrospectionPluginOrdering struct {
-	After  *Oauth2IntrospectionPluginAfter  `json:"after,omitempty"`
-	Before *Oauth2IntrospectionPluginBefore `json:"before,omitempty"`
-}
-
-func (o *Oauth2IntrospectionPluginOrdering) GetAfter() *Oauth2IntrospectionPluginAfter {
-	if o == nil {
-		return nil
-	}
-	return o.After
-}
-
-func (o *Oauth2IntrospectionPluginOrdering) GetBefore() *Oauth2IntrospectionPluginBefore {
-	if o == nil {
-		return nil
-	}
-	return o.Before
-}
-
-type Oauth2IntrospectionPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (o *Oauth2IntrospectionPluginPartials) GetID() *string {
-	if o == nil {
-		return nil
-	}
-	return o.ID
-}
-
-func (o *Oauth2IntrospectionPluginPartials) GetName() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Name
-}
-
-func (o *Oauth2IntrospectionPluginPartials) GetPath() *string {
-	if o == nil {
-		return nil
-	}
-	return o.Path
-}
-
 type Oauth2IntrospectionPluginProtocols string
 
 const (
@@ -281,8 +281,8 @@ func (o *Oauth2IntrospectionPluginService) GetID() *string {
 	return o.ID
 }
 
+// Oauth2IntrospectionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type Oauth2IntrospectionPlugin struct {
-	Config *Oauth2IntrospectionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -295,16 +295,17 @@ type Oauth2IntrospectionPlugin struct {
 	Ordering     *Oauth2IntrospectionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []Oauth2IntrospectionPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                          `json:"updated_at,omitempty"`
+	Config    Oauth2IntrospectionPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []Oauth2IntrospectionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *Oauth2IntrospectionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *Oauth2IntrospectionPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (o Oauth2IntrospectionPlugin) MarshalJSON() ([]byte, error) {
@@ -312,17 +313,10 @@ func (o Oauth2IntrospectionPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *Oauth2IntrospectionPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (o *Oauth2IntrospectionPlugin) GetConfig() *Oauth2IntrospectionPluginConfig {
-	if o == nil {
-		return nil
-	}
-	return o.Config
 }
 
 func (o *Oauth2IntrospectionPlugin) GetCreatedAt() *int64 {
@@ -371,6 +365,27 @@ func (o *Oauth2IntrospectionPlugin) GetPartials() []Oauth2IntrospectionPluginPar
 	return o.Partials
 }
 
+func (o *Oauth2IntrospectionPlugin) GetTags() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Tags
+}
+
+func (o *Oauth2IntrospectionPlugin) GetUpdatedAt() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.UpdatedAt
+}
+
+func (o *Oauth2IntrospectionPlugin) GetConfig() Oauth2IntrospectionPluginConfig {
+	if o == nil {
+		return Oauth2IntrospectionPluginConfig{}
+	}
+	return o.Config
+}
+
 func (o *Oauth2IntrospectionPlugin) GetProtocols() []Oauth2IntrospectionPluginProtocols {
 	if o == nil {
 		return nil
@@ -390,18 +405,4 @@ func (o *Oauth2IntrospectionPlugin) GetService() *Oauth2IntrospectionPluginServi
 		return nil
 	}
 	return o.Service
-}
-
-func (o *Oauth2IntrospectionPlugin) GetTags() []string {
-	if o == nil {
-		return nil
-	}
-	return o.Tags
-}
-
-func (o *Oauth2IntrospectionPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.UpdatedAt
 }

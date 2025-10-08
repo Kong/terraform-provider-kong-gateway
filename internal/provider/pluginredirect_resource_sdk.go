@@ -15,14 +15,9 @@ func (r *PluginRedirectResourceModel) RefreshFromSharedRedirectPlugin(ctx contex
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.RedirectPluginConfig{}
-			r.Config.KeepIncomingPath = types.BoolPointerValue(resp.Config.KeepIncomingPath)
-			r.Config.Location = types.StringValue(resp.Config.Location)
-			r.Config.StatusCode = types.Int64PointerValue(resp.Config.StatusCode)
-		}
+		r.Config.KeepIncomingPath = types.BoolPointerValue(resp.Config.KeepIncomingPath)
+		r.Config.Location = types.StringValue(resp.Config.Location)
+		r.Config.StatusCode = types.Int64PointerValue(resp.Config.StatusCode)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -62,18 +57,16 @@ func (r *PluginRedirectResourceModel) RefreshFromSharedRedirectPlugin(ctx contex
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -186,53 +179,6 @@ func (r *PluginRedirectResourceModel) ToOperationsUpdateRedirectPluginRequest(ct
 func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context) (*shared.RedirectPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.RedirectPluginConfig
-	if r.Config != nil {
-		keepIncomingPath := new(bool)
-		if !r.Config.KeepIncomingPath.IsUnknown() && !r.Config.KeepIncomingPath.IsNull() {
-			*keepIncomingPath = r.Config.KeepIncomingPath.ValueBool()
-		} else {
-			keepIncomingPath = nil
-		}
-		var location string
-		location = r.Config.Location.ValueString()
-
-		statusCode := new(int64)
-		if !r.Config.StatusCode.IsUnknown() && !r.Config.StatusCode.IsNull() {
-			*statusCode = r.Config.StatusCode.ValueInt64()
-		} else {
-			statusCode = nil
-		}
-		config = &shared.RedirectPluginConfig{
-			KeepIncomingPath: keepIncomingPath,
-			Location:         location,
-			StatusCode:       statusCode,
-		}
-	}
-	var consumer *shared.RedirectPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.RedirectPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.RedirectPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.RedirectPluginConsumerGroup{
-			ID: id1,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -245,11 +191,11 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -284,33 +230,87 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 			Before: before,
 		}
 	}
-	var partials []shared.RedirectPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.RedirectPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id3 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id3 = partialsItem.ID.ValueString()
-			} else {
-				id3 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.RedirectPluginPartials{
-				ID:   id3,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.RedirectPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.RedirectPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	keepIncomingPath := new(bool)
+	if !r.Config.KeepIncomingPath.IsUnknown() && !r.Config.KeepIncomingPath.IsNull() {
+		*keepIncomingPath = r.Config.KeepIncomingPath.ValueBool()
+	} else {
+		keepIncomingPath = nil
+	}
+	var location string
+	location = r.Config.Location.ValueString()
+
+	statusCode := new(int64)
+	if !r.Config.StatusCode.IsUnknown() && !r.Config.StatusCode.IsNull() {
+		*statusCode = r.Config.StatusCode.ValueInt64()
+	} else {
+		statusCode = nil
+	}
+	config := shared.RedirectPluginConfig{
+		KeepIncomingPath: keepIncomingPath,
+		Location:         location,
+		StatusCode:       statusCode,
+	}
+	var consumer *shared.RedirectPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.RedirectPluginConsumer{
+			ID: id2,
+		}
+	}
+	var consumerGroup *shared.RedirectPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id3 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id3 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		consumerGroup = &shared.RedirectPluginConsumerGroup{
+			ID: id3,
 		}
 	}
 	protocols := make([]shared.RedirectPluginProtocols, 0, len(r.Protocols))
@@ -341,34 +341,21 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 			ID: id5,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.RedirectPlugin{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
-		ID:            id2,
+		ID:            id,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Partials:      partials,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
+		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type RequestTransformerPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTransformerPluginAfter) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTransformerPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (r *RequestTransformerPluginBefore) GetAccess() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Access
+}
+
+type RequestTransformerPluginOrdering struct {
+	After  *RequestTransformerPluginAfter  `json:"after,omitempty"`
+	Before *RequestTransformerPluginBefore `json:"before,omitempty"`
+}
+
+func (r *RequestTransformerPluginOrdering) GetAfter() *RequestTransformerPluginAfter {
+	if r == nil {
+		return nil
+	}
+	return r.After
+}
+
+func (r *RequestTransformerPluginOrdering) GetBefore() *RequestTransformerPluginBefore {
+	if r == nil {
+		return nil
+	}
+	return r.Before
+}
+
+type RequestTransformerPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (r *RequestTransformerPluginPartials) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
+func (r *RequestTransformerPluginPartials) GetName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Name
+}
+
+func (r *RequestTransformerPluginPartials) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
 type Add struct {
 	Body        []string `json:"body,omitempty"`
 	Headers     []string `json:"headers,omitempty"`
@@ -227,76 +297,6 @@ func (r *RequestTransformerPluginConsumerGroup) GetID() *string {
 	return r.ID
 }
 
-type RequestTransformerPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestTransformerPluginAfter) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestTransformerPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (r *RequestTransformerPluginBefore) GetAccess() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Access
-}
-
-type RequestTransformerPluginOrdering struct {
-	After  *RequestTransformerPluginAfter  `json:"after,omitempty"`
-	Before *RequestTransformerPluginBefore `json:"before,omitempty"`
-}
-
-func (r *RequestTransformerPluginOrdering) GetAfter() *RequestTransformerPluginAfter {
-	if r == nil {
-		return nil
-	}
-	return r.After
-}
-
-func (r *RequestTransformerPluginOrdering) GetBefore() *RequestTransformerPluginBefore {
-	if r == nil {
-		return nil
-	}
-	return r.Before
-}
-
-type RequestTransformerPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (r *RequestTransformerPluginPartials) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
-func (r *RequestTransformerPluginPartials) GetName() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Name
-}
-
-func (r *RequestTransformerPluginPartials) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
 // RequestTransformerPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type RequestTransformerPluginProtocols string
 
@@ -372,12 +372,8 @@ func (r *RequestTransformerPluginService) GetID() *string {
 	return r.ID
 }
 
+// RequestTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestTransformerPlugin struct {
-	Config *RequestTransformerPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RequestTransformerPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *RequestTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -390,16 +386,21 @@ type RequestTransformerPlugin struct {
 	Ordering     *RequestTransformerPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RequestTransformerPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                          `json:"updated_at,omitempty"`
+	Config    *RequestTransformerPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RequestTransformerPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *RequestTransformerPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []RequestTransformerPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RequestTransformerPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RequestTransformerPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RequestTransformerPlugin) MarshalJSON() ([]byte, error) {
@@ -411,27 +412,6 @@ func (r *RequestTransformerPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (r *RequestTransformerPlugin) GetConfig() *RequestTransformerPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *RequestTransformerPlugin) GetConsumer() *RequestTransformerPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
-}
-
-func (r *RequestTransformerPlugin) GetConsumerGroup() *RequestTransformerPluginConsumerGroup {
-	if r == nil {
-		return nil
-	}
-	return r.ConsumerGroup
 }
 
 func (r *RequestTransformerPlugin) GetCreatedAt() *int64 {
@@ -480,6 +460,41 @@ func (r *RequestTransformerPlugin) GetPartials() []RequestTransformerPluginParti
 	return r.Partials
 }
 
+func (r *RequestTransformerPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RequestTransformerPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
+}
+
+func (r *RequestTransformerPlugin) GetConfig() *RequestTransformerPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RequestTransformerPlugin) GetConsumer() *RequestTransformerPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
+func (r *RequestTransformerPlugin) GetConsumerGroup() *RequestTransformerPluginConsumerGroup {
+	if r == nil {
+		return nil
+	}
+	return r.ConsumerGroup
+}
+
 func (r *RequestTransformerPlugin) GetProtocols() []RequestTransformerPluginProtocols {
 	if r == nil {
 		return nil
@@ -499,18 +514,4 @@ func (r *RequestTransformerPlugin) GetService() *RequestTransformerPluginService
 		return nil
 	}
 	return r.Service
-}
-
-func (r *RequestTransformerPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RequestTransformerPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
 }

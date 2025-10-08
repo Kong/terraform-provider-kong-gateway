@@ -18,9 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -39,21 +37,21 @@ type PluginAiRagInjectorResource struct {
 
 // PluginAiRagInjectorResourceModel describes the resource data model.
 type PluginAiRagInjectorResourceModel struct {
-	Config        *tfTypes.AiRagInjectorPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                       `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                       `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                        `tfsdk:"created_at"`
-	Enabled       types.Bool                         `tfsdk:"enabled"`
-	ID            types.String                       `tfsdk:"id"`
-	InstanceName  types.String                       `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials        `tfsdk:"partials"`
-	Protocols     []types.String                     `tfsdk:"protocols"`
-	Route         *tfTypes.Set                       `tfsdk:"route"`
-	Service       *tfTypes.Set                       `tfsdk:"service"`
-	Tags          []types.String                     `tfsdk:"tags"`
-	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
-	Workspace     types.String                       `tfsdk:"workspace"`
+	Config        tfTypes.AiRagInjectorPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                      `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                      `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials       `tfsdk:"partials"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.Set                      `tfsdk:"route"`
+	Service       *tfTypes.Set                      `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
+	Workspace     types.String                      `tfsdk:"workspace"`
 }
 
 func (r *PluginAiRagInjectorResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -65,12 +63,10 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginAiRagInjector Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"embeddings": schema.SingleNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"auth": schema.SingleNestedAttribute{
 								Computed: true,
@@ -155,16 +151,11 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 								},
 							},
 							"model": schema.SingleNestedAttribute{
-								Computed: true,
-								Optional: true,
+								Required: true,
 								Attributes: map[string]schema.Attribute{
 									"name": schema.StringAttribute{
-										Computed:    true,
-										Optional:    true,
-										Description: `Model name to execute. Not Null`,
-										Validators: []validator.String{
-											speakeasy_stringvalidators.NotNull(),
-										},
+										Required:    true,
+										Description: `Model name to execute.`,
 									},
 									"options": schema.SingleNestedAttribute{
 										Computed: true,
@@ -273,11 +264,9 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 										Description: `Key/value settings for the model`,
 									},
 									"provider": schema.StringAttribute{
-										Computed:    true,
-										Optional:    true,
-										Description: `AI provider format to use for embeddings API. Not Null; must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
+										Required:    true,
+										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
 										Validators: []validator.String{
-											speakeasy_stringvalidators.NotNull(),
 											stringvalidator.OneOf(
 												"azure",
 												"bedrock",
@@ -289,15 +278,7 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 										},
 									},
 								},
-								Description: `Not Null`,
-								Validators: []validator.Object{
-									speakeasy_objectvalidators.NotNull(),
-								},
 							},
-						},
-						Description: `Not Null`,
-						Validators: []validator.Object{
-							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 					"fetch_chunks_count": schema.Float64Attribute{
@@ -327,23 +308,16 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 						Description: `Halt the LLM request process in case of a vectordb or embeddings service failure`,
 					},
 					"vectordb": schema.SingleNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"dimensions": schema.Int64Attribute{
-								Computed:    true,
-								Optional:    true,
-								Description: `the desired dimensionality for the vectors. Not Null`,
-								Validators: []validator.Int64{
-									speakeasy_int64validators.NotNull(),
-								},
+								Required:    true,
+								Description: `the desired dimensionality for the vectors`,
 							},
 							"distance_metric": schema.StringAttribute{
-								Computed:    true,
-								Optional:    true,
-								Description: `the distance metric to use for vector searches. Not Null; must be one of ["cosine", "euclidean"]`,
+								Required:    true,
+								Description: `the distance metric to use for vector searches. must be one of ["cosine", "euclidean"]`,
 								Validators: []validator.String{
-									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"cosine",
 										"euclidean",
@@ -600,21 +574,15 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 								},
 							},
 							"strategy": schema.StringAttribute{
-								Computed:    true,
-								Optional:    true,
-								Description: `which vector database driver to use. Not Null; must be one of ["pgvector", "redis"]`,
+								Required:    true,
+								Description: `which vector database driver to use. must be one of ["pgvector", "redis"]`,
 								Validators: []validator.String{
-									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"pgvector",
 										"redis",
 									),
 								},
 							},
-						},
-						Description: `Not Null`,
-						Validators: []validator.Object{
-							speakeasy_objectvalidators.NotNull(),
 						},
 					},
 					"vectordb_namespace": schema.StringAttribute{

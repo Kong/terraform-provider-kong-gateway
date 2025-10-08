@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type PreFunctionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (p *PreFunctionPluginAfter) GetAccess() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Access
+}
+
+type PreFunctionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (p *PreFunctionPluginBefore) GetAccess() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Access
+}
+
+type PreFunctionPluginOrdering struct {
+	After  *PreFunctionPluginAfter  `json:"after,omitempty"`
+	Before *PreFunctionPluginBefore `json:"before,omitempty"`
+}
+
+func (p *PreFunctionPluginOrdering) GetAfter() *PreFunctionPluginAfter {
+	if p == nil {
+		return nil
+	}
+	return p.After
+}
+
+func (p *PreFunctionPluginOrdering) GetBefore() *PreFunctionPluginBefore {
+	if p == nil {
+		return nil
+	}
+	return p.Before
+}
+
+type PreFunctionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (p *PreFunctionPluginPartials) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *PreFunctionPluginPartials) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PreFunctionPluginPartials) GetPath() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Path
+}
+
 type PreFunctionPluginConfig struct {
 	Access          []string `json:"access,omitempty"`
 	BodyFilter      []string `json:"body_filter,omitempty"`
@@ -91,76 +161,6 @@ func (p *PreFunctionPluginConfig) GetWsUpstreamFrame() []string {
 	return p.WsUpstreamFrame
 }
 
-type PreFunctionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (p *PreFunctionPluginAfter) GetAccess() []string {
-	if p == nil {
-		return nil
-	}
-	return p.Access
-}
-
-type PreFunctionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (p *PreFunctionPluginBefore) GetAccess() []string {
-	if p == nil {
-		return nil
-	}
-	return p.Access
-}
-
-type PreFunctionPluginOrdering struct {
-	After  *PreFunctionPluginAfter  `json:"after,omitempty"`
-	Before *PreFunctionPluginBefore `json:"before,omitempty"`
-}
-
-func (p *PreFunctionPluginOrdering) GetAfter() *PreFunctionPluginAfter {
-	if p == nil {
-		return nil
-	}
-	return p.After
-}
-
-func (p *PreFunctionPluginOrdering) GetBefore() *PreFunctionPluginBefore {
-	if p == nil {
-		return nil
-	}
-	return p.Before
-}
-
-type PreFunctionPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (p *PreFunctionPluginPartials) GetID() *string {
-	if p == nil {
-		return nil
-	}
-	return p.ID
-}
-
-func (p *PreFunctionPluginPartials) GetName() *string {
-	if p == nil {
-		return nil
-	}
-	return p.Name
-}
-
-func (p *PreFunctionPluginPartials) GetPath() *string {
-	if p == nil {
-		return nil
-	}
-	return p.Path
-}
-
 // PreFunctionPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type PreFunctionPluginProtocols string
 
@@ -236,8 +236,8 @@ func (p *PreFunctionPluginService) GetID() *string {
 	return p.ID
 }
 
+// PreFunctionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type PreFunctionPlugin struct {
-	Config *PreFunctionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -250,16 +250,17 @@ type PreFunctionPlugin struct {
 	Ordering     *PreFunctionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []PreFunctionPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                   `json:"updated_at,omitempty"`
+	Config    *PreFunctionPluginConfig `json:"config,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []PreFunctionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *PreFunctionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *PreFunctionPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (p PreFunctionPlugin) MarshalJSON() ([]byte, error) {
@@ -271,13 +272,6 @@ func (p *PreFunctionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (p *PreFunctionPlugin) GetConfig() *PreFunctionPluginConfig {
-	if p == nil {
-		return nil
-	}
-	return p.Config
 }
 
 func (p *PreFunctionPlugin) GetCreatedAt() *int64 {
@@ -326,6 +320,27 @@ func (p *PreFunctionPlugin) GetPartials() []PreFunctionPluginPartials {
 	return p.Partials
 }
 
+func (p *PreFunctionPlugin) GetTags() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Tags
+}
+
+func (p *PreFunctionPlugin) GetUpdatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.UpdatedAt
+}
+
+func (p *PreFunctionPlugin) GetConfig() *PreFunctionPluginConfig {
+	if p == nil {
+		return nil
+	}
+	return p.Config
+}
+
 func (p *PreFunctionPlugin) GetProtocols() []PreFunctionPluginProtocols {
 	if p == nil {
 		return nil
@@ -345,18 +360,4 @@ func (p *PreFunctionPlugin) GetService() *PreFunctionPluginService {
 		return nil
 	}
 	return p.Service
-}
-
-func (p *PreFunctionPlugin) GetTags() []string {
-	if p == nil {
-		return nil
-	}
-	return p.Tags
-}
-
-func (p *PreFunctionPlugin) GetUpdatedAt() *int64 {
-	if p == nil {
-		return nil
-	}
-	return p.UpdatedAt
 }

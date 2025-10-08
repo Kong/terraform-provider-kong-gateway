@@ -41,7 +41,7 @@ type PluginAcmeResource struct {
 
 // PluginAcmeResourceModel describes the resource data model.
 type PluginAcmeResourceModel struct {
-	Config       *tfTypes.AcmePluginConfig   `tfsdk:"config"`
+	Config       tfTypes.AcmePluginConfig    `tfsdk:"config"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
 	ID           types.String                `tfsdk:"id"`
@@ -63,16 +63,11 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 		MarkdownDescription: "PluginAcme Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"account_email": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The account identifier. Can be reused in a different plugin instance. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The account identifier. Can be reused in a different plugin instance.`,
 					},
 					"account_key": schema.SingleNestedAttribute{
 						Computed: true,

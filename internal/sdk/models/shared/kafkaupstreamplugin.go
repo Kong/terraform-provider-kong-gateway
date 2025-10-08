@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type KafkaUpstreamPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (k *KafkaUpstreamPluginAfter) GetAccess() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Access
+}
+
+type KafkaUpstreamPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (k *KafkaUpstreamPluginBefore) GetAccess() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Access
+}
+
+type KafkaUpstreamPluginOrdering struct {
+	After  *KafkaUpstreamPluginAfter  `json:"after,omitempty"`
+	Before *KafkaUpstreamPluginBefore `json:"before,omitempty"`
+}
+
+func (k *KafkaUpstreamPluginOrdering) GetAfter() *KafkaUpstreamPluginAfter {
+	if k == nil {
+		return nil
+	}
+	return k.After
+}
+
+func (k *KafkaUpstreamPluginOrdering) GetBefore() *KafkaUpstreamPluginBefore {
+	if k == nil {
+		return nil
+	}
+	return k.Before
+}
+
+type KafkaUpstreamPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (k *KafkaUpstreamPluginPartials) GetID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ID
+}
+
+func (k *KafkaUpstreamPluginPartials) GetName() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Name
+}
+
+func (k *KafkaUpstreamPluginPartials) GetPath() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Path
+}
+
 // KafkaUpstreamPluginMechanism - The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256`, or `SCRAM-SHA-512`.
 type KafkaUpstreamPluginMechanism string
 
@@ -903,76 +973,6 @@ func (k *KafkaUpstreamPluginConsumer) GetID() *string {
 	return k.ID
 }
 
-type KafkaUpstreamPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (k *KafkaUpstreamPluginAfter) GetAccess() []string {
-	if k == nil {
-		return nil
-	}
-	return k.Access
-}
-
-type KafkaUpstreamPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (k *KafkaUpstreamPluginBefore) GetAccess() []string {
-	if k == nil {
-		return nil
-	}
-	return k.Access
-}
-
-type KafkaUpstreamPluginOrdering struct {
-	After  *KafkaUpstreamPluginAfter  `json:"after,omitempty"`
-	Before *KafkaUpstreamPluginBefore `json:"before,omitempty"`
-}
-
-func (k *KafkaUpstreamPluginOrdering) GetAfter() *KafkaUpstreamPluginAfter {
-	if k == nil {
-		return nil
-	}
-	return k.After
-}
-
-func (k *KafkaUpstreamPluginOrdering) GetBefore() *KafkaUpstreamPluginBefore {
-	if k == nil {
-		return nil
-	}
-	return k.Before
-}
-
-type KafkaUpstreamPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (k *KafkaUpstreamPluginPartials) GetID() *string {
-	if k == nil {
-		return nil
-	}
-	return k.ID
-}
-
-func (k *KafkaUpstreamPluginPartials) GetName() *string {
-	if k == nil {
-		return nil
-	}
-	return k.Name
-}
-
-func (k *KafkaUpstreamPluginPartials) GetPath() *string {
-	if k == nil {
-		return nil
-	}
-	return k.Path
-}
-
 type KafkaUpstreamPluginProtocols string
 
 const (
@@ -1029,10 +1029,8 @@ func (k *KafkaUpstreamPluginService) GetID() *string {
 	return k.ID
 }
 
+// KafkaUpstreamPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KafkaUpstreamPlugin struct {
-	Config *KafkaUpstreamPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *KafkaUpstreamPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1045,16 +1043,19 @@ type KafkaUpstreamPlugin struct {
 	Ordering     *KafkaUpstreamPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []KafkaUpstreamPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    KafkaUpstreamPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *KafkaUpstreamPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []KafkaUpstreamPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *KafkaUpstreamPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *KafkaUpstreamPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (k KafkaUpstreamPlugin) MarshalJSON() ([]byte, error) {
@@ -1062,24 +1063,10 @@ func (k KafkaUpstreamPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (k *KafkaUpstreamPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (k *KafkaUpstreamPlugin) GetConfig() *KafkaUpstreamPluginConfig {
-	if k == nil {
-		return nil
-	}
-	return k.Config
-}
-
-func (k *KafkaUpstreamPlugin) GetConsumer() *KafkaUpstreamPluginConsumer {
-	if k == nil {
-		return nil
-	}
-	return k.Consumer
 }
 
 func (k *KafkaUpstreamPlugin) GetCreatedAt() *int64 {
@@ -1128,6 +1115,34 @@ func (k *KafkaUpstreamPlugin) GetPartials() []KafkaUpstreamPluginPartials {
 	return k.Partials
 }
 
+func (k *KafkaUpstreamPlugin) GetTags() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Tags
+}
+
+func (k *KafkaUpstreamPlugin) GetUpdatedAt() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.UpdatedAt
+}
+
+func (k *KafkaUpstreamPlugin) GetConfig() KafkaUpstreamPluginConfig {
+	if k == nil {
+		return KafkaUpstreamPluginConfig{}
+	}
+	return k.Config
+}
+
+func (k *KafkaUpstreamPlugin) GetConsumer() *KafkaUpstreamPluginConsumer {
+	if k == nil {
+		return nil
+	}
+	return k.Consumer
+}
+
 func (k *KafkaUpstreamPlugin) GetProtocols() []KafkaUpstreamPluginProtocols {
 	if k == nil {
 		return nil
@@ -1147,18 +1162,4 @@ func (k *KafkaUpstreamPlugin) GetService() *KafkaUpstreamPluginService {
 		return nil
 	}
 	return k.Service
-}
-
-func (k *KafkaUpstreamPlugin) GetTags() []string {
-	if k == nil {
-		return nil
-	}
-	return k.Tags
-}
-
-func (k *KafkaUpstreamPlugin) GetUpdatedAt() *int64 {
-	if k == nil {
-		return nil
-	}
-	return k.UpdatedAt
 }

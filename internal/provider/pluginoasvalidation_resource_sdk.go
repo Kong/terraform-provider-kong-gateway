@@ -15,26 +15,21 @@ func (r *PluginOasValidationResourceModel) RefreshFromSharedOasValidationPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.OasValidationPluginConfig{}
-			r.Config.AllowedHeaderParameters = types.StringPointerValue(resp.Config.AllowedHeaderParameters)
-			r.Config.APISpec = types.StringValue(resp.Config.APISpec)
-			r.Config.APISpecEncoded = types.BoolPointerValue(resp.Config.APISpecEncoded)
-			r.Config.CustomBasePath = types.StringPointerValue(resp.Config.CustomBasePath)
-			r.Config.HeaderParameterCheck = types.BoolPointerValue(resp.Config.HeaderParameterCheck)
-			r.Config.IncludeBasePath = types.BoolPointerValue(resp.Config.IncludeBasePath)
-			r.Config.NotifyOnlyRequestValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyRequestValidationFailure)
-			r.Config.NotifyOnlyResponseBodyValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyResponseBodyValidationFailure)
-			r.Config.QueryParameterCheck = types.BoolPointerValue(resp.Config.QueryParameterCheck)
-			r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
-			r.Config.ValidateRequestHeaderParams = types.BoolPointerValue(resp.Config.ValidateRequestHeaderParams)
-			r.Config.ValidateRequestQueryParams = types.BoolPointerValue(resp.Config.ValidateRequestQueryParams)
-			r.Config.ValidateRequestURIParams = types.BoolPointerValue(resp.Config.ValidateRequestURIParams)
-			r.Config.ValidateResponseBody = types.BoolPointerValue(resp.Config.ValidateResponseBody)
-			r.Config.VerboseResponse = types.BoolPointerValue(resp.Config.VerboseResponse)
-		}
+		r.Config.AllowedHeaderParameters = types.StringPointerValue(resp.Config.AllowedHeaderParameters)
+		r.Config.APISpec = types.StringValue(resp.Config.APISpec)
+		r.Config.APISpecEncoded = types.BoolPointerValue(resp.Config.APISpecEncoded)
+		r.Config.CustomBasePath = types.StringPointerValue(resp.Config.CustomBasePath)
+		r.Config.HeaderParameterCheck = types.BoolPointerValue(resp.Config.HeaderParameterCheck)
+		r.Config.IncludeBasePath = types.BoolPointerValue(resp.Config.IncludeBasePath)
+		r.Config.NotifyOnlyRequestValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyRequestValidationFailure)
+		r.Config.NotifyOnlyResponseBodyValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyResponseBodyValidationFailure)
+		r.Config.QueryParameterCheck = types.BoolPointerValue(resp.Config.QueryParameterCheck)
+		r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
+		r.Config.ValidateRequestHeaderParams = types.BoolPointerValue(resp.Config.ValidateRequestHeaderParams)
+		r.Config.ValidateRequestQueryParams = types.BoolPointerValue(resp.Config.ValidateRequestQueryParams)
+		r.Config.ValidateRequestURIParams = types.BoolPointerValue(resp.Config.ValidateRequestURIParams)
+		r.Config.ValidateResponseBody = types.BoolPointerValue(resp.Config.ValidateResponseBody)
+		r.Config.VerboseResponse = types.BoolPointerValue(resp.Config.VerboseResponse)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -68,18 +63,16 @@ func (r *PluginOasValidationResourceModel) RefreshFromSharedOasValidationPlugin(
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -192,125 +185,6 @@ func (r *PluginOasValidationResourceModel) ToOperationsUpdateOasvalidationPlugin
 func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx context.Context) (*shared.OasValidationPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.OasValidationPluginConfig
-	if r.Config != nil {
-		allowedHeaderParameters := new(string)
-		if !r.Config.AllowedHeaderParameters.IsUnknown() && !r.Config.AllowedHeaderParameters.IsNull() {
-			*allowedHeaderParameters = r.Config.AllowedHeaderParameters.ValueString()
-		} else {
-			allowedHeaderParameters = nil
-		}
-		var apiSpec string
-		apiSpec = r.Config.APISpec.ValueString()
-
-		apiSpecEncoded := new(bool)
-		if !r.Config.APISpecEncoded.IsUnknown() && !r.Config.APISpecEncoded.IsNull() {
-			*apiSpecEncoded = r.Config.APISpecEncoded.ValueBool()
-		} else {
-			apiSpecEncoded = nil
-		}
-		customBasePath := new(string)
-		if !r.Config.CustomBasePath.IsUnknown() && !r.Config.CustomBasePath.IsNull() {
-			*customBasePath = r.Config.CustomBasePath.ValueString()
-		} else {
-			customBasePath = nil
-		}
-		headerParameterCheck := new(bool)
-		if !r.Config.HeaderParameterCheck.IsUnknown() && !r.Config.HeaderParameterCheck.IsNull() {
-			*headerParameterCheck = r.Config.HeaderParameterCheck.ValueBool()
-		} else {
-			headerParameterCheck = nil
-		}
-		includeBasePath := new(bool)
-		if !r.Config.IncludeBasePath.IsUnknown() && !r.Config.IncludeBasePath.IsNull() {
-			*includeBasePath = r.Config.IncludeBasePath.ValueBool()
-		} else {
-			includeBasePath = nil
-		}
-		notifyOnlyRequestValidationFailure := new(bool)
-		if !r.Config.NotifyOnlyRequestValidationFailure.IsUnknown() && !r.Config.NotifyOnlyRequestValidationFailure.IsNull() {
-			*notifyOnlyRequestValidationFailure = r.Config.NotifyOnlyRequestValidationFailure.ValueBool()
-		} else {
-			notifyOnlyRequestValidationFailure = nil
-		}
-		notifyOnlyResponseBodyValidationFailure := new(bool)
-		if !r.Config.NotifyOnlyResponseBodyValidationFailure.IsUnknown() && !r.Config.NotifyOnlyResponseBodyValidationFailure.IsNull() {
-			*notifyOnlyResponseBodyValidationFailure = r.Config.NotifyOnlyResponseBodyValidationFailure.ValueBool()
-		} else {
-			notifyOnlyResponseBodyValidationFailure = nil
-		}
-		queryParameterCheck := new(bool)
-		if !r.Config.QueryParameterCheck.IsUnknown() && !r.Config.QueryParameterCheck.IsNull() {
-			*queryParameterCheck = r.Config.QueryParameterCheck.ValueBool()
-		} else {
-			queryParameterCheck = nil
-		}
-		validateRequestBody := new(bool)
-		if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
-			*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
-		} else {
-			validateRequestBody = nil
-		}
-		validateRequestHeaderParams := new(bool)
-		if !r.Config.ValidateRequestHeaderParams.IsUnknown() && !r.Config.ValidateRequestHeaderParams.IsNull() {
-			*validateRequestHeaderParams = r.Config.ValidateRequestHeaderParams.ValueBool()
-		} else {
-			validateRequestHeaderParams = nil
-		}
-		validateRequestQueryParams := new(bool)
-		if !r.Config.ValidateRequestQueryParams.IsUnknown() && !r.Config.ValidateRequestQueryParams.IsNull() {
-			*validateRequestQueryParams = r.Config.ValidateRequestQueryParams.ValueBool()
-		} else {
-			validateRequestQueryParams = nil
-		}
-		validateRequestURIParams := new(bool)
-		if !r.Config.ValidateRequestURIParams.IsUnknown() && !r.Config.ValidateRequestURIParams.IsNull() {
-			*validateRequestURIParams = r.Config.ValidateRequestURIParams.ValueBool()
-		} else {
-			validateRequestURIParams = nil
-		}
-		validateResponseBody := new(bool)
-		if !r.Config.ValidateResponseBody.IsUnknown() && !r.Config.ValidateResponseBody.IsNull() {
-			*validateResponseBody = r.Config.ValidateResponseBody.ValueBool()
-		} else {
-			validateResponseBody = nil
-		}
-		verboseResponse := new(bool)
-		if !r.Config.VerboseResponse.IsUnknown() && !r.Config.VerboseResponse.IsNull() {
-			*verboseResponse = r.Config.VerboseResponse.ValueBool()
-		} else {
-			verboseResponse = nil
-		}
-		config = &shared.OasValidationPluginConfig{
-			AllowedHeaderParameters:                 allowedHeaderParameters,
-			APISpec:                                 apiSpec,
-			APISpecEncoded:                          apiSpecEncoded,
-			CustomBasePath:                          customBasePath,
-			HeaderParameterCheck:                    headerParameterCheck,
-			IncludeBasePath:                         includeBasePath,
-			NotifyOnlyRequestValidationFailure:      notifyOnlyRequestValidationFailure,
-			NotifyOnlyResponseBodyValidationFailure: notifyOnlyResponseBodyValidationFailure,
-			QueryParameterCheck:                     queryParameterCheck,
-			ValidateRequestBody:                     validateRequestBody,
-			ValidateRequestHeaderParams:             validateRequestHeaderParams,
-			ValidateRequestQueryParams:              validateRequestQueryParams,
-			ValidateRequestURIParams:                validateRequestURIParams,
-			ValidateResponseBody:                    validateResponseBody,
-			VerboseResponse:                         verboseResponse,
-		}
-	}
-	var consumer *shared.OasValidationPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.OasValidationPluginConsumer{
-			ID: id,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -323,11 +197,11 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 	} else {
 		enabled = nil
 	}
-	id1 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id1 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -362,33 +236,159 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 			Before: before,
 		}
 	}
-	var partials []shared.OasValidationPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.OasValidationPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.OasValidationPluginPartials{
-				ID:   id2,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.OasValidationPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.OasValidationPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	allowedHeaderParameters := new(string)
+	if !r.Config.AllowedHeaderParameters.IsUnknown() && !r.Config.AllowedHeaderParameters.IsNull() {
+		*allowedHeaderParameters = r.Config.AllowedHeaderParameters.ValueString()
+	} else {
+		allowedHeaderParameters = nil
+	}
+	var apiSpec string
+	apiSpec = r.Config.APISpec.ValueString()
+
+	apiSpecEncoded := new(bool)
+	if !r.Config.APISpecEncoded.IsUnknown() && !r.Config.APISpecEncoded.IsNull() {
+		*apiSpecEncoded = r.Config.APISpecEncoded.ValueBool()
+	} else {
+		apiSpecEncoded = nil
+	}
+	customBasePath := new(string)
+	if !r.Config.CustomBasePath.IsUnknown() && !r.Config.CustomBasePath.IsNull() {
+		*customBasePath = r.Config.CustomBasePath.ValueString()
+	} else {
+		customBasePath = nil
+	}
+	headerParameterCheck := new(bool)
+	if !r.Config.HeaderParameterCheck.IsUnknown() && !r.Config.HeaderParameterCheck.IsNull() {
+		*headerParameterCheck = r.Config.HeaderParameterCheck.ValueBool()
+	} else {
+		headerParameterCheck = nil
+	}
+	includeBasePath := new(bool)
+	if !r.Config.IncludeBasePath.IsUnknown() && !r.Config.IncludeBasePath.IsNull() {
+		*includeBasePath = r.Config.IncludeBasePath.ValueBool()
+	} else {
+		includeBasePath = nil
+	}
+	notifyOnlyRequestValidationFailure := new(bool)
+	if !r.Config.NotifyOnlyRequestValidationFailure.IsUnknown() && !r.Config.NotifyOnlyRequestValidationFailure.IsNull() {
+		*notifyOnlyRequestValidationFailure = r.Config.NotifyOnlyRequestValidationFailure.ValueBool()
+	} else {
+		notifyOnlyRequestValidationFailure = nil
+	}
+	notifyOnlyResponseBodyValidationFailure := new(bool)
+	if !r.Config.NotifyOnlyResponseBodyValidationFailure.IsUnknown() && !r.Config.NotifyOnlyResponseBodyValidationFailure.IsNull() {
+		*notifyOnlyResponseBodyValidationFailure = r.Config.NotifyOnlyResponseBodyValidationFailure.ValueBool()
+	} else {
+		notifyOnlyResponseBodyValidationFailure = nil
+	}
+	queryParameterCheck := new(bool)
+	if !r.Config.QueryParameterCheck.IsUnknown() && !r.Config.QueryParameterCheck.IsNull() {
+		*queryParameterCheck = r.Config.QueryParameterCheck.ValueBool()
+	} else {
+		queryParameterCheck = nil
+	}
+	validateRequestBody := new(bool)
+	if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
+		*validateRequestBody = r.Config.ValidateRequestBody.ValueBool()
+	} else {
+		validateRequestBody = nil
+	}
+	validateRequestHeaderParams := new(bool)
+	if !r.Config.ValidateRequestHeaderParams.IsUnknown() && !r.Config.ValidateRequestHeaderParams.IsNull() {
+		*validateRequestHeaderParams = r.Config.ValidateRequestHeaderParams.ValueBool()
+	} else {
+		validateRequestHeaderParams = nil
+	}
+	validateRequestQueryParams := new(bool)
+	if !r.Config.ValidateRequestQueryParams.IsUnknown() && !r.Config.ValidateRequestQueryParams.IsNull() {
+		*validateRequestQueryParams = r.Config.ValidateRequestQueryParams.ValueBool()
+	} else {
+		validateRequestQueryParams = nil
+	}
+	validateRequestURIParams := new(bool)
+	if !r.Config.ValidateRequestURIParams.IsUnknown() && !r.Config.ValidateRequestURIParams.IsNull() {
+		*validateRequestURIParams = r.Config.ValidateRequestURIParams.ValueBool()
+	} else {
+		validateRequestURIParams = nil
+	}
+	validateResponseBody := new(bool)
+	if !r.Config.ValidateResponseBody.IsUnknown() && !r.Config.ValidateResponseBody.IsNull() {
+		*validateResponseBody = r.Config.ValidateResponseBody.ValueBool()
+	} else {
+		validateResponseBody = nil
+	}
+	verboseResponse := new(bool)
+	if !r.Config.VerboseResponse.IsUnknown() && !r.Config.VerboseResponse.IsNull() {
+		*verboseResponse = r.Config.VerboseResponse.ValueBool()
+	} else {
+		verboseResponse = nil
+	}
+	config := shared.OasValidationPluginConfig{
+		AllowedHeaderParameters:                 allowedHeaderParameters,
+		APISpec:                                 apiSpec,
+		APISpecEncoded:                          apiSpecEncoded,
+		CustomBasePath:                          customBasePath,
+		HeaderParameterCheck:                    headerParameterCheck,
+		IncludeBasePath:                         includeBasePath,
+		NotifyOnlyRequestValidationFailure:      notifyOnlyRequestValidationFailure,
+		NotifyOnlyResponseBodyValidationFailure: notifyOnlyResponseBodyValidationFailure,
+		QueryParameterCheck:                     queryParameterCheck,
+		ValidateRequestBody:                     validateRequestBody,
+		ValidateRequestHeaderParams:             validateRequestHeaderParams,
+		ValidateRequestQueryParams:              validateRequestQueryParams,
+		ValidateRequestURIParams:                validateRequestURIParams,
+		ValidateResponseBody:                    validateResponseBody,
+		VerboseResponse:                         verboseResponse,
+	}
+	var consumer *shared.OasValidationPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.OasValidationPluginConsumer{
+			ID: id2,
 		}
 	}
 	protocols := make([]shared.OasValidationPluginProtocols, 0, len(r.Protocols))
@@ -419,33 +419,20 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 			ID: id4,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.OasValidationPlugin{
-		Config:       config,
-		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

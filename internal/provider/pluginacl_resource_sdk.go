@@ -58,18 +58,16 @@ func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(ctx context.Context,
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -182,42 +180,6 @@ func (r *PluginACLResourceModel) ToOperationsUpdateACLPluginRequest(ctx context.
 func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared.ACLPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.Config
-	if r.Config != nil {
-		allow := make([]string, 0, len(r.Config.Allow))
-		for _, allowItem := range r.Config.Allow {
-			allow = append(allow, allowItem.ValueString())
-		}
-		alwaysUseAuthenticatedGroups := new(bool)
-		if !r.Config.AlwaysUseAuthenticatedGroups.IsUnknown() && !r.Config.AlwaysUseAuthenticatedGroups.IsNull() {
-			*alwaysUseAuthenticatedGroups = r.Config.AlwaysUseAuthenticatedGroups.ValueBool()
-		} else {
-			alwaysUseAuthenticatedGroups = nil
-		}
-		deny := make([]string, 0, len(r.Config.Deny))
-		for _, denyItem := range r.Config.Deny {
-			deny = append(deny, denyItem.ValueString())
-		}
-		hideGroupsHeader := new(bool)
-		if !r.Config.HideGroupsHeader.IsUnknown() && !r.Config.HideGroupsHeader.IsNull() {
-			*hideGroupsHeader = r.Config.HideGroupsHeader.ValueBool()
-		} else {
-			hideGroupsHeader = nil
-		}
-		includeConsumerGroups := new(bool)
-		if !r.Config.IncludeConsumerGroups.IsUnknown() && !r.Config.IncludeConsumerGroups.IsNull() {
-			*includeConsumerGroups = r.Config.IncludeConsumerGroups.ValueBool()
-		} else {
-			includeConsumerGroups = nil
-		}
-		config = &shared.Config{
-			Allow:                        allow,
-			AlwaysUseAuthenticatedGroups: alwaysUseAuthenticatedGroups,
-			Deny:                         deny,
-			HideGroupsHeader:             hideGroupsHeader,
-			IncludeConsumerGroups:        includeConsumerGroups,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -269,33 +231,79 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 			Before: before,
 		}
 	}
-	var partials []shared.ACLPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.ACLPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.ACLPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.ACLPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.ACLPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.Config
+	if r.Config != nil {
+		allow := make([]string, 0, len(r.Config.Allow))
+		for _, allowItem := range r.Config.Allow {
+			allow = append(allow, allowItem.ValueString())
+		}
+		alwaysUseAuthenticatedGroups := new(bool)
+		if !r.Config.AlwaysUseAuthenticatedGroups.IsUnknown() && !r.Config.AlwaysUseAuthenticatedGroups.IsNull() {
+			*alwaysUseAuthenticatedGroups = r.Config.AlwaysUseAuthenticatedGroups.ValueBool()
+		} else {
+			alwaysUseAuthenticatedGroups = nil
+		}
+		deny := make([]string, 0, len(r.Config.Deny))
+		for _, denyItem := range r.Config.Deny {
+			deny = append(deny, denyItem.ValueString())
+		}
+		hideGroupsHeader := new(bool)
+		if !r.Config.HideGroupsHeader.IsUnknown() && !r.Config.HideGroupsHeader.IsNull() {
+			*hideGroupsHeader = r.Config.HideGroupsHeader.ValueBool()
+		} else {
+			hideGroupsHeader = nil
+		}
+		includeConsumerGroups := new(bool)
+		if !r.Config.IncludeConsumerGroups.IsUnknown() && !r.Config.IncludeConsumerGroups.IsNull() {
+			*includeConsumerGroups = r.Config.IncludeConsumerGroups.ValueBool()
+		} else {
+			includeConsumerGroups = nil
+		}
+		config = &shared.Config{
+			Allow:                        allow,
+			AlwaysUseAuthenticatedGroups: alwaysUseAuthenticatedGroups,
+			Deny:                         deny,
+			HideGroupsHeader:             hideGroupsHeader,
+			IncludeConsumerGroups:        includeConsumerGroups,
 		}
 	}
 	protocols := make([]shared.ACLPluginProtocols, 0, len(r.Protocols))
@@ -326,32 +334,19 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.ACLPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

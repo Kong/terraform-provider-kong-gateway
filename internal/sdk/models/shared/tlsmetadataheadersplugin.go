@@ -8,63 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type TLSMetadataHeadersPluginConfig struct {
-	// Define the HTTP header name used for the SHA1 fingerprint of the client certificate.
-	ClientCertFingerprintHeaderName *string `json:"client_cert_fingerprint_header_name,omitempty"`
-	// Define the HTTP header name used for the PEM format URL encoded client certificate.
-	ClientCertHeaderName *string `json:"client_cert_header_name,omitempty"`
-	// Define the HTTP header name used for the issuer DN of the client certificate.
-	ClientCertIssuerDnHeaderName *string `json:"client_cert_issuer_dn_header_name,omitempty"`
-	// Define the HTTP header name used for the subject DN of the client certificate.
-	ClientCertSubjectDnHeaderName *string `json:"client_cert_subject_dn_header_name,omitempty"`
-	// Define the HTTP header name used for the serial number of the client certificate.
-	ClientSerialHeaderName *string `json:"client_serial_header_name,omitempty"`
-	// Enables TLS client certificate metadata values to be injected into HTTP headers.
-	InjectClientCertDetails *bool `json:"inject_client_cert_details,omitempty"`
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetClientCertFingerprintHeaderName() *string {
-	if t == nil {
-		return nil
-	}
-	return t.ClientCertFingerprintHeaderName
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetClientCertHeaderName() *string {
-	if t == nil {
-		return nil
-	}
-	return t.ClientCertHeaderName
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetClientCertIssuerDnHeaderName() *string {
-	if t == nil {
-		return nil
-	}
-	return t.ClientCertIssuerDnHeaderName
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetClientCertSubjectDnHeaderName() *string {
-	if t == nil {
-		return nil
-	}
-	return t.ClientCertSubjectDnHeaderName
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetClientSerialHeaderName() *string {
-	if t == nil {
-		return nil
-	}
-	return t.ClientSerialHeaderName
-}
-
-func (t *TLSMetadataHeadersPluginConfig) GetInjectClientCertDetails() *bool {
-	if t == nil {
-		return nil
-	}
-	return t.InjectClientCertDetails
-}
-
 type TLSMetadataHeadersPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -135,6 +78,63 @@ func (t *TLSMetadataHeadersPluginPartials) GetPath() *string {
 	return t.Path
 }
 
+type TLSMetadataHeadersPluginConfig struct {
+	// Define the HTTP header name used for the SHA1 fingerprint of the client certificate.
+	ClientCertFingerprintHeaderName *string `json:"client_cert_fingerprint_header_name,omitempty"`
+	// Define the HTTP header name used for the PEM format URL encoded client certificate.
+	ClientCertHeaderName *string `json:"client_cert_header_name,omitempty"`
+	// Define the HTTP header name used for the issuer DN of the client certificate.
+	ClientCertIssuerDnHeaderName *string `json:"client_cert_issuer_dn_header_name,omitempty"`
+	// Define the HTTP header name used for the subject DN of the client certificate.
+	ClientCertSubjectDnHeaderName *string `json:"client_cert_subject_dn_header_name,omitempty"`
+	// Define the HTTP header name used for the serial number of the client certificate.
+	ClientSerialHeaderName *string `json:"client_serial_header_name,omitempty"`
+	// Enables TLS client certificate metadata values to be injected into HTTP headers.
+	InjectClientCertDetails *bool `json:"inject_client_cert_details,omitempty"`
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetClientCertFingerprintHeaderName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.ClientCertFingerprintHeaderName
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetClientCertHeaderName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.ClientCertHeaderName
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetClientCertIssuerDnHeaderName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.ClientCertIssuerDnHeaderName
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetClientCertSubjectDnHeaderName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.ClientCertSubjectDnHeaderName
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetClientSerialHeaderName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.ClientSerialHeaderName
+}
+
+func (t *TLSMetadataHeadersPluginConfig) GetInjectClientCertDetails() *bool {
+	if t == nil {
+		return nil
+	}
+	return t.InjectClientCertDetails
+}
+
 type TLSMetadataHeadersPluginProtocols string
 
 const (
@@ -188,8 +188,8 @@ func (t *TLSMetadataHeadersPluginService) GetID() *string {
 	return t.ID
 }
 
+// TLSMetadataHeadersPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type TLSMetadataHeadersPlugin struct {
-	Config *TLSMetadataHeadersPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -202,16 +202,17 @@ type TLSMetadataHeadersPlugin struct {
 	Ordering     *TLSMetadataHeadersPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []TLSMetadataHeadersPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                          `json:"updated_at,omitempty"`
+	Config    *TLSMetadataHeadersPluginConfig `json:"config,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []TLSMetadataHeadersPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *TLSMetadataHeadersPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *TLSMetadataHeadersPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (t TLSMetadataHeadersPlugin) MarshalJSON() ([]byte, error) {
@@ -223,13 +224,6 @@ func (t *TLSMetadataHeadersPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (t *TLSMetadataHeadersPlugin) GetConfig() *TLSMetadataHeadersPluginConfig {
-	if t == nil {
-		return nil
-	}
-	return t.Config
 }
 
 func (t *TLSMetadataHeadersPlugin) GetCreatedAt() *int64 {
@@ -278,6 +272,27 @@ func (t *TLSMetadataHeadersPlugin) GetPartials() []TLSMetadataHeadersPluginParti
 	return t.Partials
 }
 
+func (t *TLSMetadataHeadersPlugin) GetTags() []string {
+	if t == nil {
+		return nil
+	}
+	return t.Tags
+}
+
+func (t *TLSMetadataHeadersPlugin) GetUpdatedAt() *int64 {
+	if t == nil {
+		return nil
+	}
+	return t.UpdatedAt
+}
+
+func (t *TLSMetadataHeadersPlugin) GetConfig() *TLSMetadataHeadersPluginConfig {
+	if t == nil {
+		return nil
+	}
+	return t.Config
+}
+
 func (t *TLSMetadataHeadersPlugin) GetProtocols() []TLSMetadataHeadersPluginProtocols {
 	if t == nil {
 		return nil
@@ -297,18 +312,4 @@ func (t *TLSMetadataHeadersPlugin) GetService() *TLSMetadataHeadersPluginService
 		return nil
 	}
 	return t.Service
-}
-
-func (t *TLSMetadataHeadersPlugin) GetTags() []string {
-	if t == nil {
-		return nil
-	}
-	return t.Tags
-}
-
-func (t *TLSMetadataHeadersPlugin) GetUpdatedAt() *int64 {
-	if t == nil {
-		return nil
-	}
-	return t.UpdatedAt
 }

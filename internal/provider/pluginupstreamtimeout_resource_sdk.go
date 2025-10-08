@@ -56,18 +56,16 @@ func (r *PluginUpstreamTimeoutResourceModel) RefreshFromSharedUpstreamTimeoutPlu
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -180,44 +178,6 @@ func (r *PluginUpstreamTimeoutResourceModel) ToOperationsUpdateUpstreamtimeoutPl
 func (r *PluginUpstreamTimeoutResourceModel) ToSharedUpstreamTimeoutPlugin(ctx context.Context) (*shared.UpstreamTimeoutPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.UpstreamTimeoutPluginConfig
-	if r.Config != nil {
-		connectTimeout := new(int64)
-		if !r.Config.ConnectTimeout.IsUnknown() && !r.Config.ConnectTimeout.IsNull() {
-			*connectTimeout = r.Config.ConnectTimeout.ValueInt64()
-		} else {
-			connectTimeout = nil
-		}
-		readTimeout := new(int64)
-		if !r.Config.ReadTimeout.IsUnknown() && !r.Config.ReadTimeout.IsNull() {
-			*readTimeout = r.Config.ReadTimeout.ValueInt64()
-		} else {
-			readTimeout = nil
-		}
-		sendTimeout := new(int64)
-		if !r.Config.SendTimeout.IsUnknown() && !r.Config.SendTimeout.IsNull() {
-			*sendTimeout = r.Config.SendTimeout.ValueInt64()
-		} else {
-			sendTimeout = nil
-		}
-		config = &shared.UpstreamTimeoutPluginConfig{
-			ConnectTimeout: connectTimeout,
-			ReadTimeout:    readTimeout,
-			SendTimeout:    sendTimeout,
-		}
-	}
-	var consumer *shared.UpstreamTimeoutPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.UpstreamTimeoutPluginConsumer{
-			ID: id,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -230,11 +190,11 @@ func (r *PluginUpstreamTimeoutResourceModel) ToSharedUpstreamTimeoutPlugin(ctx c
 	} else {
 		enabled = nil
 	}
-	id1 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id1 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -269,33 +229,81 @@ func (r *PluginUpstreamTimeoutResourceModel) ToSharedUpstreamTimeoutPlugin(ctx c
 			Before: before,
 		}
 	}
-	var partials []shared.UpstreamTimeoutPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.UpstreamTimeoutPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.UpstreamTimeoutPluginPartials{
-				ID:   id2,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.UpstreamTimeoutPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.UpstreamTimeoutPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.UpstreamTimeoutPluginConfig
+	if r.Config != nil {
+		connectTimeout := new(int64)
+		if !r.Config.ConnectTimeout.IsUnknown() && !r.Config.ConnectTimeout.IsNull() {
+			*connectTimeout = r.Config.ConnectTimeout.ValueInt64()
+		} else {
+			connectTimeout = nil
+		}
+		readTimeout := new(int64)
+		if !r.Config.ReadTimeout.IsUnknown() && !r.Config.ReadTimeout.IsNull() {
+			*readTimeout = r.Config.ReadTimeout.ValueInt64()
+		} else {
+			readTimeout = nil
+		}
+		sendTimeout := new(int64)
+		if !r.Config.SendTimeout.IsUnknown() && !r.Config.SendTimeout.IsNull() {
+			*sendTimeout = r.Config.SendTimeout.ValueInt64()
+		} else {
+			sendTimeout = nil
+		}
+		config = &shared.UpstreamTimeoutPluginConfig{
+			ConnectTimeout: connectTimeout,
+			ReadTimeout:    readTimeout,
+			SendTimeout:    sendTimeout,
+		}
+	}
+	var consumer *shared.UpstreamTimeoutPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.UpstreamTimeoutPluginConsumer{
+			ID: id2,
 		}
 	}
 	protocols := make([]shared.UpstreamTimeoutPluginProtocols, 0, len(r.Protocols))
@@ -326,33 +334,20 @@ func (r *PluginUpstreamTimeoutResourceModel) ToSharedUpstreamTimeoutPlugin(ctx c
 			ID: id4,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.UpstreamTimeoutPlugin{
-		Config:       config,
-		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

@@ -21,7 +21,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -40,19 +39,19 @@ type PluginOauth2IntrospectionResource struct {
 
 // PluginOauth2IntrospectionResourceModel describes the resource data model.
 type PluginOauth2IntrospectionResourceModel struct {
-	Config       *tfTypes.Oauth2IntrospectionPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                              `tfsdk:"created_at"`
-	Enabled      types.Bool                               `tfsdk:"enabled"`
-	ID           types.String                             `tfsdk:"id"`
-	InstanceName types.String                             `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering               `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials              `tfsdk:"partials"`
-	Protocols    []types.String                           `tfsdk:"protocols"`
-	Route        *tfTypes.Set                             `tfsdk:"route"`
-	Service      *tfTypes.Set                             `tfsdk:"service"`
-	Tags         []types.String                           `tfsdk:"tags"`
-	UpdatedAt    types.Int64                              `tfsdk:"updated_at"`
-	Workspace    types.String                             `tfsdk:"workspace"`
+	Config       tfTypes.Oauth2IntrospectionPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                             `tfsdk:"created_at"`
+	Enabled      types.Bool                              `tfsdk:"enabled"`
+	ID           types.String                            `tfsdk:"id"`
+	InstanceName types.String                            `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering              `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials             `tfsdk:"partials"`
+	Protocols    []types.String                          `tfsdk:"protocols"`
+	Route        *tfTypes.Set                            `tfsdk:"route"`
+	Service      *tfTypes.Set                            `tfsdk:"service"`
+	Tags         []types.String                          `tfsdk:"tags"`
+	UpdatedAt    types.Int64                             `tfsdk:"updated_at"`
+	Workspace    types.String                            `tfsdk:"workspace"`
 }
 
 func (r *PluginOauth2IntrospectionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,8 +63,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 		MarkdownDescription: "PluginOauth2Introspection Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -73,12 +71,8 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						Description: `An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure ` + "`" + `4xx` + "`" + `. Note that this value must refer to the consumer ` + "`" + `id` + "`" + ` or ` + "`" + `username` + "`" + ` attribute, and **not** its ` + "`" + `custom_id` + "`" + `.`,
 					},
 					"authorization_value": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The value to set as the ` + "`" + `Authorization` + "`" + ` header when querying the introspection endpoint. This depends on the OAuth 2.0 server, but usually is the ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as a Base64-encoded Basic Auth string (` + "`" + `Basic MG9hNWl...` + "`" + `). Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The value to set as the ` + "`" + `Authorization` + "`" + ` header when querying the introspection endpoint. This depends on the OAuth 2.0 server, but usually is the ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as a Base64-encoded Basic Auth string (` + "`" + `Basic MG9hNWl...` + "`" + `).`,
 					},
 					"consumer_by": schema.StringAttribute{
 						Computed:    true,
@@ -117,12 +111,8 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						Description: `A boolean indicating whether to forward information about the current downstream request to the introspect endpoint. If true, headers ` + "`" + `X-Request-Path` + "`" + ` and ` + "`" + `X-Request-Http-Method` + "`" + ` will be inserted into the introspect request.`,
 					},
 					"introspection_url": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search.`,
 					},
 					"keepalive": schema.Int64Attribute{
 						Computed:    true,

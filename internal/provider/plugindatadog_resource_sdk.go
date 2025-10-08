@@ -99,18 +99,16 @@ func (r *PluginDatadogResourceModel) RefreshFromSharedDatadogPlugin(ctx context.
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -223,6 +221,96 @@ func (r *PluginDatadogResourceModel) ToOperationsUpdateDatadogPluginRequest(ctx 
 func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) (*shared.DatadogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.DatadogPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.DatadogPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.DatadogPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.DatadogPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.DatadogPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.DatadogPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	partials := make([]shared.DatadogPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.DatadogPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	var config *shared.DatadogPluginConfig
 	if r.Config != nil {
 		consumerTag := new(string)
@@ -251,7 +339,7 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 			} else {
 				consumerIdentifier = nil
 			}
-			name := shared.DatadogPluginName(metricsItem.Name.ValueString())
+			name1 := shared.DatadogPluginName(metricsItem.Name.ValueString())
 			sampleRate := new(float64)
 			if !metricsItem.SampleRate.IsUnknown() && !metricsItem.SampleRate.IsNull() {
 				*sampleRate = metricsItem.SampleRate.ValueFloat64()
@@ -259,16 +347,16 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 				sampleRate = nil
 			}
 			statType := shared.StatType(metricsItem.StatType.ValueString())
-			tags := make([]string, 0, len(metricsItem.Tags))
-			for _, tagsItem := range metricsItem.Tags {
-				tags = append(tags, tagsItem.ValueString())
+			tags1 := make([]string, 0, len(metricsItem.Tags))
+			for _, tagsItem1 := range metricsItem.Tags {
+				tags1 = append(tags1, tagsItem1.ValueString())
 			}
 			metrics = append(metrics, shared.Metrics{
 				ConsumerIdentifier: consumerIdentifier,
-				Name:               name,
+				Name:               name1,
 				SampleRate:         sampleRate,
 				StatType:           statType,
-				Tags:               tags,
+				Tags:               tags1,
 			})
 		}
 		port := new(int64)
@@ -384,94 +472,14 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 	}
 	var consumer *shared.DatadogPluginConsumer
 	if r.Consumer != nil {
-		id := new(string)
+		id2 := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
+			*id2 = r.Consumer.ID.ValueString()
 		} else {
-			id = nil
+			id2 = nil
 		}
 		consumer = &shared.DatadogPluginConsumer{
-			ID: id,
-		}
-	}
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id1 := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
-	} else {
-		id1 = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.DatadogPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.DatadogPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.DatadogPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.DatadogPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.DatadogPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.DatadogPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.DatadogPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.DatadogPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
-			}
-			name1 := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name1 = partialsItem.Name.ValueString()
-			} else {
-				name1 = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.DatadogPluginPartials{
-				ID:   id2,
-				Name: name1,
-				Path: path,
-			})
+			ID: id2,
 		}
 	}
 	protocols := make([]shared.DatadogPluginProtocols, 0, len(r.Protocols))
@@ -502,33 +510,20 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 			ID: id4,
 		}
 	}
-	var tags1 []string
-	if r.Tags != nil {
-		tags1 = make([]string, 0, len(r.Tags))
-		for _, tagsItem1 := range r.Tags {
-			tags1 = append(tags1, tagsItem1.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.DatadogPlugin{
-		Config:       config,
-		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags1,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

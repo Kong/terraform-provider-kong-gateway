@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AiLlmAsJudgePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiLlmAsJudgePluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiLlmAsJudgePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiLlmAsJudgePluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiLlmAsJudgePluginOrdering struct {
+	After  *AiLlmAsJudgePluginAfter  `json:"after,omitempty"`
+	Before *AiLlmAsJudgePluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiLlmAsJudgePluginOrdering) GetAfter() *AiLlmAsJudgePluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiLlmAsJudgePluginOrdering) GetBefore() *AiLlmAsJudgePluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiLlmAsJudgePluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiLlmAsJudgePluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiLlmAsJudgePluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiLlmAsJudgePluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 // AiLlmAsJudgePluginParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
 type AiLlmAsJudgePluginParamLocation string
 
@@ -907,76 +977,6 @@ func (a *AiLlmAsJudgePluginConsumerGroup) GetID() *string {
 	return a.ID
 }
 
-type AiLlmAsJudgePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiLlmAsJudgePluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiLlmAsJudgePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiLlmAsJudgePluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiLlmAsJudgePluginOrdering struct {
-	After  *AiLlmAsJudgePluginAfter  `json:"after,omitempty"`
-	Before *AiLlmAsJudgePluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiLlmAsJudgePluginOrdering) GetAfter() *AiLlmAsJudgePluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiLlmAsJudgePluginOrdering) GetBefore() *AiLlmAsJudgePluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiLlmAsJudgePluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiLlmAsJudgePluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiLlmAsJudgePluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiLlmAsJudgePluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type AiLlmAsJudgePluginProtocols string
 
 const (
@@ -1033,12 +1033,8 @@ func (a *AiLlmAsJudgePluginService) GetID() *string {
 	return a.ID
 }
 
+// AiLlmAsJudgePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiLlmAsJudgePlugin struct {
-	Config *AiLlmAsJudgePluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AiLlmAsJudgePluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *AiLlmAsJudgePluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1051,16 +1047,21 @@ type AiLlmAsJudgePlugin struct {
 	Ordering     *AiLlmAsJudgePluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiLlmAsJudgePluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                   `json:"updated_at,omitempty"`
+	Config    AiLlmAsJudgePluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AiLlmAsJudgePluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *AiLlmAsJudgePluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiLlmAsJudgePluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiLlmAsJudgePluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiLlmAsJudgePluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiLlmAsJudgePlugin) MarshalJSON() ([]byte, error) {
@@ -1068,31 +1069,10 @@ func (a AiLlmAsJudgePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiLlmAsJudgePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (a *AiLlmAsJudgePlugin) GetConfig() *AiLlmAsJudgePluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
-func (a *AiLlmAsJudgePlugin) GetConsumer() *AiLlmAsJudgePluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
-}
-
-func (a *AiLlmAsJudgePlugin) GetConsumerGroup() *AiLlmAsJudgePluginConsumerGroup {
-	if a == nil {
-		return nil
-	}
-	return a.ConsumerGroup
 }
 
 func (a *AiLlmAsJudgePlugin) GetCreatedAt() *int64 {
@@ -1141,6 +1121,41 @@ func (a *AiLlmAsJudgePlugin) GetPartials() []AiLlmAsJudgePluginPartials {
 	return a.Partials
 }
 
+func (a *AiLlmAsJudgePlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiLlmAsJudgePlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AiLlmAsJudgePlugin) GetConfig() AiLlmAsJudgePluginConfig {
+	if a == nil {
+		return AiLlmAsJudgePluginConfig{}
+	}
+	return a.Config
+}
+
+func (a *AiLlmAsJudgePlugin) GetConsumer() *AiLlmAsJudgePluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
+func (a *AiLlmAsJudgePlugin) GetConsumerGroup() *AiLlmAsJudgePluginConsumerGroup {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerGroup
+}
+
 func (a *AiLlmAsJudgePlugin) GetProtocols() []AiLlmAsJudgePluginProtocols {
 	if a == nil {
 		return nil
@@ -1160,18 +1175,4 @@ func (a *AiLlmAsJudgePlugin) GetService() *AiLlmAsJudgePluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AiLlmAsJudgePlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiLlmAsJudgePlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

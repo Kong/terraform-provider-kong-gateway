@@ -18,7 +18,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,21 +36,21 @@ type PluginAiGcpModelArmorResource struct {
 
 // PluginAiGcpModelArmorResourceModel describes the resource data model.
 type PluginAiGcpModelArmorResourceModel struct {
-	Config        *tfTypes.AiGcpModelArmorPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                          `tfsdk:"created_at"`
-	Enabled       types.Bool                           `tfsdk:"enabled"`
-	ID            types.String                         `tfsdk:"id"`
-	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials          `tfsdk:"partials"`
-	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.Set                         `tfsdk:"route"`
-	Service       *tfTypes.Set                         `tfsdk:"service"`
-	Tags          []types.String                       `tfsdk:"tags"`
-	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
-	Workspace     types.String                         `tfsdk:"workspace"`
+	Config        tfTypes.AiGcpModelArmorPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                         `tfsdk:"created_at"`
+	Enabled       types.Bool                          `tfsdk:"enabled"`
+	ID            types.String                        `tfsdk:"id"`
+	InstanceName  types.String                        `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols     []types.String                      `tfsdk:"protocols"`
+	Route         *tfTypes.Set                        `tfsdk:"route"`
+	Service       *tfTypes.Set                        `tfsdk:"service"`
+	Tags          []types.String                      `tfsdk:"tags"`
+	UpdatedAt     types.Int64                         `tfsdk:"updated_at"`
+	Workspace     types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginAiGcpModelArmorResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -63,8 +62,7 @@ func (r *PluginAiGcpModelArmorResource) Schema(ctx context.Context, req resource
 		MarkdownDescription: "PluginAiGcpModelArmor Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"enable_multi_language_detection": schema.BoolAttribute{
 						Computed:    true,
@@ -94,20 +92,12 @@ func (r *PluginAiGcpModelArmorResource) Schema(ctx context.Context, req resource
 						},
 					},
 					"location_id": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `GCP Location ID for the GCP Model Armor subscription. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `GCP Location ID for the GCP Model Armor subscription.`,
 					},
 					"project_id": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `GCP Project ID for the GCP Model Armor subscription. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `GCP Project ID for the GCP Model Armor subscription.`,
 					},
 					"request_failure_message": schema.StringAttribute{
 						Computed:    true,
@@ -140,12 +130,8 @@ func (r *PluginAiGcpModelArmorResource) Schema(ctx context.Context, req resource
 						Description: `Stop processing if an error occurs.`,
 					},
 					"template_id": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `GCP Model Armor Template ID to enforce. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `GCP Model Armor Template ID to enforce.`,
 					},
 					"text_source": schema.StringAttribute{
 						Computed:    true,

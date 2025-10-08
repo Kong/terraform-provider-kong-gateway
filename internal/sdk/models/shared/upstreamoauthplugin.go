@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type UpstreamOauthPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (u *UpstreamOauthPluginAfter) GetAccess() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Access
+}
+
+type UpstreamOauthPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (u *UpstreamOauthPluginBefore) GetAccess() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Access
+}
+
+type UpstreamOauthPluginOrdering struct {
+	After  *UpstreamOauthPluginAfter  `json:"after,omitempty"`
+	Before *UpstreamOauthPluginBefore `json:"before,omitempty"`
+}
+
+func (u *UpstreamOauthPluginOrdering) GetAfter() *UpstreamOauthPluginAfter {
+	if u == nil {
+		return nil
+	}
+	return u.After
+}
+
+func (u *UpstreamOauthPluginOrdering) GetBefore() *UpstreamOauthPluginBefore {
+	if u == nil {
+		return nil
+	}
+	return u.Before
+}
+
+type UpstreamOauthPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (u *UpstreamOauthPluginPartials) GetID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ID
+}
+
+func (u *UpstreamOauthPluginPartials) GetName() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Name
+}
+
+func (u *UpstreamOauthPluginPartials) GetPath() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Path
+}
+
 type Behavior struct {
 	// The template to use to create the body of the response to return to the consumer if Kong fails to obtain a token from the IdP.
 	IdpErrorResponseBodyTemplate *string `json:"idp_error_response_body_template,omitempty"`
@@ -755,76 +825,6 @@ func (u *UpstreamOauthPluginConsumerGroup) GetID() *string {
 	return u.ID
 }
 
-type UpstreamOauthPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (u *UpstreamOauthPluginAfter) GetAccess() []string {
-	if u == nil {
-		return nil
-	}
-	return u.Access
-}
-
-type UpstreamOauthPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (u *UpstreamOauthPluginBefore) GetAccess() []string {
-	if u == nil {
-		return nil
-	}
-	return u.Access
-}
-
-type UpstreamOauthPluginOrdering struct {
-	After  *UpstreamOauthPluginAfter  `json:"after,omitempty"`
-	Before *UpstreamOauthPluginBefore `json:"before,omitempty"`
-}
-
-func (u *UpstreamOauthPluginOrdering) GetAfter() *UpstreamOauthPluginAfter {
-	if u == nil {
-		return nil
-	}
-	return u.After
-}
-
-func (u *UpstreamOauthPluginOrdering) GetBefore() *UpstreamOauthPluginBefore {
-	if u == nil {
-		return nil
-	}
-	return u.Before
-}
-
-type UpstreamOauthPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (u *UpstreamOauthPluginPartials) GetID() *string {
-	if u == nil {
-		return nil
-	}
-	return u.ID
-}
-
-func (u *UpstreamOauthPluginPartials) GetName() *string {
-	if u == nil {
-		return nil
-	}
-	return u.Name
-}
-
-func (u *UpstreamOauthPluginPartials) GetPath() *string {
-	if u == nil {
-		return nil
-	}
-	return u.Path
-}
-
 type UpstreamOauthPluginProtocols string
 
 const (
@@ -881,12 +881,8 @@ func (u *UpstreamOauthPluginService) GetID() *string {
 	return u.ID
 }
 
+// UpstreamOauthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type UpstreamOauthPlugin struct {
-	Config *UpstreamOauthPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *UpstreamOauthPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *UpstreamOauthPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -899,16 +895,21 @@ type UpstreamOauthPlugin struct {
 	Ordering     *UpstreamOauthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []UpstreamOauthPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    UpstreamOauthPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *UpstreamOauthPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *UpstreamOauthPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []UpstreamOauthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *UpstreamOauthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *UpstreamOauthPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (u UpstreamOauthPlugin) MarshalJSON() ([]byte, error) {
@@ -916,31 +917,10 @@ func (u UpstreamOauthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpstreamOauthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (u *UpstreamOauthPlugin) GetConfig() *UpstreamOauthPluginConfig {
-	if u == nil {
-		return nil
-	}
-	return u.Config
-}
-
-func (u *UpstreamOauthPlugin) GetConsumer() *UpstreamOauthPluginConsumer {
-	if u == nil {
-		return nil
-	}
-	return u.Consumer
-}
-
-func (u *UpstreamOauthPlugin) GetConsumerGroup() *UpstreamOauthPluginConsumerGroup {
-	if u == nil {
-		return nil
-	}
-	return u.ConsumerGroup
 }
 
 func (u *UpstreamOauthPlugin) GetCreatedAt() *int64 {
@@ -989,6 +969,41 @@ func (u *UpstreamOauthPlugin) GetPartials() []UpstreamOauthPluginPartials {
 	return u.Partials
 }
 
+func (u *UpstreamOauthPlugin) GetTags() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Tags
+}
+
+func (u *UpstreamOauthPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.UpdatedAt
+}
+
+func (u *UpstreamOauthPlugin) GetConfig() UpstreamOauthPluginConfig {
+	if u == nil {
+		return UpstreamOauthPluginConfig{}
+	}
+	return u.Config
+}
+
+func (u *UpstreamOauthPlugin) GetConsumer() *UpstreamOauthPluginConsumer {
+	if u == nil {
+		return nil
+	}
+	return u.Consumer
+}
+
+func (u *UpstreamOauthPlugin) GetConsumerGroup() *UpstreamOauthPluginConsumerGroup {
+	if u == nil {
+		return nil
+	}
+	return u.ConsumerGroup
+}
+
 func (u *UpstreamOauthPlugin) GetProtocols() []UpstreamOauthPluginProtocols {
 	if u == nil {
 		return nil
@@ -1008,18 +1023,4 @@ func (u *UpstreamOauthPlugin) GetService() *UpstreamOauthPluginService {
 		return nil
 	}
 	return u.Service
-}
-
-func (u *UpstreamOauthPlugin) GetTags() []string {
-	if u == nil {
-		return nil
-	}
-	return u.Tags
-}
-
-func (u *UpstreamOauthPlugin) GetUpdatedAt() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.UpdatedAt
 }

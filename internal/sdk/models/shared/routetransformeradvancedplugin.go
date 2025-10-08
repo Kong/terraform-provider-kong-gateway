@@ -8,53 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RouteTransformerAdvancedPluginConfig struct {
-	EscapePath *bool   `json:"escape_path,omitempty"`
-	Host       *string `json:"host,omitempty"`
-	Path       *string `json:"path,omitempty"`
-	Port       *string `json:"port,omitempty"`
-}
-
-func (r *RouteTransformerAdvancedPluginConfig) GetEscapePath() *bool {
-	if r == nil {
-		return nil
-	}
-	return r.EscapePath
-}
-
-func (r *RouteTransformerAdvancedPluginConfig) GetHost() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Host
-}
-
-func (r *RouteTransformerAdvancedPluginConfig) GetPath() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Path
-}
-
-func (r *RouteTransformerAdvancedPluginConfig) GetPort() *string {
-	if r == nil {
-		return nil
-	}
-	return r.Port
-}
-
-// RouteTransformerAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type RouteTransformerAdvancedPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (r *RouteTransformerAdvancedPluginConsumer) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
 type RouteTransformerAdvancedPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -125,6 +78,53 @@ func (r *RouteTransformerAdvancedPluginPartials) GetPath() *string {
 	return r.Path
 }
 
+type RouteTransformerAdvancedPluginConfig struct {
+	EscapePath *bool   `json:"escape_path,omitempty"`
+	Host       *string `json:"host,omitempty"`
+	Path       *string `json:"path,omitempty"`
+	Port       *string `json:"port,omitempty"`
+}
+
+func (r *RouteTransformerAdvancedPluginConfig) GetEscapePath() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.EscapePath
+}
+
+func (r *RouteTransformerAdvancedPluginConfig) GetHost() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Host
+}
+
+func (r *RouteTransformerAdvancedPluginConfig) GetPath() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Path
+}
+
+func (r *RouteTransformerAdvancedPluginConfig) GetPort() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Port
+}
+
+// RouteTransformerAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type RouteTransformerAdvancedPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (r *RouteTransformerAdvancedPluginConsumer) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
 type RouteTransformerAdvancedPluginProtocols string
 
 const (
@@ -181,10 +181,8 @@ func (r *RouteTransformerAdvancedPluginService) GetID() *string {
 	return r.ID
 }
 
+// RouteTransformerAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RouteTransformerAdvancedPlugin struct {
-	Config *RouteTransformerAdvancedPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RouteTransformerAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -197,16 +195,19 @@ type RouteTransformerAdvancedPlugin struct {
 	Ordering     *RouteTransformerAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RouteTransformerAdvancedPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                                `json:"updated_at,omitempty"`
+	Config    *RouteTransformerAdvancedPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RouteTransformerAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RouteTransformerAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RouteTransformerAdvancedPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RouteTransformerAdvancedPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RouteTransformerAdvancedPlugin) MarshalJSON() ([]byte, error) {
@@ -218,20 +219,6 @@ func (r *RouteTransformerAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (r *RouteTransformerAdvancedPlugin) GetConfig() *RouteTransformerAdvancedPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *RouteTransformerAdvancedPlugin) GetConsumer() *RouteTransformerAdvancedPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
 }
 
 func (r *RouteTransformerAdvancedPlugin) GetCreatedAt() *int64 {
@@ -280,6 +267,34 @@ func (r *RouteTransformerAdvancedPlugin) GetPartials() []RouteTransformerAdvance
 	return r.Partials
 }
 
+func (r *RouteTransformerAdvancedPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RouteTransformerAdvancedPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
+}
+
+func (r *RouteTransformerAdvancedPlugin) GetConfig() *RouteTransformerAdvancedPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RouteTransformerAdvancedPlugin) GetConsumer() *RouteTransformerAdvancedPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
 func (r *RouteTransformerAdvancedPlugin) GetProtocols() []RouteTransformerAdvancedPluginProtocols {
 	if r == nil {
 		return nil
@@ -299,18 +314,4 @@ func (r *RouteTransformerAdvancedPlugin) GetService() *RouteTransformerAdvancedP
 		return nil
 	}
 	return r.Service
-}
-
-func (r *RouteTransformerAdvancedPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RouteTransformerAdvancedPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
 }

@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AiMcpProxyPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiMcpProxyPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiMcpProxyPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AiMcpProxyPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AiMcpProxyPluginOrdering struct {
+	After  *AiMcpProxyPluginAfter  `json:"after,omitempty"`
+	Before *AiMcpProxyPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AiMcpProxyPluginOrdering) GetAfter() *AiMcpProxyPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AiMcpProxyPluginOrdering) GetBefore() *AiMcpProxyPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AiMcpProxyPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AiMcpProxyPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AiMcpProxyPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AiMcpProxyPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type Logging struct {
 	// If enabled, will log the request and response body into the Kong log plugin(s) output.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
@@ -340,76 +410,6 @@ func (a *AiMcpProxyPluginConfig) GetTools() []Tools {
 	return a.Tools
 }
 
-type AiMcpProxyPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiMcpProxyPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiMcpProxyPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AiMcpProxyPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AiMcpProxyPluginOrdering struct {
-	After  *AiMcpProxyPluginAfter  `json:"after,omitempty"`
-	Before *AiMcpProxyPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AiMcpProxyPluginOrdering) GetAfter() *AiMcpProxyPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AiMcpProxyPluginOrdering) GetBefore() *AiMcpProxyPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AiMcpProxyPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AiMcpProxyPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AiMcpProxyPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AiMcpProxyPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type AiMcpProxyPluginProtocols string
 
 const (
@@ -466,8 +466,8 @@ func (a *AiMcpProxyPluginService) GetID() *string {
 	return a.ID
 }
 
+// AiMcpProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiMcpProxyPlugin struct {
-	Config *AiMcpProxyPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -480,16 +480,17 @@ type AiMcpProxyPlugin struct {
 	Ordering     *AiMcpProxyPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiMcpProxyPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                 `json:"updated_at,omitempty"`
+	Config    AiMcpProxyPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AiMcpProxyPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiMcpProxyPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AiMcpProxyPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AiMcpProxyPlugin) MarshalJSON() ([]byte, error) {
@@ -497,17 +498,10 @@ func (a AiMcpProxyPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiMcpProxyPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (a *AiMcpProxyPlugin) GetConfig() *AiMcpProxyPluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
 }
 
 func (a *AiMcpProxyPlugin) GetCreatedAt() *int64 {
@@ -556,6 +550,27 @@ func (a *AiMcpProxyPlugin) GetPartials() []AiMcpProxyPluginPartials {
 	return a.Partials
 }
 
+func (a *AiMcpProxyPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AiMcpProxyPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AiMcpProxyPlugin) GetConfig() AiMcpProxyPluginConfig {
+	if a == nil {
+		return AiMcpProxyPluginConfig{}
+	}
+	return a.Config
+}
+
 func (a *AiMcpProxyPlugin) GetProtocols() []AiMcpProxyPluginProtocols {
 	if a == nil {
 		return nil
@@ -575,18 +590,4 @@ func (a *AiMcpProxyPlugin) GetService() *AiMcpProxyPluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AiMcpProxyPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AiMcpProxyPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

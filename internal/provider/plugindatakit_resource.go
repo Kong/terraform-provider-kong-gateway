@@ -21,7 +21,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -42,21 +41,21 @@ type PluginDatakitResource struct {
 
 // PluginDatakitResourceModel describes the resource data model.
 type PluginDatakitResourceModel struct {
-	Config        *tfTypes.DatakitPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                 `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                 `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                  `tfsdk:"created_at"`
-	Enabled       types.Bool                   `tfsdk:"enabled"`
-	ID            types.String                 `tfsdk:"id"`
-	InstanceName  types.String                 `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials  `tfsdk:"partials"`
-	Protocols     []types.String               `tfsdk:"protocols"`
-	Route         *tfTypes.Set                 `tfsdk:"route"`
-	Service       *tfTypes.Set                 `tfsdk:"service"`
-	Tags          []types.String               `tfsdk:"tags"`
-	UpdatedAt     types.Int64                  `tfsdk:"updated_at"`
-	Workspace     types.String                 `tfsdk:"workspace"`
+	Config        tfTypes.DatakitPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                 `tfsdk:"created_at"`
+	Enabled       types.Bool                  `tfsdk:"enabled"`
+	ID            types.String                `tfsdk:"id"`
+	InstanceName  types.String                `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Protocols     []types.String              `tfsdk:"protocols"`
+	Route         *tfTypes.Set                `tfsdk:"route"`
+	Service       *tfTypes.Set                `tfsdk:"service"`
+	Tags          []types.String              `tfsdk:"tags"`
+	UpdatedAt     types.Int64                 `tfsdk:"updated_at"`
+	Workspace     types.String                `tfsdk:"workspace"`
 }
 
 func (r *PluginDatakitResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -68,16 +67,14 @@ func (r *PluginDatakitResource) Schema(ctx context.Context, req resource.SchemaR
 		MarkdownDescription: "PluginDatakit Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"debug": schema.BoolAttribute{
 						Computed: true,
 						Optional: true,
 					},
 					"nodes": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -110,10 +107,6 @@ func (r *PluginDatakitResource) Schema(ctx context.Context, req resource.SchemaR
 									},
 								},
 							},
-						},
-						Description: `Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
 						},
 					},
 					"resources": schema.SingleNestedAttribute{

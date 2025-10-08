@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type JqPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JqPluginAfter) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JqPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (j *JqPluginBefore) GetAccess() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Access
+}
+
+type JqPluginOrdering struct {
+	After  *JqPluginAfter  `json:"after,omitempty"`
+	Before *JqPluginBefore `json:"before,omitempty"`
+}
+
+func (j *JqPluginOrdering) GetAfter() *JqPluginAfter {
+	if j == nil {
+		return nil
+	}
+	return j.After
+}
+
+func (j *JqPluginOrdering) GetBefore() *JqPluginBefore {
+	if j == nil {
+		return nil
+	}
+	return j.Before
+}
+
+type JqPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (j *JqPluginPartials) GetID() *string {
+	if j == nil {
+		return nil
+	}
+	return j.ID
+}
+
+func (j *JqPluginPartials) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JqPluginPartials) GetPath() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Path
+}
+
 type RequestJqProgramOptions struct {
 	ASCIIOutput   *bool `json:"ascii_output,omitempty"`
 	CompactOutput *bool `json:"compact_output,omitempty"`
@@ -165,76 +235,6 @@ func (j *JqPluginConsumer) GetID() *string {
 	return j.ID
 }
 
-type JqPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (j *JqPluginAfter) GetAccess() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Access
-}
-
-type JqPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (j *JqPluginBefore) GetAccess() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Access
-}
-
-type JqPluginOrdering struct {
-	After  *JqPluginAfter  `json:"after,omitempty"`
-	Before *JqPluginBefore `json:"before,omitempty"`
-}
-
-func (j *JqPluginOrdering) GetAfter() *JqPluginAfter {
-	if j == nil {
-		return nil
-	}
-	return j.After
-}
-
-func (j *JqPluginOrdering) GetBefore() *JqPluginBefore {
-	if j == nil {
-		return nil
-	}
-	return j.Before
-}
-
-type JqPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (j *JqPluginPartials) GetID() *string {
-	if j == nil {
-		return nil
-	}
-	return j.ID
-}
-
-func (j *JqPluginPartials) GetName() *string {
-	if j == nil {
-		return nil
-	}
-	return j.Name
-}
-
-func (j *JqPluginPartials) GetPath() *string {
-	if j == nil {
-		return nil
-	}
-	return j.Path
-}
-
 type JqPluginProtocols string
 
 const (
@@ -291,10 +291,8 @@ func (j *JqPluginService) GetID() *string {
 	return j.ID
 }
 
+// JqPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JqPlugin struct {
-	Config *JqPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *JqPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -307,16 +305,19 @@ type JqPlugin struct {
 	Ordering     *JqPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []JqPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64          `json:"updated_at,omitempty"`
+	Config    *JqPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *JqPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []JqPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *JqPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *JqPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (j JqPlugin) MarshalJSON() ([]byte, error) {
@@ -328,20 +329,6 @@ func (j *JqPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (j *JqPlugin) GetConfig() *JqPluginConfig {
-	if j == nil {
-		return nil
-	}
-	return j.Config
-}
-
-func (j *JqPlugin) GetConsumer() *JqPluginConsumer {
-	if j == nil {
-		return nil
-	}
-	return j.Consumer
 }
 
 func (j *JqPlugin) GetCreatedAt() *int64 {
@@ -390,6 +377,34 @@ func (j *JqPlugin) GetPartials() []JqPluginPartials {
 	return j.Partials
 }
 
+func (j *JqPlugin) GetTags() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Tags
+}
+
+func (j *JqPlugin) GetUpdatedAt() *int64 {
+	if j == nil {
+		return nil
+	}
+	return j.UpdatedAt
+}
+
+func (j *JqPlugin) GetConfig() *JqPluginConfig {
+	if j == nil {
+		return nil
+	}
+	return j.Config
+}
+
+func (j *JqPlugin) GetConsumer() *JqPluginConsumer {
+	if j == nil {
+		return nil
+	}
+	return j.Consumer
+}
+
 func (j *JqPlugin) GetProtocols() []JqPluginProtocols {
 	if j == nil {
 		return nil
@@ -409,18 +424,4 @@ func (j *JqPlugin) GetService() *JqPluginService {
 		return nil
 	}
 	return j.Service
-}
-
-func (j *JqPlugin) GetTags() []string {
-	if j == nil {
-		return nil
-	}
-	return j.Tags
-}
-
-func (j *JqPlugin) GetUpdatedAt() *int64 {
-	if j == nil {
-		return nil
-	}
-	return j.UpdatedAt
 }

@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AzureFunctionsPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AzureFunctionsPluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AzureFunctionsPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AzureFunctionsPluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AzureFunctionsPluginOrdering struct {
+	After  *AzureFunctionsPluginAfter  `json:"after,omitempty"`
+	Before *AzureFunctionsPluginBefore `json:"before,omitempty"`
+}
+
+func (a *AzureFunctionsPluginOrdering) GetAfter() *AzureFunctionsPluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AzureFunctionsPluginOrdering) GetBefore() *AzureFunctionsPluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AzureFunctionsPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AzureFunctionsPluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AzureFunctionsPluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AzureFunctionsPluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type AzureFunctionsPluginConfig struct {
 	// The apikey to access the Azure resources. If provided, it is injected as the `x-functions-key` header.
 	Apikey *string `json:"apikey,omitempty"`
@@ -113,76 +183,6 @@ func (a *AzureFunctionsPluginConsumer) GetID() *string {
 	return a.ID
 }
 
-type AzureFunctionsPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AzureFunctionsPluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AzureFunctionsPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AzureFunctionsPluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AzureFunctionsPluginOrdering struct {
-	After  *AzureFunctionsPluginAfter  `json:"after,omitempty"`
-	Before *AzureFunctionsPluginBefore `json:"before,omitempty"`
-}
-
-func (a *AzureFunctionsPluginOrdering) GetAfter() *AzureFunctionsPluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AzureFunctionsPluginOrdering) GetBefore() *AzureFunctionsPluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AzureFunctionsPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AzureFunctionsPluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AzureFunctionsPluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AzureFunctionsPluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 // AzureFunctionsPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type AzureFunctionsPluginProtocols string
 
@@ -258,10 +258,8 @@ func (a *AzureFunctionsPluginService) GetID() *string {
 	return a.ID
 }
 
+// AzureFunctionsPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AzureFunctionsPlugin struct {
-	Config *AzureFunctionsPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *AzureFunctionsPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -274,16 +272,19 @@ type AzureFunctionsPlugin struct {
 	Ordering     *AzureFunctionsPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AzureFunctionsPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                     `json:"updated_at,omitempty"`
+	Config    AzureFunctionsPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *AzureFunctionsPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []AzureFunctionsPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AzureFunctionsPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AzureFunctionsPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AzureFunctionsPlugin) MarshalJSON() ([]byte, error) {
@@ -291,24 +292,10 @@ func (a AzureFunctionsPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AzureFunctionsPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (a *AzureFunctionsPlugin) GetConfig() *AzureFunctionsPluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
-}
-
-func (a *AzureFunctionsPlugin) GetConsumer() *AzureFunctionsPluginConsumer {
-	if a == nil {
-		return nil
-	}
-	return a.Consumer
 }
 
 func (a *AzureFunctionsPlugin) GetCreatedAt() *int64 {
@@ -357,6 +344,34 @@ func (a *AzureFunctionsPlugin) GetPartials() []AzureFunctionsPluginPartials {
 	return a.Partials
 }
 
+func (a *AzureFunctionsPlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AzureFunctionsPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AzureFunctionsPlugin) GetConfig() AzureFunctionsPluginConfig {
+	if a == nil {
+		return AzureFunctionsPluginConfig{}
+	}
+	return a.Config
+}
+
+func (a *AzureFunctionsPlugin) GetConsumer() *AzureFunctionsPluginConsumer {
+	if a == nil {
+		return nil
+	}
+	return a.Consumer
+}
+
 func (a *AzureFunctionsPlugin) GetProtocols() []AzureFunctionsPluginProtocols {
 	if a == nil {
 		return nil
@@ -376,18 +391,4 @@ func (a *AzureFunctionsPlugin) GetService() *AzureFunctionsPluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AzureFunctionsPlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AzureFunctionsPlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

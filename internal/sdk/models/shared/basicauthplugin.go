@@ -8,36 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type BasicAuthPluginConfig struct {
-	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
-	Anonymous *string `json:"anonymous,omitempty"`
-	// An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
-	HideCredentials *bool `json:"hide_credentials,omitempty"`
-	// When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
-	Realm *string `json:"realm,omitempty"`
-}
-
-func (b *BasicAuthPluginConfig) GetAnonymous() *string {
-	if b == nil {
-		return nil
-	}
-	return b.Anonymous
-}
-
-func (b *BasicAuthPluginConfig) GetHideCredentials() *bool {
-	if b == nil {
-		return nil
-	}
-	return b.HideCredentials
-}
-
-func (b *BasicAuthPluginConfig) GetRealm() *string {
-	if b == nil {
-		return nil
-	}
-	return b.Realm
-}
-
 type BasicAuthPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -108,6 +78,36 @@ func (b *BasicAuthPluginPartials) GetPath() *string {
 	return b.Path
 }
 
+type BasicAuthPluginConfig struct {
+	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
+	Anonymous *string `json:"anonymous,omitempty"`
+	// An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
+	HideCredentials *bool `json:"hide_credentials,omitempty"`
+	// When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
+	Realm *string `json:"realm,omitempty"`
+}
+
+func (b *BasicAuthPluginConfig) GetAnonymous() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Anonymous
+}
+
+func (b *BasicAuthPluginConfig) GetHideCredentials() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.HideCredentials
+}
+
+func (b *BasicAuthPluginConfig) GetRealm() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Realm
+}
+
 type BasicAuthPluginProtocols string
 
 const (
@@ -170,8 +170,8 @@ func (b *BasicAuthPluginService) GetID() *string {
 	return b.ID
 }
 
+// BasicAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type BasicAuthPlugin struct {
-	Config *BasicAuthPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -184,16 +184,17 @@ type BasicAuthPlugin struct {
 	Ordering     *BasicAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []BasicAuthPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                 `json:"updated_at,omitempty"`
+	Config    *BasicAuthPluginConfig `json:"config,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []BasicAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *BasicAuthPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *BasicAuthPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (b BasicAuthPlugin) MarshalJSON() ([]byte, error) {
@@ -205,13 +206,6 @@ func (b *BasicAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (b *BasicAuthPlugin) GetConfig() *BasicAuthPluginConfig {
-	if b == nil {
-		return nil
-	}
-	return b.Config
 }
 
 func (b *BasicAuthPlugin) GetCreatedAt() *int64 {
@@ -260,6 +254,27 @@ func (b *BasicAuthPlugin) GetPartials() []BasicAuthPluginPartials {
 	return b.Partials
 }
 
+func (b *BasicAuthPlugin) GetTags() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Tags
+}
+
+func (b *BasicAuthPlugin) GetUpdatedAt() *int64 {
+	if b == nil {
+		return nil
+	}
+	return b.UpdatedAt
+}
+
+func (b *BasicAuthPlugin) GetConfig() *BasicAuthPluginConfig {
+	if b == nil {
+		return nil
+	}
+	return b.Config
+}
+
 func (b *BasicAuthPlugin) GetProtocols() []BasicAuthPluginProtocols {
 	if b == nil {
 		return nil
@@ -279,18 +294,4 @@ func (b *BasicAuthPlugin) GetService() *BasicAuthPluginService {
 		return nil
 	}
 	return b.Service
-}
-
-func (b *BasicAuthPlugin) GetTags() []string {
-	if b == nil {
-		return nil
-	}
-	return b.Tags
-}
-
-func (b *BasicAuthPlugin) GetUpdatedAt() *int64 {
-	if b == nil {
-		return nil
-	}
-	return b.UpdatedAt
 }

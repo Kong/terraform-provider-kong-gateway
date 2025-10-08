@@ -8,69 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type IPRestrictionPluginConfig struct {
-	// List of IPs or CIDR ranges to allow. One of `config.allow` or `config.deny` must be specified.
-	Allow []string `json:"allow,omitempty"`
-	// List of IPs or CIDR ranges to deny. One of `config.allow` or `config.deny` must be specified.
-	Deny []string `json:"deny,omitempty"`
-	// The message to send as a response body to rejected requests.
-	Message *string `json:"message,omitempty"`
-	// The HTTP status of the requests that will be rejected by the plugin.
-	Status *float64 `json:"status,omitempty"`
-}
-
-func (i *IPRestrictionPluginConfig) GetAllow() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Allow
-}
-
-func (i *IPRestrictionPluginConfig) GetDeny() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Deny
-}
-
-func (i *IPRestrictionPluginConfig) GetMessage() *string {
-	if i == nil {
-		return nil
-	}
-	return i.Message
-}
-
-func (i *IPRestrictionPluginConfig) GetStatus() *float64 {
-	if i == nil {
-		return nil
-	}
-	return i.Status
-}
-
-// IPRestrictionPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type IPRestrictionPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (i *IPRestrictionPluginConsumer) GetID() *string {
-	if i == nil {
-		return nil
-	}
-	return i.ID
-}
-
-// IPRestrictionPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-type IPRestrictionPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (i *IPRestrictionPluginConsumerGroup) GetID() *string {
-	if i == nil {
-		return nil
-	}
-	return i.ID
-}
-
 type IPRestrictionPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -139,6 +76,69 @@ func (i *IPRestrictionPluginPartials) GetPath() *string {
 		return nil
 	}
 	return i.Path
+}
+
+type IPRestrictionPluginConfig struct {
+	// List of IPs or CIDR ranges to allow. One of `config.allow` or `config.deny` must be specified.
+	Allow []string `json:"allow,omitempty"`
+	// List of IPs or CIDR ranges to deny. One of `config.allow` or `config.deny` must be specified.
+	Deny []string `json:"deny,omitempty"`
+	// The message to send as a response body to rejected requests.
+	Message *string `json:"message,omitempty"`
+	// The HTTP status of the requests that will be rejected by the plugin.
+	Status *float64 `json:"status,omitempty"`
+}
+
+func (i *IPRestrictionPluginConfig) GetAllow() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Allow
+}
+
+func (i *IPRestrictionPluginConfig) GetDeny() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Deny
+}
+
+func (i *IPRestrictionPluginConfig) GetMessage() *string {
+	if i == nil {
+		return nil
+	}
+	return i.Message
+}
+
+func (i *IPRestrictionPluginConfig) GetStatus() *float64 {
+	if i == nil {
+		return nil
+	}
+	return i.Status
+}
+
+// IPRestrictionPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type IPRestrictionPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (i *IPRestrictionPluginConsumer) GetID() *string {
+	if i == nil {
+		return nil
+	}
+	return i.ID
+}
+
+// IPRestrictionPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+type IPRestrictionPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (i *IPRestrictionPluginConsumerGroup) GetID() *string {
+	if i == nil {
+		return nil
+	}
+	return i.ID
 }
 
 // IPRestrictionPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -216,12 +216,8 @@ func (i *IPRestrictionPluginService) GetID() *string {
 	return i.ID
 }
 
+// IPRestrictionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type IPRestrictionPlugin struct {
-	Config *IPRestrictionPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *IPRestrictionPluginConsumer `json:"consumer,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *IPRestrictionPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -234,16 +230,21 @@ type IPRestrictionPlugin struct {
 	Ordering     *IPRestrictionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []IPRestrictionPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                     `json:"updated_at,omitempty"`
+	Config    *IPRestrictionPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *IPRestrictionPluginConsumer `json:"consumer,omitempty"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *IPRestrictionPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []IPRestrictionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *IPRestrictionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *IPRestrictionPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (i IPRestrictionPlugin) MarshalJSON() ([]byte, error) {
@@ -255,27 +256,6 @@ func (i *IPRestrictionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (i *IPRestrictionPlugin) GetConfig() *IPRestrictionPluginConfig {
-	if i == nil {
-		return nil
-	}
-	return i.Config
-}
-
-func (i *IPRestrictionPlugin) GetConsumer() *IPRestrictionPluginConsumer {
-	if i == nil {
-		return nil
-	}
-	return i.Consumer
-}
-
-func (i *IPRestrictionPlugin) GetConsumerGroup() *IPRestrictionPluginConsumerGroup {
-	if i == nil {
-		return nil
-	}
-	return i.ConsumerGroup
 }
 
 func (i *IPRestrictionPlugin) GetCreatedAt() *int64 {
@@ -324,6 +304,41 @@ func (i *IPRestrictionPlugin) GetPartials() []IPRestrictionPluginPartials {
 	return i.Partials
 }
 
+func (i *IPRestrictionPlugin) GetTags() []string {
+	if i == nil {
+		return nil
+	}
+	return i.Tags
+}
+
+func (i *IPRestrictionPlugin) GetUpdatedAt() *int64 {
+	if i == nil {
+		return nil
+	}
+	return i.UpdatedAt
+}
+
+func (i *IPRestrictionPlugin) GetConfig() *IPRestrictionPluginConfig {
+	if i == nil {
+		return nil
+	}
+	return i.Config
+}
+
+func (i *IPRestrictionPlugin) GetConsumer() *IPRestrictionPluginConsumer {
+	if i == nil {
+		return nil
+	}
+	return i.Consumer
+}
+
+func (i *IPRestrictionPlugin) GetConsumerGroup() *IPRestrictionPluginConsumerGroup {
+	if i == nil {
+		return nil
+	}
+	return i.ConsumerGroup
+}
+
 func (i *IPRestrictionPlugin) GetProtocols() []IPRestrictionPluginProtocols {
 	if i == nil {
 		return nil
@@ -343,18 +358,4 @@ func (i *IPRestrictionPlugin) GetService() *IPRestrictionPluginService {
 		return nil
 	}
 	return i.Service
-}
-
-func (i *IPRestrictionPlugin) GetTags() []string {
-	if i == nil {
-		return nil
-	}
-	return i.Tags
-}
-
-func (i *IPRestrictionPlugin) GetUpdatedAt() *int64 {
-	if i == nil {
-		return nil
-	}
-	return i.UpdatedAt
 }

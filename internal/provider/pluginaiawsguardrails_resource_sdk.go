@@ -15,32 +15,27 @@ func (r *PluginAiAwsGuardrailsResourceModel) RefreshFromSharedAiAwsGuardrailsPlu
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Config.AwsAccessKeyID = types.StringPointerValue(resp.Config.AwsAccessKeyID)
+		r.Config.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.AwsAssumeRoleArn)
+		r.Config.AwsRegion = types.StringValue(resp.Config.AwsRegion)
+		r.Config.AwsRoleSessionName = types.StringPointerValue(resp.Config.AwsRoleSessionName)
+		r.Config.AwsSecretAccessKey = types.StringPointerValue(resp.Config.AwsSecretAccessKey)
+		r.Config.AwsStsEndpointURL = types.StringPointerValue(resp.Config.AwsStsEndpointURL)
+		if resp.Config.GuardingMode != nil {
+			r.Config.GuardingMode = types.StringValue(string(*resp.Config.GuardingMode))
 		} else {
-			r.Config = &tfTypes.AiAwsGuardrailsPluginConfig{}
-			r.Config.AwsAccessKeyID = types.StringPointerValue(resp.Config.AwsAccessKeyID)
-			r.Config.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.AwsAssumeRoleArn)
-			r.Config.AwsRegion = types.StringValue(resp.Config.AwsRegion)
-			r.Config.AwsRoleSessionName = types.StringPointerValue(resp.Config.AwsRoleSessionName)
-			r.Config.AwsSecretAccessKey = types.StringPointerValue(resp.Config.AwsSecretAccessKey)
-			r.Config.AwsStsEndpointURL = types.StringPointerValue(resp.Config.AwsStsEndpointURL)
-			if resp.Config.GuardingMode != nil {
-				r.Config.GuardingMode = types.StringValue(string(*resp.Config.GuardingMode))
-			} else {
-				r.Config.GuardingMode = types.StringNull()
-			}
-			r.Config.GuardrailsID = types.StringValue(resp.Config.GuardrailsID)
-			r.Config.GuardrailsVersion = types.StringValue(resp.Config.GuardrailsVersion)
-			r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
-			r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
-			if resp.Config.TextSource != nil {
-				r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
-			} else {
-				r.Config.TextSource = types.StringNull()
-			}
-			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
+			r.Config.GuardingMode = types.StringNull()
 		}
+		r.Config.GuardrailsID = types.StringValue(resp.Config.GuardrailsID)
+		r.Config.GuardrailsVersion = types.StringValue(resp.Config.GuardrailsVersion)
+		r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
+		r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
+		if resp.Config.TextSource != nil {
+			r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
+		} else {
+			r.Config.TextSource = types.StringNull()
+		}
+		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
 		} else {
@@ -80,18 +75,16 @@ func (r *PluginAiAwsGuardrailsResourceModel) RefreshFromSharedAiAwsGuardrailsPlu
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -204,117 +197,6 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToOperationsUpdateAiawsguardrailsPl
 func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx context.Context) (*shared.AiAwsGuardrailsPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.AiAwsGuardrailsPluginConfig
-	if r.Config != nil {
-		awsAccessKeyID := new(string)
-		if !r.Config.AwsAccessKeyID.IsUnknown() && !r.Config.AwsAccessKeyID.IsNull() {
-			*awsAccessKeyID = r.Config.AwsAccessKeyID.ValueString()
-		} else {
-			awsAccessKeyID = nil
-		}
-		awsAssumeRoleArn := new(string)
-		if !r.Config.AwsAssumeRoleArn.IsUnknown() && !r.Config.AwsAssumeRoleArn.IsNull() {
-			*awsAssumeRoleArn = r.Config.AwsAssumeRoleArn.ValueString()
-		} else {
-			awsAssumeRoleArn = nil
-		}
-		var awsRegion string
-		awsRegion = r.Config.AwsRegion.ValueString()
-
-		awsRoleSessionName := new(string)
-		if !r.Config.AwsRoleSessionName.IsUnknown() && !r.Config.AwsRoleSessionName.IsNull() {
-			*awsRoleSessionName = r.Config.AwsRoleSessionName.ValueString()
-		} else {
-			awsRoleSessionName = nil
-		}
-		awsSecretAccessKey := new(string)
-		if !r.Config.AwsSecretAccessKey.IsUnknown() && !r.Config.AwsSecretAccessKey.IsNull() {
-			*awsSecretAccessKey = r.Config.AwsSecretAccessKey.ValueString()
-		} else {
-			awsSecretAccessKey = nil
-		}
-		awsStsEndpointURL := new(string)
-		if !r.Config.AwsStsEndpointURL.IsUnknown() && !r.Config.AwsStsEndpointURL.IsNull() {
-			*awsStsEndpointURL = r.Config.AwsStsEndpointURL.ValueString()
-		} else {
-			awsStsEndpointURL = nil
-		}
-		guardingMode := new(shared.GuardingMode)
-		if !r.Config.GuardingMode.IsUnknown() && !r.Config.GuardingMode.IsNull() {
-			*guardingMode = shared.GuardingMode(r.Config.GuardingMode.ValueString())
-		} else {
-			guardingMode = nil
-		}
-		var guardrailsID string
-		guardrailsID = r.Config.GuardrailsID.ValueString()
-
-		var guardrailsVersion string
-		guardrailsVersion = r.Config.GuardrailsVersion.ValueString()
-
-		responseBufferSize := new(float64)
-		if !r.Config.ResponseBufferSize.IsUnknown() && !r.Config.ResponseBufferSize.IsNull() {
-			*responseBufferSize = r.Config.ResponseBufferSize.ValueFloat64()
-		} else {
-			responseBufferSize = nil
-		}
-		stopOnError := new(bool)
-		if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
-			*stopOnError = r.Config.StopOnError.ValueBool()
-		} else {
-			stopOnError = nil
-		}
-		textSource := new(shared.TextSource)
-		if !r.Config.TextSource.IsUnknown() && !r.Config.TextSource.IsNull() {
-			*textSource = shared.TextSource(r.Config.TextSource.ValueString())
-		} else {
-			textSource = nil
-		}
-		timeout := new(float64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueFloat64()
-		} else {
-			timeout = nil
-		}
-		config = &shared.AiAwsGuardrailsPluginConfig{
-			AwsAccessKeyID:     awsAccessKeyID,
-			AwsAssumeRoleArn:   awsAssumeRoleArn,
-			AwsRegion:          awsRegion,
-			AwsRoleSessionName: awsRoleSessionName,
-			AwsSecretAccessKey: awsSecretAccessKey,
-			AwsStsEndpointURL:  awsStsEndpointURL,
-			GuardingMode:       guardingMode,
-			GuardrailsID:       guardrailsID,
-			GuardrailsVersion:  guardrailsVersion,
-			ResponseBufferSize: responseBufferSize,
-			StopOnError:        stopOnError,
-			TextSource:         textSource,
-			Timeout:            timeout,
-		}
-	}
-	var consumer *shared.AiAwsGuardrailsPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.AiAwsGuardrailsPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.AiAwsGuardrailsPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.AiAwsGuardrailsPluginConsumerGroup{
-			ID: id1,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -327,11 +209,11 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -366,33 +248,151 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 			Before: before,
 		}
 	}
-	var partials []shared.AiAwsGuardrailsPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiAwsGuardrailsPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id3 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id3 = partialsItem.ID.ValueString()
-			} else {
-				id3 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiAwsGuardrailsPluginPartials{
-				ID:   id3,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AiAwsGuardrailsPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiAwsGuardrailsPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	awsAccessKeyID := new(string)
+	if !r.Config.AwsAccessKeyID.IsUnknown() && !r.Config.AwsAccessKeyID.IsNull() {
+		*awsAccessKeyID = r.Config.AwsAccessKeyID.ValueString()
+	} else {
+		awsAccessKeyID = nil
+	}
+	awsAssumeRoleArn := new(string)
+	if !r.Config.AwsAssumeRoleArn.IsUnknown() && !r.Config.AwsAssumeRoleArn.IsNull() {
+		*awsAssumeRoleArn = r.Config.AwsAssumeRoleArn.ValueString()
+	} else {
+		awsAssumeRoleArn = nil
+	}
+	var awsRegion string
+	awsRegion = r.Config.AwsRegion.ValueString()
+
+	awsRoleSessionName := new(string)
+	if !r.Config.AwsRoleSessionName.IsUnknown() && !r.Config.AwsRoleSessionName.IsNull() {
+		*awsRoleSessionName = r.Config.AwsRoleSessionName.ValueString()
+	} else {
+		awsRoleSessionName = nil
+	}
+	awsSecretAccessKey := new(string)
+	if !r.Config.AwsSecretAccessKey.IsUnknown() && !r.Config.AwsSecretAccessKey.IsNull() {
+		*awsSecretAccessKey = r.Config.AwsSecretAccessKey.ValueString()
+	} else {
+		awsSecretAccessKey = nil
+	}
+	awsStsEndpointURL := new(string)
+	if !r.Config.AwsStsEndpointURL.IsUnknown() && !r.Config.AwsStsEndpointURL.IsNull() {
+		*awsStsEndpointURL = r.Config.AwsStsEndpointURL.ValueString()
+	} else {
+		awsStsEndpointURL = nil
+	}
+	guardingMode := new(shared.GuardingMode)
+	if !r.Config.GuardingMode.IsUnknown() && !r.Config.GuardingMode.IsNull() {
+		*guardingMode = shared.GuardingMode(r.Config.GuardingMode.ValueString())
+	} else {
+		guardingMode = nil
+	}
+	var guardrailsID string
+	guardrailsID = r.Config.GuardrailsID.ValueString()
+
+	var guardrailsVersion string
+	guardrailsVersion = r.Config.GuardrailsVersion.ValueString()
+
+	responseBufferSize := new(float64)
+	if !r.Config.ResponseBufferSize.IsUnknown() && !r.Config.ResponseBufferSize.IsNull() {
+		*responseBufferSize = r.Config.ResponseBufferSize.ValueFloat64()
+	} else {
+		responseBufferSize = nil
+	}
+	stopOnError := new(bool)
+	if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
+		*stopOnError = r.Config.StopOnError.ValueBool()
+	} else {
+		stopOnError = nil
+	}
+	textSource := new(shared.TextSource)
+	if !r.Config.TextSource.IsUnknown() && !r.Config.TextSource.IsNull() {
+		*textSource = shared.TextSource(r.Config.TextSource.ValueString())
+	} else {
+		textSource = nil
+	}
+	timeout := new(float64)
+	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+		*timeout = r.Config.Timeout.ValueFloat64()
+	} else {
+		timeout = nil
+	}
+	config := shared.AiAwsGuardrailsPluginConfig{
+		AwsAccessKeyID:     awsAccessKeyID,
+		AwsAssumeRoleArn:   awsAssumeRoleArn,
+		AwsRegion:          awsRegion,
+		AwsRoleSessionName: awsRoleSessionName,
+		AwsSecretAccessKey: awsSecretAccessKey,
+		AwsStsEndpointURL:  awsStsEndpointURL,
+		GuardingMode:       guardingMode,
+		GuardrailsID:       guardrailsID,
+		GuardrailsVersion:  guardrailsVersion,
+		ResponseBufferSize: responseBufferSize,
+		StopOnError:        stopOnError,
+		TextSource:         textSource,
+		Timeout:            timeout,
+	}
+	var consumer *shared.AiAwsGuardrailsPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.AiAwsGuardrailsPluginConsumer{
+			ID: id2,
+		}
+	}
+	var consumerGroup *shared.AiAwsGuardrailsPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id3 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id3 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		consumerGroup = &shared.AiAwsGuardrailsPluginConsumerGroup{
+			ID: id3,
 		}
 	}
 	protocols := make([]shared.AiAwsGuardrailsPluginProtocols, 0, len(r.Protocols))
@@ -423,34 +423,21 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 			ID: id5,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.AiAwsGuardrailsPlugin{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
-		ID:            id2,
+		ID:            id,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Partials:      partials,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
+		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

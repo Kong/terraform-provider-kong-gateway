@@ -8,37 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type WebsocketSizeLimitPluginConfig struct {
-	ClientMaxPayload   *int64 `json:"client_max_payload,omitempty"`
-	UpstreamMaxPayload *int64 `json:"upstream_max_payload,omitempty"`
-}
-
-func (w *WebsocketSizeLimitPluginConfig) GetClientMaxPayload() *int64 {
-	if w == nil {
-		return nil
-	}
-	return w.ClientMaxPayload
-}
-
-func (w *WebsocketSizeLimitPluginConfig) GetUpstreamMaxPayload() *int64 {
-	if w == nil {
-		return nil
-	}
-	return w.UpstreamMaxPayload
-}
-
-// WebsocketSizeLimitPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type WebsocketSizeLimitPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (w *WebsocketSizeLimitPluginConsumer) GetID() *string {
-	if w == nil {
-		return nil
-	}
-	return w.ID
-}
-
 type WebsocketSizeLimitPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -109,6 +78,37 @@ func (w *WebsocketSizeLimitPluginPartials) GetPath() *string {
 	return w.Path
 }
 
+type WebsocketSizeLimitPluginConfig struct {
+	ClientMaxPayload   *int64 `json:"client_max_payload,omitempty"`
+	UpstreamMaxPayload *int64 `json:"upstream_max_payload,omitempty"`
+}
+
+func (w *WebsocketSizeLimitPluginConfig) GetClientMaxPayload() *int64 {
+	if w == nil {
+		return nil
+	}
+	return w.ClientMaxPayload
+}
+
+func (w *WebsocketSizeLimitPluginConfig) GetUpstreamMaxPayload() *int64 {
+	if w == nil {
+		return nil
+	}
+	return w.UpstreamMaxPayload
+}
+
+// WebsocketSizeLimitPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type WebsocketSizeLimitPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (w *WebsocketSizeLimitPluginConsumer) GetID() *string {
+	if w == nil {
+		return nil
+	}
+	return w.ID
+}
+
 type WebsocketSizeLimitPluginProtocols string
 
 const (
@@ -159,10 +159,8 @@ func (w *WebsocketSizeLimitPluginService) GetID() *string {
 	return w.ID
 }
 
+// WebsocketSizeLimitPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type WebsocketSizeLimitPlugin struct {
-	Config *WebsocketSizeLimitPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *WebsocketSizeLimitPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -175,16 +173,19 @@ type WebsocketSizeLimitPlugin struct {
 	Ordering     *WebsocketSizeLimitPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []WebsocketSizeLimitPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                          `json:"updated_at,omitempty"`
+	Config    *WebsocketSizeLimitPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *WebsocketSizeLimitPluginConsumer `json:"consumer,omitempty"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []WebsocketSizeLimitPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *WebsocketSizeLimitPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *WebsocketSizeLimitPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (w WebsocketSizeLimitPlugin) MarshalJSON() ([]byte, error) {
@@ -196,20 +197,6 @@ func (w *WebsocketSizeLimitPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (w *WebsocketSizeLimitPlugin) GetConfig() *WebsocketSizeLimitPluginConfig {
-	if w == nil {
-		return nil
-	}
-	return w.Config
-}
-
-func (w *WebsocketSizeLimitPlugin) GetConsumer() *WebsocketSizeLimitPluginConsumer {
-	if w == nil {
-		return nil
-	}
-	return w.Consumer
 }
 
 func (w *WebsocketSizeLimitPlugin) GetCreatedAt() *int64 {
@@ -258,6 +245,34 @@ func (w *WebsocketSizeLimitPlugin) GetPartials() []WebsocketSizeLimitPluginParti
 	return w.Partials
 }
 
+func (w *WebsocketSizeLimitPlugin) GetTags() []string {
+	if w == nil {
+		return nil
+	}
+	return w.Tags
+}
+
+func (w *WebsocketSizeLimitPlugin) GetUpdatedAt() *int64 {
+	if w == nil {
+		return nil
+	}
+	return w.UpdatedAt
+}
+
+func (w *WebsocketSizeLimitPlugin) GetConfig() *WebsocketSizeLimitPluginConfig {
+	if w == nil {
+		return nil
+	}
+	return w.Config
+}
+
+func (w *WebsocketSizeLimitPlugin) GetConsumer() *WebsocketSizeLimitPluginConsumer {
+	if w == nil {
+		return nil
+	}
+	return w.Consumer
+}
+
 func (w *WebsocketSizeLimitPlugin) GetProtocols() []WebsocketSizeLimitPluginProtocols {
 	if w == nil {
 		return nil
@@ -277,18 +292,4 @@ func (w *WebsocketSizeLimitPlugin) GetService() *WebsocketSizeLimitPluginService
 		return nil
 	}
 	return w.Service
-}
-
-func (w *WebsocketSizeLimitPlugin) GetTags() []string {
-	if w == nil {
-		return nil
-	}
-	return w.Tags
-}
-
-func (w *WebsocketSizeLimitPlugin) GetUpdatedAt() *int64 {
-	if w == nil {
-		return nil
-	}
-	return w.UpdatedAt
 }

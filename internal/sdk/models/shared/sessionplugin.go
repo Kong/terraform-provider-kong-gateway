@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type SessionPluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SessionPluginAfter) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SessionPluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (s *SessionPluginBefore) GetAccess() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Access
+}
+
+type SessionPluginOrdering struct {
+	After  *SessionPluginAfter  `json:"after,omitempty"`
+	Before *SessionPluginBefore `json:"before,omitempty"`
+}
+
+func (s *SessionPluginOrdering) GetAfter() *SessionPluginAfter {
+	if s == nil {
+		return nil
+	}
+	return s.After
+}
+
+func (s *SessionPluginOrdering) GetBefore() *SessionPluginBefore {
+	if s == nil {
+		return nil
+	}
+	return s.Before
+}
+
+type SessionPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (s *SessionPluginPartials) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
+func (s *SessionPluginPartials) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *SessionPluginPartials) GetPath() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Path
+}
+
 type Bind string
 
 const (
@@ -444,76 +514,6 @@ func (s *SessionPluginConfig) GetStoreMetadata() *bool {
 	return s.StoreMetadata
 }
 
-type SessionPluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *SessionPluginAfter) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type SessionPluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (s *SessionPluginBefore) GetAccess() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Access
-}
-
-type SessionPluginOrdering struct {
-	After  *SessionPluginAfter  `json:"after,omitempty"`
-	Before *SessionPluginBefore `json:"before,omitempty"`
-}
-
-func (s *SessionPluginOrdering) GetAfter() *SessionPluginAfter {
-	if s == nil {
-		return nil
-	}
-	return s.After
-}
-
-func (s *SessionPluginOrdering) GetBefore() *SessionPluginBefore {
-	if s == nil {
-		return nil
-	}
-	return s.Before
-}
-
-type SessionPluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (s *SessionPluginPartials) GetID() *string {
-	if s == nil {
-		return nil
-	}
-	return s.ID
-}
-
-func (s *SessionPluginPartials) GetName() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Name
-}
-
-func (s *SessionPluginPartials) GetPath() *string {
-	if s == nil {
-		return nil
-	}
-	return s.Path
-}
-
 // SessionPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type SessionPluginProtocols string
 
@@ -589,8 +589,8 @@ func (s *SessionPluginService) GetID() *string {
 	return s.ID
 }
 
+// SessionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SessionPlugin struct {
-	Config *SessionPluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -603,16 +603,17 @@ type SessionPlugin struct {
 	Ordering     *SessionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []SessionPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64               `json:"updated_at,omitempty"`
+	Config    *SessionPluginConfig `json:"config,omitempty"`
 	// A set of strings representing protocols.
 	Protocols []SessionPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *SessionPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *SessionPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s SessionPlugin) MarshalJSON() ([]byte, error) {
@@ -624,13 +625,6 @@ func (s *SessionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (s *SessionPlugin) GetConfig() *SessionPluginConfig {
-	if s == nil {
-		return nil
-	}
-	return s.Config
 }
 
 func (s *SessionPlugin) GetCreatedAt() *int64 {
@@ -679,6 +673,27 @@ func (s *SessionPlugin) GetPartials() []SessionPluginPartials {
 	return s.Partials
 }
 
+func (s *SessionPlugin) GetTags() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Tags
+}
+
+func (s *SessionPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.UpdatedAt
+}
+
+func (s *SessionPlugin) GetConfig() *SessionPluginConfig {
+	if s == nil {
+		return nil
+	}
+	return s.Config
+}
+
 func (s *SessionPlugin) GetProtocols() []SessionPluginProtocols {
 	if s == nil {
 		return nil
@@ -698,18 +713,4 @@ func (s *SessionPlugin) GetService() *SessionPluginService {
 		return nil
 	}
 	return s.Service
-}
-
-func (s *SessionPlugin) GetTags() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Tags
-}
-
-func (s *SessionPlugin) GetUpdatedAt() *int64 {
-	if s == nil {
-		return nil
-	}
-	return s.UpdatedAt
 }

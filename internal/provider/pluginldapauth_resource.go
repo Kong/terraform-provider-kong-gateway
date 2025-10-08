@@ -19,7 +19,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,19 +37,19 @@ type PluginLdapAuthResource struct {
 
 // PluginLdapAuthResourceModel describes the resource data model.
 type PluginLdapAuthResourceModel struct {
-	Config       *tfTypes.LdapAuthPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                   `tfsdk:"created_at"`
-	Enabled      types.Bool                    `tfsdk:"enabled"`
-	ID           types.String                  `tfsdk:"id"`
-	InstanceName types.String                  `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering    `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials   `tfsdk:"partials"`
-	Protocols    []types.String                `tfsdk:"protocols"`
-	Route        *tfTypes.Set                  `tfsdk:"route"`
-	Service      *tfTypes.Set                  `tfsdk:"service"`
-	Tags         []types.String                `tfsdk:"tags"`
-	UpdatedAt    types.Int64                   `tfsdk:"updated_at"`
-	Workspace    types.String                  `tfsdk:"workspace"`
+	Config       tfTypes.LdapAuthPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                  `tfsdk:"created_at"`
+	Enabled      types.Bool                   `tfsdk:"enabled"`
+	ID           types.String                 `tfsdk:"id"`
+	InstanceName types.String                 `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials  `tfsdk:"partials"`
+	Protocols    []types.String               `tfsdk:"protocols"`
+	Route        *tfTypes.Set                 `tfsdk:"route"`
+	Service      *tfTypes.Set                 `tfsdk:"service"`
+	Tags         []types.String               `tfsdk:"tags"`
+	UpdatedAt    types.Int64                  `tfsdk:"updated_at"`
+	Workspace    types.String                 `tfsdk:"workspace"`
 }
 
 func (r *PluginLdapAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,8 +61,7 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 		MarkdownDescription: "PluginLdapAuth Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -71,20 +69,12 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 						Description: `An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure ` + "`" + `4xx` + "`" + `.`,
 					},
 					"attribute": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `Attribute to be used to search the user; e.g. cn. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `Attribute to be used to search the user; e.g. cn`,
 					},
 					"base_dn": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `Base DN as the starting point for the search; e.g., dc=example,dc=com. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `Base DN as the starting point for the search; e.g., dc=example,dc=com`,
 					},
 					"cache_ttl": schema.Float64Attribute{
 						Computed:    true,
@@ -107,12 +97,8 @@ func (r *PluginLdapAuthResource) Schema(ctx context.Context, req resource.Schema
 						Description: `An optional value in milliseconds that defines how long an idle connection to LDAP server will live before being closed.`,
 					},
 					"ldap_host": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `A string representing a host name, such as example.com. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `A string representing a host name, such as example.com.`,
 					},
 					"ldap_port": schema.Int64Attribute{
 						Computed:    true,

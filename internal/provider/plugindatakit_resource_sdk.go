@@ -17,95 +17,90 @@ func (r *PluginDatakitResourceModel) RefreshFromSharedDatakitPlugin(ctx context.
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Config.Debug = types.BoolPointerValue(resp.Config.Debug)
+		r.Config.Nodes = []tfTypes.Nodes{}
+
+		for _, nodesItem := range resp.Config.Nodes {
+			var nodes tfTypes.Nodes
+
+			nodes.Name = types.StringValue(nodesItem.Name)
+			nodes.Type = types.StringValue(string(nodesItem.Type))
+
+			r.Config.Nodes = append(r.Config.Nodes, nodes)
+		}
+		if resp.Config.Resources == nil {
+			r.Config.Resources = nil
 		} else {
-			r.Config = &tfTypes.DatakitPluginConfig{}
-			r.Config.Debug = types.BoolPointerValue(resp.Config.Debug)
-			r.Config.Nodes = []tfTypes.Nodes{}
-
-			for _, nodesItem := range resp.Config.Nodes {
-				var nodes tfTypes.Nodes
-
-				nodes.Name = types.StringValue(nodesItem.Name)
-				nodes.Type = types.StringValue(string(nodesItem.Type))
-
-				r.Config.Nodes = append(r.Config.Nodes, nodes)
-			}
-			if resp.Config.Resources == nil {
-				r.Config.Resources = nil
+			r.Config.Resources = &tfTypes.Resources{}
+			if resp.Config.Resources.Cache == nil {
+				r.Config.Resources.Cache = nil
 			} else {
-				r.Config.Resources = &tfTypes.Resources{}
-				if resp.Config.Resources.Cache == nil {
-					r.Config.Resources.Cache = nil
+				r.Config.Resources.Cache = &tfTypes.DatakitPluginCache{}
+				if resp.Config.Resources.Cache.Memory == nil {
+					r.Config.Resources.Cache.Memory = nil
 				} else {
-					r.Config.Resources.Cache = &tfTypes.DatakitPluginCache{}
-					if resp.Config.Resources.Cache.Memory == nil {
-						r.Config.Resources.Cache.Memory = nil
-					} else {
-						r.Config.Resources.Cache.Memory = &tfTypes.DatakitPluginMemory{}
-						r.Config.Resources.Cache.Memory.DictionaryName = types.StringPointerValue(resp.Config.Resources.Cache.Memory.DictionaryName)
-					}
-					if resp.Config.Resources.Cache.Redis == nil {
-						r.Config.Resources.Cache.Redis = nil
-					} else {
-						r.Config.Resources.Cache.Redis = &tfTypes.PartialRedisEeConfig{}
-						r.Config.Resources.Cache.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ClusterMaxRedirections)
-						r.Config.Resources.Cache.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
-
-						for _, clusterNodesItem := range resp.Config.Resources.Cache.Redis.ClusterNodes {
-							var clusterNodes tfTypes.PartialRedisEeClusterNodes
-
-							clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
-							clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
-
-							r.Config.Resources.Cache.Redis.ClusterNodes = append(r.Config.Resources.Cache.Redis.ClusterNodes, clusterNodes)
-						}
-						r.Config.Resources.Cache.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ConnectTimeout)
-						r.Config.Resources.Cache.Redis.ConnectionIsProxied = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.ConnectionIsProxied)
-						r.Config.Resources.Cache.Redis.Database = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.Database)
-						r.Config.Resources.Cache.Redis.Host = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Host)
-						r.Config.Resources.Cache.Redis.KeepaliveBacklog = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.KeepaliveBacklog)
-						r.Config.Resources.Cache.Redis.KeepalivePoolSize = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.KeepalivePoolSize)
-						r.Config.Resources.Cache.Redis.Password = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Password)
-						r.Config.Resources.Cache.Redis.Port = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.Port)
-						r.Config.Resources.Cache.Redis.ReadTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ReadTimeout)
-						r.Config.Resources.Cache.Redis.SendTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.SendTimeout)
-						r.Config.Resources.Cache.Redis.SentinelMaster = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelMaster)
-						r.Config.Resources.Cache.Redis.SentinelNodes = []tfTypes.PartialRedisEeSentinelNodes{}
-
-						for _, sentinelNodesItem := range resp.Config.Resources.Cache.Redis.SentinelNodes {
-							var sentinelNodes tfTypes.PartialRedisEeSentinelNodes
-
-							sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
-							sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
-
-							r.Config.Resources.Cache.Redis.SentinelNodes = append(r.Config.Resources.Cache.Redis.SentinelNodes, sentinelNodes)
-						}
-						r.Config.Resources.Cache.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelPassword)
-						if resp.Config.Resources.Cache.Redis.SentinelRole != nil {
-							r.Config.Resources.Cache.Redis.SentinelRole = types.StringValue(string(*resp.Config.Resources.Cache.Redis.SentinelRole))
-						} else {
-							r.Config.Resources.Cache.Redis.SentinelRole = types.StringNull()
-						}
-						r.Config.Resources.Cache.Redis.SentinelUsername = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelUsername)
-						r.Config.Resources.Cache.Redis.ServerName = types.StringPointerValue(resp.Config.Resources.Cache.Redis.ServerName)
-						r.Config.Resources.Cache.Redis.Ssl = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.Ssl)
-						r.Config.Resources.Cache.Redis.SslVerify = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.SslVerify)
-						r.Config.Resources.Cache.Redis.Username = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Username)
-					}
-					if resp.Config.Resources.Cache.Strategy != nil {
-						r.Config.Resources.Cache.Strategy = types.StringValue(string(*resp.Config.Resources.Cache.Strategy))
-					} else {
-						r.Config.Resources.Cache.Strategy = types.StringNull()
-					}
+					r.Config.Resources.Cache.Memory = &tfTypes.DatakitPluginMemory{}
+					r.Config.Resources.Cache.Memory.DictionaryName = types.StringPointerValue(resp.Config.Resources.Cache.Memory.DictionaryName)
 				}
-				if len(resp.Config.Resources.Vault) > 0 {
-					r.Config.Resources.Vault = make(map[string]jsontypes.Normalized, len(resp.Config.Resources.Vault))
-					for key, value := range resp.Config.Resources.Vault {
-						result, _ := json.Marshal(value)
-						r.Config.Resources.Vault[key] = jsontypes.NewNormalizedValue(string(result))
+				if resp.Config.Resources.Cache.Redis == nil {
+					r.Config.Resources.Cache.Redis = nil
+				} else {
+					r.Config.Resources.Cache.Redis = &tfTypes.PartialRedisEeConfig{}
+					r.Config.Resources.Cache.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ClusterMaxRedirections)
+					r.Config.Resources.Cache.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
+
+					for _, clusterNodesItem := range resp.Config.Resources.Cache.Redis.ClusterNodes {
+						var clusterNodes tfTypes.PartialRedisEeClusterNodes
+
+						clusterNodes.IP = types.StringPointerValue(clusterNodesItem.IP)
+						clusterNodes.Port = types.Int64PointerValue(clusterNodesItem.Port)
+
+						r.Config.Resources.Cache.Redis.ClusterNodes = append(r.Config.Resources.Cache.Redis.ClusterNodes, clusterNodes)
 					}
+					r.Config.Resources.Cache.Redis.ConnectTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ConnectTimeout)
+					r.Config.Resources.Cache.Redis.ConnectionIsProxied = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.ConnectionIsProxied)
+					r.Config.Resources.Cache.Redis.Database = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.Database)
+					r.Config.Resources.Cache.Redis.Host = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Host)
+					r.Config.Resources.Cache.Redis.KeepaliveBacklog = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.KeepaliveBacklog)
+					r.Config.Resources.Cache.Redis.KeepalivePoolSize = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.KeepalivePoolSize)
+					r.Config.Resources.Cache.Redis.Password = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Password)
+					r.Config.Resources.Cache.Redis.Port = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.Port)
+					r.Config.Resources.Cache.Redis.ReadTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.ReadTimeout)
+					r.Config.Resources.Cache.Redis.SendTimeout = types.Int64PointerValue(resp.Config.Resources.Cache.Redis.SendTimeout)
+					r.Config.Resources.Cache.Redis.SentinelMaster = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelMaster)
+					r.Config.Resources.Cache.Redis.SentinelNodes = []tfTypes.PartialRedisEeSentinelNodes{}
+
+					for _, sentinelNodesItem := range resp.Config.Resources.Cache.Redis.SentinelNodes {
+						var sentinelNodes tfTypes.PartialRedisEeSentinelNodes
+
+						sentinelNodes.Host = types.StringPointerValue(sentinelNodesItem.Host)
+						sentinelNodes.Port = types.Int64PointerValue(sentinelNodesItem.Port)
+
+						r.Config.Resources.Cache.Redis.SentinelNodes = append(r.Config.Resources.Cache.Redis.SentinelNodes, sentinelNodes)
+					}
+					r.Config.Resources.Cache.Redis.SentinelPassword = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelPassword)
+					if resp.Config.Resources.Cache.Redis.SentinelRole != nil {
+						r.Config.Resources.Cache.Redis.SentinelRole = types.StringValue(string(*resp.Config.Resources.Cache.Redis.SentinelRole))
+					} else {
+						r.Config.Resources.Cache.Redis.SentinelRole = types.StringNull()
+					}
+					r.Config.Resources.Cache.Redis.SentinelUsername = types.StringPointerValue(resp.Config.Resources.Cache.Redis.SentinelUsername)
+					r.Config.Resources.Cache.Redis.ServerName = types.StringPointerValue(resp.Config.Resources.Cache.Redis.ServerName)
+					r.Config.Resources.Cache.Redis.Ssl = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.Ssl)
+					r.Config.Resources.Cache.Redis.SslVerify = types.BoolPointerValue(resp.Config.Resources.Cache.Redis.SslVerify)
+					r.Config.Resources.Cache.Redis.Username = types.StringPointerValue(resp.Config.Resources.Cache.Redis.Username)
+				}
+				if resp.Config.Resources.Cache.Strategy != nil {
+					r.Config.Resources.Cache.Strategy = types.StringValue(string(*resp.Config.Resources.Cache.Strategy))
+				} else {
+					r.Config.Resources.Cache.Strategy = types.StringNull()
+				}
+			}
+			if len(resp.Config.Resources.Vault) > 0 {
+				r.Config.Resources.Vault = make(map[string]jsontypes.Normalized, len(resp.Config.Resources.Vault))
+				for key, value := range resp.Config.Resources.Vault {
+					result, _ := json.Marshal(value)
+					r.Config.Resources.Vault[key] = jsontypes.NewNormalizedValue(string(result))
 				}
 			}
 		}
@@ -148,18 +143,16 @@ func (r *PluginDatakitResourceModel) RefreshFromSharedDatakitPlugin(ctx context.
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -272,272 +265,6 @@ func (r *PluginDatakitResourceModel) ToOperationsUpdateDatakitPluginRequest(ctx 
 func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) (*shared.DatakitPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.DatakitPluginConfig
-	if r.Config != nil {
-		debug := new(bool)
-		if !r.Config.Debug.IsUnknown() && !r.Config.Debug.IsNull() {
-			*debug = r.Config.Debug.ValueBool()
-		} else {
-			debug = nil
-		}
-		nodes := make([]shared.Nodes, 0, len(r.Config.Nodes))
-		for _, nodesItem := range r.Config.Nodes {
-			var name string
-			name = nodesItem.Name.ValueString()
-
-			typeVar := shared.Type(nodesItem.Type.ValueString())
-			nodes = append(nodes, shared.Nodes{
-				Name: name,
-				Type: typeVar,
-			})
-		}
-		var resources *shared.Resources
-		if r.Config.Resources != nil {
-			var cache *shared.DatakitPluginCache
-			if r.Config.Resources.Cache != nil {
-				var memory *shared.DatakitPluginMemory
-				if r.Config.Resources.Cache.Memory != nil {
-					dictionaryName := new(string)
-					if !r.Config.Resources.Cache.Memory.DictionaryName.IsUnknown() && !r.Config.Resources.Cache.Memory.DictionaryName.IsNull() {
-						*dictionaryName = r.Config.Resources.Cache.Memory.DictionaryName.ValueString()
-					} else {
-						dictionaryName = nil
-					}
-					memory = &shared.DatakitPluginMemory{
-						DictionaryName: dictionaryName,
-					}
-				}
-				var redis *shared.DatakitPluginRedis
-				if r.Config.Resources.Cache.Redis != nil {
-					clusterMaxRedirections := new(int64)
-					if !r.Config.Resources.Cache.Redis.ClusterMaxRedirections.IsUnknown() && !r.Config.Resources.Cache.Redis.ClusterMaxRedirections.IsNull() {
-						*clusterMaxRedirections = r.Config.Resources.Cache.Redis.ClusterMaxRedirections.ValueInt64()
-					} else {
-						clusterMaxRedirections = nil
-					}
-					clusterNodes := make([]shared.DatakitPluginClusterNodes, 0, len(r.Config.Resources.Cache.Redis.ClusterNodes))
-					for _, clusterNodesItem := range r.Config.Resources.Cache.Redis.ClusterNodes {
-						ip := new(string)
-						if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
-							*ip = clusterNodesItem.IP.ValueString()
-						} else {
-							ip = nil
-						}
-						port := new(int64)
-						if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
-							*port = clusterNodesItem.Port.ValueInt64()
-						} else {
-							port = nil
-						}
-						clusterNodes = append(clusterNodes, shared.DatakitPluginClusterNodes{
-							IP:   ip,
-							Port: port,
-						})
-					}
-					connectTimeout := new(int64)
-					if !r.Config.Resources.Cache.Redis.ConnectTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.ConnectTimeout.IsNull() {
-						*connectTimeout = r.Config.Resources.Cache.Redis.ConnectTimeout.ValueInt64()
-					} else {
-						connectTimeout = nil
-					}
-					connectionIsProxied := new(bool)
-					if !r.Config.Resources.Cache.Redis.ConnectionIsProxied.IsUnknown() && !r.Config.Resources.Cache.Redis.ConnectionIsProxied.IsNull() {
-						*connectionIsProxied = r.Config.Resources.Cache.Redis.ConnectionIsProxied.ValueBool()
-					} else {
-						connectionIsProxied = nil
-					}
-					database := new(int64)
-					if !r.Config.Resources.Cache.Redis.Database.IsUnknown() && !r.Config.Resources.Cache.Redis.Database.IsNull() {
-						*database = r.Config.Resources.Cache.Redis.Database.ValueInt64()
-					} else {
-						database = nil
-					}
-					host := new(string)
-					if !r.Config.Resources.Cache.Redis.Host.IsUnknown() && !r.Config.Resources.Cache.Redis.Host.IsNull() {
-						*host = r.Config.Resources.Cache.Redis.Host.ValueString()
-					} else {
-						host = nil
-					}
-					keepaliveBacklog := new(int64)
-					if !r.Config.Resources.Cache.Redis.KeepaliveBacklog.IsUnknown() && !r.Config.Resources.Cache.Redis.KeepaliveBacklog.IsNull() {
-						*keepaliveBacklog = r.Config.Resources.Cache.Redis.KeepaliveBacklog.ValueInt64()
-					} else {
-						keepaliveBacklog = nil
-					}
-					keepalivePoolSize := new(int64)
-					if !r.Config.Resources.Cache.Redis.KeepalivePoolSize.IsUnknown() && !r.Config.Resources.Cache.Redis.KeepalivePoolSize.IsNull() {
-						*keepalivePoolSize = r.Config.Resources.Cache.Redis.KeepalivePoolSize.ValueInt64()
-					} else {
-						keepalivePoolSize = nil
-					}
-					password := new(string)
-					if !r.Config.Resources.Cache.Redis.Password.IsUnknown() && !r.Config.Resources.Cache.Redis.Password.IsNull() {
-						*password = r.Config.Resources.Cache.Redis.Password.ValueString()
-					} else {
-						password = nil
-					}
-					port1 := new(int64)
-					if !r.Config.Resources.Cache.Redis.Port.IsUnknown() && !r.Config.Resources.Cache.Redis.Port.IsNull() {
-						*port1 = r.Config.Resources.Cache.Redis.Port.ValueInt64()
-					} else {
-						port1 = nil
-					}
-					readTimeout := new(int64)
-					if !r.Config.Resources.Cache.Redis.ReadTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.ReadTimeout.IsNull() {
-						*readTimeout = r.Config.Resources.Cache.Redis.ReadTimeout.ValueInt64()
-					} else {
-						readTimeout = nil
-					}
-					sendTimeout := new(int64)
-					if !r.Config.Resources.Cache.Redis.SendTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.SendTimeout.IsNull() {
-						*sendTimeout = r.Config.Resources.Cache.Redis.SendTimeout.ValueInt64()
-					} else {
-						sendTimeout = nil
-					}
-					sentinelMaster := new(string)
-					if !r.Config.Resources.Cache.Redis.SentinelMaster.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelMaster.IsNull() {
-						*sentinelMaster = r.Config.Resources.Cache.Redis.SentinelMaster.ValueString()
-					} else {
-						sentinelMaster = nil
-					}
-					sentinelNodes := make([]shared.DatakitPluginSentinelNodes, 0, len(r.Config.Resources.Cache.Redis.SentinelNodes))
-					for _, sentinelNodesItem := range r.Config.Resources.Cache.Redis.SentinelNodes {
-						host1 := new(string)
-						if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
-							*host1 = sentinelNodesItem.Host.ValueString()
-						} else {
-							host1 = nil
-						}
-						port2 := new(int64)
-						if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
-							*port2 = sentinelNodesItem.Port.ValueInt64()
-						} else {
-							port2 = nil
-						}
-						sentinelNodes = append(sentinelNodes, shared.DatakitPluginSentinelNodes{
-							Host: host1,
-							Port: port2,
-						})
-					}
-					sentinelPassword := new(string)
-					if !r.Config.Resources.Cache.Redis.SentinelPassword.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelPassword.IsNull() {
-						*sentinelPassword = r.Config.Resources.Cache.Redis.SentinelPassword.ValueString()
-					} else {
-						sentinelPassword = nil
-					}
-					sentinelRole := new(shared.DatakitPluginSentinelRole)
-					if !r.Config.Resources.Cache.Redis.SentinelRole.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelRole.IsNull() {
-						*sentinelRole = shared.DatakitPluginSentinelRole(r.Config.Resources.Cache.Redis.SentinelRole.ValueString())
-					} else {
-						sentinelRole = nil
-					}
-					sentinelUsername := new(string)
-					if !r.Config.Resources.Cache.Redis.SentinelUsername.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelUsername.IsNull() {
-						*sentinelUsername = r.Config.Resources.Cache.Redis.SentinelUsername.ValueString()
-					} else {
-						sentinelUsername = nil
-					}
-					serverName := new(string)
-					if !r.Config.Resources.Cache.Redis.ServerName.IsUnknown() && !r.Config.Resources.Cache.Redis.ServerName.IsNull() {
-						*serverName = r.Config.Resources.Cache.Redis.ServerName.ValueString()
-					} else {
-						serverName = nil
-					}
-					ssl := new(bool)
-					if !r.Config.Resources.Cache.Redis.Ssl.IsUnknown() && !r.Config.Resources.Cache.Redis.Ssl.IsNull() {
-						*ssl = r.Config.Resources.Cache.Redis.Ssl.ValueBool()
-					} else {
-						ssl = nil
-					}
-					sslVerify := new(bool)
-					if !r.Config.Resources.Cache.Redis.SslVerify.IsUnknown() && !r.Config.Resources.Cache.Redis.SslVerify.IsNull() {
-						*sslVerify = r.Config.Resources.Cache.Redis.SslVerify.ValueBool()
-					} else {
-						sslVerify = nil
-					}
-					username := new(string)
-					if !r.Config.Resources.Cache.Redis.Username.IsUnknown() && !r.Config.Resources.Cache.Redis.Username.IsNull() {
-						*username = r.Config.Resources.Cache.Redis.Username.ValueString()
-					} else {
-						username = nil
-					}
-					redis = &shared.DatakitPluginRedis{
-						ClusterMaxRedirections: clusterMaxRedirections,
-						ClusterNodes:           clusterNodes,
-						ConnectTimeout:         connectTimeout,
-						ConnectionIsProxied:    connectionIsProxied,
-						Database:               database,
-						Host:                   host,
-						KeepaliveBacklog:       keepaliveBacklog,
-						KeepalivePoolSize:      keepalivePoolSize,
-						Password:               password,
-						Port:                   port1,
-						ReadTimeout:            readTimeout,
-						SendTimeout:            sendTimeout,
-						SentinelMaster:         sentinelMaster,
-						SentinelNodes:          sentinelNodes,
-						SentinelPassword:       sentinelPassword,
-						SentinelRole:           sentinelRole,
-						SentinelUsername:       sentinelUsername,
-						ServerName:             serverName,
-						Ssl:                    ssl,
-						SslVerify:              sslVerify,
-						Username:               username,
-					}
-				}
-				strategy := new(shared.DatakitPluginStrategy)
-				if !r.Config.Resources.Cache.Strategy.IsUnknown() && !r.Config.Resources.Cache.Strategy.IsNull() {
-					*strategy = shared.DatakitPluginStrategy(r.Config.Resources.Cache.Strategy.ValueString())
-				} else {
-					strategy = nil
-				}
-				cache = &shared.DatakitPluginCache{
-					Memory:   memory,
-					Redis:    redis,
-					Strategy: strategy,
-				}
-			}
-			vault := make(map[string]interface{})
-			for vaultKey, vaultValue := range r.Config.Resources.Vault {
-				var vaultInst interface{}
-				_ = json.Unmarshal([]byte(vaultValue.ValueString()), &vaultInst)
-				vault[vaultKey] = vaultInst
-			}
-			resources = &shared.Resources{
-				Cache: cache,
-				Vault: vault,
-			}
-		}
-		config = &shared.DatakitPluginConfig{
-			Debug:     debug,
-			Nodes:     nodes,
-			Resources: resources,
-		}
-	}
-	var consumer *shared.DatakitPluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.DatakitPluginConsumer{
-			ID: id,
-		}
-	}
-	var consumerGroup *shared.DatakitPluginConsumerGroup
-	if r.ConsumerGroup != nil {
-		id1 := new(string)
-		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
-		} else {
-			id1 = nil
-		}
-		consumerGroup = &shared.DatakitPluginConsumerGroup{
-			ID: id1,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -550,11 +277,11 @@ func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) 
 	} else {
 		enabled = nil
 	}
-	id2 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id2 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -589,33 +316,306 @@ func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) 
 			Before: before,
 		}
 	}
-	var partials []shared.DatakitPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.DatakitPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id3 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id3 = partialsItem.ID.ValueString()
-			} else {
-				id3 = nil
+	partials := make([]shared.DatakitPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.DatakitPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	debug := new(bool)
+	if !r.Config.Debug.IsUnknown() && !r.Config.Debug.IsNull() {
+		*debug = r.Config.Debug.ValueBool()
+	} else {
+		debug = nil
+	}
+	nodes := make([]shared.Nodes, 0, len(r.Config.Nodes))
+	for _, nodesItem := range r.Config.Nodes {
+		var name1 string
+		name1 = nodesItem.Name.ValueString()
+
+		typeVar := shared.Type(nodesItem.Type.ValueString())
+		nodes = append(nodes, shared.Nodes{
+			Name: name1,
+			Type: typeVar,
+		})
+	}
+	var resources *shared.Resources
+	if r.Config.Resources != nil {
+		var cache *shared.DatakitPluginCache
+		if r.Config.Resources.Cache != nil {
+			var memory *shared.DatakitPluginMemory
+			if r.Config.Resources.Cache.Memory != nil {
+				dictionaryName := new(string)
+				if !r.Config.Resources.Cache.Memory.DictionaryName.IsUnknown() && !r.Config.Resources.Cache.Memory.DictionaryName.IsNull() {
+					*dictionaryName = r.Config.Resources.Cache.Memory.DictionaryName.ValueString()
+				} else {
+					dictionaryName = nil
+				}
+				memory = &shared.DatakitPluginMemory{
+					DictionaryName: dictionaryName,
+				}
 			}
-			name1 := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name1 = partialsItem.Name.ValueString()
-			} else {
-				name1 = nil
+			var redis *shared.DatakitPluginRedis
+			if r.Config.Resources.Cache.Redis != nil {
+				clusterMaxRedirections := new(int64)
+				if !r.Config.Resources.Cache.Redis.ClusterMaxRedirections.IsUnknown() && !r.Config.Resources.Cache.Redis.ClusterMaxRedirections.IsNull() {
+					*clusterMaxRedirections = r.Config.Resources.Cache.Redis.ClusterMaxRedirections.ValueInt64()
+				} else {
+					clusterMaxRedirections = nil
+				}
+				clusterNodes := make([]shared.DatakitPluginClusterNodes, 0, len(r.Config.Resources.Cache.Redis.ClusterNodes))
+				for _, clusterNodesItem := range r.Config.Resources.Cache.Redis.ClusterNodes {
+					ip := new(string)
+					if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
+						*ip = clusterNodesItem.IP.ValueString()
+					} else {
+						ip = nil
+					}
+					port := new(int64)
+					if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
+						*port = clusterNodesItem.Port.ValueInt64()
+					} else {
+						port = nil
+					}
+					clusterNodes = append(clusterNodes, shared.DatakitPluginClusterNodes{
+						IP:   ip,
+						Port: port,
+					})
+				}
+				connectTimeout := new(int64)
+				if !r.Config.Resources.Cache.Redis.ConnectTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.ConnectTimeout.IsNull() {
+					*connectTimeout = r.Config.Resources.Cache.Redis.ConnectTimeout.ValueInt64()
+				} else {
+					connectTimeout = nil
+				}
+				connectionIsProxied := new(bool)
+				if !r.Config.Resources.Cache.Redis.ConnectionIsProxied.IsUnknown() && !r.Config.Resources.Cache.Redis.ConnectionIsProxied.IsNull() {
+					*connectionIsProxied = r.Config.Resources.Cache.Redis.ConnectionIsProxied.ValueBool()
+				} else {
+					connectionIsProxied = nil
+				}
+				database := new(int64)
+				if !r.Config.Resources.Cache.Redis.Database.IsUnknown() && !r.Config.Resources.Cache.Redis.Database.IsNull() {
+					*database = r.Config.Resources.Cache.Redis.Database.ValueInt64()
+				} else {
+					database = nil
+				}
+				host := new(string)
+				if !r.Config.Resources.Cache.Redis.Host.IsUnknown() && !r.Config.Resources.Cache.Redis.Host.IsNull() {
+					*host = r.Config.Resources.Cache.Redis.Host.ValueString()
+				} else {
+					host = nil
+				}
+				keepaliveBacklog := new(int64)
+				if !r.Config.Resources.Cache.Redis.KeepaliveBacklog.IsUnknown() && !r.Config.Resources.Cache.Redis.KeepaliveBacklog.IsNull() {
+					*keepaliveBacklog = r.Config.Resources.Cache.Redis.KeepaliveBacklog.ValueInt64()
+				} else {
+					keepaliveBacklog = nil
+				}
+				keepalivePoolSize := new(int64)
+				if !r.Config.Resources.Cache.Redis.KeepalivePoolSize.IsUnknown() && !r.Config.Resources.Cache.Redis.KeepalivePoolSize.IsNull() {
+					*keepalivePoolSize = r.Config.Resources.Cache.Redis.KeepalivePoolSize.ValueInt64()
+				} else {
+					keepalivePoolSize = nil
+				}
+				password := new(string)
+				if !r.Config.Resources.Cache.Redis.Password.IsUnknown() && !r.Config.Resources.Cache.Redis.Password.IsNull() {
+					*password = r.Config.Resources.Cache.Redis.Password.ValueString()
+				} else {
+					password = nil
+				}
+				port1 := new(int64)
+				if !r.Config.Resources.Cache.Redis.Port.IsUnknown() && !r.Config.Resources.Cache.Redis.Port.IsNull() {
+					*port1 = r.Config.Resources.Cache.Redis.Port.ValueInt64()
+				} else {
+					port1 = nil
+				}
+				readTimeout := new(int64)
+				if !r.Config.Resources.Cache.Redis.ReadTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.ReadTimeout.IsNull() {
+					*readTimeout = r.Config.Resources.Cache.Redis.ReadTimeout.ValueInt64()
+				} else {
+					readTimeout = nil
+				}
+				sendTimeout := new(int64)
+				if !r.Config.Resources.Cache.Redis.SendTimeout.IsUnknown() && !r.Config.Resources.Cache.Redis.SendTimeout.IsNull() {
+					*sendTimeout = r.Config.Resources.Cache.Redis.SendTimeout.ValueInt64()
+				} else {
+					sendTimeout = nil
+				}
+				sentinelMaster := new(string)
+				if !r.Config.Resources.Cache.Redis.SentinelMaster.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelMaster.IsNull() {
+					*sentinelMaster = r.Config.Resources.Cache.Redis.SentinelMaster.ValueString()
+				} else {
+					sentinelMaster = nil
+				}
+				sentinelNodes := make([]shared.DatakitPluginSentinelNodes, 0, len(r.Config.Resources.Cache.Redis.SentinelNodes))
+				for _, sentinelNodesItem := range r.Config.Resources.Cache.Redis.SentinelNodes {
+					host1 := new(string)
+					if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
+						*host1 = sentinelNodesItem.Host.ValueString()
+					} else {
+						host1 = nil
+					}
+					port2 := new(int64)
+					if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
+						*port2 = sentinelNodesItem.Port.ValueInt64()
+					} else {
+						port2 = nil
+					}
+					sentinelNodes = append(sentinelNodes, shared.DatakitPluginSentinelNodes{
+						Host: host1,
+						Port: port2,
+					})
+				}
+				sentinelPassword := new(string)
+				if !r.Config.Resources.Cache.Redis.SentinelPassword.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelPassword.IsNull() {
+					*sentinelPassword = r.Config.Resources.Cache.Redis.SentinelPassword.ValueString()
+				} else {
+					sentinelPassword = nil
+				}
+				sentinelRole := new(shared.DatakitPluginSentinelRole)
+				if !r.Config.Resources.Cache.Redis.SentinelRole.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelRole.IsNull() {
+					*sentinelRole = shared.DatakitPluginSentinelRole(r.Config.Resources.Cache.Redis.SentinelRole.ValueString())
+				} else {
+					sentinelRole = nil
+				}
+				sentinelUsername := new(string)
+				if !r.Config.Resources.Cache.Redis.SentinelUsername.IsUnknown() && !r.Config.Resources.Cache.Redis.SentinelUsername.IsNull() {
+					*sentinelUsername = r.Config.Resources.Cache.Redis.SentinelUsername.ValueString()
+				} else {
+					sentinelUsername = nil
+				}
+				serverName := new(string)
+				if !r.Config.Resources.Cache.Redis.ServerName.IsUnknown() && !r.Config.Resources.Cache.Redis.ServerName.IsNull() {
+					*serverName = r.Config.Resources.Cache.Redis.ServerName.ValueString()
+				} else {
+					serverName = nil
+				}
+				ssl := new(bool)
+				if !r.Config.Resources.Cache.Redis.Ssl.IsUnknown() && !r.Config.Resources.Cache.Redis.Ssl.IsNull() {
+					*ssl = r.Config.Resources.Cache.Redis.Ssl.ValueBool()
+				} else {
+					ssl = nil
+				}
+				sslVerify := new(bool)
+				if !r.Config.Resources.Cache.Redis.SslVerify.IsUnknown() && !r.Config.Resources.Cache.Redis.SslVerify.IsNull() {
+					*sslVerify = r.Config.Resources.Cache.Redis.SslVerify.ValueBool()
+				} else {
+					sslVerify = nil
+				}
+				username := new(string)
+				if !r.Config.Resources.Cache.Redis.Username.IsUnknown() && !r.Config.Resources.Cache.Redis.Username.IsNull() {
+					*username = r.Config.Resources.Cache.Redis.Username.ValueString()
+				} else {
+					username = nil
+				}
+				redis = &shared.DatakitPluginRedis{
+					ClusterMaxRedirections: clusterMaxRedirections,
+					ClusterNodes:           clusterNodes,
+					ConnectTimeout:         connectTimeout,
+					ConnectionIsProxied:    connectionIsProxied,
+					Database:               database,
+					Host:                   host,
+					KeepaliveBacklog:       keepaliveBacklog,
+					KeepalivePoolSize:      keepalivePoolSize,
+					Password:               password,
+					Port:                   port1,
+					ReadTimeout:            readTimeout,
+					SendTimeout:            sendTimeout,
+					SentinelMaster:         sentinelMaster,
+					SentinelNodes:          sentinelNodes,
+					SentinelPassword:       sentinelPassword,
+					SentinelRole:           sentinelRole,
+					SentinelUsername:       sentinelUsername,
+					ServerName:             serverName,
+					Ssl:                    ssl,
+					SslVerify:              sslVerify,
+					Username:               username,
+				}
 			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
+			strategy := new(shared.DatakitPluginStrategy)
+			if !r.Config.Resources.Cache.Strategy.IsUnknown() && !r.Config.Resources.Cache.Strategy.IsNull() {
+				*strategy = shared.DatakitPluginStrategy(r.Config.Resources.Cache.Strategy.ValueString())
 			} else {
-				path = nil
+				strategy = nil
 			}
-			partials = append(partials, shared.DatakitPluginPartials{
-				ID:   id3,
-				Name: name1,
-				Path: path,
-			})
+			cache = &shared.DatakitPluginCache{
+				Memory:   memory,
+				Redis:    redis,
+				Strategy: strategy,
+			}
+		}
+		vault := make(map[string]interface{})
+		for vaultKey, vaultValue := range r.Config.Resources.Vault {
+			var vaultInst interface{}
+			_ = json.Unmarshal([]byte(vaultValue.ValueString()), &vaultInst)
+			vault[vaultKey] = vaultInst
+		}
+		resources = &shared.Resources{
+			Cache: cache,
+			Vault: vault,
+		}
+	}
+	config := shared.DatakitPluginConfig{
+		Debug:     debug,
+		Nodes:     nodes,
+		Resources: resources,
+	}
+	var consumer *shared.DatakitPluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.DatakitPluginConsumer{
+			ID: id2,
+		}
+	}
+	var consumerGroup *shared.DatakitPluginConsumerGroup
+	if r.ConsumerGroup != nil {
+		id3 := new(string)
+		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
+			*id3 = r.ConsumerGroup.ID.ValueString()
+		} else {
+			id3 = nil
+		}
+		consumerGroup = &shared.DatakitPluginConsumerGroup{
+			ID: id3,
 		}
 	}
 	protocols := make([]shared.DatakitPluginProtocols, 0, len(r.Protocols))
@@ -646,34 +646,21 @@ func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) 
 			ID: id5,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.DatakitPlugin{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
-		ID:            id2,
+		ID:            id,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Partials:      partials,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
+		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

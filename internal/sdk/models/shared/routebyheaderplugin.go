@@ -8,49 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type RouteByHeaderPluginRules struct {
-	Condition    map[string]string `json:"condition,omitempty"`
-	UpstreamName string            `json:"upstream_name"`
-}
-
-func (r *RouteByHeaderPluginRules) GetCondition() map[string]string {
-	if r == nil {
-		return nil
-	}
-	return r.Condition
-}
-
-func (r *RouteByHeaderPluginRules) GetUpstreamName() string {
-	if r == nil {
-		return ""
-	}
-	return r.UpstreamName
-}
-
-type RouteByHeaderPluginConfig struct {
-	// Route by header rules.
-	Rules []RouteByHeaderPluginRules `json:"rules,omitempty"`
-}
-
-func (r *RouteByHeaderPluginConfig) GetRules() []RouteByHeaderPluginRules {
-	if r == nil {
-		return nil
-	}
-	return r.Rules
-}
-
-// RouteByHeaderPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type RouteByHeaderPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (r *RouteByHeaderPluginConsumer) GetID() *string {
-	if r == nil {
-		return nil
-	}
-	return r.ID
-}
-
 type RouteByHeaderPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -121,6 +78,49 @@ func (r *RouteByHeaderPluginPartials) GetPath() *string {
 	return r.Path
 }
 
+type RouteByHeaderPluginRules struct {
+	Condition    map[string]string `json:"condition,omitempty"`
+	UpstreamName string            `json:"upstream_name"`
+}
+
+func (r *RouteByHeaderPluginRules) GetCondition() map[string]string {
+	if r == nil {
+		return nil
+	}
+	return r.Condition
+}
+
+func (r *RouteByHeaderPluginRules) GetUpstreamName() string {
+	if r == nil {
+		return ""
+	}
+	return r.UpstreamName
+}
+
+type RouteByHeaderPluginConfig struct {
+	// Route by header rules.
+	Rules []RouteByHeaderPluginRules `json:"rules,omitempty"`
+}
+
+func (r *RouteByHeaderPluginConfig) GetRules() []RouteByHeaderPluginRules {
+	if r == nil {
+		return nil
+	}
+	return r.Rules
+}
+
+// RouteByHeaderPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type RouteByHeaderPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (r *RouteByHeaderPluginConsumer) GetID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ID
+}
+
 type RouteByHeaderPluginProtocols string
 
 const (
@@ -177,10 +177,8 @@ func (r *RouteByHeaderPluginService) GetID() *string {
 	return r.ID
 }
 
+// RouteByHeaderPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RouteByHeaderPlugin struct {
-	Config *RouteByHeaderPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *RouteByHeaderPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -193,16 +191,19 @@ type RouteByHeaderPlugin struct {
 	Ordering     *RouteByHeaderPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RouteByHeaderPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                     `json:"updated_at,omitempty"`
+	Config    *RouteByHeaderPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *RouteByHeaderPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RouteByHeaderPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *RouteByHeaderPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *RouteByHeaderPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (r RouteByHeaderPlugin) MarshalJSON() ([]byte, error) {
@@ -214,20 +215,6 @@ func (r *RouteByHeaderPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (r *RouteByHeaderPlugin) GetConfig() *RouteByHeaderPluginConfig {
-	if r == nil {
-		return nil
-	}
-	return r.Config
-}
-
-func (r *RouteByHeaderPlugin) GetConsumer() *RouteByHeaderPluginConsumer {
-	if r == nil {
-		return nil
-	}
-	return r.Consumer
 }
 
 func (r *RouteByHeaderPlugin) GetCreatedAt() *int64 {
@@ -276,6 +263,34 @@ func (r *RouteByHeaderPlugin) GetPartials() []RouteByHeaderPluginPartials {
 	return r.Partials
 }
 
+func (r *RouteByHeaderPlugin) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RouteByHeaderPlugin) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
+}
+
+func (r *RouteByHeaderPlugin) GetConfig() *RouteByHeaderPluginConfig {
+	if r == nil {
+		return nil
+	}
+	return r.Config
+}
+
+func (r *RouteByHeaderPlugin) GetConsumer() *RouteByHeaderPluginConsumer {
+	if r == nil {
+		return nil
+	}
+	return r.Consumer
+}
+
 func (r *RouteByHeaderPlugin) GetProtocols() []RouteByHeaderPluginProtocols {
 	if r == nil {
 		return nil
@@ -295,18 +310,4 @@ func (r *RouteByHeaderPlugin) GetService() *RouteByHeaderPluginService {
 		return nil
 	}
 	return r.Service
-}
-
-func (r *RouteByHeaderPlugin) GetTags() []string {
-	if r == nil {
-		return nil
-	}
-	return r.Tags
-}
-
-func (r *RouteByHeaderPlugin) GetUpdatedAt() *int64 {
-	if r == nil {
-		return nil
-	}
-	return r.UpdatedAt
 }

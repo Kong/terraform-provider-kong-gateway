@@ -23,7 +23,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -44,19 +43,19 @@ type PluginKafkaConsumeResource struct {
 
 // PluginKafkaConsumeResourceModel describes the resource data model.
 type PluginKafkaConsumeResourceModel struct {
-	Config       *tfTypes.KafkaConsumePluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                      `tfsdk:"consumer"`
-	CreatedAt    types.Int64                       `tfsdk:"created_at"`
-	Enabled      types.Bool                        `tfsdk:"enabled"`
-	ID           types.String                      `tfsdk:"id"`
-	InstanceName types.String                      `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols    []types.String                    `tfsdk:"protocols"`
-	Route        *tfTypes.Set                      `tfsdk:"route"`
-	Tags         []types.String                    `tfsdk:"tags"`
-	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
-	Workspace    types.String                      `tfsdk:"workspace"`
+	Config       tfTypes.KafkaConsumePluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                     `tfsdk:"consumer"`
+	CreatedAt    types.Int64                      `tfsdk:"created_at"`
+	Enabled      types.Bool                       `tfsdk:"enabled"`
+	ID           types.String                     `tfsdk:"id"`
+	InstanceName types.String                     `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering       `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials      `tfsdk:"partials"`
+	Protocols    []types.String                   `tfsdk:"protocols"`
+	Route        *tfTypes.Set                     `tfsdk:"route"`
+	Tags         []types.String                   `tfsdk:"tags"`
+	UpdatedAt    types.Int64                      `tfsdk:"updated_at"`
+	Workspace    types.String                     `tfsdk:"workspace"`
 }
 
 func (r *PluginKafkaConsumeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -68,8 +67,7 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 		MarkdownDescription: "PluginKafkaConsume Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"authentication": schema.SingleNestedAttribute{
 						Computed: true,
@@ -124,8 +122,7 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 						},
 					},
 					"bootstrap_servers": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -150,10 +147,7 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 								},
 							},
 						},
-						Description: `Set of bootstrap brokers in a ` + "`" + `{host: host, port: port}` + "`" + ` list format. Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
-						},
+						Description: `Set of bootstrap brokers in a ` + "`" + `{host: host, port: port}` + "`" + ` list format.`,
 					},
 					"cluster_name": schema.StringAttribute{
 						Computed:    true,
@@ -451,8 +445,7 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 						},
 					},
 					"topics": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -692,10 +685,7 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 								},
 							},
 						},
-						Description: `The Kafka topics and their configuration you want to consume from. Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
-						},
+						Description: `The Kafka topics and their configuration you want to consume from.`,
 					},
 				},
 			},

@@ -19,7 +19,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,7 +37,7 @@ type PluginOpaResource struct {
 
 // PluginOpaResourceModel describes the resource data model.
 type PluginOpaResourceModel struct {
-	Config       *tfTypes.OpaPluginConfig    `tfsdk:"config"`
+	Config       tfTypes.OpaPluginConfig     `tfsdk:"config"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
 	ID           types.String                `tfsdk:"id"`
@@ -62,8 +61,7 @@ func (r *PluginOpaResource) Schema(ctx context.Context, req resource.SchemaReque
 		MarkdownDescription: "PluginOpa Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"include_body_in_opa_input": schema.BoolAttribute{
 						Computed: true,
@@ -100,12 +98,8 @@ func (r *PluginOpaResource) Schema(ctx context.Context, req resource.SchemaReque
 						Description: `A string representing a host name, such as example.com.`,
 					},
 					"opa_path": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes). Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).`,
 					},
 					"opa_port": schema.Int64Attribute{
 						Computed:    true,

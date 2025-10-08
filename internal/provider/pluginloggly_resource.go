@@ -19,7 +19,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,7 +37,7 @@ type PluginLogglyResource struct {
 
 // PluginLogglyResourceModel describes the resource data model.
 type PluginLogglyResourceModel struct {
-	Config       *tfTypes.LogglyPluginConfig `tfsdk:"config"`
+	Config       tfTypes.LogglyPluginConfig  `tfsdk:"config"`
 	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
@@ -63,8 +62,7 @@ func (r *PluginLogglyResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginLoggly Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"client_errors_severity": schema.StringAttribute{
 						Computed:    true,
@@ -95,12 +93,7 @@ func (r *PluginLogglyResource) Schema(ctx context.Context, req resource.SchemaRe
 						Description: `A string representing a host name, such as example.com.`,
 					},
 					"key": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required: true,
 					},
 					"log_level": schema.StringAttribute{
 						Computed:    true,

@@ -52,18 +52,16 @@ func (r *PluginTLSHandshakeModifierResourceModel) RefreshFromSharedTLSHandshakeM
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -176,18 +174,6 @@ func (r *PluginTLSHandshakeModifierResourceModel) ToOperationsUpdateTlshandshake
 func (r *PluginTLSHandshakeModifierResourceModel) ToSharedTLSHandshakeModifierPlugin(ctx context.Context) (*shared.TLSHandshakeModifierPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.TLSHandshakeModifierPluginConfig
-	if r.Config != nil {
-		tlsClientCertificate := new(shared.TLSClientCertificate)
-		if !r.Config.TLSClientCertificate.IsUnknown() && !r.Config.TLSClientCertificate.IsNull() {
-			*tlsClientCertificate = shared.TLSClientCertificate(r.Config.TLSClientCertificate.ValueString())
-		} else {
-			tlsClientCertificate = nil
-		}
-		config = &shared.TLSHandshakeModifierPluginConfig{
-			TLSClientCertificate: tlsClientCertificate,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -239,33 +225,55 @@ func (r *PluginTLSHandshakeModifierResourceModel) ToSharedTLSHandshakeModifierPl
 			Before: before,
 		}
 	}
-	var partials []shared.TLSHandshakeModifierPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.TLSHandshakeModifierPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.TLSHandshakeModifierPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.TLSHandshakeModifierPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.TLSHandshakeModifierPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	var config *shared.TLSHandshakeModifierPluginConfig
+	if r.Config != nil {
+		tlsClientCertificate := new(shared.TLSClientCertificate)
+		if !r.Config.TLSClientCertificate.IsUnknown() && !r.Config.TLSClientCertificate.IsNull() {
+			*tlsClientCertificate = shared.TLSClientCertificate(r.Config.TLSClientCertificate.ValueString())
+		} else {
+			tlsClientCertificate = nil
+		}
+		config = &shared.TLSHandshakeModifierPluginConfig{
+			TLSClientCertificate: tlsClientCertificate,
 		}
 	}
 	protocols := make([]shared.TLSHandshakeModifierPluginProtocols, 0, len(r.Protocols))
@@ -296,32 +304,19 @@ func (r *PluginTLSHandshakeModifierResourceModel) ToSharedTLSHandshakeModifierPl
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.TLSHandshakeModifierPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

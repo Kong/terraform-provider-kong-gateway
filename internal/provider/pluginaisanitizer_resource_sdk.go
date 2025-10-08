@@ -92,18 +92,16 @@ func (r *PluginAiSanitizerResourceModel) RefreshFromSharedAiSanitizerPlugin(ctx 
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -216,6 +214,96 @@ func (r *PluginAiSanitizerResourceModel) ToOperationsUpdateAisanitizerPluginRequ
 func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.Context) (*shared.AiSanitizerPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.AiSanitizerPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.AiSanitizerPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.AiSanitizerPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.AiSanitizerPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.AiSanitizerPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.AiSanitizerPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	partials := make([]shared.AiSanitizerPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiSanitizerPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	var config *shared.AiSanitizerPluginConfig
 	if r.Config != nil {
 		anonymize := make([]shared.Anonymize, 0, len(r.Config.Anonymize))
@@ -230,8 +318,8 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 		}
 		customPatterns := make([]shared.CustomPatterns, 0, len(r.Config.CustomPatterns))
 		for _, customPatternsItem := range r.Config.CustomPatterns {
-			var name string
-			name = customPatternsItem.Name.ValueString()
+			var name1 string
+			name1 = customPatternsItem.Name.ValueString()
 
 			var regex string
 			regex = customPatternsItem.Regex.ValueString()
@@ -243,7 +331,7 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 				score = nil
 			}
 			customPatterns = append(customPatterns, shared.CustomPatterns{
-				Name:  name,
+				Name:  name1,
 				Regex: regex,
 				Score: score,
 			})
@@ -319,106 +407,26 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 	}
 	var consumer *shared.AiSanitizerPluginConsumer
 	if r.Consumer != nil {
-		id := new(string)
+		id2 := new(string)
 		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
+			*id2 = r.Consumer.ID.ValueString()
 		} else {
-			id = nil
+			id2 = nil
 		}
 		consumer = &shared.AiSanitizerPluginConsumer{
-			ID: id,
+			ID: id2,
 		}
 	}
 	var consumerGroup *shared.AiSanitizerPluginConsumerGroup
 	if r.ConsumerGroup != nil {
-		id1 := new(string)
+		id3 := new(string)
 		if !r.ConsumerGroup.ID.IsUnknown() && !r.ConsumerGroup.ID.IsNull() {
-			*id1 = r.ConsumerGroup.ID.ValueString()
+			*id3 = r.ConsumerGroup.ID.ValueString()
 		} else {
-			id1 = nil
+			id3 = nil
 		}
 		consumerGroup = &shared.AiSanitizerPluginConsumerGroup{
-			ID: id1,
-		}
-	}
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id2 := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id2 = r.ID.ValueString()
-	} else {
-		id2 = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.AiSanitizerPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.AiSanitizerPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.AiSanitizerPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.AiSanitizerPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.AiSanitizerPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.AiSanitizerPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.AiSanitizerPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiSanitizerPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id3 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id3 = partialsItem.ID.ValueString()
-			} else {
-				id3 = nil
-			}
-			name1 := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name1 = partialsItem.Name.ValueString()
-			} else {
-				name1 = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiSanitizerPluginPartials{
-				ID:   id3,
-				Name: name1,
-				Path: path,
-			})
+			ID: id3,
 		}
 	}
 	protocols := make([]shared.AiSanitizerPluginProtocols, 0, len(r.Protocols))
@@ -449,34 +457,21 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 			ID: id5,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.AiSanitizerPlugin{
-		Config:        config,
-		Consumer:      consumer,
-		ConsumerGroup: consumerGroup,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
-		ID:            id2,
+		ID:            id,
 		InstanceName:  instanceName,
 		Ordering:      ordering,
 		Partials:      partials,
+		Tags:          tags,
+		UpdatedAt:     updatedAt,
+		Config:        config,
+		Consumer:      consumer,
+		ConsumerGroup: consumerGroup,
 		Protocols:     protocols,
 		Route:         route,
 		Service:       service,
-		Tags:          tags,
-		UpdatedAt:     updatedAt,
 	}
 
 	return &out, diags

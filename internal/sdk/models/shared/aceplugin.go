@@ -8,6 +8,76 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+type AcePluginAfter struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AcePluginAfter) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AcePluginBefore struct {
+	Access []string `json:"access,omitempty"`
+}
+
+func (a *AcePluginBefore) GetAccess() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Access
+}
+
+type AcePluginOrdering struct {
+	After  *AcePluginAfter  `json:"after,omitempty"`
+	Before *AcePluginBefore `json:"before,omitempty"`
+}
+
+func (a *AcePluginOrdering) GetAfter() *AcePluginAfter {
+	if a == nil {
+		return nil
+	}
+	return a.After
+}
+
+func (a *AcePluginOrdering) GetBefore() *AcePluginBefore {
+	if a == nil {
+		return nil
+	}
+	return a.Before
+}
+
+type AcePluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	Path *string `json:"path,omitempty"`
+}
+
+func (a *AcePluginPartials) GetID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ID
+}
+
+func (a *AcePluginPartials) GetName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Name
+}
+
+func (a *AcePluginPartials) GetPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Path
+}
+
 type MatchPolicy string
 
 const (
@@ -344,76 +414,6 @@ func (a *AcePluginConfig) GetRateLimiting() *RateLimiting {
 	return a.RateLimiting
 }
 
-type AcePluginAfter struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AcePluginAfter) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AcePluginBefore struct {
-	Access []string `json:"access,omitempty"`
-}
-
-func (a *AcePluginBefore) GetAccess() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Access
-}
-
-type AcePluginOrdering struct {
-	After  *AcePluginAfter  `json:"after,omitempty"`
-	Before *AcePluginBefore `json:"before,omitempty"`
-}
-
-func (a *AcePluginOrdering) GetAfter() *AcePluginAfter {
-	if a == nil {
-		return nil
-	}
-	return a.After
-}
-
-func (a *AcePluginOrdering) GetBefore() *AcePluginBefore {
-	if a == nil {
-		return nil
-	}
-	return a.Before
-}
-
-type AcePluginPartials struct {
-	// A string representing a UUID (universally unique identifier).
-	ID *string `json:"id,omitempty"`
-	// A unique string representing a UTF-8 encoded name.
-	Name *string `json:"name,omitempty"`
-	Path *string `json:"path,omitempty"`
-}
-
-func (a *AcePluginPartials) GetID() *string {
-	if a == nil {
-		return nil
-	}
-	return a.ID
-}
-
-func (a *AcePluginPartials) GetName() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Name
-}
-
-func (a *AcePluginPartials) GetPath() *string {
-	if a == nil {
-		return nil
-	}
-	return a.Path
-}
-
 type AcePluginProtocols string
 
 const (
@@ -470,8 +470,8 @@ func (a *AcePluginService) GetID() *string {
 	return a.ID
 }
 
+// AcePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AcePlugin struct {
-	Config *AcePluginConfig `json:"config,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -484,16 +484,17 @@ type AcePlugin struct {
 	Ordering     *AcePluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AcePluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64           `json:"updated_at,omitempty"`
+	Config    *AcePluginConfig `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []AcePluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AcePluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *AcePluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (a AcePlugin) MarshalJSON() ([]byte, error) {
@@ -505,13 +506,6 @@ func (a *AcePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (a *AcePlugin) GetConfig() *AcePluginConfig {
-	if a == nil {
-		return nil
-	}
-	return a.Config
 }
 
 func (a *AcePlugin) GetCreatedAt() *int64 {
@@ -560,6 +554,27 @@ func (a *AcePlugin) GetPartials() []AcePluginPartials {
 	return a.Partials
 }
 
+func (a *AcePlugin) GetTags() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Tags
+}
+
+func (a *AcePlugin) GetUpdatedAt() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.UpdatedAt
+}
+
+func (a *AcePlugin) GetConfig() *AcePluginConfig {
+	if a == nil {
+		return nil
+	}
+	return a.Config
+}
+
 func (a *AcePlugin) GetProtocols() []AcePluginProtocols {
 	if a == nil {
 		return nil
@@ -579,18 +594,4 @@ func (a *AcePlugin) GetService() *AcePluginService {
 		return nil
 	}
 	return a.Service
-}
-
-func (a *AcePlugin) GetTags() []string {
-	if a == nil {
-		return nil
-	}
-	return a.Tags
-}
-
-func (a *AcePlugin) GetUpdatedAt() *int64 {
-	if a == nil {
-		return nil
-	}
-	return a.UpdatedAt
 }

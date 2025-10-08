@@ -15,25 +15,20 @@ func (r *PluginLdapAuthResourceModel) RefreshFromSharedLdapAuthPlugin(ctx contex
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.LdapAuthPluginConfig{}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.Attribute = types.StringValue(resp.Config.Attribute)
-			r.Config.BaseDn = types.StringValue(resp.Config.BaseDn)
-			r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
-			r.Config.HeaderType = types.StringPointerValue(resp.Config.HeaderType)
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
-			r.Config.LdapHost = types.StringValue(resp.Config.LdapHost)
-			r.Config.LdapPort = types.Int64PointerValue(resp.Config.LdapPort)
-			r.Config.Ldaps = types.BoolPointerValue(resp.Config.Ldaps)
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.StartTLS = types.BoolPointerValue(resp.Config.StartTLS)
-			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
-			r.Config.VerifyLdapHost = types.BoolPointerValue(resp.Config.VerifyLdapHost)
-		}
+		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+		r.Config.Attribute = types.StringValue(resp.Config.Attribute)
+		r.Config.BaseDn = types.StringValue(resp.Config.BaseDn)
+		r.Config.CacheTTL = types.Float64PointerValue(resp.Config.CacheTTL)
+		r.Config.HeaderType = types.StringPointerValue(resp.Config.HeaderType)
+		r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+		r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
+		r.Config.LdapHost = types.StringValue(resp.Config.LdapHost)
+		r.Config.LdapPort = types.Int64PointerValue(resp.Config.LdapPort)
+		r.Config.Ldaps = types.BoolPointerValue(resp.Config.Ldaps)
+		r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+		r.Config.StartTLS = types.BoolPointerValue(resp.Config.StartTLS)
+		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
+		r.Config.VerifyLdapHost = types.BoolPointerValue(resp.Config.VerifyLdapHost)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -61,18 +56,16 @@ func (r *PluginLdapAuthResourceModel) RefreshFromSharedLdapAuthPlugin(ctx contex
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -185,100 +178,6 @@ func (r *PluginLdapAuthResourceModel) ToOperationsUpdateLdapauthPluginRequest(ct
 func (r *PluginLdapAuthResourceModel) ToSharedLdapAuthPlugin(ctx context.Context) (*shared.LdapAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.LdapAuthPluginConfig
-	if r.Config != nil {
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		var attribute string
-		attribute = r.Config.Attribute.ValueString()
-
-		var baseDn string
-		baseDn = r.Config.BaseDn.ValueString()
-
-		cacheTTL := new(float64)
-		if !r.Config.CacheTTL.IsUnknown() && !r.Config.CacheTTL.IsNull() {
-			*cacheTTL = r.Config.CacheTTL.ValueFloat64()
-		} else {
-			cacheTTL = nil
-		}
-		headerType := new(string)
-		if !r.Config.HeaderType.IsUnknown() && !r.Config.HeaderType.IsNull() {
-			*headerType = r.Config.HeaderType.ValueString()
-		} else {
-			headerType = nil
-		}
-		hideCredentials := new(bool)
-		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
-			*hideCredentials = r.Config.HideCredentials.ValueBool()
-		} else {
-			hideCredentials = nil
-		}
-		keepalive := new(float64)
-		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive = r.Config.Keepalive.ValueFloat64()
-		} else {
-			keepalive = nil
-		}
-		var ldapHost string
-		ldapHost = r.Config.LdapHost.ValueString()
-
-		ldapPort := new(int64)
-		if !r.Config.LdapPort.IsUnknown() && !r.Config.LdapPort.IsNull() {
-			*ldapPort = r.Config.LdapPort.ValueInt64()
-		} else {
-			ldapPort = nil
-		}
-		ldaps := new(bool)
-		if !r.Config.Ldaps.IsUnknown() && !r.Config.Ldaps.IsNull() {
-			*ldaps = r.Config.Ldaps.ValueBool()
-		} else {
-			ldaps = nil
-		}
-		realm := new(string)
-		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
-			*realm = r.Config.Realm.ValueString()
-		} else {
-			realm = nil
-		}
-		startTLS := new(bool)
-		if !r.Config.StartTLS.IsUnknown() && !r.Config.StartTLS.IsNull() {
-			*startTLS = r.Config.StartTLS.ValueBool()
-		} else {
-			startTLS = nil
-		}
-		timeout := new(float64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueFloat64()
-		} else {
-			timeout = nil
-		}
-		verifyLdapHost := new(bool)
-		if !r.Config.VerifyLdapHost.IsUnknown() && !r.Config.VerifyLdapHost.IsNull() {
-			*verifyLdapHost = r.Config.VerifyLdapHost.ValueBool()
-		} else {
-			verifyLdapHost = nil
-		}
-		config = &shared.LdapAuthPluginConfig{
-			Anonymous:       anonymous,
-			Attribute:       attribute,
-			BaseDn:          baseDn,
-			CacheTTL:        cacheTTL,
-			HeaderType:      headerType,
-			HideCredentials: hideCredentials,
-			Keepalive:       keepalive,
-			LdapHost:        ldapHost,
-			LdapPort:        ldapPort,
-			Ldaps:           ldaps,
-			Realm:           realm,
-			StartTLS:        startTLS,
-			Timeout:         timeout,
-			VerifyLdapHost:  verifyLdapHost,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -330,34 +229,135 @@ func (r *PluginLdapAuthResourceModel) ToSharedLdapAuthPlugin(ctx context.Context
 			Before: before,
 		}
 	}
-	var partials []shared.LdapAuthPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.LdapAuthPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.LdapAuthPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.LdapAuthPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.LdapAuthPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	anonymous := new(string)
+	if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+		*anonymous = r.Config.Anonymous.ValueString()
+	} else {
+		anonymous = nil
+	}
+	var attribute string
+	attribute = r.Config.Attribute.ValueString()
+
+	var baseDn string
+	baseDn = r.Config.BaseDn.ValueString()
+
+	cacheTTL := new(float64)
+	if !r.Config.CacheTTL.IsUnknown() && !r.Config.CacheTTL.IsNull() {
+		*cacheTTL = r.Config.CacheTTL.ValueFloat64()
+	} else {
+		cacheTTL = nil
+	}
+	headerType := new(string)
+	if !r.Config.HeaderType.IsUnknown() && !r.Config.HeaderType.IsNull() {
+		*headerType = r.Config.HeaderType.ValueString()
+	} else {
+		headerType = nil
+	}
+	hideCredentials := new(bool)
+	if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
+		*hideCredentials = r.Config.HideCredentials.ValueBool()
+	} else {
+		hideCredentials = nil
+	}
+	keepalive := new(float64)
+	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
+		*keepalive = r.Config.Keepalive.ValueFloat64()
+	} else {
+		keepalive = nil
+	}
+	var ldapHost string
+	ldapHost = r.Config.LdapHost.ValueString()
+
+	ldapPort := new(int64)
+	if !r.Config.LdapPort.IsUnknown() && !r.Config.LdapPort.IsNull() {
+		*ldapPort = r.Config.LdapPort.ValueInt64()
+	} else {
+		ldapPort = nil
+	}
+	ldaps := new(bool)
+	if !r.Config.Ldaps.IsUnknown() && !r.Config.Ldaps.IsNull() {
+		*ldaps = r.Config.Ldaps.ValueBool()
+	} else {
+		ldaps = nil
+	}
+	realm := new(string)
+	if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
+		*realm = r.Config.Realm.ValueString()
+	} else {
+		realm = nil
+	}
+	startTLS := new(bool)
+	if !r.Config.StartTLS.IsUnknown() && !r.Config.StartTLS.IsNull() {
+		*startTLS = r.Config.StartTLS.ValueBool()
+	} else {
+		startTLS = nil
+	}
+	timeout := new(float64)
+	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+		*timeout = r.Config.Timeout.ValueFloat64()
+	} else {
+		timeout = nil
+	}
+	verifyLdapHost := new(bool)
+	if !r.Config.VerifyLdapHost.IsUnknown() && !r.Config.VerifyLdapHost.IsNull() {
+		*verifyLdapHost = r.Config.VerifyLdapHost.ValueBool()
+	} else {
+		verifyLdapHost = nil
+	}
+	config := shared.LdapAuthPluginConfig{
+		Anonymous:       anonymous,
+		Attribute:       attribute,
+		BaseDn:          baseDn,
+		CacheTTL:        cacheTTL,
+		HeaderType:      headerType,
+		HideCredentials: hideCredentials,
+		Keepalive:       keepalive,
+		LdapHost:        ldapHost,
+		LdapPort:        ldapPort,
+		Ldaps:           ldaps,
+		Realm:           realm,
+		StartTLS:        startTLS,
+		Timeout:         timeout,
+		VerifyLdapHost:  verifyLdapHost,
 	}
 	protocols := make([]shared.LdapAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -387,32 +387,19 @@ func (r *PluginLdapAuthResourceModel) ToSharedLdapAuthPlugin(ctx context.Context
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.LdapAuthPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

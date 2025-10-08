@@ -8,39 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type StandardWebhooksPluginConfig struct {
-	// Webhook secret
-	SecretV1 string `json:"secret_v1"`
-	// Tolerance of the webhook timestamp in seconds. If the webhook timestamp is older than this number of seconds, it will be rejected with a '400' response.
-	ToleranceSecond *int64 `json:"tolerance_second,omitempty"`
-}
-
-func (s *StandardWebhooksPluginConfig) GetSecretV1() string {
-	if s == nil {
-		return ""
-	}
-	return s.SecretV1
-}
-
-func (s *StandardWebhooksPluginConfig) GetToleranceSecond() *int64 {
-	if s == nil {
-		return nil
-	}
-	return s.ToleranceSecond
-}
-
-// StandardWebhooksPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-type StandardWebhooksPluginConsumerGroup struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (s *StandardWebhooksPluginConsumerGroup) GetID() *string {
-	if s == nil {
-		return nil
-	}
-	return s.ID
-}
-
 type StandardWebhooksPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -111,6 +78,39 @@ func (s *StandardWebhooksPluginPartials) GetPath() *string {
 	return s.Path
 }
 
+type StandardWebhooksPluginConfig struct {
+	// Webhook secret
+	SecretV1 string `json:"secret_v1"`
+	// Tolerance of the webhook timestamp in seconds. If the webhook timestamp is older than this number of seconds, it will be rejected with a '400' response.
+	ToleranceSecond *int64 `json:"tolerance_second,omitempty"`
+}
+
+func (s *StandardWebhooksPluginConfig) GetSecretV1() string {
+	if s == nil {
+		return ""
+	}
+	return s.SecretV1
+}
+
+func (s *StandardWebhooksPluginConfig) GetToleranceSecond() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.ToleranceSecond
+}
+
+// StandardWebhooksPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+type StandardWebhooksPluginConsumerGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (s *StandardWebhooksPluginConsumerGroup) GetID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ID
+}
+
 type StandardWebhooksPluginProtocols string
 
 const (
@@ -167,10 +167,8 @@ func (s *StandardWebhooksPluginService) GetID() *string {
 	return s.ID
 }
 
+// StandardWebhooksPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type StandardWebhooksPlugin struct {
-	Config *StandardWebhooksPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
-	ConsumerGroup *StandardWebhooksPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -183,16 +181,19 @@ type StandardWebhooksPlugin struct {
 	Ordering     *StandardWebhooksPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []StandardWebhooksPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                       `json:"updated_at,omitempty"`
+	Config    StandardWebhooksPluginConfig `json:"config"`
+	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
+	ConsumerGroup *StandardWebhooksPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []StandardWebhooksPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *StandardWebhooksPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *StandardWebhooksPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (s StandardWebhooksPlugin) MarshalJSON() ([]byte, error) {
@@ -200,24 +201,10 @@ func (s StandardWebhooksPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *StandardWebhooksPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (s *StandardWebhooksPlugin) GetConfig() *StandardWebhooksPluginConfig {
-	if s == nil {
-		return nil
-	}
-	return s.Config
-}
-
-func (s *StandardWebhooksPlugin) GetConsumerGroup() *StandardWebhooksPluginConsumerGroup {
-	if s == nil {
-		return nil
-	}
-	return s.ConsumerGroup
 }
 
 func (s *StandardWebhooksPlugin) GetCreatedAt() *int64 {
@@ -266,6 +253,34 @@ func (s *StandardWebhooksPlugin) GetPartials() []StandardWebhooksPluginPartials 
 	return s.Partials
 }
 
+func (s *StandardWebhooksPlugin) GetTags() []string {
+	if s == nil {
+		return nil
+	}
+	return s.Tags
+}
+
+func (s *StandardWebhooksPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.UpdatedAt
+}
+
+func (s *StandardWebhooksPlugin) GetConfig() StandardWebhooksPluginConfig {
+	if s == nil {
+		return StandardWebhooksPluginConfig{}
+	}
+	return s.Config
+}
+
+func (s *StandardWebhooksPlugin) GetConsumerGroup() *StandardWebhooksPluginConsumerGroup {
+	if s == nil {
+		return nil
+	}
+	return s.ConsumerGroup
+}
+
 func (s *StandardWebhooksPlugin) GetProtocols() []StandardWebhooksPluginProtocols {
 	if s == nil {
 		return nil
@@ -285,18 +300,4 @@ func (s *StandardWebhooksPlugin) GetService() *StandardWebhooksPluginService {
 		return nil
 	}
 	return s.Service
-}
-
-func (s *StandardWebhooksPlugin) GetTags() []string {
-	if s == nil {
-		return nil
-	}
-	return s.Tags
-}
-
-func (s *StandardWebhooksPlugin) GetUpdatedAt() *int64 {
-	if s == nil {
-		return nil
-	}
-	return s.UpdatedAt
 }

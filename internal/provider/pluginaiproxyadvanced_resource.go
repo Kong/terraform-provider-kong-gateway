@@ -21,7 +21,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -42,21 +41,21 @@ type PluginAiProxyAdvancedResource struct {
 
 // PluginAiProxyAdvancedResourceModel describes the resource data model.
 type PluginAiProxyAdvancedResourceModel struct {
-	Config        *tfTypes.AiProxyAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                          `tfsdk:"created_at"`
-	Enabled       types.Bool                           `tfsdk:"enabled"`
-	ID            types.String                         `tfsdk:"id"`
-	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials          `tfsdk:"partials"`
-	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.Set                         `tfsdk:"route"`
-	Service       *tfTypes.Set                         `tfsdk:"service"`
-	Tags          []types.String                       `tfsdk:"tags"`
-	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
-	Workspace     types.String                         `tfsdk:"workspace"`
+	Config        tfTypes.AiProxyAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                         `tfsdk:"created_at"`
+	Enabled       types.Bool                          `tfsdk:"enabled"`
+	ID            types.String                        `tfsdk:"id"`
+	InstanceName  types.String                        `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols     []types.String                      `tfsdk:"protocols"`
+	Route         *tfTypes.Set                        `tfsdk:"route"`
+	Service       *tfTypes.Set                        `tfsdk:"service"`
+	Tags          []types.String                      `tfsdk:"tags"`
+	UpdatedAt     types.Int64                         `tfsdk:"updated_at"`
+	Workspace     types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginAiProxyAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -68,8 +67,7 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 		MarkdownDescription: "PluginAiProxyAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"balancer": schema.SingleNestedAttribute{
 						Computed: true,
@@ -445,8 +443,7 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 						},
 					},
 					"targets": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -829,10 +826,6 @@ func (r *PluginAiProxyAdvancedResource) Schema(ctx context.Context, req resource
 									},
 								},
 							},
-						},
-						Description: `Not Null`,
-						Validators: []validator.List{
-							speakeasy_listvalidators.NotNull(),
 						},
 					},
 					"vectordb": schema.SingleNestedAttribute{

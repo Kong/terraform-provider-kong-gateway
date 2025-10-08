@@ -17,37 +17,32 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+		r.Config.AuthorizationValue = types.StringValue(resp.Config.AuthorizationValue)
+		if resp.Config.ConsumerBy != nil {
+			r.Config.ConsumerBy = types.StringValue(string(*resp.Config.ConsumerBy))
 		} else {
-			r.Config = &tfTypes.Oauth2IntrospectionPluginConfig{}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.AuthorizationValue = types.StringValue(resp.Config.AuthorizationValue)
-			if resp.Config.ConsumerBy != nil {
-				r.Config.ConsumerBy = types.StringValue(string(*resp.Config.ConsumerBy))
-			} else {
-				r.Config.ConsumerBy = types.StringNull()
-			}
-			r.Config.CustomClaimsForward = make([]types.String, 0, len(resp.Config.CustomClaimsForward))
-			for _, v := range resp.Config.CustomClaimsForward {
-				r.Config.CustomClaimsForward = append(r.Config.CustomClaimsForward, types.StringValue(v))
-			}
-			if len(resp.Config.CustomIntrospectionHeaders) > 0 {
-				r.Config.CustomIntrospectionHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.CustomIntrospectionHeaders))
-				for key, value := range resp.Config.CustomIntrospectionHeaders {
-					result, _ := json.Marshal(value)
-					r.Config.CustomIntrospectionHeaders[key] = jsontypes.NewNormalizedValue(string(result))
-				}
-			}
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.IntrospectRequest = types.BoolPointerValue(resp.Config.IntrospectRequest)
-			r.Config.IntrospectionURL = types.StringValue(resp.Config.IntrospectionURL)
-			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
-			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
-			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
-			r.Config.TokenTypeHint = types.StringPointerValue(resp.Config.TokenTypeHint)
-			r.Config.TTL = types.Float64PointerValue(resp.Config.TTL)
+			r.Config.ConsumerBy = types.StringNull()
 		}
+		r.Config.CustomClaimsForward = make([]types.String, 0, len(resp.Config.CustomClaimsForward))
+		for _, v := range resp.Config.CustomClaimsForward {
+			r.Config.CustomClaimsForward = append(r.Config.CustomClaimsForward, types.StringValue(v))
+		}
+		if len(resp.Config.CustomIntrospectionHeaders) > 0 {
+			r.Config.CustomIntrospectionHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.CustomIntrospectionHeaders))
+			for key, value := range resp.Config.CustomIntrospectionHeaders {
+				result, _ := json.Marshal(value)
+				r.Config.CustomIntrospectionHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+			}
+		}
+		r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+		r.Config.IntrospectRequest = types.BoolPointerValue(resp.Config.IntrospectRequest)
+		r.Config.IntrospectionURL = types.StringValue(resp.Config.IntrospectionURL)
+		r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
+		r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
+		r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
+		r.Config.TokenTypeHint = types.StringPointerValue(resp.Config.TokenTypeHint)
+		r.Config.TTL = types.Float64PointerValue(resp.Config.TTL)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -75,18 +70,16 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -199,94 +192,6 @@ func (r *PluginOauth2IntrospectionResourceModel) ToOperationsUpdateOauth2introsp
 func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlugin(ctx context.Context) (*shared.Oauth2IntrospectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.Oauth2IntrospectionPluginConfig
-	if r.Config != nil {
-		anonymous := new(string)
-		if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
-			*anonymous = r.Config.Anonymous.ValueString()
-		} else {
-			anonymous = nil
-		}
-		var authorizationValue string
-		authorizationValue = r.Config.AuthorizationValue.ValueString()
-
-		consumerBy := new(shared.Oauth2IntrospectionPluginConsumerBy)
-		if !r.Config.ConsumerBy.IsUnknown() && !r.Config.ConsumerBy.IsNull() {
-			*consumerBy = shared.Oauth2IntrospectionPluginConsumerBy(r.Config.ConsumerBy.ValueString())
-		} else {
-			consumerBy = nil
-		}
-		customClaimsForward := make([]string, 0, len(r.Config.CustomClaimsForward))
-		for _, customClaimsForwardItem := range r.Config.CustomClaimsForward {
-			customClaimsForward = append(customClaimsForward, customClaimsForwardItem.ValueString())
-		}
-		customIntrospectionHeaders := make(map[string]interface{})
-		for customIntrospectionHeadersKey, customIntrospectionHeadersValue := range r.Config.CustomIntrospectionHeaders {
-			var customIntrospectionHeadersInst interface{}
-			_ = json.Unmarshal([]byte(customIntrospectionHeadersValue.ValueString()), &customIntrospectionHeadersInst)
-			customIntrospectionHeaders[customIntrospectionHeadersKey] = customIntrospectionHeadersInst
-		}
-		hideCredentials := new(bool)
-		if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
-			*hideCredentials = r.Config.HideCredentials.ValueBool()
-		} else {
-			hideCredentials = nil
-		}
-		introspectRequest := new(bool)
-		if !r.Config.IntrospectRequest.IsUnknown() && !r.Config.IntrospectRequest.IsNull() {
-			*introspectRequest = r.Config.IntrospectRequest.ValueBool()
-		} else {
-			introspectRequest = nil
-		}
-		var introspectionURL string
-		introspectionURL = r.Config.IntrospectionURL.ValueString()
-
-		keepalive := new(int64)
-		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive = r.Config.Keepalive.ValueInt64()
-		} else {
-			keepalive = nil
-		}
-		runOnPreflight := new(bool)
-		if !r.Config.RunOnPreflight.IsUnknown() && !r.Config.RunOnPreflight.IsNull() {
-			*runOnPreflight = r.Config.RunOnPreflight.ValueBool()
-		} else {
-			runOnPreflight = nil
-		}
-		timeout := new(int64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueInt64()
-		} else {
-			timeout = nil
-		}
-		tokenTypeHint := new(string)
-		if !r.Config.TokenTypeHint.IsUnknown() && !r.Config.TokenTypeHint.IsNull() {
-			*tokenTypeHint = r.Config.TokenTypeHint.ValueString()
-		} else {
-			tokenTypeHint = nil
-		}
-		ttl := new(float64)
-		if !r.Config.TTL.IsUnknown() && !r.Config.TTL.IsNull() {
-			*ttl = r.Config.TTL.ValueFloat64()
-		} else {
-			ttl = nil
-		}
-		config = &shared.Oauth2IntrospectionPluginConfig{
-			Anonymous:                  anonymous,
-			AuthorizationValue:         authorizationValue,
-			ConsumerBy:                 consumerBy,
-			CustomClaimsForward:        customClaimsForward,
-			CustomIntrospectionHeaders: customIntrospectionHeaders,
-			HideCredentials:            hideCredentials,
-			IntrospectRequest:          introspectRequest,
-			IntrospectionURL:           introspectionURL,
-			Keepalive:                  keepalive,
-			RunOnPreflight:             runOnPreflight,
-			Timeout:                    timeout,
-			TokenTypeHint:              tokenTypeHint,
-			TTL:                        ttl,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -338,34 +243,129 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.Oauth2IntrospectionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.Oauth2IntrospectionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.Oauth2IntrospectionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.Oauth2IntrospectionPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.Oauth2IntrospectionPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	anonymous := new(string)
+	if !r.Config.Anonymous.IsUnknown() && !r.Config.Anonymous.IsNull() {
+		*anonymous = r.Config.Anonymous.ValueString()
+	} else {
+		anonymous = nil
+	}
+	var authorizationValue string
+	authorizationValue = r.Config.AuthorizationValue.ValueString()
+
+	consumerBy := new(shared.Oauth2IntrospectionPluginConsumerBy)
+	if !r.Config.ConsumerBy.IsUnknown() && !r.Config.ConsumerBy.IsNull() {
+		*consumerBy = shared.Oauth2IntrospectionPluginConsumerBy(r.Config.ConsumerBy.ValueString())
+	} else {
+		consumerBy = nil
+	}
+	customClaimsForward := make([]string, 0, len(r.Config.CustomClaimsForward))
+	for _, customClaimsForwardItem := range r.Config.CustomClaimsForward {
+		customClaimsForward = append(customClaimsForward, customClaimsForwardItem.ValueString())
+	}
+	customIntrospectionHeaders := make(map[string]interface{})
+	for customIntrospectionHeadersKey, customIntrospectionHeadersValue := range r.Config.CustomIntrospectionHeaders {
+		var customIntrospectionHeadersInst interface{}
+		_ = json.Unmarshal([]byte(customIntrospectionHeadersValue.ValueString()), &customIntrospectionHeadersInst)
+		customIntrospectionHeaders[customIntrospectionHeadersKey] = customIntrospectionHeadersInst
+	}
+	hideCredentials := new(bool)
+	if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
+		*hideCredentials = r.Config.HideCredentials.ValueBool()
+	} else {
+		hideCredentials = nil
+	}
+	introspectRequest := new(bool)
+	if !r.Config.IntrospectRequest.IsUnknown() && !r.Config.IntrospectRequest.IsNull() {
+		*introspectRequest = r.Config.IntrospectRequest.ValueBool()
+	} else {
+		introspectRequest = nil
+	}
+	var introspectionURL string
+	introspectionURL = r.Config.IntrospectionURL.ValueString()
+
+	keepalive := new(int64)
+	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
+		*keepalive = r.Config.Keepalive.ValueInt64()
+	} else {
+		keepalive = nil
+	}
+	runOnPreflight := new(bool)
+	if !r.Config.RunOnPreflight.IsUnknown() && !r.Config.RunOnPreflight.IsNull() {
+		*runOnPreflight = r.Config.RunOnPreflight.ValueBool()
+	} else {
+		runOnPreflight = nil
+	}
+	timeout := new(int64)
+	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+		*timeout = r.Config.Timeout.ValueInt64()
+	} else {
+		timeout = nil
+	}
+	tokenTypeHint := new(string)
+	if !r.Config.TokenTypeHint.IsUnknown() && !r.Config.TokenTypeHint.IsNull() {
+		*tokenTypeHint = r.Config.TokenTypeHint.ValueString()
+	} else {
+		tokenTypeHint = nil
+	}
+	ttl := new(float64)
+	if !r.Config.TTL.IsUnknown() && !r.Config.TTL.IsNull() {
+		*ttl = r.Config.TTL.ValueFloat64()
+	} else {
+		ttl = nil
+	}
+	config := shared.Oauth2IntrospectionPluginConfig{
+		Anonymous:                  anonymous,
+		AuthorizationValue:         authorizationValue,
+		ConsumerBy:                 consumerBy,
+		CustomClaimsForward:        customClaimsForward,
+		CustomIntrospectionHeaders: customIntrospectionHeaders,
+		HideCredentials:            hideCredentials,
+		IntrospectRequest:          introspectRequest,
+		IntrospectionURL:           introspectionURL,
+		Keepalive:                  keepalive,
+		RunOnPreflight:             runOnPreflight,
+		Timeout:                    timeout,
+		TokenTypeHint:              tokenTypeHint,
+		TTL:                        ttl,
 	}
 	protocols := make([]shared.Oauth2IntrospectionPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -395,32 +395,19 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 			ID: id3,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.Oauth2IntrospectionPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

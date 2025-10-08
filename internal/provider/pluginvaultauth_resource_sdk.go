@@ -59,18 +59,16 @@ func (r *PluginVaultAuthResourceModel) RefreshFromSharedVaultAuthPlugin(ctx cont
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -183,6 +181,96 @@ func (r *PluginVaultAuthResourceModel) ToOperationsUpdateVaultauthPluginRequest(
 func (r *PluginVaultAuthResourceModel) ToSharedVaultAuthPlugin(ctx context.Context) (*shared.VaultAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	createdAt := new(int64)
+	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
+		*createdAt = r.CreatedAt.ValueInt64()
+	} else {
+		createdAt = nil
+	}
+	enabled := new(bool)
+	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
+		*enabled = r.Enabled.ValueBool()
+	} else {
+		enabled = nil
+	}
+	id := new(string)
+	if !r.ID.IsUnknown() && !r.ID.IsNull() {
+		*id = r.ID.ValueString()
+	} else {
+		id = nil
+	}
+	instanceName := new(string)
+	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
+		*instanceName = r.InstanceName.ValueString()
+	} else {
+		instanceName = nil
+	}
+	var ordering *shared.VaultAuthPluginOrdering
+	if r.Ordering != nil {
+		var after *shared.VaultAuthPluginAfter
+		if r.Ordering.After != nil {
+			access := make([]string, 0, len(r.Ordering.After.Access))
+			for _, accessItem := range r.Ordering.After.Access {
+				access = append(access, accessItem.ValueString())
+			}
+			after = &shared.VaultAuthPluginAfter{
+				Access: access,
+			}
+		}
+		var before *shared.VaultAuthPluginBefore
+		if r.Ordering.Before != nil {
+			access1 := make([]string, 0, len(r.Ordering.Before.Access))
+			for _, accessItem1 := range r.Ordering.Before.Access {
+				access1 = append(access1, accessItem1.ValueString())
+			}
+			before = &shared.VaultAuthPluginBefore{
+				Access: access1,
+			}
+		}
+		ordering = &shared.VaultAuthPluginOrdering{
+			After:  after,
+			Before: before,
+		}
+	}
+	partials := make([]shared.VaultAuthPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.VaultAuthPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
 	var config *shared.VaultAuthPluginConfig
 	if r.Config != nil {
 		accessTokenName := new(string)
@@ -223,14 +311,14 @@ func (r *PluginVaultAuthResourceModel) ToSharedVaultAuthPlugin(ctx context.Conte
 		}
 		var vault *shared.VaultAuthPluginVault
 		if r.Config.Vault != nil {
-			id := new(string)
+			id2 := new(string)
 			if !r.Config.Vault.ID.IsUnknown() && !r.Config.Vault.ID.IsNull() {
-				*id = r.Config.Vault.ID.ValueString()
+				*id2 = r.Config.Vault.ID.ValueString()
 			} else {
-				id = nil
+				id2 = nil
 			}
 			vault = &shared.VaultAuthPluginVault{
-				ID: id,
+				ID: id2,
 			}
 		}
 		config = &shared.VaultAuthPluginConfig{
@@ -241,86 +329,6 @@ func (r *PluginVaultAuthResourceModel) ToSharedVaultAuthPlugin(ctx context.Conte
 			SecretTokenName: secretTokenName,
 			TokensInBody:    tokensInBody,
 			Vault:           vault,
-		}
-	}
-	createdAt := new(int64)
-	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
-		*createdAt = r.CreatedAt.ValueInt64()
-	} else {
-		createdAt = nil
-	}
-	enabled := new(bool)
-	if !r.Enabled.IsUnknown() && !r.Enabled.IsNull() {
-		*enabled = r.Enabled.ValueBool()
-	} else {
-		enabled = nil
-	}
-	id1 := new(string)
-	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
-	} else {
-		id1 = nil
-	}
-	instanceName := new(string)
-	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
-		*instanceName = r.InstanceName.ValueString()
-	} else {
-		instanceName = nil
-	}
-	var ordering *shared.VaultAuthPluginOrdering
-	if r.Ordering != nil {
-		var after *shared.VaultAuthPluginAfter
-		if r.Ordering.After != nil {
-			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
-			}
-			after = &shared.VaultAuthPluginAfter{
-				Access: access,
-			}
-		}
-		var before *shared.VaultAuthPluginBefore
-		if r.Ordering.Before != nil {
-			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
-			}
-			before = &shared.VaultAuthPluginBefore{
-				Access: access1,
-			}
-		}
-		ordering = &shared.VaultAuthPluginOrdering{
-			After:  after,
-			Before: before,
-		}
-	}
-	var partials []shared.VaultAuthPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.VaultAuthPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.VaultAuthPluginPartials{
-				ID:   id2,
-				Name: name,
-				Path: path,
-			})
 		}
 	}
 	protocols := make([]shared.VaultAuthPluginProtocols, 0, len(r.Protocols))
@@ -351,32 +359,19 @@ func (r *PluginVaultAuthResourceModel) ToSharedVaultAuthPlugin(ctx context.Conte
 			ID: id4,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.VaultAuthPlugin{
-		Config:       config,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

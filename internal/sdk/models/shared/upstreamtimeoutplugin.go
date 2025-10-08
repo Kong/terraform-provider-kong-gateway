@@ -8,48 +8,6 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type UpstreamTimeoutPluginConfig struct {
-	// The timeout in milliseconds for establishing a connection to the upstream server. Must be an integer between 1 and 2^31-2.
-	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
-	// The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
-	ReadTimeout *int64 `json:"read_timeout,omitempty"`
-	// The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
-	SendTimeout *int64 `json:"send_timeout,omitempty"`
-}
-
-func (u *UpstreamTimeoutPluginConfig) GetConnectTimeout() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.ConnectTimeout
-}
-
-func (u *UpstreamTimeoutPluginConfig) GetReadTimeout() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.ReadTimeout
-}
-
-func (u *UpstreamTimeoutPluginConfig) GetSendTimeout() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.SendTimeout
-}
-
-// UpstreamTimeoutPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-type UpstreamTimeoutPluginConsumer struct {
-	ID *string `json:"id,omitempty"`
-}
-
-func (u *UpstreamTimeoutPluginConsumer) GetID() *string {
-	if u == nil {
-		return nil
-	}
-	return u.ID
-}
-
 type UpstreamTimeoutPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -120,6 +78,48 @@ func (u *UpstreamTimeoutPluginPartials) GetPath() *string {
 	return u.Path
 }
 
+type UpstreamTimeoutPluginConfig struct {
+	// The timeout in milliseconds for establishing a connection to the upstream server. Must be an integer between 1 and 2^31-2.
+	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
+	// The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
+	ReadTimeout *int64 `json:"read_timeout,omitempty"`
+	// The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server. Must be an integer between 1 and 2^31-2.
+	SendTimeout *int64 `json:"send_timeout,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginConfig) GetConnectTimeout() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.ConnectTimeout
+}
+
+func (u *UpstreamTimeoutPluginConfig) GetReadTimeout() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.ReadTimeout
+}
+
+func (u *UpstreamTimeoutPluginConfig) GetSendTimeout() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.SendTimeout
+}
+
+// UpstreamTimeoutPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+type UpstreamTimeoutPluginConsumer struct {
+	ID *string `json:"id,omitempty"`
+}
+
+func (u *UpstreamTimeoutPluginConsumer) GetID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ID
+}
+
 type UpstreamTimeoutPluginProtocols string
 
 const (
@@ -176,10 +176,8 @@ func (u *UpstreamTimeoutPluginService) GetID() *string {
 	return u.ID
 }
 
+// UpstreamTimeoutPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type UpstreamTimeoutPlugin struct {
-	Config *UpstreamTimeoutPluginConfig `json:"config,omitempty"`
-	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
-	Consumer *UpstreamTimeoutPluginConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -192,16 +190,19 @@ type UpstreamTimeoutPlugin struct {
 	Ordering     *UpstreamTimeoutPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []UpstreamTimeoutPluginPartials `json:"partials,omitempty"`
+	// An optional set of strings associated with the Plugin for grouping and filtering.
+	Tags []string `json:"tags,omitempty"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64                       `json:"updated_at,omitempty"`
+	Config    *UpstreamTimeoutPluginConfig `json:"config,omitempty"`
+	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
+	Consumer *UpstreamTimeoutPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []UpstreamTimeoutPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *UpstreamTimeoutPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *UpstreamTimeoutPluginService `json:"service,omitempty"`
-	// An optional set of strings associated with the Plugin for grouping and filtering.
-	Tags []string `json:"tags,omitempty"`
-	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
 func (u UpstreamTimeoutPlugin) MarshalJSON() ([]byte, error) {
@@ -213,20 +214,6 @@ func (u *UpstreamTimeoutPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
-}
-
-func (u *UpstreamTimeoutPlugin) GetConfig() *UpstreamTimeoutPluginConfig {
-	if u == nil {
-		return nil
-	}
-	return u.Config
-}
-
-func (u *UpstreamTimeoutPlugin) GetConsumer() *UpstreamTimeoutPluginConsumer {
-	if u == nil {
-		return nil
-	}
-	return u.Consumer
 }
 
 func (u *UpstreamTimeoutPlugin) GetCreatedAt() *int64 {
@@ -275,6 +262,34 @@ func (u *UpstreamTimeoutPlugin) GetPartials() []UpstreamTimeoutPluginPartials {
 	return u.Partials
 }
 
+func (u *UpstreamTimeoutPlugin) GetTags() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Tags
+}
+
+func (u *UpstreamTimeoutPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.UpdatedAt
+}
+
+func (u *UpstreamTimeoutPlugin) GetConfig() *UpstreamTimeoutPluginConfig {
+	if u == nil {
+		return nil
+	}
+	return u.Config
+}
+
+func (u *UpstreamTimeoutPlugin) GetConsumer() *UpstreamTimeoutPluginConsumer {
+	if u == nil {
+		return nil
+	}
+	return u.Consumer
+}
+
 func (u *UpstreamTimeoutPlugin) GetProtocols() []UpstreamTimeoutPluginProtocols {
 	if u == nil {
 		return nil
@@ -294,18 +309,4 @@ func (u *UpstreamTimeoutPlugin) GetService() *UpstreamTimeoutPluginService {
 		return nil
 	}
 	return u.Service
-}
-
-func (u *UpstreamTimeoutPlugin) GetTags() []string {
-	if u == nil {
-		return nil
-	}
-	return u.Tags
-}
-
-func (u *UpstreamTimeoutPlugin) GetUpdatedAt() *int64 {
-	if u == nil {
-		return nil
-	}
-	return u.UpdatedAt
 }

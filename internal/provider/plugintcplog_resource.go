@@ -18,9 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -39,7 +37,7 @@ type PluginTCPLogResource struct {
 
 // PluginTCPLogResourceModel describes the resource data model.
 type PluginTCPLogResourceModel struct {
-	Config       *tfTypes.TCPLogPluginConfig `tfsdk:"config"`
+	Config       tfTypes.TCPLogPluginConfig  `tfsdk:"config"`
 	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
@@ -64,8 +62,7 @@ func (r *PluginTCPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 		MarkdownDescription: "PluginTCPLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"custom_fields_by_lua": schema.MapAttribute{
 						Computed:    true,
@@ -74,12 +71,8 @@ func (r *PluginTCPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 						Description: `A list of key-value pairs, where the key is the name of a log field and the value is a chunk of Lua code, whose return value sets or replaces the log field value.`,
 					},
 					"host": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The IP address or host name to send data to. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The IP address or host name to send data to.`,
 					},
 					"keepalive": schema.Float64Attribute{
 						Computed:    true,
@@ -87,11 +80,9 @@ func (r *PluginTCPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 						Description: `An optional value in milliseconds that defines how long an idle connection lives before being closed.`,
 					},
 					"port": schema.Int64Attribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The port to send data to on the upstream server. Not Null`,
+						Required:    true,
+						Description: `The port to send data to on the upstream server.`,
 						Validators: []validator.Int64{
-							speakeasy_int64validators.NotNull(),
 							int64validator.AtMost(65535),
 						},
 					},

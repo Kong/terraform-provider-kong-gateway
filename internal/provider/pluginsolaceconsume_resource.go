@@ -21,7 +21,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
-	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -42,19 +41,19 @@ type PluginSolaceConsumeResource struct {
 
 // PluginSolaceConsumeResourceModel describes the resource data model.
 type PluginSolaceConsumeResourceModel struct {
-	Config       *tfTypes.SolaceConsumePluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.Set                       `tfsdk:"route"`
-	Service      *tfTypes.Set                       `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
-	Workspace    types.String                       `tfsdk:"workspace"`
+	Config       tfTypes.SolaceConsumePluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                       `tfsdk:"created_at"`
+	Enabled      types.Bool                        `tfsdk:"enabled"`
+	ID           types.String                      `tfsdk:"id"`
+	InstanceName types.String                      `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
+	Protocols    []types.String                    `tfsdk:"protocols"`
+	Route        *tfTypes.Set                      `tfsdk:"route"`
+	Service      *tfTypes.Set                      `tfsdk:"service"`
+	Tags         []types.String                    `tfsdk:"tags"`
+	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
+	Workspace    types.String                      `tfsdk:"workspace"`
 }
 
 func (r *PluginSolaceConsumeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -66,12 +65,10 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 		MarkdownDescription: "PluginSolaceConsume Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"flow": schema.SingleNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"ack_mode": schema.StringAttribute{
 								Computed:    true,
@@ -85,8 +82,7 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 								},
 							},
 							"binds": schema.ListNestedAttribute{
-								Computed: true,
-								Optional: true,
+								Required: true,
 								NestedObject: schema.NestedAttributeObject{
 									Validators: []validator.Object{
 										speakeasy_objectvalidators.NotNull(),
@@ -109,10 +105,6 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 											},
 										},
 									},
-								},
-								Description: `Not Null`,
-								Validators: []validator.List{
-									speakeasy_listvalidators.NotNull(),
 								},
 							},
 							"functions": schema.ListAttribute{
@@ -157,10 +149,7 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 								},
 							},
 						},
-						Description: `The flow related configuration. Not Null`,
-						Validators: []validator.Object{
-							speakeasy_objectvalidators.NotNull(),
-						},
+						Description: `The flow related configuration.`,
 					},
 					"mode": schema.StringAttribute{
 						Computed:    true,
@@ -191,8 +180,7 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 						Description: `The ` + "`" + `POLLING` + "`" + ` mode related configuration settings.`,
 					},
 					"session": schema.SingleNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						Attributes: map[string]schema.Attribute{
 							"authentication": schema.SingleNestedAttribute{
 								Computed: true,
@@ -281,12 +269,8 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 								Description: `When enabled, a sequence number is automatically included (if not already present) in the Solace-defined fields for each message sent.`,
 							},
 							"host": schema.StringAttribute{
-								Computed:    true,
-								Optional:    true,
-								Description: `The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry). Not Null`,
-								Validators: []validator.String{
-									speakeasy_stringvalidators.NotNull(),
-								},
+								Required:    true,
+								Description: `The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry).`,
 							},
 							"properties": schema.MapAttribute{
 								Computed:    true,
@@ -311,10 +295,7 @@ func (r *PluginSolaceConsumeResource) Schema(ctx context.Context, req resource.S
 								},
 							},
 						},
-						Description: `Session related configuration. Not Null`,
-						Validators: []validator.Object{
-							speakeasy_objectvalidators.NotNull(),
-						},
+						Description: `Session related configuration.`,
 					},
 					"websocket": schema.SingleNestedAttribute{
 						Computed: true,

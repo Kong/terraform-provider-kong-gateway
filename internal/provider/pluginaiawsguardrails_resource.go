@@ -18,7 +18,6 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
-	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,21 +36,21 @@ type PluginAiAwsGuardrailsResource struct {
 
 // PluginAiAwsGuardrailsResourceModel describes the resource data model.
 type PluginAiAwsGuardrailsResourceModel struct {
-	Config        *tfTypes.AiAwsGuardrailsPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                          `tfsdk:"created_at"`
-	Enabled       types.Bool                           `tfsdk:"enabled"`
-	ID            types.String                         `tfsdk:"id"`
-	InstanceName  types.String                         `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials          `tfsdk:"partials"`
-	Protocols     []types.String                       `tfsdk:"protocols"`
-	Route         *tfTypes.Set                         `tfsdk:"route"`
-	Service       *tfTypes.Set                         `tfsdk:"service"`
-	Tags          []types.String                       `tfsdk:"tags"`
-	UpdatedAt     types.Int64                          `tfsdk:"updated_at"`
-	Workspace     types.String                         `tfsdk:"workspace"`
+	Config        tfTypes.AiAwsGuardrailsPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                        `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                        `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                         `tfsdk:"created_at"`
+	Enabled       types.Bool                          `tfsdk:"enabled"`
+	ID            types.String                        `tfsdk:"id"`
+	InstanceName  types.String                        `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering          `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials         `tfsdk:"partials"`
+	Protocols     []types.String                      `tfsdk:"protocols"`
+	Route         *tfTypes.Set                        `tfsdk:"route"`
+	Service       *tfTypes.Set                        `tfsdk:"service"`
+	Tags          []types.String                      `tfsdk:"tags"`
+	UpdatedAt     types.Int64                         `tfsdk:"updated_at"`
+	Workspace     types.String                        `tfsdk:"workspace"`
 }
 
 func (r *PluginAiAwsGuardrailsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -63,8 +62,7 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 		MarkdownDescription: "PluginAiAwsGuardrails Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"aws_access_key_id": schema.StringAttribute{
 						Computed:    true,
@@ -77,12 +75,8 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 						Description: `The target AWS IAM role ARN used to access the guardrails service`,
 					},
 					"aws_region": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The AWS region to use for the Bedrock API. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The AWS region to use for the Bedrock API`,
 					},
 					"aws_role_session_name": schema.StringAttribute{
 						Computed:    true,
@@ -112,20 +106,12 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 						},
 					},
 					"guardrails_id": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The guardrail identifier used in the request to apply the guardrail. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The guardrail identifier used in the request to apply the guardrail`,
 					},
 					"guardrails_version": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
-						Description: `The guardrail version used in the request to apply the guardrail. Not Null`,
-						Validators: []validator.String{
-							speakeasy_stringvalidators.NotNull(),
-						},
+						Required:    true,
+						Description: `The guardrail version used in the request to apply the guardrail`,
 					},
 					"response_buffer_size": schema.Float64Attribute{
 						Computed:    true,

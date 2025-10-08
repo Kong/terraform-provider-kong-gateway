@@ -17,245 +17,240 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		if resp.Config.AutoOffsetReset != nil {
+			r.Config.AutoOffsetReset = types.StringValue(string(*resp.Config.AutoOffsetReset))
 		} else {
-			r.Config = &tfTypes.ConfluentConsumePluginConfig{}
-			if resp.Config.AutoOffsetReset != nil {
-				r.Config.AutoOffsetReset = types.StringValue(string(*resp.Config.AutoOffsetReset))
-			} else {
-				r.Config.AutoOffsetReset = types.StringNull()
-			}
-			r.Config.BootstrapServers = []tfTypes.BootstrapServers{}
+			r.Config.AutoOffsetReset = types.StringNull()
+		}
+		r.Config.BootstrapServers = []tfTypes.BootstrapServers{}
 
-			for _, bootstrapServersItem := range resp.Config.BootstrapServers {
-				var bootstrapServers tfTypes.BootstrapServers
+		for _, bootstrapServersItem := range resp.Config.BootstrapServers {
+			var bootstrapServers tfTypes.BootstrapServers
 
-				bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
-				bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
+			bootstrapServers.Host = types.StringValue(bootstrapServersItem.Host)
+			bootstrapServers.Port = types.Int64Value(bootstrapServersItem.Port)
 
-				r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
-			}
-			r.Config.ClusterAPIKey = types.StringValue(resp.Config.ClusterAPIKey)
-			r.Config.ClusterAPISecret = types.StringValue(resp.Config.ClusterAPISecret)
-			r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
-			if resp.Config.CommitStrategy != nil {
-				r.Config.CommitStrategy = types.StringValue(string(*resp.Config.CommitStrategy))
+			r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
+		}
+		r.Config.ClusterAPIKey = types.StringValue(resp.Config.ClusterAPIKey)
+		r.Config.ClusterAPISecret = types.StringValue(resp.Config.ClusterAPISecret)
+		r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
+		if resp.Config.CommitStrategy != nil {
+			r.Config.CommitStrategy = types.StringValue(string(*resp.Config.CommitStrategy))
+		} else {
+			r.Config.CommitStrategy = types.StringNull()
+		}
+		r.Config.ConfluentCloudAPIKey = types.StringPointerValue(resp.Config.ConfluentCloudAPIKey)
+		r.Config.ConfluentCloudAPISecret = types.StringPointerValue(resp.Config.ConfluentCloudAPISecret)
+		r.Config.DlqTopic = types.StringPointerValue(resp.Config.DlqTopic)
+		r.Config.EnableDlq = types.BoolPointerValue(resp.Config.EnableDlq)
+		r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
+		r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
+		r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
+		for _, v := range resp.Config.MessageByLuaFunctions {
+			r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
+		}
+		if resp.Config.MessageDeserializer != nil {
+			r.Config.MessageDeserializer = types.StringValue(string(*resp.Config.MessageDeserializer))
+		} else {
+			r.Config.MessageDeserializer = types.StringNull()
+		}
+		if resp.Config.Mode != nil {
+			r.Config.Mode = types.StringValue(string(*resp.Config.Mode))
+		} else {
+			r.Config.Mode = types.StringNull()
+		}
+		if resp.Config.SchemaRegistry == nil {
+			r.Config.SchemaRegistry = nil
+		} else {
+			r.Config.SchemaRegistry = &tfTypes.ConfluentConsumePluginSchemaRegistry{}
+			if resp.Config.SchemaRegistry.Confluent == nil {
+				r.Config.SchemaRegistry.Confluent = nil
 			} else {
-				r.Config.CommitStrategy = types.StringNull()
-			}
-			r.Config.ConfluentCloudAPIKey = types.StringPointerValue(resp.Config.ConfluentCloudAPIKey)
-			r.Config.ConfluentCloudAPISecret = types.StringPointerValue(resp.Config.ConfluentCloudAPISecret)
-			r.Config.DlqTopic = types.StringPointerValue(resp.Config.DlqTopic)
-			r.Config.EnableDlq = types.BoolPointerValue(resp.Config.EnableDlq)
-			r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
-			r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
-			r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
-			for _, v := range resp.Config.MessageByLuaFunctions {
-				r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
-			}
-			if resp.Config.MessageDeserializer != nil {
-				r.Config.MessageDeserializer = types.StringValue(string(*resp.Config.MessageDeserializer))
-			} else {
-				r.Config.MessageDeserializer = types.StringNull()
-			}
-			if resp.Config.Mode != nil {
-				r.Config.Mode = types.StringValue(string(*resp.Config.Mode))
-			} else {
-				r.Config.Mode = types.StringNull()
-			}
-			if resp.Config.SchemaRegistry == nil {
-				r.Config.SchemaRegistry = nil
-			} else {
-				r.Config.SchemaRegistry = &tfTypes.ConfluentConsumePluginSchemaRegistry{}
-				if resp.Config.SchemaRegistry.Confluent == nil {
-					r.Config.SchemaRegistry.Confluent = nil
+				r.Config.SchemaRegistry.Confluent = &tfTypes.ConfluentConsumePluginConfluent{}
+				if resp.Config.SchemaRegistry.Confluent.Authentication == nil {
+					r.Config.SchemaRegistry.Confluent.Authentication = nil
 				} else {
-					r.Config.SchemaRegistry.Confluent = &tfTypes.ConfluentConsumePluginConfluent{}
-					if resp.Config.SchemaRegistry.Confluent.Authentication == nil {
-						r.Config.SchemaRegistry.Confluent.Authentication = nil
+					r.Config.SchemaRegistry.Confluent.Authentication = &tfTypes.ConfluentPluginAuthentication{}
+					if resp.Config.SchemaRegistry.Confluent.Authentication.Basic == nil {
+						r.Config.SchemaRegistry.Confluent.Authentication.Basic = nil
 					} else {
-						r.Config.SchemaRegistry.Confluent.Authentication = &tfTypes.ConfluentPluginAuthentication{}
-						if resp.Config.SchemaRegistry.Confluent.Authentication.Basic == nil {
-							r.Config.SchemaRegistry.Confluent.Authentication.Basic = nil
-						} else {
-							r.Config.SchemaRegistry.Confluent.Authentication.Basic = &tfTypes.Basic{}
-							r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Password)
-							r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Username)
-						}
-						if resp.Config.SchemaRegistry.Confluent.Authentication.Mode != nil {
-							r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Mode))
-						} else {
-							r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringNull()
-						}
-						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2 == nil {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = nil
-						} else {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = &tfTypes.Oauth2{}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
-							for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience, types.StringValue(v))
-							}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret)
-							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType != nil {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType))
-							} else {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringNull()
-							}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
-							for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes, types.StringValue(v))
-							}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
-							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
-								for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-									result, _ := json.Marshal(value)
-									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
-								}
-							}
-							if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
-								for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-									result1, _ := json.Marshal(value1)
-									r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
-								}
-							}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
-						}
-						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client == nil {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = nil
-						} else {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = &tfTypes.Oauth2Client{}
-							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod != nil {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod))
-							} else {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringNull()
-							}
-							if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg != nil {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg))
-							} else {
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringNull()
-							}
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify)
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout = types.Int64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout)
-						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Basic = &tfTypes.Basic{}
+						r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Password)
+						r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Username)
 					}
-					r.Config.SchemaRegistry.Confluent.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.SslVerify)
-					r.Config.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.TTL)
-					r.Config.SchemaRegistry.Confluent.URL = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.URL)
-				}
-			}
-			r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
-			r.Config.Topics = []tfTypes.Topics{}
-
-			for _, topicsItem := range resp.Config.Topics {
-				var topics tfTypes.Topics
-
-				topics.Name = types.StringValue(topicsItem.Name)
-				if topicsItem.SchemaRegistry == nil {
-					topics.SchemaRegistry = nil
-				} else {
-					topics.SchemaRegistry = &tfTypes.ConfluentConsumePluginSchemaRegistry{}
-					if topicsItem.SchemaRegistry.Confluent == nil {
-						topics.SchemaRegistry.Confluent = nil
+					if resp.Config.SchemaRegistry.Confluent.Authentication.Mode != nil {
+						r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Mode))
 					} else {
-						topics.SchemaRegistry.Confluent = &tfTypes.ConfluentConsumePluginConfluent{}
-						if topicsItem.SchemaRegistry.Confluent.Authentication == nil {
-							topics.SchemaRegistry.Confluent.Authentication = nil
+						r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringNull()
+					}
+					if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2 == nil {
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = nil
+					} else {
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 = &tfTypes.Oauth2{}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+						for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience, types.StringValue(v))
+						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret)
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType != nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType))
 						} else {
-							topics.SchemaRegistry.Confluent.Authentication = &tfTypes.ConfluentPluginAuthentication{}
-							if topicsItem.SchemaRegistry.Confluent.Authentication.Basic == nil {
-								topics.SchemaRegistry.Confluent.Authentication.Basic = nil
-							} else {
-								topics.SchemaRegistry.Confluent.Authentication.Basic = &tfTypes.Basic{}
-								topics.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Password)
-								topics.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Username)
-							}
-							if topicsItem.SchemaRegistry.Confluent.Authentication.Mode != nil {
-								topics.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Mode))
-							} else {
-								topics.SchemaRegistry.Confluent.Authentication.Mode = types.StringNull()
-							}
-							if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2 == nil {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2 = nil
-							} else {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2 = &tfTypes.Oauth2{}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = make([]types.String, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
-								for _, v := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = append(topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience, types.StringValue(v))
-								}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret)
-								if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType != nil {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType))
-								} else {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringNull()
-								}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Password = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = make([]types.String, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
-								for _, v := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = append(topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes, types.StringValue(v))
-								}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
-								if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
-									for key2, value2 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-										result2, _ := json.Marshal(value2)
-										topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = jsontypes.NewNormalizedValue(string(result2))
-									}
-								}
-								if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
-									for key3, value3 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-										result3, _ := json.Marshal(value3)
-										topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = jsontypes.NewNormalizedValue(string(result3))
-									}
-								}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
-							}
-							if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client == nil {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client = nil
-							} else {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client = &tfTypes.Oauth2Client{}
-								if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod != nil {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod))
-								} else {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringNull()
-								}
-								if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg != nil {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg))
-								} else {
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringNull()
-								}
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion = types.Float64PointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify)
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout = types.Int64PointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout)
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringNull()
+						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = make([]types.String, 0, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+						for _, v := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = append(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes, types.StringValue(v))
+						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
+						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+							for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+								result, _ := json.Marshal(value)
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
 							}
 						}
-						topics.SchemaRegistry.Confluent.SslVerify = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.SslVerify)
-						topics.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(topicsItem.SchemaRegistry.Confluent.TTL)
-						topics.SchemaRegistry.Confluent.URL = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.URL)
+						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+							for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+								result1, _ := json.Marshal(value1)
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+							}
+						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
+					}
+					if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client == nil {
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = nil
+					} else {
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client = &tfTypes.Oauth2Client{}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod != nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod))
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringNull()
+						}
+						if resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg != nil {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg))
+						} else {
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringNull()
+						}
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify)
+						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout = types.Int64PointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout)
 					}
 				}
-
-				r.Config.Topics = append(r.Config.Topics, topics)
+				r.Config.SchemaRegistry.Confluent.SslVerify = types.BoolPointerValue(resp.Config.SchemaRegistry.Confluent.SslVerify)
+				r.Config.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.TTL)
+				r.Config.SchemaRegistry.Confluent.URL = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.URL)
 			}
+		}
+		r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
+		r.Config.Topics = []tfTypes.Topics{}
+
+		for _, topicsItem := range resp.Config.Topics {
+			var topics tfTypes.Topics
+
+			topics.Name = types.StringValue(topicsItem.Name)
+			if topicsItem.SchemaRegistry == nil {
+				topics.SchemaRegistry = nil
+			} else {
+				topics.SchemaRegistry = &tfTypes.ConfluentConsumePluginSchemaRegistry{}
+				if topicsItem.SchemaRegistry.Confluent == nil {
+					topics.SchemaRegistry.Confluent = nil
+				} else {
+					topics.SchemaRegistry.Confluent = &tfTypes.ConfluentConsumePluginConfluent{}
+					if topicsItem.SchemaRegistry.Confluent.Authentication == nil {
+						topics.SchemaRegistry.Confluent.Authentication = nil
+					} else {
+						topics.SchemaRegistry.Confluent.Authentication = &tfTypes.ConfluentPluginAuthentication{}
+						if topicsItem.SchemaRegistry.Confluent.Authentication.Basic == nil {
+							topics.SchemaRegistry.Confluent.Authentication.Basic = nil
+						} else {
+							topics.SchemaRegistry.Confluent.Authentication.Basic = &tfTypes.Basic{}
+							topics.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Password)
+							topics.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Username)
+						}
+						if topicsItem.SchemaRegistry.Confluent.Authentication.Mode != nil {
+							topics.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Mode))
+						} else {
+							topics.SchemaRegistry.Confluent.Authentication.Mode = types.StringNull()
+						}
+						if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2 == nil {
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2 = nil
+						} else {
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2 = &tfTypes.Oauth2{}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = make([]types.String, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+							for _, v := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience = append(topics.SchemaRegistry.Confluent.Authentication.Oauth2.Audience, types.StringValue(v))
+							}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret)
+							if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType != nil {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType))
+							} else {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType = types.StringNull()
+							}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Password = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = make([]types.String, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+							for _, v := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes = append(topics.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes, types.StringValue(v))
+							}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
+							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+								for key2, value2 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+									result2, _ := json.Marshal(value2)
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = jsontypes.NewNormalizedValue(string(result2))
+								}
+							}
+							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+								for key3, value3 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+									result3, _ := json.Marshal(value3)
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = jsontypes.NewNormalizedValue(string(result3))
+								}
+							}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
+						}
+						if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client == nil {
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client = nil
+						} else {
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client = &tfTypes.Oauth2Client{}
+							if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod != nil {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod))
+							} else {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod = types.StringNull()
+							}
+							if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg != nil {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg))
+							} else {
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg = types.StringNull()
+							}
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion = types.Float64PointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify)
+							topics.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout = types.Int64PointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout)
+						}
+					}
+					topics.SchemaRegistry.Confluent.SslVerify = types.BoolPointerValue(topicsItem.SchemaRegistry.Confluent.SslVerify)
+					topics.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(topicsItem.SchemaRegistry.Confluent.TTL)
+					topics.SchemaRegistry.Confluent.URL = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.URL)
+				}
+			}
+
+			r.Config.Topics = append(r.Config.Topics, topics)
 		}
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -290,18 +285,16 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 				}
 			}
 		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.AcePluginPartials{}
 
-			for _, partialsItem := range resp.Partials {
-				var partials tfTypes.AcePluginPartials
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
 
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
 
-				r.Partials = append(r.Partials, partials)
-			}
+			r.Partials = append(r.Partials, partials)
 		}
 		r.Protocols = make([]types.String, 0, len(resp.Protocols))
 		for _, v := range resp.Protocols {
@@ -414,568 +407,6 @@ func (r *PluginConfluentConsumeResourceModel) ToOperationsUpdateConfluentconsume
 func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx context.Context) (*shared.ConfluentConsumePlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	var config *shared.ConfluentConsumePluginConfig
-	if r.Config != nil {
-		autoOffsetReset := new(shared.AutoOffsetReset)
-		if !r.Config.AutoOffsetReset.IsUnknown() && !r.Config.AutoOffsetReset.IsNull() {
-			*autoOffsetReset = shared.AutoOffsetReset(r.Config.AutoOffsetReset.ValueString())
-		} else {
-			autoOffsetReset = nil
-		}
-		bootstrapServers := make([]shared.ConfluentConsumePluginBootstrapServers, 0, len(r.Config.BootstrapServers))
-		for _, bootstrapServersItem := range r.Config.BootstrapServers {
-			var host string
-			host = bootstrapServersItem.Host.ValueString()
-
-			var port int64
-			port = bootstrapServersItem.Port.ValueInt64()
-
-			bootstrapServers = append(bootstrapServers, shared.ConfluentConsumePluginBootstrapServers{
-				Host: host,
-				Port: port,
-			})
-		}
-		var clusterAPIKey string
-		clusterAPIKey = r.Config.ClusterAPIKey.ValueString()
-
-		var clusterAPISecret string
-		clusterAPISecret = r.Config.ClusterAPISecret.ValueString()
-
-		clusterName := new(string)
-		if !r.Config.ClusterName.IsUnknown() && !r.Config.ClusterName.IsNull() {
-			*clusterName = r.Config.ClusterName.ValueString()
-		} else {
-			clusterName = nil
-		}
-		commitStrategy := new(shared.CommitStrategy)
-		if !r.Config.CommitStrategy.IsUnknown() && !r.Config.CommitStrategy.IsNull() {
-			*commitStrategy = shared.CommitStrategy(r.Config.CommitStrategy.ValueString())
-		} else {
-			commitStrategy = nil
-		}
-		confluentCloudAPIKey := new(string)
-		if !r.Config.ConfluentCloudAPIKey.IsUnknown() && !r.Config.ConfluentCloudAPIKey.IsNull() {
-			*confluentCloudAPIKey = r.Config.ConfluentCloudAPIKey.ValueString()
-		} else {
-			confluentCloudAPIKey = nil
-		}
-		confluentCloudAPISecret := new(string)
-		if !r.Config.ConfluentCloudAPISecret.IsUnknown() && !r.Config.ConfluentCloudAPISecret.IsNull() {
-			*confluentCloudAPISecret = r.Config.ConfluentCloudAPISecret.ValueString()
-		} else {
-			confluentCloudAPISecret = nil
-		}
-		dlqTopic := new(string)
-		if !r.Config.DlqTopic.IsUnknown() && !r.Config.DlqTopic.IsNull() {
-			*dlqTopic = r.Config.DlqTopic.ValueString()
-		} else {
-			dlqTopic = nil
-		}
-		enableDlq := new(bool)
-		if !r.Config.EnableDlq.IsUnknown() && !r.Config.EnableDlq.IsNull() {
-			*enableDlq = r.Config.EnableDlq.ValueBool()
-		} else {
-			enableDlq = nil
-		}
-		keepalive := new(int64)
-		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive = r.Config.Keepalive.ValueInt64()
-		} else {
-			keepalive = nil
-		}
-		keepaliveEnabled := new(bool)
-		if !r.Config.KeepaliveEnabled.IsUnknown() && !r.Config.KeepaliveEnabled.IsNull() {
-			*keepaliveEnabled = r.Config.KeepaliveEnabled.ValueBool()
-		} else {
-			keepaliveEnabled = nil
-		}
-		messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
-		for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
-			messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
-		}
-		messageDeserializer := new(shared.MessageDeserializer)
-		if !r.Config.MessageDeserializer.IsUnknown() && !r.Config.MessageDeserializer.IsNull() {
-			*messageDeserializer = shared.MessageDeserializer(r.Config.MessageDeserializer.ValueString())
-		} else {
-			messageDeserializer = nil
-		}
-		mode := new(shared.ConfluentConsumePluginMode)
-		if !r.Config.Mode.IsUnknown() && !r.Config.Mode.IsNull() {
-			*mode = shared.ConfluentConsumePluginMode(r.Config.Mode.ValueString())
-		} else {
-			mode = nil
-		}
-		var schemaRegistry *shared.ConfluentConsumePluginSchemaRegistry
-		if r.Config.SchemaRegistry != nil {
-			var confluent *shared.ConfluentConsumePluginConfluent
-			if r.Config.SchemaRegistry.Confluent != nil {
-				var authentication *shared.ConfluentConsumePluginAuthentication
-				if r.Config.SchemaRegistry.Confluent.Authentication != nil {
-					var basic *shared.ConfluentConsumePluginBasic
-					if r.Config.SchemaRegistry.Confluent.Authentication.Basic != nil {
-						var password string
-						password = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password.ValueString()
-
-						var username string
-						username = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username.ValueString()
-
-						basic = &shared.ConfluentConsumePluginBasic{
-							Password: password,
-							Username: username,
-						}
-					}
-					mode1 := new(shared.ConfluentConsumePluginConfigMode)
-					if !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
-						*mode1 = shared.ConfluentConsumePluginConfigMode(r.Config.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
-					} else {
-						mode1 = nil
-					}
-					var oauth2 *shared.ConfluentConsumePluginOauth2
-					if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
-						audience := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
-						for _, audienceItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
-							audience = append(audience, audienceItem.ValueString())
-						}
-						clientID := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
-							*clientID = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.ValueString()
-						} else {
-							clientID = nil
-						}
-						clientSecret := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsNull() {
-							*clientSecret = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.ValueString()
-						} else {
-							clientSecret = nil
-						}
-						grantType := new(shared.ConfluentConsumePluginGrantType)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsNull() {
-							*grantType = shared.ConfluentConsumePluginGrantType(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.ValueString())
-						} else {
-							grantType = nil
-						}
-						password1 := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsNull() {
-							*password1 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.ValueString()
-						} else {
-							password1 = nil
-						}
-						scopes := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
-						for _, scopesItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
-							scopes = append(scopes, scopesItem.ValueString())
-						}
-						var tokenEndpoint string
-						tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
-
-						tokenHeaders := make(map[string]interface{})
-						for tokenHeadersKey, tokenHeadersValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-							var tokenHeadersInst interface{}
-							_ = json.Unmarshal([]byte(tokenHeadersValue.ValueString()), &tokenHeadersInst)
-							tokenHeaders[tokenHeadersKey] = tokenHeadersInst
-						}
-						tokenPostArgs := make(map[string]interface{})
-						for tokenPostArgsKey, tokenPostArgsValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-							var tokenPostArgsInst interface{}
-							_ = json.Unmarshal([]byte(tokenPostArgsValue.ValueString()), &tokenPostArgsInst)
-							tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
-						}
-						username1 := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsNull() {
-							*username1 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.ValueString()
-						} else {
-							username1 = nil
-						}
-						oauth2 = &shared.ConfluentConsumePluginOauth2{
-							Audience:      audience,
-							ClientID:      clientID,
-							ClientSecret:  clientSecret,
-							GrantType:     grantType,
-							Password:      password1,
-							Scopes:        scopes,
-							TokenEndpoint: tokenEndpoint,
-							TokenHeaders:  tokenHeaders,
-							TokenPostArgs: tokenPostArgs,
-							Username:      username1,
-						}
-					}
-					var oauth2Client *shared.ConfluentConsumePluginOauth2Client
-					if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client != nil {
-						authMethod := new(shared.ConfluentConsumePluginAuthMethod)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsNull() {
-							*authMethod = shared.ConfluentConsumePluginAuthMethod(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.ValueString())
-						} else {
-							authMethod = nil
-						}
-						clientSecretJwtAlg := new(shared.ConfluentConsumePluginClientSecretJwtAlg)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsNull() {
-							*clientSecretJwtAlg = shared.ConfluentConsumePluginClientSecretJwtAlg(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.ValueString())
-						} else {
-							clientSecretJwtAlg = nil
-						}
-						httpProxy := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsNull() {
-							*httpProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.ValueString()
-						} else {
-							httpProxy = nil
-						}
-						httpProxyAuthorization := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsNull() {
-							*httpProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.ValueString()
-						} else {
-							httpProxyAuthorization = nil
-						}
-						httpVersion := new(float64)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsNull() {
-							*httpVersion = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.ValueFloat64()
-						} else {
-							httpVersion = nil
-						}
-						httpsProxy := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsNull() {
-							*httpsProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.ValueString()
-						} else {
-							httpsProxy = nil
-						}
-						httpsProxyAuthorization := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsNull() {
-							*httpsProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.ValueString()
-						} else {
-							httpsProxyAuthorization = nil
-						}
-						keepAlive := new(bool)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsNull() {
-							*keepAlive = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.ValueBool()
-						} else {
-							keepAlive = nil
-						}
-						noProxy := new(string)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsNull() {
-							*noProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.ValueString()
-						} else {
-							noProxy = nil
-						}
-						sslVerify := new(bool)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
-							*sslVerify = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
-						} else {
-							sslVerify = nil
-						}
-						timeout := new(int64)
-						if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
-							*timeout = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.ValueInt64()
-						} else {
-							timeout = nil
-						}
-						oauth2Client = &shared.ConfluentConsumePluginOauth2Client{
-							AuthMethod:              authMethod,
-							ClientSecretJwtAlg:      clientSecretJwtAlg,
-							HTTPProxy:               httpProxy,
-							HTTPProxyAuthorization:  httpProxyAuthorization,
-							HTTPVersion:             httpVersion,
-							HTTPSProxy:              httpsProxy,
-							HTTPSProxyAuthorization: httpsProxyAuthorization,
-							KeepAlive:               keepAlive,
-							NoProxy:                 noProxy,
-							SslVerify:               sslVerify,
-							Timeout:                 timeout,
-						}
-					}
-					authentication = &shared.ConfluentConsumePluginAuthentication{
-						Basic:        basic,
-						Mode:         mode1,
-						Oauth2:       oauth2,
-						Oauth2Client: oauth2Client,
-					}
-				}
-				sslVerify1 := new(bool)
-				if !r.Config.SchemaRegistry.Confluent.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.SslVerify.IsNull() {
-					*sslVerify1 = r.Config.SchemaRegistry.Confluent.SslVerify.ValueBool()
-				} else {
-					sslVerify1 = nil
-				}
-				ttl := new(float64)
-				if !r.Config.SchemaRegistry.Confluent.TTL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.TTL.IsNull() {
-					*ttl = r.Config.SchemaRegistry.Confluent.TTL.ValueFloat64()
-				} else {
-					ttl = nil
-				}
-				url := new(string)
-				if !r.Config.SchemaRegistry.Confluent.URL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.URL.IsNull() {
-					*url = r.Config.SchemaRegistry.Confluent.URL.ValueString()
-				} else {
-					url = nil
-				}
-				confluent = &shared.ConfluentConsumePluginConfluent{
-					Authentication: authentication,
-					SslVerify:      sslVerify1,
-					TTL:            ttl,
-					URL:            url,
-				}
-			}
-			schemaRegistry = &shared.ConfluentConsumePluginSchemaRegistry{
-				Confluent: confluent,
-			}
-		}
-		timeout1 := new(int64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout1 = r.Config.Timeout.ValueInt64()
-		} else {
-			timeout1 = nil
-		}
-		topics := make([]shared.Topics, 0, len(r.Config.Topics))
-		for _, topicsItem := range r.Config.Topics {
-			var name string
-			name = topicsItem.Name.ValueString()
-
-			var schemaRegistry1 *shared.ConfluentConsumePluginConfigSchemaRegistry
-			if topicsItem.SchemaRegistry != nil {
-				var confluent1 *shared.ConfluentConsumePluginConfigConfluent
-				if topicsItem.SchemaRegistry.Confluent != nil {
-					var authentication1 *shared.ConfluentConsumePluginConfigAuthentication
-					if topicsItem.SchemaRegistry.Confluent.Authentication != nil {
-						var basic1 *shared.ConfluentConsumePluginConfigBasic
-						if topicsItem.SchemaRegistry.Confluent.Authentication.Basic != nil {
-							var password2 string
-							password2 = topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Password.ValueString()
-
-							var username2 string
-							username2 = topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Username.ValueString()
-
-							basic1 = &shared.ConfluentConsumePluginConfigBasic{
-								Password: password2,
-								Username: username2,
-							}
-						}
-						mode2 := new(shared.ConfluentConsumePluginConfigTopicsMode)
-						if !topicsItem.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
-							*mode2 = shared.ConfluentConsumePluginConfigTopicsMode(topicsItem.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
-						} else {
-							mode2 = nil
-						}
-						var oauth21 *shared.ConfluentConsumePluginConfigOauth2
-						if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
-							audience1 := make([]string, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
-							for _, audienceItem1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
-								audience1 = append(audience1, audienceItem1.ValueString())
-							}
-							clientId1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
-								*clientId1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.ValueString()
-							} else {
-								clientId1 = nil
-							}
-							clientSecret1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsNull() {
-								*clientSecret1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.ValueString()
-							} else {
-								clientSecret1 = nil
-							}
-							grantType1 := new(shared.ConfluentConsumePluginConfigGrantType)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsNull() {
-								*grantType1 = shared.ConfluentConsumePluginConfigGrantType(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.ValueString())
-							} else {
-								grantType1 = nil
-							}
-							password3 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsNull() {
-								*password3 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.ValueString()
-							} else {
-								password3 = nil
-							}
-							scopes1 := make([]string, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
-							for _, scopesItem1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
-								scopes1 = append(scopes1, scopesItem1.ValueString())
-							}
-							var tokenEndpoint1 string
-							tokenEndpoint1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
-
-							tokenHeaders1 := make(map[string]interface{})
-							for tokenHeadersKey1, tokenHeadersValue1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-								var tokenHeadersInst1 interface{}
-								_ = json.Unmarshal([]byte(tokenHeadersValue1.ValueString()), &tokenHeadersInst1)
-								tokenHeaders1[tokenHeadersKey1] = tokenHeadersInst1
-							}
-							tokenPostArgs1 := make(map[string]interface{})
-							for tokenPostArgsKey1, tokenPostArgsValue1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-								var tokenPostArgsInst1 interface{}
-								_ = json.Unmarshal([]byte(tokenPostArgsValue1.ValueString()), &tokenPostArgsInst1)
-								tokenPostArgs1[tokenPostArgsKey1] = tokenPostArgsInst1
-							}
-							username3 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsNull() {
-								*username3 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.ValueString()
-							} else {
-								username3 = nil
-							}
-							oauth21 = &shared.ConfluentConsumePluginConfigOauth2{
-								Audience:      audience1,
-								ClientID:      clientId1,
-								ClientSecret:  clientSecret1,
-								GrantType:     grantType1,
-								Password:      password3,
-								Scopes:        scopes1,
-								TokenEndpoint: tokenEndpoint1,
-								TokenHeaders:  tokenHeaders1,
-								TokenPostArgs: tokenPostArgs1,
-								Username:      username3,
-							}
-						}
-						var oauth2Client1 *shared.ConfluentConsumePluginConfigOauth2Client
-						if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client != nil {
-							authMethod1 := new(shared.ConfluentConsumePluginConfigAuthMethod)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsNull() {
-								*authMethod1 = shared.ConfluentConsumePluginConfigAuthMethod(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.ValueString())
-							} else {
-								authMethod1 = nil
-							}
-							clientSecretJwtAlg1 := new(shared.ConfluentConsumePluginConfigClientSecretJwtAlg)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsNull() {
-								*clientSecretJwtAlg1 = shared.ConfluentConsumePluginConfigClientSecretJwtAlg(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.ValueString())
-							} else {
-								clientSecretJwtAlg1 = nil
-							}
-							httpProxy1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsNull() {
-								*httpProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.ValueString()
-							} else {
-								httpProxy1 = nil
-							}
-							httpProxyAuthorization1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsNull() {
-								*httpProxyAuthorization1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.ValueString()
-							} else {
-								httpProxyAuthorization1 = nil
-							}
-							httpVersion1 := new(float64)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsNull() {
-								*httpVersion1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.ValueFloat64()
-							} else {
-								httpVersion1 = nil
-							}
-							httpsProxy1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsNull() {
-								*httpsProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.ValueString()
-							} else {
-								httpsProxy1 = nil
-							}
-							httpsProxyAuthorization1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsNull() {
-								*httpsProxyAuthorization1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.ValueString()
-							} else {
-								httpsProxyAuthorization1 = nil
-							}
-							keepAlive1 := new(bool)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsNull() {
-								*keepAlive1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.ValueBool()
-							} else {
-								keepAlive1 = nil
-							}
-							noProxy1 := new(string)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsNull() {
-								*noProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.ValueString()
-							} else {
-								noProxy1 = nil
-							}
-							sslVerify2 := new(bool)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
-								*sslVerify2 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
-							} else {
-								sslVerify2 = nil
-							}
-							timeout2 := new(int64)
-							if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
-								*timeout2 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.ValueInt64()
-							} else {
-								timeout2 = nil
-							}
-							oauth2Client1 = &shared.ConfluentConsumePluginConfigOauth2Client{
-								AuthMethod:              authMethod1,
-								ClientSecretJwtAlg:      clientSecretJwtAlg1,
-								HTTPProxy:               httpProxy1,
-								HTTPProxyAuthorization:  httpProxyAuthorization1,
-								HTTPVersion:             httpVersion1,
-								HTTPSProxy:              httpsProxy1,
-								HTTPSProxyAuthorization: httpsProxyAuthorization1,
-								KeepAlive:               keepAlive1,
-								NoProxy:                 noProxy1,
-								SslVerify:               sslVerify2,
-								Timeout:                 timeout2,
-							}
-						}
-						authentication1 = &shared.ConfluentConsumePluginConfigAuthentication{
-							Basic:        basic1,
-							Mode:         mode2,
-							Oauth2:       oauth21,
-							Oauth2Client: oauth2Client1,
-						}
-					}
-					sslVerify3 := new(bool)
-					if !topicsItem.SchemaRegistry.Confluent.SslVerify.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.SslVerify.IsNull() {
-						*sslVerify3 = topicsItem.SchemaRegistry.Confluent.SslVerify.ValueBool()
-					} else {
-						sslVerify3 = nil
-					}
-					ttl1 := new(float64)
-					if !topicsItem.SchemaRegistry.Confluent.TTL.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.TTL.IsNull() {
-						*ttl1 = topicsItem.SchemaRegistry.Confluent.TTL.ValueFloat64()
-					} else {
-						ttl1 = nil
-					}
-					url1 := new(string)
-					if !topicsItem.SchemaRegistry.Confluent.URL.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.URL.IsNull() {
-						*url1 = topicsItem.SchemaRegistry.Confluent.URL.ValueString()
-					} else {
-						url1 = nil
-					}
-					confluent1 = &shared.ConfluentConsumePluginConfigConfluent{
-						Authentication: authentication1,
-						SslVerify:      sslVerify3,
-						TTL:            ttl1,
-						URL:            url1,
-					}
-				}
-				schemaRegistry1 = &shared.ConfluentConsumePluginConfigSchemaRegistry{
-					Confluent: confluent1,
-				}
-			}
-			topics = append(topics, shared.Topics{
-				Name:           name,
-				SchemaRegistry: schemaRegistry1,
-			})
-		}
-		config = &shared.ConfluentConsumePluginConfig{
-			AutoOffsetReset:         autoOffsetReset,
-			BootstrapServers:        bootstrapServers,
-			ClusterAPIKey:           clusterAPIKey,
-			ClusterAPISecret:        clusterAPISecret,
-			ClusterName:             clusterName,
-			CommitStrategy:          commitStrategy,
-			ConfluentCloudAPIKey:    confluentCloudAPIKey,
-			ConfluentCloudAPISecret: confluentCloudAPISecret,
-			DlqTopic:                dlqTopic,
-			EnableDlq:               enableDlq,
-			Keepalive:               keepalive,
-			KeepaliveEnabled:        keepaliveEnabled,
-			MessageByLuaFunctions:   messageByLuaFunctions,
-			MessageDeserializer:     messageDeserializer,
-			Mode:                    mode,
-			SchemaRegistry:          schemaRegistry,
-			Timeout:                 timeout1,
-			Topics:                  topics,
-		}
-	}
-	var consumer *shared.ConfluentConsumePluginConsumer
-	if r.Consumer != nil {
-		id := new(string)
-		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
-			*id = r.Consumer.ID.ValueString()
-		} else {
-			id = nil
-		}
-		consumer = &shared.ConfluentConsumePluginConsumer{
-			ID: id,
-		}
-	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -988,11 +419,11 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 	} else {
 		enabled = nil
 	}
-	id1 := new(string)
+	id := new(string)
 	if !r.ID.IsUnknown() && !r.ID.IsNull() {
-		*id1 = r.ID.ValueString()
+		*id = r.ID.ValueString()
 	} else {
-		id1 = nil
+		id = nil
 	}
 	instanceName := new(string)
 	if !r.InstanceName.IsUnknown() && !r.InstanceName.IsNull() {
@@ -1027,33 +458,602 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 			Before: before,
 		}
 	}
-	var partials []shared.ConfluentConsumePluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.ConfluentConsumePluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id2 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id2 = partialsItem.ID.ValueString()
-			} else {
-				id2 = nil
+	partials := make([]shared.ConfluentConsumePluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
+		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.ConfluentConsumePluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
+	}
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	updatedAt := new(int64)
+	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
+		*updatedAt = r.UpdatedAt.ValueInt64()
+	} else {
+		updatedAt = nil
+	}
+	autoOffsetReset := new(shared.AutoOffsetReset)
+	if !r.Config.AutoOffsetReset.IsUnknown() && !r.Config.AutoOffsetReset.IsNull() {
+		*autoOffsetReset = shared.AutoOffsetReset(r.Config.AutoOffsetReset.ValueString())
+	} else {
+		autoOffsetReset = nil
+	}
+	bootstrapServers := make([]shared.ConfluentConsumePluginBootstrapServers, 0, len(r.Config.BootstrapServers))
+	for _, bootstrapServersItem := range r.Config.BootstrapServers {
+		var host string
+		host = bootstrapServersItem.Host.ValueString()
+
+		var port int64
+		port = bootstrapServersItem.Port.ValueInt64()
+
+		bootstrapServers = append(bootstrapServers, shared.ConfluentConsumePluginBootstrapServers{
+			Host: host,
+			Port: port,
+		})
+	}
+	var clusterAPIKey string
+	clusterAPIKey = r.Config.ClusterAPIKey.ValueString()
+
+	var clusterAPISecret string
+	clusterAPISecret = r.Config.ClusterAPISecret.ValueString()
+
+	clusterName := new(string)
+	if !r.Config.ClusterName.IsUnknown() && !r.Config.ClusterName.IsNull() {
+		*clusterName = r.Config.ClusterName.ValueString()
+	} else {
+		clusterName = nil
+	}
+	commitStrategy := new(shared.CommitStrategy)
+	if !r.Config.CommitStrategy.IsUnknown() && !r.Config.CommitStrategy.IsNull() {
+		*commitStrategy = shared.CommitStrategy(r.Config.CommitStrategy.ValueString())
+	} else {
+		commitStrategy = nil
+	}
+	confluentCloudAPIKey := new(string)
+	if !r.Config.ConfluentCloudAPIKey.IsUnknown() && !r.Config.ConfluentCloudAPIKey.IsNull() {
+		*confluentCloudAPIKey = r.Config.ConfluentCloudAPIKey.ValueString()
+	} else {
+		confluentCloudAPIKey = nil
+	}
+	confluentCloudAPISecret := new(string)
+	if !r.Config.ConfluentCloudAPISecret.IsUnknown() && !r.Config.ConfluentCloudAPISecret.IsNull() {
+		*confluentCloudAPISecret = r.Config.ConfluentCloudAPISecret.ValueString()
+	} else {
+		confluentCloudAPISecret = nil
+	}
+	dlqTopic := new(string)
+	if !r.Config.DlqTopic.IsUnknown() && !r.Config.DlqTopic.IsNull() {
+		*dlqTopic = r.Config.DlqTopic.ValueString()
+	} else {
+		dlqTopic = nil
+	}
+	enableDlq := new(bool)
+	if !r.Config.EnableDlq.IsUnknown() && !r.Config.EnableDlq.IsNull() {
+		*enableDlq = r.Config.EnableDlq.ValueBool()
+	} else {
+		enableDlq = nil
+	}
+	keepalive := new(int64)
+	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
+		*keepalive = r.Config.Keepalive.ValueInt64()
+	} else {
+		keepalive = nil
+	}
+	keepaliveEnabled := new(bool)
+	if !r.Config.KeepaliveEnabled.IsUnknown() && !r.Config.KeepaliveEnabled.IsNull() {
+		*keepaliveEnabled = r.Config.KeepaliveEnabled.ValueBool()
+	} else {
+		keepaliveEnabled = nil
+	}
+	messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
+	for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
+		messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
+	}
+	messageDeserializer := new(shared.MessageDeserializer)
+	if !r.Config.MessageDeserializer.IsUnknown() && !r.Config.MessageDeserializer.IsNull() {
+		*messageDeserializer = shared.MessageDeserializer(r.Config.MessageDeserializer.ValueString())
+	} else {
+		messageDeserializer = nil
+	}
+	mode := new(shared.ConfluentConsumePluginMode)
+	if !r.Config.Mode.IsUnknown() && !r.Config.Mode.IsNull() {
+		*mode = shared.ConfluentConsumePluginMode(r.Config.Mode.ValueString())
+	} else {
+		mode = nil
+	}
+	var schemaRegistry *shared.ConfluentConsumePluginSchemaRegistry
+	if r.Config.SchemaRegistry != nil {
+		var confluent *shared.ConfluentConsumePluginConfluent
+		if r.Config.SchemaRegistry.Confluent != nil {
+			var authentication *shared.ConfluentConsumePluginAuthentication
+			if r.Config.SchemaRegistry.Confluent.Authentication != nil {
+				var basic *shared.ConfluentConsumePluginBasic
+				if r.Config.SchemaRegistry.Confluent.Authentication.Basic != nil {
+					var password string
+					password = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password.ValueString()
+
+					var username string
+					username = r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username.ValueString()
+
+					basic = &shared.ConfluentConsumePluginBasic{
+						Password: password,
+						Username: username,
+					}
+				}
+				mode1 := new(shared.ConfluentConsumePluginConfigMode)
+				if !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
+					*mode1 = shared.ConfluentConsumePluginConfigMode(r.Config.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
+				} else {
+					mode1 = nil
+				}
+				var oauth2 *shared.ConfluentConsumePluginOauth2
+				if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
+					audience := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+					for _, audienceItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+						audience = append(audience, audienceItem.ValueString())
+					}
+					clientID := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
+						*clientID = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.ValueString()
+					} else {
+						clientID = nil
+					}
+					clientSecret := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsNull() {
+						*clientSecret = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.ValueString()
+					} else {
+						clientSecret = nil
+					}
+					grantType := new(shared.ConfluentConsumePluginGrantType)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsNull() {
+						*grantType = shared.ConfluentConsumePluginGrantType(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.ValueString())
+					} else {
+						grantType = nil
+					}
+					password1 := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsNull() {
+						*password1 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Password.ValueString()
+					} else {
+						password1 = nil
+					}
+					scopes := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+					for _, scopesItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+						scopes = append(scopes, scopesItem.ValueString())
+					}
+					var tokenEndpoint string
+					tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
+
+					tokenHeaders := make(map[string]interface{})
+					for tokenHeadersKey, tokenHeadersValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+						var tokenHeadersInst interface{}
+						_ = json.Unmarshal([]byte(tokenHeadersValue.ValueString()), &tokenHeadersInst)
+						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
+					}
+					tokenPostArgs := make(map[string]interface{})
+					for tokenPostArgsKey, tokenPostArgsValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+						var tokenPostArgsInst interface{}
+						_ = json.Unmarshal([]byte(tokenPostArgsValue.ValueString()), &tokenPostArgsInst)
+						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
+					}
+					username1 := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsNull() {
+						*username1 = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username.ValueString()
+					} else {
+						username1 = nil
+					}
+					oauth2 = &shared.ConfluentConsumePluginOauth2{
+						Audience:      audience,
+						ClientID:      clientID,
+						ClientSecret:  clientSecret,
+						GrantType:     grantType,
+						Password:      password1,
+						Scopes:        scopes,
+						TokenEndpoint: tokenEndpoint,
+						TokenHeaders:  tokenHeaders,
+						TokenPostArgs: tokenPostArgs,
+						Username:      username1,
+					}
+				}
+				var oauth2Client *shared.ConfluentConsumePluginOauth2Client
+				if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client != nil {
+					authMethod := new(shared.ConfluentConsumePluginAuthMethod)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsNull() {
+						*authMethod = shared.ConfluentConsumePluginAuthMethod(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.ValueString())
+					} else {
+						authMethod = nil
+					}
+					clientSecretJwtAlg := new(shared.ConfluentConsumePluginClientSecretJwtAlg)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsNull() {
+						*clientSecretJwtAlg = shared.ConfluentConsumePluginClientSecretJwtAlg(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.ValueString())
+					} else {
+						clientSecretJwtAlg = nil
+					}
+					httpProxy := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsNull() {
+						*httpProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.ValueString()
+					} else {
+						httpProxy = nil
+					}
+					httpProxyAuthorization := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsNull() {
+						*httpProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.ValueString()
+					} else {
+						httpProxyAuthorization = nil
+					}
+					httpVersion := new(float64)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsNull() {
+						*httpVersion = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.ValueFloat64()
+					} else {
+						httpVersion = nil
+					}
+					httpsProxy := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsNull() {
+						*httpsProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.ValueString()
+					} else {
+						httpsProxy = nil
+					}
+					httpsProxyAuthorization := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsNull() {
+						*httpsProxyAuthorization = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.ValueString()
+					} else {
+						httpsProxyAuthorization = nil
+					}
+					keepAlive := new(bool)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsNull() {
+						*keepAlive = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.ValueBool()
+					} else {
+						keepAlive = nil
+					}
+					noProxy := new(string)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsNull() {
+						*noProxy = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.ValueString()
+					} else {
+						noProxy = nil
+					}
+					sslVerify := new(bool)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
+						*sslVerify = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
+					} else {
+						sslVerify = nil
+					}
+					timeout := new(int64)
+					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
+						*timeout = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.ValueInt64()
+					} else {
+						timeout = nil
+					}
+					oauth2Client = &shared.ConfluentConsumePluginOauth2Client{
+						AuthMethod:              authMethod,
+						ClientSecretJwtAlg:      clientSecretJwtAlg,
+						HTTPProxy:               httpProxy,
+						HTTPProxyAuthorization:  httpProxyAuthorization,
+						HTTPVersion:             httpVersion,
+						HTTPSProxy:              httpsProxy,
+						HTTPSProxyAuthorization: httpsProxyAuthorization,
+						KeepAlive:               keepAlive,
+						NoProxy:                 noProxy,
+						SslVerify:               sslVerify,
+						Timeout:                 timeout,
+					}
+				}
+				authentication = &shared.ConfluentConsumePluginAuthentication{
+					Basic:        basic,
+					Mode:         mode1,
+					Oauth2:       oauth2,
+					Oauth2Client: oauth2Client,
+				}
 			}
-			name1 := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name1 = partialsItem.Name.ValueString()
+			sslVerify1 := new(bool)
+			if !r.Config.SchemaRegistry.Confluent.SslVerify.IsUnknown() && !r.Config.SchemaRegistry.Confluent.SslVerify.IsNull() {
+				*sslVerify1 = r.Config.SchemaRegistry.Confluent.SslVerify.ValueBool()
 			} else {
-				name1 = nil
+				sslVerify1 = nil
 			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
+			ttl := new(float64)
+			if !r.Config.SchemaRegistry.Confluent.TTL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.TTL.IsNull() {
+				*ttl = r.Config.SchemaRegistry.Confluent.TTL.ValueFloat64()
 			} else {
-				path = nil
+				ttl = nil
 			}
-			partials = append(partials, shared.ConfluentConsumePluginPartials{
-				ID:   id2,
-				Name: name1,
-				Path: path,
-			})
+			url := new(string)
+			if !r.Config.SchemaRegistry.Confluent.URL.IsUnknown() && !r.Config.SchemaRegistry.Confluent.URL.IsNull() {
+				*url = r.Config.SchemaRegistry.Confluent.URL.ValueString()
+			} else {
+				url = nil
+			}
+			confluent = &shared.ConfluentConsumePluginConfluent{
+				Authentication: authentication,
+				SslVerify:      sslVerify1,
+				TTL:            ttl,
+				URL:            url,
+			}
+		}
+		schemaRegistry = &shared.ConfluentConsumePluginSchemaRegistry{
+			Confluent: confluent,
+		}
+	}
+	timeout1 := new(int64)
+	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+		*timeout1 = r.Config.Timeout.ValueInt64()
+	} else {
+		timeout1 = nil
+	}
+	topics := make([]shared.Topics, 0, len(r.Config.Topics))
+	for _, topicsItem := range r.Config.Topics {
+		var name1 string
+		name1 = topicsItem.Name.ValueString()
+
+		var schemaRegistry1 *shared.ConfluentConsumePluginConfigSchemaRegistry
+		if topicsItem.SchemaRegistry != nil {
+			var confluent1 *shared.ConfluentConsumePluginConfigConfluent
+			if topicsItem.SchemaRegistry.Confluent != nil {
+				var authentication1 *shared.ConfluentConsumePluginConfigAuthentication
+				if topicsItem.SchemaRegistry.Confluent.Authentication != nil {
+					var basic1 *shared.ConfluentConsumePluginConfigBasic
+					if topicsItem.SchemaRegistry.Confluent.Authentication.Basic != nil {
+						var password2 string
+						password2 = topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Password.ValueString()
+
+						var username2 string
+						username2 = topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Username.ValueString()
+
+						basic1 = &shared.ConfluentConsumePluginConfigBasic{
+							Password: password2,
+							Username: username2,
+						}
+					}
+					mode2 := new(shared.ConfluentConsumePluginConfigTopicsMode)
+					if !topicsItem.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
+						*mode2 = shared.ConfluentConsumePluginConfigTopicsMode(topicsItem.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
+					} else {
+						mode2 = nil
+					}
+					var oauth21 *shared.ConfluentConsumePluginConfigOauth2
+					if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
+						audience1 := make([]string, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
+						for _, audienceItem1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+							audience1 = append(audience1, audienceItem1.ValueString())
+						}
+						clientId1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
+							*clientId1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.ValueString()
+						} else {
+							clientId1 = nil
+						}
+						clientSecret1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.IsNull() {
+							*clientSecret1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.ClientSecret.ValueString()
+						} else {
+							clientSecret1 = nil
+						}
+						grantType1 := new(shared.ConfluentConsumePluginConfigGrantType)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.IsNull() {
+							*grantType1 = shared.ConfluentConsumePluginConfigGrantType(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.GrantType.ValueString())
+						} else {
+							grantType1 = nil
+						}
+						password3 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.IsNull() {
+							*password3 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Password.ValueString()
+						} else {
+							password3 = nil
+						}
+						scopes1 := make([]string, 0, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
+						for _, scopesItem1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+							scopes1 = append(scopes1, scopesItem1.ValueString())
+						}
+						var tokenEndpoint1 string
+						tokenEndpoint1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
+
+						tokenHeaders1 := make(map[string]interface{})
+						for tokenHeadersKey1, tokenHeadersValue1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+							var tokenHeadersInst1 interface{}
+							_ = json.Unmarshal([]byte(tokenHeadersValue1.ValueString()), &tokenHeadersInst1)
+							tokenHeaders1[tokenHeadersKey1] = tokenHeadersInst1
+						}
+						tokenPostArgs1 := make(map[string]interface{})
+						for tokenPostArgsKey1, tokenPostArgsValue1 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+							var tokenPostArgsInst1 interface{}
+							_ = json.Unmarshal([]byte(tokenPostArgsValue1.ValueString()), &tokenPostArgsInst1)
+							tokenPostArgs1[tokenPostArgsKey1] = tokenPostArgsInst1
+						}
+						username3 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.IsNull() {
+							*username3 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username.ValueString()
+						} else {
+							username3 = nil
+						}
+						oauth21 = &shared.ConfluentConsumePluginConfigOauth2{
+							Audience:      audience1,
+							ClientID:      clientId1,
+							ClientSecret:  clientSecret1,
+							GrantType:     grantType1,
+							Password:      password3,
+							Scopes:        scopes1,
+							TokenEndpoint: tokenEndpoint1,
+							TokenHeaders:  tokenHeaders1,
+							TokenPostArgs: tokenPostArgs1,
+							Username:      username3,
+						}
+					}
+					var oauth2Client1 *shared.ConfluentConsumePluginConfigOauth2Client
+					if topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client != nil {
+						authMethod1 := new(shared.ConfluentConsumePluginConfigAuthMethod)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.IsNull() {
+							*authMethod1 = shared.ConfluentConsumePluginConfigAuthMethod(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.AuthMethod.ValueString())
+						} else {
+							authMethod1 = nil
+						}
+						clientSecretJwtAlg1 := new(shared.ConfluentConsumePluginConfigClientSecretJwtAlg)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.IsNull() {
+							*clientSecretJwtAlg1 = shared.ConfluentConsumePluginConfigClientSecretJwtAlg(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.ClientSecretJwtAlg.ValueString())
+						} else {
+							clientSecretJwtAlg1 = nil
+						}
+						httpProxy1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.IsNull() {
+							*httpProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxy.ValueString()
+						} else {
+							httpProxy1 = nil
+						}
+						httpProxyAuthorization1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.IsNull() {
+							*httpProxyAuthorization1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPProxyAuthorization.ValueString()
+						} else {
+							httpProxyAuthorization1 = nil
+						}
+						httpVersion1 := new(float64)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.IsNull() {
+							*httpVersion1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPVersion.ValueFloat64()
+						} else {
+							httpVersion1 = nil
+						}
+						httpsProxy1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.IsNull() {
+							*httpsProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxy.ValueString()
+						} else {
+							httpsProxy1 = nil
+						}
+						httpsProxyAuthorization1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.IsNull() {
+							*httpsProxyAuthorization1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.HTTPSProxyAuthorization.ValueString()
+						} else {
+							httpsProxyAuthorization1 = nil
+						}
+						keepAlive1 := new(bool)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.IsNull() {
+							*keepAlive1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.KeepAlive.ValueBool()
+						} else {
+							keepAlive1 = nil
+						}
+						noProxy1 := new(string)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.IsNull() {
+							*noProxy1 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.NoProxy.ValueString()
+						} else {
+							noProxy1 = nil
+						}
+						sslVerify2 := new(bool)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
+							*sslVerify2 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
+						} else {
+							sslVerify2 = nil
+						}
+						timeout2 := new(int64)
+						if !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
+							*timeout2 = topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.ValueInt64()
+						} else {
+							timeout2 = nil
+						}
+						oauth2Client1 = &shared.ConfluentConsumePluginConfigOauth2Client{
+							AuthMethod:              authMethod1,
+							ClientSecretJwtAlg:      clientSecretJwtAlg1,
+							HTTPProxy:               httpProxy1,
+							HTTPProxyAuthorization:  httpProxyAuthorization1,
+							HTTPVersion:             httpVersion1,
+							HTTPSProxy:              httpsProxy1,
+							HTTPSProxyAuthorization: httpsProxyAuthorization1,
+							KeepAlive:               keepAlive1,
+							NoProxy:                 noProxy1,
+							SslVerify:               sslVerify2,
+							Timeout:                 timeout2,
+						}
+					}
+					authentication1 = &shared.ConfluentConsumePluginConfigAuthentication{
+						Basic:        basic1,
+						Mode:         mode2,
+						Oauth2:       oauth21,
+						Oauth2Client: oauth2Client1,
+					}
+				}
+				sslVerify3 := new(bool)
+				if !topicsItem.SchemaRegistry.Confluent.SslVerify.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.SslVerify.IsNull() {
+					*sslVerify3 = topicsItem.SchemaRegistry.Confluent.SslVerify.ValueBool()
+				} else {
+					sslVerify3 = nil
+				}
+				ttl1 := new(float64)
+				if !topicsItem.SchemaRegistry.Confluent.TTL.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.TTL.IsNull() {
+					*ttl1 = topicsItem.SchemaRegistry.Confluent.TTL.ValueFloat64()
+				} else {
+					ttl1 = nil
+				}
+				url1 := new(string)
+				if !topicsItem.SchemaRegistry.Confluent.URL.IsUnknown() && !topicsItem.SchemaRegistry.Confluent.URL.IsNull() {
+					*url1 = topicsItem.SchemaRegistry.Confluent.URL.ValueString()
+				} else {
+					url1 = nil
+				}
+				confluent1 = &shared.ConfluentConsumePluginConfigConfluent{
+					Authentication: authentication1,
+					SslVerify:      sslVerify3,
+					TTL:            ttl1,
+					URL:            url1,
+				}
+			}
+			schemaRegistry1 = &shared.ConfluentConsumePluginConfigSchemaRegistry{
+				Confluent: confluent1,
+			}
+		}
+		topics = append(topics, shared.Topics{
+			Name:           name1,
+			SchemaRegistry: schemaRegistry1,
+		})
+	}
+	config := shared.ConfluentConsumePluginConfig{
+		AutoOffsetReset:         autoOffsetReset,
+		BootstrapServers:        bootstrapServers,
+		ClusterAPIKey:           clusterAPIKey,
+		ClusterAPISecret:        clusterAPISecret,
+		ClusterName:             clusterName,
+		CommitStrategy:          commitStrategy,
+		ConfluentCloudAPIKey:    confluentCloudAPIKey,
+		ConfluentCloudAPISecret: confluentCloudAPISecret,
+		DlqTopic:                dlqTopic,
+		EnableDlq:               enableDlq,
+		Keepalive:               keepalive,
+		KeepaliveEnabled:        keepaliveEnabled,
+		MessageByLuaFunctions:   messageByLuaFunctions,
+		MessageDeserializer:     messageDeserializer,
+		Mode:                    mode,
+		SchemaRegistry:          schemaRegistry,
+		Timeout:                 timeout1,
+		Topics:                  topics,
+	}
+	var consumer *shared.ConfluentConsumePluginConsumer
+	if r.Consumer != nil {
+		id2 := new(string)
+		if !r.Consumer.ID.IsUnknown() && !r.Consumer.ID.IsNull() {
+			*id2 = r.Consumer.ID.ValueString()
+		} else {
+			id2 = nil
+		}
+		consumer = &shared.ConfluentConsumePluginConsumer{
+			ID: id2,
 		}
 	}
 	protocols := make([]shared.ConfluentConsumePluginProtocols, 0, len(r.Protocols))
@@ -1084,33 +1084,20 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 			ID: id4,
 		}
 	}
-	var tags []string
-	if r.Tags != nil {
-		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
-		}
-	}
-	updatedAt := new(int64)
-	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
-		*updatedAt = r.UpdatedAt.ValueInt64()
-	} else {
-		updatedAt = nil
-	}
 	out := shared.ConfluentConsumePlugin{
-		Config:       config,
-		Consumer:     consumer,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
-		ID:           id1,
+		ID:           id,
 		InstanceName: instanceName,
 		Ordering:     ordering,
 		Partials:     partials,
+		Tags:         tags,
+		UpdatedAt:    updatedAt,
+		Config:       config,
+		Consumer:     consumer,
 		Protocols:    protocols,
 		Route:        route,
 		Service:      service,
-		Tags:         tags,
-		UpdatedAt:    updatedAt,
 	}
 
 	return &out, diags

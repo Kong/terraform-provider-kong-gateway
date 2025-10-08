@@ -64,7 +64,7 @@ func (s *Workspaces) ListWorkspace(ctx context.Context, request operations.ListW
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "list-workspace",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -219,7 +219,7 @@ func (s *Workspaces) CreateWorkspace(ctx context.Context, request shared.Workspa
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "create-workspace",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Request", "json", `request:"mediaType=application/json"`)
@@ -377,7 +377,7 @@ func (s *Workspaces) DeleteWorkspace(ctx context.Context, request operations.Del
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "delete-workspace",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -508,7 +508,7 @@ func (s *Workspaces) GetWorkspace(ctx context.Context, request operations.GetWor
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "get-workspace",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -660,7 +660,7 @@ func (s *Workspaces) UpsertWorkspace(ctx context.Context, request operations.Ups
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "upsert-workspace",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Workspace", "json", `request:"mediaType=application/json"`)

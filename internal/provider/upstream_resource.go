@@ -223,7 +223,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Float64{
-											float64validator.AtMost(65535),
+											float64validator.Between(0, 65535),
 										},
 									},
 									"successes": schema.Int64Attribute{
@@ -253,7 +253,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 								Computed: true,
 								Optional: true,
 								Validators: []validator.Float64{
-									float64validator.AtMost(65535),
+									float64validator.Between(0, 65535),
 								},
 							},
 							"type": schema.StringAttribute{
@@ -290,7 +290,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Float64{
-											float64validator.AtMost(65535),
+											float64validator.Between(0, 65535),
 										},
 									},
 									"tcp_failures": schema.Int64Attribute{
@@ -385,7 +385,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 						Computed: true,
 						Optional: true,
 						Validators: []validator.Float64{
-							float64validator.AtMost(100),
+							float64validator.Between(0, 100),
 						},
 					},
 				},

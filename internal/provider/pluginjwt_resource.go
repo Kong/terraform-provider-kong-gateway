@@ -97,7 +97,7 @@ func (r *PluginJwtResource) Schema(ctx context.Context, req resource.SchemaReque
 						Optional:    true,
 						Description: `A value between 0 and 31536000 (365 days) limiting the lifetime of the JWT to maximum_expiration seconds in the future.`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(31536000),
+							float64validator.Between(0, 31536000),
 						},
 					},
 					"realm": schema.StringAttribute{

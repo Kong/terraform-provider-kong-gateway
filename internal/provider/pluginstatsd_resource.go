@@ -243,7 +243,7 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{
@@ -307,7 +307,7 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 						Computed: true,
 						Optional: true,
 						Validators: []validator.Float64{
-							float64validator.AtMost(65507),
+							float64validator.Between(0, 65507),
 						},
 					},
 					"use_tcp": schema.BoolAttribute{

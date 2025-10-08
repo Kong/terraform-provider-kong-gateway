@@ -202,7 +202,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{
@@ -249,7 +249,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `Tracing sampling rate for configuring the probability-based sampler. When set, this value supersedes the global ` + "`" + `tracing_sampling_rate` + "`" + ` setting from kong.conf.`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(1),
+							float64validator.Between(0, 1),
 						},
 					},
 					"sampling_strategy": schema.StringAttribute{

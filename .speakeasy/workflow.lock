@@ -1,4 +1,4 @@
-speakeasyVersion: 1.634.1
+speakeasyVersion: 1.636.0
 sources:
     Gateway:
         sourceNamespace: gateway
@@ -26,7 +26,7 @@ targets:
         sourceBlobDigest: sha256:4480283a1eae9bdc25755a33276e40d3767af38725f68cb2dcfe39662a72ae68
 workflow:
     workflowVersion: 1.0.0
-    speakeasyVersion: 1.634.1
+    speakeasyVersion: 1.636.0
     sources:
         gateway:
             inputs:

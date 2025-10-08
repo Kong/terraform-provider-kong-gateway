@@ -114,7 +114,7 @@ func (r *PluginCanaryResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `The percentage of traffic to be routed to the canary release.`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(100),
+							float64validator.Between(0, 100),
 						},
 					},
 					"start": schema.Float64Attribute{

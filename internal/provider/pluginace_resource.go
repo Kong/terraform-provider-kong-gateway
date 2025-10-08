@@ -264,7 +264,7 @@ func (r *PluginAceResource) Schema(ctx context.Context, req resource.SchemaReque
 								Computed: true,
 								Optional: true,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 						},

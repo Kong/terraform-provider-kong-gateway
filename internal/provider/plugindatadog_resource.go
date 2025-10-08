@@ -123,7 +123,7 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 									Optional:    true,
 									Description: `Sampling rate`,
 									Validators: []validator.Float64{
-										float64validator.AtMost(1),
+										float64validator.Between(0, 1),
 									},
 								},
 								"stat_type": schema.StringAttribute{
@@ -204,7 +204,7 @@ func (r *PluginDatadogResource) Schema(ctx context.Context, req resource.SchemaR
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{

@@ -106,7 +106,7 @@ func (r *PluginAiSanitizerResource) Schema(ctx context.Context, req resource.Sch
 									Computed: true,
 									Optional: true,
 									Validators: []validator.Float64{
-										float64validator.AtMost(1),
+										float64validator.Between(0, 1),
 									},
 								},
 							},

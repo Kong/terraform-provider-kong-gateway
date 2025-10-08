@@ -61,7 +61,7 @@ func (s *Keys) ListKey(ctx context.Context, request operations.ListKeyRequest, o
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "list-key",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -216,7 +216,7 @@ func (s *Keys) CreateKey(ctx context.Context, request operations.CreateKeyReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "create-key",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Key", "json", `request:"mediaType=application/json"`)
@@ -374,7 +374,7 @@ func (s *Keys) DeleteKey(ctx context.Context, request operations.DeleteKeyReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "delete-key",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -505,7 +505,7 @@ func (s *Keys) GetKey(ctx context.Context, request operations.GetKeyRequest, opt
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "get-key",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -657,7 +657,7 @@ func (s *Keys) UpsertKey(ctx context.Context, request operations.UpsertKeyReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "upsert-key",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Key", "json", `request:"mediaType=application/json"`)

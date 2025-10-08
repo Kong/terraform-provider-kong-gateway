@@ -63,7 +63,7 @@ func (s *SNIs) ListSni(ctx context.Context, request operations.ListSniRequest, o
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "list-sni",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -218,7 +218,7 @@ func (s *SNIs) CreateSni(ctx context.Context, request operations.CreateSniReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "create-sni",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Sni", "json", `request:"mediaType=application/json"`)
@@ -376,7 +376,7 @@ func (s *SNIs) DeleteSni(ctx context.Context, request operations.DeleteSniReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "delete-sni",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -507,7 +507,7 @@ func (s *SNIs) GetSni(ctx context.Context, request operations.GetSniRequest, opt
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "get-sni",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 
@@ -659,7 +659,7 @@ func (s *SNIs) UpsertSni(ctx context.Context, request operations.UpsertSniReques
 		BaseURL:          baseURL,
 		Context:          ctx,
 		OperationID:      "upsert-sni",
-		OAuth2Scopes:     []string{},
+		OAuth2Scopes:     nil,
 		SecuritySource:   s.sdkConfiguration.Security,
 	}
 	bodyReader, reqContentType, err := utils.SerializeRequestBody(ctx, request, false, false, "Sni", "json", `request:"mediaType=application/json"`)

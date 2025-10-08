@@ -452,7 +452,7 @@ func (r *PluginConfluentResource) Schema(ctx context.Context, req resource.Schem
 										Optional:    true,
 										Description: `The TTL in seconds for the schema registry cache.`,
 										Validators: []validator.Float64{
-											float64validator.AtMost(3600),
+											float64validator.Between(0, 3600),
 										},
 									},
 									"url": schema.StringAttribute{

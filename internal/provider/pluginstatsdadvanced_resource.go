@@ -239,7 +239,7 @@ func (r *PluginStatsdAdvancedResource) Schema(ctx context.Context, req resource.
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{
@@ -283,7 +283,7 @@ func (r *PluginStatsdAdvancedResource) Schema(ctx context.Context, req resource.
 						Optional:    true,
 						Description: `Combine UDP packet up to the size configured. If zero (0), don't combine the UDP packet. Must be a number between 0 and 65507 (inclusive).`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(65507),
+							float64validator.Between(0, 65507),
 						},
 					},
 					"use_tcp": schema.BoolAttribute{

@@ -145,7 +145,7 @@ func (r *PluginOauth2Resource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `Time-to-live value for data`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(100000000),
+							float64validator.Between(0, 100000000),
 						},
 					},
 					"reuse_refresh_token": schema.BoolAttribute{

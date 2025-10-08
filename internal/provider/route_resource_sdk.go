@@ -28,6 +28,18 @@ func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, res
 				r.Destinations = append(r.Destinations, destinations)
 			}
 		}
+		if resp.Headers != nil {
+			r.Headers = make(map[string][]types.String, len(resp.Headers))
+			for headersKey, headersValue := range resp.Headers {
+				var headersResult []types.String
+				headersResult = make([]types.String, 0, len(headersValue))
+				for _, v := range headersValue {
+					headersResult = append(headersResult, types.StringValue(v))
+				}
+
+				r.Headers[headersKey] = headersResult
+			}
+		}
 		if resp.Hosts != nil {
 			r.Hosts = make([]types.String, 0, len(resp.Hosts))
 			for _, v := range resp.Hosts {
@@ -216,6 +228,14 @@ func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.Rou
 			})
 		}
 	}
+	headers := make(map[string][]string)
+	for headersKey, headersValue := range r.Headers {
+		headersInst := make([]string, 0, len(headersValue))
+		for _, item := range headersValue {
+			headersInst = append(headersInst, item.ValueString())
+		}
+		headers[headersKey] = headersInst
+	}
 	var hosts []string
 	if r.Hosts != nil {
 		hosts = make([]string, 0, len(r.Hosts))
@@ -355,6 +375,7 @@ func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.Rou
 	out := shared.RouteJSON{
 		CreatedAt:               createdAt,
 		Destinations:            destinations,
+		Headers:                 headers,
 		Hosts:                   hosts,
 		HTTPSRedirectStatusCode: httpsRedirectStatusCode,
 		ID:                      id,

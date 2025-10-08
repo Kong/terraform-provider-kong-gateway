@@ -239,7 +239,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{
@@ -278,7 +278,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `How often to sample requests that do not contain trace IDs. Set to ` + "`" + `0` + "`" + ` to turn sampling off, or to ` + "`" + `1` + "`" + ` to sample **all** requests.`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(1),
+							float64validator.Between(0, 1),
 						},
 					},
 					"send_timeout": schema.Int64Attribute{

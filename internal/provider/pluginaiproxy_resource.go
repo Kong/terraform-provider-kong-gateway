@@ -383,7 +383,7 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 										Optional:    true,
 										Description: `Defines the matching temperature, if using chat or completion models.`,
 										Validators: []validator.Float64{
-											float64validator.AtMost(5),
+											float64validator.Between(0, 5),
 										},
 									},
 									"top_k": schema.Int64Attribute{
@@ -399,7 +399,7 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 										Optional:    true,
 										Description: `Defines the top-p probability mass, if supported.`,
 										Validators: []validator.Float64{
-											float64validator.AtMost(1),
+											float64validator.Between(0, 1),
 										},
 									},
 									"upstream_path": schema.StringAttribute{

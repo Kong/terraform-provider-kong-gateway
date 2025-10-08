@@ -215,6 +215,8 @@ type RouteJSON struct {
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// A list of IP destinations of incoming connections that match this Route when using stream routing. Each entry is an object with fields "ip" (optionally in CIDR range notation) and/or "port".
 	Destinations []Destinations `json:"destinations,omitempty"`
+	// One or more lists of values indexed by header name that will cause this Route to match if present in the request. The `Host` header cannot be used with this attribute: hosts should be specified using the `hosts` attribute. When `headers` contains only one value and that value starts with the special prefix `~*`, the value is interpreted as a regular expression.
+	Headers map[string][]string `json:"headers,omitempty"`
 	// A list of domain names that match this Route. Note that the hosts value is case sensitive.
 	Hosts []string `json:"hosts,omitempty"`
 	// The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.
@@ -276,6 +278,13 @@ func (r *RouteJSON) GetDestinations() []Destinations {
 		return nil
 	}
 	return r.Destinations
+}
+
+func (r *RouteJSON) GetHeaders() map[string][]string {
+	if r == nil {
+		return nil
+	}
+	return r.Headers
 }
 
 func (r *RouteJSON) GetHosts() []string {

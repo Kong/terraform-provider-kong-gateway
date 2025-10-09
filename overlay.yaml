@@ -13,22 +13,12 @@ actions:
     update:
       x-speakeasy-type-override: any
 
-  # Plugin
-  - target: $["components"]["schemas"]["PluginWithoutParents"]["properties"]["ordering"]
-    update:
-      x-speakeasy-type-override: any
-
   # Credentials
   - target: $["components"]["schemas"]["BasicAuthWithoutParents"]["properties"]["password"]
     update:
-      writeOnly: true
       x-speakeasy-param-sensitive: true
 
-  # File Log Plugin
-  - target: $["components"]["schemas"]["FileLogPluginConfig"]["properties"]["config"]["properties"]["path"]["pattern"]
-    remove: true
-  
   # Security Scheme - allow operations when admin token is not given
   - target: $["security"]
     update:
-    - {} 
+      - {}

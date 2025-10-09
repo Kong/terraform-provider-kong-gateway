@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -35,18 +39,19 @@ type PluginOauth2IntrospectionResource struct {
 
 // PluginOauth2IntrospectionResourceModel describes the resource data model.
 type PluginOauth2IntrospectionResourceModel struct {
-	Config       *tfTypes.Oauth2IntrospectionPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                              `tfsdk:"created_at"`
-	Enabled      types.Bool                               `tfsdk:"enabled"`
-	ID           types.String                             `tfsdk:"id"`
-	InstanceName types.String                             `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                        `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                       `tfsdk:"partials"`
-	Protocols    []types.String                           `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer       `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer       `tfsdk:"service"`
-	Tags         []types.String                           `tfsdk:"tags"`
-	UpdatedAt    types.Int64                              `tfsdk:"updated_at"`
+	Config       tfTypes.Oauth2IntrospectionPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                             `tfsdk:"created_at"`
+	Enabled      types.Bool                              `tfsdk:"enabled"`
+	ID           types.String                            `tfsdk:"id"`
+	InstanceName types.String                            `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering              `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials             `tfsdk:"partials"`
+	Protocols    []types.String                          `tfsdk:"protocols"`
+	Route        *tfTypes.Set                            `tfsdk:"route"`
+	Service      *tfTypes.Set                            `tfsdk:"service"`
+	Tags         []types.String                          `tfsdk:"tags"`
+	UpdatedAt    types.Int64                             `tfsdk:"updated_at"`
+	Workspace    types.String                            `tfsdk:"workspace"`
 }
 
 func (r *PluginOauth2IntrospectionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,8 +63,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 		MarkdownDescription: "PluginOauth2Introspection Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
@@ -67,8 +71,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						Description: `An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure ` + "`" + `4xx` + "`" + `. Note that this value must refer to the consumer ` + "`" + `id` + "`" + ` or ` + "`" + `username` + "`" + ` attribute, and **not** its ` + "`" + `custom_id` + "`" + `.`,
 					},
 					"authorization_value": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `The value to set as the ` + "`" + `Authorization` + "`" + ` header when querying the introspection endpoint. This depends on the OAuth 2.0 server, but usually is the ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as a Base64-encoded Basic Auth string (` + "`" + `Basic MG9hNWl...` + "`" + `).`,
 					},
 					"consumer_by": schema.StringAttribute{
@@ -91,7 +94,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 					"custom_introspection_headers": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `A list of custom headers to be added in the introspection request.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -108,8 +111,7 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						Description: `A boolean indicating whether to forward information about the current downstream request to the introspect endpoint. If true, headers ` + "`" + `X-Request-Path` + "`" + ` and ` + "`" + `X-Request-Http-Method` + "`" + ` will be inserted into the introspect request.`,
 					},
 					"introspection_url": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search.`,
 					},
 					"keepalive": schema.Int64Attribute{
@@ -150,12 +152,17 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -194,12 +201,17 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -207,8 +219,9 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -246,6 +259,12 @@ func (r *PluginOauth2IntrospectionResource) Schema(ctx context.Context, req reso
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -289,7 +308,7 @@ func (r *PluginOauth2IntrospectionResource) Create(ctx context.Context, req reso
 		return
 	}
 
-	request, requestDiags := data.ToSharedOauth2IntrospectionPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateOauth2introspectionPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -489,5 +508,26 @@ func (r *PluginOauth2IntrospectionResource) Delete(ctx context.Context, req reso
 }
 
 func (r *PluginOauth2IntrospectionResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

@@ -12,22 +12,22 @@ type ForwardProxyPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *ForwardProxyPluginAfter) GetAccess() []string {
-	if o == nil {
+func (f *ForwardProxyPluginAfter) GetAccess() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Access
+	return f.Access
 }
 
 type ForwardProxyPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *ForwardProxyPluginBefore) GetAccess() []string {
-	if o == nil {
+func (f *ForwardProxyPluginBefore) GetAccess() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Access
+	return f.Access
 }
 
 type ForwardProxyPluginOrdering struct {
@@ -35,45 +35,47 @@ type ForwardProxyPluginOrdering struct {
 	Before *ForwardProxyPluginBefore `json:"before,omitempty"`
 }
 
-func (o *ForwardProxyPluginOrdering) GetAfter() *ForwardProxyPluginAfter {
-	if o == nil {
+func (f *ForwardProxyPluginOrdering) GetAfter() *ForwardProxyPluginAfter {
+	if f == nil {
 		return nil
 	}
-	return o.After
+	return f.After
 }
 
-func (o *ForwardProxyPluginOrdering) GetBefore() *ForwardProxyPluginBefore {
-	if o == nil {
+func (f *ForwardProxyPluginOrdering) GetBefore() *ForwardProxyPluginBefore {
+	if f == nil {
 		return nil
 	}
-	return o.Before
+	return f.Before
 }
 
 type ForwardProxyPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *ForwardProxyPluginPartials) GetID() *string {
-	if o == nil {
+func (f *ForwardProxyPluginPartials) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
-func (o *ForwardProxyPluginPartials) GetName() *string {
-	if o == nil {
+func (f *ForwardProxyPluginPartials) GetName() *string {
+	if f == nil {
 		return nil
 	}
-	return o.Name
+	return f.Name
 }
 
-func (o *ForwardProxyPluginPartials) GetPath() *string {
-	if o == nil {
+func (f *ForwardProxyPluginPartials) GetPath() *string {
+	if f == nil {
 		return nil
 	}
-	return o.Path
+	return f.Path
 }
 
 // ProxyScheme - The proxy scheme to use when connecting. Only `http` is supported.
@@ -153,67 +155,67 @@ type ForwardProxyPluginConfig struct {
 	XHeaders *XHeaders `json:"x_headers,omitempty"`
 }
 
-func (o *ForwardProxyPluginConfig) GetAuthPassword() *string {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetAuthPassword() *string {
+	if f == nil {
 		return nil
 	}
-	return o.AuthPassword
+	return f.AuthPassword
 }
 
-func (o *ForwardProxyPluginConfig) GetAuthUsername() *string {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetAuthUsername() *string {
+	if f == nil {
 		return nil
 	}
-	return o.AuthUsername
+	return f.AuthUsername
 }
 
-func (o *ForwardProxyPluginConfig) GetHTTPProxyHost() *string {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetHTTPProxyHost() *string {
+	if f == nil {
 		return nil
 	}
-	return o.HTTPProxyHost
+	return f.HTTPProxyHost
 }
 
-func (o *ForwardProxyPluginConfig) GetHTTPProxyPort() *int64 {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetHTTPProxyPort() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.HTTPProxyPort
+	return f.HTTPProxyPort
 }
 
-func (o *ForwardProxyPluginConfig) GetHTTPSProxyHost() *string {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetHTTPSProxyHost() *string {
+	if f == nil {
 		return nil
 	}
-	return o.HTTPSProxyHost
+	return f.HTTPSProxyHost
 }
 
-func (o *ForwardProxyPluginConfig) GetHTTPSProxyPort() *int64 {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetHTTPSProxyPort() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.HTTPSProxyPort
+	return f.HTTPSProxyPort
 }
 
-func (o *ForwardProxyPluginConfig) GetHTTPSVerify() *bool {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetHTTPSVerify() *bool {
+	if f == nil {
 		return nil
 	}
-	return o.HTTPSVerify
+	return f.HTTPSVerify
 }
 
-func (o *ForwardProxyPluginConfig) GetProxyScheme() *ProxyScheme {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetProxyScheme() *ProxyScheme {
+	if f == nil {
 		return nil
 	}
-	return o.ProxyScheme
+	return f.ProxyScheme
 }
 
-func (o *ForwardProxyPluginConfig) GetXHeaders() *XHeaders {
-	if o == nil {
+func (f *ForwardProxyPluginConfig) GetXHeaders() *XHeaders {
+	if f == nil {
 		return nil
 	}
-	return o.XHeaders
+	return f.XHeaders
 }
 
 // ForwardProxyPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -221,11 +223,11 @@ type ForwardProxyPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ForwardProxyPluginConsumer) GetID() *string {
-	if o == nil {
+func (f *ForwardProxyPluginConsumer) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 type ForwardProxyPluginProtocols string
@@ -265,11 +267,11 @@ type ForwardProxyPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ForwardProxyPluginRoute) GetID() *string {
-	if o == nil {
+func (f *ForwardProxyPluginRoute) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 // ForwardProxyPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -277,11 +279,11 @@ type ForwardProxyPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ForwardProxyPluginService) GetID() *string {
-	if o == nil {
+func (f *ForwardProxyPluginService) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 // ForwardProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -289,12 +291,15 @@ type ForwardProxyPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                        `json:"enabled,omitempty"`
-	ID           *string                      `json:"id,omitempty"`
-	InstanceName *string                      `json:"instance_name,omitempty"`
-	name         string                       `const:"forward-proxy" json:"name"`
-	Ordering     *ForwardProxyPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []ForwardProxyPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                     `json:"instance_name,omitempty"`
+	name         string                      `const:"forward-proxy" json:"name"`
+	Ordering     *ForwardProxyPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []ForwardProxyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
@@ -315,103 +320,103 @@ func (f ForwardProxyPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (f *ForwardProxyPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &f, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &f, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *ForwardProxyPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetCreatedAt() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return f.CreatedAt
 }
 
-func (o *ForwardProxyPlugin) GetEnabled() *bool {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetEnabled() *bool {
+	if f == nil {
 		return nil
 	}
-	return o.Enabled
+	return f.Enabled
 }
 
-func (o *ForwardProxyPlugin) GetID() *string {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
-func (o *ForwardProxyPlugin) GetInstanceName() *string {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetInstanceName() *string {
+	if f == nil {
 		return nil
 	}
-	return o.InstanceName
+	return f.InstanceName
 }
 
-func (o *ForwardProxyPlugin) GetName() string {
+func (f *ForwardProxyPlugin) GetName() string {
 	return "forward-proxy"
 }
 
-func (o *ForwardProxyPlugin) GetOrdering() *ForwardProxyPluginOrdering {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetOrdering() *ForwardProxyPluginOrdering {
+	if f == nil {
 		return nil
 	}
-	return o.Ordering
+	return f.Ordering
 }
 
-func (o *ForwardProxyPlugin) GetPartials() []ForwardProxyPluginPartials {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetPartials() []ForwardProxyPluginPartials {
+	if f == nil {
 		return nil
 	}
-	return o.Partials
+	return f.Partials
 }
 
-func (o *ForwardProxyPlugin) GetTags() []string {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetTags() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Tags
+	return f.Tags
 }
 
-func (o *ForwardProxyPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetUpdatedAt() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return f.UpdatedAt
 }
 
-func (o *ForwardProxyPlugin) GetConfig() *ForwardProxyPluginConfig {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetConfig() *ForwardProxyPluginConfig {
+	if f == nil {
 		return nil
 	}
-	return o.Config
+	return f.Config
 }
 
-func (o *ForwardProxyPlugin) GetConsumer() *ForwardProxyPluginConsumer {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetConsumer() *ForwardProxyPluginConsumer {
+	if f == nil {
 		return nil
 	}
-	return o.Consumer
+	return f.Consumer
 }
 
-func (o *ForwardProxyPlugin) GetProtocols() []ForwardProxyPluginProtocols {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetProtocols() []ForwardProxyPluginProtocols {
+	if f == nil {
 		return nil
 	}
-	return o.Protocols
+	return f.Protocols
 }
 
-func (o *ForwardProxyPlugin) GetRoute() *ForwardProxyPluginRoute {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetRoute() *ForwardProxyPluginRoute {
+	if f == nil {
 		return nil
 	}
-	return o.Route
+	return f.Route
 }
 
-func (o *ForwardProxyPlugin) GetService() *ForwardProxyPluginService {
-	if o == nil {
+func (f *ForwardProxyPlugin) GetService() *ForwardProxyPluginService {
+	if f == nil {
 		return nil
 	}
-	return o.Service
+	return f.Service
 }

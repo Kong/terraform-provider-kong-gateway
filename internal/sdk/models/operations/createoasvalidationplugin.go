@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateOasvalidationPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	OasValidationPlugin shared.OasValidationPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateOasvalidationPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOasvalidationPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OasValidationPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateOasvalidationPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateOasvalidationPluginRequest) GetOasValidationPlugin() shared.OasValidationPlugin {
+	if c == nil {
+		return shared.OasValidationPlugin{}
+	}
+	return c.OasValidationPlugin
+}
 
 type CreateOasvalidationPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateOasvalidationPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateOasvalidationPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateOasvalidationPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateOasvalidationPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateOasvalidationPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateOasvalidationPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateOasvalidationPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateOasvalidationPluginResponse) GetOasValidationPlugin() *shared.OasValidationPlugin {
-	if o == nil {
+func (c *CreateOasvalidationPluginResponse) GetOasValidationPlugin() *shared.OasValidationPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.OasValidationPlugin
+	return c.OasValidationPlugin
 }
 
-func (o *CreateOasvalidationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateOasvalidationPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

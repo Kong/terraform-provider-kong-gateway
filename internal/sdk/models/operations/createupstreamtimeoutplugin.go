@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateUpstreamtimeoutPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	UpstreamTimeoutPlugin shared.UpstreamTimeoutPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateUpstreamtimeoutPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateUpstreamtimeoutPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "UpstreamTimeoutPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateUpstreamtimeoutPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateUpstreamtimeoutPluginRequest) GetUpstreamTimeoutPlugin() shared.UpstreamTimeoutPlugin {
+	if c == nil {
+		return shared.UpstreamTimeoutPlugin{}
+	}
+	return c.UpstreamTimeoutPlugin
+}
 
 type CreateUpstreamtimeoutPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateUpstreamtimeoutPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateUpstreamtimeoutPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateUpstreamtimeoutPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateUpstreamtimeoutPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateUpstreamtimeoutPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateUpstreamtimeoutPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateUpstreamtimeoutPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateUpstreamtimeoutPluginResponse) GetUpstreamTimeoutPlugin() *shared.UpstreamTimeoutPlugin {
-	if o == nil {
+func (c *CreateUpstreamtimeoutPluginResponse) GetUpstreamTimeoutPlugin() *shared.UpstreamTimeoutPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.UpstreamTimeoutPlugin
+	return c.UpstreamTimeoutPlugin
 }
 
-func (o *CreateUpstreamtimeoutPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateUpstreamtimeoutPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAiraginjectorPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiRagInjectorPlugin shared.AiRagInjectorPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAiraginjectorPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAiraginjectorPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiRagInjectorPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAiraginjectorPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAiraginjectorPluginRequest) GetAiRagInjectorPlugin() shared.AiRagInjectorPlugin {
+	if c == nil {
+		return shared.AiRagInjectorPlugin{}
+	}
+	return c.AiRagInjectorPlugin
+}
 
 type CreateAiraginjectorPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAiraginjectorPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAiraginjectorPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAiraginjectorPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAiraginjectorPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAiraginjectorPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAiraginjectorPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAiraginjectorPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAiraginjectorPluginResponse) GetAiRagInjectorPlugin() *shared.AiRagInjectorPlugin {
-	if o == nil {
+func (c *CreateAiraginjectorPluginResponse) GetAiRagInjectorPlugin() *shared.AiRagInjectorPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiRagInjectorPlugin
+	return c.AiRagInjectorPlugin
 }
 
-func (o *CreateAiraginjectorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAiraginjectorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

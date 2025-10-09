@@ -11,6 +11,172 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(ctx context.Context, resp *shared.ACLPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.Config{}
+			r.Config.Allow = make([]types.String, 0, len(resp.Config.Allow))
+			for _, v := range resp.Config.Allow {
+				r.Config.Allow = append(r.Config.Allow, types.StringValue(v))
+			}
+			r.Config.AlwaysUseAuthenticatedGroups = types.BoolPointerValue(resp.Config.AlwaysUseAuthenticatedGroups)
+			r.Config.Deny = make([]types.String, 0, len(resp.Config.Deny))
+			for _, v := range resp.Config.Deny {
+				r.Config.Deny = append(r.Config.Deny, types.StringValue(v))
+			}
+			r.Config.HideGroupsHeader = types.BoolPointerValue(resp.Config.HideGroupsHeader)
+			r.Config.IncludeConsumerGroups = types.BoolPointerValue(resp.Config.IncludeConsumerGroups)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginACLResourceModel) ToOperationsCreateACLPluginRequest(ctx context.Context) (*operations.CreateACLPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	aclPlugin, aclPluginDiags := r.ToSharedACLPlugin(ctx)
+	diags.Append(aclPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateACLPluginRequest{
+		Workspace: workspace,
+		ACLPlugin: *aclPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginACLResourceModel) ToOperationsDeleteACLPluginRequest(ctx context.Context) (*operations.DeleteACLPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteACLPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginACLResourceModel) ToOperationsGetACLPluginRequest(ctx context.Context) (*operations.GetACLPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetACLPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginACLResourceModel) ToOperationsUpdateACLPluginRequest(ctx context.Context) (*operations.UpdateACLPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	aclPlugin, aclPluginDiags := r.ToSharedACLPlugin(ctx)
+	diags.Append(aclPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateACLPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+		ACLPlugin: *aclPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared.ACLPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -38,65 +204,65 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 	} else {
 		instanceName = nil
 	}
-	var ordering *shared.Ordering
+	var ordering *shared.ACLPluginOrdering
 	if r.Ordering != nil {
-		var after *shared.After
+		var after *shared.ACLPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
 			for _, accessItem := range r.Ordering.After.Access {
 				access = append(access, accessItem.ValueString())
 			}
-			after = &shared.After{
+			after = &shared.ACLPluginAfter{
 				Access: access,
 			}
 		}
-		var before *shared.Before
+		var before *shared.ACLPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
 			for _, accessItem1 := range r.Ordering.Before.Access {
 				access1 = append(access1, accessItem1.ValueString())
 			}
-			before = &shared.Before{
+			before = &shared.ACLPluginBefore{
 				Access: access1,
 			}
 		}
-		ordering = &shared.Ordering{
+		ordering = &shared.ACLPluginOrdering{
 			After:  after,
 			Before: before,
 		}
 	}
-	var partials []shared.Partials
-	if r.Partials != nil {
-		partials = make([]shared.Partials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.Partials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.ACLPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.ACLPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -140,11 +306,11 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 			IncludeConsumerGroups:        includeConsumerGroups,
 		}
 	}
-	protocols := make([]shared.Protocols, 0, len(r.Protocols))
+	protocols := make([]shared.ACLPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
-		protocols = append(protocols, shared.Protocols(protocolsItem.ValueString()))
+		protocols = append(protocols, shared.ACLPluginProtocols(protocolsItem.ValueString()))
 	}
-	var route *shared.Route
+	var route *shared.ACLPluginRoute
 	if r.Route != nil {
 		id2 := new(string)
 		if !r.Route.ID.IsUnknown() && !r.Route.ID.IsNull() {
@@ -152,7 +318,7 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 		} else {
 			id2 = nil
 		}
-		route = &shared.Route{
+		route = &shared.ACLPluginRoute{
 			ID: id2,
 		}
 	}
@@ -184,143 +350,4 @@ func (r *PluginACLResourceModel) ToSharedACLPlugin(ctx context.Context) (*shared
 	}
 
 	return &out, diags
-}
-
-func (r *PluginACLResourceModel) ToOperationsUpdateACLPluginRequest(ctx context.Context) (*operations.UpdateACLPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	aclPlugin, aclPluginDiags := r.ToSharedACLPlugin(ctx)
-	diags.Append(aclPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateACLPluginRequest{
-		PluginID:  pluginID,
-		ACLPlugin: *aclPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginACLResourceModel) ToOperationsGetACLPluginRequest(ctx context.Context) (*operations.GetACLPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetACLPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginACLResourceModel) ToOperationsDeleteACLPluginRequest(ctx context.Context) (*operations.DeleteACLPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteACLPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginACLResourceModel) RefreshFromSharedACLPlugin(ctx context.Context, resp *shared.ACLPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.Config{}
-			r.Config.Allow = make([]types.String, 0, len(resp.Config.Allow))
-			for _, v := range resp.Config.Allow {
-				r.Config.Allow = append(r.Config.Allow, types.StringValue(v))
-			}
-			r.Config.AlwaysUseAuthenticatedGroups = types.BoolPointerValue(resp.Config.AlwaysUseAuthenticatedGroups)
-			r.Config.Deny = make([]types.String, 0, len(resp.Config.Deny))
-			for _, v := range resp.Config.Deny {
-				r.Config.Deny = append(r.Config.Deny, types.StringValue(v))
-			}
-			r.Config.HideGroupsHeader = types.BoolPointerValue(resp.Config.HideGroupsHeader)
-			r.Config.IncludeConsumerGroups = types.BoolPointerValue(resp.Config.IncludeConsumerGroups)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

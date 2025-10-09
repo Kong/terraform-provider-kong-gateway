@@ -14,9 +14,6 @@ KeyAuth Resource
 
 ```terraform
 resource "kong-gateway_key_auth" "my_keyauth" {
-  consumer = {
-    id = "...my_id..."
-  }
   consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
   created_at  = 1
   id          = "...my_id..."
@@ -24,7 +21,8 @@ resource "kong-gateway_key_auth" "my_keyauth" {
   tags = [
     "..."
   ]
-  ttl = 6
+  ttl       = 6
+  workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -33,31 +31,36 @@ resource "kong-gateway_key_auth" "my_keyauth" {
 
 ### Required
 
-- `consumer_id` (String) Consumer ID for nested entities
-- `key` (String)
+- `consumer_id` (String) Consumer ID for nested entities. Requires replacement if changed.
 
 ### Optional
 
-- `consumer` (Attributes) (see [below for nested schema](#nestedatt--consumer))
-- `created_at` (Number) Unix epoch when the resource was created.
-- `tags` (List of String)
-- `ttl` (Number) key-auth ttl in seconds
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
-
-<a id="nestedatt--consumer"></a>
-### Nested Schema for `consumer`
-
-Optional:
-
-- `id` (String)
+- `created_at` (Number) Unix epoch when the resource was created. Requires replacement if changed.
+- `id` (String) A string representing a UUID (universally unique identifier). Requires replacement if changed.
+- `key` (String) Requires replacement if changed.
+- `tags` (List of String) A set of strings representing tags. Requires replacement if changed.
+- `ttl` (Number) key-auth ttl in seconds. Requires replacement if changed.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_key_auth.my_kong-gateway_key_auth
+  id = jsonencode({
+    consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+    id = ""
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_key_auth.my_kong-gateway_key_auth '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": ""}'
+terraform import kong-gateway_key_auth.my_kong-gateway_key_auth '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

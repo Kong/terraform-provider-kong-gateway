@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
@@ -11,20 +12,40 @@ type DeleteKeyAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the API-key to lookup
 	KeyAuthID string `pathParam:"style=simple,explode=false,name=KeyAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteKeyAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (d DeleteKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (o *DeleteKeyAuthWithConsumerRequest) GetKeyAuthID() string {
-	if o == nil {
+func (d *DeleteKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteKeyAuthWithConsumerRequest) GetConsumerID() string {
+	if d == nil {
 		return ""
 	}
-	return o.KeyAuthID
+	return d.ConsumerID
+}
+
+func (d *DeleteKeyAuthWithConsumerRequest) GetKeyAuthID() string {
+	if d == nil {
+		return ""
+	}
+	return d.KeyAuthID
+}
+
+func (d *DeleteKeyAuthWithConsumerRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteKeyAuthWithConsumerResponse struct {
@@ -36,23 +57,23 @@ type DeleteKeyAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *DeleteKeyAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteKeyAuthWithConsumerResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteKeyAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteKeyAuthWithConsumerResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }

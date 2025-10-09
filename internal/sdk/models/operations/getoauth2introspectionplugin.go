@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetOauth2introspectionPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetOauth2introspectionPluginRequest) GetPluginID() string {
-	if o == nil {
+func (g GetOauth2introspectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetOauth2introspectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetOauth2introspectionPluginRequest) GetPluginID() string {
+	if g == nil {
 		return ""
 	}
-	return o.PluginID
+	return g.PluginID
+}
+
+func (g *GetOauth2introspectionPluginRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetOauth2introspectionPluginResponse struct {
@@ -32,37 +53,37 @@ type GetOauth2introspectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetOauth2introspectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (g *GetOauth2introspectionPluginResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetOauth2introspectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetOauth2introspectionPluginResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetOauth2introspectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetOauth2introspectionPluginResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetOauth2introspectionPluginResponse) GetOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPlugin {
-	if o == nil {
+func (g *GetOauth2introspectionPluginResponse) GetOauth2IntrospectionPlugin() *shared.Oauth2IntrospectionPlugin {
+	if g == nil {
 		return nil
 	}
-	return o.Oauth2IntrospectionPlugin
+	return g.Oauth2IntrospectionPlugin
 }
 
-func (o *GetOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

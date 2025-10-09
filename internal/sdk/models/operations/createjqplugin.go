@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateJqPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace string          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	JqPlugin  shared.JqPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateJqPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateJqPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JqPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateJqPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateJqPluginRequest) GetJqPlugin() shared.JqPlugin {
+	if c == nil {
+		return shared.JqPlugin{}
+	}
+	return c.JqPlugin
+}
 
 type CreateJqPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateJqPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateJqPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateJqPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateJqPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateJqPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateJqPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateJqPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateJqPluginResponse) GetJqPlugin() *shared.JqPlugin {
-	if o == nil {
+func (c *CreateJqPluginResponse) GetJqPlugin() *shared.JqPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.JqPlugin
+	return c.JqPlugin
 }
 
-func (o *CreateJqPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateJqPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

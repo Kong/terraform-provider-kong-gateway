@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateRequesttransformerPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RequestTransformerPlugin shared.RequestTransformerPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateRequesttransformerPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateRequesttransformerPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateRequesttransformerPluginRequest) GetRequestTransformerPlugin() shared.RequestTransformerPlugin {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RequestTransformerPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateRequesttransformerPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateRequesttransformerPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateRequesttransformerPluginRequest) GetRequestTransformerPlugin() shared.RequestTransformerPlugin {
+	if u == nil {
 		return shared.RequestTransformerPlugin{}
 	}
-	return o.RequestTransformerPlugin
+	return u.RequestTransformerPlugin
 }
 
 type UpdateRequesttransformerPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateRequesttransformerPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateRequesttransformerPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateRequesttransformerPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateRequesttransformerPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateRequesttransformerPluginResponse) GetRequestTransformerPlugin() *shared.RequestTransformerPlugin {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginResponse) GetRequestTransformerPlugin() *shared.RequestTransformerPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.RequestTransformerPlugin
+	return u.RequestTransformerPlugin
 }
 
-func (o *UpdateRequesttransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateRequesttransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

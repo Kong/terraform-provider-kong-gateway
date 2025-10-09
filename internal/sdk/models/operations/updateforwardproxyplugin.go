@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateForwardproxyPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	ForwardProxyPlugin shared.ForwardProxyPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateForwardproxyPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateForwardproxyPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateForwardproxyPluginRequest) GetForwardProxyPlugin() shared.ForwardProxyPlugin {
-	if o == nil {
+func (u *UpdateForwardproxyPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ForwardProxyPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateForwardproxyPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateForwardproxyPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateForwardproxyPluginRequest) GetForwardProxyPlugin() shared.ForwardProxyPlugin {
+	if u == nil {
 		return shared.ForwardProxyPlugin{}
 	}
-	return o.ForwardProxyPlugin
+	return u.ForwardProxyPlugin
 }
 
 type UpdateForwardproxyPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateForwardproxyPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateForwardproxyPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateForwardproxyPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateForwardproxyPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateForwardproxyPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateForwardproxyPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateForwardproxyPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateForwardproxyPluginResponse) GetForwardProxyPlugin() *shared.ForwardProxyPlugin {
-	if o == nil {
+func (u *UpdateForwardproxyPluginResponse) GetForwardProxyPlugin() *shared.ForwardProxyPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.ForwardProxyPlugin
+	return u.ForwardProxyPlugin
 }
 
-func (o *UpdateForwardproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateForwardproxyPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

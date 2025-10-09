@@ -3,13 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -34,20 +37,21 @@ type PluginProxyCacheAdvancedResource struct {
 
 // PluginProxyCacheAdvancedResourceModel describes the resource data model.
 type PluginProxyCacheAdvancedResourceModel struct {
-	Config        *tfTypes.ProxyCacheAdvancedPluginConfig `tfsdk:"config"`
-	Consumer      *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                             `tfsdk:"created_at"`
-	Enabled       types.Bool                              `tfsdk:"enabled"`
-	ID            types.String                            `tfsdk:"id"`
-	InstanceName  types.String                            `tfsdk:"instance_name"`
-	Ordering      *tfTypes.Ordering                       `tfsdk:"ordering"`
-	Partials      []tfTypes.Partials                      `tfsdk:"partials"`
-	Protocols     []types.String                          `tfsdk:"protocols"`
-	Route         *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"route"`
-	Service       *tfTypes.ACLWithoutParentsConsumer      `tfsdk:"service"`
-	Tags          []types.String                          `tfsdk:"tags"`
-	UpdatedAt     types.Int64                             `tfsdk:"updated_at"`
+	Config        tfTypes.ProxyCacheAdvancedPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                           `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                           `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                            `tfsdk:"created_at"`
+	Enabled       types.Bool                             `tfsdk:"enabled"`
+	ID            types.String                           `tfsdk:"id"`
+	InstanceName  types.String                           `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering             `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials            `tfsdk:"partials"`
+	Protocols     []types.String                         `tfsdk:"protocols"`
+	Route         *tfTypes.Set                           `tfsdk:"route"`
+	Service       *tfTypes.Set                           `tfsdk:"service"`
+	Tags          []types.String                         `tfsdk:"tags"`
+	UpdatedAt     types.Int64                            `tfsdk:"updated_at"`
+	Workspace     types.String                           `tfsdk:"workspace"`
 }
 
 func (r *PluginProxyCacheAdvancedResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,8 +63,7 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 		MarkdownDescription: "PluginProxyCacheAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"bypass_on_err": schema.BoolAttribute{
 						Computed:    true,
@@ -312,8 +315,7 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 						Description: `Number of seconds to keep resources in the storage backend. This value is independent of ` + "`" + `cache_ttl` + "`" + ` or resource TTLs defined by Cache-Control behaviors.`,
 					},
 					"strategy": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `The backing data store in which to hold cache entities. Accepted values are: ` + "`" + `memory` + "`" + ` and ` + "`" + `redis` + "`" + `. must be one of ["memory", "redis"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
@@ -369,12 +371,17 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -413,12 +420,17 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -426,8 +438,9 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -465,6 +478,12 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -508,7 +527,7 @@ func (r *PluginProxyCacheAdvancedResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	request, requestDiags := data.ToSharedProxyCacheAdvancedPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateProxycacheadvancedPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -708,5 +727,26 @@ func (r *PluginProxyCacheAdvancedResource) Delete(ctx context.Context, req resou
 }
 
 func (r *PluginProxyCacheAdvancedResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

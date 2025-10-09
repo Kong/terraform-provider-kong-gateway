@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -11,30 +12,51 @@ type AddConsumerToGroupRequestBody struct {
 	ConsumerID *string `json:"consumer,omitempty"`
 }
 
-func (o *AddConsumerToGroupRequestBody) GetConsumerID() *string {
-	if o == nil {
+func (a *AddConsumerToGroupRequestBody) GetConsumerID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerID
+	return a.ConsumerID
 }
 
 type AddConsumerToGroupRequest struct {
-	ConsumerGroupID string                         `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
-	RequestBody     *AddConsumerToGroupRequestBody `request:"mediaType=application/json"`
+	// The UUID or name of the consumer group
+	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
+	// The name or UUID of the workspace
+	Workspace   string                         `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	RequestBody *AddConsumerToGroupRequestBody `request:"mediaType=application/json"`
 }
 
-func (o *AddConsumerToGroupRequest) GetConsumerGroupID() string {
-	if o == nil {
+func (a AddConsumerToGroupRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AddConsumerToGroupRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"ConsumerGroupId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AddConsumerToGroupRequest) GetConsumerGroupID() string {
+	if a == nil {
 		return ""
 	}
-	return o.ConsumerGroupID
+	return a.ConsumerGroupID
 }
 
-func (o *AddConsumerToGroupRequest) GetRequestBody() *AddConsumerToGroupRequestBody {
-	if o == nil {
+func (a *AddConsumerToGroupRequest) GetWorkspace() string {
+	if a == nil {
+		return ""
+	}
+	return a.Workspace
+}
+
+func (a *AddConsumerToGroupRequest) GetRequestBody() *AddConsumerToGroupRequestBody {
+	if a == nil {
 		return nil
 	}
-	return o.RequestBody
+	return a.RequestBody
 }
 
 // AddConsumerToGroupResponseBody - Consumer added to group
@@ -43,18 +65,18 @@ type AddConsumerToGroupResponseBody struct {
 	Consumers     []shared.Consumer     `json:"consumers,omitempty"`
 }
 
-func (o *AddConsumerToGroupResponseBody) GetConsumerGroup() *shared.ConsumerGroup {
-	if o == nil {
+func (a *AddConsumerToGroupResponseBody) GetConsumerGroup() *shared.ConsumerGroup {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return a.ConsumerGroup
 }
 
-func (o *AddConsumerToGroupResponseBody) GetConsumers() []shared.Consumer {
-	if o == nil {
+func (a *AddConsumerToGroupResponseBody) GetConsumers() []shared.Consumer {
+	if a == nil {
 		return nil
 	}
-	return o.Consumers
+	return a.Consumers
 }
 
 type AddConsumerToGroupResponse struct {
@@ -68,30 +90,30 @@ type AddConsumerToGroupResponse struct {
 	Object *AddConsumerToGroupResponseBody
 }
 
-func (o *AddConsumerToGroupResponse) GetContentType() string {
-	if o == nil {
+func (a *AddConsumerToGroupResponse) GetContentType() string {
+	if a == nil {
 		return ""
 	}
-	return o.ContentType
+	return a.ContentType
 }
 
-func (o *AddConsumerToGroupResponse) GetStatusCode() int {
-	if o == nil {
+func (a *AddConsumerToGroupResponse) GetStatusCode() int {
+	if a == nil {
 		return 0
 	}
-	return o.StatusCode
+	return a.StatusCode
 }
 
-func (o *AddConsumerToGroupResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (a *AddConsumerToGroupResponse) GetRawResponse() *http.Response {
+	if a == nil {
 		return nil
 	}
-	return o.RawResponse
+	return a.RawResponse
 }
 
-func (o *AddConsumerToGroupResponse) GetObject() *AddConsumerToGroupResponseBody {
-	if o == nil {
+func (a *AddConsumerToGroupResponse) GetObject() *AddConsumerToGroupResponseBody {
+	if a == nil {
 		return nil
 	}
-	return o.Object
+	return a.Object
 }

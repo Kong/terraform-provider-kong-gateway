@@ -50,7 +50,9 @@ func (o *OpaPluginOrdering) GetBefore() *OpaPluginBefore {
 }
 
 type OpaPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
@@ -118,7 +120,7 @@ type OpaPluginConfig struct {
 	// A string representing a host name, such as example.com.
 	OpaHost *string `json:"opa_host,omitempty"`
 	// A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).
-	OpaPath *string `json:"opa_path,omitempty"`
+	OpaPath string `json:"opa_path"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	OpaPort *int64 `json:"opa_port,omitempty"`
 	// The protocol to use when talking to Open Policy Agent (OPA) server. Allowed protocols are `http` and `https`.
@@ -176,9 +178,9 @@ func (o *OpaPluginConfig) GetOpaHost() *string {
 	return o.OpaHost
 }
 
-func (o *OpaPluginConfig) GetOpaPath() *string {
+func (o *OpaPluginConfig) GetOpaPath() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.OpaPath
 }
@@ -265,17 +267,20 @@ type OpaPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool               `json:"enabled,omitempty"`
-	ID           *string             `json:"id,omitempty"`
-	InstanceName *string             `json:"instance_name,omitempty"`
-	name         string              `const:"opa" json:"name"`
-	Ordering     *OpaPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []OpaPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string            `json:"instance_name,omitempty"`
+	name         string             `const:"opa" json:"name"`
+	Ordering     *OpaPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []OpaPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64           `json:"updated_at,omitempty"`
-	Config    *OpaPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64          `json:"updated_at,omitempty"`
+	Config    OpaPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []OpaPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
@@ -289,7 +294,7 @@ func (o OpaPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpaPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
@@ -355,9 +360,9 @@ func (o *OpaPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *OpaPlugin) GetConfig() *OpaPluginConfig {
+func (o *OpaPlugin) GetConfig() OpaPluginConfig {
 	if o == nil {
-		return nil
+		return OpaPluginConfig{}
 	}
 	return o.Config
 }

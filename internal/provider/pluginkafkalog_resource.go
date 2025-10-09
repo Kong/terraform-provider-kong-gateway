@@ -3,14 +3,19 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -38,19 +43,20 @@ type PluginKafkaLogResource struct {
 
 // PluginKafkaLogResourceModel describes the resource data model.
 type PluginKafkaLogResourceModel struct {
-	Config       *tfTypes.KafkaLogPluginConfig      `tfsdk:"config"`
-	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Config       tfTypes.KafkaLogPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                 `tfsdk:"consumer"`
+	CreatedAt    types.Int64                  `tfsdk:"created_at"`
+	Enabled      types.Bool                   `tfsdk:"enabled"`
+	ID           types.String                 `tfsdk:"id"`
+	InstanceName types.String                 `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering   `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials  `tfsdk:"partials"`
+	Protocols    []types.String               `tfsdk:"protocols"`
+	Route        *tfTypes.Set                 `tfsdk:"route"`
+	Service      *tfTypes.Set                 `tfsdk:"service"`
+	Tags         []types.String               `tfsdk:"tags"`
+	UpdatedAt    types.Int64                  `tfsdk:"updated_at"`
+	Workspace    types.String                 `tfsdk:"workspace"`
 }
 
 func (r *PluginKafkaLogResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,8 +68,7 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 		MarkdownDescription: "PluginKafkaLog Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"authentication": schema.SingleNestedAttribute{
 						Computed: true,
@@ -145,9 +150,6 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `Lua code as a key-value map`,
-						Validators: []validator.Map{
-							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-						},
 					},
 					"keepalive": schema.Int64Attribute{
 						Computed: true,
@@ -156,6 +158,11 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 					"keepalive_enabled": schema.BoolAttribute{
 						Computed: true,
 						Optional: true,
+					},
+					"key_query_arg": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The request query parameter name that contains the Kafka message key. If specified, messages with the same key will be sent to the same Kafka partition, ensuring consistent ordering.`,
 					},
 					"producer_async": schema.BoolAttribute{
 						Computed:    true,
@@ -205,6 +212,262 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 						Optional:    true,
 						Description: `Time to wait for a Produce response in milliseconds`,
 					},
+					"schema_registry": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"confluent": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"authentication": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"basic": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"password": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+													"username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+												},
+											},
+											"mode": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Authentication mode to use with the schema registry. must be one of ["basic", "none", "oauth2"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"basic",
+														"none",
+														"oauth2",
+													),
+												},
+											},
+											"oauth2": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"audience": schema.ListAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `List of audiences passed to the IdP when obtaining a new token.`,
+													},
+													"client_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The client ID for the application registration in the IdP.`,
+													},
+													"client_secret": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The client secret for the application registration in the IdP.`,
+													},
+													"grant_type": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The OAuth grant type to be used. must be one of ["client_credentials", "password"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_credentials",
+																"password",
+															),
+														},
+													},
+													"password": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The password to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+													},
+													"scopes": schema.ListAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `List of scopes to request from the IdP when obtaining a new token.`,
+													},
+													"token_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The token endpoint URI. Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+													"token_headers": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: jsontypes.NormalizedType{},
+														Description: `Extra headers to be passed in the token endpoint request.`,
+														Validators: []validator.Map{
+															mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+														},
+													},
+													"token_post_args": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: jsontypes.NormalizedType{},
+														Description: `Extra post arguments to be passed in the token endpoint request.`,
+														Validators: []validator.Map{
+															mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+														},
+													},
+													"username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The username to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+													},
+												},
+											},
+											"oauth2_client": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"auth_method": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The authentication method used in client requests to the IdP. Supported values are: ` + "`" + `client_secret_basic` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` in the ` + "`" + `Authorization: Basic` + "`" + ` header, ` + "`" + `client_secret_post` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as part of the request body, or ` + "`" + `client_secret_jwt` + "`" + ` to send a JWT signed with the ` + "`" + `client_secret` + "`" + ` using the client assertion as part of the body. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_secret_basic",
+																"client_secret_jwt",
+																"client_secret_post",
+																"none",
+															),
+														},
+													},
+													"client_secret_jwt_alg": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The algorithm to use with JWT when using ` + "`" + `client_secret_jwt` + "`" + ` authentication. must be one of ["HS256", "HS512"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"HS256",
+																"HS512",
+															),
+														},
+													},
+													"http_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The proxy to use when making HTTP requests to the IdP.`,
+													},
+													"http_proxy_authorization": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `http_proxy` + "`" + `.`,
+													},
+													"http_version": schema.Float64Attribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The HTTP version used for requests made by this plugin. Supported values: ` + "`" + `1.1` + "`" + ` for HTTP 1.1 and ` + "`" + `1.0` + "`" + ` for HTTP 1.0.`,
+													},
+													"https_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The proxy to use when making HTTPS requests to the IdP.`,
+													},
+													"https_proxy_authorization": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `https_proxy` + "`" + `.`,
+													},
+													"keep_alive": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Whether to use keepalive connections to the IdP.`,
+													},
+													"no_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `A comma-separated list of hosts that should not be proxied.`,
+													},
+													"ssl_verify": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Whether to verify the certificate presented by the IdP when using HTTPS.`,
+													},
+													"timeout": schema.Int64Attribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Network I/O timeout for requests to the IdP in milliseconds.`,
+														Validators: []validator.Int64{
+															int64validator.AtMost(2147483646),
+														},
+													},
+												},
+											},
+										},
+									},
+									"key_schema": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"schema_version": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.`,
+											},
+											"subject_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The name of the subject`,
+											},
+										},
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set to false to disable SSL certificate verification when connecting to the schema registry.`,
+									},
+									"ttl": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The TTL in seconds for the schema registry cache.`,
+										Validators: []validator.Float64{
+											float64validator.Between(0, 3600),
+										},
+									},
+									"url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The URL of the schema registry.`,
+									},
+									"value_schema": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"schema_version": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.`,
+											},
+											"subject_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The name of the subject`,
+											},
+										},
+									},
+								},
+							},
+						},
+						Description: `The plugin-global schema registry configuration. This can be overwritten by the topic configuration.`,
+					},
 					"security": schema.SingleNestedAttribute{
 						Computed: true,
 						Optional: true,
@@ -227,8 +490,7 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 						Description: `Socket timeout in milliseconds.`,
 					},
 					"topic": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `The Kafka topic to publish to.`,
 					},
 				},
@@ -255,12 +517,17 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -299,12 +566,17 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -312,8 +584,9 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -351,6 +624,12 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -394,7 +673,7 @@ func (r *PluginKafkaLogResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	request, requestDiags := data.ToSharedKafkaLogPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateKafkalogPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -594,5 +873,26 @@ func (r *PluginKafkaLogResource) Delete(ctx context.Context, req resource.Delete
 }
 
 func (r *PluginKafkaLogResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

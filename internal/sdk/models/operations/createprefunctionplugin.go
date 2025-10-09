@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreatePrefunctionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace         string                   `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	PreFunctionPlugin shared.PreFunctionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreatePrefunctionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreatePrefunctionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "PreFunctionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreatePrefunctionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreatePrefunctionPluginRequest) GetPreFunctionPlugin() shared.PreFunctionPlugin {
+	if c == nil {
+		return shared.PreFunctionPlugin{}
+	}
+	return c.PreFunctionPlugin
+}
 
 type CreatePrefunctionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreatePrefunctionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreatePrefunctionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreatePrefunctionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreatePrefunctionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreatePrefunctionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreatePrefunctionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreatePrefunctionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreatePrefunctionPluginResponse) GetPreFunctionPlugin() *shared.PreFunctionPlugin {
-	if o == nil {
+func (c *CreatePrefunctionPluginResponse) GetPreFunctionPlugin() *shared.PreFunctionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.PreFunctionPlugin
+	return c.PreFunctionPlugin
 }
 
-func (o *CreatePrefunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreatePrefunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

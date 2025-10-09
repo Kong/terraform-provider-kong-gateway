@@ -5,17 +5,18 @@ package shared
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
 // RouteExpressionHTTPSRedirectStatusCode - The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.
 type RouteExpressionHTTPSRedirectStatusCode int64
 
 const (
-	RouteExpressionHTTPSRedirectStatusCodeFourHundredAndTwentySix RouteExpressionHTTPSRedirectStatusCode = 426
 	RouteExpressionHTTPSRedirectStatusCodeThreeHundredAndOne      RouteExpressionHTTPSRedirectStatusCode = 301
 	RouteExpressionHTTPSRedirectStatusCodeThreeHundredAndTwo      RouteExpressionHTTPSRedirectStatusCode = 302
 	RouteExpressionHTTPSRedirectStatusCodeThreeHundredAndSeven    RouteExpressionHTTPSRedirectStatusCode = 307
 	RouteExpressionHTTPSRedirectStatusCodeThreeHundredAndEight    RouteExpressionHTTPSRedirectStatusCode = 308
+	RouteExpressionHTTPSRedirectStatusCodeFourHundredAndTwentySix RouteExpressionHTTPSRedirectStatusCode = 426
 )
 
 func (e RouteExpressionHTTPSRedirectStatusCode) ToPointer() *RouteExpressionHTTPSRedirectStatusCode {
@@ -27,8 +28,6 @@ func (e *RouteExpressionHTTPSRedirectStatusCode) UnmarshalJSON(data []byte) erro
 		return err
 	}
 	switch v {
-	case 426:
-		fallthrough
 	case 301:
 		fallthrough
 	case 302:
@@ -36,6 +35,8 @@ func (e *RouteExpressionHTTPSRedirectStatusCode) UnmarshalJSON(data []byte) erro
 	case 307:
 		fallthrough
 	case 308:
+		fallthrough
+	case 426:
 		*e = RouteExpressionHTTPSRedirectStatusCode(v)
 		return nil
 	default:
@@ -70,6 +71,7 @@ func (e *RouteExpressionPathHandling) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// RouteExpressionProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type RouteExpressionProtocols string
 
 const (
@@ -125,11 +127,22 @@ type RouteExpressionService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *RouteExpressionService) GetID() *string {
-	if o == nil {
+func (r RouteExpressionService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RouteExpressionService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RouteExpressionService) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.ID
 }
 
 // RouteExpression - Route entities define rules to match client requests. Each Route is associated with a Service, and a Service may have multiple Routes associated to it. Every request matching a given Route will be proxied to its associated Service. The combination of Routes and Services (and the separation of concerns between them) offers a powerful routing mechanism with which it is possible to define fine-grained entry-points in Kong leading to different upstream services of your infrastructure. You need at least one matching rule that applies to the protocol being matched by the Route.
@@ -140,14 +153,16 @@ type RouteExpression struct {
 	Expression *string `json:"expression,omitempty"`
 	// The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol.
 	HTTPSRedirectStatusCode *RouteExpressionHTTPSRedirectStatusCode `json:"https_redirect_status_code,omitempty"`
-	ID                      *string                                 `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".
 	Name *string `json:"name,omitempty"`
 	// Controls how the Service path, Route path and requested path are combined when sending a request to the upstream. See above for a detailed description of each behavior.
 	PathHandling *RouteExpressionPathHandling `json:"path_handling,omitempty"`
 	// When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
-	PreserveHost *bool  `json:"preserve_host,omitempty"`
-	Priority     *int64 `json:"priority,omitempty"`
+	PreserveHost *bool `json:"preserve_host,omitempty"`
+	// A number used to specify the matching order for expression routes. The higher the `priority`, the sooner an route will be evaluated. This field is ignored unless `expression` field is set.
+	Priority *int64 `json:"priority,omitempty"`
 	// An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.
 	Protocols []RouteExpressionProtocols `json:"protocols,omitempty"`
 	// Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
@@ -164,107 +179,118 @@ type RouteExpression struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *RouteExpression) GetCreatedAt() *int64 {
-	if o == nil {
-		return nil
-	}
-	return o.CreatedAt
+func (r RouteExpression) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
 }
 
-func (o *RouteExpression) GetExpression() *string {
-	if o == nil {
-		return nil
+func (r *RouteExpression) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
 	}
-	return o.Expression
+	return nil
 }
 
-func (o *RouteExpression) GetHTTPSRedirectStatusCode() *RouteExpressionHTTPSRedirectStatusCode {
-	if o == nil {
+func (r *RouteExpression) GetCreatedAt() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.HTTPSRedirectStatusCode
+	return r.CreatedAt
 }
 
-func (o *RouteExpression) GetID() *string {
-	if o == nil {
+func (r *RouteExpression) GetExpression() *string {
+	if r == nil {
 		return nil
 	}
-	return o.ID
+	return r.Expression
 }
 
-func (o *RouteExpression) GetName() *string {
-	if o == nil {
+func (r *RouteExpression) GetHTTPSRedirectStatusCode() *RouteExpressionHTTPSRedirectStatusCode {
+	if r == nil {
 		return nil
 	}
-	return o.Name
+	return r.HTTPSRedirectStatusCode
 }
 
-func (o *RouteExpression) GetPathHandling() *RouteExpressionPathHandling {
-	if o == nil {
+func (r *RouteExpression) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return o.PathHandling
+	return r.ID
 }
 
-func (o *RouteExpression) GetPreserveHost() *bool {
-	if o == nil {
+func (r *RouteExpression) GetName() *string {
+	if r == nil {
 		return nil
 	}
-	return o.PreserveHost
+	return r.Name
 }
 
-func (o *RouteExpression) GetPriority() *int64 {
-	if o == nil {
+func (r *RouteExpression) GetPathHandling() *RouteExpressionPathHandling {
+	if r == nil {
 		return nil
 	}
-	return o.Priority
+	return r.PathHandling
 }
 
-func (o *RouteExpression) GetProtocols() []RouteExpressionProtocols {
-	if o == nil {
+func (r *RouteExpression) GetPreserveHost() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Protocols
+	return r.PreserveHost
 }
 
-func (o *RouteExpression) GetRequestBuffering() *bool {
-	if o == nil {
+func (r *RouteExpression) GetPriority() *int64 {
+	if r == nil {
 		return nil
 	}
-	return o.RequestBuffering
+	return r.Priority
 }
 
-func (o *RouteExpression) GetResponseBuffering() *bool {
-	if o == nil {
+func (r *RouteExpression) GetProtocols() []RouteExpressionProtocols {
+	if r == nil {
 		return nil
 	}
-	return o.ResponseBuffering
+	return r.Protocols
 }
 
-func (o *RouteExpression) GetService() *RouteExpressionService {
-	if o == nil {
+func (r *RouteExpression) GetRequestBuffering() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.Service
+	return r.RequestBuffering
 }
 
-func (o *RouteExpression) GetStripPath() *bool {
-	if o == nil {
+func (r *RouteExpression) GetResponseBuffering() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.StripPath
+	return r.ResponseBuffering
 }
 
-func (o *RouteExpression) GetTags() []string {
-	if o == nil {
+func (r *RouteExpression) GetService() *RouteExpressionService {
+	if r == nil {
 		return nil
 	}
-	return o.Tags
+	return r.Service
 }
 
-func (o *RouteExpression) GetUpdatedAt() *int64 {
-	if o == nil {
+func (r *RouteExpression) GetStripPath() *bool {
+	if r == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return r.StripPath
+}
+
+func (r *RouteExpression) GetTags() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Tags
+}
+
+func (r *RouteExpression) GetUpdatedAt() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.UpdatedAt
 }

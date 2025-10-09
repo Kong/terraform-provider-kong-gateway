@@ -12,22 +12,22 @@ type AiProxyPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiProxyPluginAfter) GetAccess() []string {
-	if o == nil {
+func (a *AiProxyPluginAfter) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiProxyPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiProxyPluginBefore) GetAccess() []string {
-	if o == nil {
+func (a *AiProxyPluginBefore) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiProxyPluginOrdering struct {
@@ -35,45 +35,47 @@ type AiProxyPluginOrdering struct {
 	Before *AiProxyPluginBefore `json:"before,omitempty"`
 }
 
-func (o *AiProxyPluginOrdering) GetAfter() *AiProxyPluginAfter {
-	if o == nil {
+func (a *AiProxyPluginOrdering) GetAfter() *AiProxyPluginAfter {
+	if a == nil {
 		return nil
 	}
-	return o.After
+	return a.After
 }
 
-func (o *AiProxyPluginOrdering) GetBefore() *AiProxyPluginBefore {
-	if o == nil {
+func (a *AiProxyPluginOrdering) GetBefore() *AiProxyPluginBefore {
+	if a == nil {
 		return nil
 	}
-	return o.Before
+	return a.Before
 }
 
 type AiProxyPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *AiProxyPluginPartials) GetID() *string {
-	if o == nil {
+func (a *AiProxyPluginPartials) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiProxyPluginPartials) GetName() *string {
-	if o == nil {
+func (a *AiProxyPluginPartials) GetName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Name
+	return a.Name
 }
 
-func (o *AiProxyPluginPartials) GetPath() *string {
-	if o == nil {
+func (a *AiProxyPluginPartials) GetPath() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Path
+	return a.Path
 }
 
 // ParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
@@ -134,111 +136,149 @@ type Auth struct {
 	ParamValue *string `json:"param_value,omitempty"`
 }
 
-func (o *Auth) GetAllowOverride() *bool {
-	if o == nil {
+func (a *Auth) GetAllowOverride() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.AllowOverride
+	return a.AllowOverride
 }
 
-func (o *Auth) GetAwsAccessKeyID() *string {
-	if o == nil {
+func (a *Auth) GetAwsAccessKeyID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsAccessKeyID
+	return a.AwsAccessKeyID
 }
 
-func (o *Auth) GetAwsSecretAccessKey() *string {
-	if o == nil {
+func (a *Auth) GetAwsSecretAccessKey() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsSecretAccessKey
+	return a.AwsSecretAccessKey
 }
 
-func (o *Auth) GetAzureClientID() *string {
-	if o == nil {
+func (a *Auth) GetAzureClientID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureClientID
+	return a.AzureClientID
 }
 
-func (o *Auth) GetAzureClientSecret() *string {
-	if o == nil {
+func (a *Auth) GetAzureClientSecret() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureClientSecret
+	return a.AzureClientSecret
 }
 
-func (o *Auth) GetAzureTenantID() *string {
-	if o == nil {
+func (a *Auth) GetAzureTenantID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureTenantID
+	return a.AzureTenantID
 }
 
-func (o *Auth) GetAzureUseManagedIdentity() *bool {
-	if o == nil {
+func (a *Auth) GetAzureUseManagedIdentity() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.AzureUseManagedIdentity
+	return a.AzureUseManagedIdentity
 }
 
-func (o *Auth) GetGcpServiceAccountJSON() *string {
-	if o == nil {
+func (a *Auth) GetGcpServiceAccountJSON() *string {
+	if a == nil {
 		return nil
 	}
-	return o.GcpServiceAccountJSON
+	return a.GcpServiceAccountJSON
 }
 
-func (o *Auth) GetGcpUseServiceAccount() *bool {
-	if o == nil {
+func (a *Auth) GetGcpUseServiceAccount() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.GcpUseServiceAccount
+	return a.GcpUseServiceAccount
 }
 
-func (o *Auth) GetHeaderName() *string {
-	if o == nil {
+func (a *Auth) GetHeaderName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HeaderName
+	return a.HeaderName
 }
 
-func (o *Auth) GetHeaderValue() *string {
-	if o == nil {
+func (a *Auth) GetHeaderValue() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HeaderValue
+	return a.HeaderValue
 }
 
-func (o *Auth) GetParamLocation() *ParamLocation {
-	if o == nil {
+func (a *Auth) GetParamLocation() *ParamLocation {
+	if a == nil {
 		return nil
 	}
-	return o.ParamLocation
+	return a.ParamLocation
 }
 
-func (o *Auth) GetParamName() *string {
-	if o == nil {
+func (a *Auth) GetParamName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ParamName
+	return a.ParamName
 }
 
-func (o *Auth) GetParamValue() *string {
-	if o == nil {
+func (a *Auth) GetParamValue() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ParamValue
+	return a.ParamValue
+}
+
+// AiProxyPluginGenaiCategory - Generative AI category of the request
+type AiProxyPluginGenaiCategory string
+
+const (
+	AiProxyPluginGenaiCategoryAudioSpeech        AiProxyPluginGenaiCategory = "audio/speech"
+	AiProxyPluginGenaiCategoryAudioTranscription AiProxyPluginGenaiCategory = "audio/transcription"
+	AiProxyPluginGenaiCategoryImageGeneration    AiProxyPluginGenaiCategory = "image/generation"
+	AiProxyPluginGenaiCategoryTextEmbeddings     AiProxyPluginGenaiCategory = "text/embeddings"
+	AiProxyPluginGenaiCategoryTextGeneration     AiProxyPluginGenaiCategory = "text/generation"
+)
+
+func (e AiProxyPluginGenaiCategory) ToPointer() *AiProxyPluginGenaiCategory {
+	return &e
+}
+func (e *AiProxyPluginGenaiCategory) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "audio/speech":
+		fallthrough
+	case "audio/transcription":
+		fallthrough
+	case "image/generation":
+		fallthrough
+	case "text/embeddings":
+		fallthrough
+	case "text/generation":
+		*e = AiProxyPluginGenaiCategory(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiProxyPluginGenaiCategory: %v", v)
+	}
 }
 
 // AiProxyPluginLlmFormat - LLM input and output format and schema to use
 type AiProxyPluginLlmFormat string
 
 const (
-	AiProxyPluginLlmFormatBedrock AiProxyPluginLlmFormat = "bedrock"
-	AiProxyPluginLlmFormatGemini  AiProxyPluginLlmFormat = "gemini"
-	AiProxyPluginLlmFormatOpenai  AiProxyPluginLlmFormat = "openai"
+	AiProxyPluginLlmFormatBedrock     AiProxyPluginLlmFormat = "bedrock"
+	AiProxyPluginLlmFormatCohere      AiProxyPluginLlmFormat = "cohere"
+	AiProxyPluginLlmFormatGemini      AiProxyPluginLlmFormat = "gemini"
+	AiProxyPluginLlmFormatHuggingface AiProxyPluginLlmFormat = "huggingface"
+	AiProxyPluginLlmFormatOpenai      AiProxyPluginLlmFormat = "openai"
 )
 
 func (e AiProxyPluginLlmFormat) ToPointer() *AiProxyPluginLlmFormat {
@@ -252,7 +292,11 @@ func (e *AiProxyPluginLlmFormat) UnmarshalJSON(data []byte) error {
 	switch v {
 	case "bedrock":
 		fallthrough
+	case "cohere":
+		fallthrough
 	case "gemini":
+		fallthrough
+	case "huggingface":
 		fallthrough
 	case "openai":
 		*e = AiProxyPluginLlmFormat(v)
@@ -262,25 +306,25 @@ func (e *AiProxyPluginLlmFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type Logging struct {
+type AiProxyPluginLogging struct {
 	// If enabled, will log the request and response body into the Kong log plugin(s) output.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
 	// If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
 	LogStatistics *bool `json:"log_statistics,omitempty"`
 }
 
-func (o *Logging) GetLogPayloads() *bool {
-	if o == nil {
+func (a *AiProxyPluginLogging) GetLogPayloads() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.LogPayloads
+	return a.LogPayloads
 }
 
-func (o *Logging) GetLogStatistics() *bool {
-	if o == nil {
+func (a *AiProxyPluginLogging) GetLogStatistics() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.LogStatistics
+	return a.LogStatistics
 }
 
 type Bedrock struct {
@@ -292,64 +336,148 @@ type Bedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
+	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
+	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
 }
 
-func (o *Bedrock) GetAwsAssumeRoleArn() *string {
-	if o == nil {
+func (b *Bedrock) GetAwsAssumeRoleArn() *string {
+	if b == nil {
 		return nil
 	}
-	return o.AwsAssumeRoleArn
+	return b.AwsAssumeRoleArn
 }
 
-func (o *Bedrock) GetAwsRegion() *string {
-	if o == nil {
+func (b *Bedrock) GetAwsRegion() *string {
+	if b == nil {
 		return nil
 	}
-	return o.AwsRegion
+	return b.AwsRegion
 }
 
-func (o *Bedrock) GetAwsRoleSessionName() *string {
-	if o == nil {
+func (b *Bedrock) GetAwsRoleSessionName() *string {
+	if b == nil {
 		return nil
 	}
-	return o.AwsRoleSessionName
+	return b.AwsRoleSessionName
 }
 
-func (o *Bedrock) GetAwsStsEndpointURL() *string {
-	if o == nil {
+func (b *Bedrock) GetAwsStsEndpointURL() *string {
+	if b == nil {
 		return nil
 	}
-	return o.AwsStsEndpointURL
+	return b.AwsStsEndpointURL
+}
+
+func (b *Bedrock) GetEmbeddingsNormalize() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.EmbeddingsNormalize
+}
+
+func (b *Bedrock) GetPerformanceConfigLatency() *string {
+	if b == nil {
+		return nil
+	}
+	return b.PerformanceConfigLatency
+}
+
+// EmbeddingInputType - The purpose of the input text to calculate embedding vectors.
+type EmbeddingInputType string
+
+const (
+	EmbeddingInputTypeClassification EmbeddingInputType = "classification"
+	EmbeddingInputTypeClustering     EmbeddingInputType = "clustering"
+	EmbeddingInputTypeImage          EmbeddingInputType = "image"
+	EmbeddingInputTypeSearchDocument EmbeddingInputType = "search_document"
+	EmbeddingInputTypeSearchQuery    EmbeddingInputType = "search_query"
+)
+
+func (e EmbeddingInputType) ToPointer() *EmbeddingInputType {
+	return &e
+}
+func (e *EmbeddingInputType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "classification":
+		fallthrough
+	case "clustering":
+		fallthrough
+	case "image":
+		fallthrough
+	case "search_document":
+		fallthrough
+	case "search_query":
+		*e = EmbeddingInputType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for EmbeddingInputType: %v", v)
+	}
+}
+
+type Cohere struct {
+	// The purpose of the input text to calculate embedding vectors.
+	EmbeddingInputType *EmbeddingInputType `json:"embedding_input_type,omitempty"`
+	// Wait for the model if it is not ready
+	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (c *Cohere) GetEmbeddingInputType() *EmbeddingInputType {
+	if c == nil {
+		return nil
+	}
+	return c.EmbeddingInputType
+}
+
+func (c *Cohere) GetWaitForModel() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.WaitForModel
 }
 
 type Gemini struct {
 	// If running Gemini on Vertex, specify the regional API endpoint (hostname only).
 	APIEndpoint *string `json:"api_endpoint,omitempty"`
+	// If running Gemini on Vertex Model Garden, specify the endpoint ID.
+	EndpointID *string `json:"endpoint_id,omitempty"`
 	// If running Gemini on Vertex, specify the location ID.
 	LocationID *string `json:"location_id,omitempty"`
 	// If running Gemini on Vertex, specify the project ID.
 	ProjectID *string `json:"project_id,omitempty"`
 }
 
-func (o *Gemini) GetAPIEndpoint() *string {
-	if o == nil {
+func (g *Gemini) GetAPIEndpoint() *string {
+	if g == nil {
 		return nil
 	}
-	return o.APIEndpoint
+	return g.APIEndpoint
 }
 
-func (o *Gemini) GetLocationID() *string {
-	if o == nil {
+func (g *Gemini) GetEndpointID() *string {
+	if g == nil {
 		return nil
 	}
-	return o.LocationID
+	return g.EndpointID
 }
 
-func (o *Gemini) GetProjectID() *string {
-	if o == nil {
+func (g *Gemini) GetLocationID() *string {
+	if g == nil {
 		return nil
 	}
-	return o.ProjectID
+	return g.LocationID
+}
+
+func (g *Gemini) GetProjectID() *string {
+	if g == nil {
+		return nil
+	}
+	return g.ProjectID
 }
 
 type Huggingface struct {
@@ -359,18 +487,18 @@ type Huggingface struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
-func (o *Huggingface) GetUseCache() *bool {
-	if o == nil {
+func (h *Huggingface) GetUseCache() *bool {
+	if h == nil {
 		return nil
 	}
-	return o.UseCache
+	return h.UseCache
 }
 
-func (o *Huggingface) GetWaitForModel() *bool {
-	if o == nil {
+func (h *Huggingface) GetWaitForModel() *bool {
+	if h == nil {
 		return nil
 	}
-	return o.WaitForModel
+	return h.WaitForModel
 }
 
 // Llama2Format - If using llama2 provider, select the upstream message format.
@@ -439,10 +567,13 @@ type OptionsObj struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string      `json:"azure_instance,omitempty"`
-	Bedrock       *Bedrock     `json:"bedrock,omitempty"`
-	Gemini        *Gemini      `json:"gemini,omitempty"`
-	Huggingface   *Huggingface `json:"huggingface,omitempty"`
+	AzureInstance *string  `json:"azure_instance,omitempty"`
+	Bedrock       *Bedrock `json:"bedrock,omitempty"`
+	Cohere        *Cohere  `json:"cohere,omitempty"`
+	// If using embeddings models, set the number of dimensions to generate.
+	EmbeddingsDimensions *int64       `json:"embeddings_dimensions,omitempty"`
+	Gemini               *Gemini      `json:"gemini,omitempty"`
+	Huggingface          *Huggingface `json:"huggingface,omitempty"`
 	// Defines the cost per 1M tokens in your prompt.
 	InputCost *float64 `json:"input_cost,omitempty"`
 	// If using llama2 provider, select the upstream message format.
@@ -498,6 +629,20 @@ func (o *OptionsObj) GetBedrock() *Bedrock {
 		return nil
 	}
 	return o.Bedrock
+}
+
+func (o *OptionsObj) GetCohere() *Cohere {
+	if o == nil {
+		return nil
+	}
+	return o.Cohere
+}
+
+func (o *OptionsObj) GetEmbeddingsDimensions() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.EmbeddingsDimensions
 }
 
 func (o *OptionsObj) GetGemini() *Gemini {
@@ -638,28 +783,28 @@ type Model struct {
 	// Key/value settings for the model
 	Options *OptionsObj `json:"options,omitempty"`
 	// AI provider request format - Kong translates requests to and from the specified backend compatible formats.
-	Provider *Provider `json:"provider,omitempty"`
+	Provider Provider `json:"provider"`
 }
 
-func (o *Model) GetName() *string {
-	if o == nil {
+func (m *Model) GetName() *string {
+	if m == nil {
 		return nil
 	}
-	return o.Name
+	return m.Name
 }
 
-func (o *Model) GetOptions() *OptionsObj {
-	if o == nil {
+func (m *Model) GetOptions() *OptionsObj {
+	if m == nil {
 		return nil
 	}
-	return o.Options
+	return m.Options
 }
 
-func (o *Model) GetProvider() *Provider {
-	if o == nil {
-		return nil
+func (m *Model) GetProvider() Provider {
+	if m == nil {
+		return Provider("")
 	}
-	return o.Provider
+	return m.Provider
 }
 
 // ResponseStreaming - Whether to 'optionally allow', 'deny', or 'always' (force) the streaming of answers via server sent events.
@@ -692,13 +837,24 @@ func (e *ResponseStreaming) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// RouteType - The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation.
+// RouteType - The model's operation implementation, for this provider.
 type RouteType string
 
 const (
-	RouteTypeLlmV1Chat        RouteType = "llm/v1/chat"
-	RouteTypeLlmV1Completions RouteType = "llm/v1/completions"
-	RouteTypePreserve         RouteType = "preserve"
+	RouteTypeAudioV1AudioSpeech         RouteType = "audio/v1/audio/speech"
+	RouteTypeAudioV1AudioTranscriptions RouteType = "audio/v1/audio/transcriptions"
+	RouteTypeAudioV1AudioTranslations   RouteType = "audio/v1/audio/translations"
+	RouteTypeImageV1ImagesEdits         RouteType = "image/v1/images/edits"
+	RouteTypeImageV1ImagesGenerations   RouteType = "image/v1/images/generations"
+	RouteTypeLlmV1Assistants            RouteType = "llm/v1/assistants"
+	RouteTypeLlmV1Batches               RouteType = "llm/v1/batches"
+	RouteTypeLlmV1Chat                  RouteType = "llm/v1/chat"
+	RouteTypeLlmV1Completions           RouteType = "llm/v1/completions"
+	RouteTypeLlmV1Embeddings            RouteType = "llm/v1/embeddings"
+	RouteTypeLlmV1Files                 RouteType = "llm/v1/files"
+	RouteTypeLlmV1Responses             RouteType = "llm/v1/responses"
+	RouteTypePreserve                   RouteType = "preserve"
+	RouteTypeRealtimeV1Realtime         RouteType = "realtime/v1/realtime"
 )
 
 func (e RouteType) ToPointer() *RouteType {
@@ -710,11 +866,33 @@ func (e *RouteType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "audio/v1/audio/speech":
+		fallthrough
+	case "audio/v1/audio/transcriptions":
+		fallthrough
+	case "audio/v1/audio/translations":
+		fallthrough
+	case "image/v1/images/edits":
+		fallthrough
+	case "image/v1/images/generations":
+		fallthrough
+	case "llm/v1/assistants":
+		fallthrough
+	case "llm/v1/batches":
+		fallthrough
 	case "llm/v1/chat":
 		fallthrough
 	case "llm/v1/completions":
 		fallthrough
+	case "llm/v1/embeddings":
+		fallthrough
+	case "llm/v1/files":
+		fallthrough
+	case "llm/v1/responses":
+		fallthrough
 	case "preserve":
+		fallthrough
+	case "realtime/v1/realtime":
 		*e = RouteType(v)
 		return nil
 	default:
@@ -724,74 +902,83 @@ func (e *RouteType) UnmarshalJSON(data []byte) error {
 
 type AiProxyPluginConfig struct {
 	Auth *Auth `json:"auth,omitempty"`
+	// Generative AI category of the request
+	GenaiCategory *AiProxyPluginGenaiCategory `json:"genai_category,omitempty"`
 	// LLM input and output format and schema to use
 	LlmFormat *AiProxyPluginLlmFormat `json:"llm_format,omitempty"`
-	Logging   *Logging                `json:"logging,omitempty"`
-	// max allowed body size allowed to be introspected
+	Logging   *AiProxyPluginLogging   `json:"logging,omitempty"`
+	// max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
-	Model              *Model `json:"model,omitempty"`
+	Model              Model  `json:"model"`
 	// Display the model name selected in the X-Kong-LLM-Model response header
 	ModelNameHeader *bool `json:"model_name_header,omitempty"`
 	// Whether to 'optionally allow', 'deny', or 'always' (force) the streaming of answers via server sent events.
 	ResponseStreaming *ResponseStreaming `json:"response_streaming,omitempty"`
-	// The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation.
-	RouteType *RouteType `json:"route_type,omitempty"`
+	// The model's operation implementation, for this provider.
+	RouteType RouteType `json:"route_type"`
 }
 
-func (o *AiProxyPluginConfig) GetAuth() *Auth {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetAuth() *Auth {
+	if a == nil {
 		return nil
 	}
-	return o.Auth
+	return a.Auth
 }
 
-func (o *AiProxyPluginConfig) GetLlmFormat() *AiProxyPluginLlmFormat {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetGenaiCategory() *AiProxyPluginGenaiCategory {
+	if a == nil {
 		return nil
 	}
-	return o.LlmFormat
+	return a.GenaiCategory
 }
 
-func (o *AiProxyPluginConfig) GetLogging() *Logging {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetLlmFormat() *AiProxyPluginLlmFormat {
+	if a == nil {
 		return nil
 	}
-	return o.Logging
+	return a.LlmFormat
 }
 
-func (o *AiProxyPluginConfig) GetMaxRequestBodySize() *int64 {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetLogging() *AiProxyPluginLogging {
+	if a == nil {
 		return nil
 	}
-	return o.MaxRequestBodySize
+	return a.Logging
 }
 
-func (o *AiProxyPluginConfig) GetModel() *Model {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetMaxRequestBodySize() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.Model
+	return a.MaxRequestBodySize
 }
 
-func (o *AiProxyPluginConfig) GetModelNameHeader() *bool {
-	if o == nil {
-		return nil
+func (a *AiProxyPluginConfig) GetModel() Model {
+	if a == nil {
+		return Model{}
 	}
-	return o.ModelNameHeader
+	return a.Model
 }
 
-func (o *AiProxyPluginConfig) GetResponseStreaming() *ResponseStreaming {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetModelNameHeader() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.ResponseStreaming
+	return a.ModelNameHeader
 }
 
-func (o *AiProxyPluginConfig) GetRouteType() *RouteType {
-	if o == nil {
+func (a *AiProxyPluginConfig) GetResponseStreaming() *ResponseStreaming {
+	if a == nil {
 		return nil
 	}
-	return o.RouteType
+	return a.ResponseStreaming
+}
+
+func (a *AiProxyPluginConfig) GetRouteType() RouteType {
+	if a == nil {
+		return RouteType("")
+	}
+	return a.RouteType
 }
 
 // AiProxyPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -799,11 +986,11 @@ type AiProxyPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiProxyPluginConsumer) GetID() *string {
-	if o == nil {
+func (a *AiProxyPluginConsumer) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiProxyPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -811,11 +998,11 @@ type AiProxyPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiProxyPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (a *AiProxyPluginConsumerGroup) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 type AiProxyPluginProtocols string
@@ -825,6 +1012,8 @@ const (
 	AiProxyPluginProtocolsGrpcs AiProxyPluginProtocols = "grpcs"
 	AiProxyPluginProtocolsHTTP  AiProxyPluginProtocols = "http"
 	AiProxyPluginProtocolsHTTPS AiProxyPluginProtocols = "https"
+	AiProxyPluginProtocolsWs    AiProxyPluginProtocols = "ws"
+	AiProxyPluginProtocolsWss   AiProxyPluginProtocols = "wss"
 )
 
 func (e AiProxyPluginProtocols) ToPointer() *AiProxyPluginProtocols {
@@ -843,6 +1032,10 @@ func (e *AiProxyPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
+		fallthrough
+	case "ws":
+		fallthrough
+	case "wss":
 		*e = AiProxyPluginProtocols(v)
 		return nil
 	default:
@@ -855,11 +1048,11 @@ type AiProxyPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiProxyPluginRoute) GetID() *string {
-	if o == nil {
+func (a *AiProxyPluginRoute) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiProxyPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -867,11 +1060,11 @@ type AiProxyPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiProxyPluginService) GetID() *string {
-	if o == nil {
+func (a *AiProxyPluginService) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -879,22 +1072,25 @@ type AiProxyPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"ai-proxy" json:"name"`
-	Ordering     *AiProxyPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []AiProxyPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"ai-proxy" json:"name"`
+	Ordering     *AiProxyPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []AiProxyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *AiProxyPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64              `json:"updated_at,omitempty"`
+	Config    AiProxyPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *AiProxyPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *AiProxyPluginConsumerGroup `json:"consumer_group,omitempty"`
-	// A set of strings representing HTTP protocols.
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []AiProxyPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *AiProxyPluginRoute `json:"route,omitempty"`
@@ -907,110 +1103,110 @@ func (a AiProxyPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiProxyPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *AiProxyPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *AiProxyPlugin) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.CreatedAt
 }
 
-func (o *AiProxyPlugin) GetEnabled() *bool {
-	if o == nil {
+func (a *AiProxyPlugin) GetEnabled() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.Enabled
+	return a.Enabled
 }
 
-func (o *AiProxyPlugin) GetID() *string {
-	if o == nil {
+func (a *AiProxyPlugin) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiProxyPlugin) GetInstanceName() *string {
-	if o == nil {
+func (a *AiProxyPlugin) GetInstanceName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.InstanceName
+	return a.InstanceName
 }
 
-func (o *AiProxyPlugin) GetName() string {
+func (a *AiProxyPlugin) GetName() string {
 	return "ai-proxy"
 }
 
-func (o *AiProxyPlugin) GetOrdering() *AiProxyPluginOrdering {
-	if o == nil {
+func (a *AiProxyPlugin) GetOrdering() *AiProxyPluginOrdering {
+	if a == nil {
 		return nil
 	}
-	return o.Ordering
+	return a.Ordering
 }
 
-func (o *AiProxyPlugin) GetPartials() []AiProxyPluginPartials {
-	if o == nil {
+func (a *AiProxyPlugin) GetPartials() []AiProxyPluginPartials {
+	if a == nil {
 		return nil
 	}
-	return o.Partials
+	return a.Partials
 }
 
-func (o *AiProxyPlugin) GetTags() []string {
-	if o == nil {
+func (a *AiProxyPlugin) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Tags
 }
 
-func (o *AiProxyPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (a *AiProxyPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return a.UpdatedAt
 }
 
-func (o *AiProxyPlugin) GetConfig() *AiProxyPluginConfig {
-	if o == nil {
-		return nil
+func (a *AiProxyPlugin) GetConfig() AiProxyPluginConfig {
+	if a == nil {
+		return AiProxyPluginConfig{}
 	}
-	return o.Config
+	return a.Config
 }
 
-func (o *AiProxyPlugin) GetConsumer() *AiProxyPluginConsumer {
-	if o == nil {
+func (a *AiProxyPlugin) GetConsumer() *AiProxyPluginConsumer {
+	if a == nil {
 		return nil
 	}
-	return o.Consumer
+	return a.Consumer
 }
 
-func (o *AiProxyPlugin) GetConsumerGroup() *AiProxyPluginConsumerGroup {
-	if o == nil {
+func (a *AiProxyPlugin) GetConsumerGroup() *AiProxyPluginConsumerGroup {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return a.ConsumerGroup
 }
 
-func (o *AiProxyPlugin) GetProtocols() []AiProxyPluginProtocols {
-	if o == nil {
+func (a *AiProxyPlugin) GetProtocols() []AiProxyPluginProtocols {
+	if a == nil {
 		return nil
 	}
-	return o.Protocols
+	return a.Protocols
 }
 
-func (o *AiProxyPlugin) GetRoute() *AiProxyPluginRoute {
-	if o == nil {
+func (a *AiProxyPlugin) GetRoute() *AiProxyPluginRoute {
+	if a == nil {
 		return nil
 	}
-	return o.Route
+	return a.Route
 }
 
-func (o *AiProxyPlugin) GetService() *AiProxyPluginService {
-	if o == nil {
+func (a *AiProxyPlugin) GetService() *AiProxyPluginService {
+	if a == nil {
 		return nil
 	}
-	return o.Service
+	return a.Service
 }

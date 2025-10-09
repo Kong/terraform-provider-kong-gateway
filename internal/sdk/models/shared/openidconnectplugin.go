@@ -50,7 +50,9 @@ func (o *OpenidConnectPluginOrdering) GetBefore() *OpenidConnectPluginBefore {
 }
 
 type OpenidConnectPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
@@ -188,28 +190,28 @@ func (e *BearerTokenParamType) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type ClientAlg string
+type OpenidConnectPluginClientAlg string
 
 const (
-	ClientAlgEs256 ClientAlg = "ES256"
-	ClientAlgEs384 ClientAlg = "ES384"
-	ClientAlgEs512 ClientAlg = "ES512"
-	ClientAlgEdDsa ClientAlg = "EdDSA"
-	ClientAlgHs256 ClientAlg = "HS256"
-	ClientAlgHs384 ClientAlg = "HS384"
-	ClientAlgHs512 ClientAlg = "HS512"
-	ClientAlgPs256 ClientAlg = "PS256"
-	ClientAlgPs384 ClientAlg = "PS384"
-	ClientAlgPs512 ClientAlg = "PS512"
-	ClientAlgRs256 ClientAlg = "RS256"
-	ClientAlgRs384 ClientAlg = "RS384"
-	ClientAlgRs512 ClientAlg = "RS512"
+	OpenidConnectPluginClientAlgEs256 OpenidConnectPluginClientAlg = "ES256"
+	OpenidConnectPluginClientAlgEs384 OpenidConnectPluginClientAlg = "ES384"
+	OpenidConnectPluginClientAlgEs512 OpenidConnectPluginClientAlg = "ES512"
+	OpenidConnectPluginClientAlgEdDsa OpenidConnectPluginClientAlg = "EdDSA"
+	OpenidConnectPluginClientAlgHs256 OpenidConnectPluginClientAlg = "HS256"
+	OpenidConnectPluginClientAlgHs384 OpenidConnectPluginClientAlg = "HS384"
+	OpenidConnectPluginClientAlgHs512 OpenidConnectPluginClientAlg = "HS512"
+	OpenidConnectPluginClientAlgPs256 OpenidConnectPluginClientAlg = "PS256"
+	OpenidConnectPluginClientAlgPs384 OpenidConnectPluginClientAlg = "PS384"
+	OpenidConnectPluginClientAlgPs512 OpenidConnectPluginClientAlg = "PS512"
+	OpenidConnectPluginClientAlgRs256 OpenidConnectPluginClientAlg = "RS256"
+	OpenidConnectPluginClientAlgRs384 OpenidConnectPluginClientAlg = "RS384"
+	OpenidConnectPluginClientAlgRs512 OpenidConnectPluginClientAlg = "RS512"
 )
 
-func (e ClientAlg) ToPointer() *ClientAlg {
+func (e OpenidConnectPluginClientAlg) ToPointer() *OpenidConnectPluginClientAlg {
 	return &e
 }
-func (e *ClientAlg) UnmarshalJSON(data []byte) error {
+func (e *OpenidConnectPluginClientAlg) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -240,29 +242,29 @@ func (e *ClientAlg) UnmarshalJSON(data []byte) error {
 	case "RS384":
 		fallthrough
 	case "RS512":
-		*e = ClientAlg(v)
+		*e = OpenidConnectPluginClientAlg(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for ClientAlg: %v", v)
+		return fmt.Errorf("invalid value for OpenidConnectPluginClientAlg: %v", v)
 	}
 }
 
-type ClientAuth string
+type OpenidConnectPluginClientAuth string
 
 const (
-	ClientAuthClientSecretBasic       ClientAuth = "client_secret_basic"
-	ClientAuthClientSecretJwt         ClientAuth = "client_secret_jwt"
-	ClientAuthClientSecretPost        ClientAuth = "client_secret_post"
-	ClientAuthNone                    ClientAuth = "none"
-	ClientAuthPrivateKeyJwt           ClientAuth = "private_key_jwt"
-	ClientAuthSelfSignedTLSClientAuth ClientAuth = "self_signed_tls_client_auth"
-	ClientAuthTLSClientAuth           ClientAuth = "tls_client_auth"
+	OpenidConnectPluginClientAuthClientSecretBasic       OpenidConnectPluginClientAuth = "client_secret_basic"
+	OpenidConnectPluginClientAuthClientSecretJwt         OpenidConnectPluginClientAuth = "client_secret_jwt"
+	OpenidConnectPluginClientAuthClientSecretPost        OpenidConnectPluginClientAuth = "client_secret_post"
+	OpenidConnectPluginClientAuthNone                    OpenidConnectPluginClientAuth = "none"
+	OpenidConnectPluginClientAuthPrivateKeyJwt           OpenidConnectPluginClientAuth = "private_key_jwt"
+	OpenidConnectPluginClientAuthSelfSignedTLSClientAuth OpenidConnectPluginClientAuth = "self_signed_tls_client_auth"
+	OpenidConnectPluginClientAuthTLSClientAuth           OpenidConnectPluginClientAuth = "tls_client_auth"
 )
 
-func (e ClientAuth) ToPointer() *ClientAuth {
+func (e OpenidConnectPluginClientAuth) ToPointer() *OpenidConnectPluginClientAuth {
 	return &e
 }
-func (e *ClientAuth) UnmarshalJSON(data []byte) error {
+func (e *OpenidConnectPluginClientAuth) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -281,10 +283,10 @@ func (e *ClientAuth) UnmarshalJSON(data []byte) error {
 	case "self_signed_tls_client_auth":
 		fallthrough
 	case "tls_client_auth":
-		*e = ClientAuth(v)
+		*e = OpenidConnectPluginClientAuth(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for ClientAuth: %v", v)
+		return fmt.Errorf("invalid value for OpenidConnectPluginClientAuth: %v", v)
 	}
 }
 
@@ -345,179 +347,179 @@ type ClientJwk struct {
 	Y             *string  `json:"y,omitempty"`
 }
 
-func (o *ClientJwk) GetAlg() *string {
-	if o == nil {
+func (c *ClientJwk) GetAlg() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Alg
+	return c.Alg
 }
 
-func (o *ClientJwk) GetCrv() *string {
-	if o == nil {
+func (c *ClientJwk) GetCrv() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Crv
+	return c.Crv
 }
 
-func (o *ClientJwk) GetD() *string {
-	if o == nil {
+func (c *ClientJwk) GetD() *string {
+	if c == nil {
 		return nil
 	}
-	return o.D
+	return c.D
 }
 
-func (o *ClientJwk) GetDp() *string {
-	if o == nil {
+func (c *ClientJwk) GetDp() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Dp
+	return c.Dp
 }
 
-func (o *ClientJwk) GetDq() *string {
-	if o == nil {
+func (c *ClientJwk) GetDq() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Dq
+	return c.Dq
 }
 
-func (o *ClientJwk) GetE() *string {
-	if o == nil {
+func (c *ClientJwk) GetE() *string {
+	if c == nil {
 		return nil
 	}
-	return o.E
+	return c.E
 }
 
-func (o *ClientJwk) GetIssuer() *string {
-	if o == nil {
+func (c *ClientJwk) GetIssuer() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Issuer
+	return c.Issuer
 }
 
-func (o *ClientJwk) GetK() *string {
-	if o == nil {
+func (c *ClientJwk) GetK() *string {
+	if c == nil {
 		return nil
 	}
-	return o.K
+	return c.K
 }
 
-func (o *ClientJwk) GetKeyOps() []string {
-	if o == nil {
+func (c *ClientJwk) GetKeyOps() []string {
+	if c == nil {
 		return nil
 	}
-	return o.KeyOps
+	return c.KeyOps
 }
 
-func (o *ClientJwk) GetKid() *string {
-	if o == nil {
+func (c *ClientJwk) GetKid() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Kid
+	return c.Kid
 }
 
-func (o *ClientJwk) GetKty() *string {
-	if o == nil {
+func (c *ClientJwk) GetKty() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Kty
+	return c.Kty
 }
 
-func (o *ClientJwk) GetN() *string {
-	if o == nil {
+func (c *ClientJwk) GetN() *string {
+	if c == nil {
 		return nil
 	}
-	return o.N
+	return c.N
 }
 
-func (o *ClientJwk) GetOth() *string {
-	if o == nil {
+func (c *ClientJwk) GetOth() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Oth
+	return c.Oth
 }
 
-func (o *ClientJwk) GetP() *string {
-	if o == nil {
+func (c *ClientJwk) GetP() *string {
+	if c == nil {
 		return nil
 	}
-	return o.P
+	return c.P
 }
 
-func (o *ClientJwk) GetQ() *string {
-	if o == nil {
+func (c *ClientJwk) GetQ() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Q
+	return c.Q
 }
 
-func (o *ClientJwk) GetQi() *string {
-	if o == nil {
+func (c *ClientJwk) GetQi() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Qi
+	return c.Qi
 }
 
-func (o *ClientJwk) GetR() *string {
-	if o == nil {
+func (c *ClientJwk) GetR() *string {
+	if c == nil {
 		return nil
 	}
-	return o.R
+	return c.R
 }
 
-func (o *ClientJwk) GetT() *string {
-	if o == nil {
+func (c *ClientJwk) GetT() *string {
+	if c == nil {
 		return nil
 	}
-	return o.T
+	return c.T
 }
 
-func (o *ClientJwk) GetUse() *string {
-	if o == nil {
+func (c *ClientJwk) GetUse() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Use
+	return c.Use
 }
 
-func (o *ClientJwk) GetX() *string {
-	if o == nil {
+func (c *ClientJwk) GetX() *string {
+	if c == nil {
 		return nil
 	}
-	return o.X
+	return c.X
 }
 
-func (o *ClientJwk) GetX5c() []string {
-	if o == nil {
+func (c *ClientJwk) GetX5c() []string {
+	if c == nil {
 		return nil
 	}
-	return o.X5c
+	return c.X5c
 }
 
-func (o *ClientJwk) GetX5t() *string {
-	if o == nil {
+func (c *ClientJwk) GetX5t() *string {
+	if c == nil {
 		return nil
 	}
-	return o.X5t
+	return c.X5t
 }
 
-func (o *ClientJwk) GetX5tNumberS256() *string {
-	if o == nil {
+func (c *ClientJwk) GetX5tNumberS256() *string {
+	if c == nil {
 		return nil
 	}
-	return o.X5tNumberS256
+	return c.X5tNumberS256
 }
 
-func (o *ClientJwk) GetX5u() *string {
-	if o == nil {
+func (c *ClientJwk) GetX5u() *string {
+	if c == nil {
 		return nil
 	}
-	return o.X5u
+	return c.X5u
 }
 
-func (o *ClientJwk) GetY() *string {
-	if o == nil {
+func (c *ClientJwk) GetY() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Y
+	return c.Y
 }
 
 type OpenidConnectPluginClusterNodes struct {
@@ -637,151 +639,151 @@ type ClusterCacheRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *ClusterCacheRedis) GetClusterMaxRedirections() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetClusterMaxRedirections() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ClusterMaxRedirections
+	return c.ClusterMaxRedirections
 }
 
-func (o *ClusterCacheRedis) GetClusterNodes() []OpenidConnectPluginClusterNodes {
-	if o == nil {
+func (c *ClusterCacheRedis) GetClusterNodes() []OpenidConnectPluginClusterNodes {
+	if c == nil {
 		return nil
 	}
-	return o.ClusterNodes
+	return c.ClusterNodes
 }
 
-func (o *ClusterCacheRedis) GetConnectTimeout() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetConnectTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return c.ConnectTimeout
 }
 
-func (o *ClusterCacheRedis) GetConnectionIsProxied() *bool {
-	if o == nil {
+func (c *ClusterCacheRedis) GetConnectionIsProxied() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.ConnectionIsProxied
+	return c.ConnectionIsProxied
 }
 
-func (o *ClusterCacheRedis) GetDatabase() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetDatabase() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Database
+	return c.Database
 }
 
-func (o *ClusterCacheRedis) GetHost() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetHost() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Host
+	return c.Host
 }
 
-func (o *ClusterCacheRedis) GetKeepaliveBacklog() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetKeepaliveBacklog() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.KeepaliveBacklog
+	return c.KeepaliveBacklog
 }
 
-func (o *ClusterCacheRedis) GetKeepalivePoolSize() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetKeepalivePoolSize() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.KeepalivePoolSize
+	return c.KeepalivePoolSize
 }
 
-func (o *ClusterCacheRedis) GetPassword() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetPassword() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Password
+	return c.Password
 }
 
-func (o *ClusterCacheRedis) GetPort() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetPort() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Port
+	return c.Port
 }
 
-func (o *ClusterCacheRedis) GetReadTimeout() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetReadTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return c.ReadTimeout
 }
 
-func (o *ClusterCacheRedis) GetSendTimeout() *int64 {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSendTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.SendTimeout
+	return c.SendTimeout
 }
 
-func (o *ClusterCacheRedis) GetSentinelMaster() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSentinelMaster() *string {
+	if c == nil {
 		return nil
 	}
-	return o.SentinelMaster
+	return c.SentinelMaster
 }
 
-func (o *ClusterCacheRedis) GetSentinelNodes() []OpenidConnectPluginSentinelNodes {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSentinelNodes() []OpenidConnectPluginSentinelNodes {
+	if c == nil {
 		return nil
 	}
-	return o.SentinelNodes
+	return c.SentinelNodes
 }
 
-func (o *ClusterCacheRedis) GetSentinelPassword() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSentinelPassword() *string {
+	if c == nil {
 		return nil
 	}
-	return o.SentinelPassword
+	return c.SentinelPassword
 }
 
-func (o *ClusterCacheRedis) GetSentinelRole() *OpenidConnectPluginSentinelRole {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSentinelRole() *OpenidConnectPluginSentinelRole {
+	if c == nil {
 		return nil
 	}
-	return o.SentinelRole
+	return c.SentinelRole
 }
 
-func (o *ClusterCacheRedis) GetSentinelUsername() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSentinelUsername() *string {
+	if c == nil {
 		return nil
 	}
-	return o.SentinelUsername
+	return c.SentinelUsername
 }
 
-func (o *ClusterCacheRedis) GetServerName() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetServerName() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ServerName
+	return c.ServerName
 }
 
-func (o *ClusterCacheRedis) GetSsl() *bool {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSsl() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.Ssl
+	return c.Ssl
 }
 
-func (o *ClusterCacheRedis) GetSslVerify() *bool {
-	if o == nil {
+func (c *ClusterCacheRedis) GetSslVerify() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.SslVerify
+	return c.SslVerify
 }
 
-func (o *ClusterCacheRedis) GetUsername() *string {
-	if o == nil {
+func (c *ClusterCacheRedis) GetUsername() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Username
+	return c.Username
 }
 
 // ClusterCacheStrategy - The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared.
@@ -1723,6 +1725,35 @@ func (e *RevocationEndpointAuthMethod) UnmarshalJSON(data []byte) error {
 	}
 }
 
+type SessionBind string
+
+const (
+	SessionBindIP        SessionBind = "ip"
+	SessionBindScheme    SessionBind = "scheme"
+	SessionBindUserAgent SessionBind = "user-agent"
+)
+
+func (e SessionBind) ToPointer() *SessionBind {
+	return &e
+}
+func (e *SessionBind) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ip":
+		fallthrough
+	case "scheme":
+		fallthrough
+	case "user-agent":
+		*e = SessionBind(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for SessionBind: %v", v)
+	}
+}
+
 // SessionCookieSameSite - Controls whether a cookie is sent with cross-origin requests, providing some protection against cross-site request forgery attacks.
 type SessionCookieSameSite string
 
@@ -2036,11 +2067,11 @@ type OpenidConnectPluginConfig struct {
 	// If given, these claims are forbidden in the token payload.
 	ClaimsForbidden []string `json:"claims_forbidden,omitempty"`
 	// The algorithm to use for client_secret_jwt (only HS***) or private_key_jwt authentication.
-	ClientAlg []ClientAlg `json:"client_alg,omitempty"`
+	ClientAlg []OpenidConnectPluginClientAlg `json:"client_alg,omitempty"`
 	// The client to use for this request (the selection is made with a request parameter with the same name).
 	ClientArg *string `json:"client_arg,omitempty"`
 	// The default OpenID Connect client authentication method is 'client_secret_basic' (using 'Authorization: Basic' header), 'client_secret_post' (credentials in body), 'client_secret_jwt' (signed client assertion in body), 'private_key_jwt' (private key-signed assertion), 'tls_client_auth' (client certificate), 'self_signed_tls_client_auth' (self-signed client certificate), and 'none' (no authentication).
-	ClientAuth []ClientAuth `json:"client_auth,omitempty"`
+	ClientAuth []OpenidConnectPluginClientAuth `json:"client_auth,omitempty"`
 	// Where to look for the client credentials: - `header`: search the HTTP headers - `query`: search the URL's query string - `body`: search from the HTTP request body.
 	ClientCredentialsParamType []ClientCredentialsParamType `json:"client_credentials_param_type,omitempty"`
 	// The client id(s) that the plugin uses when it calls authenticated endpoints on the identity provider.
@@ -2056,6 +2087,10 @@ type OpenidConnectPluginConfig struct {
 	ConsumerBy []OpenidConnectPluginConsumerBy `json:"consumer_by,omitempty"`
 	// The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
 	ConsumerClaim []string `json:"consumer_claim,omitempty"`
+	// The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
+	ConsumerGroupsClaim []string `json:"consumer_groups_claim,omitempty"`
+	// Do not terminate the request if consumer groups mapping fails.
+	ConsumerGroupsOptional *bool `json:"consumer_groups_optional,omitempty"`
 	// Do not terminate the request if consumer mapping fails.
 	ConsumerOptional *bool `json:"consumer_optional,omitempty"`
 	// The claim used to derive virtual credentials (e.g. to be consumed by the rate-limiting plugin), in case the consumer mapping is not used. If multiple values are set, it means the claim is inside a nested object of the token payload.
@@ -2163,7 +2198,7 @@ type OpenidConnectPluginConfig struct {
 	// Designate token's parameter name for introspection.
 	IntrospectionTokenParamName *string `json:"introspection_token_param_name,omitempty"`
 	// The discovery endpoint (or the issuer identifier). When there is no discovery endpoint, please also configure `config.using_pseudo_issuer=true`.
-	Issuer *string `json:"issuer,omitempty"`
+	Issuer string `json:"issuer"`
 	// The issuers allowed to be present in the tokens (`iss` claim).
 	IssuersAllowed []string `json:"issuers_allowed,omitempty"`
 	// The claim to match against the JWT session cookie.
@@ -2275,6 +2310,8 @@ type OpenidConnectPluginConfig struct {
 	SessionAbsoluteTimeout *float64 `json:"session_absolute_timeout,omitempty"`
 	// The session audience, which is the intended target application. For example `"my-application"`.
 	SessionAudience *string `json:"session_audience,omitempty"`
+	// Bind the session to data acquired from the HTTP request or connection.
+	SessionBind []SessionBind `json:"session_bind,omitempty"`
 	// The session cookie Domain flag.
 	SessionCookieDomain *string `json:"session_cookie_domain,omitempty"`
 	// Forbids JavaScript from accessing the cookie, for example, through the `Document.cookie` property.
@@ -2634,7 +2671,7 @@ func (o *OpenidConnectPluginConfig) GetClaimsForbidden() []string {
 	return o.ClaimsForbidden
 }
 
-func (o *OpenidConnectPluginConfig) GetClientAlg() []ClientAlg {
+func (o *OpenidConnectPluginConfig) GetClientAlg() []OpenidConnectPluginClientAlg {
 	if o == nil {
 		return nil
 	}
@@ -2648,7 +2685,7 @@ func (o *OpenidConnectPluginConfig) GetClientArg() *string {
 	return o.ClientArg
 }
 
-func (o *OpenidConnectPluginConfig) GetClientAuth() []ClientAuth {
+func (o *OpenidConnectPluginConfig) GetClientAuth() []OpenidConnectPluginClientAuth {
 	if o == nil {
 		return nil
 	}
@@ -2709,6 +2746,20 @@ func (o *OpenidConnectPluginConfig) GetConsumerClaim() []string {
 		return nil
 	}
 	return o.ConsumerClaim
+}
+
+func (o *OpenidConnectPluginConfig) GetConsumerGroupsClaim() []string {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroupsClaim
+}
+
+func (o *OpenidConnectPluginConfig) GetConsumerGroupsOptional() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.ConsumerGroupsOptional
 }
 
 func (o *OpenidConnectPluginConfig) GetConsumerOptional() *bool {
@@ -3082,9 +3133,9 @@ func (o *OpenidConnectPluginConfig) GetIntrospectionTokenParamName() *string {
 	return o.IntrospectionTokenParamName
 }
 
-func (o *OpenidConnectPluginConfig) GetIssuer() *string {
+func (o *OpenidConnectPluginConfig) GetIssuer() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.Issuer
 }
@@ -3472,6 +3523,13 @@ func (o *OpenidConnectPluginConfig) GetSessionAudience() *string {
 		return nil
 	}
 	return o.SessionAudience
+}
+
+func (o *OpenidConnectPluginConfig) GetSessionBind() []SessionBind {
+	if o == nil {
+		return nil
+	}
+	return o.SessionBind
 }
 
 func (o *OpenidConnectPluginConfig) GetSessionCookieDomain() *string {
@@ -4025,17 +4083,20 @@ type OpenidConnectPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                         `json:"enabled,omitempty"`
-	ID           *string                       `json:"id,omitempty"`
-	InstanceName *string                       `json:"instance_name,omitempty"`
-	name         string                        `const:"openid-connect" json:"name"`
-	Ordering     *OpenidConnectPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []OpenidConnectPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                      `json:"instance_name,omitempty"`
+	name         string                       `const:"openid-connect" json:"name"`
+	Ordering     *OpenidConnectPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []OpenidConnectPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                     `json:"updated_at,omitempty"`
-	Config    *OpenidConnectPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    OpenidConnectPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []OpenidConnectPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
@@ -4049,7 +4110,7 @@ func (o OpenidConnectPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpenidConnectPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
@@ -4115,9 +4176,9 @@ func (o *OpenidConnectPlugin) GetUpdatedAt() *int64 {
 	return o.UpdatedAt
 }
 
-func (o *OpenidConnectPlugin) GetConfig() *OpenidConnectPluginConfig {
+func (o *OpenidConnectPlugin) GetConfig() OpenidConnectPluginConfig {
 	if o == nil {
-		return nil
+		return OpenidConnectPluginConfig{}
 	}
 	return o.Config
 }

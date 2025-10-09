@@ -16,12 +16,12 @@ RouteExpression Resource
 resource "kong-gateway_route_expression" "my_routeexpression" {
   created_at                 = 8
   expression                 = "...my_expression..."
-  https_redirect_status_code = 308
+  https_redirect_status_code = 426
   id                         = "...my_id..."
   name                       = "...my_name..."
   path_handling              = "v1"
   preserve_host              = false
-  priority                   = 8
+  priority                   = 51884809308246
   protocols = [
     "tls"
   ]
@@ -35,6 +35,7 @@ resource "kong-gateway_route_expression" "my_routeexpression" {
     "..."
   ]
   updated_at = 7
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -45,11 +46,12 @@ resource "kong-gateway_route_expression" "my_routeexpression" {
 
 - `created_at` (Number) Unix epoch when the resource was created.
 - `expression` (String) Use Router Expression to perform route match. This option is only available when `router_flavor` is set to `expressions`.
-- `https_redirect_status_code` (Number) The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol. must be one of ["426", "301", "302", "307", "308"]
+- `https_redirect_status_code` (Number) The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is `HTTP` instead of `HTTPS`. `Location` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the `https` protocol. must be one of ["301", "302", "307", "308", "426"]
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `name` (String) The name of the Route. Route names must be unique, and they are case sensitive. For example, there can be two different Routes named "test" and "Test".
 - `path_handling` (String) Controls how the Service path, Route path and requested path are combined when sending a request to the upstream. See above for a detailed description of each behavior. must be one of ["v0", "v1"]
 - `preserve_host` (Boolean) When matching a Route via one of the `hosts` domain names, use the request `Host` header in the upstream request headers. If set to `false`, the upstream `Host` header will be that of the Service's `host`.
-- `priority` (Number)
+- `priority` (Number) A number used to specify the matching order for expression routes. The higher the `priority`, the sooner an route will be evaluated. This field is ignored unless `expression` field is set.
 - `protocols` (List of String) An array of the protocols this Route should allow. See the [Route Object](#route-object) section for a list of accepted protocols. When set to only `"https"`, HTTP requests are answered with an upgrade error. When set to only `"http"`, HTTPS requests are answered with an error.
 - `request_buffering` (Boolean) Whether to enable request body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that receive data with chunked transfer encoding.
 - `response_buffering` (Boolean) Whether to enable response body buffering or not. With HTTP 1.1, it may make sense to turn this off on services that send data with chunked transfer encoding.
@@ -57,10 +59,7 @@ resource "kong-gateway_route_expression" "my_routeexpression" {
 - `strip_path` (Boolean) When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.
 - `tags` (List of String) An optional set of strings associated with the Route for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--service"></a>
 ### Nested Schema for `service`
@@ -73,6 +72,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_route_expression.my_kong-gateway_route_expression
+  id = jsonencode({
+    id = "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_route_expression.my_kong-gateway_route_expression ""
+terraform import kong-gateway_route_expression.my_kong-gateway_route_expression '{"id": "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

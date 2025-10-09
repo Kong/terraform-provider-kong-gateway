@@ -11,6 +11,192 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, resp *shared.RouteJSON) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		if resp.Destinations != nil {
+			r.Destinations = []tfTypes.PartialRedisEeClusterNodes{}
+
+			for _, destinationsItem := range resp.Destinations {
+				var destinations tfTypes.PartialRedisEeClusterNodes
+
+				destinations.IP = types.StringPointerValue(destinationsItem.IP)
+				destinations.Port = types.Int64PointerValue(destinationsItem.Port)
+
+				r.Destinations = append(r.Destinations, destinations)
+			}
+		}
+		if resp.Headers != nil {
+			r.Headers = make(map[string][]types.String, len(resp.Headers))
+			for headersKey, headersValue := range resp.Headers {
+				var headersResult []types.String
+				headersResult = make([]types.String, 0, len(headersValue))
+				for _, v := range headersValue {
+					headersResult = append(headersResult, types.StringValue(v))
+				}
+
+				r.Headers[headersKey] = headersResult
+			}
+		}
+		if resp.Hosts != nil {
+			r.Hosts = make([]types.String, 0, len(resp.Hosts))
+			for _, v := range resp.Hosts {
+				r.Hosts = append(r.Hosts, types.StringValue(v))
+			}
+		}
+		if resp.HTTPSRedirectStatusCode != nil {
+			r.HTTPSRedirectStatusCode = types.Int64Value(int64(*resp.HTTPSRedirectStatusCode))
+		} else {
+			r.HTTPSRedirectStatusCode = types.Int64Null()
+		}
+		r.ID = types.StringPointerValue(resp.ID)
+		if resp.Methods != nil {
+			r.Methods = make([]types.String, 0, len(resp.Methods))
+			for _, v := range resp.Methods {
+				r.Methods = append(r.Methods, types.StringValue(v))
+			}
+		}
+		r.Name = types.StringPointerValue(resp.Name)
+		if resp.PathHandling != nil {
+			r.PathHandling = types.StringValue(string(*resp.PathHandling))
+		} else {
+			r.PathHandling = types.StringNull()
+		}
+		if resp.Paths != nil {
+			r.Paths = make([]types.String, 0, len(resp.Paths))
+			for _, v := range resp.Paths {
+				r.Paths = append(r.Paths, types.StringValue(v))
+			}
+		}
+		r.PreserveHost = types.BoolPointerValue(resp.PreserveHost)
+		if resp.Protocols != nil {
+			r.Protocols = make([]types.String, 0, len(resp.Protocols))
+			for _, v := range resp.Protocols {
+				r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+			}
+		}
+		r.RegexPriority = types.Int64PointerValue(resp.RegexPriority)
+		r.RequestBuffering = types.BoolPointerValue(resp.RequestBuffering)
+		r.ResponseBuffering = types.BoolPointerValue(resp.ResponseBuffering)
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Snis != nil {
+			r.Snis = make([]types.String, 0, len(resp.Snis))
+			for _, v := range resp.Snis {
+				r.Snis = append(r.Snis, types.StringValue(v))
+			}
+		}
+		if resp.Sources != nil {
+			r.Sources = []tfTypes.PartialRedisEeClusterNodes{}
+
+			for _, sourcesItem := range resp.Sources {
+				var sources tfTypes.PartialRedisEeClusterNodes
+
+				sources.IP = types.StringPointerValue(sourcesItem.IP)
+				sources.Port = types.Int64PointerValue(sourcesItem.Port)
+
+				r.Sources = append(r.Sources, sources)
+			}
+		}
+		r.StripPath = types.BoolPointerValue(resp.StripPath)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *RouteResourceModel) ToOperationsCreateRouteRequest(ctx context.Context) (*operations.CreateRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	routeJSON, routeJSONDiags := r.ToSharedRouteJSON(ctx)
+	diags.Append(routeJSONDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateRouteRequest{
+		Workspace: workspace,
+		RouteJSON: *routeJSON,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) ToOperationsDeleteRouteRequest(ctx context.Context) (*operations.DeleteRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteRouteRequest{
+		RouteIDOrName: routeIDOrName,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) ToOperationsGetRouteRequest(ctx context.Context) (*operations.GetRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetRouteRequest{
+		RouteIDOrName: routeIDOrName,
+		Workspace:     workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *RouteResourceModel) ToOperationsUpsertRouteRequest(ctx context.Context) (*operations.UpsertRouteRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var routeIDOrName string
+	routeIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	routeJSON, routeJSONDiags := r.ToSharedRouteJSON(ctx)
+	diags.Append(routeJSONDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertRouteRequest{
+		RouteIDOrName: routeIDOrName,
+		Workspace:     workspace,
+		RouteJSON:     *routeJSON,
+	}
+
+	return &out, diags
+}
+
 func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.RouteJSON, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -173,9 +359,12 @@ func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.Rou
 	} else {
 		stripPath = nil
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -208,165 +397,4 @@ func (r *RouteResourceModel) ToSharedRouteJSON(ctx context.Context) (*shared.Rou
 	}
 
 	return &out, diags
-}
-
-func (r *RouteResourceModel) ToOperationsUpsertRouteRequest(ctx context.Context) (*operations.UpsertRouteRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var routeIDOrName string
-	routeIDOrName = r.ID.ValueString()
-
-	routeJSON, routeJSONDiags := r.ToSharedRouteJSON(ctx)
-	diags.Append(routeJSONDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertRouteRequest{
-		RouteIDOrName: routeIDOrName,
-		RouteJSON:     *routeJSON,
-	}
-
-	return &out, diags
-}
-
-func (r *RouteResourceModel) ToOperationsGetRouteRequest(ctx context.Context) (*operations.GetRouteRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var routeIDOrName string
-	routeIDOrName = r.ID.ValueString()
-
-	out := operations.GetRouteRequest{
-		RouteIDOrName: routeIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *RouteResourceModel) ToOperationsDeleteRouteRequest(ctx context.Context) (*operations.DeleteRouteRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var routeIDOrName string
-	routeIDOrName = r.ID.ValueString()
-
-	out := operations.DeleteRouteRequest{
-		RouteIDOrName: routeIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *RouteResourceModel) RefreshFromSharedRouteJSON(ctx context.Context, resp *shared.RouteJSON) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		if resp.Destinations != nil {
-			r.Destinations = []tfTypes.AiProxyAdvancedPluginClusterNodes{}
-			if len(r.Destinations) > len(resp.Destinations) {
-				r.Destinations = r.Destinations[:len(resp.Destinations)]
-			}
-			for destinationsCount, destinationsItem := range resp.Destinations {
-				var destinations tfTypes.AiProxyAdvancedPluginClusterNodes
-				destinations.IP = types.StringPointerValue(destinationsItem.IP)
-				destinations.Port = types.Int64PointerValue(destinationsItem.Port)
-				if destinationsCount+1 > len(r.Destinations) {
-					r.Destinations = append(r.Destinations, destinations)
-				} else {
-					r.Destinations[destinationsCount].IP = destinations.IP
-					r.Destinations[destinationsCount].Port = destinations.Port
-				}
-			}
-		}
-		if resp.Headers != nil {
-			r.Headers = make(map[string][]types.String, len(resp.Headers))
-			for headersKey, headersValue := range resp.Headers {
-				var headersResult []types.String
-				headersResult = make([]types.String, 0, len(headersValue))
-				for _, v := range headersValue {
-					headersResult = append(headersResult, types.StringValue(v))
-				}
-
-				r.Headers[headersKey] = headersResult
-			}
-		}
-		if resp.Hosts != nil {
-			r.Hosts = make([]types.String, 0, len(resp.Hosts))
-			for _, v := range resp.Hosts {
-				r.Hosts = append(r.Hosts, types.StringValue(v))
-			}
-		}
-		if resp.HTTPSRedirectStatusCode != nil {
-			r.HTTPSRedirectStatusCode = types.Int64Value(int64(*resp.HTTPSRedirectStatusCode))
-		} else {
-			r.HTTPSRedirectStatusCode = types.Int64Null()
-		}
-		r.ID = types.StringPointerValue(resp.ID)
-		if resp.Methods != nil {
-			r.Methods = make([]types.String, 0, len(resp.Methods))
-			for _, v := range resp.Methods {
-				r.Methods = append(r.Methods, types.StringValue(v))
-			}
-		}
-		r.Name = types.StringPointerValue(resp.Name)
-		if resp.PathHandling != nil {
-			r.PathHandling = types.StringValue(string(*resp.PathHandling))
-		} else {
-			r.PathHandling = types.StringNull()
-		}
-		if resp.Paths != nil {
-			r.Paths = make([]types.String, 0, len(resp.Paths))
-			for _, v := range resp.Paths {
-				r.Paths = append(r.Paths, types.StringValue(v))
-			}
-		}
-		r.PreserveHost = types.BoolPointerValue(resp.PreserveHost)
-		if resp.Protocols != nil {
-			r.Protocols = make([]types.String, 0, len(resp.Protocols))
-			for _, v := range resp.Protocols {
-				r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-			}
-		}
-		r.RegexPriority = types.Int64PointerValue(resp.RegexPriority)
-		r.RequestBuffering = types.BoolPointerValue(resp.RequestBuffering)
-		r.ResponseBuffering = types.BoolPointerValue(resp.ResponseBuffering)
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		if resp.Snis != nil {
-			r.Snis = make([]types.String, 0, len(resp.Snis))
-			for _, v := range resp.Snis {
-				r.Snis = append(r.Snis, types.StringValue(v))
-			}
-		}
-		if resp.Sources != nil {
-			r.Sources = []tfTypes.AiProxyAdvancedPluginClusterNodes{}
-			if len(r.Sources) > len(resp.Sources) {
-				r.Sources = r.Sources[:len(resp.Sources)]
-			}
-			for sourcesCount, sourcesItem := range resp.Sources {
-				var sources tfTypes.AiProxyAdvancedPluginClusterNodes
-				sources.IP = types.StringPointerValue(sourcesItem.IP)
-				sources.Port = types.Int64PointerValue(sourcesItem.Port)
-				if sourcesCount+1 > len(r.Sources) {
-					r.Sources = append(r.Sources, sources)
-				} else {
-					r.Sources[sourcesCount].IP = sources.IP
-					r.Sources[sourcesCount].Port = sources.Port
-				}
-			}
-		}
-		r.StripPath = types.BoolPointerValue(resp.StripPath)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

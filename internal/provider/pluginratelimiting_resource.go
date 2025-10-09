@@ -3,13 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -34,20 +37,21 @@ type PluginRateLimitingResource struct {
 
 // PluginRateLimitingResourceModel describes the resource data model.
 type PluginRateLimitingResourceModel struct {
-	Config        *tfTypes.RateLimitingPluginConfig  `tfsdk:"config"`
-	Consumer      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
-	ConsumerGroup *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                        `tfsdk:"created_at"`
-	Enabled       types.Bool                         `tfsdk:"enabled"`
-	ID            types.String                       `tfsdk:"id"`
-	InstanceName  types.String                       `tfsdk:"instance_name"`
-	Ordering      *tfTypes.Ordering                  `tfsdk:"ordering"`
-	Partials      []tfTypes.Partials                 `tfsdk:"partials"`
-	Protocols     []types.String                     `tfsdk:"protocols"`
-	Route         *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
-	Service       *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	Tags          []types.String                     `tfsdk:"tags"`
-	UpdatedAt     types.Int64                        `tfsdk:"updated_at"`
+	Config        *tfTypes.RateLimitingPluginConfig `tfsdk:"config"`
+	Consumer      *tfTypes.Set                      `tfsdk:"consumer"`
+	ConsumerGroup *tfTypes.Set                      `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                       `tfsdk:"created_at"`
+	Enabled       types.Bool                        `tfsdk:"enabled"`
+	ID            types.String                      `tfsdk:"id"`
+	InstanceName  types.String                      `tfsdk:"instance_name"`
+	Ordering      *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
+	Partials      []tfTypes.AcePluginPartials       `tfsdk:"partials"`
+	Protocols     []types.String                    `tfsdk:"protocols"`
+	Route         *tfTypes.Set                      `tfsdk:"route"`
+	Service       *tfTypes.Set                      `tfsdk:"service"`
+	Tags          []types.String                    `tfsdk:"tags"`
+	UpdatedAt     types.Int64                       `tfsdk:"updated_at"`
+	Workspace     types.String                      `tfsdk:"workspace"`
 }
 
 func (r *PluginRateLimitingResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -248,12 +252,17 @@ func (r *PluginRateLimitingResource) Schema(ctx context.Context, req resource.Sc
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -292,12 +301,17 @@ func (r *PluginRateLimitingResource) Schema(ctx context.Context, req resource.Sc
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -305,8 +319,9 @@ func (r *PluginRateLimitingResource) Schema(ctx context.Context, req resource.Sc
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -344,6 +359,12 @@ func (r *PluginRateLimitingResource) Schema(ctx context.Context, req resource.Sc
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -387,7 +408,7 @@ func (r *PluginRateLimitingResource) Create(ctx context.Context, req resource.Cr
 		return
 	}
 
-	request, requestDiags := data.ToSharedRateLimitingPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateRatelimitingPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -587,5 +608,26 @@ func (r *PluginRateLimitingResource) Delete(ctx context.Context, req resource.De
 }
 
 func (r *PluginRateLimitingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

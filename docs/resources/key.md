@@ -30,6 +30,7 @@ resource "kong-gateway_key" "my_key" {
     "..."
   ]
   updated_at = 9
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   x5t        = "...my_x5t..."
 }
 ```
@@ -44,17 +45,15 @@ resource "kong-gateway_key" "my_key" {
 ### Optional
 
 - `created_at` (Number) Unix epoch when the resource was created.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `jwk` (String) A JSON Web Key represented as a string.
 - `name` (String) The name to associate with the given keys.
 - `pem` (Attributes) A keypair in PEM format. (see [below for nested schema](#nestedatt--pem))
 - `set` (Attributes) The id (an UUID) of the key-set with which to associate the key. (see [below for nested schema](#nestedatt--set))
 - `tags` (List of String) An optional set of strings associated with the Key for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `x5t` (String)
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `x5t` (String) X.509 certificate SHA-1 thumbprint.
 
 <a id="nestedatt--pem"></a>
 ### Nested Schema for `pem`
@@ -76,6 +75,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_key.my_kong-gateway_key
+  id = jsonencode({
+    id = "bba22c06-a632-42be-a018-1b9ff357b5b9"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_key.my_kong-gateway_key ""
+terraform import kong-gateway_key.my_kong-gateway_key '{"id": "bba22c06-a632-42be-a018-1b9ff357b5b9", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

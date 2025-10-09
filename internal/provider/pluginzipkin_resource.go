@@ -3,7 +3,9 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -11,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -36,19 +39,20 @@ type PluginZipkinResource struct {
 
 // PluginZipkinResourceModel describes the resource data model.
 type PluginZipkinResourceModel struct {
-	Config       *tfTypes.ZipkinPluginConfig        `tfsdk:"config"`
-	Consumer     *tfTypes.ACLWithoutParentsConsumer `tfsdk:"consumer"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Config       *tfTypes.ZipkinPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
+	CreatedAt    types.Int64                 `tfsdk:"created_at"`
+	Enabled      types.Bool                  `tfsdk:"enabled"`
+	ID           types.String                `tfsdk:"id"`
+	InstanceName types.String                `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Protocols    []types.String              `tfsdk:"protocols"`
+	Route        *tfTypes.Set                `tfsdk:"route"`
+	Service      *tfTypes.Set                `tfsdk:"service"`
+	Tags         []types.String              `tfsdk:"tags"`
+	UpdatedAt    types.Int64                 `tfsdk:"updated_at"`
+	Workspace    types.String                `tfsdk:"workspace"`
 }
 
 func (r *PluginZipkinResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -168,9 +172,8 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 							"default_format": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. Not Null; must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
+								Description: `The default header format to use when extractors did not match any format in the incoming headers and ` + "`" + `inject` + "`" + ` is configured with the value: ` + "`" + `preserve` + "`" + `. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in ` + "`" + `extract` + "`" + `. must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "instana", "jaeger", "ot", "w3c"]`,
 								Validators: []validator.String{
-									speakeasy_stringvalidators.NotNull(),
 									stringvalidator.OneOf(
 										"aws",
 										"b3",
@@ -215,7 +218,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Time in seconds before the initial retry is made for a failing batch.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(1000000),
+									float64validator.Between(0.001, 1000000),
 								},
 							},
 							"max_batch_size": schema.Int64Attribute{
@@ -236,7 +239,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum number of (fractional) seconds to elapse after the first entry was queued before the queue starts calling the handler.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(3600),
+									float64validator.Between(0, 3600),
 								},
 							},
 							"max_entries": schema.Int64Attribute{
@@ -252,7 +255,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 								Optional:    true,
 								Description: `Maximum time in seconds between retries, caps exponential backoff.`,
 								Validators: []validator.Float64{
-									float64validator.AtMost(1000000),
+									float64validator.Between(0.001, 1000000),
 								},
 							},
 							"max_retry_time": schema.Float64Attribute{
@@ -275,7 +278,7 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 						Optional:    true,
 						Description: `How often to sample requests that do not contain trace IDs. Set to ` + "`" + `0` + "`" + ` to turn sampling off, or to ` + "`" + `1` + "`" + ` to sample **all** requests.`,
 						Validators: []validator.Float64{
-							float64validator.AtMost(1),
+							float64validator.Between(0, 1),
 						},
 					},
 					"send_timeout": schema.Int64Attribute{
@@ -351,12 +354,17 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -395,12 +403,17 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -408,8 +421,9 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -447,6 +461,12 @@ func (r *PluginZipkinResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -490,7 +510,7 @@ func (r *PluginZipkinResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	request, requestDiags := data.ToSharedZipkinPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateZipkinPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -690,5 +710,26 @@ func (r *PluginZipkinResource) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 func (r *PluginZipkinResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

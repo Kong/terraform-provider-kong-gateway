@@ -12,22 +12,22 @@ type FileLogPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *FileLogPluginAfter) GetAccess() []string {
-	if o == nil {
+func (f *FileLogPluginAfter) GetAccess() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Access
+	return f.Access
 }
 
 type FileLogPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *FileLogPluginBefore) GetAccess() []string {
-	if o == nil {
+func (f *FileLogPluginBefore) GetAccess() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Access
+	return f.Access
 }
 
 type FileLogPluginOrdering struct {
@@ -35,75 +35,77 @@ type FileLogPluginOrdering struct {
 	Before *FileLogPluginBefore `json:"before,omitempty"`
 }
 
-func (o *FileLogPluginOrdering) GetAfter() *FileLogPluginAfter {
-	if o == nil {
+func (f *FileLogPluginOrdering) GetAfter() *FileLogPluginAfter {
+	if f == nil {
 		return nil
 	}
-	return o.After
+	return f.After
 }
 
-func (o *FileLogPluginOrdering) GetBefore() *FileLogPluginBefore {
-	if o == nil {
+func (f *FileLogPluginOrdering) GetBefore() *FileLogPluginBefore {
+	if f == nil {
 		return nil
 	}
-	return o.Before
+	return f.Before
 }
 
 type FileLogPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *FileLogPluginPartials) GetID() *string {
-	if o == nil {
+func (f *FileLogPluginPartials) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
-func (o *FileLogPluginPartials) GetName() *string {
-	if o == nil {
+func (f *FileLogPluginPartials) GetName() *string {
+	if f == nil {
 		return nil
 	}
-	return o.Name
+	return f.Name
 }
 
-func (o *FileLogPluginPartials) GetPath() *string {
-	if o == nil {
+func (f *FileLogPluginPartials) GetPath() *string {
+	if f == nil {
 		return nil
 	}
-	return o.Path
+	return f.Path
 }
 
 type FileLogPluginConfig struct {
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// The file path of the output log file. The plugin creates the log file if it doesn't exist yet.
-	Path *string `json:"path,omitempty"`
+	Path string `json:"path"`
 	// Determines whether the log file is closed and reopened on every request.
 	Reopen *bool `json:"reopen,omitempty"`
 }
 
-func (o *FileLogPluginConfig) GetCustomFieldsByLua() map[string]any {
-	if o == nil {
+func (f *FileLogPluginConfig) GetCustomFieldsByLua() map[string]string {
+	if f == nil {
 		return nil
 	}
-	return o.CustomFieldsByLua
+	return f.CustomFieldsByLua
 }
 
-func (o *FileLogPluginConfig) GetPath() *string {
-	if o == nil {
-		return nil
+func (f *FileLogPluginConfig) GetPath() string {
+	if f == nil {
+		return ""
 	}
-	return o.Path
+	return f.Path
 }
 
-func (o *FileLogPluginConfig) GetReopen() *bool {
-	if o == nil {
+func (f *FileLogPluginConfig) GetReopen() *bool {
+	if f == nil {
 		return nil
 	}
-	return o.Reopen
+	return f.Reopen
 }
 
 // FileLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -111,11 +113,11 @@ type FileLogPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *FileLogPluginConsumer) GetID() *string {
-	if o == nil {
+func (f *FileLogPluginConsumer) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 // FileLogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -174,11 +176,11 @@ type FileLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *FileLogPluginRoute) GetID() *string {
-	if o == nil {
+func (f *FileLogPluginRoute) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 // FileLogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -186,11 +188,11 @@ type FileLogPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *FileLogPluginService) GetID() *string {
-	if o == nil {
+func (f *FileLogPluginService) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
 // FileLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -198,17 +200,20 @@ type FileLogPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                   `json:"enabled,omitempty"`
-	ID           *string                 `json:"id,omitempty"`
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"file-log" json:"name"`
-	Ordering     *FileLogPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []FileLogPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                `json:"instance_name,omitempty"`
+	name         string                 `const:"file-log" json:"name"`
+	Ordering     *FileLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []FileLogPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64               `json:"updated_at,omitempty"`
-	Config    *FileLogPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64              `json:"updated_at,omitempty"`
+	Config    FileLogPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *FileLogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
@@ -224,103 +229,103 @@ func (f FileLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (f *FileLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &f, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &f, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *FileLogPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (f *FileLogPlugin) GetCreatedAt() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return f.CreatedAt
 }
 
-func (o *FileLogPlugin) GetEnabled() *bool {
-	if o == nil {
+func (f *FileLogPlugin) GetEnabled() *bool {
+	if f == nil {
 		return nil
 	}
-	return o.Enabled
+	return f.Enabled
 }
 
-func (o *FileLogPlugin) GetID() *string {
-	if o == nil {
+func (f *FileLogPlugin) GetID() *string {
+	if f == nil {
 		return nil
 	}
-	return o.ID
+	return f.ID
 }
 
-func (o *FileLogPlugin) GetInstanceName() *string {
-	if o == nil {
+func (f *FileLogPlugin) GetInstanceName() *string {
+	if f == nil {
 		return nil
 	}
-	return o.InstanceName
+	return f.InstanceName
 }
 
-func (o *FileLogPlugin) GetName() string {
+func (f *FileLogPlugin) GetName() string {
 	return "file-log"
 }
 
-func (o *FileLogPlugin) GetOrdering() *FileLogPluginOrdering {
-	if o == nil {
+func (f *FileLogPlugin) GetOrdering() *FileLogPluginOrdering {
+	if f == nil {
 		return nil
 	}
-	return o.Ordering
+	return f.Ordering
 }
 
-func (o *FileLogPlugin) GetPartials() []FileLogPluginPartials {
-	if o == nil {
+func (f *FileLogPlugin) GetPartials() []FileLogPluginPartials {
+	if f == nil {
 		return nil
 	}
-	return o.Partials
+	return f.Partials
 }
 
-func (o *FileLogPlugin) GetTags() []string {
-	if o == nil {
+func (f *FileLogPlugin) GetTags() []string {
+	if f == nil {
 		return nil
 	}
-	return o.Tags
+	return f.Tags
 }
 
-func (o *FileLogPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (f *FileLogPlugin) GetUpdatedAt() *int64 {
+	if f == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return f.UpdatedAt
 }
 
-func (o *FileLogPlugin) GetConfig() *FileLogPluginConfig {
-	if o == nil {
-		return nil
+func (f *FileLogPlugin) GetConfig() FileLogPluginConfig {
+	if f == nil {
+		return FileLogPluginConfig{}
 	}
-	return o.Config
+	return f.Config
 }
 
-func (o *FileLogPlugin) GetConsumer() *FileLogPluginConsumer {
-	if o == nil {
+func (f *FileLogPlugin) GetConsumer() *FileLogPluginConsumer {
+	if f == nil {
 		return nil
 	}
-	return o.Consumer
+	return f.Consumer
 }
 
-func (o *FileLogPlugin) GetProtocols() []FileLogPluginProtocols {
-	if o == nil {
+func (f *FileLogPlugin) GetProtocols() []FileLogPluginProtocols {
+	if f == nil {
 		return nil
 	}
-	return o.Protocols
+	return f.Protocols
 }
 
-func (o *FileLogPlugin) GetRoute() *FileLogPluginRoute {
-	if o == nil {
+func (f *FileLogPlugin) GetRoute() *FileLogPluginRoute {
+	if f == nil {
 		return nil
 	}
-	return o.Route
+	return f.Route
 }
 
-func (o *FileLogPlugin) GetService() *FileLogPluginService {
-	if o == nil {
+func (f *FileLogPlugin) GetService() *FileLogPluginService {
+	if f == nil {
 		return nil
 	}
-	return o.Service
+	return f.Service
 }

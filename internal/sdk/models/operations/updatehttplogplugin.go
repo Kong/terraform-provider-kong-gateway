@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateHttplogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	HTTPLogPlugin shared.HTTPLogPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateHttplogPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateHttplogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateHttplogPluginRequest) GetHTTPLogPlugin() shared.HTTPLogPlugin {
-	if o == nil {
+func (u *UpdateHttplogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "HttpLogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateHttplogPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateHttplogPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateHttplogPluginRequest) GetHTTPLogPlugin() shared.HTTPLogPlugin {
+	if u == nil {
 		return shared.HTTPLogPlugin{}
 	}
-	return o.HTTPLogPlugin
+	return u.HTTPLogPlugin
 }
 
 type UpdateHttplogPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateHttplogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateHttplogPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateHttplogPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateHttplogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateHttplogPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateHttplogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateHttplogPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateHttplogPluginResponse) GetHTTPLogPlugin() *shared.HTTPLogPlugin {
-	if o == nil {
+func (u *UpdateHttplogPluginResponse) GetHTTPLogPlugin() *shared.HTTPLogPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.HTTPLogPlugin
+	return u.HTTPLogPlugin
 }
 
-func (o *UpdateHttplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateHttplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

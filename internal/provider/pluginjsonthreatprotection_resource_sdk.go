@@ -11,6 +11,175 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginJSONThreatProtectionResourceModel) RefreshFromSharedJSONThreatProtectionPlugin(ctx context.Context, resp *shared.JSONThreatProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.JSONThreatProtectionPluginConfig{}
+			r.Config.AllowDuplicateObjectEntryName = types.BoolPointerValue(resp.Config.AllowDuplicateObjectEntryName)
+			if resp.Config.EnforcementMode != nil {
+				r.Config.EnforcementMode = types.StringValue(string(*resp.Config.EnforcementMode))
+			} else {
+				r.Config.EnforcementMode = types.StringNull()
+			}
+			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
+			r.Config.ErrorStatusCode = types.Int64PointerValue(resp.Config.ErrorStatusCode)
+			r.Config.MaxArrayElementCount = types.Int64PointerValue(resp.Config.MaxArrayElementCount)
+			r.Config.MaxBodySize = types.Int64PointerValue(resp.Config.MaxBodySize)
+			r.Config.MaxContainerDepth = types.Int64PointerValue(resp.Config.MaxContainerDepth)
+			r.Config.MaxObjectEntryCount = types.Int64PointerValue(resp.Config.MaxObjectEntryCount)
+			r.Config.MaxObjectEntryNameLength = types.Int64PointerValue(resp.Config.MaxObjectEntryNameLength)
+			r.Config.MaxStringValueLength = types.Int64PointerValue(resp.Config.MaxStringValueLength)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginJSONThreatProtectionResourceModel) ToOperationsCreateJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.CreateJsonthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jsonThreatProtectionPlugin, jsonThreatProtectionPluginDiags := r.ToSharedJSONThreatProtectionPlugin(ctx)
+	diags.Append(jsonThreatProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateJsonthreatprotectionPluginRequest{
+		Workspace:                  workspace,
+		JSONThreatProtectionPlugin: *jsonThreatProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJSONThreatProtectionResourceModel) ToOperationsDeleteJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.DeleteJsonthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteJsonthreatprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJSONThreatProtectionResourceModel) ToOperationsGetJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.GetJsonthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetJsonthreatprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginJSONThreatProtectionResourceModel) ToOperationsUpdateJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.UpdateJsonthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	jsonThreatProtectionPlugin, jsonThreatProtectionPluginDiags := r.ToSharedJSONThreatProtectionPlugin(ctx)
+	diags.Append(jsonThreatProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateJsonthreatprotectionPluginRequest{
+		PluginID:                   pluginID,
+		Workspace:                  workspace,
+		JSONThreatProtectionPlugin: *jsonThreatProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPlugin(ctx context.Context) (*shared.JSONThreatProtectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +234,38 @@ func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPl
 			Before: before,
 		}
 	}
-	var partials []shared.JSONThreatProtectionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.JSONThreatProtectionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.JSONThreatProtectionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.JSONThreatProtectionPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.JSONThreatProtectionPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -223,146 +392,4 @@ func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPl
 	}
 
 	return &out, diags
-}
-
-func (r *PluginJSONThreatProtectionResourceModel) ToOperationsUpdateJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.UpdateJsonthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	jsonThreatProtectionPlugin, jsonThreatProtectionPluginDiags := r.ToSharedJSONThreatProtectionPlugin(ctx)
-	diags.Append(jsonThreatProtectionPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateJsonthreatprotectionPluginRequest{
-		PluginID:                   pluginID,
-		JSONThreatProtectionPlugin: *jsonThreatProtectionPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJSONThreatProtectionResourceModel) ToOperationsGetJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.GetJsonthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetJsonthreatprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJSONThreatProtectionResourceModel) ToOperationsDeleteJsonthreatprotectionPluginRequest(ctx context.Context) (*operations.DeleteJsonthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteJsonthreatprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginJSONThreatProtectionResourceModel) RefreshFromSharedJSONThreatProtectionPlugin(ctx context.Context, resp *shared.JSONThreatProtectionPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.JSONThreatProtectionPluginConfig{}
-			r.Config.AllowDuplicateObjectEntryName = types.BoolPointerValue(resp.Config.AllowDuplicateObjectEntryName)
-			if resp.Config.EnforcementMode != nil {
-				r.Config.EnforcementMode = types.StringValue(string(*resp.Config.EnforcementMode))
-			} else {
-				r.Config.EnforcementMode = types.StringNull()
-			}
-			r.Config.ErrorMessage = types.StringPointerValue(resp.Config.ErrorMessage)
-			r.Config.ErrorStatusCode = types.Int64PointerValue(resp.Config.ErrorStatusCode)
-			r.Config.MaxArrayElementCount = types.Int64PointerValue(resp.Config.MaxArrayElementCount)
-			r.Config.MaxBodySize = types.Int64PointerValue(resp.Config.MaxBodySize)
-			r.Config.MaxContainerDepth = types.Int64PointerValue(resp.Config.MaxContainerDepth)
-			r.Config.MaxObjectEntryCount = types.Int64PointerValue(resp.Config.MaxObjectEntryCount)
-			r.Config.MaxObjectEntryNameLength = types.Int64PointerValue(resp.Config.MaxObjectEntryNameLength)
-			r.Config.MaxStringValueLength = types.Int64PointerValue(resp.Config.MaxStringValueLength)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

@@ -11,6 +11,215 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx context.Context, resp *shared.AwsLambdaPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.AwsLambdaPluginConfig{}
+			r.Config.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.AwsAssumeRoleArn)
+			if resp.Config.AwsImdsProtocolVersion != nil {
+				r.Config.AwsImdsProtocolVersion = types.StringValue(string(*resp.Config.AwsImdsProtocolVersion))
+			} else {
+				r.Config.AwsImdsProtocolVersion = types.StringNull()
+			}
+			r.Config.AwsKey = types.StringPointerValue(resp.Config.AwsKey)
+			r.Config.AwsRegion = types.StringPointerValue(resp.Config.AwsRegion)
+			r.Config.AwsRoleSessionName = types.StringPointerValue(resp.Config.AwsRoleSessionName)
+			r.Config.AwsSecret = types.StringPointerValue(resp.Config.AwsSecret)
+			r.Config.AwsStsEndpointURL = types.StringPointerValue(resp.Config.AwsStsEndpointURL)
+			r.Config.AwsgatewayCompatible = types.BoolPointerValue(resp.Config.AwsgatewayCompatible)
+			if resp.Config.AwsgatewayCompatiblePayloadVersion != nil {
+				r.Config.AwsgatewayCompatiblePayloadVersion = types.StringValue(string(*resp.Config.AwsgatewayCompatiblePayloadVersion))
+			} else {
+				r.Config.AwsgatewayCompatiblePayloadVersion = types.StringNull()
+			}
+			r.Config.Base64EncodeBody = types.BoolPointerValue(resp.Config.Base64EncodeBody)
+			r.Config.DisableHTTPS = types.BoolPointerValue(resp.Config.DisableHTTPS)
+			if resp.Config.EmptyArraysMode != nil {
+				r.Config.EmptyArraysMode = types.StringValue(string(*resp.Config.EmptyArraysMode))
+			} else {
+				r.Config.EmptyArraysMode = types.StringNull()
+			}
+			r.Config.ForwardRequestBody = types.BoolPointerValue(resp.Config.ForwardRequestBody)
+			r.Config.ForwardRequestHeaders = types.BoolPointerValue(resp.Config.ForwardRequestHeaders)
+			r.Config.ForwardRequestMethod = types.BoolPointerValue(resp.Config.ForwardRequestMethod)
+			r.Config.ForwardRequestURI = types.BoolPointerValue(resp.Config.ForwardRequestURI)
+			r.Config.FunctionName = types.StringPointerValue(resp.Config.FunctionName)
+			r.Config.Host = types.StringPointerValue(resp.Config.Host)
+			if resp.Config.InvocationType != nil {
+				r.Config.InvocationType = types.StringValue(string(*resp.Config.InvocationType))
+			} else {
+				r.Config.InvocationType = types.StringNull()
+			}
+			r.Config.IsProxyIntegration = types.BoolPointerValue(resp.Config.IsProxyIntegration)
+			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
+			if resp.Config.LogType != nil {
+				r.Config.LogType = types.StringValue(string(*resp.Config.LogType))
+			} else {
+				r.Config.LogType = types.StringNull()
+			}
+			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
+			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
+			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
+			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
+			r.Config.UnhandledStatus = types.Int64PointerValue(resp.Config.UnhandledStatus)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsCreateAwslambdaPluginRequest(ctx context.Context) (*operations.CreateAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	awsLambdaPlugin, awsLambdaPluginDiags := r.ToSharedAwsLambdaPlugin(ctx)
+	diags.Append(awsLambdaPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateAwslambdaPluginRequest{
+		Workspace:       workspace,
+		AwsLambdaPlugin: *awsLambdaPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsDeleteAwslambdaPluginRequest(ctx context.Context) (*operations.DeleteAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteAwslambdaPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsGetAwslambdaPluginRequest(ctx context.Context) (*operations.GetAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetAwslambdaPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAwsLambdaResourceModel) ToOperationsUpdateAwslambdaPluginRequest(ctx context.Context) (*operations.UpdateAwslambdaPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	awsLambdaPlugin, awsLambdaPluginDiags := r.ToSharedAwsLambdaPlugin(ctx)
+	diags.Append(awsLambdaPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAwslambdaPluginRequest{
+		PluginID:        pluginID,
+		Workspace:       workspace,
+		AwsLambdaPlugin: *awsLambdaPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Context) (*shared.AwsLambdaPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +274,38 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 			Before: before,
 		}
 	}
-	var partials []shared.AwsLambdaPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AwsLambdaPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AwsLambdaPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AwsLambdaPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AwsLambdaPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -153,6 +362,12 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 			*awsgatewayCompatible = r.Config.AwsgatewayCompatible.ValueBool()
 		} else {
 			awsgatewayCompatible = nil
+		}
+		awsgatewayCompatiblePayloadVersion := new(shared.AwsgatewayCompatiblePayloadVersion)
+		if !r.Config.AwsgatewayCompatiblePayloadVersion.IsUnknown() && !r.Config.AwsgatewayCompatiblePayloadVersion.IsNull() {
+			*awsgatewayCompatiblePayloadVersion = shared.AwsgatewayCompatiblePayloadVersion(r.Config.AwsgatewayCompatiblePayloadVersion.ValueString())
+		} else {
+			awsgatewayCompatiblePayloadVersion = nil
 		}
 		base64EncodeBody := new(bool)
 		if !r.Config.Base64EncodeBody.IsUnknown() && !r.Config.Base64EncodeBody.IsNull() {
@@ -269,33 +484,34 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 			unhandledStatus = nil
 		}
 		config = &shared.AwsLambdaPluginConfig{
-			AwsAssumeRoleArn:       awsAssumeRoleArn,
-			AwsImdsProtocolVersion: awsImdsProtocolVersion,
-			AwsKey:                 awsKey,
-			AwsRegion:              awsRegion,
-			AwsRoleSessionName:     awsRoleSessionName,
-			AwsSecret:              awsSecret,
-			AwsStsEndpointURL:      awsStsEndpointURL,
-			AwsgatewayCompatible:   awsgatewayCompatible,
-			Base64EncodeBody:       base64EncodeBody,
-			DisableHTTPS:           disableHTTPS,
-			EmptyArraysMode:        emptyArraysMode,
-			ForwardRequestBody:     forwardRequestBody,
-			ForwardRequestHeaders:  forwardRequestHeaders,
-			ForwardRequestMethod:   forwardRequestMethod,
-			ForwardRequestURI:      forwardRequestURI,
-			FunctionName:           functionName,
-			Host:                   host,
-			InvocationType:         invocationType,
-			IsProxyIntegration:     isProxyIntegration,
-			Keepalive:              keepalive,
-			LogType:                logType,
-			Port:                   port,
-			ProxyURL:               proxyURL,
-			Qualifier:              qualifier,
-			SkipLargeBodies:        skipLargeBodies,
-			Timeout:                timeout,
-			UnhandledStatus:        unhandledStatus,
+			AwsAssumeRoleArn:                   awsAssumeRoleArn,
+			AwsImdsProtocolVersion:             awsImdsProtocolVersion,
+			AwsKey:                             awsKey,
+			AwsRegion:                          awsRegion,
+			AwsRoleSessionName:                 awsRoleSessionName,
+			AwsSecret:                          awsSecret,
+			AwsStsEndpointURL:                  awsStsEndpointURL,
+			AwsgatewayCompatible:               awsgatewayCompatible,
+			AwsgatewayCompatiblePayloadVersion: awsgatewayCompatiblePayloadVersion,
+			Base64EncodeBody:                   base64EncodeBody,
+			DisableHTTPS:                       disableHTTPS,
+			EmptyArraysMode:                    emptyArraysMode,
+			ForwardRequestBody:                 forwardRequestBody,
+			ForwardRequestHeaders:              forwardRequestHeaders,
+			ForwardRequestMethod:               forwardRequestMethod,
+			ForwardRequestURI:                  forwardRequestURI,
+			FunctionName:                       functionName,
+			Host:                               host,
+			InvocationType:                     invocationType,
+			IsProxyIntegration:                 isProxyIntegration,
+			Keepalive:                          keepalive,
+			LogType:                            logType,
+			Port:                               port,
+			ProxyURL:                           proxyURL,
+			Qualifier:                          qualifier,
+			SkipLargeBodies:                    skipLargeBodies,
+			Timeout:                            timeout,
+			UnhandledStatus:                    unhandledStatus,
 		}
 	}
 	var consumer *shared.AwsLambdaPluginConsumer
@@ -355,181 +571,4 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 	}
 
 	return &out, diags
-}
-
-func (r *PluginAwsLambdaResourceModel) ToOperationsUpdateAwslambdaPluginRequest(ctx context.Context) (*operations.UpdateAwslambdaPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	awsLambdaPlugin, awsLambdaPluginDiags := r.ToSharedAwsLambdaPlugin(ctx)
-	diags.Append(awsLambdaPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateAwslambdaPluginRequest{
-		PluginID:        pluginID,
-		AwsLambdaPlugin: *awsLambdaPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAwsLambdaResourceModel) ToOperationsGetAwslambdaPluginRequest(ctx context.Context) (*operations.GetAwslambdaPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetAwslambdaPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAwsLambdaResourceModel) ToOperationsDeleteAwslambdaPluginRequest(ctx context.Context) (*operations.DeleteAwslambdaPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteAwslambdaPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx context.Context, resp *shared.AwsLambdaPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.AwsLambdaPluginConfig{}
-			r.Config.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.AwsAssumeRoleArn)
-			if resp.Config.AwsImdsProtocolVersion != nil {
-				r.Config.AwsImdsProtocolVersion = types.StringValue(string(*resp.Config.AwsImdsProtocolVersion))
-			} else {
-				r.Config.AwsImdsProtocolVersion = types.StringNull()
-			}
-			r.Config.AwsKey = types.StringPointerValue(resp.Config.AwsKey)
-			r.Config.AwsRegion = types.StringPointerValue(resp.Config.AwsRegion)
-			r.Config.AwsRoleSessionName = types.StringPointerValue(resp.Config.AwsRoleSessionName)
-			r.Config.AwsSecret = types.StringPointerValue(resp.Config.AwsSecret)
-			r.Config.AwsStsEndpointURL = types.StringPointerValue(resp.Config.AwsStsEndpointURL)
-			r.Config.AwsgatewayCompatible = types.BoolPointerValue(resp.Config.AwsgatewayCompatible)
-			r.Config.Base64EncodeBody = types.BoolPointerValue(resp.Config.Base64EncodeBody)
-			r.Config.DisableHTTPS = types.BoolPointerValue(resp.Config.DisableHTTPS)
-			if resp.Config.EmptyArraysMode != nil {
-				r.Config.EmptyArraysMode = types.StringValue(string(*resp.Config.EmptyArraysMode))
-			} else {
-				r.Config.EmptyArraysMode = types.StringNull()
-			}
-			r.Config.ForwardRequestBody = types.BoolPointerValue(resp.Config.ForwardRequestBody)
-			r.Config.ForwardRequestHeaders = types.BoolPointerValue(resp.Config.ForwardRequestHeaders)
-			r.Config.ForwardRequestMethod = types.BoolPointerValue(resp.Config.ForwardRequestMethod)
-			r.Config.ForwardRequestURI = types.BoolPointerValue(resp.Config.ForwardRequestURI)
-			r.Config.FunctionName = types.StringPointerValue(resp.Config.FunctionName)
-			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			if resp.Config.InvocationType != nil {
-				r.Config.InvocationType = types.StringValue(string(*resp.Config.InvocationType))
-			} else {
-				r.Config.InvocationType = types.StringNull()
-			}
-			r.Config.IsProxyIntegration = types.BoolPointerValue(resp.Config.IsProxyIntegration)
-			r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
-			if resp.Config.LogType != nil {
-				r.Config.LogType = types.StringValue(string(*resp.Config.LogType))
-			} else {
-				r.Config.LogType = types.StringNull()
-			}
-			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
-			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
-			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
-			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
-			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
-			r.Config.UnhandledStatus = types.Int64PointerValue(resp.Config.UnhandledStatus)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

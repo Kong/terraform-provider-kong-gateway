@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAiproxyadvancedPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AiProxyAdvancedPlugin shared.AiProxyAdvancedPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAiproxyadvancedPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAiproxyadvancedPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiProxyAdvancedPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAiproxyadvancedPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAiproxyadvancedPluginRequest) GetAiProxyAdvancedPlugin() shared.AiProxyAdvancedPlugin {
+	if c == nil {
+		return shared.AiProxyAdvancedPlugin{}
+	}
+	return c.AiProxyAdvancedPlugin
+}
 
 type CreateAiproxyadvancedPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAiproxyadvancedPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAiproxyadvancedPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAiproxyadvancedPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAiproxyadvancedPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAiproxyadvancedPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAiproxyadvancedPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAiproxyadvancedPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAiproxyadvancedPluginResponse) GetAiProxyAdvancedPlugin() *shared.AiProxyAdvancedPlugin {
-	if o == nil {
+func (c *CreateAiproxyadvancedPluginResponse) GetAiProxyAdvancedPlugin() *shared.AiProxyAdvancedPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AiProxyAdvancedPlugin
+	return c.AiProxyAdvancedPlugin
 }
 
-func (o *CreateAiproxyadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAiproxyadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteRouteRequest struct {
 	// ID or name of the Route to lookup
 	RouteIDOrName string `pathParam:"style=simple,explode=false,name=RouteIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteRouteRequest) GetRouteIDOrName() string {
-	if o == nil {
+func (d DeleteRouteRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteRouteRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"RouteIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteRouteRequest) GetRouteIDOrName() string {
+	if d == nil {
 		return ""
 	}
-	return o.RouteIDOrName
+	return d.RouteIDOrName
+}
+
+func (d *DeleteRouteRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteRouteResponse struct {
@@ -30,30 +51,30 @@ type DeleteRouteResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteRouteResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteRouteResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteRouteResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteRouteResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteRouteResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteRouteResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

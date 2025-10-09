@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetServiceRequest struct {
 	// ID or name of the Service to lookup
 	ServiceIDOrName string `pathParam:"style=simple,explode=false,name=ServiceIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetServiceRequest) GetServiceIDOrName() string {
-	if o == nil {
+func (g GetServiceRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetServiceRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ServiceIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetServiceRequest) GetServiceIDOrName() string {
+	if g == nil {
 		return ""
 	}
-	return o.ServiceIDOrName
+	return g.ServiceIDOrName
+}
+
+func (g *GetServiceRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetServiceResponse struct {
@@ -32,37 +53,37 @@ type GetServiceResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetServiceResponse) GetContentType() string {
-	if o == nil {
+func (g *GetServiceResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetServiceResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetServiceResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetServiceResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetServiceResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetServiceResponse) GetService() *shared.ServiceOutput {
-	if o == nil {
+func (g *GetServiceResponse) GetService() *shared.ServiceOutput {
+	if g == nil {
 		return nil
 	}
-	return o.Service
+	return g.Service
 }
 
-func (o *GetServiceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetServiceResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

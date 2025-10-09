@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateLdapauthPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	LdapAuthPlugin shared.LdapAuthPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateLdapauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateLdapauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "LdapAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateLdapauthPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateLdapauthPluginRequest) GetLdapAuthPlugin() shared.LdapAuthPlugin {
+	if c == nil {
+		return shared.LdapAuthPlugin{}
+	}
+	return c.LdapAuthPlugin
+}
 
 type CreateLdapauthPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateLdapauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateLdapauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateLdapauthPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateLdapauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateLdapauthPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateLdapauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateLdapauthPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateLdapauthPluginResponse) GetLdapAuthPlugin() *shared.LdapAuthPlugin {
-	if o == nil {
+func (c *CreateLdapauthPluginResponse) GetLdapAuthPlugin() *shared.LdapAuthPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.LdapAuthPlugin
+	return c.LdapAuthPlugin
 }
 
-func (o *CreateLdapauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateLdapauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

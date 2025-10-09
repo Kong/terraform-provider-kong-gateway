@@ -3,9 +3,50 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreatePartialRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new Partial for creation
+	Partial shared.Partial `request:"mediaType=application/json"`
+}
+
+func (c CreatePartialRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreatePartialRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Partial"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreatePartialRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreatePartialRequest) GetPartial() shared.Partial {
+	if c == nil {
+		return shared.Partial{}
+	}
+	return c.Partial
+}
+
+func (c *CreatePartialRequest) GetPartialRedisCe() *shared.PartialRedisCe {
+	return c.GetPartial().PartialRedisCe
+}
+
+func (c *CreatePartialRequest) GetPartialRedisEe() *shared.PartialRedisEe {
+	return c.GetPartial().PartialRedisEe
+}
 
 type CreatePartialResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +61,51 @@ type CreatePartialResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreatePartialResponse) GetContentType() string {
-	if o == nil {
+func (c *CreatePartialResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreatePartialResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreatePartialResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreatePartialResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreatePartialResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreatePartialResponse) GetPartial() *shared.Partial {
-	if o == nil {
+func (c *CreatePartialResponse) GetPartial() *shared.Partial {
+	if c == nil {
 		return nil
 	}
-	return o.Partial
+	return c.Partial
 }
 
-func (o *CreatePartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreatePartialResponse) GetPartialRedisCe() *shared.PartialRedisCe {
+	if v := c.GetPartial(); v != nil {
+		return v.PartialRedisCe
+	}
+	return nil
+}
+
+func (c *CreatePartialResponse) GetPartialRedisEe() *shared.PartialRedisEe {
+	if v := c.GetPartial(); v != nil {
+		return v.PartialRedisEe
+	}
+	return nil
+}
+
+func (c *CreatePartialResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateHeadercertauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID             string                      `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	HeaderCertAuthPlugin shared.HeaderCertAuthPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateHeadercertauthPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateHeadercertauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateHeadercertauthPluginRequest) GetHeaderCertAuthPlugin() shared.HeaderCertAuthPlugin {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "HeaderCertAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateHeadercertauthPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateHeadercertauthPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateHeadercertauthPluginRequest) GetHeaderCertAuthPlugin() shared.HeaderCertAuthPlugin {
+	if u == nil {
 		return shared.HeaderCertAuthPlugin{}
 	}
-	return o.HeaderCertAuthPlugin
+	return u.HeaderCertAuthPlugin
 }
 
 type UpdateHeadercertauthPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateHeadercertauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateHeadercertauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateHeadercertauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateHeadercertauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateHeadercertauthPluginResponse) GetHeaderCertAuthPlugin() *shared.HeaderCertAuthPlugin {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginResponse) GetHeaderCertAuthPlugin() *shared.HeaderCertAuthPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.HeaderCertAuthPlugin
+	return u.HeaderCertAuthPlugin
 }
 
-func (o *UpdateHeadercertauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateHeadercertauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

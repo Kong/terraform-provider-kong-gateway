@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertRouteRequest struct {
 	// ID or name of the Route to lookup
 	RouteIDOrName string `pathParam:"style=simple,explode=false,name=RouteIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Route
 	RouteJSON shared.RouteJSON `request:"mediaType=application/json"`
 }
 
-func (o *UpsertRouteRequest) GetRouteIDOrName() string {
-	if o == nil {
-		return ""
-	}
-	return o.RouteIDOrName
+func (u UpsertRouteRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertRouteRequest) GetRouteJSON() shared.RouteJSON {
-	if o == nil {
+func (u *UpsertRouteRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"RouteIdOrName", "workspace", "RouteJson"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertRouteRequest) GetRouteIDOrName() string {
+	if u == nil {
+		return ""
+	}
+	return u.RouteIDOrName
+}
+
+func (u *UpsertRouteRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertRouteRequest) GetRouteJSON() shared.RouteJSON {
+	if u == nil {
 		return shared.RouteJSON{}
 	}
-	return o.RouteJSON
+	return u.RouteJSON
 }
 
 type UpsertRouteResponse struct {
@@ -41,37 +62,37 @@ type UpsertRouteResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertRouteResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertRouteResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertRouteResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertRouteResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertRouteResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertRouteResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertRouteResponse) GetRouteJSON() *shared.RouteJSON {
-	if o == nil {
+func (u *UpsertRouteResponse) GetRouteJSON() *shared.RouteJSON {
+	if u == nil {
 		return nil
 	}
-	return o.RouteJSON
+	return u.RouteJSON
 }
 
-func (o *UpsertRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertRouteResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

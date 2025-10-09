@@ -6,62 +6,64 @@ type KeyAuthConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *KeyAuthConsumer) GetID() *string {
-	if o == nil {
+func (k *KeyAuthConsumer) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
 type KeyAuth struct {
 	Consumer *KeyAuthConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64   `json:"created_at,omitempty"`
-	ID        *string  `json:"id,omitempty"`
-	Key       string   `json:"key"`
-	Tags      []string `json:"tags,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID  *string `json:"id,omitempty"`
+	Key *string `json:"key,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
 	// key-auth ttl in seconds
 	TTL *int64 `json:"ttl,omitempty"`
 }
 
-func (o *KeyAuth) GetConsumer() *KeyAuthConsumer {
-	if o == nil {
+func (k *KeyAuth) GetConsumer() *KeyAuthConsumer {
+	if k == nil {
 		return nil
 	}
-	return o.Consumer
+	return k.Consumer
 }
 
-func (o *KeyAuth) GetCreatedAt() *int64 {
-	if o == nil {
+func (k *KeyAuth) GetCreatedAt() *int64 {
+	if k == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return k.CreatedAt
 }
 
-func (o *KeyAuth) GetID() *string {
-	if o == nil {
+func (k *KeyAuth) GetID() *string {
+	if k == nil {
 		return nil
 	}
-	return o.ID
+	return k.ID
 }
 
-func (o *KeyAuth) GetKey() string {
-	if o == nil {
-		return ""
-	}
-	return o.Key
-}
-
-func (o *KeyAuth) GetTags() []string {
-	if o == nil {
+func (k *KeyAuth) GetKey() *string {
+	if k == nil {
 		return nil
 	}
-	return o.Tags
+	return k.Key
 }
 
-func (o *KeyAuth) GetTTL() *int64 {
-	if o == nil {
+func (k *KeyAuth) GetTags() []string {
+	if k == nil {
 		return nil
 	}
-	return o.TTL
+	return k.Tags
+}
+
+func (k *KeyAuth) GetTTL() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.TTL
 }

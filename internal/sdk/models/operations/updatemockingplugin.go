@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateMockingPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID      string               `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	MockingPlugin shared.MockingPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateMockingPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateMockingPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateMockingPluginRequest) GetMockingPlugin() shared.MockingPlugin {
-	if o == nil {
+func (u *UpdateMockingPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "MockingPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateMockingPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateMockingPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateMockingPluginRequest) GetMockingPlugin() shared.MockingPlugin {
+	if u == nil {
 		return shared.MockingPlugin{}
 	}
-	return o.MockingPlugin
+	return u.MockingPlugin
 }
 
 type UpdateMockingPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateMockingPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateMockingPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateMockingPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateMockingPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateMockingPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateMockingPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateMockingPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateMockingPluginResponse) GetMockingPlugin() *shared.MockingPlugin {
-	if o == nil {
+func (u *UpdateMockingPluginResponse) GetMockingPlugin() *shared.MockingPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.MockingPlugin
+	return u.MockingPlugin
 }
 
-func (o *UpdateMockingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateMockingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

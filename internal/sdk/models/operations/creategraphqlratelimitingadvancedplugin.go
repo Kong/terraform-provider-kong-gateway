@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateGraphqlratelimitingadvancedPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                         string                                   `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	GraphqlRateLimitingAdvancedPlugin shared.GraphqlRateLimitingAdvancedPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateGraphqlratelimitingadvancedPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateGraphqlratelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GraphqlRateLimitingAdvancedPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateGraphqlratelimitingadvancedPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateGraphqlratelimitingadvancedPluginRequest) GetGraphqlRateLimitingAdvancedPlugin() shared.GraphqlRateLimitingAdvancedPlugin {
+	if c == nil {
+		return shared.GraphqlRateLimitingAdvancedPlugin{}
+	}
+	return c.GraphqlRateLimitingAdvancedPlugin
+}
 
 type CreateGraphqlratelimitingadvancedPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateGraphqlratelimitingadvancedPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateGraphqlratelimitingadvancedPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateGraphqlratelimitingadvancedPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateGraphqlratelimitingadvancedPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateGraphqlratelimitingadvancedPluginResponse) GetGraphqlRateLimitingAdvancedPlugin() *shared.GraphqlRateLimitingAdvancedPlugin {
-	if o == nil {
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetGraphqlRateLimitingAdvancedPlugin() *shared.GraphqlRateLimitingAdvancedPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.GraphqlRateLimitingAdvancedPlugin
+	return c.GraphqlRateLimitingAdvancedPlugin
 }
 
-func (o *CreateGraphqlratelimitingadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

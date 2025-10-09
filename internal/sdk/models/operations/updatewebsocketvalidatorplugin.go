@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateWebsocketvalidatorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID                 string                          `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	WebsocketValidatorPlugin shared.WebsocketValidatorPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateWebsocketvalidatorPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateWebsocketvalidatorPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateWebsocketvalidatorPluginRequest) GetWebsocketValidatorPlugin() shared.WebsocketValidatorPlugin {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "WebsocketValidatorPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateWebsocketvalidatorPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateWebsocketvalidatorPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateWebsocketvalidatorPluginRequest) GetWebsocketValidatorPlugin() shared.WebsocketValidatorPlugin {
+	if u == nil {
 		return shared.WebsocketValidatorPlugin{}
 	}
-	return o.WebsocketValidatorPlugin
+	return u.WebsocketValidatorPlugin
 }
 
 type UpdateWebsocketvalidatorPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateWebsocketvalidatorPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateWebsocketvalidatorPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateWebsocketvalidatorPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateWebsocketvalidatorPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateWebsocketvalidatorPluginResponse) GetWebsocketValidatorPlugin() *shared.WebsocketValidatorPlugin {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginResponse) GetWebsocketValidatorPlugin() *shared.WebsocketValidatorPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.WebsocketValidatorPlugin
+	return u.WebsocketValidatorPlugin
 }
 
-func (o *UpdateWebsocketvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateWebsocketvalidatorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

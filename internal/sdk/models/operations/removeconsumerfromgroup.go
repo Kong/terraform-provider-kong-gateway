@@ -3,26 +3,48 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"net/http"
 )
 
 type RemoveConsumerFromGroupRequest struct {
-	ConsumerGroupID      string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
-	ConsumerIDOrUsername string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
+	// The UUID or name of the consumer group
+	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
+	ConsumerID      string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *RemoveConsumerFromGroupRequest) GetConsumerGroupID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerGroupID
+func (r RemoveConsumerFromGroupRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
 }
 
-func (o *RemoveConsumerFromGroupRequest) GetConsumerIDOrUsername() string {
-	if o == nil {
+func (r *RemoveConsumerFromGroupRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"ConsumerGroupId", "ConsumerIdOrUsername", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RemoveConsumerFromGroupRequest) GetConsumerGroupID() string {
+	if r == nil {
 		return ""
 	}
-	return o.ConsumerIDOrUsername
+	return r.ConsumerGroupID
+}
+
+func (r *RemoveConsumerFromGroupRequest) GetConsumerID() string {
+	if r == nil {
+		return ""
+	}
+	return r.ConsumerID
+}
+
+func (r *RemoveConsumerFromGroupRequest) GetWorkspace() string {
+	if r == nil {
+		return ""
+	}
+	return r.Workspace
 }
 
 type RemoveConsumerFromGroupResponse struct {
@@ -34,23 +56,23 @@ type RemoveConsumerFromGroupResponse struct {
 	RawResponse *http.Response
 }
 
-func (o *RemoveConsumerFromGroupResponse) GetContentType() string {
-	if o == nil {
+func (r *RemoveConsumerFromGroupResponse) GetContentType() string {
+	if r == nil {
 		return ""
 	}
-	return o.ContentType
+	return r.ContentType
 }
 
-func (o *RemoveConsumerFromGroupResponse) GetStatusCode() int {
-	if o == nil {
+func (r *RemoveConsumerFromGroupResponse) GetStatusCode() int {
+	if r == nil {
 		return 0
 	}
-	return o.StatusCode
+	return r.StatusCode
 }
 
-func (o *RemoveConsumerFromGroupResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (r *RemoveConsumerFromGroupResponse) GetRawResponse() *http.Response {
+	if r == nil {
 		return nil
 	}
-	return o.RawResponse
+	return r.RawResponse
 }

@@ -3,13 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -33,21 +36,22 @@ type RouteExpressionResource struct {
 
 // RouteExpressionResourceModel describes the resource data model.
 type RouteExpressionResourceModel struct {
-	CreatedAt               types.Int64                        `tfsdk:"created_at"`
-	Expression              types.String                       `tfsdk:"expression"`
-	HTTPSRedirectStatusCode types.Int64                        `tfsdk:"https_redirect_status_code"`
-	ID                      types.String                       `tfsdk:"id"`
-	Name                    types.String                       `tfsdk:"name"`
-	PathHandling            types.String                       `tfsdk:"path_handling"`
-	PreserveHost            types.Bool                         `tfsdk:"preserve_host"`
-	Priority                types.Int64                        `tfsdk:"priority"`
-	Protocols               []types.String                     `tfsdk:"protocols"`
-	RequestBuffering        types.Bool                         `tfsdk:"request_buffering"`
-	ResponseBuffering       types.Bool                         `tfsdk:"response_buffering"`
-	Service                 *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	StripPath               types.Bool                         `tfsdk:"strip_path"`
-	Tags                    []types.String                     `tfsdk:"tags"`
-	UpdatedAt               types.Int64                        `tfsdk:"updated_at"`
+	CreatedAt               types.Int64    `tfsdk:"created_at"`
+	Expression              types.String   `tfsdk:"expression"`
+	HTTPSRedirectStatusCode types.Int64    `tfsdk:"https_redirect_status_code"`
+	ID                      types.String   `tfsdk:"id"`
+	Name                    types.String   `tfsdk:"name"`
+	PathHandling            types.String   `tfsdk:"path_handling"`
+	PreserveHost            types.Bool     `tfsdk:"preserve_host"`
+	Priority                types.Int64    `tfsdk:"priority"`
+	Protocols               []types.String `tfsdk:"protocols"`
+	RequestBuffering        types.Bool     `tfsdk:"request_buffering"`
+	ResponseBuffering       types.Bool     `tfsdk:"response_buffering"`
+	Service                 *tfTypes.Set   `tfsdk:"service"`
+	StripPath               types.Bool     `tfsdk:"strip_path"`
+	Tags                    []types.String `tfsdk:"tags"`
+	UpdatedAt               types.Int64    `tfsdk:"updated_at"`
+	Workspace               types.String   `tfsdk:"workspace"`
 }
 
 func (r *RouteExpressionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -71,20 +75,21 @@ func (r *RouteExpressionResource) Schema(ctx context.Context, req resource.Schem
 			"https_redirect_status_code": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of ["426", "301", "302", "307", "308"]`,
+				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of ["301", "302", "307", "308", "426"]`,
 				Validators: []validator.Int64{
 					int64validator.OneOf(
-						426,
 						301,
 						302,
 						307,
 						308,
+						426,
 					),
 				},
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"name": schema.StringAttribute{
 				Computed:    true,
@@ -105,8 +110,12 @@ func (r *RouteExpressionResource) Schema(ctx context.Context, req resource.Schem
 				Description: `When matching a Route via one of the ` + "`" + `hosts` + "`" + ` domain names, use the request ` + "`" + `Host` + "`" + ` header in the upstream request headers. If set to ` + "`" + `false` + "`" + `, the upstream ` + "`" + `Host` + "`" + ` header will be that of the Service's ` + "`" + `host` + "`" + `.`,
 			},
 			"priority": schema.Int64Attribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A number used to specify the matching order for expression routes. The higher the ` + "`" + `priority` + "`" + `, the sooner an route will be evaluated. This field is ignored unless ` + "`" + `expression` + "`" + ` field is set.`,
+				Validators: []validator.Int64{
+					int64validator.AtMost(70368744177663),
+				},
 			},
 			"protocols": schema.ListAttribute{
 				Computed:    true,
@@ -151,6 +160,12 @@ func (r *RouteExpressionResource) Schema(ctx context.Context, req resource.Schem
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
 			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
+			},
 		},
 	}
 }
@@ -193,7 +208,7 @@ func (r *RouteExpressionResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	request, requestDiags := data.ToSharedRouteExpression(ctx)
+	request, requestDiags := data.ToOperationsCreateRouteRouteExpressionRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -393,5 +408,26 @@ func (r *RouteExpressionResource) Delete(ctx context.Context, req resource.Delet
 }
 
 func (r *RouteExpressionResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

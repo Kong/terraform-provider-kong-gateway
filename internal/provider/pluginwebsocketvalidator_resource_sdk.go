@@ -11,6 +11,205 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValidatorPlugin(ctx context.Context, resp *shared.WebsocketValidatorPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.WebsocketValidatorPluginConfig{}
+			if resp.Config.Client == nil {
+				r.Config.Client = nil
+			} else {
+				r.Config.Client = &tfTypes.WebsocketValidatorPluginClient{}
+				if resp.Config.Client.Binary == nil {
+					r.Config.Client.Binary = nil
+				} else {
+					r.Config.Client.Binary = &tfTypes.Binary{}
+					r.Config.Client.Binary.Schema = types.StringValue(resp.Config.Client.Binary.Schema)
+					r.Config.Client.Binary.Type = types.StringValue(string(resp.Config.Client.Binary.Type))
+				}
+				if resp.Config.Client.Text == nil {
+					r.Config.Client.Text = nil
+				} else {
+					r.Config.Client.Text = &tfTypes.Binary{}
+					r.Config.Client.Text.Schema = types.StringValue(resp.Config.Client.Text.Schema)
+					r.Config.Client.Text.Type = types.StringValue(string(resp.Config.Client.Text.Type))
+				}
+			}
+			if resp.Config.Upstream == nil {
+				r.Config.Upstream = nil
+			} else {
+				r.Config.Upstream = &tfTypes.WebsocketValidatorPluginClient{}
+				if resp.Config.Upstream.Binary == nil {
+					r.Config.Upstream.Binary = nil
+				} else {
+					r.Config.Upstream.Binary = &tfTypes.Binary{}
+					r.Config.Upstream.Binary.Schema = types.StringValue(resp.Config.Upstream.Binary.Schema)
+					r.Config.Upstream.Binary.Type = types.StringValue(string(resp.Config.Upstream.Binary.Type))
+				}
+				if resp.Config.Upstream.Text == nil {
+					r.Config.Upstream.Text = nil
+				} else {
+					r.Config.Upstream.Text = &tfTypes.Binary{}
+					r.Config.Upstream.Text.Schema = types.StringValue(resp.Config.Upstream.Text.Schema)
+					r.Config.Upstream.Text.Type = types.StringValue(string(resp.Config.Upstream.Text.Type))
+				}
+			}
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsCreateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.CreateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
+	diags.Append(websocketValidatorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateWebsocketvalidatorPluginRequest{
+		Workspace:                workspace,
+		WebsocketValidatorPlugin: *websocketValidatorPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsDeleteWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.DeleteWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteWebsocketvalidatorPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsGetWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.GetWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetWebsocketvalidatorPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginWebsocketValidatorResourceModel) ToOperationsUpdateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.UpdateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
+	diags.Append(websocketValidatorPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateWebsocketvalidatorPluginRequest{
+		PluginID:                 pluginID,
+		Workspace:                workspace,
+		WebsocketValidatorPlugin: *websocketValidatorPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin(ctx context.Context) (*shared.WebsocketValidatorPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +264,38 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 			Before: before,
 		}
 	}
-	var partials []shared.WebsocketValidatorPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.WebsocketValidatorPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.WebsocketValidatorPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.WebsocketValidatorPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.WebsocketValidatorPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -113,7 +312,7 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 				var schema string
 				schema = r.Config.Client.Binary.Schema.ValueString()
 
-				typeVar := shared.WebsocketValidatorPluginConfigClientType(r.Config.Client.Binary.Type.ValueString())
+				typeVar := shared.WebsocketValidatorPluginType(r.Config.Client.Binary.Type.ValueString())
 				binary = &shared.Binary{
 					Schema: schema,
 					Type:   typeVar,
@@ -124,7 +323,7 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 				var schema1 string
 				schema1 = r.Config.Client.Text.Schema.ValueString()
 
-				typeVar1 := shared.WebsocketValidatorPluginType(r.Config.Client.Text.Type.ValueString())
+				typeVar1 := shared.WebsocketValidatorPluginConfigType(r.Config.Client.Text.Type.ValueString())
 				text = &shared.Text{
 					Schema: schema1,
 					Type:   typeVar1,
@@ -142,7 +341,7 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 				var schema2 string
 				schema2 = r.Config.Upstream.Binary.Schema.ValueString()
 
-				typeVar2 := shared.WebsocketValidatorPluginConfigType(r.Config.Upstream.Binary.Type.ValueString())
+				typeVar2 := shared.WebsocketValidatorPluginConfigUpstreamType(r.Config.Upstream.Binary.Type.ValueString())
 				binary1 = &shared.WebsocketValidatorPluginBinary{
 					Schema: schema2,
 					Type:   typeVar2,
@@ -153,7 +352,7 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 				var schema3 string
 				schema3 = r.Config.Upstream.Text.Schema.ValueString()
 
-				typeVar3 := shared.WebsocketValidatorPluginConfigUpstreamType(r.Config.Upstream.Text.Type.ValueString())
+				typeVar3 := shared.WebsocketValidatorPluginConfigUpstreamTextType(r.Config.Upstream.Text.Type.ValueString())
 				text1 = &shared.WebsocketValidatorPluginText{
 					Schema: schema3,
 					Type:   typeVar3,
@@ -226,176 +425,4 @@ func (r *PluginWebsocketValidatorResourceModel) ToSharedWebsocketValidatorPlugin
 	}
 
 	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsUpdateWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.UpdateWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	websocketValidatorPlugin, websocketValidatorPluginDiags := r.ToSharedWebsocketValidatorPlugin(ctx)
-	diags.Append(websocketValidatorPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateWebsocketvalidatorPluginRequest{
-		PluginID:                 pluginID,
-		WebsocketValidatorPlugin: *websocketValidatorPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsGetWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.GetWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) ToOperationsDeleteWebsocketvalidatorPluginRequest(ctx context.Context) (*operations.DeleteWebsocketvalidatorPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteWebsocketvalidatorPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginWebsocketValidatorResourceModel) RefreshFromSharedWebsocketValidatorPlugin(ctx context.Context, resp *shared.WebsocketValidatorPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.WebsocketValidatorPluginConfig{}
-			if resp.Config.Client == nil {
-				r.Config.Client = nil
-			} else {
-				r.Config.Client = &tfTypes.WebsocketValidatorPluginClient{}
-				if resp.Config.Client.Binary == nil {
-					r.Config.Client.Binary = nil
-				} else {
-					r.Config.Client.Binary = &tfTypes.Binary{}
-					r.Config.Client.Binary.Schema = types.StringValue(resp.Config.Client.Binary.Schema)
-					r.Config.Client.Binary.Type = types.StringValue(string(resp.Config.Client.Binary.Type))
-				}
-				if resp.Config.Client.Text == nil {
-					r.Config.Client.Text = nil
-				} else {
-					r.Config.Client.Text = &tfTypes.Binary{}
-					r.Config.Client.Text.Schema = types.StringValue(resp.Config.Client.Text.Schema)
-					r.Config.Client.Text.Type = types.StringValue(string(resp.Config.Client.Text.Type))
-				}
-			}
-			if resp.Config.Upstream == nil {
-				r.Config.Upstream = nil
-			} else {
-				r.Config.Upstream = &tfTypes.WebsocketValidatorPluginClient{}
-				if resp.Config.Upstream.Binary == nil {
-					r.Config.Upstream.Binary = nil
-				} else {
-					r.Config.Upstream.Binary = &tfTypes.Binary{}
-					r.Config.Upstream.Binary.Schema = types.StringValue(resp.Config.Upstream.Binary.Schema)
-					r.Config.Upstream.Binary.Type = types.StringValue(string(resp.Config.Upstream.Binary.Type))
-				}
-				if resp.Config.Upstream.Text == nil {
-					r.Config.Upstream.Text = nil
-				} else {
-					r.Config.Upstream.Text = &tfTypes.Binary{}
-					r.Config.Upstream.Text.Schema = types.StringValue(resp.Config.Upstream.Text.Schema)
-					r.Config.Upstream.Text.Type = types.StringValue(string(resp.Config.Upstream.Text.Type))
-				}
-			}
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

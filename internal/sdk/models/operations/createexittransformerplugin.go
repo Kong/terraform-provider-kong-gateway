@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateExittransformerPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ExitTransformerPlugin shared.ExitTransformerPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateExittransformerPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateExittransformerPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ExitTransformerPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateExittransformerPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateExittransformerPluginRequest) GetExitTransformerPlugin() shared.ExitTransformerPlugin {
+	if c == nil {
+		return shared.ExitTransformerPlugin{}
+	}
+	return c.ExitTransformerPlugin
+}
 
 type CreateExittransformerPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateExittransformerPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateExittransformerPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateExittransformerPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateExittransformerPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateExittransformerPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateExittransformerPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateExittransformerPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateExittransformerPluginResponse) GetExitTransformerPlugin() *shared.ExitTransformerPlugin {
-	if o == nil {
+func (c *CreateExittransformerPluginResponse) GetExitTransformerPlugin() *shared.ExitTransformerPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ExitTransformerPlugin
+	return c.ExitTransformerPlugin
 }
 
-func (o *CreateExittransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateExittransformerPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

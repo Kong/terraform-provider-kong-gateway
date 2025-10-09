@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateRoutebyheaderPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RouteByHeaderPlugin shared.RouteByHeaderPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateRoutebyheaderPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateRoutebyheaderPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateRoutebyheaderPluginRequest) GetRouteByHeaderPlugin() shared.RouteByHeaderPlugin {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RouteByHeaderPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateRoutebyheaderPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateRoutebyheaderPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateRoutebyheaderPluginRequest) GetRouteByHeaderPlugin() shared.RouteByHeaderPlugin {
+	if u == nil {
 		return shared.RouteByHeaderPlugin{}
 	}
-	return o.RouteByHeaderPlugin
+	return u.RouteByHeaderPlugin
 }
 
 type UpdateRoutebyheaderPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateRoutebyheaderPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateRoutebyheaderPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateRoutebyheaderPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateRoutebyheaderPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateRoutebyheaderPluginResponse) GetRouteByHeaderPlugin() *shared.RouteByHeaderPlugin {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginResponse) GetRouteByHeaderPlugin() *shared.RouteByHeaderPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.RouteByHeaderPlugin
+	return u.RouteByHeaderPlugin
 }
 
-func (o *UpdateRoutebyheaderPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateRoutebyheaderPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

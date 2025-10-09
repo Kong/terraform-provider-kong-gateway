@@ -12,22 +12,22 @@ type LdapAuthPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *LdapAuthPluginAfter) GetAccess() []string {
-	if o == nil {
+func (l *LdapAuthPluginAfter) GetAccess() []string {
+	if l == nil {
 		return nil
 	}
-	return o.Access
+	return l.Access
 }
 
 type LdapAuthPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *LdapAuthPluginBefore) GetAccess() []string {
-	if o == nil {
+func (l *LdapAuthPluginBefore) GetAccess() []string {
+	if l == nil {
 		return nil
 	}
-	return o.Access
+	return l.Access
 }
 
 type LdapAuthPluginOrdering struct {
@@ -35,54 +35,56 @@ type LdapAuthPluginOrdering struct {
 	Before *LdapAuthPluginBefore `json:"before,omitempty"`
 }
 
-func (o *LdapAuthPluginOrdering) GetAfter() *LdapAuthPluginAfter {
-	if o == nil {
+func (l *LdapAuthPluginOrdering) GetAfter() *LdapAuthPluginAfter {
+	if l == nil {
 		return nil
 	}
-	return o.After
+	return l.After
 }
 
-func (o *LdapAuthPluginOrdering) GetBefore() *LdapAuthPluginBefore {
-	if o == nil {
+func (l *LdapAuthPluginOrdering) GetBefore() *LdapAuthPluginBefore {
+	if l == nil {
 		return nil
 	}
-	return o.Before
+	return l.Before
 }
 
 type LdapAuthPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *LdapAuthPluginPartials) GetID() *string {
-	if o == nil {
+func (l *LdapAuthPluginPartials) GetID() *string {
+	if l == nil {
 		return nil
 	}
-	return o.ID
+	return l.ID
 }
 
-func (o *LdapAuthPluginPartials) GetName() *string {
-	if o == nil {
+func (l *LdapAuthPluginPartials) GetName() *string {
+	if l == nil {
 		return nil
 	}
-	return o.Name
+	return l.Name
 }
 
-func (o *LdapAuthPluginPartials) GetPath() *string {
-	if o == nil {
+func (l *LdapAuthPluginPartials) GetPath() *string {
+	if l == nil {
 		return nil
 	}
-	return o.Path
+	return l.Path
 }
 
 type LdapAuthPluginConfig struct {
 	// An optional string (consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request fails with an authentication failure `4xx`.
 	Anonymous *string `json:"anonymous,omitempty"`
 	// Attribute to be used to search the user; e.g. cn
-	Attribute *string `json:"attribute,omitempty"`
+	Attribute string `json:"attribute"`
 	// Base DN as the starting point for the search; e.g., dc=example,dc=com
-	BaseDn *string `json:"base_dn,omitempty"`
+	BaseDn string `json:"base_dn"`
 	// Cache expiry time in seconds.
 	CacheTTL *float64 `json:"cache_ttl,omitempty"`
 	// An optional string to use as part of the Authorization header
@@ -92,7 +94,7 @@ type LdapAuthPluginConfig struct {
 	// An optional value in milliseconds that defines how long an idle connection to LDAP server will live before being closed.
 	Keepalive *float64 `json:"keepalive,omitempty"`
 	// A string representing a host name, such as example.com.
-	LdapHost *string `json:"ldap_host,omitempty"`
+	LdapHost string `json:"ldap_host"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	LdapPort *int64 `json:"ldap_port,omitempty"`
 	// Set to `true` to connect using the LDAPS protocol (LDAP over TLS).  When `ldaps` is configured, you must use port 636. If the `ldap` setting is enabled, ensure the `start_tls` setting is disabled.
@@ -107,102 +109,102 @@ type LdapAuthPluginConfig struct {
 	VerifyLdapHost *bool `json:"verify_ldap_host,omitempty"`
 }
 
-func (o *LdapAuthPluginConfig) GetAnonymous() *string {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetAnonymous() *string {
+	if l == nil {
 		return nil
 	}
-	return o.Anonymous
+	return l.Anonymous
 }
 
-func (o *LdapAuthPluginConfig) GetAttribute() *string {
-	if o == nil {
-		return nil
+func (l *LdapAuthPluginConfig) GetAttribute() string {
+	if l == nil {
+		return ""
 	}
-	return o.Attribute
+	return l.Attribute
 }
 
-func (o *LdapAuthPluginConfig) GetBaseDn() *string {
-	if o == nil {
-		return nil
+func (l *LdapAuthPluginConfig) GetBaseDn() string {
+	if l == nil {
+		return ""
 	}
-	return o.BaseDn
+	return l.BaseDn
 }
 
-func (o *LdapAuthPluginConfig) GetCacheTTL() *float64 {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetCacheTTL() *float64 {
+	if l == nil {
 		return nil
 	}
-	return o.CacheTTL
+	return l.CacheTTL
 }
 
-func (o *LdapAuthPluginConfig) GetHeaderType() *string {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetHeaderType() *string {
+	if l == nil {
 		return nil
 	}
-	return o.HeaderType
+	return l.HeaderType
 }
 
-func (o *LdapAuthPluginConfig) GetHideCredentials() *bool {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetHideCredentials() *bool {
+	if l == nil {
 		return nil
 	}
-	return o.HideCredentials
+	return l.HideCredentials
 }
 
-func (o *LdapAuthPluginConfig) GetKeepalive() *float64 {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetKeepalive() *float64 {
+	if l == nil {
 		return nil
 	}
-	return o.Keepalive
+	return l.Keepalive
 }
 
-func (o *LdapAuthPluginConfig) GetLdapHost() *string {
-	if o == nil {
-		return nil
+func (l *LdapAuthPluginConfig) GetLdapHost() string {
+	if l == nil {
+		return ""
 	}
-	return o.LdapHost
+	return l.LdapHost
 }
 
-func (o *LdapAuthPluginConfig) GetLdapPort() *int64 {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetLdapPort() *int64 {
+	if l == nil {
 		return nil
 	}
-	return o.LdapPort
+	return l.LdapPort
 }
 
-func (o *LdapAuthPluginConfig) GetLdaps() *bool {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetLdaps() *bool {
+	if l == nil {
 		return nil
 	}
-	return o.Ldaps
+	return l.Ldaps
 }
 
-func (o *LdapAuthPluginConfig) GetRealm() *string {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetRealm() *string {
+	if l == nil {
 		return nil
 	}
-	return o.Realm
+	return l.Realm
 }
 
-func (o *LdapAuthPluginConfig) GetStartTLS() *bool {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetStartTLS() *bool {
+	if l == nil {
 		return nil
 	}
-	return o.StartTLS
+	return l.StartTLS
 }
 
-func (o *LdapAuthPluginConfig) GetTimeout() *float64 {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetTimeout() *float64 {
+	if l == nil {
 		return nil
 	}
-	return o.Timeout
+	return l.Timeout
 }
 
-func (o *LdapAuthPluginConfig) GetVerifyLdapHost() *bool {
-	if o == nil {
+func (l *LdapAuthPluginConfig) GetVerifyLdapHost() *bool {
+	if l == nil {
 		return nil
 	}
-	return o.VerifyLdapHost
+	return l.VerifyLdapHost
 }
 
 type LdapAuthPluginProtocols string
@@ -248,11 +250,11 @@ type LdapAuthPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *LdapAuthPluginRoute) GetID() *string {
-	if o == nil {
+func (l *LdapAuthPluginRoute) GetID() *string {
+	if l == nil {
 		return nil
 	}
-	return o.ID
+	return l.ID
 }
 
 // LdapAuthPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -260,11 +262,11 @@ type LdapAuthPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *LdapAuthPluginService) GetID() *string {
-	if o == nil {
+func (l *LdapAuthPluginService) GetID() *string {
+	if l == nil {
 		return nil
 	}
-	return o.ID
+	return l.ID
 }
 
 // LdapAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -272,17 +274,20 @@ type LdapAuthPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                    `json:"enabled,omitempty"`
-	ID           *string                  `json:"id,omitempty"`
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"ldap-auth" json:"name"`
-	Ordering     *LdapAuthPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []LdapAuthPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"ldap-auth" json:"name"`
+	Ordering     *LdapAuthPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []LdapAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                `json:"updated_at,omitempty"`
-	Config    *LdapAuthPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64               `json:"updated_at,omitempty"`
+	Config    LdapAuthPluginConfig `json:"config"`
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []LdapAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
@@ -296,96 +301,96 @@ func (l LdapAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (l *LdapAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *LdapAuthPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (l *LdapAuthPlugin) GetCreatedAt() *int64 {
+	if l == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return l.CreatedAt
 }
 
-func (o *LdapAuthPlugin) GetEnabled() *bool {
-	if o == nil {
+func (l *LdapAuthPlugin) GetEnabled() *bool {
+	if l == nil {
 		return nil
 	}
-	return o.Enabled
+	return l.Enabled
 }
 
-func (o *LdapAuthPlugin) GetID() *string {
-	if o == nil {
+func (l *LdapAuthPlugin) GetID() *string {
+	if l == nil {
 		return nil
 	}
-	return o.ID
+	return l.ID
 }
 
-func (o *LdapAuthPlugin) GetInstanceName() *string {
-	if o == nil {
+func (l *LdapAuthPlugin) GetInstanceName() *string {
+	if l == nil {
 		return nil
 	}
-	return o.InstanceName
+	return l.InstanceName
 }
 
-func (o *LdapAuthPlugin) GetName() string {
+func (l *LdapAuthPlugin) GetName() string {
 	return "ldap-auth"
 }
 
-func (o *LdapAuthPlugin) GetOrdering() *LdapAuthPluginOrdering {
-	if o == nil {
+func (l *LdapAuthPlugin) GetOrdering() *LdapAuthPluginOrdering {
+	if l == nil {
 		return nil
 	}
-	return o.Ordering
+	return l.Ordering
 }
 
-func (o *LdapAuthPlugin) GetPartials() []LdapAuthPluginPartials {
-	if o == nil {
+func (l *LdapAuthPlugin) GetPartials() []LdapAuthPluginPartials {
+	if l == nil {
 		return nil
 	}
-	return o.Partials
+	return l.Partials
 }
 
-func (o *LdapAuthPlugin) GetTags() []string {
-	if o == nil {
+func (l *LdapAuthPlugin) GetTags() []string {
+	if l == nil {
 		return nil
 	}
-	return o.Tags
+	return l.Tags
 }
 
-func (o *LdapAuthPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (l *LdapAuthPlugin) GetUpdatedAt() *int64 {
+	if l == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return l.UpdatedAt
 }
 
-func (o *LdapAuthPlugin) GetConfig() *LdapAuthPluginConfig {
-	if o == nil {
-		return nil
+func (l *LdapAuthPlugin) GetConfig() LdapAuthPluginConfig {
+	if l == nil {
+		return LdapAuthPluginConfig{}
 	}
-	return o.Config
+	return l.Config
 }
 
-func (o *LdapAuthPlugin) GetProtocols() []LdapAuthPluginProtocols {
-	if o == nil {
+func (l *LdapAuthPlugin) GetProtocols() []LdapAuthPluginProtocols {
+	if l == nil {
 		return nil
 	}
-	return o.Protocols
+	return l.Protocols
 }
 
-func (o *LdapAuthPlugin) GetRoute() *LdapAuthPluginRoute {
-	if o == nil {
+func (l *LdapAuthPlugin) GetRoute() *LdapAuthPluginRoute {
+	if l == nil {
 		return nil
 	}
-	return o.Route
+	return l.Route
 }
 
-func (o *LdapAuthPlugin) GetService() *LdapAuthPluginService {
-	if o == nil {
+func (l *LdapAuthPlugin) GetService() *LdapAuthPluginService {
+	if l == nil {
 		return nil
 	}
-	return o.Service
+	return l.Service
 }

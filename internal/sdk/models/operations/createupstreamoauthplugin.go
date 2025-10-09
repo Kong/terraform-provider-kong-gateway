@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateUpstreamoauthPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	UpstreamOauthPlugin shared.UpstreamOauthPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateUpstreamoauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateUpstreamoauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "UpstreamOauthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateUpstreamoauthPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateUpstreamoauthPluginRequest) GetUpstreamOauthPlugin() shared.UpstreamOauthPlugin {
+	if c == nil {
+		return shared.UpstreamOauthPlugin{}
+	}
+	return c.UpstreamOauthPlugin
+}
 
 type CreateUpstreamoauthPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateUpstreamoauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateUpstreamoauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateUpstreamoauthPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateUpstreamoauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateUpstreamoauthPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateUpstreamoauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateUpstreamoauthPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateUpstreamoauthPluginResponse) GetUpstreamOauthPlugin() *shared.UpstreamOauthPlugin {
-	if o == nil {
+func (c *CreateUpstreamoauthPluginResponse) GetUpstreamOauthPlugin() *shared.UpstreamOauthPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.UpstreamOauthPlugin
+	return c.UpstreamOauthPlugin
 }
 
-func (o *CreateUpstreamoauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateUpstreamoauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

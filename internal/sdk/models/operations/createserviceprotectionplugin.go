@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateServiceprotectionPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace               string                         `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ServiceProtectionPlugin shared.ServiceProtectionPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateServiceprotectionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateServiceprotectionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ServiceProtectionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateServiceprotectionPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateServiceprotectionPluginRequest) GetServiceProtectionPlugin() shared.ServiceProtectionPlugin {
+	if c == nil {
+		return shared.ServiceProtectionPlugin{}
+	}
+	return c.ServiceProtectionPlugin
+}
 
 type CreateServiceprotectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateServiceprotectionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateServiceprotectionPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateServiceprotectionPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateServiceprotectionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateServiceprotectionPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateServiceprotectionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateServiceprotectionPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateServiceprotectionPluginResponse) GetServiceProtectionPlugin() *shared.ServiceProtectionPlugin {
-	if o == nil {
+func (c *CreateServiceprotectionPluginResponse) GetServiceProtectionPlugin() *shared.ServiceProtectionPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ServiceProtectionPlugin
+	return c.ServiceProtectionPlugin
 }
 
-func (o *CreateServiceprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateServiceprotectionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

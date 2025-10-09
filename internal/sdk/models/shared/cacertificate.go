@@ -9,52 +9,53 @@ type CACertificate struct {
 	// SHA256 hex digest of the public certificate. This field is read-only and it cannot be set by the caller, the value is automatically computed.
 	CertDigest *string `json:"cert_digest,omitempty"`
 	// Unix epoch when the resource was created.
-	CreatedAt *int64  `json:"created_at,omitempty"`
-	ID        *string `json:"id,omitempty"`
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
 	// An optional set of strings associated with the Certificate for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
 
-func (o *CACertificate) GetCert() string {
-	if o == nil {
+func (c *CACertificate) GetCert() string {
+	if c == nil {
 		return ""
 	}
-	return o.Cert
+	return c.Cert
 }
 
-func (o *CACertificate) GetCertDigest() *string {
-	if o == nil {
+func (c *CACertificate) GetCertDigest() *string {
+	if c == nil {
 		return nil
 	}
-	return o.CertDigest
+	return c.CertDigest
 }
 
-func (o *CACertificate) GetCreatedAt() *int64 {
-	if o == nil {
+func (c *CACertificate) GetCreatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return c.CreatedAt
 }
 
-func (o *CACertificate) GetID() *string {
-	if o == nil {
+func (c *CACertificate) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-func (o *CACertificate) GetTags() []string {
-	if o == nil {
+func (c *CACertificate) GetTags() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Tags
+	return c.Tags
 }
 
-func (o *CACertificate) GetUpdatedAt() *int64 {
-	if o == nil {
+func (c *CACertificate) GetUpdatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return c.UpdatedAt
 }

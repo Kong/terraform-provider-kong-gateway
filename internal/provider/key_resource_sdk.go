@@ -11,6 +11,121 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *KeyResourceModel) RefreshFromSharedKey(ctx context.Context, resp *shared.Key) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Jwk = types.StringPointerValue(resp.Jwk)
+		r.Kid = types.StringValue(resp.Kid)
+		r.Name = types.StringPointerValue(resp.Name)
+		if resp.Pem == nil {
+			r.Pem = nil
+		} else {
+			r.Pem = &tfTypes.Pem{}
+			r.Pem.PrivateKey = types.StringPointerValue(resp.Pem.PrivateKey)
+			r.Pem.PublicKey = types.StringPointerValue(resp.Pem.PublicKey)
+		}
+		if resp.Set == nil {
+			r.Set = nil
+		} else {
+			r.Set = &tfTypes.Set{}
+			r.Set.ID = types.StringPointerValue(resp.Set.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		r.X5t = types.StringPointerValue(resp.X5t)
+	}
+
+	return diags
+}
+
+func (r *KeyResourceModel) ToOperationsCreateKeyRequest(ctx context.Context) (*operations.CreateKeyRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	key, keyDiags := r.ToSharedKey(ctx)
+	diags.Append(keyDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateKeyRequest{
+		Workspace: workspace,
+		Key:       *key,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyResourceModel) ToOperationsDeleteKeyRequest(ctx context.Context) (*operations.DeleteKeyRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keyIDOrName string
+	keyIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteKeyRequest{
+		KeyIDOrName: keyIDOrName,
+		Workspace:   workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyResourceModel) ToOperationsGetKeyRequest(ctx context.Context) (*operations.GetKeyRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keyIDOrName string
+	keyIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetKeyRequest{
+		KeyIDOrName: keyIDOrName,
+		Workspace:   workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *KeyResourceModel) ToOperationsUpsertKeyRequest(ctx context.Context) (*operations.UpsertKeyRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var keyIDOrName string
+	keyIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	key, keyDiags := r.ToSharedKey(ctx)
+	diags.Append(keyDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertKeyRequest{
+		KeyIDOrName: keyIDOrName,
+		Workspace:   workspace,
+		Key:         *key,
+	}
+
+	return &out, diags
+}
+
 func (r *KeyResourceModel) ToSharedKey(ctx context.Context) (*shared.Key, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -72,9 +187,12 @@ func (r *KeyResourceModel) ToSharedKey(ctx context.Context) (*shared.Key, diag.D
 			ID: id1,
 		}
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -102,84 +220,4 @@ func (r *KeyResourceModel) ToSharedKey(ctx context.Context) (*shared.Key, diag.D
 	}
 
 	return &out, diags
-}
-
-func (r *KeyResourceModel) ToOperationsUpsertKeyRequest(ctx context.Context) (*operations.UpsertKeyRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var keyIDOrName string
-	keyIDOrName = r.ID.ValueString()
-
-	key, keyDiags := r.ToSharedKey(ctx)
-	diags.Append(keyDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertKeyRequest{
-		KeyIDOrName: keyIDOrName,
-		Key:         *key,
-	}
-
-	return &out, diags
-}
-
-func (r *KeyResourceModel) ToOperationsGetKeyRequest(ctx context.Context) (*operations.GetKeyRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var keyIDOrName string
-	keyIDOrName = r.ID.ValueString()
-
-	out := operations.GetKeyRequest{
-		KeyIDOrName: keyIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *KeyResourceModel) ToOperationsDeleteKeyRequest(ctx context.Context) (*operations.DeleteKeyRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var keyIDOrName string
-	keyIDOrName = r.ID.ValueString()
-
-	out := operations.DeleteKeyRequest{
-		KeyIDOrName: keyIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *KeyResourceModel) RefreshFromSharedKey(ctx context.Context, resp *shared.Key) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Jwk = types.StringPointerValue(resp.Jwk)
-		r.Kid = types.StringValue(resp.Kid)
-		r.Name = types.StringPointerValue(resp.Name)
-		if resp.Pem == nil {
-			r.Pem = nil
-		} else {
-			r.Pem = &tfTypes.Pem{}
-			r.Pem.PrivateKey = types.StringPointerValue(resp.Pem.PrivateKey)
-			r.Pem.PublicKey = types.StringPointerValue(resp.Pem.PublicKey)
-		}
-		if resp.Set == nil {
-			r.Set = nil
-		} else {
-			r.Set = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Set.ID = types.StringPointerValue(resp.Set.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-		r.X5t = types.StringPointerValue(resp.X5t)
-	}
-
-	return diags
 }

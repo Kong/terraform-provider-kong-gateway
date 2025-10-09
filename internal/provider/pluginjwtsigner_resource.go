@@ -3,13 +3,17 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -35,18 +39,19 @@ type PluginJwtSignerResource struct {
 
 // PluginJwtSignerResourceModel describes the resource data model.
 type PluginJwtSignerResourceModel struct {
-	Config       *tfTypes.JwtSignerPluginConfig     `tfsdk:"config"`
-	CreatedAt    types.Int64                        `tfsdk:"created_at"`
-	Enabled      types.Bool                         `tfsdk:"enabled"`
-	ID           types.String                       `tfsdk:"id"`
-	InstanceName types.String                       `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                  `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                 `tfsdk:"partials"`
-	Protocols    []types.String                     `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer `tfsdk:"service"`
-	Tags         []types.String                     `tfsdk:"tags"`
-	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Config       *tfTypes.JwtSignerPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                    `tfsdk:"created_at"`
+	Enabled      types.Bool                     `tfsdk:"enabled"`
+	ID           types.String                   `tfsdk:"id"`
+	InstanceName types.String                   `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering     `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials    `tfsdk:"partials"`
+	Protocols    []types.String                 `tfsdk:"protocols"`
+	Route        *tfTypes.Set                   `tfsdk:"route"`
+	Service      *tfTypes.Set                   `tfsdk:"service"`
+	Tags         []types.String                 `tfsdk:"tags"`
+	UpdatedAt    types.Int64                    `tfsdk:"updated_at"`
+	Workspace    types.String                   `tfsdk:"workspace"`
 }
 
 func (r *PluginJwtSignerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -61,6 +66,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"access_token_audience_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token to verify against values of ` + "`" + `config.access_token_audiences_allowed` + "`" + `.`,
+					},
+					"access_token_audiences_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The audiences allowed to be present in the access token claim specified by ` + "`" + `config.access_token_audience_claim` + "`" + `.`,
+					},
 					"access_token_consumer_by": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -72,6 +89,24 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `When you set a value for this parameter, the plugin tries to map an arbitrary claim specified with this configuration parameter (for example, ` + "`" + `sub` + "`" + ` or ` + "`" + `username` + "`" + `) in an access token to Kong consumer entity.`,
+					},
+					"access_token_expiry_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the expiry claim in an access token to verify if the default ` + "`" + `exp` + "`" + ` is not used.`,
+					},
+					"access_token_introspection_audience_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token introspection to verify against values of ` + "`" + `config.access_token_introspection_audiences_allowed` + "`" + `.`,
+					},
+					"access_token_introspection_audiences_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The audiences allowed to be present in the access token introspection claim specified by ` + "`" + `config.access_token_introspection_audience_claim` + "`" + `.`,
 					},
 					"access_token_introspection_authorization": schema.StringAttribute{
 						Computed:    true,
@@ -100,10 +135,28 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `When you use ` + "`" + `opaque` + "`" + ` access tokens and you want to turn on access token introspection, you need to specify the OAuth 2.0 introspection endpoint URI with this configuration parameter.`,
 					},
+					"access_token_introspection_expiry_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the expiry claim in an access token introspection to verify if the default ` + "`" + `exp` + "`" + ` is not used.`,
+					},
 					"access_token_introspection_hint": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If you need to give ` + "`" + `hint` + "`" + ` parameter when introspecting an access token, use this parameter to specify the value. By default, the plugin sends ` + "`" + `hint=access_token` + "`" + `.`,
+					},
+					"access_token_introspection_issuer_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token introspection to verify against values of ` + "`" + `config.access_token_introspection_issuers_allowed` + "`" + `.`,
+					},
+					"access_token_introspection_issuers_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The issuers allowed to be present in the access token introspection claim specified by ` + "`" + `config.access_token_introspection_issuer_claim` + "`" + `.`,
 					},
 					"access_token_introspection_jwt_claim": schema.ListAttribute{
 						Computed:    true,
@@ -114,7 +167,29 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"access_token_introspection_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Adjusts clock skew between the token issuer introspection results and Kong. The value is added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time in seconds. You can disable access token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_introspection_expiry` + "`" + `.`,
+						Description: `Adjusts clock skew between the token issuer introspection results and Kong. The value will be used to time-related claim verification. For example, it will be added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time in seconds. You can disable access token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_introspection_expiry` + "`" + `.`,
+					},
+					"access_token_introspection_notbefore_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the notbefore claim in an access token introspection to verify if the default ` + "`" + `nbf` + "`" + ` is not used.`,
+					},
+					"access_token_introspection_optional_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the optional claims of the access token introspection result. These claims are only validated when they are present. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
+					},
+					"access_token_introspection_required_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the required claims that must be present in the access token introspection result. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
 					},
 					"access_token_introspection_scopes_claim": schema.ListAttribute{
 						Computed:    true,
@@ -128,6 +203,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `Specify the required values (or scopes) that are checked by an introspection claim/property specified by ` + "`" + `config.access_token_introspection_scopes_claim` + "`" + `.`,
 					},
+					"access_token_introspection_subject_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token introspection to verify against values of ` + "`" + `config.access_token_introspection_subjects_allowed` + "`" + `.`,
+					},
+					"access_token_introspection_subjects_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The subjects allowed to be present in the access token introspection claim specified by ` + "`" + `config.access_token_introspection_subject_claim` + "`" + `.`,
+					},
 					"access_token_introspection_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
@@ -138,14 +225,32 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The ` + "`" + `iss` + "`" + ` claim of a signed or re-signed access token is set to this value. Original ` + "`" + `iss` + "`" + ` claim of the incoming token (possibly introspected) is stored in ` + "`" + `original_iss` + "`" + ` claim of the newly signed access token.`,
 					},
+					"access_token_issuer_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token to verify against values of ` + "`" + `config.access_token_issuers_allowed` + "`" + `.`,
+					},
+					"access_token_issuers_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The issuers allowed to be present in the access token claim specified by ` + "`" + `config.access_token_issuer_claim` + "`" + `.`,
+					},
 					"access_token_jwks_uri": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Specify the URI where the plugin can fetch the public keys (JWKS) to verify the signature of the access token.`,
 					},
-					"access_token_jwks_uri_client_certificate": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+					"access_token_jwks_uri_client_certificate": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"id": schema.StringAttribute{
+								Computed: true,
+								Optional: true,
+							},
+						},
 						Description: `The client certificate that will be used to authenticate Kong if ` + "`" + `access_token_jwks_uri` + "`" + ` is an https uri that requires mTLS Auth.`,
 					},
 					"access_token_jwks_uri_client_password": schema.StringAttribute{
@@ -168,9 +273,15 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The name of the keyset containing signing keys.`,
 					},
-					"access_token_keyset_client_certificate": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+					"access_token_keyset_client_certificate": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"id": schema.StringAttribute{
+								Computed: true,
+								Optional: true,
+							},
+						},
 						Description: `The client certificate that will be used to authenticate Kong if ` + "`" + `access_token_keyset` + "`" + ` is an https uri that requires mTLS Auth.`,
 					},
 					"access_token_keyset_client_password": schema.StringAttribute{
@@ -191,17 +302,39 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"access_token_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Adjusts clock skew between the token issuer and Kong. The value is added to the token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers' current time in seconds. You can disable access token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_expiry` + "`" + `.`,
+						Description: `Adjusts clock skew between the token issuer and Kong. The value will be used to time-related claim verification. For example, it will be added to the token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers' current time in seconds. You can disable access token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_access_token_expiry` + "`" + `.`,
+					},
+					"access_token_notbefore_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the notbefore claim in an access token to verify if the default ` + "`" + `nbf` + "`" + ` is not used.`,
 					},
 					"access_token_optional": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If an access token is not provided or no ` + "`" + `config.access_token_request_header` + "`" + ` is specified, the plugin cannot verify the access token. In that case, the plugin normally responds with ` + "`" + `401 Unauthorized` + "`" + ` (client didn't send a token) or ` + "`" + `500 Unexpected` + "`" + ` (a configuration error). Use this parameter to allow the request to proceed even when there is no token to check. If the token is provided, then this parameter has no effect`,
 					},
+					"access_token_optional_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the optional claims of the access token. These claims are only validated when they are present. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
+					},
 					"access_token_request_header": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `This parameter tells the name of the header where to look for the access token.`,
+					},
+					"access_token_required_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the required claims that must be present in the access token. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
 					},
 					"access_token_scopes_claim": schema.ListAttribute{
 						Computed:    true,
@@ -214,6 +347,11 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `Specify the required values (or scopes) that are checked by a claim specified by ` + "`" + `config.access_token_scopes_claim` + "`" + `.`,
+					},
+					"access_token_signing": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn access token signing or re-signing off and on as needed. If turned off, the plugin will not send the signed or resigned token to the upstream.`,
 					},
 					"access_token_signing_algorithm": schema.StringAttribute{
 						Computed:    true,
@@ -236,6 +374,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 							),
 						},
 					},
+					"access_token_subject_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in an access token to verify against values of ` + "`" + `config.access_token_subjects_allowed` + "`" + `.`,
+					},
+					"access_token_subjects_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The subjects allowed to be present in the access token claim specified by ` + "`" + `config.access_token_subject_claim` + "`" + `.`,
+					},
 					"access_token_upstream_header": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -249,7 +399,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"add_access_token_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Add customized claims if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -258,7 +408,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"add_channel_token_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Add customized claims if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -267,7 +417,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"add_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Add customized claims to both tokens if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -283,6 +433,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `Whether to cache channel token introspection results.`,
 					},
+					"channel_token_audience_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token to verify against values of ` + "`" + `config.channel_token_audiences_allowed` + "`" + `.`,
+					},
+					"channel_token_audiences_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The audiences allowed to be present in the channel token claim specified by ` + "`" + `config.channel_token_audience_claim` + "`" + `.`,
+					},
 					"channel_token_consumer_by": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -294,6 +456,24 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `When you set a value for this parameter, the plugin tries to map an arbitrary claim specified with this configuration parameter. Kong consumers have an ` + "`" + `id` + "`" + `, a ` + "`" + `username` + "`" + `, and a ` + "`" + `custom_id` + "`" + `. If this parameter is enabled but the mapping fails, such as when there's a non-existent Kong consumer, the plugin responds with ` + "`" + `403 Forbidden` + "`" + `.`,
+					},
+					"channel_token_expiry_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the expiry claim in a channel token to verify if the default ` + "`" + `exp` + "`" + ` is not used.`,
+					},
+					"channel_token_introspection_audience_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token introspection to verify against values of ` + "`" + `config.channel_token_introspection_audiences_allowed` + "`" + `.`,
+					},
+					"channel_token_introspection_audiences_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The audiences allowed to be present in the channel token introspection claim specified by ` + "`" + `config.channel_token_introspection_audience_claim` + "`" + `.`,
 					},
 					"channel_token_introspection_authorization": schema.StringAttribute{
 						Computed:    true,
@@ -322,10 +502,28 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `When you use ` + "`" + `opaque` + "`" + ` access tokens and you want to turn on access token introspection, you need to specify the OAuth 2.0 introspection endpoint URI with this configuration parameter. Otherwise, the plugin does not try introspection and returns ` + "`" + `401 Unauthorized` + "`" + ` instead.`,
 					},
+					"channel_token_introspection_expiry_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the expiry claim in a channel token to verify if the default ` + "`" + `exp` + "`" + ` is not used.`,
+					},
 					"channel_token_introspection_hint": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If you need to give ` + "`" + `hint` + "`" + ` parameter when introspecting a channel token, you can use this parameter to specify the value of such parameter. By default, a ` + "`" + `hint` + "`" + ` isn't sent with channel token introspection.`,
+					},
+					"channel_token_introspection_issuer_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token introspection to verify against values of ` + "`" + `config.channel_token_introspection_issuers_allowed` + "`" + `.`,
+					},
+					"channel_token_introspection_issuers_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The issuers allowed to be present in the channel token introspection claim specified by ` + "`" + `config.channel_token_introspection_issuer_claim` + "`" + `.`,
 					},
 					"channel_token_introspection_jwt_claim": schema.ListAttribute{
 						Computed:    true,
@@ -336,7 +534,29 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"channel_token_introspection_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `You can use this parameter to adjust clock skew between the token issuer introspection results and Kong. The value will be added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time (in seconds). You can disable channel token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_introspection_expiry` + "`" + `.`,
+						Description: `You can use this parameter to adjust clock skew between the token issuer introspection results and Kong. The value will be used to time-related claim verification. For example, it will be added to introspection results (` + "`" + `JSON` + "`" + `) ` + "`" + `exp` + "`" + ` claim/property before checking token expiry against Kong servers current time (in seconds). You can disable channel token introspection ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_introspection_expiry` + "`" + `.`,
+					},
+					"channel_token_introspection_notbefore_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the notbefore claim in a channel token to verify if the default ` + "`" + `nbf` + "`" + ` is not used.`,
+					},
+					"channel_token_introspection_optional_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the optional claims of the channel token introspection. These claims are only validated when they are present. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
+					},
+					"channel_token_introspection_required_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the required claims that must be present in the channel token introspection. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
 					},
 					"channel_token_introspection_scopes_claim": schema.ListAttribute{
 						Computed:    true,
@@ -350,6 +570,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						ElementType: types.StringType,
 						Description: `Use this parameter to specify the required values (or scopes) that are checked by an introspection claim/property specified by ` + "`" + `config.channel_token_introspection_scopes_claim` + "`" + `.`,
 					},
+					"channel_token_introspection_subject_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token to verify against values of ` + "`" + `config.channel_token_introspection_subjects_allowed` + "`" + `.`,
+					},
+					"channel_token_introspection_subjects_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The subjects allowed to be present in the channel token introspection claim specified by ` + "`" + `config.channel_token_introspection_subject_claim` + "`" + `.`,
+					},
 					"channel_token_introspection_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
@@ -360,14 +592,32 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The ` + "`" + `iss` + "`" + ` claim of the re-signed channel token is set to this value, which is ` + "`" + `kong` + "`" + ` by default. The original ` + "`" + `iss` + "`" + ` claim of the incoming token (possibly introspected) is stored in the ` + "`" + `original_iss` + "`" + ` claim of the newly signed channel token.`,
 					},
+					"channel_token_issuer_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token to verify against values of ` + "`" + `config.channel_token_issuers_allowed` + "`" + `.`,
+					},
+					"channel_token_issuers_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The issuers allowed to be present in the channel token claim specified by ` + "`" + `config.channel_token_issuer_claim` + "`" + `.`,
+					},
 					"channel_token_jwks_uri": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If you want to use ` + "`" + `config.verify_channel_token_signature` + "`" + `, you must specify the URI where the plugin can fetch the public keys (JWKS) to verify the signature of the channel token. If you don't specify a URI and you pass a JWT token to the plugin, then the plugin responds with ` + "`" + `401 Unauthorized` + "`" + `.`,
 					},
-					"channel_token_jwks_uri_client_certificate": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+					"channel_token_jwks_uri_client_certificate": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"id": schema.StringAttribute{
+								Computed: true,
+								Optional: true,
+							},
+						},
 						Description: `The client certificate that will be used to authenticate Kong if ` + "`" + `access_token_jwks_uri` + "`" + ` is an https uri that requires mTLS Auth.`,
 					},
 					"channel_token_jwks_uri_client_password": schema.StringAttribute{
@@ -390,9 +640,15 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `The name of the keyset containing signing keys.`,
 					},
-					"channel_token_keyset_client_certificate": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+					"channel_token_keyset_client_certificate": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"id": schema.StringAttribute{
+								Computed: true,
+								Optional: true,
+							},
+						},
 						Description: `The client certificate that will be used to authenticate Kong if ` + "`" + `channel_token_keyset` + "`" + ` is an https uri that requires mTLS Auth.`,
 					},
 					"channel_token_keyset_client_password": schema.StringAttribute{
@@ -413,17 +669,39 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"channel_token_leeway": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Adjusts clock skew between the token issuer and Kong. The value will be added to token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers current time in seconds. You can disable channel token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_expiry` + "`" + `.`,
+						Description: `Adjusts clock skew between the token issuer and Kong. The value will be used to time-related claim verification. For example, it will be added to token's ` + "`" + `exp` + "`" + ` claim before checking token expiry against Kong servers current time in seconds. You can disable channel token ` + "`" + `expiry` + "`" + ` verification altogether with ` + "`" + `config.verify_channel_token_expiry` + "`" + `.`,
+					},
+					"channel_token_notbefore_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the notbefore claim in a channel token to verify if the default ` + "`" + `nbf` + "`" + ` is not used.`,
 					},
 					"channel_token_optional": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `If a channel token is not provided or no ` + "`" + `config.channel_token_request_header` + "`" + ` is specified, the plugin cannot verify the channel token. In that case, the plugin normally responds with ` + "`" + `401 Unauthorized` + "`" + ` (client didn't send a token) or ` + "`" + `500 Unexpected` + "`" + ` (a configuration error). Enable this parameter to allow the request to proceed even when there is no channel token to check. If the channel token is provided, then this parameter has no effect`,
 					},
+					"channel_token_optional_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the optional claims of the channel token. These claims are only validated when they are present. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
+					},
 					"channel_token_request_header": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `This parameter tells the name of the header where to look for the channel token. If you don't want to do anything with the channel token, then you can set this to ` + "`" + `null` + "`" + ` or ` + "`" + `""` + "`" + ` (empty string).`,
+					},
+					"channel_token_required_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `Specify the required claims that must be present in the channel token. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.`,
 					},
 					"channel_token_scopes_claim": schema.ListAttribute{
 						Computed:    true,
@@ -436,6 +714,11 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `Specify the required values (or scopes) that are checked by a claim specified by ` + "`" + `config.channel_token_scopes_claim` + "`" + `.`,
+					},
+					"channel_token_signing": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn channel token signing or re-signing off and on as needed. If turned off, the plugin will not send the signed or resigned token to the upstream.`,
 					},
 					"channel_token_signing_algorithm": schema.StringAttribute{
 						Computed:    true,
@@ -457,6 +740,18 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 								"RS512",
 							),
 						},
+					},
+					"channel_token_subject_claim": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specify the claim in a channel token to verify against values of ` + "`" + `config.channel_token_subjects_allowed` + "`" + `.`,
+					},
+					"channel_token_subjects_allowed": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The subjects allowed to be present in the channel token claim specified by ` + "`" + `config.channel_token_subject_claim` + "`" + `.`,
 					},
 					"channel_token_upstream_header": schema.StringAttribute{
 						Computed:    true,
@@ -518,7 +813,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"set_access_token_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Set customized claims. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -527,7 +822,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"set_channel_token_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Set customized claims. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -536,7 +831,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					"set_claims": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: types.StringType,
+						ElementType: jsontypes.NormalizedType{},
 						Description: `Set customized claims to both tokens. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.`,
 						Validators: []validator.Map{
 							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
@@ -552,20 +847,55 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `Providing an opaque channel token for plugin introspection, and verifying expiry and scopes on introspection results may make further payload checks unnecessary before the plugin signs a new token. This also applies when using a JWT token with introspection JSON as per config.channel_token_introspection_jwt_claim. Use this parameter to manage additional payload checks before signing a new token. With true (default), payload's expiry or scopes aren't checked.`,
 					},
+					"verify_access_token_audience": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token required audiences verification, specified with ` + "`" + `config.access_token_audiences_required` + "`" + `.`,
+					},
 					"verify_access_token_expiry": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn access token expiry verification off and on as needed.`,
+					},
+					"verify_access_token_introspection_audience": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token introspection required audiences verification, specified with ` + "`" + `config.access_token_introspection_audiences_required` + "`" + `.`,
 					},
 					"verify_access_token_introspection_expiry": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn access token introspection expiry verification off and on as needed.`,
 					},
+					"verify_access_token_introspection_issuer": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token introspection allowed issuers verification, specified with ` + "`" + `config.access_token_introspection_issuers_allowed` + "`" + `.`,
+					},
+					"verify_access_token_introspection_notbefore": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token introspection notbefore verification.`,
+					},
 					"verify_access_token_introspection_scopes": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn off and on the access token introspection scopes verification, specified with ` + "`" + `config.access_token_introspection_scopes_required` + "`" + `.`,
+					},
+					"verify_access_token_introspection_subject": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token introspection required subjects verification, specified with ` + "`" + `config.access_token_introspection_subjects_required` + "`" + `.`,
+					},
+					"verify_access_token_issuer": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token allowed issuers verification, specified with ` + "`" + `config.access_token_issuers_allowed` + "`" + `.`,
+					},
+					"verify_access_token_notbefore": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token notbefore verification.`,
 					},
 					"verify_access_token_scopes": schema.BoolAttribute{
 						Computed:    true,
@@ -577,19 +907,59 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Optional:    true,
 						Description: `Quickly turn access token signature verification off and on as needed.`,
 					},
+					"verify_access_token_subject": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the access token required subjects verification, specified with ` + "`" + `config.access_token_subjects_required` + "`" + `.`,
+					},
+					"verify_channel_token_audience": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token required audiences verification, specified with ` + "`" + `config.channel_token_audiences_required` + "`" + `.`,
+					},
 					"verify_channel_token_expiry": schema.BoolAttribute{
 						Computed: true,
 						Optional: true,
+					},
+					"verify_channel_token_introspection_audience": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token introspection required audiences verification, specified with ` + "`" + `config.channel_token_introspection_audiences_required` + "`" + `.`,
 					},
 					"verify_channel_token_introspection_expiry": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn on/off the channel token introspection expiry verification.`,
 					},
+					"verify_channel_token_introspection_issuer": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token introspection allowed issuers verification, specified with ` + "`" + `config.channel_token_introspection_issuers_allowed` + "`" + `.`,
+					},
+					"verify_channel_token_introspection_notbefore": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token introspection notbefore verification.`,
+					},
 					"verify_channel_token_introspection_scopes": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn on/off the channel token introspection scopes verification specified with ` + "`" + `config.channel_token_introspection_scopes_required` + "`" + `.`,
+					},
+					"verify_channel_token_introspection_subject": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token introspection required subjects verification, specified with ` + "`" + `config.channel_token_introspection_subjects_required` + "`" + `.`,
+					},
+					"verify_channel_token_issuer": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token allowed issuers verification, specified with ` + "`" + `config.channel_token_issuers_allowed` + "`" + `.`,
+					},
+					"verify_channel_token_notbefore": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token notbefore verification.`,
 					},
 					"verify_channel_token_scopes": schema.BoolAttribute{
 						Computed:    true,
@@ -600,6 +970,11 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Computed:    true,
 						Optional:    true,
 						Description: `Quickly turn on/off the channel token signature verification.`,
+					},
+					"verify_channel_token_subject": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Quickly turn off and on the channel token required subjects verification, specified with ` + "`" + `config.channel_token_subjects_required` + "`" + `.`,
 					},
 				},
 			},
@@ -614,12 +989,17 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -658,12 +1038,17 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -671,8 +1056,9 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -710,6 +1096,12 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -753,7 +1145,7 @@ func (r *PluginJwtSignerResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	request, requestDiags := data.ToSharedJwtSignerPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateJwtsignerPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -953,5 +1345,26 @@ func (r *PluginJwtSignerResource) Delete(ctx context.Context, req resource.Delet
 }
 
 func (r *PluginJwtSignerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

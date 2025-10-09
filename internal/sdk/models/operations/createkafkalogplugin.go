@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateKafkalogPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	KafkaLogPlugin shared.KafkaLogPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateKafkalogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKafkalogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "KafkaLogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateKafkalogPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateKafkalogPluginRequest) GetKafkaLogPlugin() shared.KafkaLogPlugin {
+	if c == nil {
+		return shared.KafkaLogPlugin{}
+	}
+	return c.KafkaLogPlugin
+}
 
 type CreateKafkalogPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateKafkalogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateKafkalogPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateKafkalogPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateKafkalogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateKafkalogPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateKafkalogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateKafkalogPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateKafkalogPluginResponse) GetKafkaLogPlugin() *shared.KafkaLogPlugin {
-	if o == nil {
+func (c *CreateKafkalogPluginResponse) GetKafkaLogPlugin() *shared.KafkaLogPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.KafkaLogPlugin
+	return c.KafkaLogPlugin
 }
 
-func (o *CreateKafkalogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateKafkalogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

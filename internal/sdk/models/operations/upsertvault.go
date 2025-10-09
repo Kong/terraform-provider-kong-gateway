@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertVaultRequest struct {
 	// ID or prefix of the Vault to lookup
 	VaultIDOrPrefix string `pathParam:"style=simple,explode=false,name=VaultIdOrPrefix"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Vault
 	Vault shared.Vault `request:"mediaType=application/json"`
 }
 
-func (o *UpsertVaultRequest) GetVaultIDOrPrefix() string {
-	if o == nil {
-		return ""
-	}
-	return o.VaultIDOrPrefix
+func (u UpsertVaultRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertVaultRequest) GetVault() shared.Vault {
-	if o == nil {
+func (u *UpsertVaultRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"VaultIdOrPrefix", "workspace", "Vault"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertVaultRequest) GetVaultIDOrPrefix() string {
+	if u == nil {
+		return ""
+	}
+	return u.VaultIDOrPrefix
+}
+
+func (u *UpsertVaultRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertVaultRequest) GetVault() shared.Vault {
+	if u == nil {
 		return shared.Vault{}
 	}
-	return o.Vault
+	return u.Vault
 }
 
 type UpsertVaultResponse struct {
@@ -41,37 +62,37 @@ type UpsertVaultResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertVaultResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertVaultResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertVaultResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertVaultResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertVaultResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertVaultResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertVaultResponse) GetVault() *shared.Vault {
-	if o == nil {
+func (u *UpsertVaultResponse) GetVault() *shared.Vault {
+	if u == nil {
 		return nil
 	}
-	return o.Vault
+	return u.Vault
 }
 
-func (o *UpsertVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertVaultResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

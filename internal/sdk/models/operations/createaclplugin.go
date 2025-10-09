@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateACLPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace string           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ACLPlugin shared.ACLPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateACLPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateACLPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ACLPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateACLPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateACLPluginRequest) GetACLPlugin() shared.ACLPlugin {
+	if c == nil {
+		return shared.ACLPlugin{}
+	}
+	return c.ACLPlugin
+}
 
 type CreateACLPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateACLPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateACLPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateACLPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateACLPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateACLPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateACLPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateACLPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateACLPluginResponse) GetACLPlugin() *shared.ACLPlugin {
-	if o == nil {
+func (c *CreateACLPluginResponse) GetACLPlugin() *shared.ACLPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ACLPlugin
+	return c.ACLPlugin
 }
 
-func (o *CreateACLPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateACLPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

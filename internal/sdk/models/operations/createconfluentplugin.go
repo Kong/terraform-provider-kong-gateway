@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateConfluentPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace       string                 `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	ConfluentPlugin shared.ConfluentPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateConfluentPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateConfluentPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ConfluentPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateConfluentPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateConfluentPluginRequest) GetConfluentPlugin() shared.ConfluentPlugin {
+	if c == nil {
+		return shared.ConfluentPlugin{}
+	}
+	return c.ConfluentPlugin
+}
 
 type CreateConfluentPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateConfluentPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateConfluentPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateConfluentPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateConfluentPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateConfluentPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateConfluentPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateConfluentPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateConfluentPluginResponse) GetConfluentPlugin() *shared.ConfluentPlugin {
-	if o == nil {
+func (c *CreateConfluentPluginResponse) GetConfluentPlugin() *shared.ConfluentPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.ConfluentPlugin
+	return c.ConfluentPlugin
 }
 
-func (o *CreateConfluentPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateConfluentPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

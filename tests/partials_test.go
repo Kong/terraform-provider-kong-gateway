@@ -8,7 +8,6 @@ import (
 )
 
 func TestPartials(t *testing.T) {
-	t.Parallel()
 	t.Run("not sent by default", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			Steps: []resource.TestStep{

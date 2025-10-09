@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateOpenidconnectPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	OpenidConnectPlugin shared.OpenidConnectPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateOpenidconnectPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOpenidconnectPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OpenidConnectPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateOpenidconnectPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateOpenidconnectPluginRequest) GetOpenidConnectPlugin() shared.OpenidConnectPlugin {
+	if c == nil {
+		return shared.OpenidConnectPlugin{}
+	}
+	return c.OpenidConnectPlugin
+}
 
 type CreateOpenidconnectPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateOpenidconnectPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateOpenidconnectPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateOpenidconnectPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateOpenidconnectPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateOpenidconnectPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateOpenidconnectPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateOpenidconnectPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateOpenidconnectPluginResponse) GetOpenidConnectPlugin() *shared.OpenidConnectPlugin {
-	if o == nil {
+func (c *CreateOpenidconnectPluginResponse) GetOpenidConnectPlugin() *shared.OpenidConnectPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.OpenidConnectPlugin
+	return c.OpenidConnectPlugin
 }
 
-func (o *CreateOpenidconnectPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateOpenidconnectPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

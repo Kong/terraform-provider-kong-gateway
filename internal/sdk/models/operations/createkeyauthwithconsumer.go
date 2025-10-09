@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type CreateKeyAuthWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new API-key for creation
-	KeyAuthWithoutParents shared.KeyAuthWithoutParents `request:"mediaType=application/json"`
+	KeyAuthWithoutParents *shared.KeyAuthWithoutParents `request:"mediaType=application/json"`
 }
 
-func (o *CreateKeyAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
+func (c CreateKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateKeyAuthWithConsumerRequest) GetConsumerID() string {
+	if c == nil {
 		return ""
 	}
-	return o.ConsumerID
+	return c.ConsumerID
 }
 
-func (o *CreateKeyAuthWithConsumerRequest) GetKeyAuthWithoutParents() shared.KeyAuthWithoutParents {
-	if o == nil {
-		return shared.KeyAuthWithoutParents{}
+func (c *CreateKeyAuthWithConsumerRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
 	}
-	return o.KeyAuthWithoutParents
+	return c.Workspace
+}
+
+func (c *CreateKeyAuthWithConsumerRequest) GetKeyAuthWithoutParents() *shared.KeyAuthWithoutParents {
+	if c == nil {
+		return nil
+	}
+	return c.KeyAuthWithoutParents
 }
 
 type CreateKeyAuthWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type CreateKeyAuthWithConsumerResponse struct {
 	KeyAuth *shared.KeyAuth
 }
 
-func (o *CreateKeyAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateKeyAuthWithConsumerResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateKeyAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateKeyAuthWithConsumerResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateKeyAuthWithConsumerResponse) GetKeyAuth() *shared.KeyAuth {
-	if o == nil {
+func (c *CreateKeyAuthWithConsumerResponse) GetKeyAuth() *shared.KeyAuth {
+	if c == nil {
 		return nil
 	}
-	return o.KeyAuth
+	return c.KeyAuth
 }

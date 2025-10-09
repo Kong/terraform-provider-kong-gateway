@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateKafkaconsumePluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	KafkaConsumePlugin shared.KafkaConsumePlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateKafkaconsumePluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKafkaconsumePluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "KafkaConsumePlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateKafkaconsumePluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateKafkaconsumePluginRequest) GetKafkaConsumePlugin() shared.KafkaConsumePlugin {
+	if c == nil {
+		return shared.KafkaConsumePlugin{}
+	}
+	return c.KafkaConsumePlugin
+}
 
 type CreateKafkaconsumePluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateKafkaconsumePluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateKafkaconsumePluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateKafkaconsumePluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateKafkaconsumePluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateKafkaconsumePluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateKafkaconsumePluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateKafkaconsumePluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateKafkaconsumePluginResponse) GetKafkaConsumePlugin() *shared.KafkaConsumePlugin {
-	if o == nil {
+func (c *CreateKafkaconsumePluginResponse) GetKafkaConsumePlugin() *shared.KafkaConsumePlugin {
+	if c == nil {
 		return nil
 	}
-	return o.KafkaConsumePlugin
+	return c.KafkaConsumePlugin
 }
 
-func (o *CreateKafkaconsumePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateKafkaconsumePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

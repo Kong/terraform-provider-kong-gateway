@@ -36,17 +36,25 @@ resource "kong-gateway_ca_certificate" "my_cacertificate" {
 
 - `cert_digest` (String) SHA256 hex digest of the public certificate. This field is read-only and it cannot be set by the caller, the value is automatically computed.
 - `created_at` (Number) Unix epoch when the resource was created.
+- `id` (String) A string representing a UUID (universally unique identifier).
 - `tags` (List of String) An optional set of strings associated with the Certificate for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_ca_certificate.my_kong-gateway_ca_certificate
+  id = "..."
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_ca_certificate.my_kong-gateway_ca_certificate ""
+terraform import kong-gateway_ca_certificate.my_kong-gateway_ca_certificate "..."
 ```

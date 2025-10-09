@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type DeleteUpstreamRequest struct {
 	// ID or name of the Upstream to lookup
 	UpstreamIDOrName string `pathParam:"style=simple,explode=false,name=UpstreamIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *DeleteUpstreamRequest) GetUpstreamIDOrName() string {
-	if o == nil {
+func (d DeleteUpstreamRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteUpstreamRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"UpstreamIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DeleteUpstreamRequest) GetUpstreamIDOrName() string {
+	if d == nil {
 		return ""
 	}
-	return o.UpstreamIDOrName
+	return d.UpstreamIDOrName
+}
+
+func (d *DeleteUpstreamRequest) GetWorkspace() string {
+	if d == nil {
+		return ""
+	}
+	return d.Workspace
 }
 
 type DeleteUpstreamResponse struct {
@@ -30,30 +51,30 @@ type DeleteUpstreamResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *DeleteUpstreamResponse) GetContentType() string {
-	if o == nil {
+func (d *DeleteUpstreamResponse) GetContentType() string {
+	if d == nil {
 		return ""
 	}
-	return o.ContentType
+	return d.ContentType
 }
 
-func (o *DeleteUpstreamResponse) GetStatusCode() int {
-	if o == nil {
+func (d *DeleteUpstreamResponse) GetStatusCode() int {
+	if d == nil {
 		return 0
 	}
-	return o.StatusCode
+	return d.StatusCode
 }
 
-func (o *DeleteUpstreamResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (d *DeleteUpstreamResponse) GetRawResponse() *http.Response {
+	if d == nil {
 		return nil
 	}
-	return o.RawResponse
+	return d.RawResponse
 }
 
-func (o *DeleteUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (d *DeleteUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if d == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return d.GatewayUnauthorizedError
 }

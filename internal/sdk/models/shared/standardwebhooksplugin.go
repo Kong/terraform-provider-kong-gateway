@@ -12,22 +12,22 @@ type StandardWebhooksPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *StandardWebhooksPluginAfter) GetAccess() []string {
-	if o == nil {
+func (s *StandardWebhooksPluginAfter) GetAccess() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Access
+	return s.Access
 }
 
 type StandardWebhooksPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *StandardWebhooksPluginBefore) GetAccess() []string {
-	if o == nil {
+func (s *StandardWebhooksPluginBefore) GetAccess() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Access
+	return s.Access
 }
 
 type StandardWebhooksPluginOrdering struct {
@@ -35,66 +35,68 @@ type StandardWebhooksPluginOrdering struct {
 	Before *StandardWebhooksPluginBefore `json:"before,omitempty"`
 }
 
-func (o *StandardWebhooksPluginOrdering) GetAfter() *StandardWebhooksPluginAfter {
-	if o == nil {
+func (s *StandardWebhooksPluginOrdering) GetAfter() *StandardWebhooksPluginAfter {
+	if s == nil {
 		return nil
 	}
-	return o.After
+	return s.After
 }
 
-func (o *StandardWebhooksPluginOrdering) GetBefore() *StandardWebhooksPluginBefore {
-	if o == nil {
+func (s *StandardWebhooksPluginOrdering) GetBefore() *StandardWebhooksPluginBefore {
+	if s == nil {
 		return nil
 	}
-	return o.Before
+	return s.Before
 }
 
 type StandardWebhooksPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *StandardWebhooksPluginPartials) GetID() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginPartials) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-func (o *StandardWebhooksPluginPartials) GetName() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginPartials) GetName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Name
+	return s.Name
 }
 
-func (o *StandardWebhooksPluginPartials) GetPath() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginPartials) GetPath() *string {
+	if s == nil {
 		return nil
 	}
-	return o.Path
+	return s.Path
 }
 
 type StandardWebhooksPluginConfig struct {
 	// Webhook secret
-	SecretV1 *string `json:"secret_v1,omitempty"`
+	SecretV1 string `json:"secret_v1"`
 	// Tolerance of the webhook timestamp in seconds. If the webhook timestamp is older than this number of seconds, it will be rejected with a '400' response.
 	ToleranceSecond *int64 `json:"tolerance_second,omitempty"`
 }
 
-func (o *StandardWebhooksPluginConfig) GetSecretV1() *string {
-	if o == nil {
-		return nil
+func (s *StandardWebhooksPluginConfig) GetSecretV1() string {
+	if s == nil {
+		return ""
 	}
-	return o.SecretV1
+	return s.SecretV1
 }
 
-func (o *StandardWebhooksPluginConfig) GetToleranceSecond() *int64 {
-	if o == nil {
+func (s *StandardWebhooksPluginConfig) GetToleranceSecond() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.ToleranceSecond
+	return s.ToleranceSecond
 }
 
 // StandardWebhooksPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -102,11 +104,11 @@ type StandardWebhooksPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StandardWebhooksPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginConsumerGroup) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 type StandardWebhooksPluginProtocols string
@@ -146,11 +148,11 @@ type StandardWebhooksPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StandardWebhooksPluginRoute) GetID() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginRoute) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 // StandardWebhooksPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -158,11 +160,11 @@ type StandardWebhooksPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *StandardWebhooksPluginService) GetID() *string {
-	if o == nil {
+func (s *StandardWebhooksPluginService) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
 // StandardWebhooksPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -170,17 +172,20 @@ type StandardWebhooksPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                            `json:"enabled,omitempty"`
-	ID           *string                          `json:"id,omitempty"`
-	InstanceName *string                          `json:"instance_name,omitempty"`
-	name         string                           `const:"standard-webhooks" json:"name"`
-	Ordering     *StandardWebhooksPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []StandardWebhooksPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                         `json:"instance_name,omitempty"`
+	name         string                          `const:"standard-webhooks" json:"name"`
+	Ordering     *StandardWebhooksPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []StandardWebhooksPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                        `json:"updated_at,omitempty"`
-	Config    *StandardWebhooksPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64                       `json:"updated_at,omitempty"`
+	Config    StandardWebhooksPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *StandardWebhooksPluginConsumerGroup `json:"consumer_group,omitempty"`
 	// A set of strings representing HTTP protocols.
@@ -196,103 +201,103 @@ func (s StandardWebhooksPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *StandardWebhooksPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *StandardWebhooksPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetCreatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return s.CreatedAt
 }
 
-func (o *StandardWebhooksPlugin) GetEnabled() *bool {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetEnabled() *bool {
+	if s == nil {
 		return nil
 	}
-	return o.Enabled
+	return s.Enabled
 }
 
-func (o *StandardWebhooksPlugin) GetID() *string {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetID() *string {
+	if s == nil {
 		return nil
 	}
-	return o.ID
+	return s.ID
 }
 
-func (o *StandardWebhooksPlugin) GetInstanceName() *string {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetInstanceName() *string {
+	if s == nil {
 		return nil
 	}
-	return o.InstanceName
+	return s.InstanceName
 }
 
-func (o *StandardWebhooksPlugin) GetName() string {
+func (s *StandardWebhooksPlugin) GetName() string {
 	return "standard-webhooks"
 }
 
-func (o *StandardWebhooksPlugin) GetOrdering() *StandardWebhooksPluginOrdering {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetOrdering() *StandardWebhooksPluginOrdering {
+	if s == nil {
 		return nil
 	}
-	return o.Ordering
+	return s.Ordering
 }
 
-func (o *StandardWebhooksPlugin) GetPartials() []StandardWebhooksPluginPartials {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetPartials() []StandardWebhooksPluginPartials {
+	if s == nil {
 		return nil
 	}
-	return o.Partials
+	return s.Partials
 }
 
-func (o *StandardWebhooksPlugin) GetTags() []string {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetTags() []string {
+	if s == nil {
 		return nil
 	}
-	return o.Tags
+	return s.Tags
 }
 
-func (o *StandardWebhooksPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetUpdatedAt() *int64 {
+	if s == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return s.UpdatedAt
 }
 
-func (o *StandardWebhooksPlugin) GetConfig() *StandardWebhooksPluginConfig {
-	if o == nil {
-		return nil
+func (s *StandardWebhooksPlugin) GetConfig() StandardWebhooksPluginConfig {
+	if s == nil {
+		return StandardWebhooksPluginConfig{}
 	}
-	return o.Config
+	return s.Config
 }
 
-func (o *StandardWebhooksPlugin) GetConsumerGroup() *StandardWebhooksPluginConsumerGroup {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetConsumerGroup() *StandardWebhooksPluginConsumerGroup {
+	if s == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return s.ConsumerGroup
 }
 
-func (o *StandardWebhooksPlugin) GetProtocols() []StandardWebhooksPluginProtocols {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetProtocols() []StandardWebhooksPluginProtocols {
+	if s == nil {
 		return nil
 	}
-	return o.Protocols
+	return s.Protocols
 }
 
-func (o *StandardWebhooksPlugin) GetRoute() *StandardWebhooksPluginRoute {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetRoute() *StandardWebhooksPluginRoute {
+	if s == nil {
 		return nil
 	}
-	return o.Route
+	return s.Route
 }
 
-func (o *StandardWebhooksPlugin) GetService() *StandardWebhooksPluginService {
-	if o == nil {
+func (s *StandardWebhooksPlugin) GetService() *StandardWebhooksPluginService {
+	if s == nil {
 		return nil
 	}
-	return o.Service
+	return s.Service
 }

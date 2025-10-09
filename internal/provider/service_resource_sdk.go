@@ -11,6 +11,145 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(ctx context.Context, resp *shared.ServiceOutput) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.CaCertificates != nil {
+			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
+			for _, v := range resp.CaCertificates {
+				r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
+			}
+		}
+		if resp.ClientCertificate == nil {
+			r.ClientCertificate = nil
+		} else {
+			r.ClientCertificate = &tfTypes.Set{}
+			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
+		}
+		r.ConnectTimeout = types.Int64PointerValue(resp.ConnectTimeout)
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.Host = types.StringValue(resp.Host)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.Name = types.StringPointerValue(resp.Name)
+		r.Path = types.StringPointerValue(resp.Path)
+		r.Port = types.Int64PointerValue(resp.Port)
+		if resp.Protocol != nil {
+			r.Protocol = types.StringValue(string(*resp.Protocol))
+		} else {
+			r.Protocol = types.StringNull()
+		}
+		r.ReadTimeout = types.Int64PointerValue(resp.ReadTimeout)
+		r.Retries = types.Int64PointerValue(resp.Retries)
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		if resp.TLSSans == nil {
+			r.TLSSans = nil
+		} else {
+			r.TLSSans = &tfTypes.TLSSans{}
+			r.TLSSans.Dnsnames = make([]types.String, 0, len(resp.TLSSans.Dnsnames))
+			for _, v := range resp.TLSSans.Dnsnames {
+				r.TLSSans.Dnsnames = append(r.TLSSans.Dnsnames, types.StringValue(v))
+			}
+			r.TLSSans.Uris = make([]types.String, 0, len(resp.TLSSans.Uris))
+			for _, v := range resp.TLSSans.Uris {
+				r.TLSSans.Uris = append(r.TLSSans.Uris, types.StringValue(v))
+			}
+		}
+		r.TLSVerify = types.BoolPointerValue(resp.TLSVerify)
+		r.TLSVerifyDepth = types.Int64PointerValue(resp.TLSVerifyDepth)
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+		r.WriteTimeout = types.Int64PointerValue(resp.WriteTimeout)
+	}
+
+	return diags
+}
+
+func (r *ServiceResourceModel) ToOperationsCreateServiceRequest(ctx context.Context) (*operations.CreateServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	service, serviceDiags := r.ToSharedService(ctx)
+	diags.Append(serviceDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateServiceRequest{
+		Workspace: workspace,
+		Service:   *service,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) ToOperationsDeleteServiceRequest(ctx context.Context) (*operations.DeleteServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) ToOperationsGetServiceRequest(ctx context.Context) (*operations.GetServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+		Workspace:       workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *ServiceResourceModel) ToOperationsUpsertServiceRequest(ctx context.Context) (*operations.UpsertServiceRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var serviceIDOrName string
+	serviceIDOrName = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	service, serviceDiags := r.ToSharedService(ctx)
+	diags.Append(serviceDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpsertServiceRequest{
+		ServiceIDOrName: serviceIDOrName,
+		Workspace:       workspace,
+		Service:         *service,
+	}
+
+	return &out, diags
+}
+
 func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Service, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -96,9 +235,27 @@ func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Ser
 	} else {
 		retries = nil
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
+	}
+	var tlsSans *shared.TLSSans
+	if r.TLSSans != nil {
+		dnsnames := make([]string, 0, len(r.TLSSans.Dnsnames))
+		for _, dnsnamesItem := range r.TLSSans.Dnsnames {
+			dnsnames = append(dnsnames, dnsnamesItem.ValueString())
+		}
+		uris := make([]string, 0, len(r.TLSSans.Uris))
+		for _, urisItem := range r.TLSSans.Uris {
+			uris = append(uris, urisItem.ValueString())
+		}
+		tlsSans = &shared.TLSSans{
+			Dnsnames: dnsnames,
+			Uris:     uris,
+		}
 	}
 	tlsVerify := new(bool)
 	if !r.TLSVerify.IsUnknown() && !r.TLSVerify.IsNull() {
@@ -145,6 +302,7 @@ func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Ser
 		ReadTimeout:       readTimeout,
 		Retries:           retries,
 		Tags:              tags,
+		TLSSans:           tlsSans,
 		TLSVerify:         tlsVerify,
 		TLSVerifyDepth:    tlsVerifyDepth,
 		UpdatedAt:         updatedAt,
@@ -153,95 +311,4 @@ func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Ser
 	}
 
 	return &out, diags
-}
-
-func (r *ServiceResourceModel) ToOperationsUpsertServiceRequest(ctx context.Context) (*operations.UpsertServiceRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var serviceIDOrName string
-	serviceIDOrName = r.ID.ValueString()
-
-	service, serviceDiags := r.ToSharedService(ctx)
-	diags.Append(serviceDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpsertServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
-		Service:         *service,
-	}
-
-	return &out, diags
-}
-
-func (r *ServiceResourceModel) ToOperationsGetServiceRequest(ctx context.Context) (*operations.GetServiceRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var serviceIDOrName string
-	serviceIDOrName = r.ID.ValueString()
-
-	out := operations.GetServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *ServiceResourceModel) ToOperationsDeleteServiceRequest(ctx context.Context) (*operations.DeleteServiceRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var serviceIDOrName string
-	serviceIDOrName = r.ID.ValueString()
-
-	out := operations.DeleteServiceRequest{
-		ServiceIDOrName: serviceIDOrName,
-	}
-
-	return &out, diags
-}
-
-func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(ctx context.Context, resp *shared.ServiceOutput) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.CaCertificates != nil {
-			r.CaCertificates = make([]types.String, 0, len(resp.CaCertificates))
-			for _, v := range resp.CaCertificates {
-				r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
-			}
-		}
-		if resp.ClientCertificate == nil {
-			r.ClientCertificate = nil
-		} else {
-			r.ClientCertificate = &tfTypes.ACLWithoutParentsConsumer{}
-			r.ClientCertificate.ID = types.StringPointerValue(resp.ClientCertificate.ID)
-		}
-		r.ConnectTimeout = types.Int64PointerValue(resp.ConnectTimeout)
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.Host = types.StringValue(resp.Host)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.Name = types.StringPointerValue(resp.Name)
-		r.Path = types.StringPointerValue(resp.Path)
-		r.Port = types.Int64PointerValue(resp.Port)
-		if resp.Protocol != nil {
-			r.Protocol = types.StringValue(string(*resp.Protocol))
-		} else {
-			r.Protocol = types.StringNull()
-		}
-		r.ReadTimeout = types.Int64PointerValue(resp.ReadTimeout)
-		r.Retries = types.Int64PointerValue(resp.Retries)
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.TLSVerify = types.BoolPointerValue(resp.TLSVerify)
-		r.TLSVerifyDepth = types.Int64PointerValue(resp.TLSVerifyDepth)
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-		r.WriteTimeout = types.Int64PointerValue(resp.WriteTimeout)
-	}
-
-	return diags
 }

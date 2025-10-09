@@ -12,22 +12,22 @@ type ProxyCacheAdvancedPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginAfter) GetAccess() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginAfter) GetAccess() []string {
+	if p == nil {
 		return nil
 	}
-	return o.Access
+	return p.Access
 }
 
 type ProxyCacheAdvancedPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginBefore) GetAccess() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginBefore) GetAccess() []string {
+	if p == nil {
 		return nil
 	}
-	return o.Access
+	return p.Access
 }
 
 type ProxyCacheAdvancedPluginOrdering struct {
@@ -35,45 +35,47 @@ type ProxyCacheAdvancedPluginOrdering struct {
 	Before *ProxyCacheAdvancedPluginBefore `json:"before,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginOrdering) GetAfter() *ProxyCacheAdvancedPluginAfter {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginOrdering) GetAfter() *ProxyCacheAdvancedPluginAfter {
+	if p == nil {
 		return nil
 	}
-	return o.After
+	return p.After
 }
 
-func (o *ProxyCacheAdvancedPluginOrdering) GetBefore() *ProxyCacheAdvancedPluginBefore {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginOrdering) GetBefore() *ProxyCacheAdvancedPluginBefore {
+	if p == nil {
 		return nil
 	}
-	return o.Before
+	return p.Before
 }
 
 type ProxyCacheAdvancedPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginPartials) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginPartials) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
-func (o *ProxyCacheAdvancedPluginPartials) GetName() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginPartials) GetName() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Name
+	return p.Name
 }
 
-func (o *ProxyCacheAdvancedPluginPartials) GetPath() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginPartials) GetPath() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Path
+	return p.Path
 }
 
 type ProxyCacheAdvancedPluginMemory struct {
@@ -81,11 +83,11 @@ type ProxyCacheAdvancedPluginMemory struct {
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginMemory) GetDictionaryName() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginMemory) GetDictionaryName() *string {
+	if p == nil {
 		return nil
 	}
-	return o.DictionaryName
+	return p.DictionaryName
 }
 
 type ProxyCacheAdvancedPluginClusterNodes struct {
@@ -95,18 +97,18 @@ type ProxyCacheAdvancedPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginClusterNodes) GetIP() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginClusterNodes) GetIP() *string {
+	if p == nil {
 		return nil
 	}
-	return o.IP
+	return p.IP
 }
 
-func (o *ProxyCacheAdvancedPluginClusterNodes) GetPort() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginClusterNodes) GetPort() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.Port
+	return p.Port
 }
 
 type ProxyCacheAdvancedPluginSentinelNodes struct {
@@ -116,18 +118,18 @@ type ProxyCacheAdvancedPluginSentinelNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginSentinelNodes) GetHost() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginSentinelNodes) GetHost() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Host
+	return p.Host
 }
 
-func (o *ProxyCacheAdvancedPluginSentinelNodes) GetPort() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginSentinelNodes) GetPort() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.Port
+	return p.Port
 }
 
 // ProxyCacheAdvancedPluginSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
@@ -205,151 +207,151 @@ type ProxyCacheAdvancedPluginRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.ClusterMaxRedirections
+	return p.ClusterMaxRedirections
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetClusterNodes() []ProxyCacheAdvancedPluginClusterNodes {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetClusterNodes() []ProxyCacheAdvancedPluginClusterNodes {
+	if p == nil {
 		return nil
 	}
-	return o.ClusterNodes
+	return p.ClusterNodes
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetConnectTimeout() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetConnectTimeout() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return p.ConnectTimeout
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetConnectionIsProxied() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetConnectionIsProxied() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.ConnectionIsProxied
+	return p.ConnectionIsProxied
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetDatabase() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetDatabase() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.Database
+	return p.Database
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetHost() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetHost() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Host
+	return p.Host
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetKeepaliveBacklog() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetKeepaliveBacklog() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.KeepaliveBacklog
+	return p.KeepaliveBacklog
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetKeepalivePoolSize() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetKeepalivePoolSize() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.KeepalivePoolSize
+	return p.KeepalivePoolSize
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetPassword() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetPassword() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Password
+	return p.Password
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetPort() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetPort() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.Port
+	return p.Port
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetReadTimeout() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetReadTimeout() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return p.ReadTimeout
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSendTimeout() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSendTimeout() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.SendTimeout
+	return p.SendTimeout
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSentinelMaster() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSentinelMaster() *string {
+	if p == nil {
 		return nil
 	}
-	return o.SentinelMaster
+	return p.SentinelMaster
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSentinelNodes() []ProxyCacheAdvancedPluginSentinelNodes {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSentinelNodes() []ProxyCacheAdvancedPluginSentinelNodes {
+	if p == nil {
 		return nil
 	}
-	return o.SentinelNodes
+	return p.SentinelNodes
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSentinelPassword() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSentinelPassword() *string {
+	if p == nil {
 		return nil
 	}
-	return o.SentinelPassword
+	return p.SentinelPassword
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSentinelRole() *ProxyCacheAdvancedPluginSentinelRole {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSentinelRole() *ProxyCacheAdvancedPluginSentinelRole {
+	if p == nil {
 		return nil
 	}
-	return o.SentinelRole
+	return p.SentinelRole
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSentinelUsername() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSentinelUsername() *string {
+	if p == nil {
 		return nil
 	}
-	return o.SentinelUsername
+	return p.SentinelUsername
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetServerName() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetServerName() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ServerName
+	return p.ServerName
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSsl() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSsl() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.Ssl
+	return p.Ssl
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetSslVerify() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetSslVerify() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.SslVerify
+	return p.SslVerify
 }
 
-func (o *ProxyCacheAdvancedPluginRedis) GetUsername() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRedis) GetUsername() *string {
+	if p == nil {
 		return nil
 	}
-	return o.Username
+	return p.Username
 }
 
 type ProxyCacheAdvancedPluginRequestMethod string
@@ -394,25 +396,25 @@ type ProxyCacheAdvancedPluginResponseHeaders struct {
 	Age          *bool `json:"age,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginResponseHeaders) GetXCacheKey() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginResponseHeaders) GetXCacheKey() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.XCacheKey
+	return p.XCacheKey
 }
 
-func (o *ProxyCacheAdvancedPluginResponseHeaders) GetXCacheStatus() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginResponseHeaders) GetXCacheStatus() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.XCacheStatus
+	return p.XCacheStatus
 }
 
-func (o *ProxyCacheAdvancedPluginResponseHeaders) GetAge() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginResponseHeaders) GetAge() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.Age
+	return p.Age
 }
 
 // ProxyCacheAdvancedPluginStrategy - The backing data store in which to hold cache entities. Accepted values are: `memory` and `redis`.
@@ -464,109 +466,109 @@ type ProxyCacheAdvancedPluginConfig struct {
 	// Number of seconds to keep resources in the storage backend. This value is independent of `cache_ttl` or resource TTLs defined by Cache-Control behaviors.
 	StorageTTL *int64 `json:"storage_ttl,omitempty"`
 	// The backing data store in which to hold cache entities. Accepted values are: `memory` and `redis`.
-	Strategy *ProxyCacheAdvancedPluginStrategy `json:"strategy,omitempty"`
+	Strategy ProxyCacheAdvancedPluginStrategy `json:"strategy"`
 	// Relevant headers considered for the cache key. If undefined, none of the headers are taken into consideration.
 	VaryHeaders []string `json:"vary_headers,omitempty"`
 	// Relevant query parameters considered for the cache key. If undefined, all params are taken into consideration. By default, the max number of params accepted is 100. You can change this value via the `lua_max_post_args` in `kong.conf`.
 	VaryQueryParams []string `json:"vary_query_params,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetBypassOnErr() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetBypassOnErr() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.BypassOnErr
+	return p.BypassOnErr
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetCacheControl() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetCacheControl() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.CacheControl
+	return p.CacheControl
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetCacheTTL() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetCacheTTL() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.CacheTTL
+	return p.CacheTTL
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetContentType() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetContentType() []string {
+	if p == nil {
 		return nil
 	}
-	return o.ContentType
+	return p.ContentType
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetIgnoreURICase() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetIgnoreURICase() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.IgnoreURICase
+	return p.IgnoreURICase
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetMemory() *ProxyCacheAdvancedPluginMemory {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetMemory() *ProxyCacheAdvancedPluginMemory {
+	if p == nil {
 		return nil
 	}
-	return o.Memory
+	return p.Memory
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetRedis() *ProxyCacheAdvancedPluginRedis {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetRedis() *ProxyCacheAdvancedPluginRedis {
+	if p == nil {
 		return nil
 	}
-	return o.Redis
+	return p.Redis
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetRequestMethod() []ProxyCacheAdvancedPluginRequestMethod {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetRequestMethod() []ProxyCacheAdvancedPluginRequestMethod {
+	if p == nil {
 		return nil
 	}
-	return o.RequestMethod
+	return p.RequestMethod
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetResponseCode() []int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetResponseCode() []int64 {
+	if p == nil {
 		return nil
 	}
-	return o.ResponseCode
+	return p.ResponseCode
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetResponseHeaders() *ProxyCacheAdvancedPluginResponseHeaders {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetResponseHeaders() *ProxyCacheAdvancedPluginResponseHeaders {
+	if p == nil {
 		return nil
 	}
-	return o.ResponseHeaders
+	return p.ResponseHeaders
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetStorageTTL() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetStorageTTL() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.StorageTTL
+	return p.StorageTTL
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetStrategy() *ProxyCacheAdvancedPluginStrategy {
-	if o == nil {
-		return nil
+func (p *ProxyCacheAdvancedPluginConfig) GetStrategy() ProxyCacheAdvancedPluginStrategy {
+	if p == nil {
+		return ProxyCacheAdvancedPluginStrategy("")
 	}
-	return o.Strategy
+	return p.Strategy
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetVaryHeaders() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetVaryHeaders() []string {
+	if p == nil {
 		return nil
 	}
-	return o.VaryHeaders
+	return p.VaryHeaders
 }
 
-func (o *ProxyCacheAdvancedPluginConfig) GetVaryQueryParams() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConfig) GetVaryQueryParams() []string {
+	if p == nil {
 		return nil
 	}
-	return o.VaryQueryParams
+	return p.VaryQueryParams
 }
 
 // ProxyCacheAdvancedPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -574,11 +576,11 @@ type ProxyCacheAdvancedPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginConsumer) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConsumer) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
 // ProxyCacheAdvancedPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -586,11 +588,11 @@ type ProxyCacheAdvancedPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginConsumerGroup) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
 type ProxyCacheAdvancedPluginProtocols string
@@ -630,11 +632,11 @@ type ProxyCacheAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginRoute) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginRoute) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
 // ProxyCacheAdvancedPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -642,11 +644,11 @@ type ProxyCacheAdvancedPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ProxyCacheAdvancedPluginService) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPluginService) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
 // ProxyCacheAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -654,17 +656,20 @@ type ProxyCacheAdvancedPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                              `json:"enabled,omitempty"`
-	ID           *string                            `json:"id,omitempty"`
-	InstanceName *string                            `json:"instance_name,omitempty"`
-	name         string                             `const:"proxy-cache-advanced" json:"name"`
-	Ordering     *ProxyCacheAdvancedPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []ProxyCacheAdvancedPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                           `json:"instance_name,omitempty"`
+	name         string                            `const:"proxy-cache-advanced" json:"name"`
+	Ordering     *ProxyCacheAdvancedPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []ProxyCacheAdvancedPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                          `json:"updated_at,omitempty"`
-	Config    *ProxyCacheAdvancedPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64                         `json:"updated_at,omitempty"`
+	Config    ProxyCacheAdvancedPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *ProxyCacheAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -682,110 +687,110 @@ func (p ProxyCacheAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (p *ProxyCacheAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &p, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetCreatedAt() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return p.CreatedAt
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetEnabled() *bool {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetEnabled() *bool {
+	if p == nil {
 		return nil
 	}
-	return o.Enabled
+	return p.Enabled
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetID() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetID() *string {
+	if p == nil {
 		return nil
 	}
-	return o.ID
+	return p.ID
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetInstanceName() *string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetInstanceName() *string {
+	if p == nil {
 		return nil
 	}
-	return o.InstanceName
+	return p.InstanceName
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetName() string {
+func (p *ProxyCacheAdvancedPlugin) GetName() string {
 	return "proxy-cache-advanced"
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetOrdering() *ProxyCacheAdvancedPluginOrdering {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetOrdering() *ProxyCacheAdvancedPluginOrdering {
+	if p == nil {
 		return nil
 	}
-	return o.Ordering
+	return p.Ordering
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetPartials() []ProxyCacheAdvancedPluginPartials {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetPartials() []ProxyCacheAdvancedPluginPartials {
+	if p == nil {
 		return nil
 	}
-	return o.Partials
+	return p.Partials
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetTags() []string {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetTags() []string {
+	if p == nil {
 		return nil
 	}
-	return o.Tags
+	return p.Tags
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetUpdatedAt() *int64 {
+	if p == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return p.UpdatedAt
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetConfig() *ProxyCacheAdvancedPluginConfig {
-	if o == nil {
-		return nil
+func (p *ProxyCacheAdvancedPlugin) GetConfig() ProxyCacheAdvancedPluginConfig {
+	if p == nil {
+		return ProxyCacheAdvancedPluginConfig{}
 	}
-	return o.Config
+	return p.Config
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetConsumer() *ProxyCacheAdvancedPluginConsumer {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetConsumer() *ProxyCacheAdvancedPluginConsumer {
+	if p == nil {
 		return nil
 	}
-	return o.Consumer
+	return p.Consumer
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetConsumerGroup() *ProxyCacheAdvancedPluginConsumerGroup {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetConsumerGroup() *ProxyCacheAdvancedPluginConsumerGroup {
+	if p == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return p.ConsumerGroup
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetProtocols() []ProxyCacheAdvancedPluginProtocols {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetProtocols() []ProxyCacheAdvancedPluginProtocols {
+	if p == nil {
 		return nil
 	}
-	return o.Protocols
+	return p.Protocols
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetRoute() *ProxyCacheAdvancedPluginRoute {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetRoute() *ProxyCacheAdvancedPluginRoute {
+	if p == nil {
 		return nil
 	}
-	return o.Route
+	return p.Route
 }
 
-func (o *ProxyCacheAdvancedPlugin) GetService() *ProxyCacheAdvancedPluginService {
-	if o == nil {
+func (p *ProxyCacheAdvancedPlugin) GetService() *ProxyCacheAdvancedPluginService {
+	if p == nil {
 		return nil
 	}
-	return o.Service
+	return p.Service
 }

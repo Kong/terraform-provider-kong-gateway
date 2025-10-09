@@ -12,22 +12,22 @@ type UpstreamOauthPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *UpstreamOauthPluginAfter) GetAccess() []string {
-	if o == nil {
+func (u *UpstreamOauthPluginAfter) GetAccess() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Access
+	return u.Access
 }
 
 type UpstreamOauthPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *UpstreamOauthPluginBefore) GetAccess() []string {
-	if o == nil {
+func (u *UpstreamOauthPluginBefore) GetAccess() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Access
+	return u.Access
 }
 
 type UpstreamOauthPluginOrdering struct {
@@ -35,45 +35,47 @@ type UpstreamOauthPluginOrdering struct {
 	Before *UpstreamOauthPluginBefore `json:"before,omitempty"`
 }
 
-func (o *UpstreamOauthPluginOrdering) GetAfter() *UpstreamOauthPluginAfter {
-	if o == nil {
+func (u *UpstreamOauthPluginOrdering) GetAfter() *UpstreamOauthPluginAfter {
+	if u == nil {
 		return nil
 	}
-	return o.After
+	return u.After
 }
 
-func (o *UpstreamOauthPluginOrdering) GetBefore() *UpstreamOauthPluginBefore {
-	if o == nil {
+func (u *UpstreamOauthPluginOrdering) GetBefore() *UpstreamOauthPluginBefore {
+	if u == nil {
 		return nil
 	}
-	return o.Before
+	return u.Before
 }
 
 type UpstreamOauthPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *UpstreamOauthPluginPartials) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginPartials) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
-func (o *UpstreamOauthPluginPartials) GetName() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginPartials) GetName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Name
+	return u.Name
 }
 
-func (o *UpstreamOauthPluginPartials) GetPath() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginPartials) GetPath() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Path
+	return u.Path
 }
 
 type Behavior struct {
@@ -91,46 +93,46 @@ type Behavior struct {
 	UpstreamAccessTokenHeaderName *string `json:"upstream_access_token_header_name,omitempty"`
 }
 
-func (o *Behavior) GetIdpErrorResponseBodyTemplate() *string {
-	if o == nil {
+func (b *Behavior) GetIdpErrorResponseBodyTemplate() *string {
+	if b == nil {
 		return nil
 	}
-	return o.IdpErrorResponseBodyTemplate
+	return b.IdpErrorResponseBodyTemplate
 }
 
-func (o *Behavior) GetIdpErrorResponseContentType() *string {
-	if o == nil {
+func (b *Behavior) GetIdpErrorResponseContentType() *string {
+	if b == nil {
 		return nil
 	}
-	return o.IdpErrorResponseContentType
+	return b.IdpErrorResponseContentType
 }
 
-func (o *Behavior) GetIdpErrorResponseMessage() *string {
-	if o == nil {
+func (b *Behavior) GetIdpErrorResponseMessage() *string {
+	if b == nil {
 		return nil
 	}
-	return o.IdpErrorResponseMessage
+	return b.IdpErrorResponseMessage
 }
 
-func (o *Behavior) GetIdpErrorResponseStatusCode() *int64 {
-	if o == nil {
+func (b *Behavior) GetIdpErrorResponseStatusCode() *int64 {
+	if b == nil {
 		return nil
 	}
-	return o.IdpErrorResponseStatusCode
+	return b.IdpErrorResponseStatusCode
 }
 
-func (o *Behavior) GetPurgeTokenOnUpstreamStatusCodes() []int64 {
-	if o == nil {
+func (b *Behavior) GetPurgeTokenOnUpstreamStatusCodes() []int64 {
+	if b == nil {
 		return nil
 	}
-	return o.PurgeTokenOnUpstreamStatusCodes
+	return b.PurgeTokenOnUpstreamStatusCodes
 }
 
-func (o *Behavior) GetUpstreamAccessTokenHeaderName() *string {
-	if o == nil {
+func (b *Behavior) GetUpstreamAccessTokenHeaderName() *string {
+	if b == nil {
 		return nil
 	}
-	return o.UpstreamAccessTokenHeaderName
+	return b.UpstreamAccessTokenHeaderName
 }
 
 type UpstreamOauthPluginMemory struct {
@@ -138,11 +140,11 @@ type UpstreamOauthPluginMemory struct {
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
-func (o *UpstreamOauthPluginMemory) GetDictionaryName() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginMemory) GetDictionaryName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.DictionaryName
+	return u.DictionaryName
 }
 
 type UpstreamOauthPluginClusterNodes struct {
@@ -152,18 +154,18 @@ type UpstreamOauthPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *UpstreamOauthPluginClusterNodes) GetIP() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginClusterNodes) GetIP() *string {
+	if u == nil {
 		return nil
 	}
-	return o.IP
+	return u.IP
 }
 
-func (o *UpstreamOauthPluginClusterNodes) GetPort() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginClusterNodes) GetPort() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.Port
+	return u.Port
 }
 
 type UpstreamOauthPluginSentinelNodes struct {
@@ -173,18 +175,18 @@ type UpstreamOauthPluginSentinelNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
-func (o *UpstreamOauthPluginSentinelNodes) GetHost() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginSentinelNodes) GetHost() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Host
+	return u.Host
 }
 
-func (o *UpstreamOauthPluginSentinelNodes) GetPort() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginSentinelNodes) GetPort() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.Port
+	return u.Port
 }
 
 // UpstreamOauthPluginSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
@@ -262,151 +264,151 @@ type UpstreamOauthPluginRedis struct {
 	Username *string `json:"username,omitempty"`
 }
 
-func (o *UpstreamOauthPluginRedis) GetClusterMaxRedirections() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetClusterMaxRedirections() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ClusterMaxRedirections
+	return u.ClusterMaxRedirections
 }
 
-func (o *UpstreamOauthPluginRedis) GetClusterNodes() []UpstreamOauthPluginClusterNodes {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetClusterNodes() []UpstreamOauthPluginClusterNodes {
+	if u == nil {
 		return nil
 	}
-	return o.ClusterNodes
+	return u.ClusterNodes
 }
 
-func (o *UpstreamOauthPluginRedis) GetConnectTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetConnectTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ConnectTimeout
+	return u.ConnectTimeout
 }
 
-func (o *UpstreamOauthPluginRedis) GetConnectionIsProxied() *bool {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetConnectionIsProxied() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.ConnectionIsProxied
+	return u.ConnectionIsProxied
 }
 
-func (o *UpstreamOauthPluginRedis) GetDatabase() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetDatabase() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.Database
+	return u.Database
 }
 
-func (o *UpstreamOauthPluginRedis) GetHost() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetHost() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Host
+	return u.Host
 }
 
-func (o *UpstreamOauthPluginRedis) GetKeepaliveBacklog() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetKeepaliveBacklog() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.KeepaliveBacklog
+	return u.KeepaliveBacklog
 }
 
-func (o *UpstreamOauthPluginRedis) GetKeepalivePoolSize() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetKeepalivePoolSize() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.KeepalivePoolSize
+	return u.KeepalivePoolSize
 }
 
-func (o *UpstreamOauthPluginRedis) GetPassword() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetPassword() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Password
+	return u.Password
 }
 
-func (o *UpstreamOauthPluginRedis) GetPort() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetPort() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.Port
+	return u.Port
 }
 
-func (o *UpstreamOauthPluginRedis) GetReadTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetReadTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.ReadTimeout
+	return u.ReadTimeout
 }
 
-func (o *UpstreamOauthPluginRedis) GetSendTimeout() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSendTimeout() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.SendTimeout
+	return u.SendTimeout
 }
 
-func (o *UpstreamOauthPluginRedis) GetSentinelMaster() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSentinelMaster() *string {
+	if u == nil {
 		return nil
 	}
-	return o.SentinelMaster
+	return u.SentinelMaster
 }
 
-func (o *UpstreamOauthPluginRedis) GetSentinelNodes() []UpstreamOauthPluginSentinelNodes {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSentinelNodes() []UpstreamOauthPluginSentinelNodes {
+	if u == nil {
 		return nil
 	}
-	return o.SentinelNodes
+	return u.SentinelNodes
 }
 
-func (o *UpstreamOauthPluginRedis) GetSentinelPassword() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSentinelPassword() *string {
+	if u == nil {
 		return nil
 	}
-	return o.SentinelPassword
+	return u.SentinelPassword
 }
 
-func (o *UpstreamOauthPluginRedis) GetSentinelRole() *UpstreamOauthPluginSentinelRole {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSentinelRole() *UpstreamOauthPluginSentinelRole {
+	if u == nil {
 		return nil
 	}
-	return o.SentinelRole
+	return u.SentinelRole
 }
 
-func (o *UpstreamOauthPluginRedis) GetSentinelUsername() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSentinelUsername() *string {
+	if u == nil {
 		return nil
 	}
-	return o.SentinelUsername
+	return u.SentinelUsername
 }
 
-func (o *UpstreamOauthPluginRedis) GetServerName() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetServerName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ServerName
+	return u.ServerName
 }
 
-func (o *UpstreamOauthPluginRedis) GetSsl() *bool {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSsl() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.Ssl
+	return u.Ssl
 }
 
-func (o *UpstreamOauthPluginRedis) GetSslVerify() *bool {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetSslVerify() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.SslVerify
+	return u.SslVerify
 }
 
-func (o *UpstreamOauthPluginRedis) GetUsername() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRedis) GetUsername() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Username
+	return u.Username
 }
 
 // UpstreamOauthPluginStrategy - The method Kong should use to cache tokens issued by the IdP.
@@ -447,39 +449,39 @@ type UpstreamOauthPluginCache struct {
 	Strategy *UpstreamOauthPluginStrategy `json:"strategy,omitempty"`
 }
 
-func (o *UpstreamOauthPluginCache) GetDefaultTTL() *float64 {
-	if o == nil {
+func (u *UpstreamOauthPluginCache) GetDefaultTTL() *float64 {
+	if u == nil {
 		return nil
 	}
-	return o.DefaultTTL
+	return u.DefaultTTL
 }
 
-func (o *UpstreamOauthPluginCache) GetEagerlyExpire() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPluginCache) GetEagerlyExpire() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.EagerlyExpire
+	return u.EagerlyExpire
 }
 
-func (o *UpstreamOauthPluginCache) GetMemory() *UpstreamOauthPluginMemory {
-	if o == nil {
+func (u *UpstreamOauthPluginCache) GetMemory() *UpstreamOauthPluginMemory {
+	if u == nil {
 		return nil
 	}
-	return o.Memory
+	return u.Memory
 }
 
-func (o *UpstreamOauthPluginCache) GetRedis() *UpstreamOauthPluginRedis {
-	if o == nil {
+func (u *UpstreamOauthPluginCache) GetRedis() *UpstreamOauthPluginRedis {
+	if u == nil {
 		return nil
 	}
-	return o.Redis
+	return u.Redis
 }
 
-func (o *UpstreamOauthPluginCache) GetStrategy() *UpstreamOauthPluginStrategy {
-	if o == nil {
+func (u *UpstreamOauthPluginCache) GetStrategy() *UpstreamOauthPluginStrategy {
+	if u == nil {
 		return nil
 	}
-	return o.Strategy
+	return u.Strategy
 }
 
 // AuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
@@ -567,81 +569,81 @@ type Client struct {
 	Timeout *int64 `json:"timeout,omitempty"`
 }
 
-func (o *Client) GetAuthMethod() *AuthMethod {
-	if o == nil {
+func (c *Client) GetAuthMethod() *AuthMethod {
+	if c == nil {
 		return nil
 	}
-	return o.AuthMethod
+	return c.AuthMethod
 }
 
-func (o *Client) GetClientSecretJwtAlg() *ClientSecretJwtAlg {
-	if o == nil {
+func (c *Client) GetClientSecretJwtAlg() *ClientSecretJwtAlg {
+	if c == nil {
 		return nil
 	}
-	return o.ClientSecretJwtAlg
+	return c.ClientSecretJwtAlg
 }
 
-func (o *Client) GetHTTPProxy() *string {
-	if o == nil {
+func (c *Client) GetHTTPProxy() *string {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPProxy
+	return c.HTTPProxy
 }
 
-func (o *Client) GetHTTPProxyAuthorization() *string {
-	if o == nil {
+func (c *Client) GetHTTPProxyAuthorization() *string {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPProxyAuthorization
+	return c.HTTPProxyAuthorization
 }
 
-func (o *Client) GetHTTPVersion() *float64 {
-	if o == nil {
+func (c *Client) GetHTTPVersion() *float64 {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPVersion
+	return c.HTTPVersion
 }
 
-func (o *Client) GetHTTPSProxy() *string {
-	if o == nil {
+func (c *Client) GetHTTPSProxy() *string {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPSProxy
+	return c.HTTPSProxy
 }
 
-func (o *Client) GetHTTPSProxyAuthorization() *string {
-	if o == nil {
+func (c *Client) GetHTTPSProxyAuthorization() *string {
+	if c == nil {
 		return nil
 	}
-	return o.HTTPSProxyAuthorization
+	return c.HTTPSProxyAuthorization
 }
 
-func (o *Client) GetKeepAlive() *bool {
-	if o == nil {
+func (c *Client) GetKeepAlive() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.KeepAlive
+	return c.KeepAlive
 }
 
-func (o *Client) GetNoProxy() *string {
-	if o == nil {
+func (c *Client) GetNoProxy() *string {
+	if c == nil {
 		return nil
 	}
-	return o.NoProxy
+	return c.NoProxy
 }
 
-func (o *Client) GetSslVerify() *bool {
-	if o == nil {
+func (c *Client) GetSslVerify() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.SslVerify
+	return c.SslVerify
 }
 
-func (o *Client) GetTimeout() *int64 {
-	if o == nil {
+func (c *Client) GetTimeout() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.Timeout
+	return c.Timeout
 }
 
 // GrantType - The OAuth grant type to be used.
@@ -685,7 +687,7 @@ type Oauth struct {
 	// List of scopes to request from the IdP when obtaining a new token.
 	Scopes []string `json:"scopes,omitempty"`
 	// The token endpoint URI.
-	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
 	TokenHeaders map[string]any `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
@@ -736,9 +738,9 @@ func (o *Oauth) GetScopes() []string {
 	return o.Scopes
 }
 
-func (o *Oauth) GetTokenEndpoint() *string {
+func (o *Oauth) GetTokenEndpoint() string {
 	if o == nil {
-		return nil
+		return ""
 	}
 	return o.TokenEndpoint
 }
@@ -768,35 +770,35 @@ type UpstreamOauthPluginConfig struct {
 	Behavior *Behavior                 `json:"behavior,omitempty"`
 	Cache    *UpstreamOauthPluginCache `json:"cache,omitempty"`
 	Client   *Client                   `json:"client,omitempty"`
-	Oauth    *Oauth                    `json:"oauth,omitempty"`
+	Oauth    Oauth                     `json:"oauth"`
 }
 
-func (o *UpstreamOauthPluginConfig) GetBehavior() *Behavior {
-	if o == nil {
+func (u *UpstreamOauthPluginConfig) GetBehavior() *Behavior {
+	if u == nil {
 		return nil
 	}
-	return o.Behavior
+	return u.Behavior
 }
 
-func (o *UpstreamOauthPluginConfig) GetCache() *UpstreamOauthPluginCache {
-	if o == nil {
+func (u *UpstreamOauthPluginConfig) GetCache() *UpstreamOauthPluginCache {
+	if u == nil {
 		return nil
 	}
-	return o.Cache
+	return u.Cache
 }
 
-func (o *UpstreamOauthPluginConfig) GetClient() *Client {
-	if o == nil {
+func (u *UpstreamOauthPluginConfig) GetClient() *Client {
+	if u == nil {
 		return nil
 	}
-	return o.Client
+	return u.Client
 }
 
-func (o *UpstreamOauthPluginConfig) GetOauth() *Oauth {
-	if o == nil {
-		return nil
+func (u *UpstreamOauthPluginConfig) GetOauth() Oauth {
+	if u == nil {
+		return Oauth{}
 	}
-	return o.Oauth
+	return u.Oauth
 }
 
 // UpstreamOauthPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -804,11 +806,11 @@ type UpstreamOauthPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamOauthPluginConsumer) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginConsumer) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UpstreamOauthPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -816,11 +818,11 @@ type UpstreamOauthPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamOauthPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginConsumerGroup) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 type UpstreamOauthPluginProtocols string
@@ -860,11 +862,11 @@ type UpstreamOauthPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamOauthPluginRoute) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginRoute) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UpstreamOauthPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -872,11 +874,11 @@ type UpstreamOauthPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UpstreamOauthPluginService) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPluginService) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UpstreamOauthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -884,17 +886,20 @@ type UpstreamOauthPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                         `json:"enabled,omitempty"`
-	ID           *string                       `json:"id,omitempty"`
-	InstanceName *string                       `json:"instance_name,omitempty"`
-	name         string                        `const:"upstream-oauth" json:"name"`
-	Ordering     *UpstreamOauthPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []UpstreamOauthPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                      `json:"instance_name,omitempty"`
+	name         string                       `const:"upstream-oauth" json:"name"`
+	Ordering     *UpstreamOauthPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []UpstreamOauthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                     `json:"updated_at,omitempty"`
-	Config    *UpstreamOauthPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64                    `json:"updated_at,omitempty"`
+	Config    UpstreamOauthPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *UpstreamOauthPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -912,110 +917,110 @@ func (u UpstreamOauthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpstreamOauthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *UpstreamOauthPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetCreatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return u.CreatedAt
 }
 
-func (o *UpstreamOauthPlugin) GetEnabled() *bool {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetEnabled() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.Enabled
+	return u.Enabled
 }
 
-func (o *UpstreamOauthPlugin) GetID() *string {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
-func (o *UpstreamOauthPlugin) GetInstanceName() *string {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetInstanceName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.InstanceName
+	return u.InstanceName
 }
 
-func (o *UpstreamOauthPlugin) GetName() string {
+func (u *UpstreamOauthPlugin) GetName() string {
 	return "upstream-oauth"
 }
 
-func (o *UpstreamOauthPlugin) GetOrdering() *UpstreamOauthPluginOrdering {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetOrdering() *UpstreamOauthPluginOrdering {
+	if u == nil {
 		return nil
 	}
-	return o.Ordering
+	return u.Ordering
 }
 
-func (o *UpstreamOauthPlugin) GetPartials() []UpstreamOauthPluginPartials {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetPartials() []UpstreamOauthPluginPartials {
+	if u == nil {
 		return nil
 	}
-	return o.Partials
+	return u.Partials
 }
 
-func (o *UpstreamOauthPlugin) GetTags() []string {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetTags() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Tags
+	return u.Tags
 }
 
-func (o *UpstreamOauthPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return u.UpdatedAt
 }
 
-func (o *UpstreamOauthPlugin) GetConfig() *UpstreamOauthPluginConfig {
-	if o == nil {
-		return nil
+func (u *UpstreamOauthPlugin) GetConfig() UpstreamOauthPluginConfig {
+	if u == nil {
+		return UpstreamOauthPluginConfig{}
 	}
-	return o.Config
+	return u.Config
 }
 
-func (o *UpstreamOauthPlugin) GetConsumer() *UpstreamOauthPluginConsumer {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetConsumer() *UpstreamOauthPluginConsumer {
+	if u == nil {
 		return nil
 	}
-	return o.Consumer
+	return u.Consumer
 }
 
-func (o *UpstreamOauthPlugin) GetConsumerGroup() *UpstreamOauthPluginConsumerGroup {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetConsumerGroup() *UpstreamOauthPluginConsumerGroup {
+	if u == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return u.ConsumerGroup
 }
 
-func (o *UpstreamOauthPlugin) GetProtocols() []UpstreamOauthPluginProtocols {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetProtocols() []UpstreamOauthPluginProtocols {
+	if u == nil {
 		return nil
 	}
-	return o.Protocols
+	return u.Protocols
 }
 
-func (o *UpstreamOauthPlugin) GetRoute() *UpstreamOauthPluginRoute {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetRoute() *UpstreamOauthPluginRoute {
+	if u == nil {
 		return nil
 	}
-	return o.Route
+	return u.Route
 }
 
-func (o *UpstreamOauthPlugin) GetService() *UpstreamOauthPluginService {
-	if o == nil {
+func (u *UpstreamOauthPlugin) GetService() *UpstreamOauthPluginService {
+	if u == nil {
 		return nil
 	}
-	return o.Service
+	return u.Service
 }

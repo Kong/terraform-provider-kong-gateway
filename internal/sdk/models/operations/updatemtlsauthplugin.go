@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateMtlsauthPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID       string                `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	MtlsAuthPlugin shared.MtlsAuthPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateMtlsauthPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateMtlsauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateMtlsauthPluginRequest) GetMtlsAuthPlugin() shared.MtlsAuthPlugin {
-	if o == nil {
+func (u *UpdateMtlsauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "MtlsAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateMtlsauthPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateMtlsauthPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateMtlsauthPluginRequest) GetMtlsAuthPlugin() shared.MtlsAuthPlugin {
+	if u == nil {
 		return shared.MtlsAuthPlugin{}
 	}
-	return o.MtlsAuthPlugin
+	return u.MtlsAuthPlugin
 }
 
 type UpdateMtlsauthPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateMtlsauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateMtlsauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateMtlsauthPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateMtlsauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateMtlsauthPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateMtlsauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateMtlsauthPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateMtlsauthPluginResponse) GetMtlsAuthPlugin() *shared.MtlsAuthPlugin {
-	if o == nil {
+func (u *UpdateMtlsauthPluginResponse) GetMtlsAuthPlugin() *shared.MtlsAuthPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.MtlsAuthPlugin
+	return u.MtlsAuthPlugin
 }
 
-func (o *UpdateMtlsauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateMtlsauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

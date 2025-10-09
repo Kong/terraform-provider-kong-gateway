@@ -12,22 +12,22 @@ type AiResponseTransformerPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginAfter) GetAccess() []string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAfter) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiResponseTransformerPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginBefore) GetAccess() []string {
-	if o == nil {
+func (a *AiResponseTransformerPluginBefore) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiResponseTransformerPluginOrdering struct {
@@ -35,45 +35,47 @@ type AiResponseTransformerPluginOrdering struct {
 	Before *AiResponseTransformerPluginBefore `json:"before,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginOrdering) GetAfter() *AiResponseTransformerPluginAfter {
-	if o == nil {
+func (a *AiResponseTransformerPluginOrdering) GetAfter() *AiResponseTransformerPluginAfter {
+	if a == nil {
 		return nil
 	}
-	return o.After
+	return a.After
 }
 
-func (o *AiResponseTransformerPluginOrdering) GetBefore() *AiResponseTransformerPluginBefore {
-	if o == nil {
+func (a *AiResponseTransformerPluginOrdering) GetBefore() *AiResponseTransformerPluginBefore {
+	if a == nil {
 		return nil
 	}
-	return o.Before
+	return a.Before
 }
 
 type AiResponseTransformerPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginPartials) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginPartials) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiResponseTransformerPluginPartials) GetName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginPartials) GetName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Name
+	return a.Name
 }
 
-func (o *AiResponseTransformerPluginPartials) GetPath() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginPartials) GetPath() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Path
+	return a.Path
 }
 
 // AiResponseTransformerPluginParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
@@ -134,102 +136,102 @@ type AiResponseTransformerPluginAuth struct {
 	ParamValue *string `json:"param_value,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAllowOverride() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAllowOverride() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.AllowOverride
+	return a.AllowOverride
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAwsAccessKeyID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAwsAccessKeyID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsAccessKeyID
+	return a.AwsAccessKeyID
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAwsSecretAccessKey() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAwsSecretAccessKey() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsSecretAccessKey
+	return a.AwsSecretAccessKey
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAzureClientID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAzureClientID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureClientID
+	return a.AzureClientID
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAzureClientSecret() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAzureClientSecret() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureClientSecret
+	return a.AzureClientSecret
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAzureTenantID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAzureTenantID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureTenantID
+	return a.AzureTenantID
 }
 
-func (o *AiResponseTransformerPluginAuth) GetAzureUseManagedIdentity() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetAzureUseManagedIdentity() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.AzureUseManagedIdentity
+	return a.AzureUseManagedIdentity
 }
 
-func (o *AiResponseTransformerPluginAuth) GetGcpServiceAccountJSON() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetGcpServiceAccountJSON() *string {
+	if a == nil {
 		return nil
 	}
-	return o.GcpServiceAccountJSON
+	return a.GcpServiceAccountJSON
 }
 
-func (o *AiResponseTransformerPluginAuth) GetGcpUseServiceAccount() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetGcpUseServiceAccount() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.GcpUseServiceAccount
+	return a.GcpUseServiceAccount
 }
 
-func (o *AiResponseTransformerPluginAuth) GetHeaderName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetHeaderName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HeaderName
+	return a.HeaderName
 }
 
-func (o *AiResponseTransformerPluginAuth) GetHeaderValue() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetHeaderValue() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HeaderValue
+	return a.HeaderValue
 }
 
-func (o *AiResponseTransformerPluginAuth) GetParamLocation() *AiResponseTransformerPluginParamLocation {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetParamLocation() *AiResponseTransformerPluginParamLocation {
+	if a == nil {
 		return nil
 	}
-	return o.ParamLocation
+	return a.ParamLocation
 }
 
-func (o *AiResponseTransformerPluginAuth) GetParamName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetParamName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ParamName
+	return a.ParamName
 }
 
-func (o *AiResponseTransformerPluginAuth) GetParamValue() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginAuth) GetParamValue() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ParamValue
+	return a.ParamValue
 }
 
 type AiResponseTransformerPluginLogging struct {
@@ -239,18 +241,18 @@ type AiResponseTransformerPluginLogging struct {
 	LogStatistics *bool `json:"log_statistics,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginLogging) GetLogPayloads() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginLogging) GetLogPayloads() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.LogPayloads
+	return a.LogPayloads
 }
 
-func (o *AiResponseTransformerPluginLogging) GetLogStatistics() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginLogging) GetLogStatistics() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.LogStatistics
+	return a.LogStatistics
 }
 
 type AiResponseTransformerPluginBedrock struct {
@@ -262,64 +264,148 @@ type AiResponseTransformerPluginBedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
+	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
+	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginBedrock) GetAwsAssumeRoleArn() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginBedrock) GetAwsAssumeRoleArn() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsAssumeRoleArn
+	return a.AwsAssumeRoleArn
 }
 
-func (o *AiResponseTransformerPluginBedrock) GetAwsRegion() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginBedrock) GetAwsRegion() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsRegion
+	return a.AwsRegion
 }
 
-func (o *AiResponseTransformerPluginBedrock) GetAwsRoleSessionName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginBedrock) GetAwsRoleSessionName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsRoleSessionName
+	return a.AwsRoleSessionName
 }
 
-func (o *AiResponseTransformerPluginBedrock) GetAwsStsEndpointURL() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginBedrock) GetAwsStsEndpointURL() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AwsStsEndpointURL
+	return a.AwsStsEndpointURL
+}
+
+func (a *AiResponseTransformerPluginBedrock) GetEmbeddingsNormalize() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.EmbeddingsNormalize
+}
+
+func (a *AiResponseTransformerPluginBedrock) GetPerformanceConfigLatency() *string {
+	if a == nil {
+		return nil
+	}
+	return a.PerformanceConfigLatency
+}
+
+// AiResponseTransformerPluginEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
+type AiResponseTransformerPluginEmbeddingInputType string
+
+const (
+	AiResponseTransformerPluginEmbeddingInputTypeClassification AiResponseTransformerPluginEmbeddingInputType = "classification"
+	AiResponseTransformerPluginEmbeddingInputTypeClustering     AiResponseTransformerPluginEmbeddingInputType = "clustering"
+	AiResponseTransformerPluginEmbeddingInputTypeImage          AiResponseTransformerPluginEmbeddingInputType = "image"
+	AiResponseTransformerPluginEmbeddingInputTypeSearchDocument AiResponseTransformerPluginEmbeddingInputType = "search_document"
+	AiResponseTransformerPluginEmbeddingInputTypeSearchQuery    AiResponseTransformerPluginEmbeddingInputType = "search_query"
+)
+
+func (e AiResponseTransformerPluginEmbeddingInputType) ToPointer() *AiResponseTransformerPluginEmbeddingInputType {
+	return &e
+}
+func (e *AiResponseTransformerPluginEmbeddingInputType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "classification":
+		fallthrough
+	case "clustering":
+		fallthrough
+	case "image":
+		fallthrough
+	case "search_document":
+		fallthrough
+	case "search_query":
+		*e = AiResponseTransformerPluginEmbeddingInputType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiResponseTransformerPluginEmbeddingInputType: %v", v)
+	}
+}
+
+type AiResponseTransformerPluginCohere struct {
+	// The purpose of the input text to calculate embedding vectors.
+	EmbeddingInputType *AiResponseTransformerPluginEmbeddingInputType `json:"embedding_input_type,omitempty"`
+	// Wait for the model if it is not ready
+	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (a *AiResponseTransformerPluginCohere) GetEmbeddingInputType() *AiResponseTransformerPluginEmbeddingInputType {
+	if a == nil {
+		return nil
+	}
+	return a.EmbeddingInputType
+}
+
+func (a *AiResponseTransformerPluginCohere) GetWaitForModel() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.WaitForModel
 }
 
 type AiResponseTransformerPluginGemini struct {
 	// If running Gemini on Vertex, specify the regional API endpoint (hostname only).
 	APIEndpoint *string `json:"api_endpoint,omitempty"`
+	// If running Gemini on Vertex Model Garden, specify the endpoint ID.
+	EndpointID *string `json:"endpoint_id,omitempty"`
 	// If running Gemini on Vertex, specify the location ID.
 	LocationID *string `json:"location_id,omitempty"`
 	// If running Gemini on Vertex, specify the project ID.
 	ProjectID *string `json:"project_id,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginGemini) GetAPIEndpoint() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginGemini) GetAPIEndpoint() *string {
+	if a == nil {
 		return nil
 	}
-	return o.APIEndpoint
+	return a.APIEndpoint
 }
 
-func (o *AiResponseTransformerPluginGemini) GetLocationID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginGemini) GetEndpointID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.LocationID
+	return a.EndpointID
 }
 
-func (o *AiResponseTransformerPluginGemini) GetProjectID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginGemini) GetLocationID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ProjectID
+	return a.LocationID
+}
+
+func (a *AiResponseTransformerPluginGemini) GetProjectID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ProjectID
 }
 
 type AiResponseTransformerPluginHuggingface struct {
@@ -329,18 +415,18 @@ type AiResponseTransformerPluginHuggingface struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginHuggingface) GetUseCache() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginHuggingface) GetUseCache() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.UseCache
+	return a.UseCache
 }
 
-func (o *AiResponseTransformerPluginHuggingface) GetWaitForModel() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginHuggingface) GetWaitForModel() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.WaitForModel
+	return a.WaitForModel
 }
 
 // AiResponseTransformerPluginLlama2Format - If using llama2 provider, select the upstream message format.
@@ -409,10 +495,13 @@ type AiResponseTransformerPluginOptions struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string                                 `json:"azure_instance,omitempty"`
-	Bedrock       *AiResponseTransformerPluginBedrock     `json:"bedrock,omitempty"`
-	Gemini        *AiResponseTransformerPluginGemini      `json:"gemini,omitempty"`
-	Huggingface   *AiResponseTransformerPluginHuggingface `json:"huggingface,omitempty"`
+	AzureInstance *string                             `json:"azure_instance,omitempty"`
+	Bedrock       *AiResponseTransformerPluginBedrock `json:"bedrock,omitempty"`
+	Cohere        *AiResponseTransformerPluginCohere  `json:"cohere,omitempty"`
+	// If using embeddings models, set the number of dimensions to generate.
+	EmbeddingsDimensions *int64                                  `json:"embeddings_dimensions,omitempty"`
+	Gemini               *AiResponseTransformerPluginGemini      `json:"gemini,omitempty"`
+	Huggingface          *AiResponseTransformerPluginHuggingface `json:"huggingface,omitempty"`
 	// Defines the cost per 1M tokens in your prompt.
 	InputCost *float64 `json:"input_cost,omitempty"`
 	// If using llama2 provider, select the upstream message format.
@@ -435,123 +524,137 @@ type AiResponseTransformerPluginOptions struct {
 	UpstreamURL *string `json:"upstream_url,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginOptions) GetAnthropicVersion() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetAnthropicVersion() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AnthropicVersion
+	return a.AnthropicVersion
 }
 
-func (o *AiResponseTransformerPluginOptions) GetAzureAPIVersion() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetAzureAPIVersion() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureAPIVersion
+	return a.AzureAPIVersion
 }
 
-func (o *AiResponseTransformerPluginOptions) GetAzureDeploymentID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetAzureDeploymentID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureDeploymentID
+	return a.AzureDeploymentID
 }
 
-func (o *AiResponseTransformerPluginOptions) GetAzureInstance() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetAzureInstance() *string {
+	if a == nil {
 		return nil
 	}
-	return o.AzureInstance
+	return a.AzureInstance
 }
 
-func (o *AiResponseTransformerPluginOptions) GetBedrock() *AiResponseTransformerPluginBedrock {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetBedrock() *AiResponseTransformerPluginBedrock {
+	if a == nil {
 		return nil
 	}
-	return o.Bedrock
+	return a.Bedrock
 }
 
-func (o *AiResponseTransformerPluginOptions) GetGemini() *AiResponseTransformerPluginGemini {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetCohere() *AiResponseTransformerPluginCohere {
+	if a == nil {
 		return nil
 	}
-	return o.Gemini
+	return a.Cohere
 }
 
-func (o *AiResponseTransformerPluginOptions) GetHuggingface() *AiResponseTransformerPluginHuggingface {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetEmbeddingsDimensions() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.Huggingface
+	return a.EmbeddingsDimensions
 }
 
-func (o *AiResponseTransformerPluginOptions) GetInputCost() *float64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetGemini() *AiResponseTransformerPluginGemini {
+	if a == nil {
 		return nil
 	}
-	return o.InputCost
+	return a.Gemini
 }
 
-func (o *AiResponseTransformerPluginOptions) GetLlama2Format() *AiResponseTransformerPluginLlama2Format {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetHuggingface() *AiResponseTransformerPluginHuggingface {
+	if a == nil {
 		return nil
 	}
-	return o.Llama2Format
+	return a.Huggingface
 }
 
-func (o *AiResponseTransformerPluginOptions) GetMaxTokens() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetInputCost() *float64 {
+	if a == nil {
 		return nil
 	}
-	return o.MaxTokens
+	return a.InputCost
 }
 
-func (o *AiResponseTransformerPluginOptions) GetMistralFormat() *AiResponseTransformerPluginMistralFormat {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetLlama2Format() *AiResponseTransformerPluginLlama2Format {
+	if a == nil {
 		return nil
 	}
-	return o.MistralFormat
+	return a.Llama2Format
 }
 
-func (o *AiResponseTransformerPluginOptions) GetOutputCost() *float64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetMaxTokens() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.OutputCost
+	return a.MaxTokens
 }
 
-func (o *AiResponseTransformerPluginOptions) GetTemperature() *float64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetMistralFormat() *AiResponseTransformerPluginMistralFormat {
+	if a == nil {
 		return nil
 	}
-	return o.Temperature
+	return a.MistralFormat
 }
 
-func (o *AiResponseTransformerPluginOptions) GetTopK() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetOutputCost() *float64 {
+	if a == nil {
 		return nil
 	}
-	return o.TopK
+	return a.OutputCost
 }
 
-func (o *AiResponseTransformerPluginOptions) GetTopP() *float64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetTemperature() *float64 {
+	if a == nil {
 		return nil
 	}
-	return o.TopP
+	return a.Temperature
 }
 
-func (o *AiResponseTransformerPluginOptions) GetUpstreamPath() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetTopK() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpstreamPath
+	return a.TopK
 }
 
-func (o *AiResponseTransformerPluginOptions) GetUpstreamURL() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginOptions) GetTopP() *float64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpstreamURL
+	return a.TopP
+}
+
+func (a *AiResponseTransformerPluginOptions) GetUpstreamPath() *string {
+	if a == nil {
+		return nil
+	}
+	return a.UpstreamPath
+}
+
+func (a *AiResponseTransformerPluginOptions) GetUpstreamURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.UpstreamURL
 }
 
 // AiResponseTransformerPluginProvider - AI provider request format - Kong translates requests to and from the specified backend compatible formats.
@@ -608,37 +711,48 @@ type AiResponseTransformerPluginModel struct {
 	// Key/value settings for the model
 	Options *AiResponseTransformerPluginOptions `json:"options,omitempty"`
 	// AI provider request format - Kong translates requests to and from the specified backend compatible formats.
-	Provider *AiResponseTransformerPluginProvider `json:"provider,omitempty"`
+	Provider AiResponseTransformerPluginProvider `json:"provider"`
 }
 
-func (o *AiResponseTransformerPluginModel) GetName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginModel) GetName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Name
+	return a.Name
 }
 
-func (o *AiResponseTransformerPluginModel) GetOptions() *AiResponseTransformerPluginOptions {
-	if o == nil {
+func (a *AiResponseTransformerPluginModel) GetOptions() *AiResponseTransformerPluginOptions {
+	if a == nil {
 		return nil
 	}
-	return o.Options
+	return a.Options
 }
 
-func (o *AiResponseTransformerPluginModel) GetProvider() *AiResponseTransformerPluginProvider {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPluginModel) GetProvider() AiResponseTransformerPluginProvider {
+	if a == nil {
+		return AiResponseTransformerPluginProvider("")
 	}
-	return o.Provider
+	return a.Provider
 }
 
-// AiResponseTransformerPluginRouteType - The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation.
+// AiResponseTransformerPluginRouteType - The model's operation implementation, for this provider.
 type AiResponseTransformerPluginRouteType string
 
 const (
-	AiResponseTransformerPluginRouteTypeLlmV1Chat        AiResponseTransformerPluginRouteType = "llm/v1/chat"
-	AiResponseTransformerPluginRouteTypeLlmV1Completions AiResponseTransformerPluginRouteType = "llm/v1/completions"
-	AiResponseTransformerPluginRouteTypePreserve         AiResponseTransformerPluginRouteType = "preserve"
+	AiResponseTransformerPluginRouteTypeAudioV1AudioSpeech         AiResponseTransformerPluginRouteType = "audio/v1/audio/speech"
+	AiResponseTransformerPluginRouteTypeAudioV1AudioTranscriptions AiResponseTransformerPluginRouteType = "audio/v1/audio/transcriptions"
+	AiResponseTransformerPluginRouteTypeAudioV1AudioTranslations   AiResponseTransformerPluginRouteType = "audio/v1/audio/translations"
+	AiResponseTransformerPluginRouteTypeImageV1ImagesEdits         AiResponseTransformerPluginRouteType = "image/v1/images/edits"
+	AiResponseTransformerPluginRouteTypeImageV1ImagesGenerations   AiResponseTransformerPluginRouteType = "image/v1/images/generations"
+	AiResponseTransformerPluginRouteTypeLlmV1Assistants            AiResponseTransformerPluginRouteType = "llm/v1/assistants"
+	AiResponseTransformerPluginRouteTypeLlmV1Batches               AiResponseTransformerPluginRouteType = "llm/v1/batches"
+	AiResponseTransformerPluginRouteTypeLlmV1Chat                  AiResponseTransformerPluginRouteType = "llm/v1/chat"
+	AiResponseTransformerPluginRouteTypeLlmV1Completions           AiResponseTransformerPluginRouteType = "llm/v1/completions"
+	AiResponseTransformerPluginRouteTypeLlmV1Embeddings            AiResponseTransformerPluginRouteType = "llm/v1/embeddings"
+	AiResponseTransformerPluginRouteTypeLlmV1Files                 AiResponseTransformerPluginRouteType = "llm/v1/files"
+	AiResponseTransformerPluginRouteTypeLlmV1Responses             AiResponseTransformerPluginRouteType = "llm/v1/responses"
+	AiResponseTransformerPluginRouteTypePreserve                   AiResponseTransformerPluginRouteType = "preserve"
+	AiResponseTransformerPluginRouteTypeRealtimeV1Realtime         AiResponseTransformerPluginRouteType = "realtime/v1/realtime"
 )
 
 func (e AiResponseTransformerPluginRouteType) ToPointer() *AiResponseTransformerPluginRouteType {
@@ -650,11 +764,33 @@ func (e *AiResponseTransformerPluginRouteType) UnmarshalJSON(data []byte) error 
 		return err
 	}
 	switch v {
+	case "audio/v1/audio/speech":
+		fallthrough
+	case "audio/v1/audio/transcriptions":
+		fallthrough
+	case "audio/v1/audio/translations":
+		fallthrough
+	case "image/v1/images/edits":
+		fallthrough
+	case "image/v1/images/generations":
+		fallthrough
+	case "llm/v1/assistants":
+		fallthrough
+	case "llm/v1/batches":
+		fallthrough
 	case "llm/v1/chat":
 		fallthrough
 	case "llm/v1/completions":
 		fallthrough
+	case "llm/v1/embeddings":
+		fallthrough
+	case "llm/v1/files":
+		fallthrough
+	case "llm/v1/responses":
+		fallthrough
 	case "preserve":
+		fallthrough
+	case "realtime/v1/realtime":
 		*e = AiResponseTransformerPluginRouteType(v)
 		return nil
 	default:
@@ -665,37 +801,37 @@ func (e *AiResponseTransformerPluginRouteType) UnmarshalJSON(data []byte) error 
 type AiResponseTransformerPluginLlm struct {
 	Auth    *AiResponseTransformerPluginAuth    `json:"auth,omitempty"`
 	Logging *AiResponseTransformerPluginLogging `json:"logging,omitempty"`
-	Model   *AiResponseTransformerPluginModel   `json:"model,omitempty"`
-	// The model's operation implementation, for this provider. Set to `preserve` to pass through without transformation.
-	RouteType *AiResponseTransformerPluginRouteType `json:"route_type,omitempty"`
+	Model   AiResponseTransformerPluginModel    `json:"model"`
+	// The model's operation implementation, for this provider.
+	RouteType AiResponseTransformerPluginRouteType `json:"route_type"`
 }
 
-func (o *AiResponseTransformerPluginLlm) GetAuth() *AiResponseTransformerPluginAuth {
-	if o == nil {
+func (a *AiResponseTransformerPluginLlm) GetAuth() *AiResponseTransformerPluginAuth {
+	if a == nil {
 		return nil
 	}
-	return o.Auth
+	return a.Auth
 }
 
-func (o *AiResponseTransformerPluginLlm) GetLogging() *AiResponseTransformerPluginLogging {
-	if o == nil {
+func (a *AiResponseTransformerPluginLlm) GetLogging() *AiResponseTransformerPluginLogging {
+	if a == nil {
 		return nil
 	}
-	return o.Logging
+	return a.Logging
 }
 
-func (o *AiResponseTransformerPluginLlm) GetModel() *AiResponseTransformerPluginModel {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPluginLlm) GetModel() AiResponseTransformerPluginModel {
+	if a == nil {
+		return AiResponseTransformerPluginModel{}
 	}
-	return o.Model
+	return a.Model
 }
 
-func (o *AiResponseTransformerPluginLlm) GetRouteType() *AiResponseTransformerPluginRouteType {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPluginLlm) GetRouteType() AiResponseTransformerPluginRouteType {
+	if a == nil {
+		return AiResponseTransformerPluginRouteType("")
 	}
-	return o.RouteType
+	return a.RouteType
 }
 
 type AiResponseTransformerPluginConfig struct {
@@ -710,93 +846,93 @@ type AiResponseTransformerPluginConfig struct {
 	// An integer representing a port number between 0 and 65535, inclusive.
 	HTTPSProxyPort *int64 `json:"https_proxy_port,omitempty"`
 	// Verify the TLS certificate of the AI upstream service.
-	HTTPSVerify *bool                           `json:"https_verify,omitempty"`
-	Llm         *AiResponseTransformerPluginLlm `json:"llm,omitempty"`
-	// max allowed body size allowed to be introspected
+	HTTPSVerify *bool                          `json:"https_verify,omitempty"`
+	Llm         AiResponseTransformerPluginLlm `json:"llm"`
+	// max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
 	// Set true to read specific response format from the LLM, and accordingly set the status code / body / headers that proxy back to the client. You need to engineer your LLM prompt to return the correct format, see plugin docs 'Overview' page for usage instructions.
 	ParseLlmResponseJSONInstructions *bool `json:"parse_llm_response_json_instructions,omitempty"`
 	// Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting.
-	Prompt *string `json:"prompt,omitempty"`
+	Prompt string `json:"prompt"`
 	// Defines the regular expression that must match to indicate a successful AI transformation at the response phase. The first match will be set as the returning body. If the AI service's response doesn't match this pattern, a failure is returned to the client.
 	TransformationExtractPattern *string `json:"transformation_extract_pattern,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPProxyHost() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPProxyHost() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPProxyHost
+	return a.HTTPProxyHost
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPProxyPort() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPProxyPort() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPProxyPort
+	return a.HTTPProxyPort
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPTimeout() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPTimeout() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPTimeout
+	return a.HTTPTimeout
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPSProxyHost() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPSProxyHost() *string {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPSProxyHost
+	return a.HTTPSProxyHost
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPSProxyPort() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPSProxyPort() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPSProxyPort
+	return a.HTTPSProxyPort
 }
 
-func (o *AiResponseTransformerPluginConfig) GetHTTPSVerify() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetHTTPSVerify() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.HTTPSVerify
+	return a.HTTPSVerify
 }
 
-func (o *AiResponseTransformerPluginConfig) GetLlm() *AiResponseTransformerPluginLlm {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPluginConfig) GetLlm() AiResponseTransformerPluginLlm {
+	if a == nil {
+		return AiResponseTransformerPluginLlm{}
 	}
-	return o.Llm
+	return a.Llm
 }
 
-func (o *AiResponseTransformerPluginConfig) GetMaxRequestBodySize() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetMaxRequestBodySize() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.MaxRequestBodySize
+	return a.MaxRequestBodySize
 }
 
-func (o *AiResponseTransformerPluginConfig) GetParseLlmResponseJSONInstructions() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetParseLlmResponseJSONInstructions() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.ParseLlmResponseJSONInstructions
+	return a.ParseLlmResponseJSONInstructions
 }
 
-func (o *AiResponseTransformerPluginConfig) GetPrompt() *string {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPluginConfig) GetPrompt() string {
+	if a == nil {
+		return ""
 	}
-	return o.Prompt
+	return a.Prompt
 }
 
-func (o *AiResponseTransformerPluginConfig) GetTransformationExtractPattern() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginConfig) GetTransformationExtractPattern() *string {
+	if a == nil {
 		return nil
 	}
-	return o.TransformationExtractPattern
+	return a.TransformationExtractPattern
 }
 
 // AiResponseTransformerPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -804,11 +940,11 @@ type AiResponseTransformerPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginConsumer) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginConsumer) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiResponseTransformerPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -816,11 +952,11 @@ type AiResponseTransformerPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginConsumerGroup) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 type AiResponseTransformerPluginProtocols string
@@ -860,11 +996,11 @@ type AiResponseTransformerPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginRoute) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginRoute) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiResponseTransformerPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -872,11 +1008,11 @@ type AiResponseTransformerPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiResponseTransformerPluginService) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPluginService) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiResponseTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -884,17 +1020,20 @@ type AiResponseTransformerPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                                 `json:"enabled,omitempty"`
-	ID           *string                               `json:"id,omitempty"`
-	InstanceName *string                               `json:"instance_name,omitempty"`
-	name         string                                `const:"ai-response-transformer" json:"name"`
-	Ordering     *AiResponseTransformerPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []AiResponseTransformerPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                              `json:"instance_name,omitempty"`
+	name         string                               `const:"ai-response-transformer" json:"name"`
+	Ordering     *AiResponseTransformerPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []AiResponseTransformerPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                             `json:"updated_at,omitempty"`
-	Config    *AiResponseTransformerPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64                            `json:"updated_at,omitempty"`
+	Config    AiResponseTransformerPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *AiResponseTransformerPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -912,110 +1051,110 @@ func (a AiResponseTransformerPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiResponseTransformerPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *AiResponseTransformerPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.CreatedAt
 }
 
-func (o *AiResponseTransformerPlugin) GetEnabled() *bool {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetEnabled() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.Enabled
+	return a.Enabled
 }
 
-func (o *AiResponseTransformerPlugin) GetID() *string {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiResponseTransformerPlugin) GetInstanceName() *string {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetInstanceName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.InstanceName
+	return a.InstanceName
 }
 
-func (o *AiResponseTransformerPlugin) GetName() string {
+func (a *AiResponseTransformerPlugin) GetName() string {
 	return "ai-response-transformer"
 }
 
-func (o *AiResponseTransformerPlugin) GetOrdering() *AiResponseTransformerPluginOrdering {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetOrdering() *AiResponseTransformerPluginOrdering {
+	if a == nil {
 		return nil
 	}
-	return o.Ordering
+	return a.Ordering
 }
 
-func (o *AiResponseTransformerPlugin) GetPartials() []AiResponseTransformerPluginPartials {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetPartials() []AiResponseTransformerPluginPartials {
+	if a == nil {
 		return nil
 	}
-	return o.Partials
+	return a.Partials
 }
 
-func (o *AiResponseTransformerPlugin) GetTags() []string {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Tags
 }
 
-func (o *AiResponseTransformerPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return a.UpdatedAt
 }
 
-func (o *AiResponseTransformerPlugin) GetConfig() *AiResponseTransformerPluginConfig {
-	if o == nil {
-		return nil
+func (a *AiResponseTransformerPlugin) GetConfig() AiResponseTransformerPluginConfig {
+	if a == nil {
+		return AiResponseTransformerPluginConfig{}
 	}
-	return o.Config
+	return a.Config
 }
 
-func (o *AiResponseTransformerPlugin) GetConsumer() *AiResponseTransformerPluginConsumer {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetConsumer() *AiResponseTransformerPluginConsumer {
+	if a == nil {
 		return nil
 	}
-	return o.Consumer
+	return a.Consumer
 }
 
-func (o *AiResponseTransformerPlugin) GetConsumerGroup() *AiResponseTransformerPluginConsumerGroup {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetConsumerGroup() *AiResponseTransformerPluginConsumerGroup {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return a.ConsumerGroup
 }
 
-func (o *AiResponseTransformerPlugin) GetProtocols() []AiResponseTransformerPluginProtocols {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetProtocols() []AiResponseTransformerPluginProtocols {
+	if a == nil {
 		return nil
 	}
-	return o.Protocols
+	return a.Protocols
 }
 
-func (o *AiResponseTransformerPlugin) GetRoute() *AiResponseTransformerPluginRoute {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetRoute() *AiResponseTransformerPluginRoute {
+	if a == nil {
 		return nil
 	}
-	return o.Route
+	return a.Route
 }
 
-func (o *AiResponseTransformerPlugin) GetService() *AiResponseTransformerPluginService {
-	if o == nil {
+func (a *AiResponseTransformerPlugin) GetService() *AiResponseTransformerPluginService {
+	if a == nil {
 		return nil
 	}
-	return o.Service
+	return a.Service
 }

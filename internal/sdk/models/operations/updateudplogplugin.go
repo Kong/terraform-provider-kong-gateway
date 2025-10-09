@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateUdplogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	UDPLogPlugin shared.UDPLogPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateUdplogPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateUdplogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateUdplogPluginRequest) GetUDPLogPlugin() shared.UDPLogPlugin {
-	if o == nil {
+func (u *UpdateUdplogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "UdpLogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateUdplogPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateUdplogPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateUdplogPluginRequest) GetUDPLogPlugin() shared.UDPLogPlugin {
+	if u == nil {
 		return shared.UDPLogPlugin{}
 	}
-	return o.UDPLogPlugin
+	return u.UDPLogPlugin
 }
 
 type UpdateUdplogPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateUdplogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateUdplogPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateUdplogPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateUdplogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateUdplogPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateUdplogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateUdplogPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateUdplogPluginResponse) GetUDPLogPlugin() *shared.UDPLogPlugin {
-	if o == nil {
+func (u *UpdateUdplogPluginResponse) GetUDPLogPlugin() *shared.UDPLogPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.UDPLogPlugin
+	return u.UDPLogPlugin
 }
 
-func (o *UpdateUdplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateUdplogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

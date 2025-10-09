@@ -12,22 +12,22 @@ type MtlsAuthPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *MtlsAuthPluginAfter) GetAccess() []string {
-	if o == nil {
+func (m *MtlsAuthPluginAfter) GetAccess() []string {
+	if m == nil {
 		return nil
 	}
-	return o.Access
+	return m.Access
 }
 
 type MtlsAuthPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *MtlsAuthPluginBefore) GetAccess() []string {
-	if o == nil {
+func (m *MtlsAuthPluginBefore) GetAccess() []string {
+	if m == nil {
 		return nil
 	}
-	return o.Access
+	return m.Access
 }
 
 type MtlsAuthPluginOrdering struct {
@@ -35,45 +35,47 @@ type MtlsAuthPluginOrdering struct {
 	Before *MtlsAuthPluginBefore `json:"before,omitempty"`
 }
 
-func (o *MtlsAuthPluginOrdering) GetAfter() *MtlsAuthPluginAfter {
-	if o == nil {
+func (m *MtlsAuthPluginOrdering) GetAfter() *MtlsAuthPluginAfter {
+	if m == nil {
 		return nil
 	}
-	return o.After
+	return m.After
 }
 
-func (o *MtlsAuthPluginOrdering) GetBefore() *MtlsAuthPluginBefore {
-	if o == nil {
+func (m *MtlsAuthPluginOrdering) GetBefore() *MtlsAuthPluginBefore {
+	if m == nil {
 		return nil
 	}
-	return o.Before
+	return m.Before
 }
 
 type MtlsAuthPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *MtlsAuthPluginPartials) GetID() *string {
-	if o == nil {
+func (m *MtlsAuthPluginPartials) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
-func (o *MtlsAuthPluginPartials) GetName() *string {
-	if o == nil {
+func (m *MtlsAuthPluginPartials) GetName() *string {
+	if m == nil {
 		return nil
 	}
-	return o.Name
+	return m.Name
 }
 
-func (o *MtlsAuthPluginPartials) GetPath() *string {
-	if o == nil {
+func (m *MtlsAuthPluginPartials) GetPath() *string {
+	if m == nil {
 		return nil
 	}
-	return o.Path
+	return m.Path
 }
 
 // MtlsAuthPluginAuthenticatedGroupBy - Certificate property to use as the authenticated group. Valid values are `CN` (Common Name) or `DN` (Distinguished Name). Once `skip_consumer_lookup` is applied, any client with a valid certificate can access the Service/API. To restrict usage to only some of the authenticated users, also add the ACL plugin (not covered here) and create allowed or denied groups of users.
@@ -167,7 +169,7 @@ type MtlsAuthPluginConfig struct {
 	// Certificate property to use as the authenticated group. Valid values are `CN` (Common Name) or `DN` (Distinguished Name). Once `skip_consumer_lookup` is applied, any client with a valid certificate can access the Service/API. To restrict usage to only some of the authenticated users, also add the ACL plugin (not covered here) and create allowed or denied groups of users.
 	AuthenticatedGroupBy *MtlsAuthPluginAuthenticatedGroupBy `json:"authenticated_group_by,omitempty"`
 	// List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (`id`).
-	CaCertificates []string `json:"ca_certificates,omitempty"`
+	CaCertificates []string `json:"ca_certificates"`
 	// Cache expiry time in seconds.
 	CacheTTL *float64 `json:"cache_ttl,omitempty"`
 	// The length of time in seconds between refreshes of the revocation check status cache.
@@ -194,116 +196,116 @@ type MtlsAuthPluginConfig struct {
 	SkipConsumerLookup *bool `json:"skip_consumer_lookup,omitempty"`
 }
 
-func (o *MtlsAuthPluginConfig) GetAllowPartialChain() *bool {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetAllowPartialChain() *bool {
+	if m == nil {
 		return nil
 	}
-	return o.AllowPartialChain
+	return m.AllowPartialChain
 }
 
-func (o *MtlsAuthPluginConfig) GetAnonymous() *string {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetAnonymous() *string {
+	if m == nil {
 		return nil
 	}
-	return o.Anonymous
+	return m.Anonymous
 }
 
-func (o *MtlsAuthPluginConfig) GetAuthenticatedGroupBy() *MtlsAuthPluginAuthenticatedGroupBy {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetAuthenticatedGroupBy() *MtlsAuthPluginAuthenticatedGroupBy {
+	if m == nil {
 		return nil
 	}
-	return o.AuthenticatedGroupBy
+	return m.AuthenticatedGroupBy
 }
 
-func (o *MtlsAuthPluginConfig) GetCaCertificates() []string {
-	if o == nil {
-		return nil
+func (m *MtlsAuthPluginConfig) GetCaCertificates() []string {
+	if m == nil {
+		return []string{}
 	}
-	return o.CaCertificates
+	return m.CaCertificates
 }
 
-func (o *MtlsAuthPluginConfig) GetCacheTTL() *float64 {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetCacheTTL() *float64 {
+	if m == nil {
 		return nil
 	}
-	return o.CacheTTL
+	return m.CacheTTL
 }
 
-func (o *MtlsAuthPluginConfig) GetCertCacheTTL() *float64 {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetCertCacheTTL() *float64 {
+	if m == nil {
 		return nil
 	}
-	return o.CertCacheTTL
+	return m.CertCacheTTL
 }
 
-func (o *MtlsAuthPluginConfig) GetConsumerBy() []MtlsAuthPluginConsumerBy {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetConsumerBy() []MtlsAuthPluginConsumerBy {
+	if m == nil {
 		return nil
 	}
-	return o.ConsumerBy
+	return m.ConsumerBy
 }
 
-func (o *MtlsAuthPluginConfig) GetDefaultConsumer() *string {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetDefaultConsumer() *string {
+	if m == nil {
 		return nil
 	}
-	return o.DefaultConsumer
+	return m.DefaultConsumer
 }
 
-func (o *MtlsAuthPluginConfig) GetHTTPProxyHost() *string {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetHTTPProxyHost() *string {
+	if m == nil {
 		return nil
 	}
-	return o.HTTPProxyHost
+	return m.HTTPProxyHost
 }
 
-func (o *MtlsAuthPluginConfig) GetHTTPProxyPort() *int64 {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetHTTPProxyPort() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.HTTPProxyPort
+	return m.HTTPProxyPort
 }
 
-func (o *MtlsAuthPluginConfig) GetHTTPTimeout() *float64 {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetHTTPTimeout() *float64 {
+	if m == nil {
 		return nil
 	}
-	return o.HTTPTimeout
+	return m.HTTPTimeout
 }
 
-func (o *MtlsAuthPluginConfig) GetHTTPSProxyHost() *string {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetHTTPSProxyHost() *string {
+	if m == nil {
 		return nil
 	}
-	return o.HTTPSProxyHost
+	return m.HTTPSProxyHost
 }
 
-func (o *MtlsAuthPluginConfig) GetHTTPSProxyPort() *int64 {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetHTTPSProxyPort() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.HTTPSProxyPort
+	return m.HTTPSProxyPort
 }
 
-func (o *MtlsAuthPluginConfig) GetRevocationCheckMode() *MtlsAuthPluginRevocationCheckMode {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetRevocationCheckMode() *MtlsAuthPluginRevocationCheckMode {
+	if m == nil {
 		return nil
 	}
-	return o.RevocationCheckMode
+	return m.RevocationCheckMode
 }
 
-func (o *MtlsAuthPluginConfig) GetSendCaDn() *bool {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetSendCaDn() *bool {
+	if m == nil {
 		return nil
 	}
-	return o.SendCaDn
+	return m.SendCaDn
 }
 
-func (o *MtlsAuthPluginConfig) GetSkipConsumerLookup() *bool {
-	if o == nil {
+func (m *MtlsAuthPluginConfig) GetSkipConsumerLookup() *bool {
+	if m == nil {
 		return nil
 	}
-	return o.SkipConsumerLookup
+	return m.SkipConsumerLookup
 }
 
 type MtlsAuthPluginProtocols string
@@ -343,11 +345,11 @@ type MtlsAuthPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MtlsAuthPluginRoute) GetID() *string {
-	if o == nil {
+func (m *MtlsAuthPluginRoute) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 // MtlsAuthPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -355,11 +357,11 @@ type MtlsAuthPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *MtlsAuthPluginService) GetID() *string {
-	if o == nil {
+func (m *MtlsAuthPluginService) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
 // MtlsAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -367,17 +369,20 @@ type MtlsAuthPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                    `json:"enabled,omitempty"`
-	ID           *string                  `json:"id,omitempty"`
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"mtls-auth" json:"name"`
-	Ordering     *MtlsAuthPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []MtlsAuthPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                 `json:"instance_name,omitempty"`
+	name         string                  `const:"mtls-auth" json:"name"`
+	Ordering     *MtlsAuthPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []MtlsAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                `json:"updated_at,omitempty"`
-	Config    *MtlsAuthPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64               `json:"updated_at,omitempty"`
+	Config    MtlsAuthPluginConfig `json:"config"`
 	// A set of strings representing HTTP protocols.
 	Protocols []MtlsAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
@@ -391,96 +396,96 @@ func (m MtlsAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (m *MtlsAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &m, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *MtlsAuthPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetCreatedAt() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return m.CreatedAt
 }
 
-func (o *MtlsAuthPlugin) GetEnabled() *bool {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetEnabled() *bool {
+	if m == nil {
 		return nil
 	}
-	return o.Enabled
+	return m.Enabled
 }
 
-func (o *MtlsAuthPlugin) GetID() *string {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetID() *string {
+	if m == nil {
 		return nil
 	}
-	return o.ID
+	return m.ID
 }
 
-func (o *MtlsAuthPlugin) GetInstanceName() *string {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetInstanceName() *string {
+	if m == nil {
 		return nil
 	}
-	return o.InstanceName
+	return m.InstanceName
 }
 
-func (o *MtlsAuthPlugin) GetName() string {
+func (m *MtlsAuthPlugin) GetName() string {
 	return "mtls-auth"
 }
 
-func (o *MtlsAuthPlugin) GetOrdering() *MtlsAuthPluginOrdering {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetOrdering() *MtlsAuthPluginOrdering {
+	if m == nil {
 		return nil
 	}
-	return o.Ordering
+	return m.Ordering
 }
 
-func (o *MtlsAuthPlugin) GetPartials() []MtlsAuthPluginPartials {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetPartials() []MtlsAuthPluginPartials {
+	if m == nil {
 		return nil
 	}
-	return o.Partials
+	return m.Partials
 }
 
-func (o *MtlsAuthPlugin) GetTags() []string {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetTags() []string {
+	if m == nil {
 		return nil
 	}
-	return o.Tags
+	return m.Tags
 }
 
-func (o *MtlsAuthPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetUpdatedAt() *int64 {
+	if m == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return m.UpdatedAt
 }
 
-func (o *MtlsAuthPlugin) GetConfig() *MtlsAuthPluginConfig {
-	if o == nil {
-		return nil
+func (m *MtlsAuthPlugin) GetConfig() MtlsAuthPluginConfig {
+	if m == nil {
+		return MtlsAuthPluginConfig{}
 	}
-	return o.Config
+	return m.Config
 }
 
-func (o *MtlsAuthPlugin) GetProtocols() []MtlsAuthPluginProtocols {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetProtocols() []MtlsAuthPluginProtocols {
+	if m == nil {
 		return nil
 	}
-	return o.Protocols
+	return m.Protocols
 }
 
-func (o *MtlsAuthPlugin) GetRoute() *MtlsAuthPluginRoute {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetRoute() *MtlsAuthPluginRoute {
+	if m == nil {
 		return nil
 	}
-	return o.Route
+	return m.Route
 }
 
-func (o *MtlsAuthPlugin) GetService() *MtlsAuthPluginService {
-	if o == nil {
+func (m *MtlsAuthPlugin) GetService() *MtlsAuthPluginService {
+	if m == nil {
 		return nil
 	}
-	return o.Service
+	return m.Service
 }

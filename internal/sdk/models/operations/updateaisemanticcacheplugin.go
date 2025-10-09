@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateAisemanticcachePluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID              string                       `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiSemanticCachePlugin shared.AiSemanticCachePlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateAisemanticcachePluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateAisemanticcachePluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateAisemanticcachePluginRequest) GetAiSemanticCachePlugin() shared.AiSemanticCachePlugin {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiSemanticCachePlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateAisemanticcachePluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateAisemanticcachePluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateAisemanticcachePluginRequest) GetAiSemanticCachePlugin() shared.AiSemanticCachePlugin {
+	if u == nil {
 		return shared.AiSemanticCachePlugin{}
 	}
-	return o.AiSemanticCachePlugin
+	return u.AiSemanticCachePlugin
 }
 
 type UpdateAisemanticcachePluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateAisemanticcachePluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateAisemanticcachePluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateAisemanticcachePluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateAisemanticcachePluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateAisemanticcachePluginResponse) GetAiSemanticCachePlugin() *shared.AiSemanticCachePlugin {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginResponse) GetAiSemanticCachePlugin() *shared.AiSemanticCachePlugin {
+	if u == nil {
 		return nil
 	}
-	return o.AiSemanticCachePlugin
+	return u.AiSemanticCachePlugin
 }
 
-func (o *UpdateAisemanticcachePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateAisemanticcachePluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

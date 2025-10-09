@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateWebsocketsizelimitPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	WebsocketSizeLimitPlugin shared.WebsocketSizeLimitPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateWebsocketsizelimitPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateWebsocketsizelimitPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "WebsocketSizeLimitPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateWebsocketsizelimitPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateWebsocketsizelimitPluginRequest) GetWebsocketSizeLimitPlugin() shared.WebsocketSizeLimitPlugin {
+	if c == nil {
+		return shared.WebsocketSizeLimitPlugin{}
+	}
+	return c.WebsocketSizeLimitPlugin
+}
 
 type CreateWebsocketsizelimitPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateWebsocketsizelimitPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateWebsocketsizelimitPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateWebsocketsizelimitPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateWebsocketsizelimitPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateWebsocketsizelimitPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateWebsocketsizelimitPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateWebsocketsizelimitPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateWebsocketsizelimitPluginResponse) GetWebsocketSizeLimitPlugin() *shared.WebsocketSizeLimitPlugin {
-	if o == nil {
+func (c *CreateWebsocketsizelimitPluginResponse) GetWebsocketSizeLimitPlugin() *shared.WebsocketSizeLimitPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.WebsocketSizeLimitPlugin
+	return c.WebsocketSizeLimitPlugin
 }
 
-func (o *CreateWebsocketsizelimitPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateWebsocketsizelimitPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

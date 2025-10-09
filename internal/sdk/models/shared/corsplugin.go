@@ -12,22 +12,22 @@ type CorsPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *CorsPluginAfter) GetAccess() []string {
-	if o == nil {
+func (c *CorsPluginAfter) GetAccess() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Access
+	return c.Access
 }
 
 type CorsPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *CorsPluginBefore) GetAccess() []string {
-	if o == nil {
+func (c *CorsPluginBefore) GetAccess() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Access
+	return c.Access
 }
 
 type CorsPluginOrdering struct {
@@ -35,45 +35,47 @@ type CorsPluginOrdering struct {
 	Before *CorsPluginBefore `json:"before,omitempty"`
 }
 
-func (o *CorsPluginOrdering) GetAfter() *CorsPluginAfter {
-	if o == nil {
+func (c *CorsPluginOrdering) GetAfter() *CorsPluginAfter {
+	if c == nil {
 		return nil
 	}
-	return o.After
+	return c.After
 }
 
-func (o *CorsPluginOrdering) GetBefore() *CorsPluginBefore {
-	if o == nil {
+func (c *CorsPluginOrdering) GetBefore() *CorsPluginBefore {
+	if c == nil {
 		return nil
 	}
-	return o.Before
+	return c.Before
 }
 
 type CorsPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *CorsPluginPartials) GetID() *string {
-	if o == nil {
+func (c *CorsPluginPartials) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-func (o *CorsPluginPartials) GetName() *string {
-	if o == nil {
+func (c *CorsPluginPartials) GetName() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Name
+	return c.Name
 }
 
-func (o *CorsPluginPartials) GetPath() *string {
-	if o == nil {
+func (c *CorsPluginPartials) GetPath() *string {
+	if c == nil {
 		return nil
 	}
-	return o.Path
+	return c.Path
 }
 
 type Methods string
@@ -136,7 +138,7 @@ type CorsPluginConfig struct {
 	MaxAge *float64 `json:"max_age,omitempty"`
 	// 'Value for the `Access-Control-Allow-Methods` header. Available options include `GET`, `HEAD`, `PUT`, `PATCH`, `POST`, `DELETE`, `OPTIONS`, `TRACE`, `CONNECT`. By default, all options are allowed.'
 	Methods []Methods `json:"methods,omitempty"`
-	// List of allowed domains for the `Access-Control-Allow-Origin` header. If you want to allow all origins, add `*` as a single value to this configuration field. The accepted values can either be flat strings or PCRE regexes.
+	// List of allowed domains for the `Access-Control-Allow-Origin` header. If you want to allow all origins, add `*` as a single value to this configuration field. The accepted values can either be flat strings or PCRE regexes. NOTE: If you don't specify any allowed domains, all origins are allowed.
 	Origins []string `json:"origins,omitempty"`
 	// A boolean value that instructs the plugin to proxy the `OPTIONS` preflight request to the Upstream service.
 	PreflightContinue *bool `json:"preflight_continue,omitempty"`
@@ -144,67 +146,67 @@ type CorsPluginConfig struct {
 	PrivateNetwork *bool `json:"private_network,omitempty"`
 }
 
-func (o *CorsPluginConfig) GetAllowOriginAbsent() *bool {
-	if o == nil {
+func (c *CorsPluginConfig) GetAllowOriginAbsent() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.AllowOriginAbsent
+	return c.AllowOriginAbsent
 }
 
-func (o *CorsPluginConfig) GetCredentials() *bool {
-	if o == nil {
+func (c *CorsPluginConfig) GetCredentials() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.Credentials
+	return c.Credentials
 }
 
-func (o *CorsPluginConfig) GetExposedHeaders() []string {
-	if o == nil {
+func (c *CorsPluginConfig) GetExposedHeaders() []string {
+	if c == nil {
 		return nil
 	}
-	return o.ExposedHeaders
+	return c.ExposedHeaders
 }
 
-func (o *CorsPluginConfig) GetHeaders() []string {
-	if o == nil {
+func (c *CorsPluginConfig) GetHeaders() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Headers
+	return c.Headers
 }
 
-func (o *CorsPluginConfig) GetMaxAge() *float64 {
-	if o == nil {
+func (c *CorsPluginConfig) GetMaxAge() *float64 {
+	if c == nil {
 		return nil
 	}
-	return o.MaxAge
+	return c.MaxAge
 }
 
-func (o *CorsPluginConfig) GetMethods() []Methods {
-	if o == nil {
+func (c *CorsPluginConfig) GetMethods() []Methods {
+	if c == nil {
 		return nil
 	}
-	return o.Methods
+	return c.Methods
 }
 
-func (o *CorsPluginConfig) GetOrigins() []string {
-	if o == nil {
+func (c *CorsPluginConfig) GetOrigins() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Origins
+	return c.Origins
 }
 
-func (o *CorsPluginConfig) GetPreflightContinue() *bool {
-	if o == nil {
+func (c *CorsPluginConfig) GetPreflightContinue() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.PreflightContinue
+	return c.PreflightContinue
 }
 
-func (o *CorsPluginConfig) GetPrivateNetwork() *bool {
-	if o == nil {
+func (c *CorsPluginConfig) GetPrivateNetwork() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.PrivateNetwork
+	return c.PrivateNetwork
 }
 
 type CorsPluginProtocols string
@@ -244,11 +246,11 @@ type CorsPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *CorsPluginRoute) GetID() *string {
-	if o == nil {
+func (c *CorsPluginRoute) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
 // CorsPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -256,11 +258,11 @@ type CorsPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *CorsPluginService) GetID() *string {
-	if o == nil {
+func (c *CorsPluginService) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
 // CorsPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -268,12 +270,15 @@ type CorsPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                `json:"enabled,omitempty"`
-	ID           *string              `json:"id,omitempty"`
-	InstanceName *string              `json:"instance_name,omitempty"`
-	name         string               `const:"cors" json:"name"`
-	Ordering     *CorsPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []CorsPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string             `json:"instance_name,omitempty"`
+	name         string              `const:"cors" json:"name"`
+	Ordering     *CorsPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []CorsPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
@@ -292,96 +297,96 @@ func (c CorsPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CorsPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *CorsPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (c *CorsPlugin) GetCreatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return c.CreatedAt
 }
 
-func (o *CorsPlugin) GetEnabled() *bool {
-	if o == nil {
+func (c *CorsPlugin) GetEnabled() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.Enabled
+	return c.Enabled
 }
 
-func (o *CorsPlugin) GetID() *string {
-	if o == nil {
+func (c *CorsPlugin) GetID() *string {
+	if c == nil {
 		return nil
 	}
-	return o.ID
+	return c.ID
 }
 
-func (o *CorsPlugin) GetInstanceName() *string {
-	if o == nil {
+func (c *CorsPlugin) GetInstanceName() *string {
+	if c == nil {
 		return nil
 	}
-	return o.InstanceName
+	return c.InstanceName
 }
 
-func (o *CorsPlugin) GetName() string {
+func (c *CorsPlugin) GetName() string {
 	return "cors"
 }
 
-func (o *CorsPlugin) GetOrdering() *CorsPluginOrdering {
-	if o == nil {
+func (c *CorsPlugin) GetOrdering() *CorsPluginOrdering {
+	if c == nil {
 		return nil
 	}
-	return o.Ordering
+	return c.Ordering
 }
 
-func (o *CorsPlugin) GetPartials() []CorsPluginPartials {
-	if o == nil {
+func (c *CorsPlugin) GetPartials() []CorsPluginPartials {
+	if c == nil {
 		return nil
 	}
-	return o.Partials
+	return c.Partials
 }
 
-func (o *CorsPlugin) GetTags() []string {
-	if o == nil {
+func (c *CorsPlugin) GetTags() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Tags
+	return c.Tags
 }
 
-func (o *CorsPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (c *CorsPlugin) GetUpdatedAt() *int64 {
+	if c == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return c.UpdatedAt
 }
 
-func (o *CorsPlugin) GetConfig() *CorsPluginConfig {
-	if o == nil {
+func (c *CorsPlugin) GetConfig() *CorsPluginConfig {
+	if c == nil {
 		return nil
 	}
-	return o.Config
+	return c.Config
 }
 
-func (o *CorsPlugin) GetProtocols() []CorsPluginProtocols {
-	if o == nil {
+func (c *CorsPlugin) GetProtocols() []CorsPluginProtocols {
+	if c == nil {
 		return nil
 	}
-	return o.Protocols
+	return c.Protocols
 }
 
-func (o *CorsPlugin) GetRoute() *CorsPluginRoute {
-	if o == nil {
+func (c *CorsPlugin) GetRoute() *CorsPluginRoute {
+	if c == nil {
 		return nil
 	}
-	return o.Route
+	return c.Route
 }
 
-func (o *CorsPlugin) GetService() *CorsPluginService {
-	if o == nil {
+func (c *CorsPlugin) GetService() *CorsPluginService {
+	if c == nil {
 		return nil
 	}
-	return o.Service
+	return c.Service
 }

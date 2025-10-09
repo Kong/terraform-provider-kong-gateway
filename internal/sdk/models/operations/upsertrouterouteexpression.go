@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type UpsertRouteRouteExpressionRequest struct {
 	// ID or name of the Route to lookup
 	RouteIDOrName string `pathParam:"style=simple,explode=false,name=RouteIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Route
 	RouteExpression shared.RouteExpression `request:"mediaType=application/json"`
 }
 
-func (o *UpsertRouteRouteExpressionRequest) GetRouteIDOrName() string {
-	if o == nil {
-		return ""
-	}
-	return o.RouteIDOrName
+func (u UpsertRouteRouteExpressionRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpsertRouteRouteExpressionRequest) GetRouteExpression() shared.RouteExpression {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"RouteIdOrName", "workspace", "RouteExpression"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpsertRouteRouteExpressionRequest) GetRouteIDOrName() string {
+	if u == nil {
+		return ""
+	}
+	return u.RouteIDOrName
+}
+
+func (u *UpsertRouteRouteExpressionRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpsertRouteRouteExpressionRequest) GetRouteExpression() shared.RouteExpression {
+	if u == nil {
 		return shared.RouteExpression{}
 	}
-	return o.RouteExpression
+	return u.RouteExpression
 }
 
 type UpsertRouteRouteExpressionResponse struct {
@@ -41,37 +62,37 @@ type UpsertRouteRouteExpressionResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpsertRouteRouteExpressionResponse) GetContentType() string {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpsertRouteRouteExpressionResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpsertRouteRouteExpressionResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpsertRouteRouteExpressionResponse) GetRouteExpression() *shared.RouteExpression {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionResponse) GetRouteExpression() *shared.RouteExpression {
+	if u == nil {
 		return nil
 	}
-	return o.RouteExpression
+	return u.RouteExpression
 }
 
-func (o *UpsertRouteRouteExpressionResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpsertRouteRouteExpressionResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

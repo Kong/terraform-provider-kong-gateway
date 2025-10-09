@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetAisemanticpromptguardPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetAisemanticpromptguardPluginRequest) GetPluginID() string {
-	if o == nil {
+func (g GetAisemanticpromptguardPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetAisemanticpromptguardPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetAisemanticpromptguardPluginRequest) GetPluginID() string {
+	if g == nil {
 		return ""
 	}
-	return o.PluginID
+	return g.PluginID
+}
+
+func (g *GetAisemanticpromptguardPluginRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetAisemanticpromptguardPluginResponse struct {
@@ -32,37 +53,37 @@ type GetAisemanticpromptguardPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetAisemanticpromptguardPluginResponse) GetContentType() string {
-	if o == nil {
+func (g *GetAisemanticpromptguardPluginResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetAisemanticpromptguardPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetAisemanticpromptguardPluginResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetAisemanticpromptguardPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetAisemanticpromptguardPluginResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetAisemanticpromptguardPluginResponse) GetAiSemanticPromptGuardPlugin() *shared.AiSemanticPromptGuardPlugin {
-	if o == nil {
+func (g *GetAisemanticpromptguardPluginResponse) GetAiSemanticPromptGuardPlugin() *shared.AiSemanticPromptGuardPlugin {
+	if g == nil {
 		return nil
 	}
-	return o.AiSemanticPromptGuardPlugin
+	return g.AiSemanticPromptGuardPlugin
 }
 
-func (o *GetAisemanticpromptguardPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetAisemanticpromptguardPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

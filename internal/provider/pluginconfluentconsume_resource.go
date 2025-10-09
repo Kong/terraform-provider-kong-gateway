@@ -3,18 +3,25 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
@@ -36,19 +43,20 @@ type PluginConfluentConsumeResource struct {
 
 // PluginConfluentConsumeResourceModel describes the resource data model.
 type PluginConfluentConsumeResourceModel struct {
-	Config       *tfTypes.ConfluentConsumePluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.ACLWithoutParentsConsumer    `tfsdk:"consumer"`
-	CreatedAt    types.Int64                           `tfsdk:"created_at"`
-	Enabled      types.Bool                            `tfsdk:"enabled"`
-	ID           types.String                          `tfsdk:"id"`
-	InstanceName types.String                          `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                     `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                    `tfsdk:"partials"`
-	Protocols    []types.String                        `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer    `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer    `tfsdk:"service"`
-	Tags         []types.String                        `tfsdk:"tags"`
-	UpdatedAt    types.Int64                           `tfsdk:"updated_at"`
+	Config       tfTypes.ConfluentConsumePluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                         `tfsdk:"consumer"`
+	CreatedAt    types.Int64                          `tfsdk:"created_at"`
+	Enabled      types.Bool                           `tfsdk:"enabled"`
+	ID           types.String                         `tfsdk:"id"`
+	InstanceName types.String                         `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering           `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials          `tfsdk:"partials"`
+	Protocols    []types.String                       `tfsdk:"protocols"`
+	Route        *tfTypes.Set                         `tfsdk:"route"`
+	Service      *tfTypes.Set                         `tfsdk:"service"`
+	Tags         []types.String                       `tfsdk:"tags"`
+	UpdatedAt    types.Int64                          `tfsdk:"updated_at"`
+	Workspace    types.String                         `tfsdk:"workspace"`
 }
 
 func (r *PluginConfluentConsumeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,8 +68,7 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 		MarkdownDescription: "PluginConfluentConsume Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"auto_offset_reset": schema.StringAttribute{
 						Computed:    true,
@@ -104,13 +111,11 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 						Description: `Set of bootstrap brokers in a ` + "`" + `{host: host, port: port}` + "`" + ` list format.`,
 					},
 					"cluster_api_key": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `Username/Apikey for SASL authentication.`,
 					},
 					"cluster_api_secret": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `Password/ApiSecret for SASL authentication.`,
 					},
 					"cluster_name": schema.StringAttribute{
@@ -139,6 +144,16 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 						Optional:    true,
 						Description: `The corresponding secret for the Confluent Cloud API key.`,
 					},
+					"dlq_topic": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The topic to use for the Dead Letter Queue.`,
+					},
+					"enable_dlq": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the ` + "`" + `message_by_lua_functions` + "`" + `, it will be forwarded to ` + "`" + `dlq_topic` + "`" + ` that can be processed later.`,
+					},
 					"keepalive": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,
@@ -147,6 +162,12 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 					"keepalive_enabled": schema.BoolAttribute{
 						Computed: true,
 						Optional: true,
+					},
+					"message_by_lua_functions": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `The Lua functions that manipulates the message being sent to the client.`,
 					},
 					"message_deserializer": schema.StringAttribute{
 						Computed:    true,
@@ -162,13 +183,238 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 					"mode": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The mode of operation for the plugin. must be one of ["http-get", "server-sent-events"]`,
+						Description: `The mode of operation for the plugin. must be one of ["http-get", "server-sent-events", "websocket"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"http-get",
 								"server-sent-events",
+								"websocket",
 							),
 						},
+					},
+					"schema_registry": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"confluent": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"authentication": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"basic": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"password": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+													"username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+												},
+											},
+											"mode": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Authentication mode to use with the schema registry. must be one of ["basic", "none", "oauth2"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"basic",
+														"none",
+														"oauth2",
+													),
+												},
+											},
+											"oauth2": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"audience": schema.ListAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `List of audiences passed to the IdP when obtaining a new token.`,
+													},
+													"client_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The client ID for the application registration in the IdP.`,
+													},
+													"client_secret": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The client secret for the application registration in the IdP.`,
+													},
+													"grant_type": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The OAuth grant type to be used. must be one of ["client_credentials", "password"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_credentials",
+																"password",
+															),
+														},
+													},
+													"password": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The password to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+													},
+													"scopes": schema.ListAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `List of scopes to request from the IdP when obtaining a new token.`,
+													},
+													"token_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The token endpoint URI. Not Null`,
+														Validators: []validator.String{
+															speakeasy_stringvalidators.NotNull(),
+														},
+													},
+													"token_headers": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: jsontypes.NormalizedType{},
+														Description: `Extra headers to be passed in the token endpoint request.`,
+														Validators: []validator.Map{
+															mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+														},
+													},
+													"token_post_args": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: jsontypes.NormalizedType{},
+														Description: `Extra post arguments to be passed in the token endpoint request.`,
+														Validators: []validator.Map{
+															mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+														},
+													},
+													"username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The username to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+													},
+												},
+											},
+											"oauth2_client": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"auth_method": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The authentication method used in client requests to the IdP. Supported values are: ` + "`" + `client_secret_basic` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` in the ` + "`" + `Authorization: Basic` + "`" + ` header, ` + "`" + `client_secret_post` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as part of the request body, or ` + "`" + `client_secret_jwt` + "`" + ` to send a JWT signed with the ` + "`" + `client_secret` + "`" + ` using the client assertion as part of the body. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_secret_basic",
+																"client_secret_jwt",
+																"client_secret_post",
+																"none",
+															),
+														},
+													},
+													"client_secret_jwt_alg": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The algorithm to use with JWT when using ` + "`" + `client_secret_jwt` + "`" + ` authentication. must be one of ["HS256", "HS512"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"HS256",
+																"HS512",
+															),
+														},
+													},
+													"http_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The proxy to use when making HTTP requests to the IdP.`,
+													},
+													"http_proxy_authorization": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `http_proxy` + "`" + `.`,
+													},
+													"http_version": schema.Float64Attribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The HTTP version used for requests made by this plugin. Supported values: ` + "`" + `1.1` + "`" + ` for HTTP 1.1 and ` + "`" + `1.0` + "`" + ` for HTTP 1.0.`,
+													},
+													"https_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The proxy to use when making HTTPS requests to the IdP.`,
+													},
+													"https_proxy_authorization": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `https_proxy` + "`" + `.`,
+													},
+													"keep_alive": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Whether to use keepalive connections to the IdP.`,
+													},
+													"no_proxy": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `A comma-separated list of hosts that should not be proxied.`,
+													},
+													"ssl_verify": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Whether to verify the certificate presented by the IdP when using HTTPS.`,
+													},
+													"timeout": schema.Int64Attribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Network I/O timeout for requests to the IdP in milliseconds.`,
+														Validators: []validator.Int64{
+															int64validator.AtMost(2147483646),
+														},
+													},
+												},
+											},
+										},
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set to false to disable SSL certificate verification when connecting to the schema registry.`,
+									},
+									"ttl": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The TTL in seconds for the schema registry cache.`,
+										Validators: []validator.Float64{
+											float64validator.Between(0, 3600),
+										},
+									},
+									"url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The URL of the schema registry.`,
+									},
+								},
+							},
+						},
+						Description: `The plugin-global schema registry configuration.`,
 					},
 					"timeout": schema.Int64Attribute{
 						Computed:    true,
@@ -176,8 +422,7 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 						Description: `Socket timeout in milliseconds.`,
 					},
 					"topics": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
+						Required: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -190,6 +435,230 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 									Validators: []validator.String{
 										speakeasy_stringvalidators.NotNull(),
 									},
+								},
+								"schema_registry": schema.SingleNestedAttribute{
+									Computed: true,
+									Optional: true,
+									Attributes: map[string]schema.Attribute{
+										"confluent": schema.SingleNestedAttribute{
+											Computed: true,
+											Optional: true,
+											Attributes: map[string]schema.Attribute{
+												"authentication": schema.SingleNestedAttribute{
+													Computed: true,
+													Optional: true,
+													Attributes: map[string]schema.Attribute{
+														"basic": schema.SingleNestedAttribute{
+															Computed: true,
+															Optional: true,
+															Attributes: map[string]schema.Attribute{
+																"password": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `Not Null`,
+																	Validators: []validator.String{
+																		speakeasy_stringvalidators.NotNull(),
+																	},
+																},
+																"username": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `Not Null`,
+																	Validators: []validator.String{
+																		speakeasy_stringvalidators.NotNull(),
+																	},
+																},
+															},
+														},
+														"mode": schema.StringAttribute{
+															Computed:    true,
+															Optional:    true,
+															Description: `Authentication mode to use with the schema registry. must be one of ["basic", "none", "oauth2"]`,
+															Validators: []validator.String{
+																stringvalidator.OneOf(
+																	"basic",
+																	"none",
+																	"oauth2",
+																),
+															},
+														},
+														"oauth2": schema.SingleNestedAttribute{
+															Computed: true,
+															Optional: true,
+															Attributes: map[string]schema.Attribute{
+																"audience": schema.ListAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	ElementType: types.StringType,
+																	Description: `List of audiences passed to the IdP when obtaining a new token.`,
+																},
+																"client_id": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The client ID for the application registration in the IdP.`,
+																},
+																"client_secret": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The client secret for the application registration in the IdP.`,
+																},
+																"grant_type": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The OAuth grant type to be used. must be one of ["client_credentials", "password"]`,
+																	Validators: []validator.String{
+																		stringvalidator.OneOf(
+																			"client_credentials",
+																			"password",
+																		),
+																	},
+																},
+																"password": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The password to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+																},
+																"scopes": schema.ListAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	ElementType: types.StringType,
+																	Description: `List of scopes to request from the IdP when obtaining a new token.`,
+																},
+																"token_endpoint": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The token endpoint URI. Not Null`,
+																	Validators: []validator.String{
+																		speakeasy_stringvalidators.NotNull(),
+																	},
+																},
+																"token_headers": schema.MapAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	ElementType: jsontypes.NormalizedType{},
+																	Description: `Extra headers to be passed in the token endpoint request.`,
+																	Validators: []validator.Map{
+																		mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+																	},
+																},
+																"token_post_args": schema.MapAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	ElementType: jsontypes.NormalizedType{},
+																	Description: `Extra post arguments to be passed in the token endpoint request.`,
+																	Validators: []validator.Map{
+																		mapvalidator.ValueStringsAre(validators.IsValidJSON()),
+																	},
+																},
+																"username": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The username to use if ` + "`" + `config.oauth.grant_type` + "`" + ` is set to ` + "`" + `password` + "`" + `.`,
+																},
+															},
+														},
+														"oauth2_client": schema.SingleNestedAttribute{
+															Computed: true,
+															Optional: true,
+															Attributes: map[string]schema.Attribute{
+																"auth_method": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The authentication method used in client requests to the IdP. Supported values are: ` + "`" + `client_secret_basic` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` in the ` + "`" + `Authorization: Basic` + "`" + ` header, ` + "`" + `client_secret_post` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as part of the request body, or ` + "`" + `client_secret_jwt` + "`" + ` to send a JWT signed with the ` + "`" + `client_secret` + "`" + ` using the client assertion as part of the body. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none"]`,
+																	Validators: []validator.String{
+																		stringvalidator.OneOf(
+																			"client_secret_basic",
+																			"client_secret_jwt",
+																			"client_secret_post",
+																			"none",
+																		),
+																	},
+																},
+																"client_secret_jwt_alg": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The algorithm to use with JWT when using ` + "`" + `client_secret_jwt` + "`" + ` authentication. must be one of ["HS256", "HS512"]`,
+																	Validators: []validator.String{
+																		stringvalidator.OneOf(
+																			"HS256",
+																			"HS512",
+																		),
+																	},
+																},
+																"http_proxy": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The proxy to use when making HTTP requests to the IdP.`,
+																},
+																"http_proxy_authorization": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `http_proxy` + "`" + `.`,
+																},
+																"http_version": schema.Float64Attribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The HTTP version used for requests made by this plugin. Supported values: ` + "`" + `1.1` + "`" + ` for HTTP 1.1 and ` + "`" + `1.0` + "`" + ` for HTTP 1.0.`,
+																},
+																"https_proxy": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The proxy to use when making HTTPS requests to the IdP.`,
+																},
+																"https_proxy_authorization": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `The ` + "`" + `Proxy-Authorization` + "`" + ` header value to be used with ` + "`" + `https_proxy` + "`" + `.`,
+																},
+																"keep_alive": schema.BoolAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `Whether to use keepalive connections to the IdP.`,
+																},
+																"no_proxy": schema.StringAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `A comma-separated list of hosts that should not be proxied.`,
+																},
+																"ssl_verify": schema.BoolAttribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `Whether to verify the certificate presented by the IdP when using HTTPS.`,
+																},
+																"timeout": schema.Int64Attribute{
+																	Computed:    true,
+																	Optional:    true,
+																	Description: `Network I/O timeout for requests to the IdP in milliseconds.`,
+																	Validators: []validator.Int64{
+																		int64validator.AtMost(2147483646),
+																	},
+																},
+															},
+														},
+													},
+												},
+												"ssl_verify": schema.BoolAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Set to false to disable SSL certificate verification when connecting to the schema registry.`,
+												},
+												"ttl": schema.Float64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `The TTL in seconds for the schema registry cache.`,
+													Validators: []validator.Float64{
+														float64validator.Between(0, 3600),
+													},
+												},
+												"url": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `The URL of the schema registry.`,
+												},
+											},
+										},
+									},
+									Description: `The plugin-global schema registry configuration.`,
 								},
 							},
 						},
@@ -219,12 +688,17 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -263,12 +737,17 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -276,12 +755,13 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A set of strings representing HTTP protocols.`,
+				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -315,6 +795,12 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -358,7 +844,7 @@ func (r *PluginConfluentConsumeResource) Create(ctx context.Context, req resourc
 		return
 	}
 
-	request, requestDiags := data.ToSharedConfluentConsumePlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateConfluentconsumePluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -558,5 +1044,26 @@ func (r *PluginConfluentConsumeResource) Delete(ctx context.Context, req resourc
 }
 
 func (r *PluginConfluentConsumeResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

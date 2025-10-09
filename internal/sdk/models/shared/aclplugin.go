@@ -8,72 +8,74 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
-type After struct {
+type ACLPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *After) GetAccess() []string {
-	if o == nil {
+func (a *ACLPluginAfter) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
-type Before struct {
+type ACLPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *Before) GetAccess() []string {
-	if o == nil {
+func (a *ACLPluginBefore) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
-type Ordering struct {
-	After  *After  `json:"after,omitempty"`
-	Before *Before `json:"before,omitempty"`
+type ACLPluginOrdering struct {
+	After  *ACLPluginAfter  `json:"after,omitempty"`
+	Before *ACLPluginBefore `json:"before,omitempty"`
 }
 
-func (o *Ordering) GetAfter() *After {
-	if o == nil {
+func (a *ACLPluginOrdering) GetAfter() *ACLPluginAfter {
+	if a == nil {
 		return nil
 	}
-	return o.After
+	return a.After
 }
 
-func (o *Ordering) GetBefore() *Before {
-	if o == nil {
+func (a *ACLPluginOrdering) GetBefore() *ACLPluginBefore {
+	if a == nil {
 		return nil
 	}
-	return o.Before
+	return a.Before
 }
 
-type Partials struct {
-	ID   *string `json:"id,omitempty"`
+type ACLPluginPartials struct {
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *Partials) GetID() *string {
-	if o == nil {
+func (a *ACLPluginPartials) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *Partials) GetName() *string {
-	if o == nil {
+func (a *ACLPluginPartials) GetName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Name
+	return a.Name
 }
 
-func (o *Partials) GetPath() *string {
-	if o == nil {
+func (a *ACLPluginPartials) GetPath() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Path
+	return a.Path
 }
 
 type Config struct {
@@ -89,54 +91,54 @@ type Config struct {
 	IncludeConsumerGroups *bool `json:"include_consumer_groups,omitempty"`
 }
 
-func (o *Config) GetAllow() []string {
-	if o == nil {
+func (c *Config) GetAllow() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Allow
+	return c.Allow
 }
 
-func (o *Config) GetAlwaysUseAuthenticatedGroups() *bool {
-	if o == nil {
+func (c *Config) GetAlwaysUseAuthenticatedGroups() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.AlwaysUseAuthenticatedGroups
+	return c.AlwaysUseAuthenticatedGroups
 }
 
-func (o *Config) GetDeny() []string {
-	if o == nil {
+func (c *Config) GetDeny() []string {
+	if c == nil {
 		return nil
 	}
-	return o.Deny
+	return c.Deny
 }
 
-func (o *Config) GetHideGroupsHeader() *bool {
-	if o == nil {
+func (c *Config) GetHideGroupsHeader() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.HideGroupsHeader
+	return c.HideGroupsHeader
 }
 
-func (o *Config) GetIncludeConsumerGroups() *bool {
-	if o == nil {
+func (c *Config) GetIncludeConsumerGroups() *bool {
+	if c == nil {
 		return nil
 	}
-	return o.IncludeConsumerGroups
+	return c.IncludeConsumerGroups
 }
 
-type Protocols string
+type ACLPluginProtocols string
 
 const (
-	ProtocolsGrpc  Protocols = "grpc"
-	ProtocolsGrpcs Protocols = "grpcs"
-	ProtocolsHTTP  Protocols = "http"
-	ProtocolsHTTPS Protocols = "https"
+	ACLPluginProtocolsGrpc  ACLPluginProtocols = "grpc"
+	ACLPluginProtocolsGrpcs ACLPluginProtocols = "grpcs"
+	ACLPluginProtocolsHTTP  ACLPluginProtocols = "http"
+	ACLPluginProtocolsHTTPS ACLPluginProtocols = "https"
 )
 
-func (e Protocols) ToPointer() *Protocols {
+func (e ACLPluginProtocols) ToPointer() *ACLPluginProtocols {
 	return &e
 }
-func (e *Protocols) UnmarshalJSON(data []byte) error {
+func (e *ACLPluginProtocols) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -149,23 +151,23 @@ func (e *Protocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
-		*e = Protocols(v)
+		*e = ACLPluginProtocols(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Protocols: %v", v)
+		return fmt.Errorf("invalid value for ACLPluginProtocols: %v", v)
 	}
 }
 
-// Route - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
-type Route struct {
+// ACLPluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
+type ACLPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *Route) GetID() *string {
-	if o == nil {
+func (a *ACLPluginRoute) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // ACLPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -173,11 +175,11 @@ type ACLPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *ACLPluginService) GetID() *string {
-	if o == nil {
+func (a *ACLPluginService) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // ACLPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -185,21 +187,24 @@ type ACLPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool      `json:"enabled,omitempty"`
-	ID           *string    `json:"id,omitempty"`
-	InstanceName *string    `json:"instance_name,omitempty"`
-	name         string     `const:"acl" json:"name"`
-	Ordering     *Ordering  `json:"ordering,omitempty"`
-	Partials     []Partials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string            `json:"instance_name,omitempty"`
+	name         string             `const:"acl" json:"name"`
+	Ordering     *ACLPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []ACLPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64  `json:"updated_at,omitempty"`
 	Config    *Config `json:"config,omitempty"`
 	// A set of strings representing HTTP protocols.
-	Protocols []Protocols `json:"protocols,omitempty"`
+	Protocols []ACLPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
-	Route *Route `json:"route,omitempty"`
+	Route *ACLPluginRoute `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *ACLPluginService `json:"service,omitempty"`
 }
@@ -209,96 +214,96 @@ func (a ACLPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *ACLPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *ACLPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *ACLPlugin) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.CreatedAt
 }
 
-func (o *ACLPlugin) GetEnabled() *bool {
-	if o == nil {
+func (a *ACLPlugin) GetEnabled() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.Enabled
+	return a.Enabled
 }
 
-func (o *ACLPlugin) GetID() *string {
-	if o == nil {
+func (a *ACLPlugin) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *ACLPlugin) GetInstanceName() *string {
-	if o == nil {
+func (a *ACLPlugin) GetInstanceName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.InstanceName
+	return a.InstanceName
 }
 
-func (o *ACLPlugin) GetName() string {
+func (a *ACLPlugin) GetName() string {
 	return "acl"
 }
 
-func (o *ACLPlugin) GetOrdering() *Ordering {
-	if o == nil {
+func (a *ACLPlugin) GetOrdering() *ACLPluginOrdering {
+	if a == nil {
 		return nil
 	}
-	return o.Ordering
+	return a.Ordering
 }
 
-func (o *ACLPlugin) GetPartials() []Partials {
-	if o == nil {
+func (a *ACLPlugin) GetPartials() []ACLPluginPartials {
+	if a == nil {
 		return nil
 	}
-	return o.Partials
+	return a.Partials
 }
 
-func (o *ACLPlugin) GetTags() []string {
-	if o == nil {
+func (a *ACLPlugin) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Tags
 }
 
-func (o *ACLPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (a *ACLPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return a.UpdatedAt
 }
 
-func (o *ACLPlugin) GetConfig() *Config {
-	if o == nil {
+func (a *ACLPlugin) GetConfig() *Config {
+	if a == nil {
 		return nil
 	}
-	return o.Config
+	return a.Config
 }
 
-func (o *ACLPlugin) GetProtocols() []Protocols {
-	if o == nil {
+func (a *ACLPlugin) GetProtocols() []ACLPluginProtocols {
+	if a == nil {
 		return nil
 	}
-	return o.Protocols
+	return a.Protocols
 }
 
-func (o *ACLPlugin) GetRoute() *Route {
-	if o == nil {
+func (a *ACLPlugin) GetRoute() *ACLPluginRoute {
+	if a == nil {
 		return nil
 	}
-	return o.Route
+	return a.Route
 }
 
-func (o *ACLPlugin) GetService() *ACLPluginService {
-	if o == nil {
+func (a *ACLPlugin) GetService() *ACLPluginService {
+	if a == nil {
 		return nil
 	}
-	return o.Service
+	return a.Service
 }

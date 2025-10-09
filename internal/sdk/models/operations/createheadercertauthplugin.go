@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateHeadercertauthPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	HeaderCertAuthPlugin shared.HeaderCertAuthPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateHeadercertauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateHeadercertauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "HeaderCertAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateHeadercertauthPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateHeadercertauthPluginRequest) GetHeaderCertAuthPlugin() shared.HeaderCertAuthPlugin {
+	if c == nil {
+		return shared.HeaderCertAuthPlugin{}
+	}
+	return c.HeaderCertAuthPlugin
+}
 
 type CreateHeadercertauthPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateHeadercertauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateHeadercertauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateHeadercertauthPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateHeadercertauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateHeadercertauthPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateHeadercertauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateHeadercertauthPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateHeadercertauthPluginResponse) GetHeaderCertAuthPlugin() *shared.HeaderCertAuthPlugin {
-	if o == nil {
+func (c *CreateHeadercertauthPluginResponse) GetHeaderCertAuthPlugin() *shared.HeaderCertAuthPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.HeaderCertAuthPlugin
+	return c.HeaderCertAuthPlugin
 }
 
-func (o *CreateHeadercertauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateHeadercertauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

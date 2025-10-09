@@ -12,22 +12,22 @@ type AiPromptDecoratorPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginAfter) GetAccess() []string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginAfter) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiPromptDecoratorPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginBefore) GetAccess() []string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginBefore) GetAccess() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Access
+	return a.Access
 }
 
 type AiPromptDecoratorPluginOrdering struct {
@@ -35,54 +35,58 @@ type AiPromptDecoratorPluginOrdering struct {
 	Before *AiPromptDecoratorPluginBefore `json:"before,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginOrdering) GetAfter() *AiPromptDecoratorPluginAfter {
-	if o == nil {
+func (a *AiPromptDecoratorPluginOrdering) GetAfter() *AiPromptDecoratorPluginAfter {
+	if a == nil {
 		return nil
 	}
-	return o.After
+	return a.After
 }
 
-func (o *AiPromptDecoratorPluginOrdering) GetBefore() *AiPromptDecoratorPluginBefore {
-	if o == nil {
+func (a *AiPromptDecoratorPluginOrdering) GetBefore() *AiPromptDecoratorPluginBefore {
+	if a == nil {
 		return nil
 	}
-	return o.Before
+	return a.Before
 }
 
 type AiPromptDecoratorPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginPartials) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginPartials) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiPromptDecoratorPluginPartials) GetName() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginPartials) GetName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Name
+	return a.Name
 }
 
-func (o *AiPromptDecoratorPluginPartials) GetPath() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginPartials) GetPath() *string {
+	if a == nil {
 		return nil
 	}
-	return o.Path
+	return a.Path
 }
 
 // LlmFormat - LLM input and output format and schema to use
 type LlmFormat string
 
 const (
-	LlmFormatBedrock LlmFormat = "bedrock"
-	LlmFormatGemini  LlmFormat = "gemini"
-	LlmFormatOpenai  LlmFormat = "openai"
+	LlmFormatBedrock     LlmFormat = "bedrock"
+	LlmFormatCohere      LlmFormat = "cohere"
+	LlmFormatGemini      LlmFormat = "gemini"
+	LlmFormatHuggingface LlmFormat = "huggingface"
+	LlmFormatOpenai      LlmFormat = "openai"
 )
 
 func (e LlmFormat) ToPointer() *LlmFormat {
@@ -96,7 +100,11 @@ func (e *LlmFormat) UnmarshalJSON(data []byte) error {
 	switch v {
 	case "bedrock":
 		fallthrough
+	case "cohere":
+		fallthrough
 	case "gemini":
+		fallthrough
+	case "huggingface":
 		fallthrough
 	case "openai":
 		*e = LlmFormat(v)
@@ -140,18 +148,18 @@ type AiPromptDecoratorPluginAppend struct {
 	Role    *Role  `json:"role,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginAppend) GetContent() string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginAppend) GetContent() string {
+	if a == nil {
 		return ""
 	}
-	return o.Content
+	return a.Content
 }
 
-func (o *AiPromptDecoratorPluginAppend) GetRole() *Role {
-	if o == nil {
+func (a *AiPromptDecoratorPluginAppend) GetRole() *Role {
+	if a == nil {
 		return nil
 	}
-	return o.Role
+	return a.Role
 }
 
 type AiPromptDecoratorPluginRole string
@@ -188,18 +196,18 @@ type Prepend struct {
 	Role    *AiPromptDecoratorPluginRole `json:"role,omitempty"`
 }
 
-func (o *Prepend) GetContent() string {
-	if o == nil {
+func (p *Prepend) GetContent() string {
+	if p == nil {
 		return ""
 	}
-	return o.Content
+	return p.Content
 }
 
-func (o *Prepend) GetRole() *AiPromptDecoratorPluginRole {
-	if o == nil {
+func (p *Prepend) GetRole() *AiPromptDecoratorPluginRole {
+	if p == nil {
 		return nil
 	}
-	return o.Role
+	return p.Role
 }
 
 type Prompts struct {
@@ -209,47 +217,47 @@ type Prompts struct {
 	Prepend []Prepend `json:"prepend,omitempty"`
 }
 
-func (o *Prompts) GetAppend() []AiPromptDecoratorPluginAppend {
-	if o == nil {
+func (p *Prompts) GetAppend() []AiPromptDecoratorPluginAppend {
+	if p == nil {
 		return nil
 	}
-	return o.Append
+	return p.Append
 }
 
-func (o *Prompts) GetPrepend() []Prepend {
-	if o == nil {
+func (p *Prompts) GetPrepend() []Prepend {
+	if p == nil {
 		return nil
 	}
-	return o.Prepend
+	return p.Prepend
 }
 
 type AiPromptDecoratorPluginConfig struct {
 	// LLM input and output format and schema to use
 	LlmFormat *LlmFormat `json:"llm_format,omitempty"`
-	// max allowed body size allowed to be introspected
+	// max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 	MaxRequestBodySize *int64   `json:"max_request_body_size,omitempty"`
 	Prompts            *Prompts `json:"prompts,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginConfig) GetLlmFormat() *LlmFormat {
-	if o == nil {
+func (a *AiPromptDecoratorPluginConfig) GetLlmFormat() *LlmFormat {
+	if a == nil {
 		return nil
 	}
-	return o.LlmFormat
+	return a.LlmFormat
 }
 
-func (o *AiPromptDecoratorPluginConfig) GetMaxRequestBodySize() *int64 {
-	if o == nil {
+func (a *AiPromptDecoratorPluginConfig) GetMaxRequestBodySize() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.MaxRequestBodySize
+	return a.MaxRequestBodySize
 }
 
-func (o *AiPromptDecoratorPluginConfig) GetPrompts() *Prompts {
-	if o == nil {
+func (a *AiPromptDecoratorPluginConfig) GetPrompts() *Prompts {
+	if a == nil {
 		return nil
 	}
-	return o.Prompts
+	return a.Prompts
 }
 
 // AiPromptDecoratorPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -257,11 +265,11 @@ type AiPromptDecoratorPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginConsumer) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginConsumer) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiPromptDecoratorPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -269,11 +277,11 @@ type AiPromptDecoratorPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginConsumerGroup) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginConsumerGroup) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 type AiPromptDecoratorPluginProtocols string
@@ -313,11 +321,11 @@ type AiPromptDecoratorPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginRoute) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginRoute) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiPromptDecoratorPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -325,11 +333,11 @@ type AiPromptDecoratorPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *AiPromptDecoratorPluginService) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPluginService) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
 // AiPromptDecoratorPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -337,12 +345,15 @@ type AiPromptDecoratorPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                             `json:"enabled,omitempty"`
-	ID           *string                           `json:"id,omitempty"`
-	InstanceName *string                           `json:"instance_name,omitempty"`
-	name         string                            `const:"ai-prompt-decorator" json:"name"`
-	Ordering     *AiPromptDecoratorPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []AiPromptDecoratorPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string                          `json:"instance_name,omitempty"`
+	name         string                           `const:"ai-prompt-decorator" json:"name"`
+	Ordering     *AiPromptDecoratorPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []AiPromptDecoratorPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
@@ -365,110 +376,110 @@ func (a AiPromptDecoratorPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiPromptDecoratorPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *AiPromptDecoratorPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetCreatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return a.CreatedAt
 }
 
-func (o *AiPromptDecoratorPlugin) GetEnabled() *bool {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetEnabled() *bool {
+	if a == nil {
 		return nil
 	}
-	return o.Enabled
+	return a.Enabled
 }
 
-func (o *AiPromptDecoratorPlugin) GetID() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetID() *string {
+	if a == nil {
 		return nil
 	}
-	return o.ID
+	return a.ID
 }
 
-func (o *AiPromptDecoratorPlugin) GetInstanceName() *string {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetInstanceName() *string {
+	if a == nil {
 		return nil
 	}
-	return o.InstanceName
+	return a.InstanceName
 }
 
-func (o *AiPromptDecoratorPlugin) GetName() string {
+func (a *AiPromptDecoratorPlugin) GetName() string {
 	return "ai-prompt-decorator"
 }
 
-func (o *AiPromptDecoratorPlugin) GetOrdering() *AiPromptDecoratorPluginOrdering {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetOrdering() *AiPromptDecoratorPluginOrdering {
+	if a == nil {
 		return nil
 	}
-	return o.Ordering
+	return a.Ordering
 }
 
-func (o *AiPromptDecoratorPlugin) GetPartials() []AiPromptDecoratorPluginPartials {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetPartials() []AiPromptDecoratorPluginPartials {
+	if a == nil {
 		return nil
 	}
-	return o.Partials
+	return a.Partials
 }
 
-func (o *AiPromptDecoratorPlugin) GetTags() []string {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetTags() []string {
+	if a == nil {
 		return nil
 	}
-	return o.Tags
+	return a.Tags
 }
 
-func (o *AiPromptDecoratorPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetUpdatedAt() *int64 {
+	if a == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return a.UpdatedAt
 }
 
-func (o *AiPromptDecoratorPlugin) GetConfig() *AiPromptDecoratorPluginConfig {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetConfig() *AiPromptDecoratorPluginConfig {
+	if a == nil {
 		return nil
 	}
-	return o.Config
+	return a.Config
 }
 
-func (o *AiPromptDecoratorPlugin) GetConsumer() *AiPromptDecoratorPluginConsumer {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetConsumer() *AiPromptDecoratorPluginConsumer {
+	if a == nil {
 		return nil
 	}
-	return o.Consumer
+	return a.Consumer
 }
 
-func (o *AiPromptDecoratorPlugin) GetConsumerGroup() *AiPromptDecoratorPluginConsumerGroup {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetConsumerGroup() *AiPromptDecoratorPluginConsumerGroup {
+	if a == nil {
 		return nil
 	}
-	return o.ConsumerGroup
+	return a.ConsumerGroup
 }
 
-func (o *AiPromptDecoratorPlugin) GetProtocols() []AiPromptDecoratorPluginProtocols {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetProtocols() []AiPromptDecoratorPluginProtocols {
+	if a == nil {
 		return nil
 	}
-	return o.Protocols
+	return a.Protocols
 }
 
-func (o *AiPromptDecoratorPlugin) GetRoute() *AiPromptDecoratorPluginRoute {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetRoute() *AiPromptDecoratorPluginRoute {
+	if a == nil {
 		return nil
 	}
-	return o.Route
+	return a.Route
 }
 
-func (o *AiPromptDecoratorPlugin) GetService() *AiPromptDecoratorPluginService {
-	if o == nil {
+func (a *AiPromptDecoratorPlugin) GetService() *AiPromptDecoratorPluginService {
+	if a == nil {
 		return nil
 	}
-	return o.Service
+	return a.Service
 }

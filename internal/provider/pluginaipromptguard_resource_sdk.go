@@ -11,6 +11,194 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginAiPromptGuardResourceModel) RefreshFromSharedAiPromptGuardPlugin(ctx context.Context, resp *shared.AiPromptGuardPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.AiPromptGuardPluginConfig{}
+			r.Config.AllowAllConversationHistory = types.BoolPointerValue(resp.Config.AllowAllConversationHistory)
+			r.Config.AllowPatterns = make([]types.String, 0, len(resp.Config.AllowPatterns))
+			for _, v := range resp.Config.AllowPatterns {
+				r.Config.AllowPatterns = append(r.Config.AllowPatterns, types.StringValue(v))
+			}
+			r.Config.DenyPatterns = make([]types.String, 0, len(resp.Config.DenyPatterns))
+			for _, v := range resp.Config.DenyPatterns {
+				r.Config.DenyPatterns = append(r.Config.DenyPatterns, types.StringValue(v))
+			}
+			if resp.Config.GenaiCategory != nil {
+				r.Config.GenaiCategory = types.StringValue(string(*resp.Config.GenaiCategory))
+			} else {
+				r.Config.GenaiCategory = types.StringNull()
+			}
+			if resp.Config.LlmFormat != nil {
+				r.Config.LlmFormat = types.StringValue(string(*resp.Config.LlmFormat))
+			} else {
+				r.Config.LlmFormat = types.StringNull()
+			}
+			r.Config.MatchAllRoles = types.BoolPointerValue(resp.Config.MatchAllRoles)
+			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		if resp.ConsumerGroup == nil {
+			r.ConsumerGroup = nil
+		} else {
+			r.ConsumerGroup = &tfTypes.Set{}
+			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginAiPromptGuardResourceModel) ToOperationsCreateAipromptguardPluginRequest(ctx context.Context) (*operations.CreateAipromptguardPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	aiPromptGuardPlugin, aiPromptGuardPluginDiags := r.ToSharedAiPromptGuardPlugin(ctx)
+	diags.Append(aiPromptGuardPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateAipromptguardPluginRequest{
+		Workspace:           workspace,
+		AiPromptGuardPlugin: *aiPromptGuardPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptGuardResourceModel) ToOperationsDeleteAipromptguardPluginRequest(ctx context.Context) (*operations.DeleteAipromptguardPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteAipromptguardPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptGuardResourceModel) ToOperationsGetAipromptguardPluginRequest(ctx context.Context) (*operations.GetAipromptguardPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetAipromptguardPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginAiPromptGuardResourceModel) ToOperationsUpdateAipromptguardPluginRequest(ctx context.Context) (*operations.UpdateAipromptguardPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	aiPromptGuardPlugin, aiPromptGuardPluginDiags := r.ToSharedAiPromptGuardPlugin(ctx)
+	diags.Append(aiPromptGuardPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateAipromptguardPluginRequest{
+		PluginID:            pluginID,
+		Workspace:           workspace,
+		AiPromptGuardPlugin: *aiPromptGuardPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx context.Context) (*shared.AiPromptGuardPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +253,38 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 			Before: before,
 		}
 	}
-	var partials []shared.AiPromptGuardPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.AiPromptGuardPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.AiPromptGuardPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.AiPromptGuardPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.AiPromptGuardPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -120,6 +308,12 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 		for _, denyPatternsItem := range r.Config.DenyPatterns {
 			denyPatterns = append(denyPatterns, denyPatternsItem.ValueString())
 		}
+		genaiCategory := new(shared.GenaiCategory)
+		if !r.Config.GenaiCategory.IsUnknown() && !r.Config.GenaiCategory.IsNull() {
+			*genaiCategory = shared.GenaiCategory(r.Config.GenaiCategory.ValueString())
+		} else {
+			genaiCategory = nil
+		}
 		llmFormat := new(shared.AiPromptGuardPluginLlmFormat)
 		if !r.Config.LlmFormat.IsUnknown() && !r.Config.LlmFormat.IsNull() {
 			*llmFormat = shared.AiPromptGuardPluginLlmFormat(r.Config.LlmFormat.ValueString())
@@ -142,6 +336,7 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 			AllowAllConversationHistory: allowAllConversationHistory,
 			AllowPatterns:               allowPatterns,
 			DenyPatterns:                denyPatterns,
+			GenaiCategory:               genaiCategory,
 			LlmFormat:                   llmFormat,
 			MatchAllRoles:               matchAllRoles,
 			MaxRequestBodySize:          maxRequestBodySize,
@@ -217,160 +412,4 @@ func (r *PluginAiPromptGuardResourceModel) ToSharedAiPromptGuardPlugin(ctx conte
 	}
 
 	return &out, diags
-}
-
-func (r *PluginAiPromptGuardResourceModel) ToOperationsUpdateAipromptguardPluginRequest(ctx context.Context) (*operations.UpdateAipromptguardPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	aiPromptGuardPlugin, aiPromptGuardPluginDiags := r.ToSharedAiPromptGuardPlugin(ctx)
-	diags.Append(aiPromptGuardPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateAipromptguardPluginRequest{
-		PluginID:            pluginID,
-		AiPromptGuardPlugin: *aiPromptGuardPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAiPromptGuardResourceModel) ToOperationsGetAipromptguardPluginRequest(ctx context.Context) (*operations.GetAipromptguardPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetAipromptguardPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAiPromptGuardResourceModel) ToOperationsDeleteAipromptguardPluginRequest(ctx context.Context) (*operations.DeleteAipromptguardPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteAipromptguardPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginAiPromptGuardResourceModel) RefreshFromSharedAiPromptGuardPlugin(ctx context.Context, resp *shared.AiPromptGuardPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.AiPromptGuardPluginConfig{}
-			r.Config.AllowAllConversationHistory = types.BoolPointerValue(resp.Config.AllowAllConversationHistory)
-			r.Config.AllowPatterns = make([]types.String, 0, len(resp.Config.AllowPatterns))
-			for _, v := range resp.Config.AllowPatterns {
-				r.Config.AllowPatterns = append(r.Config.AllowPatterns, types.StringValue(v))
-			}
-			r.Config.DenyPatterns = make([]types.String, 0, len(resp.Config.DenyPatterns))
-			for _, v := range resp.Config.DenyPatterns {
-				r.Config.DenyPatterns = append(r.Config.DenyPatterns, types.StringValue(v))
-			}
-			if resp.Config.LlmFormat != nil {
-				r.Config.LlmFormat = types.StringValue(string(*resp.Config.LlmFormat))
-			} else {
-				r.Config.LlmFormat = types.StringNull()
-			}
-			r.Config.MatchAllRoles = types.BoolPointerValue(resp.Config.MatchAllRoles)
-			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		if resp.ConsumerGroup == nil {
-			r.ConsumerGroup = nil
-		} else {
-			r.ConsumerGroup = &tfTypes.ACLWithoutParentsConsumer{}
-			r.ConsumerGroup.ID = types.StringPointerValue(resp.ConsumerGroup.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

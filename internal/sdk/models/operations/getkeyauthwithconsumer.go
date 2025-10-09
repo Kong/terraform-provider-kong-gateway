@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -12,20 +13,40 @@ type GetKeyAuthWithConsumerRequest struct {
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
 	// ID of the API-key to lookup
 	KeyAuthID string `pathParam:"style=simple,explode=false,name=KeyAuthId"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetKeyAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (g GetKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
 }
 
-func (o *GetKeyAuthWithConsumerRequest) GetKeyAuthID() string {
-	if o == nil {
+func (g *GetKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetKeyAuthWithConsumerRequest) GetConsumerID() string {
+	if g == nil {
 		return ""
 	}
-	return o.KeyAuthID
+	return g.ConsumerID
+}
+
+func (g *GetKeyAuthWithConsumerRequest) GetKeyAuthID() string {
+	if g == nil {
+		return ""
+	}
+	return g.KeyAuthID
+}
+
+func (g *GetKeyAuthWithConsumerRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetKeyAuthWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type GetKeyAuthWithConsumerResponse struct {
 	KeyAuth *shared.KeyAuth
 }
 
-func (o *GetKeyAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (g *GetKeyAuthWithConsumerResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetKeyAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetKeyAuthWithConsumerResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetKeyAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetKeyAuthWithConsumerResponse) GetKeyAuth() *shared.KeyAuth {
-	if o == nil {
+func (g *GetKeyAuthWithConsumerResponse) GetKeyAuth() *shared.KeyAuth {
+	if g == nil {
 		return nil
 	}
-	return o.KeyAuth
+	return g.KeyAuth
 }

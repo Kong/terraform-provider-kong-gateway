@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateRatelimitingPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RateLimitingPlugin shared.RateLimitingPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateRatelimitingPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateRatelimitingPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateRatelimitingPluginRequest) GetRateLimitingPlugin() shared.RateLimitingPlugin {
-	if o == nil {
+func (u *UpdateRatelimitingPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RateLimitingPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateRatelimitingPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateRatelimitingPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateRatelimitingPluginRequest) GetRateLimitingPlugin() shared.RateLimitingPlugin {
+	if u == nil {
 		return shared.RateLimitingPlugin{}
 	}
-	return o.RateLimitingPlugin
+	return u.RateLimitingPlugin
 }
 
 type UpdateRatelimitingPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateRatelimitingPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateRatelimitingPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateRatelimitingPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateRatelimitingPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateRatelimitingPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateRatelimitingPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateRatelimitingPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateRatelimitingPluginResponse) GetRateLimitingPlugin() *shared.RateLimitingPlugin {
-	if o == nil {
+func (u *UpdateRatelimitingPluginResponse) GetRateLimitingPlugin() *shared.RateLimitingPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.RateLimitingPlugin
+	return u.RateLimitingPlugin
 }
 
-func (o *UpdateRatelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateRatelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

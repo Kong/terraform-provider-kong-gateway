@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateOauth2PluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	Oauth2Plugin shared.Oauth2Plugin `request:"mediaType=application/json"`
+}
+
+func (c CreateOauth2PluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOauth2PluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Oauth2Plugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateOauth2PluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateOauth2PluginRequest) GetOauth2Plugin() shared.Oauth2Plugin {
+	if c == nil {
+		return shared.Oauth2Plugin{}
+	}
+	return c.Oauth2Plugin
+}
 
 type CreateOauth2PluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateOauth2PluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateOauth2PluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateOauth2PluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateOauth2PluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateOauth2PluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateOauth2PluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateOauth2PluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateOauth2PluginResponse) GetOauth2Plugin() *shared.Oauth2Plugin {
-	if o == nil {
+func (c *CreateOauth2PluginResponse) GetOauth2Plugin() *shared.Oauth2Plugin {
+	if c == nil {
 		return nil
 	}
-	return o.Oauth2Plugin
+	return c.Oauth2Plugin
 }
 
-func (o *CreateOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

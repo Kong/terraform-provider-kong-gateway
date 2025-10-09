@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateAzurefunctionsPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID             string                      `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AzureFunctionsPlugin shared.AzureFunctionsPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateAzurefunctionsPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateAzurefunctionsPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateAzurefunctionsPluginRequest) GetAzureFunctionsPlugin() shared.AzureFunctionsPlugin {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AzureFunctionsPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateAzurefunctionsPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateAzurefunctionsPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateAzurefunctionsPluginRequest) GetAzureFunctionsPlugin() shared.AzureFunctionsPlugin {
+	if u == nil {
 		return shared.AzureFunctionsPlugin{}
 	}
-	return o.AzureFunctionsPlugin
+	return u.AzureFunctionsPlugin
 }
 
 type UpdateAzurefunctionsPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateAzurefunctionsPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateAzurefunctionsPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateAzurefunctionsPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateAzurefunctionsPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateAzurefunctionsPluginResponse) GetAzureFunctionsPlugin() *shared.AzureFunctionsPlugin {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginResponse) GetAzureFunctionsPlugin() *shared.AzureFunctionsPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.AzureFunctionsPlugin
+	return u.AzureFunctionsPlugin
 }
 
-func (o *UpdateAzurefunctionsPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateAzurefunctionsPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdatePostfunctionPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID           string                    `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	PostFunctionPlugin shared.PostFunctionPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdatePostfunctionPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdatePostfunctionPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdatePostfunctionPluginRequest) GetPostFunctionPlugin() shared.PostFunctionPlugin {
-	if o == nil {
+func (u *UpdatePostfunctionPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "PostFunctionPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdatePostfunctionPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdatePostfunctionPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdatePostfunctionPluginRequest) GetPostFunctionPlugin() shared.PostFunctionPlugin {
+	if u == nil {
 		return shared.PostFunctionPlugin{}
 	}
-	return o.PostFunctionPlugin
+	return u.PostFunctionPlugin
 }
 
 type UpdatePostfunctionPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdatePostfunctionPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdatePostfunctionPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdatePostfunctionPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdatePostfunctionPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdatePostfunctionPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdatePostfunctionPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdatePostfunctionPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdatePostfunctionPluginResponse) GetPostFunctionPlugin() *shared.PostFunctionPlugin {
-	if o == nil {
+func (u *UpdatePostfunctionPluginResponse) GetPostFunctionPlugin() *shared.PostFunctionPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.PostFunctionPlugin
+	return u.PostFunctionPlugin
 }
 
-func (o *UpdatePostfunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdatePostfunctionPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

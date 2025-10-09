@@ -3,9 +3,42 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateUpstreamRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new Upstream for creation
+	Upstream shared.Upstream `request:"mediaType=application/json"`
+}
+
+func (c CreateUpstreamRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateUpstreamRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Upstream"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateUpstreamRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateUpstreamRequest) GetUpstream() shared.Upstream {
+	if c == nil {
+		return shared.Upstream{}
+	}
+	return c.Upstream
+}
 
 type CreateUpstreamResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +53,37 @@ type CreateUpstreamResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateUpstreamResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateUpstreamResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateUpstreamResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateUpstreamResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateUpstreamResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateUpstreamResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateUpstreamResponse) GetUpstream() *shared.Upstream {
-	if o == nil {
+func (c *CreateUpstreamResponse) GetUpstream() *shared.Upstream {
+	if c == nil {
 		return nil
 	}
-	return o.Upstream
+	return c.Upstream
 }
 
-func (o *CreateUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateUpstreamResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

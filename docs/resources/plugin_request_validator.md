@@ -31,7 +31,7 @@ resource "kong-gateway_plugin_request_validator" "my_pluginrequestvalidator" {
       }
     ]
     verbose_response = true
-    version          = "draft4"
+    version          = "draft201909"
   }
   consumer = {
     id = "...my_id..."
@@ -72,6 +72,7 @@ resource "kong-gateway_plugin_request_validator" "my_pluginrequestvalidator" {
     "..."
   ]
   updated_at = 3
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -84,18 +85,16 @@ resource "kong-gateway_plugin_request_validator" "my_pluginrequestvalidator" {
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
-- `instance_name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
-- `partials` (Attributes List) (see [below for nested schema](#nestedatt--partials))
-- `protocols` (List of String) A set of strings representing HTTP protocols.
+- `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
+- `protocols` (Set of String) A set of strings representing HTTP protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -107,7 +106,7 @@ Optional:
 - `content_type_parameter_validation` (Boolean) Determines whether to enable parameters validation of request content-type.
 - `parameter_schema` (Attributes List) Array of parameter validator specification. One of `body_schema` or `parameter_schema` must be specified. (see [below for nested schema](#nestedatt--config--parameter_schema))
 - `verbose_response` (Boolean) If enabled, the plugin returns more verbose and detailed validation errors.
-- `version` (String) Which validator to use. Supported values are `kong` (default) for using Kong's own schema validator, or `draft4` for using a JSON Schema Draft 4-compliant validator. must be one of ["draft4", "kong"]
+- `version` (String) Which validator to use. Supported values are `kong` (default) for using Kong's own schema validator, or `draft4`, `draft7`, `draft201909`, and `draft202012` for using their respective JSON Schema Draft compliant validators. must be one of ["draft201909", "draft202012", "draft4", "draft6", "draft7", "kong"]
 
 <a id="nestedatt--config--parameter_schema"></a>
 ### Nested Schema for `config.parameter_schema`
@@ -118,7 +117,7 @@ Optional:
 - `in` (String) The location of the parameter. Not Null; must be one of ["header", "path", "query"]
 - `name` (String) The name of the parameter. Parameter names are case-sensitive, and correspond to the parameter name used by the `in` property. If `in` is `path`, the `name` field MUST correspond to the named capture group from the configured `route`. Not Null
 - `required` (Boolean) Determines whether this parameter is mandatory. Not Null
-- `schema` (String) Requred when `style` and `explode` are set. This is the schema defining the type used for the parameter. It is validated using `draft4` for JSON Schema draft 4 compliant validator. In addition to being a valid JSON Schema, the parameter schema MUST have a top-level `type` property to enable proper deserialization before validating.
+- `schema` (String) Required when `style` and `explode` are set. This is the schema defining the type used for the parameter. It is validated using `draft4` for JSON Schema draft 4 compliant validator. In addition to being a valid JSON Schema, the parameter schema MUST have a top-level `type` property to enable proper deserialization before validating.
 - `style` (String) Required when `schema` and `explode` are set. Describes how the parameter value will be deserialized depending on the type of the parameter value. must be one of ["deepObject", "form", "label", "matrix", "pipeDelimited", "simple", "spaceDelimited"]
 
 
@@ -161,8 +160,8 @@ Optional:
 
 Optional:
 
-- `id` (String)
-- `name` (String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) A unique string representing a UTF-8 encoded name.
 - `path` (String)
 
 
@@ -185,6 +184,20 @@ Optional:
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_plugin_request_validator.my_kong-gateway_plugin_request_validator
+  id = jsonencode({
+    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_plugin_request_validator.my_kong-gateway_plugin_request_validator ""
+terraform import kong-gateway_plugin_request_validator.my_kong-gateway_plugin_request_validator '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

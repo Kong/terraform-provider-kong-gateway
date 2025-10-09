@@ -50,7 +50,9 @@ func (o *Oauth2PluginOrdering) GetBefore() *Oauth2PluginBefore {
 }
 
 type Oauth2PluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
@@ -337,12 +339,15 @@ type Oauth2Plugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                  `json:"enabled,omitempty"`
-	ID           *string                `json:"id,omitempty"`
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"oauth2" json:"name"`
-	Ordering     *Oauth2PluginOrdering  `json:"ordering,omitempty"`
-	Partials     []Oauth2PluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"oauth2" json:"name"`
+	Ordering     *Oauth2PluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []Oauth2PluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
@@ -361,7 +366,7 @@ func (o Oauth2Plugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *Oauth2Plugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil

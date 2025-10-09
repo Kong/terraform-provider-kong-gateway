@@ -21,6 +21,7 @@ resource "kong-gateway_key_set" "my_keyset" {
     "..."
   ]
   updated_at = 4
+  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
 }
 ```
 
@@ -30,18 +31,30 @@ resource "kong-gateway_key_set" "my_keyset" {
 ### Optional
 
 - `created_at` (Number) Unix epoch when the resource was created.
-- `name` (String)
-- `tags` (List of String)
+- `id` (String) A string representing a UUID (universally unique identifier).
+- `name` (String) The name to associate with the given key-set.
+- `tags` (List of String) A set of strings representing tags.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `workspace` (String) The name or UUID of the workspace. Default: "default"
 
 ## Import
 
 Import is supported using the following syntax:
 
+In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.com/terraform/language/import) can be used with the `id` attribute, for example:
+
+```terraform
+import {
+  to = kong-gateway_key_set.my_kong-gateway_key_set
+  id = jsonencode({
+    id = "6cc34248-50b4-4a81-9201-3bdf7a83f712"
+    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  })
+}
+```
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
-terraform import kong-gateway_key_set.my_kong-gateway_key_set ""
+terraform import kong-gateway_key_set.my_kong-gateway_key_set '{"id": "6cc34248-50b4-4a81-9201-3bdf7a83f712", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
 ```

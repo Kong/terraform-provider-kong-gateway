@@ -11,6 +11,201 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(ctx context.Context, resp *shared.PreFunctionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.PostFunctionPluginConfig{}
+			r.Config.Access = make([]types.String, 0, len(resp.Config.Access))
+			for _, v := range resp.Config.Access {
+				r.Config.Access = append(r.Config.Access, types.StringValue(v))
+			}
+			r.Config.BodyFilter = make([]types.String, 0, len(resp.Config.BodyFilter))
+			for _, v := range resp.Config.BodyFilter {
+				r.Config.BodyFilter = append(r.Config.BodyFilter, types.StringValue(v))
+			}
+			r.Config.Certificate = make([]types.String, 0, len(resp.Config.Certificate))
+			for _, v := range resp.Config.Certificate {
+				r.Config.Certificate = append(r.Config.Certificate, types.StringValue(v))
+			}
+			r.Config.HeaderFilter = make([]types.String, 0, len(resp.Config.HeaderFilter))
+			for _, v := range resp.Config.HeaderFilter {
+				r.Config.HeaderFilter = append(r.Config.HeaderFilter, types.StringValue(v))
+			}
+			r.Config.Log = make([]types.String, 0, len(resp.Config.Log))
+			for _, v := range resp.Config.Log {
+				r.Config.Log = append(r.Config.Log, types.StringValue(v))
+			}
+			r.Config.Rewrite = make([]types.String, 0, len(resp.Config.Rewrite))
+			for _, v := range resp.Config.Rewrite {
+				r.Config.Rewrite = append(r.Config.Rewrite, types.StringValue(v))
+			}
+			r.Config.WsClientFrame = make([]types.String, 0, len(resp.Config.WsClientFrame))
+			for _, v := range resp.Config.WsClientFrame {
+				r.Config.WsClientFrame = append(r.Config.WsClientFrame, types.StringValue(v))
+			}
+			r.Config.WsClose = make([]types.String, 0, len(resp.Config.WsClose))
+			for _, v := range resp.Config.WsClose {
+				r.Config.WsClose = append(r.Config.WsClose, types.StringValue(v))
+			}
+			r.Config.WsHandshake = make([]types.String, 0, len(resp.Config.WsHandshake))
+			for _, v := range resp.Config.WsHandshake {
+				r.Config.WsHandshake = append(r.Config.WsHandshake, types.StringValue(v))
+			}
+			r.Config.WsUpstreamFrame = make([]types.String, 0, len(resp.Config.WsUpstreamFrame))
+			for _, v := range resp.Config.WsUpstreamFrame {
+				r.Config.WsUpstreamFrame = append(r.Config.WsUpstreamFrame, types.StringValue(v))
+			}
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsCreatePrefunctionPluginRequest(ctx context.Context) (*operations.CreatePrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	preFunctionPlugin, preFunctionPluginDiags := r.ToSharedPreFunctionPlugin(ctx)
+	diags.Append(preFunctionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreatePrefunctionPluginRequest{
+		Workspace:         workspace,
+		PreFunctionPlugin: *preFunctionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsDeletePrefunctionPluginRequest(ctx context.Context) (*operations.DeletePrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeletePrefunctionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsGetPrefunctionPluginRequest(ctx context.Context) (*operations.GetPrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetPrefunctionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginPreFunctionResourceModel) ToOperationsUpdatePrefunctionPluginRequest(ctx context.Context) (*operations.UpdatePrefunctionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	preFunctionPlugin, preFunctionPluginDiags := r.ToSharedPreFunctionPlugin(ctx)
+	diags.Append(preFunctionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdatePrefunctionPluginRequest{
+		PluginID:          pluginID,
+		Workspace:         workspace,
+		PreFunctionPlugin: *preFunctionPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin(ctx context.Context) (*shared.PreFunctionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +260,38 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin(ctx context.C
 			Before: before,
 		}
 	}
-	var partials []shared.PreFunctionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.PreFunctionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.PreFunctionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.PreFunctionPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.PreFunctionPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -203,172 +398,4 @@ func (r *PluginPreFunctionResourceModel) ToSharedPreFunctionPlugin(ctx context.C
 	}
 
 	return &out, diags
-}
-
-func (r *PluginPreFunctionResourceModel) ToOperationsUpdatePrefunctionPluginRequest(ctx context.Context) (*operations.UpdatePrefunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	preFunctionPlugin, preFunctionPluginDiags := r.ToSharedPreFunctionPlugin(ctx)
-	diags.Append(preFunctionPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdatePrefunctionPluginRequest{
-		PluginID:          pluginID,
-		PreFunctionPlugin: *preFunctionPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPreFunctionResourceModel) ToOperationsGetPrefunctionPluginRequest(ctx context.Context) (*operations.GetPrefunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetPrefunctionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPreFunctionResourceModel) ToOperationsDeletePrefunctionPluginRequest(ctx context.Context) (*operations.DeletePrefunctionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeletePrefunctionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginPreFunctionResourceModel) RefreshFromSharedPreFunctionPlugin(ctx context.Context, resp *shared.PreFunctionPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.PostFunctionPluginConfig{}
-			r.Config.Access = make([]types.String, 0, len(resp.Config.Access))
-			for _, v := range resp.Config.Access {
-				r.Config.Access = append(r.Config.Access, types.StringValue(v))
-			}
-			r.Config.BodyFilter = make([]types.String, 0, len(resp.Config.BodyFilter))
-			for _, v := range resp.Config.BodyFilter {
-				r.Config.BodyFilter = append(r.Config.BodyFilter, types.StringValue(v))
-			}
-			r.Config.Certificate = make([]types.String, 0, len(resp.Config.Certificate))
-			for _, v := range resp.Config.Certificate {
-				r.Config.Certificate = append(r.Config.Certificate, types.StringValue(v))
-			}
-			r.Config.HeaderFilter = make([]types.String, 0, len(resp.Config.HeaderFilter))
-			for _, v := range resp.Config.HeaderFilter {
-				r.Config.HeaderFilter = append(r.Config.HeaderFilter, types.StringValue(v))
-			}
-			r.Config.Log = make([]types.String, 0, len(resp.Config.Log))
-			for _, v := range resp.Config.Log {
-				r.Config.Log = append(r.Config.Log, types.StringValue(v))
-			}
-			r.Config.Rewrite = make([]types.String, 0, len(resp.Config.Rewrite))
-			for _, v := range resp.Config.Rewrite {
-				r.Config.Rewrite = append(r.Config.Rewrite, types.StringValue(v))
-			}
-			r.Config.WsClientFrame = make([]types.String, 0, len(resp.Config.WsClientFrame))
-			for _, v := range resp.Config.WsClientFrame {
-				r.Config.WsClientFrame = append(r.Config.WsClientFrame, types.StringValue(v))
-			}
-			r.Config.WsClose = make([]types.String, 0, len(resp.Config.WsClose))
-			for _, v := range resp.Config.WsClose {
-				r.Config.WsClose = append(r.Config.WsClose, types.StringValue(v))
-			}
-			r.Config.WsHandshake = make([]types.String, 0, len(resp.Config.WsHandshake))
-			for _, v := range resp.Config.WsHandshake {
-				r.Config.WsHandshake = append(r.Config.WsHandshake, types.StringValue(v))
-			}
-			r.Config.WsUpstreamFrame = make([]types.String, 0, len(resp.Config.WsUpstreamFrame))
-			for _, v := range resp.Config.WsUpstreamFrame {
-				r.Config.WsUpstreamFrame = append(r.Config.WsUpstreamFrame, types.StringValue(v))
-			}
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

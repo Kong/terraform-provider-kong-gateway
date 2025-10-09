@@ -3,9 +3,42 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRouteRouteExpressionRequest struct {
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Description of the new Route for creation
+	RouteExpression shared.RouteExpression `request:"mediaType=application/json"`
+}
+
+func (c CreateRouteRouteExpressionRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRouteRouteExpressionRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RouteExpression"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRouteRouteExpressionRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRouteRouteExpressionRequest) GetRouteExpression() shared.RouteExpression {
+	if c == nil {
+		return shared.RouteExpression{}
+	}
+	return c.RouteExpression
+}
 
 type CreateRouteRouteExpressionResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +53,37 @@ type CreateRouteRouteExpressionResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRouteRouteExpressionResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRouteRouteExpressionResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRouteRouteExpressionResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRouteRouteExpressionResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRouteRouteExpressionResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRouteRouteExpressionResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRouteRouteExpressionResponse) GetRouteExpression() *shared.RouteExpression {
-	if o == nil {
+func (c *CreateRouteRouteExpressionResponse) GetRouteExpression() *shared.RouteExpression {
+	if c == nil {
 		return nil
 	}
-	return o.RouteExpression
+	return c.RouteExpression
 }
 
-func (o *CreateRouteRouteExpressionResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRouteRouteExpressionResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

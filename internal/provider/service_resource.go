@@ -3,12 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -32,25 +36,27 @@ type ServiceResource struct {
 
 // ServiceResourceModel describes the resource data model.
 type ServiceResourceModel struct {
-	CaCertificates    []types.String                     `tfsdk:"ca_certificates"`
-	ClientCertificate *tfTypes.ACLWithoutParentsConsumer `tfsdk:"client_certificate"`
-	ConnectTimeout    types.Int64                        `tfsdk:"connect_timeout"`
-	CreatedAt         types.Int64                        `tfsdk:"created_at"`
-	Enabled           types.Bool                         `tfsdk:"enabled"`
-	Host              types.String                       `tfsdk:"host"`
-	ID                types.String                       `tfsdk:"id"`
-	Name              types.String                       `tfsdk:"name"`
-	Path              types.String                       `tfsdk:"path"`
-	Port              types.Int64                        `tfsdk:"port"`
-	Protocol          types.String                       `tfsdk:"protocol"`
-	ReadTimeout       types.Int64                        `tfsdk:"read_timeout"`
-	Retries           types.Int64                        `tfsdk:"retries"`
-	Tags              []types.String                     `tfsdk:"tags"`
-	TLSVerify         types.Bool                         `tfsdk:"tls_verify"`
-	TLSVerifyDepth    types.Int64                        `tfsdk:"tls_verify_depth"`
-	UpdatedAt         types.Int64                        `tfsdk:"updated_at"`
-	URL               types.String                       `tfsdk:"url"`
-	WriteTimeout      types.Int64                        `tfsdk:"write_timeout"`
+	CaCertificates    []types.String   `tfsdk:"ca_certificates"`
+	ClientCertificate *tfTypes.Set     `tfsdk:"client_certificate"`
+	ConnectTimeout    types.Int64      `tfsdk:"connect_timeout"`
+	CreatedAt         types.Int64      `tfsdk:"created_at"`
+	Enabled           types.Bool       `tfsdk:"enabled"`
+	Host              types.String     `tfsdk:"host"`
+	ID                types.String     `tfsdk:"id"`
+	Name              types.String     `tfsdk:"name"`
+	Path              types.String     `tfsdk:"path"`
+	Port              types.Int64      `tfsdk:"port"`
+	Protocol          types.String     `tfsdk:"protocol"`
+	ReadTimeout       types.Int64      `tfsdk:"read_timeout"`
+	Retries           types.Int64      `tfsdk:"retries"`
+	Tags              []types.String   `tfsdk:"tags"`
+	TLSSans           *tfTypes.TLSSans `tfsdk:"tls_sans"`
+	TLSVerify         types.Bool       `tfsdk:"tls_verify"`
+	TLSVerifyDepth    types.Int64      `tfsdk:"tls_verify_depth"`
+	UpdatedAt         types.Int64      `tfsdk:"updated_at"`
+	URL               types.String     `tfsdk:"url"`
+	Workspace         types.String     `tfsdk:"workspace"`
+	WriteTimeout      types.Int64      `tfsdk:"write_timeout"`
 }
 
 func (r *ServiceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -82,6 +88,9 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				Description: `The timeout in milliseconds for establishing a connection to the upstream server.`,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 2147483646),
+				},
 			},
 			"created_at": schema.Int64Attribute{
 				Computed:    true,
@@ -98,8 +107,12 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Description: `The host of the upstream server. Note that the host value is case sensitive.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"name": schema.StringAttribute{
 				Computed:    true,
@@ -115,6 +128,9 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				Description: `The upstream server port.`,
+				Validators: []validator.Int64{
+					int64validator.AtMost(65535),
+				},
 			},
 			"protocol": schema.StringAttribute{
 				Computed:    true,
@@ -139,17 +155,42 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				Description: `The timeout in milliseconds between two successive read operations for transmitting a request to the upstream server.`,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 2147483646),
+				},
 			},
 			"retries": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `The number of retries to execute upon failure to proxy.`,
+				Validators: []validator.Int64{
+					int64validator.AtMost(32767),
+				},
 			},
 			"tags": schema.ListAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
 				Description: `An optional set of strings associated with the Service for grouping and filtering.`,
+			},
+			"tls_sans": schema.SingleNestedAttribute{
+				Computed: true,
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"dnsnames": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `A dnsName for TLS verification.`,
+					},
+					"uris": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `An URI for TLS verification.`,
+					},
+				},
+				Description: `Additional Subject Alternative Names that can be matched on Upstream server's TLS certificate (in addition to ` + "`" + `host` + "`" + `).`,
 			},
 			"tls_verify": schema.BoolAttribute{
 				Computed:    true,
@@ -160,6 +201,9 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Computed:    true,
 				Optional:    true,
 				Description: `Maximum depth of chain while verifying Upstream server's TLS certificate. If set to ` + "`" + `null` + "`" + `, then the Nginx default is respected.`,
+				Validators: []validator.Int64{
+					int64validator.AtMost(64),
+				},
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed:    true,
@@ -170,10 +214,19 @@ func (r *ServiceResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Optional:    true,
 				Description: `Helper field to set ` + "`" + `protocol` + "`" + `, ` + "`" + `host` + "`" + `, ` + "`" + `port` + "`" + ` and ` + "`" + `path` + "`" + ` using a URL. This field is write-only and is not returned in responses.`,
 			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
+			},
 			"write_timeout": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
 				Description: `The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.`,
+				Validators: []validator.Int64{
+					int64validator.Between(1, 2147483646),
+				},
 			},
 		},
 	}
@@ -217,7 +270,7 @@ func (r *ServiceResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	request, requestDiags := data.ToSharedService(ctx)
+	request, requestDiags := data.ToOperationsCreateServiceRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -491,5 +544,26 @@ func (r *ServiceResource) Delete(ctx context.Context, req resource.DeleteRequest
 }
 
 func (r *ServiceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "7fca84d6-7d37-4a74-a7b0-93e576089a41", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"7fca84d6-7d37-4a74-a7b0-93e576089a41"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

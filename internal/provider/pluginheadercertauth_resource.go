@@ -3,13 +3,16 @@
 package provider
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -34,18 +37,19 @@ type PluginHeaderCertAuthResource struct {
 
 // PluginHeaderCertAuthResourceModel describes the resource data model.
 type PluginHeaderCertAuthResourceModel struct {
-	Config       *tfTypes.HeaderCertAuthPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                         `tfsdk:"created_at"`
-	Enabled      types.Bool                          `tfsdk:"enabled"`
-	ID           types.String                        `tfsdk:"id"`
-	InstanceName types.String                        `tfsdk:"instance_name"`
-	Ordering     *tfTypes.Ordering                   `tfsdk:"ordering"`
-	Partials     []tfTypes.Partials                  `tfsdk:"partials"`
-	Protocols    []types.String                      `tfsdk:"protocols"`
-	Route        *tfTypes.ACLWithoutParentsConsumer  `tfsdk:"route"`
-	Service      *tfTypes.ACLWithoutParentsConsumer  `tfsdk:"service"`
-	Tags         []types.String                      `tfsdk:"tags"`
-	UpdatedAt    types.Int64                         `tfsdk:"updated_at"`
+	Config       tfTypes.HeaderCertAuthPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.AcePluginOrdering         `tfsdk:"ordering"`
+	Partials     []tfTypes.AcePluginPartials        `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.Set                       `tfsdk:"route"`
+	Service      *tfTypes.Set                       `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Workspace    types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginHeaderCertAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -57,8 +61,7 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 		MarkdownDescription: "PluginHeaderCertAuth Resource",
 		Attributes: map[string]schema.Attribute{
 			"config": schema.SingleNestedAttribute{
-				Computed: true,
-				Optional: true,
+				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"allow_partial_chain": schema.BoolAttribute{
 						Computed:    true,
@@ -79,8 +82,7 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						},
 					},
 					"ca_certificates": schema.ListAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						ElementType: types.StringType,
 						Description: `List of CA Certificates strings to use as Certificate Authorities (CA) when validating a client certificate. At least one is required but you can specify as many as needed. The value of this array is comprised of primary keys (` + "`" + `id` + "`" + `).`,
 					},
@@ -95,8 +97,7 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						Description: `The length of time in milliseconds between refreshes of the revocation check status cache.`,
 					},
 					"certificate_header_format": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `Format of the certificate header. Supported formats: ` + "`" + `base64_encoded` + "`" + `, ` + "`" + `url_encoded` + "`" + `. must be one of ["base64_encoded", "url_encoded"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
@@ -106,8 +107,7 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						},
 					},
 					"certificate_header_name": schema.StringAttribute{
-						Computed:    true,
-						Optional:    true,
+						Required:    true,
 						Description: `Name of the header that contains the certificate, received from the WAF or other L7 downstream proxy.`,
 					},
 					"consumer_by": schema.ListAttribute{
@@ -187,12 +187,17 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 				Description: `Whether the plugin is applied.`,
 			},
 			"id": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A string representing a UUID (universally unique identifier).`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtLeast(1),
+				},
 			},
 			"instance_name": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
+				Computed:    true,
+				Optional:    true,
+				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"ordering": schema.SingleNestedAttribute{
 				Computed: true,
@@ -231,12 +236,17 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 					},
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A string representing a UUID (universally unique identifier).`,
+							Validators: []validator.String{
+								stringvalidator.UTF8LengthAtLeast(1),
+							},
 						},
 						"name": schema.StringAttribute{
-							Computed: true,
-							Optional: true,
+							Computed:    true,
+							Optional:    true,
+							Description: `A unique string representing a UTF-8 encoded name.`,
 						},
 						"path": schema.StringAttribute{
 							Computed: true,
@@ -244,8 +254,9 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 						},
 					},
 				},
+				Description: `A list of partials to be used by the plugin.`,
 			},
-			"protocols": schema.ListAttribute{
+			"protocols": schema.SetAttribute{
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
@@ -283,6 +294,12 @@ func (r *PluginHeaderCertAuthResource) Schema(ctx context.Context, req resource.
 				Computed:    true,
 				Optional:    true,
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"workspace": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Default:     stringdefault.StaticString(`default`),
+				Description: `The name or UUID of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -326,7 +343,7 @@ func (r *PluginHeaderCertAuthResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	request, requestDiags := data.ToSharedHeaderCertAuthPlugin(ctx)
+	request, requestDiags := data.ToOperationsCreateHeadercertauthPluginRequest(ctx)
 	resp.Diagnostics.Append(requestDiags...)
 
 	if resp.Diagnostics.HasError() {
@@ -526,5 +543,26 @@ func (r *PluginHeaderCertAuthResource) Delete(ctx context.Context, req resource.
 }
 
 func (r *PluginHeaderCertAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
+	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
+	dec.DisallowUnknownFields()
+	var data struct {
+		ID        string `json:"id"`
+		Workspace string `json:"workspace"`
+	}
+
+	if err := dec.Decode(&data); err != nil {
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		return
+	}
+
+	if len(data.ID) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
+	if len(data.Workspace) == 0 {
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

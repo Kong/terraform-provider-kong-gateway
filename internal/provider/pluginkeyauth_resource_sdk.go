@@ -11,6 +11,187 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginKeyAuthResourceModel) RefreshFromSharedKeyAuthPlugin(ctx context.Context, resp *shared.KeyAuthPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.KeyAuthPluginConfig{}
+			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
+			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+			r.Config.IdentityRealms = []tfTypes.IdentityRealms{}
+
+			for _, identityRealmsItem := range resp.Config.IdentityRealms {
+				var identityRealms tfTypes.IdentityRealms
+
+				identityRealms.ID = types.StringPointerValue(identityRealmsItem.ID)
+				identityRealms.Region = types.StringPointerValue(identityRealmsItem.Region)
+				if identityRealmsItem.Scope != nil {
+					identityRealms.Scope = types.StringValue(string(*identityRealmsItem.Scope))
+				} else {
+					identityRealms.Scope = types.StringNull()
+				}
+
+				r.Config.IdentityRealms = append(r.Config.IdentityRealms, identityRealms)
+			}
+			r.Config.KeyInBody = types.BoolPointerValue(resp.Config.KeyInBody)
+			r.Config.KeyInHeader = types.BoolPointerValue(resp.Config.KeyInHeader)
+			r.Config.KeyInQuery = types.BoolPointerValue(resp.Config.KeyInQuery)
+			r.Config.KeyNames = make([]types.String, 0, len(resp.Config.KeyNames))
+			for _, v := range resp.Config.KeyNames {
+				r.Config.KeyNames = append(r.Config.KeyNames, types.StringValue(v))
+			}
+			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
+			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginKeyAuthResourceModel) ToOperationsCreateKeyauthPluginRequest(ctx context.Context) (*operations.CreateKeyauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	keyAuthPlugin, keyAuthPluginDiags := r.ToSharedKeyAuthPlugin(ctx)
+	diags.Append(keyAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateKeyauthPluginRequest{
+		Workspace:     workspace,
+		KeyAuthPlugin: *keyAuthPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKeyAuthResourceModel) ToOperationsDeleteKeyauthPluginRequest(ctx context.Context) (*operations.DeleteKeyauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteKeyauthPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKeyAuthResourceModel) ToOperationsGetKeyauthPluginRequest(ctx context.Context) (*operations.GetKeyauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetKeyauthPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginKeyAuthResourceModel) ToOperationsUpdateKeyauthPluginRequest(ctx context.Context) (*operations.UpdateKeyauthPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	keyAuthPlugin, keyAuthPluginDiags := r.ToSharedKeyAuthPlugin(ctx)
+	diags.Append(keyAuthPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateKeyauthPluginRequest{
+		PluginID:      pluginID,
+		Workspace:     workspace,
+		KeyAuthPlugin: *keyAuthPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) (*shared.KeyAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +246,38 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 			Before: before,
 		}
 	}
-	var partials []shared.KeyAuthPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.KeyAuthPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.KeyAuthPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.KeyAuthPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.KeyAuthPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -234,164 +415,4 @@ func (r *PluginKeyAuthResourceModel) ToSharedKeyAuthPlugin(ctx context.Context) 
 	}
 
 	return &out, diags
-}
-
-func (r *PluginKeyAuthResourceModel) ToOperationsUpdateKeyauthPluginRequest(ctx context.Context) (*operations.UpdateKeyauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	keyAuthPlugin, keyAuthPluginDiags := r.ToSharedKeyAuthPlugin(ctx)
-	diags.Append(keyAuthPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateKeyauthPluginRequest{
-		PluginID:      pluginID,
-		KeyAuthPlugin: *keyAuthPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKeyAuthResourceModel) ToOperationsGetKeyauthPluginRequest(ctx context.Context) (*operations.GetKeyauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetKeyauthPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKeyAuthResourceModel) ToOperationsDeleteKeyauthPluginRequest(ctx context.Context) (*operations.DeleteKeyauthPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteKeyauthPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginKeyAuthResourceModel) RefreshFromSharedKeyAuthPlugin(ctx context.Context, resp *shared.KeyAuthPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.KeyAuthPluginConfig{}
-			r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
-			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
-			r.Config.IdentityRealms = []tfTypes.IdentityRealms{}
-			if len(r.Config.IdentityRealms) > len(resp.Config.IdentityRealms) {
-				r.Config.IdentityRealms = r.Config.IdentityRealms[:len(resp.Config.IdentityRealms)]
-			}
-			for identityRealmsCount, identityRealmsItem := range resp.Config.IdentityRealms {
-				var identityRealms tfTypes.IdentityRealms
-				identityRealms.ID = types.StringPointerValue(identityRealmsItem.ID)
-				identityRealms.Region = types.StringPointerValue(identityRealmsItem.Region)
-				if identityRealmsItem.Scope != nil {
-					identityRealms.Scope = types.StringValue(string(*identityRealmsItem.Scope))
-				} else {
-					identityRealms.Scope = types.StringNull()
-				}
-				if identityRealmsCount+1 > len(r.Config.IdentityRealms) {
-					r.Config.IdentityRealms = append(r.Config.IdentityRealms, identityRealms)
-				} else {
-					r.Config.IdentityRealms[identityRealmsCount].ID = identityRealms.ID
-					r.Config.IdentityRealms[identityRealmsCount].Region = identityRealms.Region
-					r.Config.IdentityRealms[identityRealmsCount].Scope = identityRealms.Scope
-				}
-			}
-			r.Config.KeyInBody = types.BoolPointerValue(resp.Config.KeyInBody)
-			r.Config.KeyInHeader = types.BoolPointerValue(resp.Config.KeyInHeader)
-			r.Config.KeyInQuery = types.BoolPointerValue(resp.Config.KeyInQuery)
-			r.Config.KeyNames = make([]types.String, 0, len(resp.Config.KeyNames))
-			for _, v := range resp.Config.KeyNames {
-				r.Config.KeyNames = append(r.Config.KeyNames, types.StringValue(v))
-			}
-			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
-			r.Config.RunOnPreflight = types.BoolPointerValue(resp.Config.RunOnPreflight)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

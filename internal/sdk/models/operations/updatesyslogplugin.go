@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateSyslogPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID     string              `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	SyslogPlugin shared.SyslogPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateSyslogPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateSyslogPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateSyslogPluginRequest) GetSyslogPlugin() shared.SyslogPlugin {
-	if o == nil {
+func (u *UpdateSyslogPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SyslogPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateSyslogPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateSyslogPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateSyslogPluginRequest) GetSyslogPlugin() shared.SyslogPlugin {
+	if u == nil {
 		return shared.SyslogPlugin{}
 	}
-	return o.SyslogPlugin
+	return u.SyslogPlugin
 }
 
 type UpdateSyslogPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateSyslogPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateSyslogPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateSyslogPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateSyslogPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateSyslogPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateSyslogPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateSyslogPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateSyslogPluginResponse) GetSyslogPlugin() *shared.SyslogPlugin {
-	if o == nil {
+func (u *UpdateSyslogPluginResponse) GetSyslogPlugin() *shared.SyslogPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.SyslogPlugin
+	return u.SyslogPlugin
 }
 
-func (o *UpdateSyslogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateSyslogPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

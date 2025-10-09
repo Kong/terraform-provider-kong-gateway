@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type CreateBasicAuthWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new Basic-auth credential for creation
 	BasicAuthWithoutParents shared.BasicAuthWithoutParents `request:"mediaType=application/json"`
 }
 
-func (o *CreateBasicAuthWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (c CreateBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
 }
 
-func (o *CreateBasicAuthWithConsumerRequest) GetBasicAuthWithoutParents() shared.BasicAuthWithoutParents {
-	if o == nil {
+func (c *CreateBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "BasicAuthWithoutParents"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateBasicAuthWithConsumerRequest) GetConsumerID() string {
+	if c == nil {
+		return ""
+	}
+	return c.ConsumerID
+}
+
+func (c *CreateBasicAuthWithConsumerRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateBasicAuthWithConsumerRequest) GetBasicAuthWithoutParents() shared.BasicAuthWithoutParents {
+	if c == nil {
 		return shared.BasicAuthWithoutParents{}
 	}
-	return o.BasicAuthWithoutParents
+	return c.BasicAuthWithoutParents
 }
 
 type CreateBasicAuthWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type CreateBasicAuthWithConsumerResponse struct {
 	BasicAuth *shared.BasicAuth
 }
 
-func (o *CreateBasicAuthWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateBasicAuthWithConsumerResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateBasicAuthWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateBasicAuthWithConsumerResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateBasicAuthWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateBasicAuthWithConsumerResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateBasicAuthWithConsumerResponse) GetBasicAuth() *shared.BasicAuth {
-	if o == nil {
+func (c *CreateBasicAuthWithConsumerResponse) GetBasicAuth() *shared.BasicAuth {
+	if c == nil {
 		return nil
 	}
-	return o.BasicAuth
+	return c.BasicAuth
 }

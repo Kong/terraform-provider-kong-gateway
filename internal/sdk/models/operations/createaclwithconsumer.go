@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,22 +11,42 @@ import (
 type CreateACLWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new ACL for creation
 	ACLWithoutParents shared.ACLWithoutParents `request:"mediaType=application/json"`
 }
 
-func (o *CreateACLWithConsumerRequest) GetConsumerID() string {
-	if o == nil {
-		return ""
-	}
-	return o.ConsumerID
+func (c CreateACLWithConsumerRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
 }
 
-func (o *CreateACLWithConsumerRequest) GetACLWithoutParents() shared.ACLWithoutParents {
-	if o == nil {
+func (c *CreateACLWithConsumerRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "ACLWithoutParents"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateACLWithConsumerRequest) GetConsumerID() string {
+	if c == nil {
+		return ""
+	}
+	return c.ConsumerID
+}
+
+func (c *CreateACLWithConsumerRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateACLWithConsumerRequest) GetACLWithoutParents() shared.ACLWithoutParents {
+	if c == nil {
 		return shared.ACLWithoutParents{}
 	}
-	return o.ACLWithoutParents
+	return c.ACLWithoutParents
 }
 
 type CreateACLWithConsumerResponse struct {
@@ -39,30 +60,30 @@ type CreateACLWithConsumerResponse struct {
 	ACL *shared.ACL
 }
 
-func (o *CreateACLWithConsumerResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateACLWithConsumerResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateACLWithConsumerResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateACLWithConsumerResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateACLWithConsumerResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateACLWithConsumerResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateACLWithConsumerResponse) GetACL() *shared.ACL {
-	if o == nil {
+func (c *CreateACLWithConsumerResponse) GetACL() *shared.ACL {
+	if c == nil {
 		return nil
 	}
-	return o.ACL
+	return c.ACL
 }

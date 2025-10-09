@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateKeyauthPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	KeyAuthPlugin shared.KeyAuthPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateKeyauthPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKeyauthPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "KeyAuthPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateKeyauthPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateKeyauthPluginRequest) GetKeyAuthPlugin() shared.KeyAuthPlugin {
+	if c == nil {
+		return shared.KeyAuthPlugin{}
+	}
+	return c.KeyAuthPlugin
+}
 
 type CreateKeyauthPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateKeyauthPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateKeyauthPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateKeyauthPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateKeyauthPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateKeyauthPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateKeyauthPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateKeyauthPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateKeyauthPluginResponse) GetKeyAuthPlugin() *shared.KeyAuthPlugin {
-	if o == nil {
+func (c *CreateKeyauthPluginResponse) GetKeyAuthPlugin() *shared.KeyAuthPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.KeyAuthPlugin
+	return c.KeyAuthPlugin
 }
 
-func (o *CreateKeyauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateKeyauthPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

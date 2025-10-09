@@ -11,6 +11,196 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
 
+func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProtectionPlugin(ctx context.Context, resp *shared.XMLThreatProtectionPlugin) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		if resp.Config == nil {
+			r.Config = nil
+		} else {
+			r.Config = &tfTypes.XMLThreatProtectionPluginConfig{}
+			r.Config.AllowDtd = types.BoolPointerValue(resp.Config.AllowDtd)
+			r.Config.AllowedContentTypes = make([]types.String, 0, len(resp.Config.AllowedContentTypes))
+			for _, v := range resp.Config.AllowedContentTypes {
+				r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
+			}
+			r.Config.Attribute = types.Int64PointerValue(resp.Config.Attribute)
+			r.Config.BlaMaxAmplification = types.Float64PointerValue(resp.Config.BlaMaxAmplification)
+			r.Config.BlaThreshold = types.Int64PointerValue(resp.Config.BlaThreshold)
+			r.Config.Buffer = types.Int64PointerValue(resp.Config.Buffer)
+			r.Config.CheckedContentTypes = make([]types.String, 0, len(resp.Config.CheckedContentTypes))
+			for _, v := range resp.Config.CheckedContentTypes {
+				r.Config.CheckedContentTypes = append(r.Config.CheckedContentTypes, types.StringValue(v))
+			}
+			r.Config.Comment = types.Int64PointerValue(resp.Config.Comment)
+			r.Config.Document = types.Int64PointerValue(resp.Config.Document)
+			r.Config.Entity = types.Int64PointerValue(resp.Config.Entity)
+			r.Config.Entityname = types.Int64PointerValue(resp.Config.Entityname)
+			r.Config.Entityproperty = types.Int64PointerValue(resp.Config.Entityproperty)
+			r.Config.Localname = types.Int64PointerValue(resp.Config.Localname)
+			r.Config.MaxAttributes = types.Int64PointerValue(resp.Config.MaxAttributes)
+			r.Config.MaxChildren = types.Int64PointerValue(resp.Config.MaxChildren)
+			r.Config.MaxDepth = types.Int64PointerValue(resp.Config.MaxDepth)
+			r.Config.MaxNamespaces = types.Int64PointerValue(resp.Config.MaxNamespaces)
+			r.Config.NamespaceAware = types.BoolPointerValue(resp.Config.NamespaceAware)
+			r.Config.Namespaceuri = types.Int64PointerValue(resp.Config.Namespaceuri)
+			r.Config.Pidata = types.Int64PointerValue(resp.Config.Pidata)
+			r.Config.Pitarget = types.Int64PointerValue(resp.Config.Pitarget)
+			r.Config.Prefix = types.Int64PointerValue(resp.Config.Prefix)
+			r.Config.Text = types.Int64PointerValue(resp.Config.Text)
+		}
+		if resp.Consumer == nil {
+			r.Consumer = nil
+		} else {
+			r.Consumer = &tfTypes.Set{}
+			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
+		}
+		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
+		r.Enabled = types.BoolPointerValue(resp.Enabled)
+		r.ID = types.StringPointerValue(resp.ID)
+		r.InstanceName = types.StringPointerValue(resp.InstanceName)
+		if resp.Ordering == nil {
+			r.Ordering = nil
+		} else {
+			r.Ordering = &tfTypes.AcePluginOrdering{}
+			if resp.Ordering.After == nil {
+				r.Ordering.After = nil
+			} else {
+				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
+				for _, v := range resp.Ordering.After.Access {
+					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
+				}
+			}
+			if resp.Ordering.Before == nil {
+				r.Ordering.Before = nil
+			} else {
+				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
+				for _, v := range resp.Ordering.Before.Access {
+					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
+				}
+			}
+		}
+		r.Partials = []tfTypes.AcePluginPartials{}
+
+		for _, partialsItem := range resp.Partials {
+			var partials tfTypes.AcePluginPartials
+
+			partials.ID = types.StringPointerValue(partialsItem.ID)
+			partials.Name = types.StringPointerValue(partialsItem.Name)
+			partials.Path = types.StringPointerValue(partialsItem.Path)
+
+			r.Partials = append(r.Partials, partials)
+		}
+		r.Protocols = make([]types.String, 0, len(resp.Protocols))
+		for _, v := range resp.Protocols {
+			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
+		}
+		if resp.Route == nil {
+			r.Route = nil
+		} else {
+			r.Route = &tfTypes.Set{}
+			r.Route.ID = types.StringPointerValue(resp.Route.ID)
+		}
+		if resp.Service == nil {
+			r.Service = nil
+		} else {
+			r.Service = &tfTypes.Set{}
+			r.Service.ID = types.StringPointerValue(resp.Service.ID)
+		}
+		if resp.Tags != nil {
+			r.Tags = make([]types.String, 0, len(resp.Tags))
+			for _, v := range resp.Tags {
+				r.Tags = append(r.Tags, types.StringValue(v))
+			}
+		}
+		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsCreateXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.CreateXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	xmlThreatProtectionPlugin, xmlThreatProtectionPluginDiags := r.ToSharedXMLThreatProtectionPlugin(ctx)
+	diags.Append(xmlThreatProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.CreateXmlthreatprotectionPluginRequest{
+		Workspace:                 workspace,
+		XMLThreatProtectionPlugin: *xmlThreatProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsDeleteXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.DeleteXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.DeleteXmlthreatprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsGetXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.GetXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	out := operations.GetXmlthreatprotectionPluginRequest{
+		PluginID:  pluginID,
+		Workspace: workspace,
+	}
+
+	return &out, diags
+}
+
+func (r *PluginXMLThreatProtectionResourceModel) ToOperationsUpdateXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.UpdateXmlthreatprotectionPluginRequest, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var pluginID string
+	pluginID = r.ID.ValueString()
+
+	var workspace string
+	workspace = r.Workspace.ValueString()
+
+	xmlThreatProtectionPlugin, xmlThreatProtectionPluginDiags := r.ToSharedXMLThreatProtectionPlugin(ctx)
+	diags.Append(xmlThreatProtectionPluginDiags...)
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	out := operations.UpdateXmlthreatprotectionPluginRequest{
+		PluginID:                  pluginID,
+		Workspace:                 workspace,
+		XMLThreatProtectionPlugin: *xmlThreatProtectionPlugin,
+	}
+
+	return &out, diags
+}
+
 func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlugin(ctx context.Context) (*shared.XMLThreatProtectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -65,38 +255,38 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 			Before: before,
 		}
 	}
-	var partials []shared.XMLThreatProtectionPluginPartials
-	if r.Partials != nil {
-		partials = make([]shared.XMLThreatProtectionPluginPartials, 0, len(r.Partials))
-		for _, partialsItem := range r.Partials {
-			id1 := new(string)
-			if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-				*id1 = partialsItem.ID.ValueString()
-			} else {
-				id1 = nil
-			}
-			name := new(string)
-			if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-				*name = partialsItem.Name.ValueString()
-			} else {
-				name = nil
-			}
-			path := new(string)
-			if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-				*path = partialsItem.Path.ValueString()
-			} else {
-				path = nil
-			}
-			partials = append(partials, shared.XMLThreatProtectionPluginPartials{
-				ID:   id1,
-				Name: name,
-				Path: path,
-			})
+	partials := make([]shared.XMLThreatProtectionPluginPartials, 0, len(r.Partials))
+	for _, partialsItem := range r.Partials {
+		id1 := new(string)
+		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
+			*id1 = partialsItem.ID.ValueString()
+		} else {
+			id1 = nil
 		}
+		name := new(string)
+		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
+			*name = partialsItem.Name.ValueString()
+		} else {
+			name = nil
+		}
+		path := new(string)
+		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
+			*path = partialsItem.Path.ValueString()
+		} else {
+			path = nil
+		}
+		partials = append(partials, shared.XMLThreatProtectionPluginPartials{
+			ID:   id1,
+			Name: name,
+			Path: path,
+		})
 	}
-	tags := make([]string, 0, len(r.Tags))
-	for _, tagsItem := range r.Tags {
-		tags = append(tags, tagsItem.ValueString())
+	var tags []string
+	if r.Tags != nil {
+		tags = make([]string, 0, len(r.Tags))
+		for _, tagsItem := range r.Tags {
+			tags = append(tags, tagsItem.ValueString())
+		}
 	}
 	updatedAt := new(int64)
 	if !r.UpdatedAt.IsUnknown() && !r.UpdatedAt.IsNull() {
@@ -323,167 +513,4 @@ func (r *PluginXMLThreatProtectionResourceModel) ToSharedXMLThreatProtectionPlug
 	}
 
 	return &out, diags
-}
-
-func (r *PluginXMLThreatProtectionResourceModel) ToOperationsUpdateXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.UpdateXmlthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	xmlThreatProtectionPlugin, xmlThreatProtectionPluginDiags := r.ToSharedXMLThreatProtectionPlugin(ctx)
-	diags.Append(xmlThreatProtectionPluginDiags...)
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	out := operations.UpdateXmlthreatprotectionPluginRequest{
-		PluginID:                  pluginID,
-		XMLThreatProtectionPlugin: *xmlThreatProtectionPlugin,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginXMLThreatProtectionResourceModel) ToOperationsGetXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.GetXmlthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.GetXmlthreatprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginXMLThreatProtectionResourceModel) ToOperationsDeleteXmlthreatprotectionPluginRequest(ctx context.Context) (*operations.DeleteXmlthreatprotectionPluginRequest, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	var pluginID string
-	pluginID = r.ID.ValueString()
-
-	out := operations.DeleteXmlthreatprotectionPluginRequest{
-		PluginID: pluginID,
-	}
-
-	return &out, diags
-}
-
-func (r *PluginXMLThreatProtectionResourceModel) RefreshFromSharedXMLThreatProtectionPlugin(ctx context.Context, resp *shared.XMLThreatProtectionPlugin) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
-		} else {
-			r.Config = &tfTypes.XMLThreatProtectionPluginConfig{}
-			r.Config.AllowDtd = types.BoolPointerValue(resp.Config.AllowDtd)
-			r.Config.AllowedContentTypes = make([]types.String, 0, len(resp.Config.AllowedContentTypes))
-			for _, v := range resp.Config.AllowedContentTypes {
-				r.Config.AllowedContentTypes = append(r.Config.AllowedContentTypes, types.StringValue(v))
-			}
-			r.Config.Attribute = types.Int64PointerValue(resp.Config.Attribute)
-			r.Config.BlaMaxAmplification = types.Float64PointerValue(resp.Config.BlaMaxAmplification)
-			r.Config.BlaThreshold = types.Int64PointerValue(resp.Config.BlaThreshold)
-			r.Config.Buffer = types.Int64PointerValue(resp.Config.Buffer)
-			r.Config.CheckedContentTypes = make([]types.String, 0, len(resp.Config.CheckedContentTypes))
-			for _, v := range resp.Config.CheckedContentTypes {
-				r.Config.CheckedContentTypes = append(r.Config.CheckedContentTypes, types.StringValue(v))
-			}
-			r.Config.Comment = types.Int64PointerValue(resp.Config.Comment)
-			r.Config.Document = types.Int64PointerValue(resp.Config.Document)
-			r.Config.Entity = types.Int64PointerValue(resp.Config.Entity)
-			r.Config.Entityname = types.Int64PointerValue(resp.Config.Entityname)
-			r.Config.Entityproperty = types.Int64PointerValue(resp.Config.Entityproperty)
-			r.Config.Localname = types.Int64PointerValue(resp.Config.Localname)
-			r.Config.MaxAttributes = types.Int64PointerValue(resp.Config.MaxAttributes)
-			r.Config.MaxChildren = types.Int64PointerValue(resp.Config.MaxChildren)
-			r.Config.MaxDepth = types.Int64PointerValue(resp.Config.MaxDepth)
-			r.Config.MaxNamespaces = types.Int64PointerValue(resp.Config.MaxNamespaces)
-			r.Config.NamespaceAware = types.BoolPointerValue(resp.Config.NamespaceAware)
-			r.Config.Namespaceuri = types.Int64PointerValue(resp.Config.Namespaceuri)
-			r.Config.Pidata = types.Int64PointerValue(resp.Config.Pidata)
-			r.Config.Pitarget = types.Int64PointerValue(resp.Config.Pitarget)
-			r.Config.Prefix = types.Int64PointerValue(resp.Config.Prefix)
-			r.Config.Text = types.Int64PointerValue(resp.Config.Text)
-		}
-		if resp.Consumer == nil {
-			r.Consumer = nil
-		} else {
-			r.Consumer = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Consumer.ID = types.StringPointerValue(resp.Consumer.ID)
-		}
-		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
-		r.Enabled = types.BoolPointerValue(resp.Enabled)
-		r.ID = types.StringPointerValue(resp.ID)
-		r.InstanceName = types.StringPointerValue(resp.InstanceName)
-		if resp.Ordering == nil {
-			r.Ordering = nil
-		} else {
-			r.Ordering = &tfTypes.Ordering{}
-			if resp.Ordering.After == nil {
-				r.Ordering.After = nil
-			} else {
-				r.Ordering.After = &tfTypes.After{}
-				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
-				for _, v := range resp.Ordering.After.Access {
-					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
-				}
-			}
-			if resp.Ordering.Before == nil {
-				r.Ordering.Before = nil
-			} else {
-				r.Ordering.Before = &tfTypes.After{}
-				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
-				for _, v := range resp.Ordering.Before.Access {
-					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
-				}
-			}
-		}
-		if resp.Partials != nil {
-			r.Partials = []tfTypes.Partials{}
-			if len(r.Partials) > len(resp.Partials) {
-				r.Partials = r.Partials[:len(resp.Partials)]
-			}
-			for partialsCount, partialsItem := range resp.Partials {
-				var partials tfTypes.Partials
-				partials.ID = types.StringPointerValue(partialsItem.ID)
-				partials.Name = types.StringPointerValue(partialsItem.Name)
-				partials.Path = types.StringPointerValue(partialsItem.Path)
-				if partialsCount+1 > len(r.Partials) {
-					r.Partials = append(r.Partials, partials)
-				} else {
-					r.Partials[partialsCount].ID = partials.ID
-					r.Partials[partialsCount].Name = partials.Name
-					r.Partials[partialsCount].Path = partials.Path
-				}
-			}
-		}
-		r.Protocols = make([]types.String, 0, len(resp.Protocols))
-		for _, v := range resp.Protocols {
-			r.Protocols = append(r.Protocols, types.StringValue(string(v)))
-		}
-		if resp.Route == nil {
-			r.Route = nil
-		} else {
-			r.Route = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Route.ID = types.StringPointerValue(resp.Route.ID)
-		}
-		if resp.Service == nil {
-			r.Service = nil
-		} else {
-			r.Service = &tfTypes.ACLWithoutParentsConsumer{}
-			r.Service.ID = types.StringPointerValue(resp.Service.ID)
-		}
-		r.Tags = make([]types.String, 0, len(resp.Tags))
-		for _, v := range resp.Tags {
-			r.Tags = append(r.Tags, types.StringValue(v))
-		}
-		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
-	}
-
-	return diags
 }

@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,13 +11,33 @@ import (
 type GetKeySetRequest struct {
 	// ID or name of the KeySet to lookup
 	KeySetIDOrName string `pathParam:"style=simple,explode=false,name=KeySetIdOrName"`
+	// The name or UUID of the workspace
+	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
-func (o *GetKeySetRequest) GetKeySetIDOrName() string {
-	if o == nil {
+func (g GetKeySetRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetKeySetRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"KeySetIdOrName", "workspace"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GetKeySetRequest) GetKeySetIDOrName() string {
+	if g == nil {
 		return ""
 	}
-	return o.KeySetIDOrName
+	return g.KeySetIDOrName
+}
+
+func (g *GetKeySetRequest) GetWorkspace() string {
+	if g == nil {
+		return ""
+	}
+	return g.Workspace
 }
 
 type GetKeySetResponse struct {
@@ -32,37 +53,37 @@ type GetKeySetResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *GetKeySetResponse) GetContentType() string {
-	if o == nil {
+func (g *GetKeySetResponse) GetContentType() string {
+	if g == nil {
 		return ""
 	}
-	return o.ContentType
+	return g.ContentType
 }
 
-func (o *GetKeySetResponse) GetStatusCode() int {
-	if o == nil {
+func (g *GetKeySetResponse) GetStatusCode() int {
+	if g == nil {
 		return 0
 	}
-	return o.StatusCode
+	return g.StatusCode
 }
 
-func (o *GetKeySetResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (g *GetKeySetResponse) GetRawResponse() *http.Response {
+	if g == nil {
 		return nil
 	}
-	return o.RawResponse
+	return g.RawResponse
 }
 
-func (o *GetKeySetResponse) GetKeySet() *shared.KeySet {
-	if o == nil {
+func (g *GetKeySetResponse) GetKeySet() *shared.KeySet {
+	if g == nil {
 		return nil
 	}
-	return o.KeySet
+	return g.KeySet
 }
 
-func (o *GetKeySetResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (g *GetKeySetResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if g == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return g.GatewayUnauthorizedError
 }

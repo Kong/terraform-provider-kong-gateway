@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRatelimitingPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	RateLimitingPlugin shared.RateLimitingPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateRatelimitingPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRatelimitingPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RateLimitingPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRatelimitingPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRatelimitingPluginRequest) GetRateLimitingPlugin() shared.RateLimitingPlugin {
+	if c == nil {
+		return shared.RateLimitingPlugin{}
+	}
+	return c.RateLimitingPlugin
+}
 
 type CreateRatelimitingPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateRatelimitingPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRatelimitingPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRatelimitingPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRatelimitingPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRatelimitingPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRatelimitingPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRatelimitingPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRatelimitingPluginResponse) GetRateLimitingPlugin() *shared.RateLimitingPlugin {
-	if o == nil {
+func (c *CreateRatelimitingPluginResponse) GetRateLimitingPlugin() *shared.RateLimitingPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.RateLimitingPlugin
+	return c.RateLimitingPlugin
 }
 
-func (o *CreateRatelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRatelimitingPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

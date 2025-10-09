@@ -3,28 +3,49 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
 
 type UpdateAiraginjectorPluginRequest struct {
 	// ID of the Plugin to lookup
-	PluginID            string                     `pathParam:"style=simple,explode=false,name=PluginId"`
+	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
+	// The name or UUID of the workspace
+	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiRagInjectorPlugin shared.AiRagInjectorPlugin `request:"mediaType=application/json"`
 }
 
-func (o *UpdateAiraginjectorPluginRequest) GetPluginID() string {
-	if o == nil {
-		return ""
-	}
-	return o.PluginID
+func (u UpdateAiraginjectorPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
 }
 
-func (o *UpdateAiraginjectorPluginRequest) GetAiRagInjectorPlugin() shared.AiRagInjectorPlugin {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiRagInjectorPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpdateAiraginjectorPluginRequest) GetPluginID() string {
+	if u == nil {
+		return ""
+	}
+	return u.PluginID
+}
+
+func (u *UpdateAiraginjectorPluginRequest) GetWorkspace() string {
+	if u == nil {
+		return ""
+	}
+	return u.Workspace
+}
+
+func (u *UpdateAiraginjectorPluginRequest) GetAiRagInjectorPlugin() shared.AiRagInjectorPlugin {
+	if u == nil {
 		return shared.AiRagInjectorPlugin{}
 	}
-	return o.AiRagInjectorPlugin
+	return u.AiRagInjectorPlugin
 }
 
 type UpdateAiraginjectorPluginResponse struct {
@@ -40,37 +61,37 @@ type UpdateAiraginjectorPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *UpdateAiraginjectorPluginResponse) GetContentType() string {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginResponse) GetContentType() string {
+	if u == nil {
 		return ""
 	}
-	return o.ContentType
+	return u.ContentType
 }
 
-func (o *UpdateAiraginjectorPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginResponse) GetStatusCode() int {
+	if u == nil {
 		return 0
 	}
-	return o.StatusCode
+	return u.StatusCode
 }
 
-func (o *UpdateAiraginjectorPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginResponse) GetRawResponse() *http.Response {
+	if u == nil {
 		return nil
 	}
-	return o.RawResponse
+	return u.RawResponse
 }
 
-func (o *UpdateAiraginjectorPluginResponse) GetAiRagInjectorPlugin() *shared.AiRagInjectorPlugin {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginResponse) GetAiRagInjectorPlugin() *shared.AiRagInjectorPlugin {
+	if u == nil {
 		return nil
 	}
-	return o.AiRagInjectorPlugin
+	return u.AiRagInjectorPlugin
 }
 
-func (o *UpdateAiraginjectorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (u *UpdateAiraginjectorPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if u == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return u.GatewayUnauthorizedError
 }

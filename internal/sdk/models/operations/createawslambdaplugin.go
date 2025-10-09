@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateAwslambdaPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace       string                 `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	AwsLambdaPlugin shared.AwsLambdaPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateAwslambdaPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAwslambdaPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AwsLambdaPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateAwslambdaPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateAwslambdaPluginRequest) GetAwsLambdaPlugin() shared.AwsLambdaPlugin {
+	if c == nil {
+		return shared.AwsLambdaPlugin{}
+	}
+	return c.AwsLambdaPlugin
+}
 
 type CreateAwslambdaPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateAwslambdaPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateAwslambdaPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateAwslambdaPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateAwslambdaPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateAwslambdaPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateAwslambdaPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateAwslambdaPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateAwslambdaPluginResponse) GetAwsLambdaPlugin() *shared.AwsLambdaPlugin {
-	if o == nil {
+func (c *CreateAwslambdaPluginResponse) GetAwsLambdaPlugin() *shared.AwsLambdaPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.AwsLambdaPlugin
+	return c.AwsLambdaPlugin
 }
 
-func (o *CreateAwslambdaPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateAwslambdaPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

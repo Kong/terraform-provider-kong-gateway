@@ -12,22 +12,22 @@ type UDPLogPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *UDPLogPluginAfter) GetAccess() []string {
-	if o == nil {
+func (u *UDPLogPluginAfter) GetAccess() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Access
+	return u.Access
 }
 
 type UDPLogPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
 
-func (o *UDPLogPluginBefore) GetAccess() []string {
-	if o == nil {
+func (u *UDPLogPluginBefore) GetAccess() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Access
+	return u.Access
 }
 
 type UDPLogPluginOrdering struct {
@@ -35,84 +35,86 @@ type UDPLogPluginOrdering struct {
 	Before *UDPLogPluginBefore `json:"before,omitempty"`
 }
 
-func (o *UDPLogPluginOrdering) GetAfter() *UDPLogPluginAfter {
-	if o == nil {
+func (u *UDPLogPluginOrdering) GetAfter() *UDPLogPluginAfter {
+	if u == nil {
 		return nil
 	}
-	return o.After
+	return u.After
 }
 
-func (o *UDPLogPluginOrdering) GetBefore() *UDPLogPluginBefore {
-	if o == nil {
+func (u *UDPLogPluginOrdering) GetBefore() *UDPLogPluginBefore {
+	if u == nil {
 		return nil
 	}
-	return o.Before
+	return u.Before
 }
 
 type UDPLogPluginPartials struct {
-	ID   *string `json:"id,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
 }
 
-func (o *UDPLogPluginPartials) GetID() *string {
-	if o == nil {
+func (u *UDPLogPluginPartials) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
-func (o *UDPLogPluginPartials) GetName() *string {
-	if o == nil {
+func (u *UDPLogPluginPartials) GetName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Name
+	return u.Name
 }
 
-func (o *UDPLogPluginPartials) GetPath() *string {
-	if o == nil {
+func (u *UDPLogPluginPartials) GetPath() *string {
+	if u == nil {
 		return nil
 	}
-	return o.Path
+	return u.Path
 }
 
 type UDPLogPluginConfig struct {
 	// Lua code as a key-value map
-	CustomFieldsByLua map[string]any `json:"custom_fields_by_lua,omitempty"`
+	CustomFieldsByLua map[string]string `json:"custom_fields_by_lua,omitempty"`
 	// A string representing a host name, such as example.com.
-	Host *string `json:"host,omitempty"`
+	Host string `json:"host"`
 	// An integer representing a port number between 0 and 65535, inclusive.
-	Port *int64 `json:"port,omitempty"`
+	Port int64 `json:"port"`
 	// An optional timeout in milliseconds when sending data to the upstream server.
 	Timeout *float64 `json:"timeout,omitempty"`
 }
 
-func (o *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]any {
-	if o == nil {
+func (u *UDPLogPluginConfig) GetCustomFieldsByLua() map[string]string {
+	if u == nil {
 		return nil
 	}
-	return o.CustomFieldsByLua
+	return u.CustomFieldsByLua
 }
 
-func (o *UDPLogPluginConfig) GetHost() *string {
-	if o == nil {
-		return nil
+func (u *UDPLogPluginConfig) GetHost() string {
+	if u == nil {
+		return ""
 	}
-	return o.Host
+	return u.Host
 }
 
-func (o *UDPLogPluginConfig) GetPort() *int64 {
-	if o == nil {
-		return nil
+func (u *UDPLogPluginConfig) GetPort() int64 {
+	if u == nil {
+		return 0
 	}
-	return o.Port
+	return u.Port
 }
 
-func (o *UDPLogPluginConfig) GetTimeout() *float64 {
-	if o == nil {
+func (u *UDPLogPluginConfig) GetTimeout() *float64 {
+	if u == nil {
 		return nil
 	}
-	return o.Timeout
+	return u.Timeout
 }
 
 // UDPLogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
@@ -120,11 +122,11 @@ type UDPLogPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UDPLogPluginConsumer) GetID() *string {
-	if o == nil {
+func (u *UDPLogPluginConsumer) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UDPLogPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
@@ -183,11 +185,11 @@ type UDPLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UDPLogPluginRoute) GetID() *string {
-	if o == nil {
+func (u *UDPLogPluginRoute) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UDPLogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -195,11 +197,11 @@ type UDPLogPluginService struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (o *UDPLogPluginService) GetID() *string {
-	if o == nil {
+func (u *UDPLogPluginService) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
 // UDPLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
@@ -207,17 +209,20 @@ type UDPLogPlugin struct {
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
-	Enabled      *bool                  `json:"enabled,omitempty"`
-	ID           *string                `json:"id,omitempty"`
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"udp-log" json:"name"`
-	Ordering     *UDPLogPluginOrdering  `json:"ordering,omitempty"`
-	Partials     []UDPLogPluginPartials `json:"partials,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	InstanceName *string               `json:"instance_name,omitempty"`
+	name         string                `const:"udp-log" json:"name"`
+	Ordering     *UDPLogPluginOrdering `json:"ordering,omitempty"`
+	// A list of partials to be used by the plugin.
+	Partials []UDPLogPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64              `json:"updated_at,omitempty"`
-	Config    *UDPLogPluginConfig `json:"config,omitempty"`
+	UpdatedAt *int64             `json:"updated_at,omitempty"`
+	Config    UDPLogPluginConfig `json:"config"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *UDPLogPluginConsumer `json:"consumer,omitempty"`
 	// A set of strings representing protocols.
@@ -233,103 +238,103 @@ func (u UDPLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UDPLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, false); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (o *UDPLogPlugin) GetCreatedAt() *int64 {
-	if o == nil {
+func (u *UDPLogPlugin) GetCreatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.CreatedAt
+	return u.CreatedAt
 }
 
-func (o *UDPLogPlugin) GetEnabled() *bool {
-	if o == nil {
+func (u *UDPLogPlugin) GetEnabled() *bool {
+	if u == nil {
 		return nil
 	}
-	return o.Enabled
+	return u.Enabled
 }
 
-func (o *UDPLogPlugin) GetID() *string {
-	if o == nil {
+func (u *UDPLogPlugin) GetID() *string {
+	if u == nil {
 		return nil
 	}
-	return o.ID
+	return u.ID
 }
 
-func (o *UDPLogPlugin) GetInstanceName() *string {
-	if o == nil {
+func (u *UDPLogPlugin) GetInstanceName() *string {
+	if u == nil {
 		return nil
 	}
-	return o.InstanceName
+	return u.InstanceName
 }
 
-func (o *UDPLogPlugin) GetName() string {
+func (u *UDPLogPlugin) GetName() string {
 	return "udp-log"
 }
 
-func (o *UDPLogPlugin) GetOrdering() *UDPLogPluginOrdering {
-	if o == nil {
+func (u *UDPLogPlugin) GetOrdering() *UDPLogPluginOrdering {
+	if u == nil {
 		return nil
 	}
-	return o.Ordering
+	return u.Ordering
 }
 
-func (o *UDPLogPlugin) GetPartials() []UDPLogPluginPartials {
-	if o == nil {
+func (u *UDPLogPlugin) GetPartials() []UDPLogPluginPartials {
+	if u == nil {
 		return nil
 	}
-	return o.Partials
+	return u.Partials
 }
 
-func (o *UDPLogPlugin) GetTags() []string {
-	if o == nil {
+func (u *UDPLogPlugin) GetTags() []string {
+	if u == nil {
 		return nil
 	}
-	return o.Tags
+	return u.Tags
 }
 
-func (o *UDPLogPlugin) GetUpdatedAt() *int64 {
-	if o == nil {
+func (u *UDPLogPlugin) GetUpdatedAt() *int64 {
+	if u == nil {
 		return nil
 	}
-	return o.UpdatedAt
+	return u.UpdatedAt
 }
 
-func (o *UDPLogPlugin) GetConfig() *UDPLogPluginConfig {
-	if o == nil {
-		return nil
+func (u *UDPLogPlugin) GetConfig() UDPLogPluginConfig {
+	if u == nil {
+		return UDPLogPluginConfig{}
 	}
-	return o.Config
+	return u.Config
 }
 
-func (o *UDPLogPlugin) GetConsumer() *UDPLogPluginConsumer {
-	if o == nil {
+func (u *UDPLogPlugin) GetConsumer() *UDPLogPluginConsumer {
+	if u == nil {
 		return nil
 	}
-	return o.Consumer
+	return u.Consumer
 }
 
-func (o *UDPLogPlugin) GetProtocols() []UDPLogPluginProtocols {
-	if o == nil {
+func (u *UDPLogPlugin) GetProtocols() []UDPLogPluginProtocols {
+	if u == nil {
 		return nil
 	}
-	return o.Protocols
+	return u.Protocols
 }
 
-func (o *UDPLogPlugin) GetRoute() *UDPLogPluginRoute {
-	if o == nil {
+func (u *UDPLogPlugin) GetRoute() *UDPLogPluginRoute {
+	if u == nil {
 		return nil
 	}
-	return o.Route
+	return u.Route
 }
 
-func (o *UDPLogPlugin) GetService() *UDPLogPluginService {
-	if o == nil {
+func (u *UDPLogPlugin) GetService() *UDPLogPluginService {
+	if u == nil {
 		return nil
 	}
-	return o.Service
+	return u.Service
 }

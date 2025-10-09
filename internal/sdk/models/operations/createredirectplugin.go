@@ -3,9 +3,41 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
+
+type CreateRedirectPluginRequest struct {
+	// The name or UUID of the workspace
+	Workspace      string                `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	RedirectPlugin shared.RedirectPlugin `request:"mediaType=application/json"`
+}
+
+func (c CreateRedirectPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRedirectPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RedirectPlugin"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CreateRedirectPluginRequest) GetWorkspace() string {
+	if c == nil {
+		return ""
+	}
+	return c.Workspace
+}
+
+func (c *CreateRedirectPluginRequest) GetRedirectPlugin() shared.RedirectPlugin {
+	if c == nil {
+		return shared.RedirectPlugin{}
+	}
+	return c.RedirectPlugin
+}
 
 type CreateRedirectPluginResponse struct {
 	// HTTP response content type for this operation
@@ -20,37 +52,37 @@ type CreateRedirectPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
-func (o *CreateRedirectPluginResponse) GetContentType() string {
-	if o == nil {
+func (c *CreateRedirectPluginResponse) GetContentType() string {
+	if c == nil {
 		return ""
 	}
-	return o.ContentType
+	return c.ContentType
 }
 
-func (o *CreateRedirectPluginResponse) GetStatusCode() int {
-	if o == nil {
+func (c *CreateRedirectPluginResponse) GetStatusCode() int {
+	if c == nil {
 		return 0
 	}
-	return o.StatusCode
+	return c.StatusCode
 }
 
-func (o *CreateRedirectPluginResponse) GetRawResponse() *http.Response {
-	if o == nil {
+func (c *CreateRedirectPluginResponse) GetRawResponse() *http.Response {
+	if c == nil {
 		return nil
 	}
-	return o.RawResponse
+	return c.RawResponse
 }
 
-func (o *CreateRedirectPluginResponse) GetRedirectPlugin() *shared.RedirectPlugin {
-	if o == nil {
+func (c *CreateRedirectPluginResponse) GetRedirectPlugin() *shared.RedirectPlugin {
+	if c == nil {
 		return nil
 	}
-	return o.RedirectPlugin
+	return c.RedirectPlugin
 }
 
-func (o *CreateRedirectPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
-	if o == nil {
+func (c *CreateRedirectPluginResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
+	if c == nil {
 		return nil
 	}
-	return o.GatewayUnauthorizedError
+	return c.GatewayUnauthorizedError
 }

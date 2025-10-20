@@ -251,7 +251,7 @@ type AiSanitizerPluginConfig struct {
 	CustomPatterns []CustomPatterns `json:"custom_patterns,omitempty"`
 	// The host of the sanitizer
 	Host *string `json:"host,omitempty"`
-	// The keepalive timeout for the established http connnection
+	// The keepalive timeout for the established http connection
 	KeepaliveTimeout *float64 `json:"keepalive_timeout,omitempty"`
 	// The port of the sanitizer
 	Port *float64 `json:"port,omitempty"`

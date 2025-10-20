@@ -852,7 +852,7 @@ type AiResponseTransformerPluginConfig struct {
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
 	// Set true to read specific response format from the LLM, and accordingly set the status code / body / headers that proxy back to the client. You need to engineer your LLM prompt to return the correct format, see plugin docs 'Overview' page for usage instructions.
 	ParseLlmResponseJSONInstructions *bool `json:"parse_llm_response_json_instructions,omitempty"`
-	// Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting.
+	// Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), and what response format you are expecting.
 	Prompt string `json:"prompt"`
 	// Defines the regular expression that must match to indicate a successful AI transformation at the response phase. The first match will be set as the returning body. If the AI service's response doesn't match this pattern, a failure is returned to the client.
 	TransformationExtractPattern *string `json:"transformation_extract_pattern,omitempty"`

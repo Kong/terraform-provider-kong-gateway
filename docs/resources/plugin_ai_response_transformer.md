@@ -168,7 +168,7 @@ resource "kong-gateway_plugin_ai_response_transformer" "my_pluginairesponsetrans
 Required:
 
 - `llm` (Attributes) (see [below for nested schema](#nestedatt--config--llm))
-- `prompt` (String) Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting.
+- `prompt` (String) Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), and what response format you are expecting.
 
 Optional:
 

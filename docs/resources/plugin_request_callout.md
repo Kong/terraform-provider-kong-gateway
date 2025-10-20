@@ -278,7 +278,7 @@ Optional:
 Optional:
 
 - `error_response_code` (Number) The error code to respond with if `on_error` is `fail` or if `retries` is achieved.
-- `error_response_msg` (String) The error mesasge to respond with if `on_error` is set to `fail` or if `retries` is achieved. Templating with Lua expressions is supported.
+- `error_response_msg` (String) The error message to respond with if `on_error` is set to `fail` or if `retries` is achieved. Templating with Lua expressions is supported.
 - `http_statuses` (List of Number) The list of HTTP status codes considered errors under the error handling policy.
 - `on_error` (String) must be one of ["continue", "fail", "retry"]
 - `retries` (Number) The number of retries the plugin will attempt on TCP and HTTP errors if `on_error` is set to `retry`.

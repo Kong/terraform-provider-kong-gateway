@@ -786,7 +786,7 @@ func (c *ClusterCacheRedis) GetUsername() *string {
 	return c.Username
 }
 
-// ClusterCacheStrategy - The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared.
+// ClusterCacheStrategy - The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currently only introspection cache is shared.
 type ClusterCacheStrategy string
 
 const (
@@ -2081,7 +2081,7 @@ type OpenidConnectPluginConfig struct {
 	// The client secret.
 	ClientSecret      []string           `json:"client_secret,omitempty"`
 	ClusterCacheRedis *ClusterCacheRedis `json:"cluster_cache_redis,omitempty"`
-	// The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared.
+	// The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currently only introspection cache is shared.
 	ClusterCacheStrategy *ClusterCacheStrategy `json:"cluster_cache_strategy,omitempty"`
 	// Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
 	ConsumerBy []OpenidConnectPluginConsumerBy `json:"consumer_by,omitempty"`
@@ -2368,7 +2368,7 @@ type OpenidConnectPluginConfig struct {
 	TLSClientAuthCertID *string `json:"tls_client_auth_cert_id,omitempty"`
 	// Verify identity provider server certificate during mTLS client authentication.
 	TLSClientAuthSslVerify *bool `json:"tls_client_auth_ssl_verify,omitempty"`
-	// Include the scope in the token cache key, so token with different scopes are considered diffrent tokens.
+	// Include the scope in the token cache key, so token with different scopes are considered different tokens.
 	TokenCacheKeyIncludeScope *bool `json:"token_cache_key_include_scope,omitempty"`
 	// The token endpoint. If set it overrides the value in `token_endpoint` returned by the discovery endpoint.
 	TokenEndpoint *string `json:"token_endpoint,omitempty"`

@@ -596,7 +596,7 @@ Optional:
 - `client_jwk` (Attributes List) The JWK used for the private_key_jwt authentication. (see [below for nested schema](#nestedatt--config--client_jwk))
 - `client_secret` (List of String) The client secret.
 - `cluster_cache_redis` (Attributes) (see [below for nested schema](#nestedatt--config--cluster_cache_redis))
-- `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]
+- `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currently only introspection cache is shared. must be one of ["off", "redis"]
 - `consumer_by` (List of String) Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
 - `consumer_claim` (List of String) The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
 - `consumer_groups_claim` (List of String) The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
@@ -740,7 +740,7 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `timeout` (Number) Network IO timeout in milliseconds.
 - `tls_client_auth_cert_id` (String) ID of the Certificate entity representing the client certificate to use for mTLS client authentication for connections between Kong and the Auth Server.
 - `tls_client_auth_ssl_verify` (Boolean) Verify identity provider server certificate during mTLS client authentication.
-- `token_cache_key_include_scope` (Boolean) Include the scope in the token cache key, so token with different scopes are considered diffrent tokens.
+- `token_cache_key_include_scope` (Boolean) Include the scope in the token cache key, so token with different scopes are considered different tokens.
 - `token_endpoint` (String) The token endpoint. If set it overrides the value in `token_endpoint` returned by the discovery endpoint.
 - `token_endpoint_auth_method` (String) The token endpoint authentication method: `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, or `none`: do not authenticate. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none", "private_key_jwt", "self_signed_tls_client_auth", "tls_client_auth"]
 - `token_exchange_endpoint` (String) The token exchange endpoint.

@@ -113,7 +113,7 @@ Optional:
 
 - `compressor_type` (String) What compression type to use to compress with. must be one of ["rate", "target_token"]
 - `compressor_url` (String) The url of the compressor
-- `keepalive_timeout` (Number) The keepalive timeout for the established http connnection
+- `keepalive_timeout` (Number) The keepalive timeout for the established http connection
 - `log_text_data` (Boolean) Log the text data
 - `message_type` (List of String)
 - `stop_on_error` (Boolean) Stop processing if an error occurs

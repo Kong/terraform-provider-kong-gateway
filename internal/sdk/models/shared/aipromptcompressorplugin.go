@@ -168,7 +168,7 @@ type AiPromptCompressorPluginConfig struct {
 	CompressorType *CompressorType `json:"compressor_type,omitempty"`
 	// The url of the compressor
 	CompressorURL *string `json:"compressor_url,omitempty"`
-	// The keepalive timeout for the established http connnection
+	// The keepalive timeout for the established http connection
 	KeepaliveTimeout *float64 `json:"keepalive_timeout,omitempty"`
 	// Log the text data
 	LogTextData *bool         `json:"log_text_data,omitempty"`

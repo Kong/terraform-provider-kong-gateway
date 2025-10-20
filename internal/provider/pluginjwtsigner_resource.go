@@ -82,7 +82,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of alues. Valid values are ` + "`" + `id` + "`" + `, ` + "`" + `username` + "`" + `, and ` + "`" + `custom_id` + "`" + `.`,
+						Description: `When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of values. Valid values are ` + "`" + `id` + "`" + `, ` + "`" + `username` + "`" + `, and ` + "`" + `custom_id` + "`" + `.`,
 					},
 					"access_token_consumer_claim": schema.ListAttribute{
 						Computed:    true,
@@ -195,7 +195,7 @@ func (r *PluginJwtSignerResource) Schema(ctx context.Context, req resource.Schem
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `Specify the claim/property in access token introspection results (` + "`" + `JSON` + "`" + `) to be verified against values of ` + "`" + `config.access_token_introspection_scopes_required` + "`" + `. This supports nested claims. For example, with Keycloak you could use ` + "`" + `[ "realm_access", "roles" ]` + "`" + `, hich can be given as ` + "`" + `realm_access,roles` + "`" + ` (form post). If the claim is not found in access token introspection results, and you have specified ` + "`" + `config.access_token_introspection_scopes_required` + "`" + `, the plugin responds with ` + "`" + `403 Forbidden` + "`" + `.`,
+						Description: `Specify the claim/property in access token introspection results (` + "`" + `JSON` + "`" + `) to be verified against values of ` + "`" + `config.access_token_introspection_scopes_required` + "`" + `. This supports nested claims. For example, with Keycloak you could use ` + "`" + `[ "realm_access", "roles" ]` + "`" + `, which can be given as ` + "`" + `realm_access,roles` + "`" + ` (form post). If the claim is not found in access token introspection results, and you have specified ` + "`" + `config.access_token_introspection_scopes_required` + "`" + `, the plugin responds with ` + "`" + `403 Forbidden` + "`" + `.`,
 					},
 					"access_token_introspection_scopes_required": schema.ListAttribute{
 						Computed:    true,

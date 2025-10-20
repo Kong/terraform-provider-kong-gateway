@@ -361,7 +361,7 @@ type JwtSignerPluginConfig struct {
 	AccessTokenAudienceClaim []string `json:"access_token_audience_claim,omitempty"`
 	// The audiences allowed to be present in the access token claim specified by `config.access_token_audience_claim`.
 	AccessTokenAudiencesAllowed []string `json:"access_token_audiences_allowed,omitempty"`
-	// When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of alues. Valid values are `id`, `username`, and `custom_id`.
+	// When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of values. Valid values are `id`, `username`, and `custom_id`.
 	AccessTokenConsumerBy []AccessTokenConsumerBy `json:"access_token_consumer_by,omitempty"`
 	// When you set a value for this parameter, the plugin tries to map an arbitrary claim specified with this configuration parameter (for example, `sub` or `username`) in an access token to Kong consumer entity.
 	AccessTokenConsumerClaim []string `json:"access_token_consumer_claim,omitempty"`
@@ -399,7 +399,7 @@ type JwtSignerPluginConfig struct {
 	AccessTokenIntrospectionOptionalClaims [][]string `json:"access_token_introspection_optional_claims,omitempty"`
 	// Specify the required claims that must be present in the access token introspection result. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.
 	AccessTokenIntrospectionRequiredClaims [][]string `json:"access_token_introspection_required_claims,omitempty"`
-	// Specify the claim/property in access token introspection results (`JSON`) to be verified against values of `config.access_token_introspection_scopes_required`. This supports nested claims. For example, with Keycloak you could use `[ "realm_access", "roles" ]`, hich can be given as `realm_access,roles` (form post). If the claim is not found in access token introspection results, and you have specified `config.access_token_introspection_scopes_required`, the plugin responds with `403 Forbidden`.
+	// Specify the claim/property in access token introspection results (`JSON`) to be verified against values of `config.access_token_introspection_scopes_required`. This supports nested claims. For example, with Keycloak you could use `[ "realm_access", "roles" ]`, which can be given as `realm_access,roles` (form post). If the claim is not found in access token introspection results, and you have specified `config.access_token_introspection_scopes_required`, the plugin responds with `403 Forbidden`.
 	AccessTokenIntrospectionScopesClaim []string `json:"access_token_introspection_scopes_claim,omitempty"`
 	// Specify the required values (or scopes) that are checked by an introspection claim/property specified by `config.access_token_introspection_scopes_claim`.
 	AccessTokenIntrospectionScopesRequired []string `json:"access_token_introspection_scopes_required,omitempty"`

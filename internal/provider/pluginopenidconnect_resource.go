@@ -564,7 +564,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"cluster_cache_strategy": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]`,
+						Description: `The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currently only introspection cache is shared. must be one of ["off", "redis"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"off",
@@ -1605,7 +1605,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"token_cache_key_include_scope": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Include the scope in the token cache key, so token with different scopes are considered diffrent tokens.`,
+						Description: `Include the scope in the token cache key, so token with different scopes are considered different tokens.`,
 					},
 					"token_endpoint": schema.StringAttribute{
 						Computed:    true,

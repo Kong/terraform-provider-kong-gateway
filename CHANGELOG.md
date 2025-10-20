@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0
+> Released on 2025/10/20
+
+The provider is now GA 🎉
+
 ## 0.6.0
 > Released on 2025/10/08
 

@@ -2422,7 +2422,7 @@ components:
               type: string
             keepalive_timeout:
               default: 60000
-              description: The keepalive timeout for the established http connnection
+              description: The keepalive timeout for the established http connection
               type: number
             log_text_data:
               default: false
@@ -6220,7 +6220,7 @@ components:
             prompt:
               description: >-
                 Use this prompt to tune the LLM system/assistant message for the
-                returning proxy response (from the upstream), adn what response
+                returning proxy response (from the upstream), and what response
                 format you are expecting.
               type: string
             transformation_extract_pattern:
@@ -6365,7 +6365,7 @@ components:
               type: string
             keepalive_timeout:
               default: 60000
-              description: The keepalive timeout for the established http connnection
+              description: The keepalive timeout for the established http connection
               type: number
             port:
               default: 8080
@@ -13603,7 +13603,7 @@ components:
                 When the plugin tries to apply an access token to a Kong
                 consumer mapping, it tries to find a matching Kong consumer from
                 properties defined using this configuration parameter. The
-                parameter can take an array of alues. Valid values are `id`,
+                parameter can take an array of values. Valid values are `id`,
                 `username`, and `custom_id`.
               items:
                 enum:
@@ -13787,7 +13787,7 @@ components:
                 (`JSON`) to be verified against values of
                 `config.access_token_introspection_scopes_required`. This
                 supports nested claims. For example, with Keycloak you could use
-                `[ "realm_access", "roles" ]`, hich can be given as
+                `[ "realm_access", "roles" ]`, which can be given as
                 `realm_access,roles` (form post). If the claim is not found in
                 access token introspection results, and you have specified
                 `config.access_token_introspection_scopes_required`, the plugin
@@ -18801,7 +18801,7 @@ components:
               description: >-
                 The strategy to use for the cluster cache. If set, the plugin
                 will share cache with nodes configured with the same strategy
-                backend. Currentlly only introspection cache is shared.
+                backend. Currently only introspection cache is shared.
               enum:
                 - 'off'
                 - redis
@@ -20028,7 +20028,7 @@ components:
               default: false
               description: >-
                 Include the scope in the token cache key, so token with
-                different scopes are considered diffrent tokens.
+                different scopes are considered different tokens.
               type: boolean
             token_endpoint:
               description: >-
@@ -22139,9 +22139,9 @@ components:
           properties:
             compound_identifier:
               description: >-
-                Similar to `identifer`, but supports combining multiple items.
+                Similar to `identifier`, but supports combining multiple items.
                 The priority of `compound_identifier` is higher than
-                `identifier`, which means if `compound_identifer` is set, it
+                `identifier`, which means if `compound_identifier` is set, it
                 will be used, otherwise `identifier` will be used.
               items:
                 enum:
@@ -22368,7 +22368,7 @@ components:
                   description: >-
                     If the `connection_is_proxied` is enabled, this field
                     indicates the proxy type and version you are using. For
-                    example, you can enable this optioin when you want
+                    example, you can enable this option when you want
                     authentication between Kong and Envoy proxy.
                   enum:
                     - envoy_v1.31
@@ -23222,7 +23222,7 @@ components:
                           error_response_msg:
                             default: service callout error
                             description: >-
-                              The error mesasge to respond with if `on_error` is
+                              The error message to respond with if `on_error` is
                               set to `fail` or if `retries` is achieved.
                               Templating with Lua expressions is supported.
                             type: string

@@ -121,7 +121,7 @@ func (r *PluginAiSanitizerResource) Schema(ctx context.Context, req resource.Sch
 					"keepalive_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The keepalive timeout for the established http connnection`,
+						Description: `The keepalive timeout for the established http connection`,
 					},
 					"port": schema.Float64Attribute{
 						Computed:    true,

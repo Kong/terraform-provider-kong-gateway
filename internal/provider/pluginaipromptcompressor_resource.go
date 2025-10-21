@@ -120,7 +120,7 @@ func (r *PluginAiPromptCompressorResource) Schema(ctx context.Context, req resou
 					"keepalive_timeout": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The keepalive timeout for the established http connnection`,
+						Description: `The keepalive timeout for the established http connection`,
 					},
 					"log_text_data": schema.BoolAttribute{
 						Computed:    true,

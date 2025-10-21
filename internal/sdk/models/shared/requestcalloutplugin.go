@@ -499,7 +499,7 @@ func (e *OnError) UnmarshalJSON(data []byte) error {
 type Error struct {
 	// The error code to respond with if `on_error` is `fail` or if `retries` is achieved.
 	ErrorResponseCode *int64 `json:"error_response_code,omitempty"`
-	// The error mesasge to respond with if `on_error` is set to `fail` or if `retries` is achieved. Templating with Lua expressions is supported.
+	// The error message to respond with if `on_error` is set to `fail` or if `retries` is achieved. Templating with Lua expressions is supported.
 	ErrorResponseMsg *string `json:"error_response_msg,omitempty"`
 	// The list of HTTP status codes considered errors under the error handling policy.
 	HTTPStatuses []int64  `json:"http_statuses,omitempty"`

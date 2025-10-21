@@ -360,7 +360,7 @@ func (r *PluginRequestCalloutResource) Schema(ctx context.Context, req resource.
 												"error_response_msg": schema.StringAttribute{
 													Computed:    true,
 													Optional:    true,
-													Description: `The error mesasge to respond with if ` + "`" + `on_error` + "`" + ` is set to ` + "`" + `fail` + "`" + ` or if ` + "`" + `retries` + "`" + ` is achieved. Templating with Lua expressions is supported.`,
+													Description: `The error message to respond with if ` + "`" + `on_error` + "`" + ` is set to ` + "`" + `fail` + "`" + ` or if ` + "`" + `retries` + "`" + ` is achieved. Templating with Lua expressions is supported.`,
 												},
 												"http_statuses": schema.ListAttribute{
 													Computed:    true,

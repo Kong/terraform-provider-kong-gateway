@@ -112,7 +112,7 @@ Optional:
 - `block_if_detected` (Boolean) Whether to block requests containing PII data
 - `custom_patterns` (Attributes List) List of custom patterns to be used for anonymization (see [below for nested schema](#nestedatt--config--custom_patterns))
 - `host` (String) The host of the sanitizer
-- `keepalive_timeout` (Number) The keepalive timeout for the established http connnection
+- `keepalive_timeout` (Number) The keepalive timeout for the established http connection
 - `port` (Number) The port of the sanitizer
 - `recover_redacted` (Boolean) Whether to recover redacted data. This doesn't apply to the redacted output.
 - `redact_type` (String) What value to be used to redacted to. must be one of ["placeholder", "synthetic"]

@@ -473,7 +473,7 @@ func (r *PluginAiResponseTransformerResource) Schema(ctx context.Context, req re
 					},
 					"prompt": schema.StringAttribute{
 						Required:    true,
-						Description: `Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), adn what response format you are expecting.`,
+						Description: `Use this prompt to tune the LLM system/assistant message for the returning proxy response (from the upstream), and what response format you are expecting.`,
 					},
 					"transformation_extract_pattern": schema.StringAttribute{
 						Computed:    true,

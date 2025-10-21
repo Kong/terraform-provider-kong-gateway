@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 )
 
-// trueReflectValue returns the reflect.Value for `in` after derefencing all
+// trueReflectValue returns the reflect.Value for `in` after dereferencing all
 // the pointers and unwrapping all the interfaces. It's the concrete value
 // beneath it all.
 func trueReflectValue(val reflect.Value) reflect.Value {

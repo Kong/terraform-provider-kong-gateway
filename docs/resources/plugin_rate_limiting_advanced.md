@@ -163,7 +163,7 @@ Required:
 
 Optional:
 
-- `compound_identifier` (List of String) Similar to `identifer`, but supports combining multiple items. The priority of `compound_identifier` is higher than `identifier`, which means if `compound_identifer` is set, it will be used, otherwise `identifier` will be used.
+- `compound_identifier` (List of String) Similar to `identifier`, but supports combining multiple items. The priority of `compound_identifier` is higher than `identifier`, which means if `compound_identifier` is set, it will be used, otherwise `identifier` will be used.
 - `consumer_groups` (List of String) List of consumer groups allowed to override the rate limiting settings for the given Route or Service. Required if `enforce_consumer_groups` is set to `true`.
 - `dictionary_name` (String) The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is `config.strategy` is `cluster` or `redis` and `config.sync_rate` isn't `-1`), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle.
 - `disable_penalty` (Boolean) If set to `true`, this doesn't count denied requests (status = `429`). If set to `false`, all requests, including denied ones, are counted. This parameter only affects the `sliding` window_type.
@@ -199,7 +199,7 @@ Optional:
 - `password` (String) Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
 - `port` (Number) An integer representing a port number between 0 and 65535, inclusive.
 - `read_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
-- `redis_proxy_type` (String) If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this optioin when you want authentication between Kong and Envoy proxy. must be "envoy_v1.31"
+- `redis_proxy_type` (String) If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this option when you want authentication between Kong and Envoy proxy. must be "envoy_v1.31"
 - `send_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `sentinel_master` (String) Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
 - `sentinel_nodes` (Attributes List) Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element. (see [below for nested schema](#nestedatt--config--redis--sentinel_nodes))

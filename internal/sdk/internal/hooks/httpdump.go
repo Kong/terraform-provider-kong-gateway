@@ -75,7 +75,7 @@ func dumpResponse(res *http.Response) *http.Response {
 	fmt.Println("-----------------")
 	b, err := httputil.DumpResponse(res, true)
 	if err != nil {
-		fmt.Printf("Error dumping respone: %v\n", err)
+		fmt.Printf("Error dumping response: %v\n", err)
 	} else {
 		fmt.Printf("response:\n%s\n\n", b)
 	}

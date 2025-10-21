@@ -182,7 +182,7 @@ func (r *RateLimitingAdvancedPluginClusterNodes) GetPort() *int64 {
 	return r.Port
 }
 
-// RedisProxyType - If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this optioin when you want authentication between Kong and Envoy proxy.
+// RedisProxyType - If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this option when you want authentication between Kong and Envoy proxy.
 type RedisProxyType string
 
 const (
@@ -280,7 +280,7 @@ type RateLimitingAdvancedPluginRedis struct {
 	Port *int64 `json:"port,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 	ReadTimeout *int64 `json:"read_timeout,omitempty"`
-	// If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this optioin when you want authentication between Kong and Envoy proxy.
+	// If the `connection_is_proxied` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this option when you want authentication between Kong and Envoy proxy.
 	RedisProxyType *RedisProxyType `json:"redis_proxy_type,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 	SendTimeout *int64 `json:"send_timeout,omitempty"`
@@ -555,7 +555,7 @@ func (e *RateLimitingAdvancedPluginWindowType) UnmarshalJSON(data []byte) error 
 }
 
 type RateLimitingAdvancedPluginConfig struct {
-	// Similar to `identifer`, but supports combining multiple items. The priority of `compound_identifier` is higher than `identifier`, which means if `compound_identifer` is set, it will be used, otherwise `identifier` will be used.
+	// Similar to `identifier`, but supports combining multiple items. The priority of `compound_identifier` is higher than `identifier`, which means if `compound_identifier` is set, it will be used, otherwise `identifier` will be used.
 	CompoundIdentifier []CompoundIdentifier `json:"compound_identifier,omitempty"`
 	// List of consumer groups allowed to override the rate limiting settings for the given Route or Service. Required if `enforce_consumer_groups` is set to `true`.
 	ConsumerGroups []string `json:"consumer_groups,omitempty"`

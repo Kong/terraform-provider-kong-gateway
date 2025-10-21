@@ -70,7 +70,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `Similar to ` + "`" + `identifer` + "`" + `, but supports combining multiple items. The priority of ` + "`" + `compound_identifier` + "`" + ` is higher than ` + "`" + `identifier` + "`" + `, which means if ` + "`" + `compound_identifer` + "`" + ` is set, it will be used, otherwise ` + "`" + `identifier` + "`" + ` will be used.`,
+						Description: `Similar to ` + "`" + `identifier` + "`" + `, but supports combining multiple items. The priority of ` + "`" + `compound_identifier` + "`" + ` is higher than ` + "`" + `identifier` + "`" + `, which means if ` + "`" + `compound_identifier` + "`" + ` is set, it will be used, otherwise ` + "`" + `identifier` + "`" + ` will be used.`,
 					},
 					"consumer_groups": schema.ListAttribute{
 						Computed:    true,
@@ -246,7 +246,7 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 							"redis_proxy_type": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `If the ` + "`" + `connection_is_proxied` + "`" + ` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this optioin when you want authentication between Kong and Envoy proxy. must be "envoy_v1.31"`,
+								Description: `If the ` + "`" + `connection_is_proxied` + "`" + ` is enabled, this field indicates the proxy type and version you are using. For example, you can enable this option when you want authentication between Kong and Envoy proxy. must be "envoy_v1.31"`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
 										"envoy_v1.31",

@@ -63,7 +63,7 @@ The provider is now GA 🎉
 * Credentials (e.g. `basic_auth`, `key_auth`) now require a `consumer_id` to be provided
 
 ### Features
-* Add support for `route_expression` `oidc_jwk`, `partial` and `target` resouces
+* Add support for `route_expression` `oidc_jwk`, `partial` and `target` resources
 * Add support for the following plugins
   * AI Azure Content Safety
   * AI Proxy Advanced

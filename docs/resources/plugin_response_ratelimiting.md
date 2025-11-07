@@ -116,22 +116,9 @@ Optional:
 - `header_name` (String) The name of the response header used to increment the counters.
 - `hide_client_headers` (Boolean) Optionally hide informative response headers.
 - `limit_by` (String) The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`. must be one of ["consumer", "credential", "ip"]
-- `limits` (Attributes Map) (see [below for nested schema](#nestedatt--config--limits))
+- `limits` (Map of String) A map that defines rate limits for the plugin.
 - `policy` (String) The rate-limiting policies to use for retrieving and incrementing the limits. must be one of ["cluster", "local", "redis"]
 - `redis` (Attributes) Redis configuration (see [below for nested schema](#nestedatt--config--redis))
-
-<a id="nestedatt--config--limits"></a>
-### Nested Schema for `config.limits`
-
-Optional:
-
-- `day` (Number)
-- `hour` (Number)
-- `minute` (Number)
-- `month` (Number)
-- `second` (Number)
-- `year` (Number)
-
 
 <a id="nestedatt--config--redis"></a>
 ### Nested Schema for `config.redis`

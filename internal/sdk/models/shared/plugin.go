@@ -152,16 +152,16 @@ func (e *Protocols) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// PluginRoute - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-type PluginRoute struct {
+// Route - If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
+type Route struct {
 	ID *string `json:"id,omitempty"`
 }
 
-func (p *PluginRoute) GetID() *string {
-	if p == nil {
+func (r *Route) GetID() *string {
+	if r == nil {
 		return nil
 	}
-	return p.ID
+	return r.ID
 }
 
 // PluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
@@ -200,7 +200,7 @@ type Plugin struct {
 	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support `"tcp"` and `"tls"`.
 	Protocols []Protocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the Route being used.
-	Route *PluginRoute `json:"route,omitempty"`
+	Route *Route `json:"route,omitempty"`
 	// If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 	Service *PluginService `json:"service,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -286,7 +286,7 @@ func (p *Plugin) GetProtocols() []Protocols {
 	return p.Protocols
 }
 
-func (p *Plugin) GetRoute() *PluginRoute {
+func (p *Plugin) GetRoute() *Route {
 	if p == nil {
 		return nil
 	}

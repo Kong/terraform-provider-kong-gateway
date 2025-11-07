@@ -17699,7 +17699,7 @@ func (s *Plugins) DeletePlugin(ctx context.Context, request operations.DeletePlu
 
 }
 
-// GetPlugin - Fetch a Plugin
+// GetPlugin - Get a Plugin
 // Get a Plugin using ID.
 func (s *Plugins) GetPlugin(ctx context.Context, request operations.GetPluginRequest, opts ...operations.Option) (*operations.GetPluginResponse, error) {
 	o := operations.Options{}
@@ -66237,7 +66237,7 @@ func (s *Plugins) UpdateZipkinPlugin(ctx context.Context, request operations.Upd
 
 }
 
-// FetchPluginSchema - Fetch plugin schema
+// FetchPluginSchema - Get plugin schema
 // Get the schema for a plugin
 func (s *Plugins) FetchPluginSchema(ctx context.Context, request operations.FetchPluginSchemaRequest, opts ...operations.Option) (*operations.FetchPluginSchemaResponse, error) {
 	o := operations.Options{}

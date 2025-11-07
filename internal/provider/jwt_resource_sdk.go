@@ -105,9 +105,9 @@ func (r *JwtResourceModel) ToOperationsGetJwtWithConsumerRequest(ctx context.Con
 func (r *JwtResourceModel) ToSharedJWTWithoutParents(ctx context.Context) (*shared.JWTWithoutParents, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	algorithm := new(shared.JWTWithoutParentsAlgorithm)
+	algorithm := new(shared.Algorithm)
 	if !r.Algorithm.IsUnknown() && !r.Algorithm.IsNull() {
-		*algorithm = shared.JWTWithoutParentsAlgorithm(r.Algorithm.ValueString())
+		*algorithm = shared.Algorithm(r.Algorithm.ValueString())
 	} else {
 		algorithm = nil
 	}

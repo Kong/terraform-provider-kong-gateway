@@ -131,6 +131,7 @@ func (r *PluginResponseRatelimitingResource) Schema(ctx context.Context, req res
 								},
 							},
 						},
+						Description: `A map that defines rate limits for the plugin.`,
 					},
 					"policy": schema.StringAttribute{
 						Computed:    true,

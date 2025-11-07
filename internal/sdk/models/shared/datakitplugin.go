@@ -4,6 +4,7 @@ package shared
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
@@ -78,66 +79,1138 @@ func (d *DatakitPluginPartials) GetPath() *string {
 	return d.Path
 }
 
-type Type string
+type DatakitPluginNodesConfig7Type string
 
 const (
-	TypeBranch   Type = "branch"
-	TypeCache    Type = "cache"
-	TypeCall     Type = "call"
-	TypeExit     Type = "exit"
-	TypeJq       Type = "jq"
-	TypeProperty Type = "property"
-	TypeStatic   Type = "static"
+	DatakitPluginNodesConfig7TypeStatic DatakitPluginNodesConfig7Type = "static"
 )
 
-func (e Type) ToPointer() *Type {
+func (e DatakitPluginNodesConfig7Type) ToPointer() *DatakitPluginNodesConfig7Type {
 	return &e
 }
-func (e *Type) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesConfig7Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "static":
+		*e = DatakitPluginNodesConfig7Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig7Type: %v", v)
+	}
+}
+
+// Static - Produce reusable outputs from statically-configured values
+type Static struct {
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// The entire `.values` map
+	Output *string `json:"output,omitempty"`
+	// Individual items from `.values`, referenced by key
+	Outputs map[string]any                 `json:"outputs,omitempty"`
+	Type    *DatakitPluginNodesConfig7Type `json:"type,omitempty"`
+	// An object with string keys and freeform values
+	Values string `json:"values"`
+}
+
+func (s Static) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *Static) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"values"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Static) GetName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Name
+}
+
+func (s *Static) GetOutput() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Output
+}
+
+func (s *Static) GetOutputs() map[string]any {
+	if s == nil {
+		return nil
+	}
+	return s.Outputs
+}
+
+func (s *Static) GetType() *DatakitPluginNodesConfig7Type {
+	if s == nil {
+		return nil
+	}
+	return s.Type
+}
+
+func (s *Static) GetValues() string {
+	if s == nil {
+		return ""
+	}
+	return s.Values
+}
+
+// NodesContentType - The expected mime type of the property value. When set to `application/json`, SET operations will JSON-encode input data before writing it, and GET operations will JSON-decode output data after reading it. Otherwise, this setting has no effect.
+type NodesContentType string
+
+const (
+	NodesContentTypeApplicationJSON        NodesContentType = "application/json"
+	NodesContentTypeApplicationOctetStream NodesContentType = "application/octet-stream"
+	NodesContentTypeTextPlain              NodesContentType = "text/plain"
+)
+
+func (e NodesContentType) ToPointer() *NodesContentType {
+	return &e
+}
+func (e *NodesContentType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "application/json":
+		fallthrough
+	case "application/octet-stream":
+		fallthrough
+	case "text/plain":
+		*e = NodesContentType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for NodesContentType: %v", v)
+	}
+}
+
+type DatakitPluginNodesConfig6Type string
+
+const (
+	DatakitPluginNodesConfig6TypeProperty DatakitPluginNodesConfig6Type = "property"
+)
+
+func (e DatakitPluginNodesConfig6Type) ToPointer() *DatakitPluginNodesConfig6Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig6Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "property":
+		*e = DatakitPluginNodesConfig6Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig6Type: %v", v)
+	}
+}
+
+// Property - Get or set a property
+type Property struct {
+	// The expected mime type of the property value. When set to `application/json`, SET operations will JSON-encode input data before writing it, and GET operations will JSON-decode output data after reading it. Otherwise, this setting has no effect.
+	ContentType *NodesContentType `json:"content_type,omitempty"`
+	// Property input source. When connected, this node operates in SET mode and writes input data to the property. Otherwise, the node operates in GET mode and reads the property.
+	Input *string `json:"input,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// Property output. This can be connected regardless of whether the node is operating in GET mode or SET mode.
+	Output *string `json:"output,omitempty"`
+	// The property name to get/set
+	Property string                         `json:"property"`
+	Type     *DatakitPluginNodesConfig6Type `json:"type,omitempty"`
+}
+
+func (p Property) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Property) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"property"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Property) GetContentType() *NodesContentType {
+	if p == nil {
+		return nil
+	}
+	return p.ContentType
+}
+
+func (p *Property) GetInput() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Input
+}
+
+func (p *Property) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *Property) GetOutput() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Output
+}
+
+func (p *Property) GetProperty() string {
+	if p == nil {
+		return ""
+	}
+	return p.Property
+}
+
+func (p *Property) GetType() *DatakitPluginNodesConfig6Type {
+	if p == nil {
+		return nil
+	}
+	return p.Type
+}
+
+type DatakitPluginNodesConfig5Type string
+
+const (
+	DatakitPluginNodesConfig5TypeJq DatakitPluginNodesConfig5Type = "jq"
+)
+
+func (e DatakitPluginNodesConfig5Type) ToPointer() *DatakitPluginNodesConfig5Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig5Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "jq":
+		*e = DatakitPluginNodesConfig5Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig5Type: %v", v)
+	}
+}
+
+// Jq - Process data using `jq` syntax
+type Jq struct {
+	// filter input(s)
+	Input *string `json:"input,omitempty"`
+	// filter input(s)
+	Inputs map[string]any `json:"inputs,omitempty"`
+	// The jq filter text. Refer to https://jqlang.org/manual/ for full documentation.
+	Jq string `json:"jq"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// filter output(s)
+	Output *string                        `json:"output,omitempty"`
+	Type   *DatakitPluginNodesConfig5Type `json:"type,omitempty"`
+}
+
+func (j Jq) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *Jq) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"jq"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *Jq) GetInput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Input
+}
+
+func (j *Jq) GetInputs() map[string]any {
+	if j == nil {
+		return nil
+	}
+	return j.Inputs
+}
+
+func (j *Jq) GetJq() string {
+	if j == nil {
+		return ""
+	}
+	return j.Jq
+}
+
+func (j *Jq) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *Jq) GetOutput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Output
+}
+
+func (j *Jq) GetType() *DatakitPluginNodesConfig5Type {
+	if j == nil {
+		return nil
+	}
+	return j.Type
+}
+
+// DatakitPluginNodesInputs - exit node inputs
+type DatakitPluginNodesInputs struct {
+	// HTTP response body
+	Body *string `json:"body,omitempty"`
+	// HTTP response headers
+	Headers *string `json:"headers,omitempty"`
+}
+
+func (d DatakitPluginNodesInputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesInputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesInputs) GetBody() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Body
+}
+
+func (d *DatakitPluginNodesInputs) GetHeaders() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Headers
+}
+
+type DatakitPluginNodesConfigType string
+
+const (
+	DatakitPluginNodesConfigTypeExit DatakitPluginNodesConfigType = "exit"
+)
+
+func (e DatakitPluginNodesConfigType) ToPointer() *DatakitPluginNodesConfigType {
+	return &e
+}
+func (e *DatakitPluginNodesConfigType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "exit":
+		*e = DatakitPluginNodesConfigType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfigType: %v", v)
+	}
+}
+
+// Exit - Terminate the request and send a response to the client
+type Exit struct {
+	// exit node input
+	Input *string `json:"input,omitempty"`
+	// exit node inputs
+	Inputs *DatakitPluginNodesInputs `json:"inputs,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// HTTP status code
+	Status          *int64                        `json:"status,omitempty"`
+	Type            *DatakitPluginNodesConfigType `json:"type,omitempty"`
+	WarnHeadersSent *bool                         `json:"warn_headers_sent,omitempty"`
+}
+
+func (e Exit) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(e, "", false)
+}
+
+func (e *Exit) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &e, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *Exit) GetInput() *string {
+	if e == nil {
+		return nil
+	}
+	return e.Input
+}
+
+func (e *Exit) GetInputs() *DatakitPluginNodesInputs {
+	if e == nil {
+		return nil
+	}
+	return e.Inputs
+}
+
+func (e *Exit) GetName() *string {
+	if e == nil {
+		return nil
+	}
+	return e.Name
+}
+
+func (e *Exit) GetStatus() *int64 {
+	if e == nil {
+		return nil
+	}
+	return e.Status
+}
+
+func (e *Exit) GetType() *DatakitPluginNodesConfigType {
+	if e == nil {
+		return nil
+	}
+	return e.Type
+}
+
+func (e *Exit) GetWarnHeadersSent() *bool {
+	if e == nil {
+		return nil
+	}
+	return e.WarnHeadersSent
+}
+
+// NodesInputs - call node inputs
+type NodesInputs struct {
+	// HTTP request body
+	Body *string `json:"body,omitempty"`
+	// HTTP request headers
+	Headers *string `json:"headers,omitempty"`
+	// HTTP request query
+	Query *string `json:"query,omitempty"`
+}
+
+func (n NodesInputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(n, "", false)
+}
+
+func (n *NodesInputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &n, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *NodesInputs) GetBody() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Body
+}
+
+func (n *NodesInputs) GetHeaders() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Headers
+}
+
+func (n *NodesInputs) GetQuery() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Query
+}
+
+// DatakitPluginNodesOutputs - call node outputs
+type DatakitPluginNodesOutputs struct {
+	// HTTP response body
+	Body *string `json:"body,omitempty"`
+	// HTTP response headers
+	Headers *string `json:"headers,omitempty"`
+	// HTTP response status code
+	Status *string `json:"status,omitempty"`
+}
+
+func (d DatakitPluginNodesOutputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesOutputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesOutputs) GetBody() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Body
+}
+
+func (d *DatakitPluginNodesOutputs) GetHeaders() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Headers
+}
+
+func (d *DatakitPluginNodesOutputs) GetStatus() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Status
+}
+
+type DatakitPluginNodesType string
+
+const (
+	DatakitPluginNodesTypeCall DatakitPluginNodesType = "call"
+)
+
+func (e DatakitPluginNodesType) ToPointer() *DatakitPluginNodesType {
+	return &e
+}
+func (e *DatakitPluginNodesType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "call":
+		*e = DatakitPluginNodesType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesType: %v", v)
+	}
+}
+
+// Call - Make an external HTTP request
+type Call struct {
+	// call node input
+	Input *string `json:"input,omitempty"`
+	// call node inputs
+	Inputs *NodesInputs `json:"inputs,omitempty"`
+	// A string representing an HTTP method, such as GET, POST, PUT, or DELETE. The string must contain only uppercase letters.
+	Method *string `json:"method,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// call node output
+	Output *string `json:"output,omitempty"`
+	// call node outputs
+	Outputs *DatakitPluginNodesOutputs `json:"outputs,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	SslServerName *string `json:"ssl_server_name,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	Timeout *int64                  `json:"timeout,omitempty"`
+	Type    *DatakitPluginNodesType `json:"type,omitempty"`
+	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
+	URL string `json:"url"`
+}
+
+func (c Call) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Call) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"url"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Call) GetInput() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Input
+}
+
+func (c *Call) GetInputs() *NodesInputs {
+	if c == nil {
+		return nil
+	}
+	return c.Inputs
+}
+
+func (c *Call) GetMethod() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Method
+}
+
+func (c *Call) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *Call) GetOutput() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Output
+}
+
+func (c *Call) GetOutputs() *DatakitPluginNodesOutputs {
+	if c == nil {
+		return nil
+	}
+	return c.Outputs
+}
+
+func (c *Call) GetSslServerName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.SslServerName
+}
+
+func (c *Call) GetTimeout() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.Timeout
+}
+
+func (c *Call) GetType() *DatakitPluginNodesType {
+	if c == nil {
+		return nil
+	}
+	return c.Type
+}
+
+func (c *Call) GetURL() string {
+	if c == nil {
+		return ""
+	}
+	return c.URL
+}
+
+// Inputs - cache node inputs
+type Inputs struct {
+	// The data to be cached.
+	Data *string `json:"data,omitempty"`
+	// The cache key.
+	Key *string `json:"key,omitempty"`
+	// The TTL in seconds.
+	TTL *string `json:"ttl,omitempty"`
+}
+
+func (i Inputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(i, "", false)
+}
+
+func (i *Inputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &i, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *Inputs) GetData() *string {
+	if i == nil {
+		return nil
+	}
+	return i.Data
+}
+
+func (i *Inputs) GetKey() *string {
+	if i == nil {
+		return nil
+	}
+	return i.Key
+}
+
+func (i *Inputs) GetTTL() *string {
+	if i == nil {
+		return nil
+	}
+	return i.TTL
+}
+
+// NodesOutputs - cache node outputs
+type NodesOutputs struct {
+	// The data that was cached.
+	Data *string `json:"data,omitempty"`
+	// Signals a cache hit.
+	Hit *string `json:"hit,omitempty"`
+	// Signals a cache miss.
+	Miss *string `json:"miss,omitempty"`
+	// Signals whether data was stored in cache.
+	Stored *string `json:"stored,omitempty"`
+}
+
+func (n NodesOutputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(n, "", false)
+}
+
+func (n *NodesOutputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &n, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *NodesOutputs) GetData() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Data
+}
+
+func (n *NodesOutputs) GetHit() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Hit
+}
+
+func (n *NodesOutputs) GetMiss() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Miss
+}
+
+func (n *NodesOutputs) GetStored() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Stored
+}
+
+type NodesType string
+
+const (
+	NodesTypeCache NodesType = "cache"
+)
+
+func (e NodesType) ToPointer() *NodesType {
+	return &e
+}
+func (e *NodesType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "cache":
+		*e = NodesType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for NodesType: %v", v)
+	}
+}
+
+// NodesCache - Fetch cached data
+type NodesCache struct {
+	BypassOnError *bool `json:"bypass_on_error,omitempty"`
+	// cache node input
+	Input *string `json:"input,omitempty"`
+	// cache node inputs
+	Inputs *Inputs `json:"inputs,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// cache node output
+	Output *string `json:"output,omitempty"`
+	// cache node outputs
+	Outputs *NodesOutputs `json:"outputs,omitempty"`
+	TTL     *int64        `json:"ttl,omitempty"`
+	Type    *NodesType    `json:"type,omitempty"`
+}
+
+func (n NodesCache) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(n, "", false)
+}
+
+func (n *NodesCache) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &n, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (n *NodesCache) GetBypassOnError() *bool {
+	if n == nil {
+		return nil
+	}
+	return n.BypassOnError
+}
+
+func (n *NodesCache) GetInput() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Input
+}
+
+func (n *NodesCache) GetInputs() *Inputs {
+	if n == nil {
+		return nil
+	}
+	return n.Inputs
+}
+
+func (n *NodesCache) GetName() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Name
+}
+
+func (n *NodesCache) GetOutput() *string {
+	if n == nil {
+		return nil
+	}
+	return n.Output
+}
+
+func (n *NodesCache) GetOutputs() *NodesOutputs {
+	if n == nil {
+		return nil
+	}
+	return n.Outputs
+}
+
+func (n *NodesCache) GetTTL() *int64 {
+	if n == nil {
+		return nil
+	}
+	return n.TTL
+}
+
+func (n *NodesCache) GetType() *NodesType {
+	if n == nil {
+		return nil
+	}
+	return n.Type
+}
+
+// Outputs - branch node outputs
+type Outputs struct {
+	// node output
+	Else *string `json:"else,omitempty"`
+	// node output
+	Then *string `json:"then,omitempty"`
+}
+
+func (o Outputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Outputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *Outputs) GetElse() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Else
+}
+
+func (o *Outputs) GetThen() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Then
+}
+
+type DatakitPluginNodesConfig1Type string
+
+const (
+	DatakitPluginNodesConfig1TypeBranch DatakitPluginNodesConfig1Type = "branch"
+)
+
+func (e DatakitPluginNodesConfig1Type) ToPointer() *DatakitPluginNodesConfig1Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig1Type) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "branch":
-		fallthrough
-	case "cache":
-		fallthrough
-	case "call":
-		fallthrough
-	case "exit":
-		fallthrough
-	case "jq":
-		fallthrough
-	case "property":
-		fallthrough
-	case "static":
-		*e = Type(v)
+		*e = DatakitPluginNodesConfig1Type(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Type: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig1Type: %v", v)
 	}
 }
 
-// Nodes - datakit nodes
-type Nodes struct {
+// Branch - Execute different nodes based on some input condition
+type Branch struct {
+	// nodes to execute if the input condition is `false`
+	Else []string `json:"else,omitempty"`
+	// branch node input
+	Input *string `json:"input,omitempty"`
 	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
-	Name string `json:"name"`
-	Type Type   `json:"type"`
+	Name *string `json:"name,omitempty"`
+	// branch node output
+	Output *string `json:"output,omitempty"`
+	// branch node outputs
+	Outputs *Outputs `json:"outputs,omitempty"`
+	// nodes to execute if the input condition is `true`
+	Then []string                       `json:"then,omitempty"`
+	Type *DatakitPluginNodesConfig1Type `json:"type,omitempty"`
 }
 
-func (n *Nodes) GetName() string {
-	if n == nil {
-		return ""
-	}
-	return n.Name
+func (b Branch) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
 }
 
-func (n *Nodes) GetType() Type {
-	if n == nil {
-		return Type("")
+func (b *Branch) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
 	}
-	return n.Type
+	return nil
+}
+
+func (b *Branch) GetElse() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Else
+}
+
+func (b *Branch) GetInput() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Input
+}
+
+func (b *Branch) GetName() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Name
+}
+
+func (b *Branch) GetOutput() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Output
+}
+
+func (b *Branch) GetOutputs() *Outputs {
+	if b == nil {
+		return nil
+	}
+	return b.Outputs
+}
+
+func (b *Branch) GetThen() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Then
+}
+
+func (b *Branch) GetType() *DatakitPluginNodesConfig1Type {
+	if b == nil {
+		return nil
+	}
+	return b.Type
+}
+
+type NodesUnionType string
+
+const (
+	NodesUnionTypeBranch     NodesUnionType = "branch"
+	NodesUnionTypeNodesCache NodesUnionType = "nodes_cache"
+	NodesUnionTypeCall       NodesUnionType = "call"
+	NodesUnionTypeExit       NodesUnionType = "exit"
+	NodesUnionTypeJq         NodesUnionType = "jq"
+	NodesUnionTypeProperty   NodesUnionType = "property"
+	NodesUnionTypeStatic     NodesUnionType = "static"
+)
+
+type Nodes struct {
+	Branch     *Branch     `queryParam:"inline,name=nodes"`
+	NodesCache *NodesCache `queryParam:"inline,name=nodes"`
+	Call       *Call       `queryParam:"inline,name=nodes"`
+	Exit       *Exit       `queryParam:"inline,name=nodes"`
+	Jq         *Jq         `queryParam:"inline,name=nodes"`
+	Property   *Property   `queryParam:"inline,name=nodes"`
+	Static     *Static     `queryParam:"inline,name=nodes"`
+
+	Type NodesUnionType
+}
+
+func CreateNodesBranch(branch Branch) Nodes {
+	typ := NodesUnionTypeBranch
+
+	return Nodes{
+		Branch: &branch,
+		Type:   typ,
+	}
+}
+
+func CreateNodesNodesCache(nodesCache NodesCache) Nodes {
+	typ := NodesUnionTypeNodesCache
+
+	return Nodes{
+		NodesCache: &nodesCache,
+		Type:       typ,
+	}
+}
+
+func CreateNodesCall(call Call) Nodes {
+	typ := NodesUnionTypeCall
+
+	return Nodes{
+		Call: &call,
+		Type: typ,
+	}
+}
+
+func CreateNodesExit(exit Exit) Nodes {
+	typ := NodesUnionTypeExit
+
+	return Nodes{
+		Exit: &exit,
+		Type: typ,
+	}
+}
+
+func CreateNodesJq(jq Jq) Nodes {
+	typ := NodesUnionTypeJq
+
+	return Nodes{
+		Jq:   &jq,
+		Type: typ,
+	}
+}
+
+func CreateNodesProperty(property Property) Nodes {
+	typ := NodesUnionTypeProperty
+
+	return Nodes{
+		Property: &property,
+		Type:     typ,
+	}
+}
+
+func CreateNodesStatic(static Static) Nodes {
+	typ := NodesUnionTypeStatic
+
+	return Nodes{
+		Static: &static,
+		Type:   typ,
+	}
+}
+
+func (u *Nodes) UnmarshalJSON(data []byte) error {
+
+	var call Call = Call{}
+	if err := utils.UnmarshalJSON(data, &call, "", true, nil); err == nil {
+		u.Call = &call
+		u.Type = NodesUnionTypeCall
+		return nil
+	}
+
+	var jq Jq = Jq{}
+	if err := utils.UnmarshalJSON(data, &jq, "", true, nil); err == nil {
+		u.Jq = &jq
+		u.Type = NodesUnionTypeJq
+		return nil
+	}
+
+	var property Property = Property{}
+	if err := utils.UnmarshalJSON(data, &property, "", true, nil); err == nil {
+		u.Property = &property
+		u.Type = NodesUnionTypeProperty
+		return nil
+	}
+
+	var static Static = Static{}
+	if err := utils.UnmarshalJSON(data, &static, "", true, nil); err == nil {
+		u.Static = &static
+		u.Type = NodesUnionTypeStatic
+		return nil
+	}
+
+	var branch Branch = Branch{}
+	if err := utils.UnmarshalJSON(data, &branch, "", true, nil); err == nil {
+		u.Branch = &branch
+		u.Type = NodesUnionTypeBranch
+		return nil
+	}
+
+	var nodesCache NodesCache = NodesCache{}
+	if err := utils.UnmarshalJSON(data, &nodesCache, "", true, nil); err == nil {
+		u.NodesCache = &nodesCache
+		u.Type = NodesUnionTypeNodesCache
+		return nil
+	}
+
+	var exit Exit = Exit{}
+	if err := utils.UnmarshalJSON(data, &exit, "", true, nil); err == nil {
+		u.Exit = &exit
+		u.Type = NodesUnionTypeExit
+		return nil
+	}
+
+	return fmt.Errorf("could not unmarshal `%s` into any supported union types for Nodes", string(data))
+}
+
+func (u Nodes) MarshalJSON() ([]byte, error) {
+	if u.Branch != nil {
+		return utils.MarshalJSON(u.Branch, "", true)
+	}
+
+	if u.NodesCache != nil {
+		return utils.MarshalJSON(u.NodesCache, "", true)
+	}
+
+	if u.Call != nil {
+		return utils.MarshalJSON(u.Call, "", true)
+	}
+
+	if u.Exit != nil {
+		return utils.MarshalJSON(u.Exit, "", true)
+	}
+
+	if u.Jq != nil {
+		return utils.MarshalJSON(u.Jq, "", true)
+	}
+
+	if u.Property != nil {
+		return utils.MarshalJSON(u.Property, "", true)
+	}
+
+	if u.Static != nil {
+		return utils.MarshalJSON(u.Static, "", true)
+	}
+
+	return nil, errors.New("could not marshal union type Nodes: all fields are null")
 }
 
 type DatakitPluginMemory struct {

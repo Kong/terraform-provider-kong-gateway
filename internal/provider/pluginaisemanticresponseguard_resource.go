@@ -284,7 +284,7 @@ func (r *PluginAiSemanticResponseGuardResource) Schema(ctx context.Context, req 
 					"genai_category": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation", "video/generation"]`,
+						Description: `Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"audio/speech",
@@ -293,7 +293,6 @@ func (r *PluginAiSemanticResponseGuardResource) Schema(ctx context.Context, req 
 								"realtime/generation",
 								"text/embeddings",
 								"text/generation",
-								"video/generation",
 							),
 						},
 					},

@@ -3,7 +3,7 @@
 all: speakeasy
 
 format:
-	@npx oas-toolkit filter-annotation --keep x-speakeasy-entity-operation openapi.yaml > foo
+	@npx oas-toolkit filter-annotation --keep x-speakeasy-entity-operation,x-keep-sdk openapi.yaml > foo
 	@mv foo openapi.yaml
 	@npx oas-toolkit remove-unused-components openapi.yaml > foo
 	@mv foo openapi.yaml

@@ -1,12 +1,12 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: 8315e0c8c1ac80a01f67c88ddb09803f
+  docChecksum: d3d84c40462cb91bbf39bade10637cc9
   docVersion: 0.0.1
   speakeasyVersion: 1.636.0
   generationVersion: 2.723.2
-  releaseVersion: 1.0.0
-  configChecksum: 68e56742f59ea71bb54251bc60777631
+  releaseVersion: 1.0.1
+  configChecksum: 81ceeceea8e03d48d421b40009d70f94
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -759,7 +759,9 @@ generatedFiles:
   - internal/provider/types/binds.go
   - internal/provider/types/bootstrap_servers.go
   - internal/provider/types/bot_detection_plugin_config.go
+  - internal/provider/types/branch.go
   - internal/provider/types/cache.go
+  - internal/provider/types/call.go
   - internal/provider/types/callouts.go
   - internal/provider/types/canary_plugin_config.go
   - internal/provider/types/categories.go
@@ -784,9 +786,12 @@ generatedFiles:
   - internal/provider/types/datakit_plugin_cache.go
   - internal/provider/types/datakit_plugin_config.go
   - internal/provider/types/datakit_plugin_memory.go
+  - internal/provider/types/datakit_plugin_nodes_inputs.go
+  - internal/provider/types/datakit_plugin_nodes_outputs.go
   - internal/provider/types/degraphql_plugin_config.go
   - internal/provider/types/embeddings.go
   - internal/provider/types/error.go
+  - internal/provider/types/exit.go
   - internal/provider/types/exit_transformer_plugin_config.go
   - internal/provider/types/extra_options.go
   - internal/provider/types/file_log_plugin_config.go
@@ -804,7 +809,9 @@ generatedFiles:
   - internal/provider/types/http_opts.go
   - internal/provider/types/identity_realms.go
   - internal/provider/types/injection_protection_plugin_config.go
+  - internal/provider/types/inputs.go
   - internal/provider/types/ip_restriction_plugin_config.go
+  - internal/provider/types/jq.go
   - internal/provider/types/jq_plugin_config.go
   - internal/provider/types/json_threat_protection_plugin_config.go
   - internal/provider/types/jwe_decrypt_plugin_config.go
@@ -829,6 +836,9 @@ generatedFiles:
   - internal/provider/types/mocking_plugin_config.go
   - internal/provider/types/mtls_auth_plugin_config.go
   - internal/provider/types/nodes.go
+  - internal/provider/types/nodes_cache.go
+  - internal/provider/types/nodes_inputs.go
+  - internal/provider/types/nodes_outputs.go
   - internal/provider/types/oas_validation_plugin_config.go
   - internal/provider/types/oauth2.go
   - internal/provider/types/oauth2_client.go
@@ -838,6 +848,7 @@ generatedFiles:
   - internal/provider/types/openid_connect_plugin_config.go
   - internal/provider/types/openid_connect_plugin_redis.go
   - internal/provider/types/opentelemetry_plugin_config.go
+  - internal/provider/types/outputs.go
   - internal/provider/types/parameter_schema.go
   - internal/provider/types/partial_redis_ce.go
   - internal/provider/types/partial_redis_ce_config.go
@@ -853,6 +864,7 @@ generatedFiles:
   - internal/provider/types/prometheus_plugin_config.go
   - internal/provider/types/prompts.go
   - internal/provider/types/propagation.go
+  - internal/provider/types/property.go
   - internal/provider/types/proxy.go
   - internal/provider/types/proxy_cache_advanced_plugin_config.go
   - internal/provider/types/proxy_cache_plugin_config.go
@@ -911,6 +923,7 @@ generatedFiles:
   - internal/provider/types/solace_upstream_plugin_config.go
   - internal/provider/types/solace_upstream_plugin_message.go
   - internal/provider/types/standard_webhooks_plugin_config.go
+  - internal/provider/types/static.go
   - internal/provider/types/static_tags.go
   - internal/provider/types/statsd_advanced_plugin_config.go
   - internal/provider/types/statsd_plugin_config.go
@@ -1240,7 +1253,6 @@ generatedFiles:
   - internal/sdk/models/operations/deleteworkspace.go
   - internal/sdk/models/operations/deletexmlthreatprotectionplugin.go
   - internal/sdk/models/operations/deletezipkinplugin.go
-  - internal/sdk/models/operations/fetchpartialschema.go
   - internal/sdk/models/operations/fetchpluginschema.go
   - internal/sdk/models/operations/getaceplugin.go
   - internal/sdk/models/operations/getaclplugin.go
@@ -1372,27 +1384,7 @@ generatedFiles:
   - internal/sdk/models/operations/getworkspace.go
   - internal/sdk/models/operations/getxmlthreatprotectionplugin.go
   - internal/sdk/models/operations/getzipkinplugin.go
-  - internal/sdk/models/operations/listaclwithconsumer.go
-  - internal/sdk/models/operations/listbasicauthwithconsumer.go
-  - internal/sdk/models/operations/listcacertificate.go
-  - internal/sdk/models/operations/listcertificate.go
-  - internal/sdk/models/operations/listconsumer.go
-  - internal/sdk/models/operations/listconsumergroup.go
-  - internal/sdk/models/operations/listhmacauthwithconsumer.go
-  - internal/sdk/models/operations/listjwtwithconsumer.go
-  - internal/sdk/models/operations/listkey.go
-  - internal/sdk/models/operations/listkeyauthwithconsumer.go
-  - internal/sdk/models/operations/listkeyset.go
-  - internal/sdk/models/operations/listmtlsauthwithconsumer.go
-  - internal/sdk/models/operations/listpartial.go
   - internal/sdk/models/operations/listplugin.go
-  - internal/sdk/models/operations/listroute.go
-  - internal/sdk/models/operations/listservice.go
-  - internal/sdk/models/operations/listsni.go
-  - internal/sdk/models/operations/listtargetwithupstream.go
-  - internal/sdk/models/operations/listupstream.go
-  - internal/sdk/models/operations/listvault.go
-  - internal/sdk/models/operations/listworkspace.go
   - internal/sdk/models/operations/options.go
   - internal/sdk/models/operations/removeconsumerfromgroup.go
   - internal/sdk/models/operations/updateaceplugin.go
@@ -1505,18 +1497,12 @@ generatedFiles:
   - internal/sdk/models/operations/updatewebsocketvalidatorplugin.go
   - internal/sdk/models/operations/updatexmlthreatprotectionplugin.go
   - internal/sdk/models/operations/updatezipkinplugin.go
-  - internal/sdk/models/operations/upsertaclwithconsumer.go
-  - internal/sdk/models/operations/upsertbasicauthwithconsumer.go
   - internal/sdk/models/operations/upsertcacertificate.go
   - internal/sdk/models/operations/upsertcertificate.go
   - internal/sdk/models/operations/upsertconsumer.go
   - internal/sdk/models/operations/upsertconsumergroup.go
-  - internal/sdk/models/operations/upserthmacauthwithconsumer.go
-  - internal/sdk/models/operations/upsertjwtwithconsumer.go
   - internal/sdk/models/operations/upsertkey.go
-  - internal/sdk/models/operations/upsertkeyauthwithconsumer.go
   - internal/sdk/models/operations/upsertkeyset.go
-  - internal/sdk/models/operations/upsertmtlsauthwithconsumer.go
   - internal/sdk/models/operations/upsertpartial.go
   - internal/sdk/models/operations/upsertplugin.go
   - internal/sdk/models/operations/upsertroute.go
@@ -1526,7 +1512,6 @@ generatedFiles:
   - internal/sdk/models/operations/upsertupstream.go
   - internal/sdk/models/operations/upsertvault.go
   - internal/sdk/models/operations/upsertworkspace.go
-  - internal/sdk/models/operations/validateentityschema.go
   - internal/sdk/models/shared/aceplugin.go
   - internal/sdk/models/shared/acl.go
   - internal/sdk/models/shared/aclplugin.go
@@ -1576,7 +1561,6 @@ generatedFiles:
   - internal/sdk/models/shared/filelogplugin.go
   - internal/sdk/models/shared/forwardproxyplugin.go
   - internal/sdk/models/shared/gatewayunauthorizederror.go
-  - internal/sdk/models/shared/getpartialschemaresponse.go
   - internal/sdk/models/shared/getpluginschemaresponse.go
   - internal/sdk/models/shared/graphqlproxycacheadvancedplugin.go
   - internal/sdk/models/shared/graphqlratelimitingadvancedplugin.go
@@ -1637,7 +1621,6 @@ generatedFiles:
   - internal/sdk/models/shared/responseratelimitingplugin.go
   - internal/sdk/models/shared/responsetransformeradvancedplugin.go
   - internal/sdk/models/shared/responsetransformerplugin.go
-  - internal/sdk/models/shared/route.go
   - internal/sdk/models/shared/routebyheaderplugin.go
   - internal/sdk/models/shared/routeexpression.go
   - internal/sdk/models/shared/routejson.go
@@ -1664,7 +1647,6 @@ generatedFiles:
   - internal/sdk/models/shared/upstream.go
   - internal/sdk/models/shared/upstreamoauthplugin.go
   - internal/sdk/models/shared/upstreamtimeoutplugin.go
-  - internal/sdk/models/shared/validateentityresponse.go
   - internal/sdk/models/shared/vault.go
   - internal/sdk/models/shared/vaultauthplugin.go
   - internal/sdk/models/shared/websocketsizelimitplugin.go
@@ -1679,7 +1661,6 @@ generatedFiles:
   - internal/sdk/plugins.go
   - internal/sdk/retry/config.go
   - internal/sdk/routes.go
-  - internal/sdk/schemas.go
   - internal/sdk/services.go
   - internal/sdk/snis.go
   - internal/sdk/targets.go

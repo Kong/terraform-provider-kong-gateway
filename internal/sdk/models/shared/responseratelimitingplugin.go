@@ -285,7 +285,8 @@ type ResponseRatelimitingPluginConfig struct {
 	HideClientHeaders *bool `json:"hide_client_headers,omitempty"`
 	// The entity that will be used when aggregating the limits: `consumer`, `credential`, `ip`. If the `consumer` or the `credential` cannot be determined, the system will always fallback to `ip`.
 	LimitBy *ResponseRatelimitingPluginLimitBy `json:"limit_by,omitempty"`
-	Limits  map[string]Limits                  `json:"limits,omitempty"`
+	// A map that defines rate limits for the plugin.
+	Limits map[string]Limits `json:"limits,omitempty"`
 	// The rate-limiting policies to use for retrieving and incrementing the limits.
 	Policy *ResponseRatelimitingPluginPolicy `json:"policy,omitempty"`
 	// Redis configuration

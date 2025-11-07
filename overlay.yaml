@@ -16,6 +16,11 @@ actions:
   # Credentials
   - target: $["components"]["schemas"]["BasicAuthWithoutParents"]["properties"]["password"]
     update:
+      writeOnly: true
+      x-speakeasy-param-sensitive: true
+  - target: $["components"]["schemas"]["BasicAuth"]["properties"]["password"]
+    update:
+      writeOnly: true
       x-speakeasy-param-sensitive: true
 
   # Security Scheme - allow operations when admin token is not given

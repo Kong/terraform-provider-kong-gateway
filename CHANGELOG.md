@@ -1,6 +1,13 @@
 # Changelog
 
 ## 1.0.0
+> Released on 2025/11/07
+
+### Bug fixes
+
+* Fix `gateway_plugin_datakit` nodes schema
+
+## 1.0.0
 > Released on 2025/10/20
 
 The provider is now GA 🎉

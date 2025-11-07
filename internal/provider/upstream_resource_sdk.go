@@ -386,9 +386,9 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 			} else {
 				timeout = nil
 			}
-			typeVar := new(shared.UpstreamType)
+			typeVar := new(shared.Type)
 			if !r.Healthchecks.Active.Type.IsUnknown() && !r.Healthchecks.Active.Type.IsNull() {
-				*typeVar = shared.UpstreamType(r.Healthchecks.Active.Type.ValueString())
+				*typeVar = shared.Type(r.Healthchecks.Active.Type.ValueString())
 			} else {
 				typeVar = nil
 			}
@@ -461,9 +461,9 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 					Successes:    successes1,
 				}
 			}
-			typeVar1 := new(shared.UpstreamHealthchecksType)
+			typeVar1 := new(shared.UpstreamType)
 			if !r.Healthchecks.Passive.Type.IsUnknown() && !r.Healthchecks.Passive.Type.IsNull() {
-				*typeVar1 = shared.UpstreamHealthchecksType(r.Healthchecks.Passive.Type.ValueString())
+				*typeVar1 = shared.UpstreamType(r.Healthchecks.Passive.Type.ValueString())
 			} else {
 				typeVar1 = nil
 			}

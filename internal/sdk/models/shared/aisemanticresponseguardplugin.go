@@ -515,7 +515,6 @@ const (
 	AiSemanticResponseGuardPluginGenaiCategoryRealtimeGeneration AiSemanticResponseGuardPluginGenaiCategory = "realtime/generation"
 	AiSemanticResponseGuardPluginGenaiCategoryTextEmbeddings     AiSemanticResponseGuardPluginGenaiCategory = "text/embeddings"
 	AiSemanticResponseGuardPluginGenaiCategoryTextGeneration     AiSemanticResponseGuardPluginGenaiCategory = "text/generation"
-	AiSemanticResponseGuardPluginGenaiCategoryVideoGeneration    AiSemanticResponseGuardPluginGenaiCategory = "video/generation"
 )
 
 func (e AiSemanticResponseGuardPluginGenaiCategory) ToPointer() *AiSemanticResponseGuardPluginGenaiCategory {
@@ -538,8 +537,6 @@ func (e *AiSemanticResponseGuardPluginGenaiCategory) UnmarshalJSON(data []byte) 
 	case "text/embeddings":
 		fallthrough
 	case "text/generation":
-		fallthrough
-	case "video/generation":
 		*e = AiSemanticResponseGuardPluginGenaiCategory(v)
 		return nil
 	default:

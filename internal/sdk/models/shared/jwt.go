@@ -7,38 +7,38 @@ import (
 	"fmt"
 )
 
-type Algorithm string
+type JWTAlgorithm string
 
 const (
-	AlgorithmEs256   Algorithm = "ES256"
-	AlgorithmEs256K  Algorithm = "ES256K"
-	AlgorithmEs384   Algorithm = "ES384"
-	AlgorithmEs512   Algorithm = "ES512"
-	AlgorithmEsb256  Algorithm = "ESB256"
-	AlgorithmEsb320  Algorithm = "ESB320"
-	AlgorithmEsb384  Algorithm = "ESB384"
-	AlgorithmEsb512  Algorithm = "ESB512"
-	AlgorithmEsp256  Algorithm = "ESP256"
-	AlgorithmEsp384  Algorithm = "ESP384"
-	AlgorithmEsp512  Algorithm = "ESP512"
-	AlgorithmEd25519 Algorithm = "Ed25519"
-	AlgorithmEd448   Algorithm = "Ed448"
-	AlgorithmEdDsa   Algorithm = "EdDSA"
-	AlgorithmHs256   Algorithm = "HS256"
-	AlgorithmHs384   Algorithm = "HS384"
-	AlgorithmHs512   Algorithm = "HS512"
-	AlgorithmPs256   Algorithm = "PS256"
-	AlgorithmPs384   Algorithm = "PS384"
-	AlgorithmPs512   Algorithm = "PS512"
-	AlgorithmRs256   Algorithm = "RS256"
-	AlgorithmRs384   Algorithm = "RS384"
-	AlgorithmRs512   Algorithm = "RS512"
+	JWTAlgorithmEs256   JWTAlgorithm = "ES256"
+	JWTAlgorithmEs256K  JWTAlgorithm = "ES256K"
+	JWTAlgorithmEs384   JWTAlgorithm = "ES384"
+	JWTAlgorithmEs512   JWTAlgorithm = "ES512"
+	JWTAlgorithmEsb256  JWTAlgorithm = "ESB256"
+	JWTAlgorithmEsb320  JWTAlgorithm = "ESB320"
+	JWTAlgorithmEsb384  JWTAlgorithm = "ESB384"
+	JWTAlgorithmEsb512  JWTAlgorithm = "ESB512"
+	JWTAlgorithmEsp256  JWTAlgorithm = "ESP256"
+	JWTAlgorithmEsp384  JWTAlgorithm = "ESP384"
+	JWTAlgorithmEsp512  JWTAlgorithm = "ESP512"
+	JWTAlgorithmEd25519 JWTAlgorithm = "Ed25519"
+	JWTAlgorithmEd448   JWTAlgorithm = "Ed448"
+	JWTAlgorithmEdDsa   JWTAlgorithm = "EdDSA"
+	JWTAlgorithmHs256   JWTAlgorithm = "HS256"
+	JWTAlgorithmHs384   JWTAlgorithm = "HS384"
+	JWTAlgorithmHs512   JWTAlgorithm = "HS512"
+	JWTAlgorithmPs256   JWTAlgorithm = "PS256"
+	JWTAlgorithmPs384   JWTAlgorithm = "PS384"
+	JWTAlgorithmPs512   JWTAlgorithm = "PS512"
+	JWTAlgorithmRs256   JWTAlgorithm = "RS256"
+	JWTAlgorithmRs384   JWTAlgorithm = "RS384"
+	JWTAlgorithmRs512   JWTAlgorithm = "RS512"
 )
 
-func (e Algorithm) ToPointer() *Algorithm {
+func (e JWTAlgorithm) ToPointer() *JWTAlgorithm {
 	return &e
 }
-func (e *Algorithm) UnmarshalJSON(data []byte) error {
+func (e *JWTAlgorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -89,10 +89,10 @@ func (e *Algorithm) UnmarshalJSON(data []byte) error {
 	case "RS384":
 		fallthrough
 	case "RS512":
-		*e = Algorithm(v)
+		*e = JWTAlgorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Algorithm: %v", v)
+		return fmt.Errorf("invalid value for JWTAlgorithm: %v", v)
 	}
 }
 
@@ -108,8 +108,8 @@ func (j *JWTConsumer) GetID() *string {
 }
 
 type Jwt struct {
-	Algorithm *Algorithm   `json:"algorithm,omitempty"`
-	Consumer  *JWTConsumer `json:"consumer,omitempty"`
+	Algorithm *JWTAlgorithm `json:"algorithm,omitempty"`
+	Consumer  *JWTConsumer  `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// A string representing a UUID (universally unique identifier).
@@ -121,7 +121,7 @@ type Jwt struct {
 	Tags []string `json:"tags,omitempty"`
 }
 
-func (j *Jwt) GetAlgorithm() *Algorithm {
+func (j *Jwt) GetAlgorithm() *JWTAlgorithm {
 	if j == nil {
 		return nil
 	}

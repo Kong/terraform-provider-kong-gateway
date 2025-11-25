@@ -2,6 +2,14 @@
 
 Thank you for your interest in contributing to this repository. Please note that this repository contains generated code. As such, we do not accept direct changes or pull requests. Instead, we encourage you to follow the guidelines below to report issues and suggest improvements.
 
+## For Kong employees
+
+If you're a Kong employee and want to update this provider:
+
+1. Run `make kong-plugins` in the admin-spec-generator repo
+2. Run `make format` in this repo
+3. Run `make speakeasy` to generate the provider
+
 ## How to Report Issues
 
 If you encounter any bugs or have suggestions for improvements, please open an issue on GitHub. When reporting an issue, please provide as much detail as possible to help us reproduce the problem. This includes:

@@ -7,38 +7,38 @@ import (
 	"fmt"
 )
 
-type JWTWithoutParentsAlgorithm string
+type Algorithm string
 
 const (
-	JWTWithoutParentsAlgorithmEs256   JWTWithoutParentsAlgorithm = "ES256"
-	JWTWithoutParentsAlgorithmEs256K  JWTWithoutParentsAlgorithm = "ES256K"
-	JWTWithoutParentsAlgorithmEs384   JWTWithoutParentsAlgorithm = "ES384"
-	JWTWithoutParentsAlgorithmEs512   JWTWithoutParentsAlgorithm = "ES512"
-	JWTWithoutParentsAlgorithmEsb256  JWTWithoutParentsAlgorithm = "ESB256"
-	JWTWithoutParentsAlgorithmEsb320  JWTWithoutParentsAlgorithm = "ESB320"
-	JWTWithoutParentsAlgorithmEsb384  JWTWithoutParentsAlgorithm = "ESB384"
-	JWTWithoutParentsAlgorithmEsb512  JWTWithoutParentsAlgorithm = "ESB512"
-	JWTWithoutParentsAlgorithmEsp256  JWTWithoutParentsAlgorithm = "ESP256"
-	JWTWithoutParentsAlgorithmEsp384  JWTWithoutParentsAlgorithm = "ESP384"
-	JWTWithoutParentsAlgorithmEsp512  JWTWithoutParentsAlgorithm = "ESP512"
-	JWTWithoutParentsAlgorithmEd25519 JWTWithoutParentsAlgorithm = "Ed25519"
-	JWTWithoutParentsAlgorithmEd448   JWTWithoutParentsAlgorithm = "Ed448"
-	JWTWithoutParentsAlgorithmEdDsa   JWTWithoutParentsAlgorithm = "EdDSA"
-	JWTWithoutParentsAlgorithmHs256   JWTWithoutParentsAlgorithm = "HS256"
-	JWTWithoutParentsAlgorithmHs384   JWTWithoutParentsAlgorithm = "HS384"
-	JWTWithoutParentsAlgorithmHs512   JWTWithoutParentsAlgorithm = "HS512"
-	JWTWithoutParentsAlgorithmPs256   JWTWithoutParentsAlgorithm = "PS256"
-	JWTWithoutParentsAlgorithmPs384   JWTWithoutParentsAlgorithm = "PS384"
-	JWTWithoutParentsAlgorithmPs512   JWTWithoutParentsAlgorithm = "PS512"
-	JWTWithoutParentsAlgorithmRs256   JWTWithoutParentsAlgorithm = "RS256"
-	JWTWithoutParentsAlgorithmRs384   JWTWithoutParentsAlgorithm = "RS384"
-	JWTWithoutParentsAlgorithmRs512   JWTWithoutParentsAlgorithm = "RS512"
+	AlgorithmEs256   Algorithm = "ES256"
+	AlgorithmEs256K  Algorithm = "ES256K"
+	AlgorithmEs384   Algorithm = "ES384"
+	AlgorithmEs512   Algorithm = "ES512"
+	AlgorithmEsb256  Algorithm = "ESB256"
+	AlgorithmEsb320  Algorithm = "ESB320"
+	AlgorithmEsb384  Algorithm = "ESB384"
+	AlgorithmEsb512  Algorithm = "ESB512"
+	AlgorithmEsp256  Algorithm = "ESP256"
+	AlgorithmEsp384  Algorithm = "ESP384"
+	AlgorithmEsp512  Algorithm = "ESP512"
+	AlgorithmEd25519 Algorithm = "Ed25519"
+	AlgorithmEd448   Algorithm = "Ed448"
+	AlgorithmEdDsa   Algorithm = "EdDSA"
+	AlgorithmHs256   Algorithm = "HS256"
+	AlgorithmHs384   Algorithm = "HS384"
+	AlgorithmHs512   Algorithm = "HS512"
+	AlgorithmPs256   Algorithm = "PS256"
+	AlgorithmPs384   Algorithm = "PS384"
+	AlgorithmPs512   Algorithm = "PS512"
+	AlgorithmRs256   Algorithm = "RS256"
+	AlgorithmRs384   Algorithm = "RS384"
+	AlgorithmRs512   Algorithm = "RS512"
 )
 
-func (e JWTWithoutParentsAlgorithm) ToPointer() *JWTWithoutParentsAlgorithm {
+func (e Algorithm) ToPointer() *Algorithm {
 	return &e
 }
-func (e *JWTWithoutParentsAlgorithm) UnmarshalJSON(data []byte) error {
+func (e *Algorithm) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -89,10 +89,10 @@ func (e *JWTWithoutParentsAlgorithm) UnmarshalJSON(data []byte) error {
 	case "RS384":
 		fallthrough
 	case "RS512":
-		*e = JWTWithoutParentsAlgorithm(v)
+		*e = Algorithm(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for JWTWithoutParentsAlgorithm: %v", v)
+		return fmt.Errorf("invalid value for Algorithm: %v", v)
 	}
 }
 
@@ -108,8 +108,8 @@ func (j *JWTWithoutParentsConsumer) GetID() *string {
 }
 
 type JWTWithoutParents struct {
-	Algorithm *JWTWithoutParentsAlgorithm `json:"algorithm,omitempty"`
-	Consumer  *JWTWithoutParentsConsumer  `json:"consumer,omitempty"`
+	Algorithm *Algorithm                 `json:"algorithm,omitempty"`
+	Consumer  *JWTWithoutParentsConsumer `json:"consumer,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// A string representing a UUID (universally unique identifier).
@@ -121,7 +121,7 @@ type JWTWithoutParents struct {
 	Tags []string `json:"tags,omitempty"`
 }
 
-func (j *JWTWithoutParents) GetAlgorithm() *JWTWithoutParentsAlgorithm {
+func (j *JWTWithoutParents) GetAlgorithm() *Algorithm {
 	if j == nil {
 		return nil
 	}

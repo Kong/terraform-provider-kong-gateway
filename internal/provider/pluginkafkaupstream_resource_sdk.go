@@ -17,6 +17,7 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
 		r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
 		for _, v := range resp.Config.AllowedTopics {
 			r.Config.AllowedTopics = append(r.Config.AllowedTopics, types.StringValue(v))
@@ -202,11 +203,11 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -215,17 +216,17 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -254,6 +255,8 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -373,8 +376,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		var after *shared.KafkaUpstreamPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.KafkaUpstreamPluginAfter{
 				Access: access,
@@ -383,8 +386,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		var before *shared.KafkaUpstreamPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.KafkaUpstreamPluginBefore{
 				Access: access1,
@@ -396,22 +399,22 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		}
 	}
 	partials := make([]shared.KafkaUpstreamPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -424,8 +427,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -435,8 +438,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		updatedAt = nil
 	}
 	allowedTopics := make([]string, 0, len(r.Config.AllowedTopics))
-	for _, allowedTopicsItem := range r.Config.AllowedTopics {
-		allowedTopics = append(allowedTopics, allowedTopicsItem.ValueString())
+	for allowedTopicsIndex := range r.Config.AllowedTopics {
+		allowedTopics = append(allowedTopics, r.Config.AllowedTopics[allowedTopicsIndex].ValueString())
 	}
 	var authentication *shared.KafkaUpstreamPluginAuthentication
 	if r.Config.Authentication != nil {
@@ -479,12 +482,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		}
 	}
 	bootstrapServers := make([]shared.KafkaUpstreamPluginBootstrapServers, 0, len(r.Config.BootstrapServers))
-	for _, bootstrapServersItem := range r.Config.BootstrapServers {
+	for bootstrapServersIndex := range r.Config.BootstrapServers {
 		var host string
-		host = bootstrapServersItem.Host.ValueString()
+		host = r.Config.BootstrapServers[bootstrapServersIndex].Host.ValueString()
 
 		var port int64
-		port = bootstrapServersItem.Port.ValueInt64()
+		port = r.Config.BootstrapServers[bootstrapServersIndex].Port.ValueInt64()
 
 		bootstrapServers = append(bootstrapServers, shared.KafkaUpstreamPluginBootstrapServers{
 			Host: host,
@@ -540,8 +543,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		keyQueryArg = nil
 	}
 	messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
-	for _, messageByLuaFunctionsItem := range r.Config.MessageByLuaFunctions {
-		messageByLuaFunctions = append(messageByLuaFunctions, messageByLuaFunctionsItem.ValueString())
+	for messageByLuaFunctionsIndex := range r.Config.MessageByLuaFunctions {
+		messageByLuaFunctions = append(messageByLuaFunctions, r.Config.MessageByLuaFunctions[messageByLuaFunctionsIndex].ValueString())
 	}
 	producerAsync := new(bool)
 	if !r.Config.ProducerAsync.IsUnknown() && !r.Config.ProducerAsync.IsNull() {
@@ -625,8 +628,8 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 				var oauth2 *shared.KafkaUpstreamPluginOauth2
 				if r.Config.SchemaRegistry.Confluent.Authentication.Oauth2 != nil {
 					audience := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience))
-					for _, audienceItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
-						audience = append(audience, audienceItem.ValueString())
+					for audienceIndex := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience {
+						audience = append(audience, r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Audience[audienceIndex].ValueString())
 					}
 					clientID := new(string)
 					if !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.ClientID.IsNull() {
@@ -653,22 +656,22 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 						password2 = nil
 					}
 					scopes := make([]string, 0, len(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes))
-					for _, scopesItem := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
-						scopes = append(scopes, scopesItem.ValueString())
+					for scopesIndex := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes {
+						scopes = append(scopes, r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Scopes[scopesIndex].ValueString())
 					}
 					var tokenEndpoint string
 					tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
 					tokenHeaders := make(map[string]interface{})
-					for tokenHeadersKey, tokenHeadersValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
+					for tokenHeadersKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
 						var tokenHeadersInst interface{}
-						_ = json.Unmarshal([]byte(tokenHeadersValue.ValueString()), &tokenHeadersInst)
+						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()), &tokenHeadersInst)
 						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
 					}
 					tokenPostArgs := make(map[string]interface{})
-					for tokenPostArgsKey, tokenPostArgsValue := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
+					for tokenPostArgsKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
 						var tokenPostArgsInst interface{}
-						_ = json.Unmarshal([]byte(tokenPostArgsValue.ValueString()), &tokenPostArgsInst)
+						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()), &tokenPostArgsInst)
 						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
 					}
 					username1 := new(string)

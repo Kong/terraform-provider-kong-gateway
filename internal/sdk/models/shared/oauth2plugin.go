@@ -12,6 +12,17 @@ type Oauth2PluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (o Oauth2PluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *Oauth2PluginAfter) GetAccess() []string {
 	if o == nil {
 		return nil
@@ -21,6 +32,17 @@ func (o *Oauth2PluginAfter) GetAccess() []string {
 
 type Oauth2PluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (o Oauth2PluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Oauth2PluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (o *Oauth2PluginBefore) GetAccess() []string {
 type Oauth2PluginOrdering struct {
 	After  *Oauth2PluginAfter  `json:"after,omitempty"`
 	Before *Oauth2PluginBefore `json:"before,omitempty"`
+}
+
+func (o Oauth2PluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Oauth2PluginOrdering) GetAfter() *Oauth2PluginAfter {
@@ -55,6 +88,17 @@ type Oauth2PluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (o Oauth2PluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Oauth2PluginPartials) GetID() *string {
@@ -144,6 +188,17 @@ type Oauth2PluginConfig struct {
 	Scopes []string `json:"scopes,omitempty"`
 	// An optional integer value telling the plugin how many seconds a token should last, after which the client will need to refresh the token. Set to `0` to disable the expiration.
 	TokenExpiration *float64 `json:"token_expiration,omitempty"`
+}
+
+func (o Oauth2PluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Oauth2PluginConfig) GetAcceptHTTPIfAlreadyTerminated() *bool {
@@ -315,6 +370,17 @@ type Oauth2PluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (o Oauth2PluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *Oauth2PluginRoute) GetID() *string {
 	if o == nil {
 		return nil
@@ -325,6 +391,17 @@ func (o *Oauth2PluginRoute) GetID() *string {
 // Oauth2PluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type Oauth2PluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (o Oauth2PluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Oauth2PluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Oauth2PluginService) GetID() *string {

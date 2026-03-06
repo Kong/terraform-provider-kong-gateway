@@ -5,11 +5,23 @@ package shared
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
 // PluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 type PluginConsumer struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (p PluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PluginConsumer) GetID() *string {
@@ -24,6 +36,17 @@ type PluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (p PluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *PluginConsumerGroup) GetID() *string {
 	if p == nil {
 		return nil
@@ -33,6 +56,17 @@ func (p *PluginConsumerGroup) GetID() *string {
 
 type After struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a After) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *After) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *After) GetAccess() []string {
@@ -46,6 +80,17 @@ type Before struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (b Before) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *Before) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *Before) GetAccess() []string {
 	if b == nil {
 		return nil
@@ -56,6 +101,17 @@ func (b *Before) GetAccess() []string {
 type Ordering struct {
 	After  *After  `json:"after,omitempty"`
 	Before *Before `json:"before,omitempty"`
+}
+
+func (o Ordering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *Ordering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *Ordering) GetAfter() *After {
@@ -78,6 +134,17 @@ type Partials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (p Partials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Partials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Partials) GetID() *string {
@@ -157,6 +224,17 @@ type Route struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (r Route) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *Route) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *Route) GetID() *string {
 	if r == nil {
 		return nil
@@ -167,6 +245,17 @@ func (r *Route) GetID() *string {
 // PluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type PluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (p PluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PluginService) GetID() *string {
@@ -207,6 +296,17 @@ type Plugin struct {
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (p Plugin) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Plugin) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"name"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Plugin) GetConfig() map[string]any {

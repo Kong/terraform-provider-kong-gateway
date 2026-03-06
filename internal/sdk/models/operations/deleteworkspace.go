@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,6 +11,17 @@ import (
 type DeleteWorkspaceRequest struct {
 	// ID or name of the Workspace to lookup
 	WorkspaceIDOrName string `pathParam:"style=simple,explode=false,name=WorkspaceIdOrName"`
+}
+
+func (d DeleteWorkspaceRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteWorkspaceRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"WorkspaceIdOrName"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteWorkspaceRequest) GetWorkspaceIDOrName() string {
@@ -28,6 +40,17 @@ type DeleteWorkspaceResponse struct {
 	RawResponse *http.Response
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (d DeleteWorkspaceResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteWorkspaceResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteWorkspaceResponse) GetContentType() string {

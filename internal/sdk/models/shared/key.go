@@ -2,10 +2,25 @@
 
 package shared
 
+import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
 // Pem - A keypair in PEM format.
 type Pem struct {
 	PrivateKey *string `json:"private_key,omitempty"`
 	PublicKey  *string `json:"public_key,omitempty"`
+}
+
+func (p Pem) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Pem) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Pem) GetPrivateKey() *string {
@@ -25,6 +40,17 @@ func (p *Pem) GetPublicKey() *string {
 // Set - The id (an UUID) of the key-set with which to associate the key.
 type Set struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s Set) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *Set) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Set) GetID() *string {
@@ -56,6 +82,17 @@ type Key struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 	// X.509 certificate SHA-1 thumbprint.
 	X5t *string `json:"x5t,omitempty"`
+}
+
+func (k Key) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *Key) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"kid"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *Key) GetCreatedAt() *int64 {

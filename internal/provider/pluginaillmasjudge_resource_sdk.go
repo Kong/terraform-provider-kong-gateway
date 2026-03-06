@@ -15,6 +15,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.AiLlmAsJudgePluginConfig{}
 		r.Config.HTTPProxyHost = types.StringPointerValue(resp.Config.HTTPProxyHost)
 		r.Config.HTTPProxyPort = types.Int64PointerValue(resp.Config.HTTPProxyPort)
 		r.Config.HTTPTimeout = types.Int64PointerValue(resp.Config.HTTPTimeout)
@@ -24,6 +25,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 		r.Config.IgnoreAssistantPrompts = types.BoolPointerValue(resp.Config.IgnoreAssistantPrompts)
 		r.Config.IgnoreSystemPrompts = types.BoolPointerValue(resp.Config.IgnoreSystemPrompts)
 		r.Config.IgnoreToolPrompts = types.BoolPointerValue(resp.Config.IgnoreToolPrompts)
+		r.Config.Llm = &tfTypes.Llm{}
 		if resp.Config.Llm.Auth == nil {
 			r.Config.Llm.Auth = nil
 		} else {
@@ -54,6 +56,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			r.Config.Llm.Logging.LogPayloads = types.BoolPointerValue(resp.Config.Llm.Logging.LogPayloads)
 			r.Config.Llm.Logging.LogStatistics = types.BoolPointerValue(resp.Config.Llm.Logging.LogStatistics)
 		}
+		r.Config.Llm.Model = &tfTypes.AiLlmAsJudgePluginModel{}
 		r.Config.Llm.Model.Name = types.StringPointerValue(resp.Config.Llm.Model.Name)
 		if resp.Config.Llm.Model.Options == nil {
 			r.Config.Llm.Model.Options = nil
@@ -145,11 +148,11 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -158,17 +161,17 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -197,6 +200,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -316,8 +321,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 		var after *shared.AiLlmAsJudgePluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.AiLlmAsJudgePluginAfter{
 				Access: access,
@@ -326,8 +331,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 		var before *shared.AiLlmAsJudgePluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.AiLlmAsJudgePluginBefore{
 				Access: access1,
@@ -339,22 +344,22 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 		}
 	}
 	partials := make([]shared.AiLlmAsJudgePluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -367,8 +372,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

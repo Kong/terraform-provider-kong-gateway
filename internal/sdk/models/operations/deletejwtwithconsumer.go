@@ -57,6 +57,17 @@ type DeleteJwtWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
+func (d DeleteJwtWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteJwtWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DeleteJwtWithConsumerResponse) GetContentType() string {
 	if d == nil {
 		return ""

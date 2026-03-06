@@ -12,6 +12,17 @@ type ServiceProtectionPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (s ServiceProtectionPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *ServiceProtectionPluginAfter) GetAccess() []string {
 	if s == nil {
 		return nil
@@ -21,6 +32,17 @@ func (s *ServiceProtectionPluginAfter) GetAccess() []string {
 
 type ServiceProtectionPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (s ServiceProtectionPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (s *ServiceProtectionPluginBefore) GetAccess() []string {
 type ServiceProtectionPluginOrdering struct {
 	After  *ServiceProtectionPluginAfter  `json:"after,omitempty"`
 	Before *ServiceProtectionPluginBefore `json:"before,omitempty"`
+}
+
+func (s ServiceProtectionPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginOrdering) GetAfter() *ServiceProtectionPluginAfter {
@@ -55,6 +88,17 @@ type ServiceProtectionPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (s ServiceProtectionPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginPartials) GetID() *string {
@@ -85,6 +129,17 @@ type ServiceProtectionPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (s ServiceProtectionPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *ServiceProtectionPluginClusterNodes) GetIP() *string {
 	if s == nil {
 		return nil
@@ -104,6 +159,17 @@ type ServiceProtectionPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (s ServiceProtectionPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginSentinelNodes) GetHost() *string {
@@ -193,6 +259,17 @@ type ServiceProtectionPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (s ServiceProtectionPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -429,6 +506,17 @@ type ServiceProtectionPluginConfig struct {
 	WindowType *ServiceProtectionPluginWindowType `json:"window_type,omitempty"`
 }
 
+func (s ServiceProtectionPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"limit", "window_size"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *ServiceProtectionPluginConfig) GetDictionaryName() *string {
 	if s == nil {
 		return nil
@@ -562,6 +650,17 @@ func (e *ServiceProtectionPluginProtocols) UnmarshalJSON(data []byte) error {
 // ServiceProtectionPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type ServiceProtectionPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s ServiceProtectionPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceProtectionPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceProtectionPluginService) GetID() *string {

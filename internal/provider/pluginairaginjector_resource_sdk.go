@@ -15,6 +15,8 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.AiRagInjectorPluginConfig{}
+		r.Config.Embeddings = &tfTypes.Embeddings{}
 		if resp.Config.Embeddings.Auth == nil {
 			r.Config.Embeddings.Auth = nil
 		} else {
@@ -38,6 +40,7 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 			r.Config.Embeddings.Auth.ParamName = types.StringPointerValue(resp.Config.Embeddings.Auth.ParamName)
 			r.Config.Embeddings.Auth.ParamValue = types.StringPointerValue(resp.Config.Embeddings.Auth.ParamValue)
 		}
+		r.Config.Embeddings.Model = &tfTypes.AiProxyAdvancedPluginModel{}
 		r.Config.Embeddings.Model.Name = types.StringValue(resp.Config.Embeddings.Model.Name)
 		if resp.Config.Embeddings.Model.Options == nil {
 			r.Config.Embeddings.Model.Options = nil
@@ -88,6 +91,7 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 		}
 		r.Config.InjectTemplate = types.StringPointerValue(resp.Config.InjectTemplate)
 		r.Config.StopOnFailure = types.BoolPointerValue(resp.Config.StopOnFailure)
+		r.Config.Vectordb = &tfTypes.AiRagInjectorPluginVectordb{}
 		r.Config.Vectordb.Dimensions = types.Int64Value(resp.Config.Vectordb.Dimensions)
 		r.Config.Vectordb.DistanceMetric = types.StringValue(string(resp.Config.Vectordb.DistanceMetric))
 		if resp.Config.Vectordb.Pgvector == nil {
@@ -180,11 +184,11 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -193,17 +197,17 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -232,6 +236,8 @@ func (r *PluginAiRagInjectorResourceModel) RefreshFromSharedAiRagInjectorPlugin(
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -351,8 +357,8 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 		var after *shared.AiRagInjectorPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.AiRagInjectorPluginAfter{
 				Access: access,
@@ -361,8 +367,8 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 		var before *shared.AiRagInjectorPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.AiRagInjectorPluginBefore{
 				Access: access1,
@@ -374,22 +380,22 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 		}
 	}
 	partials := make([]shared.AiRagInjectorPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -402,8 +408,8 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -788,16 +794,16 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 			clusterMaxRedirections = nil
 		}
 		clusterNodes := make([]shared.AiRagInjectorPluginClusterNodes, 0, len(r.Config.Vectordb.Redis.ClusterNodes))
-		for _, clusterNodesItem := range r.Config.Vectordb.Redis.ClusterNodes {
+		for clusterNodesIndex := range r.Config.Vectordb.Redis.ClusterNodes {
 			ip := new(string)
-			if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
-				*ip = clusterNodesItem.IP.ValueString()
+			if !r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].IP.IsUnknown() && !r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].IP.IsNull() {
+				*ip = r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].IP.ValueString()
 			} else {
 				ip = nil
 			}
 			port1 := new(int64)
-			if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
-				*port1 = clusterNodesItem.Port.ValueInt64()
+			if !r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].Port.IsUnknown() && !r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].Port.IsNull() {
+				*port1 = r.Config.Vectordb.Redis.ClusterNodes[clusterNodesIndex].Port.ValueInt64()
 			} else {
 				port1 = nil
 			}
@@ -873,16 +879,16 @@ func (r *PluginAiRagInjectorResourceModel) ToSharedAiRagInjectorPlugin(ctx conte
 			sentinelMaster = nil
 		}
 		sentinelNodes := make([]shared.AiRagInjectorPluginSentinelNodes, 0, len(r.Config.Vectordb.Redis.SentinelNodes))
-		for _, sentinelNodesItem := range r.Config.Vectordb.Redis.SentinelNodes {
+		for sentinelNodesIndex := range r.Config.Vectordb.Redis.SentinelNodes {
 			host2 := new(string)
-			if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
-				*host2 = sentinelNodesItem.Host.ValueString()
+			if !r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Host.IsUnknown() && !r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Host.IsNull() {
+				*host2 = r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Host.ValueString()
 			} else {
 				host2 = nil
 			}
 			port3 := new(int64)
-			if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
-				*port3 = sentinelNodesItem.Port.ValueInt64()
+			if !r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Port.IsUnknown() && !r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Port.IsNull() {
+				*port3 = r.Config.Vectordb.Redis.SentinelNodes[sentinelNodesIndex].Port.ValueInt64()
 			} else {
 				port3 = nil
 			}

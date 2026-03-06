@@ -56,6 +56,17 @@ type RemoveConsumerFromGroupResponse struct {
 	RawResponse *http.Response
 }
 
+func (r RemoveConsumerFromGroupResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RemoveConsumerFromGroupResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RemoveConsumerFromGroupResponse) GetContentType() string {
 	if r == nil {
 		return ""

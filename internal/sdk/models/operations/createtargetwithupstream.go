@@ -60,6 +60,17 @@ type CreateTargetWithUpstreamResponse struct {
 	Target *shared.Target
 }
 
+func (c CreateTargetWithUpstreamResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateTargetWithUpstreamResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CreateTargetWithUpstreamResponse) GetContentType() string {
 	if c == nil {
 		return ""

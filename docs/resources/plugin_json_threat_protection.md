@@ -19,12 +19,12 @@ resource "kong-gateway_plugin_json_threat_protection" "my_pluginjsonthreatprotec
     enforcement_mode                  = "block"
     error_message                     = "...my_error_message..."
     error_status_code                 = 422
-    max_array_element_count           = 333817350
-    max_body_size                     = 6963462
+    max_array_element_count           = 333817349
+    max_body_size                     = 6963461
     max_container_depth               = 1859170481
     max_object_entry_count            = 1346643259
-    max_object_entry_name_length      = 60000047
-    max_string_value_length           = 64603074
+    max_object_entry_name_length      = 60000046
+    max_string_value_length           = 64603073
   }
   created_at    = 4
   enabled       = false

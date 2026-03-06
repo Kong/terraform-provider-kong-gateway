@@ -12,6 +12,17 @@ type JqPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (j JqPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (j *JqPluginAfter) GetAccess() []string {
 	if j == nil {
 		return nil
@@ -21,6 +32,17 @@ func (j *JqPluginAfter) GetAccess() []string {
 
 type JqPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (j JqPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *JqPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (j *JqPluginBefore) GetAccess() []string {
 type JqPluginOrdering struct {
 	After  *JqPluginAfter  `json:"after,omitempty"`
 	Before *JqPluginBefore `json:"before,omitempty"`
+}
+
+func (j JqPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *JqPluginOrdering) GetAfter() *JqPluginAfter {
@@ -55,6 +88,17 @@ type JqPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (j JqPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *JqPluginPartials) GetID() *string {
@@ -84,6 +128,17 @@ type RequestJqProgramOptions struct {
 	JoinOutput    *bool `json:"join_output,omitempty"`
 	RawOutput     *bool `json:"raw_output,omitempty"`
 	SortKeys      *bool `json:"sort_keys,omitempty"`
+}
+
+func (r RequestJqProgramOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestJqProgramOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestJqProgramOptions) GetASCIIOutput() *bool {
@@ -129,6 +184,17 @@ type ResponseJqProgramOptions struct {
 	SortKeys      *bool `json:"sort_keys,omitempty"`
 }
 
+func (r ResponseJqProgramOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *ResponseJqProgramOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *ResponseJqProgramOptions) GetASCIIOutput() *bool {
 	if r == nil {
 		return nil
@@ -172,6 +238,17 @@ type JqPluginConfig struct {
 	ResponseIfStatusCode     []int64                   `json:"response_if_status_code,omitempty"`
 	ResponseJqProgram        *string                   `json:"response_jq_program,omitempty"`
 	ResponseJqProgramOptions *ResponseJqProgramOptions `json:"response_jq_program_options,omitempty"`
+}
+
+func (j JqPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *JqPluginConfig) GetRequestIfMediaType() []string {
@@ -228,6 +305,17 @@ type JqPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (j JqPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (j *JqPluginConsumer) GetID() *string {
 	if j == nil {
 		return nil
@@ -272,6 +360,17 @@ type JqPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (j JqPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (j *JqPluginRoute) GetID() *string {
 	if j == nil {
 		return nil
@@ -282,6 +381,17 @@ func (j *JqPluginRoute) GetID() *string {
 // JqPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type JqPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (j JqPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JqPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *JqPluginService) GetID() *string {

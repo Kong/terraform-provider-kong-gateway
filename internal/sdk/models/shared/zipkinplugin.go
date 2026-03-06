@@ -12,6 +12,17 @@ type ZipkinPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (z ZipkinPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (z *ZipkinPluginAfter) GetAccess() []string {
 	if z == nil {
 		return nil
@@ -21,6 +32,17 @@ func (z *ZipkinPluginAfter) GetAccess() []string {
 
 type ZipkinPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (z ZipkinPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (z *ZipkinPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (z *ZipkinPluginBefore) GetAccess() []string {
 type ZipkinPluginOrdering struct {
 	After  *ZipkinPluginAfter  `json:"after,omitempty"`
 	Before *ZipkinPluginBefore `json:"before,omitempty"`
+}
+
+func (z ZipkinPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (z *ZipkinPluginOrdering) GetAfter() *ZipkinPluginAfter {
@@ -55,6 +88,17 @@ type ZipkinPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (z ZipkinPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (z *ZipkinPluginPartials) GetID() *string {
@@ -387,6 +431,17 @@ type ZipkinPluginPropagation struct {
 	Inject []ZipkinPluginInject `json:"inject,omitempty"`
 }
 
+func (z ZipkinPluginPropagation) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginPropagation) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (z *ZipkinPluginPropagation) GetClear() []string {
 	if z == nil {
 		return nil
@@ -461,6 +516,17 @@ type ZipkinPluginQueue struct {
 	MaxRetryTime *float64 `json:"max_retry_time,omitempty"`
 }
 
+func (z ZipkinPluginQueue) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginQueue) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (z *ZipkinPluginQueue) GetConcurrencyLimit() *ZipkinPluginConcurrencyLimit {
 	if z == nil {
 		return nil
@@ -520,6 +586,17 @@ func (z *ZipkinPluginQueue) GetMaxRetryTime() *float64 {
 type StaticTags struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
+}
+
+func (s StaticTags) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *StaticTags) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "value"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *StaticTags) GetName() string {
@@ -597,6 +674,17 @@ type ZipkinPluginConfig struct {
 	TagsHeader *string `json:"tags_header,omitempty"`
 	// The length in bytes of each request's Trace ID.
 	TraceidByteCount *TraceidByteCount `json:"traceid_byte_count,omitempty"`
+}
+
+func (z ZipkinPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (z *ZipkinPluginConfig) GetConnectTimeout() *int64 {
@@ -730,6 +818,17 @@ type ZipkinPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (z ZipkinPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (z *ZipkinPluginConsumer) GetID() *string {
 	if z == nil {
 		return nil
@@ -793,6 +892,17 @@ type ZipkinPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (z ZipkinPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (z *ZipkinPluginRoute) GetID() *string {
 	if z == nil {
 		return nil
@@ -803,6 +913,17 @@ func (z *ZipkinPluginRoute) GetID() *string {
 // ZipkinPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type ZipkinPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (z ZipkinPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(z, "", false)
+}
+
+func (z *ZipkinPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &z, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (z *ZipkinPluginService) GetID() *string {

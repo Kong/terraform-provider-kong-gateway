@@ -12,6 +12,17 @@ type PrometheusPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (p PrometheusPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *PrometheusPluginAfter) GetAccess() []string {
 	if p == nil {
 		return nil
@@ -21,6 +32,17 @@ func (p *PrometheusPluginAfter) GetAccess() []string {
 
 type PrometheusPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (p PrometheusPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (p *PrometheusPluginBefore) GetAccess() []string {
 type PrometheusPluginOrdering struct {
 	After  *PrometheusPluginAfter  `json:"after,omitempty"`
 	Before *PrometheusPluginBefore `json:"before,omitempty"`
+}
+
+func (p PrometheusPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginOrdering) GetAfter() *PrometheusPluginAfter {
@@ -55,6 +88,17 @@ type PrometheusPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (p PrometheusPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginPartials) GetID() *string {
@@ -92,6 +136,17 @@ type PrometheusPluginConfig struct {
 	// A boolean value that determines if upstream metrics should be collected. If enabled, `upstream_target_health` metric will be exported.
 	UpstreamHealthMetrics *bool `json:"upstream_health_metrics,omitempty"`
 	WasmMetrics           *bool `json:"wasm_metrics,omitempty"`
+}
+
+func (p PrometheusPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginConfig) GetAiMetrics() *bool {
@@ -146,6 +201,17 @@ func (p *PrometheusPluginConfig) GetWasmMetrics() *bool {
 // PrometheusPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 type PrometheusPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (p PrometheusPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginConsumer) GetID() *string {
@@ -211,6 +277,17 @@ type PrometheusPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (p PrometheusPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *PrometheusPluginRoute) GetID() *string {
 	if p == nil {
 		return nil
@@ -221,6 +298,17 @@ func (p *PrometheusPluginRoute) GetID() *string {
 // PrometheusPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type PrometheusPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (p PrometheusPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrometheusPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *PrometheusPluginService) GetID() *string {

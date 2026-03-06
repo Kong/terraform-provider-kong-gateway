@@ -160,11 +160,11 @@ func (r *PluginResponseTransformerAdvancedResourceModel) RefreshFromSharedRespon
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -173,17 +173,17 @@ func (r *PluginResponseTransformerAdvancedResourceModel) RefreshFromSharedRespon
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -212,6 +212,8 @@ func (r *PluginResponseTransformerAdvancedResourceModel) RefreshFromSharedRespon
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -331,8 +333,8 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var after *shared.ResponseTransformerAdvancedPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.ResponseTransformerAdvancedPluginAfter{
 				Access: access,
@@ -341,8 +343,8 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var before *shared.ResponseTransformerAdvancedPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.ResponseTransformerAdvancedPluginBefore{
 				Access: access1,
@@ -354,22 +356,22 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		}
 	}
 	partials := make([]shared.ResponseTransformerAdvancedPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -382,8 +384,8 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -397,16 +399,16 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var add *shared.ResponseTransformerAdvancedPluginAdd
 		if r.Config.Add != nil {
 			headers := make([]string, 0, len(r.Config.Add.Headers))
-			for _, headersItem := range r.Config.Add.Headers {
-				headers = append(headers, headersItem.ValueString())
+			for headersIndex := range r.Config.Add.Headers {
+				headers = append(headers, r.Config.Add.Headers[headersIndex].ValueString())
 			}
 			ifStatus := make([]string, 0, len(r.Config.Add.IfStatus))
-			for _, ifStatusItem := range r.Config.Add.IfStatus {
-				ifStatus = append(ifStatus, ifStatusItem.ValueString())
+			for ifStatusIndex := range r.Config.Add.IfStatus {
+				ifStatus = append(ifStatus, r.Config.Add.IfStatus[ifStatusIndex].ValueString())
 			}
 			jsonVar := make([]string, 0, len(r.Config.Add.JSON))
-			for _, jsonItem := range r.Config.Add.JSON {
-				jsonVar = append(jsonVar, jsonItem.ValueString())
+			for jsonIndex := range r.Config.Add.JSON {
+				jsonVar = append(jsonVar, r.Config.Add.JSON[jsonIndex].ValueString())
 			}
 			jsonTypes := make([]shared.ResponseTransformerAdvancedPluginJSONTypes, 0, len(r.Config.Add.JSONTypes))
 			for _, jsonTypesItem := range r.Config.Add.JSONTypes {
@@ -422,8 +424,8 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var allow *shared.ResponseTransformerAdvancedPluginAllow
 		if r.Config.Allow != nil {
 			jsonVar1 := make([]string, 0, len(r.Config.Allow.JSON))
-			for _, jsonItem1 := range r.Config.Allow.JSON {
-				jsonVar1 = append(jsonVar1, jsonItem1.ValueString())
+			for jsonIndex1 := range r.Config.Allow.JSON {
+				jsonVar1 = append(jsonVar1, r.Config.Allow.JSON[jsonIndex1].ValueString())
 			}
 			allow = &shared.ResponseTransformerAdvancedPluginAllow{
 				JSON: jsonVar1,
@@ -432,16 +434,16 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var append1 *shared.ResponseTransformerAdvancedPluginAppend
 		if r.Config.Append != nil {
 			headers1 := make([]string, 0, len(r.Config.Append.Headers))
-			for _, headersItem1 := range r.Config.Append.Headers {
-				headers1 = append(headers1, headersItem1.ValueString())
+			for headersIndex1 := range r.Config.Append.Headers {
+				headers1 = append(headers1, r.Config.Append.Headers[headersIndex1].ValueString())
 			}
 			ifStatus1 := make([]string, 0, len(r.Config.Append.IfStatus))
-			for _, ifStatusItem1 := range r.Config.Append.IfStatus {
-				ifStatus1 = append(ifStatus1, ifStatusItem1.ValueString())
+			for ifStatusIndex1 := range r.Config.Append.IfStatus {
+				ifStatus1 = append(ifStatus1, r.Config.Append.IfStatus[ifStatusIndex1].ValueString())
 			}
 			jsonVar2 := make([]string, 0, len(r.Config.Append.JSON))
-			for _, jsonItem2 := range r.Config.Append.JSON {
-				jsonVar2 = append(jsonVar2, jsonItem2.ValueString())
+			for jsonIndex2 := range r.Config.Append.JSON {
+				jsonVar2 = append(jsonVar2, r.Config.Append.JSON[jsonIndex2].ValueString())
 			}
 			jsonTypes1 := make([]shared.ResponseTransformerAdvancedPluginConfigJSONTypes, 0, len(r.Config.Append.JSONTypes))
 			for _, jsonTypesItem1 := range r.Config.Append.JSONTypes {
@@ -463,16 +465,16 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var remove *shared.ResponseTransformerAdvancedPluginRemove
 		if r.Config.Remove != nil {
 			headers2 := make([]string, 0, len(r.Config.Remove.Headers))
-			for _, headersItem2 := range r.Config.Remove.Headers {
-				headers2 = append(headers2, headersItem2.ValueString())
+			for headersIndex2 := range r.Config.Remove.Headers {
+				headers2 = append(headers2, r.Config.Remove.Headers[headersIndex2].ValueString())
 			}
 			ifStatus2 := make([]string, 0, len(r.Config.Remove.IfStatus))
-			for _, ifStatusItem2 := range r.Config.Remove.IfStatus {
-				ifStatus2 = append(ifStatus2, ifStatusItem2.ValueString())
+			for ifStatusIndex2 := range r.Config.Remove.IfStatus {
+				ifStatus2 = append(ifStatus2, r.Config.Remove.IfStatus[ifStatusIndex2].ValueString())
 			}
 			jsonVar3 := make([]string, 0, len(r.Config.Remove.JSON))
-			for _, jsonItem3 := range r.Config.Remove.JSON {
-				jsonVar3 = append(jsonVar3, jsonItem3.ValueString())
+			for jsonIndex3 := range r.Config.Remove.JSON {
+				jsonVar3 = append(jsonVar3, r.Config.Remove.JSON[jsonIndex3].ValueString())
 			}
 			remove = &shared.ResponseTransformerAdvancedPluginRemove{
 				Headers:  headers2,
@@ -483,12 +485,12 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var rename *shared.ResponseTransformerAdvancedPluginRename
 		if r.Config.Rename != nil {
 			headers3 := make([]string, 0, len(r.Config.Rename.Headers))
-			for _, headersItem3 := range r.Config.Rename.Headers {
-				headers3 = append(headers3, headersItem3.ValueString())
+			for headersIndex3 := range r.Config.Rename.Headers {
+				headers3 = append(headers3, r.Config.Rename.Headers[headersIndex3].ValueString())
 			}
 			ifStatus3 := make([]string, 0, len(r.Config.Rename.IfStatus))
-			for _, ifStatusItem3 := range r.Config.Rename.IfStatus {
-				ifStatus3 = append(ifStatus3, ifStatusItem3.ValueString())
+			for ifStatusIndex3 := range r.Config.Rename.IfStatus {
+				ifStatus3 = append(ifStatus3, r.Config.Rename.IfStatus[ifStatusIndex3].ValueString())
 			}
 			rename = &shared.ResponseTransformerAdvancedPluginRename{
 				Headers:  headers3,
@@ -504,16 +506,16 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 				body = nil
 			}
 			headers4 := make([]string, 0, len(r.Config.Replace.Headers))
-			for _, headersItem4 := range r.Config.Replace.Headers {
-				headers4 = append(headers4, headersItem4.ValueString())
+			for headersIndex4 := range r.Config.Replace.Headers {
+				headers4 = append(headers4, r.Config.Replace.Headers[headersIndex4].ValueString())
 			}
 			ifStatus4 := make([]string, 0, len(r.Config.Replace.IfStatus))
-			for _, ifStatusItem4 := range r.Config.Replace.IfStatus {
-				ifStatus4 = append(ifStatus4, ifStatusItem4.ValueString())
+			for ifStatusIndex4 := range r.Config.Replace.IfStatus {
+				ifStatus4 = append(ifStatus4, r.Config.Replace.IfStatus[ifStatusIndex4].ValueString())
 			}
 			jsonVar4 := make([]string, 0, len(r.Config.Replace.JSON))
-			for _, jsonItem4 := range r.Config.Replace.JSON {
-				jsonVar4 = append(jsonVar4, jsonItem4.ValueString())
+			for jsonIndex4 := range r.Config.Replace.JSON {
+				jsonVar4 = append(jsonVar4, r.Config.Replace.JSON[jsonIndex4].ValueString())
 			}
 			jsonTypes2 := make([]shared.ResponseTransformerAdvancedPluginConfigReplaceJSONTypes, 0, len(r.Config.Replace.JSONTypes))
 			for _, jsonTypesItem2 := range r.Config.Replace.JSONTypes {
@@ -530,16 +532,16 @@ func (r *PluginResponseTransformerAdvancedResourceModel) ToSharedResponseTransfo
 		var transform *shared.Transform
 		if r.Config.Transform != nil {
 			functions := make([]string, 0, len(r.Config.Transform.Functions))
-			for _, functionsItem := range r.Config.Transform.Functions {
-				functions = append(functions, functionsItem.ValueString())
+			for functionsIndex := range r.Config.Transform.Functions {
+				functions = append(functions, r.Config.Transform.Functions[functionsIndex].ValueString())
 			}
 			ifStatus5 := make([]string, 0, len(r.Config.Transform.IfStatus))
-			for _, ifStatusItem5 := range r.Config.Transform.IfStatus {
-				ifStatus5 = append(ifStatus5, ifStatusItem5.ValueString())
+			for ifStatusIndex5 := range r.Config.Transform.IfStatus {
+				ifStatus5 = append(ifStatus5, r.Config.Transform.IfStatus[ifStatusIndex5].ValueString())
 			}
 			jsonVar5 := make([]string, 0, len(r.Config.Transform.JSON))
-			for _, jsonItem5 := range r.Config.Transform.JSON {
-				jsonVar5 = append(jsonVar5, jsonItem5.ValueString())
+			for jsonIndex5 := range r.Config.Transform.JSON {
+				jsonVar5 = append(jsonVar5, r.Config.Transform.JSON[jsonIndex5].ValueString())
 			}
 			transform = &shared.Transform{
 				Functions: functions,

@@ -15,6 +15,7 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.LogglyPluginConfig{}
 		if resp.Config.ClientErrorsSeverity != nil {
 			r.Config.ClientErrorsSeverity = types.StringValue(string(*resp.Config.ClientErrorsSeverity))
 		} else {
@@ -62,11 +63,11 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -75,17 +76,17 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -114,6 +115,8 @@ func (r *PluginLogglyResourceModel) RefreshFromSharedLogglyPlugin(ctx context.Co
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -233,8 +236,8 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 		var after *shared.LogglyPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.LogglyPluginAfter{
 				Access: access,
@@ -243,8 +246,8 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 		var before *shared.LogglyPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.LogglyPluginBefore{
 				Access: access1,
@@ -256,22 +259,22 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 		}
 	}
 	partials := make([]shared.LogglyPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -284,8 +287,8 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -301,9 +304,9 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 		clientErrorsSeverity = nil
 	}
 	customFieldsByLua := make(map[string]string)
-	for customFieldsByLuaKey, customFieldsByLuaValue := range r.Config.CustomFieldsByLua {
+	for customFieldsByLuaKey := range r.Config.CustomFieldsByLua {
 		var customFieldsByLuaInst string
-		customFieldsByLuaInst = customFieldsByLuaValue.ValueString()
+		customFieldsByLuaInst = r.Config.CustomFieldsByLua[customFieldsByLuaKey].ValueString()
 
 		customFieldsByLua[customFieldsByLuaKey] = customFieldsByLuaInst
 	}
@@ -341,8 +344,8 @@ func (r *PluginLogglyResourceModel) ToSharedLogglyPlugin(ctx context.Context) (*
 		successfulSeverity = nil
 	}
 	tags1 := make([]string, 0, len(r.Config.Tags))
-	for _, tagsItem1 := range r.Config.Tags {
-		tags1 = append(tags1, tagsItem1.ValueString())
+	for tagsIndex1 := range r.Config.Tags {
+		tags1 = append(tags1, r.Config.Tags[tagsIndex1].ValueString())
 	}
 	timeout := new(float64)
 	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {

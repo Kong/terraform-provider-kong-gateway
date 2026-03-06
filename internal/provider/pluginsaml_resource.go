@@ -37,13 +37,13 @@ type PluginSamlResource struct {
 
 // PluginSamlResourceModel describes the resource data model.
 type PluginSamlResourceModel struct {
-	Config       tfTypes.SamlPluginConfig    `tfsdk:"config"`
+	Config       *tfTypes.SamlPluginConfig   `tfsdk:"config"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
 	ID           types.String                `tfsdk:"id"`
 	InstanceName types.String                `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Ordering     *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials `tfsdk:"partials"`
 	Protocols    []types.String              `tfsdk:"protocols"`
 	Route        *tfTypes.Set                `tfsdk:"route"`
 	Service      *tfTypes.Set                `tfsdk:"service"`
@@ -125,7 +125,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Optional:    true,
 											Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 											Validators: []validator.Int64{
-												int64validator.AtMost(65535),
+												int64validator.Between(0, 65535),
 											},
 										},
 									},
@@ -137,7 +137,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"connection_is_proxied": schema.BoolAttribute{
@@ -160,7 +160,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Optional:    true,
 								Description: `Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return ` + "`" + `nil` + "`" + `. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than ` + "`" + `keepalive_pool_size` + "`" + `. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than ` + "`" + `keepalive_pool_size` + "`" + `.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"keepalive_pool_size": schema.Int64Attribute{
@@ -181,7 +181,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Optional:    true,
 								Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(65535),
+									int64validator.Between(0, 65535),
 								},
 							},
 							"prefix": schema.StringAttribute{
@@ -194,7 +194,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"send_timeout": schema.Int64Attribute{
@@ -202,7 +202,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"sentinel_master": schema.StringAttribute{
@@ -228,7 +228,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 											Optional:    true,
 											Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 											Validators: []validator.Int64{
-												int64validator.AtMost(65535),
+												int64validator.Between(0, 65535),
 											},
 										},
 									},
@@ -423,7 +423,7 @@ func (r *PluginSamlResource) Schema(ctx context.Context, req resource.SchemaRequ
 						Optional:    true,
 						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(65535),
+							int64validator.Between(0, 65535),
 						},
 					},
 					"session_memcached_prefix": schema.StringAttribute{
@@ -862,7 +862,10 @@ func (r *PluginSamlResource) Delete(ctx context.Context, req resource.DeleteRequ
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -883,12 +886,12 @@ func (r *PluginSamlResource) ImportState(ctx context.Context, req resource.Impor
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

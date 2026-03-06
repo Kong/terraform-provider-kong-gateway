@@ -15,6 +15,7 @@ func (r *PluginProxyCacheAdvancedResourceModel) RefreshFromSharedProxyCacheAdvan
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.ProxyCacheAdvancedPluginConfig{}
 		r.Config.BypassOnErr = types.BoolPointerValue(resp.Config.BypassOnErr)
 		r.Config.CacheControl = types.BoolPointerValue(resp.Config.CacheControl)
 		r.Config.CacheTTL = types.Int64PointerValue(resp.Config.CacheTTL)
@@ -122,11 +123,11 @@ func (r *PluginProxyCacheAdvancedResourceModel) RefreshFromSharedProxyCacheAdvan
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -135,17 +136,17 @@ func (r *PluginProxyCacheAdvancedResourceModel) RefreshFromSharedProxyCacheAdvan
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -174,6 +175,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) RefreshFromSharedProxyCacheAdvan
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -293,8 +296,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 		var after *shared.ProxyCacheAdvancedPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.ProxyCacheAdvancedPluginAfter{
 				Access: access,
@@ -303,8 +306,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 		var before *shared.ProxyCacheAdvancedPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.ProxyCacheAdvancedPluginBefore{
 				Access: access1,
@@ -316,22 +319,22 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 		}
 	}
 	partials := make([]shared.ProxyCacheAdvancedPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -344,8 +347,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -373,8 +376,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 		cacheTTL = nil
 	}
 	contentType := make([]string, 0, len(r.Config.ContentType))
-	for _, contentTypeItem := range r.Config.ContentType {
-		contentType = append(contentType, contentTypeItem.ValueString())
+	for contentTypeIndex := range r.Config.ContentType {
+		contentType = append(contentType, r.Config.ContentType[contentTypeIndex].ValueString())
 	}
 	ignoreURICase := new(bool)
 	if !r.Config.IgnoreURICase.IsUnknown() && !r.Config.IgnoreURICase.IsNull() {
@@ -403,16 +406,16 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 			clusterMaxRedirections = nil
 		}
 		clusterNodes := make([]shared.ProxyCacheAdvancedPluginClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
-		for _, clusterNodesItem := range r.Config.Redis.ClusterNodes {
+		for clusterNodesIndex := range r.Config.Redis.ClusterNodes {
 			ip := new(string)
-			if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
-				*ip = clusterNodesItem.IP.ValueString()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.IsNull() {
+				*ip = r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.ValueString()
 			} else {
 				ip = nil
 			}
 			port := new(int64)
-			if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
-				*port = clusterNodesItem.Port.ValueInt64()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.IsNull() {
+				*port = r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.ValueInt64()
 			} else {
 				port = nil
 			}
@@ -488,16 +491,16 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 			sentinelMaster = nil
 		}
 		sentinelNodes := make([]shared.ProxyCacheAdvancedPluginSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
-		for _, sentinelNodesItem := range r.Config.Redis.SentinelNodes {
+		for sentinelNodesIndex := range r.Config.Redis.SentinelNodes {
 			host1 := new(string)
-			if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
-				*host1 = sentinelNodesItem.Host.ValueString()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.IsNull() {
+				*host1 = r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.ValueString()
 			} else {
 				host1 = nil
 			}
 			port2 := new(int64)
-			if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
-				*port2 = sentinelNodesItem.Port.ValueInt64()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.IsNull() {
+				*port2 = r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.ValueInt64()
 			} else {
 				port2 = nil
 			}
@@ -577,8 +580,8 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 		requestMethod = append(requestMethod, shared.ProxyCacheAdvancedPluginRequestMethod(requestMethodItem.ValueString()))
 	}
 	responseCode := make([]int64, 0, len(r.Config.ResponseCode))
-	for _, responseCodeItem := range r.Config.ResponseCode {
-		responseCode = append(responseCode, responseCodeItem.ValueInt64())
+	for responseCodeIndex := range r.Config.ResponseCode {
+		responseCode = append(responseCode, r.Config.ResponseCode[responseCodeIndex].ValueInt64())
 	}
 	var responseHeaders *shared.ProxyCacheAdvancedPluginResponseHeaders
 	if r.Config.ResponseHeaders != nil {
@@ -614,12 +617,12 @@ func (r *PluginProxyCacheAdvancedResourceModel) ToSharedProxyCacheAdvancedPlugin
 	}
 	strategy := shared.ProxyCacheAdvancedPluginStrategy(r.Config.Strategy.ValueString())
 	varyHeaders := make([]string, 0, len(r.Config.VaryHeaders))
-	for _, varyHeadersItem := range r.Config.VaryHeaders {
-		varyHeaders = append(varyHeaders, varyHeadersItem.ValueString())
+	for varyHeadersIndex := range r.Config.VaryHeaders {
+		varyHeaders = append(varyHeaders, r.Config.VaryHeaders[varyHeadersIndex].ValueString())
 	}
 	varyQueryParams := make([]string, 0, len(r.Config.VaryQueryParams))
-	for _, varyQueryParamsItem := range r.Config.VaryQueryParams {
-		varyQueryParams = append(varyQueryParams, varyQueryParamsItem.ValueString())
+	for varyQueryParamsIndex := range r.Config.VaryQueryParams {
+		varyQueryParams = append(varyQueryParams, r.Config.VaryQueryParams[varyQueryParamsIndex].ValueString())
 	}
 	config := shared.ProxyCacheAdvancedPluginConfig{
 		BypassOnErr:     bypassOnErr,

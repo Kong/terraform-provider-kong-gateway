@@ -12,6 +12,17 @@ type CorsPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (c CorsPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CorsPluginAfter) GetAccess() []string {
 	if c == nil {
 		return nil
@@ -21,6 +32,17 @@ func (c *CorsPluginAfter) GetAccess() []string {
 
 type CorsPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (c CorsPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CorsPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (c *CorsPluginBefore) GetAccess() []string {
 type CorsPluginOrdering struct {
 	After  *CorsPluginAfter  `json:"after,omitempty"`
 	Before *CorsPluginBefore `json:"before,omitempty"`
+}
+
+func (c CorsPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CorsPluginOrdering) GetAfter() *CorsPluginAfter {
@@ -55,6 +88,17 @@ type CorsPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (c CorsPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CorsPluginPartials) GetID() *string {
@@ -144,6 +188,17 @@ type CorsPluginConfig struct {
 	PreflightContinue *bool `json:"preflight_continue,omitempty"`
 	// Flag to determine whether the `Access-Control-Allow-Private-Network` header should be sent with `true` as the value.
 	PrivateNetwork *bool `json:"private_network,omitempty"`
+}
+
+func (c CorsPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CorsPluginConfig) GetAllowOriginAbsent() *bool {
@@ -246,6 +301,17 @@ type CorsPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (c CorsPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CorsPluginRoute) GetID() *string {
 	if c == nil {
 		return nil
@@ -256,6 +322,17 @@ func (c *CorsPluginRoute) GetID() *string {
 // CorsPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type CorsPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (c CorsPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CorsPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CorsPluginService) GetID() *string {

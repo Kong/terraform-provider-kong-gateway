@@ -60,6 +60,17 @@ type CreateMtlsAuthWithConsumerResponse struct {
 	MTLSAuth *shared.MTLSAuth
 }
 
+func (c CreateMtlsAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateMtlsAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CreateMtlsAuthWithConsumerResponse) GetContentType() string {
 	if c == nil {
 		return ""

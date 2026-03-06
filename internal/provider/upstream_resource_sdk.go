@@ -145,6 +145,8 @@ func (r *UpstreamResourceModel) RefreshFromSharedUpstream(ctx context.Context, r
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 		r.UseSrvName = types.BoolPointerValue(resp.UseSrvName)
@@ -331,18 +333,18 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 				concurrency = nil
 			}
 			headers := make(map[string][]string)
-			for headersKey, headersValue := range r.Healthchecks.Active.Headers {
-				headersInst := make([]string, 0, len(headersValue))
-				for _, item := range headersValue {
-					headersInst = append(headersInst, item.ValueString())
+			for headersKey := range r.Healthchecks.Active.Headers {
+				headersInst := make([]string, 0, len(r.Healthchecks.Active.Headers[headersKey]))
+				for index := range r.Healthchecks.Active.Headers[headersKey] {
+					headersInst = append(headersInst, r.Healthchecks.Active.Headers[headersKey][index].ValueString())
 				}
 				headers[headersKey] = headersInst
 			}
 			var healthy *shared.Healthy
 			if r.Healthchecks.Active.Healthy != nil {
 				httpStatuses := make([]int64, 0, len(r.Healthchecks.Active.Healthy.HTTPStatuses))
-				for _, httpStatusesItem := range r.Healthchecks.Active.Healthy.HTTPStatuses {
-					httpStatuses = append(httpStatuses, httpStatusesItem.ValueInt64())
+				for httpStatusesIndex := range r.Healthchecks.Active.Healthy.HTTPStatuses {
+					httpStatuses = append(httpStatuses, r.Healthchecks.Active.Healthy.HTTPStatuses[httpStatusesIndex].ValueInt64())
 				}
 				interval := new(float64)
 				if !r.Healthchecks.Active.Healthy.Interval.IsUnknown() && !r.Healthchecks.Active.Healthy.Interval.IsNull() {
@@ -401,8 +403,8 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 					httpFailures = nil
 				}
 				httpStatuses1 := make([]int64, 0, len(r.Healthchecks.Active.Unhealthy.HTTPStatuses))
-				for _, httpStatusesItem1 := range r.Healthchecks.Active.Unhealthy.HTTPStatuses {
-					httpStatuses1 = append(httpStatuses1, httpStatusesItem1.ValueInt64())
+				for httpStatusesIndex1 := range r.Healthchecks.Active.Unhealthy.HTTPStatuses {
+					httpStatuses1 = append(httpStatuses1, r.Healthchecks.Active.Unhealthy.HTTPStatuses[httpStatusesIndex1].ValueInt64())
 				}
 				interval1 := new(float64)
 				if !r.Healthchecks.Active.Unhealthy.Interval.IsUnknown() && !r.Healthchecks.Active.Unhealthy.Interval.IsNull() {
@@ -447,8 +449,8 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 			var healthy1 *shared.UpstreamHealthy
 			if r.Healthchecks.Passive.Healthy != nil {
 				httpStatuses2 := make([]int64, 0, len(r.Healthchecks.Passive.Healthy.HTTPStatuses))
-				for _, httpStatusesItem2 := range r.Healthchecks.Passive.Healthy.HTTPStatuses {
-					httpStatuses2 = append(httpStatuses2, httpStatusesItem2.ValueInt64())
+				for httpStatusesIndex2 := range r.Healthchecks.Passive.Healthy.HTTPStatuses {
+					httpStatuses2 = append(httpStatuses2, r.Healthchecks.Passive.Healthy.HTTPStatuses[httpStatusesIndex2].ValueInt64())
 				}
 				successes1 := new(int64)
 				if !r.Healthchecks.Passive.Healthy.Successes.IsUnknown() && !r.Healthchecks.Passive.Healthy.Successes.IsNull() {
@@ -476,8 +478,8 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 					httpFailures1 = nil
 				}
 				httpStatuses3 := make([]int64, 0, len(r.Healthchecks.Passive.Unhealthy.HTTPStatuses))
-				for _, httpStatusesItem3 := range r.Healthchecks.Passive.Unhealthy.HTTPStatuses {
-					httpStatuses3 = append(httpStatuses3, httpStatusesItem3.ValueInt64())
+				for httpStatusesIndex3 := range r.Healthchecks.Passive.Unhealthy.HTTPStatuses {
+					httpStatuses3 = append(httpStatuses3, r.Healthchecks.Passive.Unhealthy.HTTPStatuses[httpStatusesIndex3].ValueInt64())
 				}
 				tcpFailures1 := new(int64)
 				if !r.Healthchecks.Passive.Unhealthy.TCPFailures.IsUnknown() && !r.Healthchecks.Passive.Unhealthy.TCPFailures.IsNull() {
@@ -552,8 +554,8 @@ func (r *UpstreamResourceModel) ToSharedUpstream(ctx context.Context) (*shared.U
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

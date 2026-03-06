@@ -156,7 +156,7 @@ func (r *TargetResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				},
 				Description: `The weight this target gets within the upstream loadbalancer (` + "`" + `0` + "`" + `-` + "`" + `65535` + "`" + `). If the hostname resolves to an SRV record, the ` + "`" + `weight` + "`" + ` value will be overridden by the value from the DNS record. Requires replacement if changed.`,
 				Validators: []validator.Int64{
-					int64validator.AtMost(65535),
+					int64validator.Between(0, 65535),
 				},
 			},
 			"workspace": schema.StringAttribute{

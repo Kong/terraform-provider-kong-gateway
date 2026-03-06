@@ -7,10 +7,10 @@ import (
 )
 
 type AiSemanticPromptGuardPluginConfig struct {
-	Embeddings    Embeddings   `tfsdk:"embeddings"`
+	Embeddings    *Embeddings  `tfsdk:"embeddings"`
 	GenaiCategory types.String `tfsdk:"genai_category"`
 	LlmFormat     types.String `tfsdk:"llm_format"`
 	Rules         *Rules       `tfsdk:"rules"`
 	Search        *Search      `tfsdk:"search"`
-	Vectordb      Vectordb     `tfsdk:"vectordb"`
+	Vectordb      *Vectordb    `tfsdk:"vectordb"`
 }

@@ -144,7 +144,7 @@ Optional:
 - `send_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `static_tags` (Attributes List) The tags specified on this property will be added to the generated request traces. (see [below for nested schema](#nestedatt--config--static_tags))
 - `tags_header` (String) The Zipkin plugin will add extra headers to the tags associated with any HTTP requests that come with a header named as configured by this property.
-- `traceid_byte_count` (Number) The length in bytes of each request's Trace ID. must be one of ["8", "16"]
+- `traceid_byte_count` (Number) The length in bytes of each request's Trace ID. must be one of [8, 16]
 
 <a id="nestedatt--config--propagation"></a>
 ### Nested Schema for `config.propagation`
@@ -162,7 +162,7 @@ Optional:
 
 Optional:
 
-- `concurrency_limit` (Number) The number of of queue delivery timers. -1 indicates unlimited. must be one of ["-1", "1"]
+- `concurrency_limit` (Number) The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]
 - `initial_retry_delay` (Number) Time in seconds before the initial retry is made for a failing batch.
 - `max_batch_size` (Number) Maximum number of entries that can be processed at a time.
 - `max_bytes` (Number) Maximum number of bytes that can be waiting on a queue, requires string content.

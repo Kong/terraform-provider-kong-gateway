@@ -12,6 +12,17 @@ type SyslogPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (s SyslogPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SyslogPluginAfter) GetAccess() []string {
 	if s == nil {
 		return nil
@@ -21,6 +32,17 @@ func (s *SyslogPluginAfter) GetAccess() []string {
 
 type SyslogPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (s SyslogPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SyslogPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (s *SyslogPluginBefore) GetAccess() []string {
 type SyslogPluginOrdering struct {
 	After  *SyslogPluginAfter  `json:"after,omitempty"`
 	Before *SyslogPluginBefore `json:"before,omitempty"`
+}
+
+func (s SyslogPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SyslogPluginOrdering) GetAfter() *SyslogPluginAfter {
@@ -55,6 +88,17 @@ type SyslogPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (s SyslogPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SyslogPluginPartials) GetID() *string {
@@ -346,6 +390,17 @@ type SyslogPluginConfig struct {
 	SuccessfulSeverity   *SyslogPluginSuccessfulSeverity   `json:"successful_severity,omitempty"`
 }
 
+func (s SyslogPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SyslogPluginConfig) GetClientErrorsSeverity() *SyslogPluginClientErrorsSeverity {
 	if s == nil {
 		return nil
@@ -391,6 +446,17 @@ func (s *SyslogPluginConfig) GetSuccessfulSeverity() *SyslogPluginSuccessfulSeve
 // SyslogPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 type SyslogPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s SyslogPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SyslogPluginConsumer) GetID() *string {
@@ -456,6 +522,17 @@ type SyslogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (s SyslogPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SyslogPluginRoute) GetID() *string {
 	if s == nil {
 		return nil
@@ -466,6 +543,17 @@ func (s *SyslogPluginRoute) GetID() *string {
 // SyslogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type SyslogPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s SyslogPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SyslogPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SyslogPluginService) GetID() *string {

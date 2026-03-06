@@ -2,6 +2,10 @@
 
 package shared
 
+import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
 // The Consumer object represents a consumer - or a user - of a Service. You can either rely on Kong as the primary datastore, or you can map the consumer list with your database to keep consistency between Kong and your existing primary datastore.
 type Consumer struct {
 	// Unix epoch when the resource was created.
@@ -16,6 +20,17 @@ type Consumer struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 	// The unique username of the Consumer. You must send either this field or `custom_id` with the request.
 	Username *string `json:"username,omitempty"`
+}
+
+func (c Consumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Consumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Consumer) GetCreatedAt() *int64 {

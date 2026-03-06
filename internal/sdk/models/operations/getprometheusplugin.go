@@ -53,6 +53,17 @@ type GetPrometheusPluginResponse struct {
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
+func (g GetPrometheusPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetPrometheusPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GetPrometheusPluginResponse) GetContentType() string {
 	if g == nil {
 		return ""

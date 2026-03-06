@@ -2,9 +2,24 @@
 
 package shared
 
+import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
 // TargetWithoutParentsUpstream - The unique identifier or the name of the upstream for which to update the target.
 type TargetWithoutParentsUpstream struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (t TargetWithoutParentsUpstream) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *TargetWithoutParentsUpstream) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *TargetWithoutParentsUpstream) GetID() *string {
@@ -32,6 +47,17 @@ type TargetWithoutParents struct {
 	Upstream *TargetWithoutParentsUpstream `json:"upstream,omitempty"`
 	// The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record.
 	Weight *int64 `json:"weight,omitempty"`
+}
+
+func (t TargetWithoutParents) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *TargetWithoutParents) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *TargetWithoutParents) GetCreatedAt() *float64 {

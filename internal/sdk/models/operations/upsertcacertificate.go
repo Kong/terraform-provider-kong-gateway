@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -12,6 +13,17 @@ type UpsertCaCertificateRequest struct {
 	CACertificateID string `pathParam:"style=simple,explode=false,name=CACertificateId"`
 	// Description of the CA Certificate
 	CACertificate shared.CACertificate `request:"mediaType=application/json"`
+}
+
+func (u UpsertCaCertificateRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpsertCaCertificateRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"CACertificateId", "CACertificate"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpsertCaCertificateRequest) GetCACertificateID() string {
@@ -39,6 +51,17 @@ type UpsertCaCertificateResponse struct {
 	CACertificate *shared.CACertificate
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpsertCaCertificateResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpsertCaCertificateResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpsertCaCertificateResponse) GetContentType() string {

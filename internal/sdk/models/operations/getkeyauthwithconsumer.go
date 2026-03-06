@@ -60,6 +60,17 @@ type GetKeyAuthWithConsumerResponse struct {
 	KeyAuth *shared.KeyAuth
 }
 
+func (g GetKeyAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetKeyAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GetKeyAuthWithConsumerResponse) GetContentType() string {
 	if g == nil {
 		return ""

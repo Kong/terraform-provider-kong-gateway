@@ -5,11 +5,23 @@ package shared
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
 // ClientCertificate - Certificate to be used as client certificate while TLS handshaking to the upstream server.
 type ClientCertificate struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (c ClientCertificate) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ClientCertificate) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ClientCertificate) GetID() *string {
@@ -78,6 +90,17 @@ type TLSSans struct {
 	Uris []string `json:"uris,omitempty"`
 }
 
+func (t TLSSans) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *TLSSans) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *TLSSans) GetDnsnames() []string {
 	if t == nil {
 		return nil
@@ -132,6 +155,17 @@ type ServiceOutput struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 	// The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.
 	WriteTimeout *int64 `json:"write_timeout,omitempty"`
+}
+
+func (s ServiceOutput) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceOutput) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"host"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ServiceOutput) GetCaCertificates() []string {
@@ -309,6 +343,17 @@ type Service struct {
 	URL *string `json:"url,omitempty"`
 	// The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.
 	WriteTimeout *int64 `json:"write_timeout,omitempty"`
+}
+
+func (s Service) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *Service) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"host"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Service) GetCaCertificates() []string {

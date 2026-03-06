@@ -13,6 +13,17 @@ type DatakitPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (d DatakitPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DatakitPluginAfter) GetAccess() []string {
 	if d == nil {
 		return nil
@@ -22,6 +33,17 @@ func (d *DatakitPluginAfter) GetAccess() []string {
 
 type DatakitPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (d DatakitPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginBefore) GetAccess() []string {
@@ -34,6 +56,17 @@ func (d *DatakitPluginBefore) GetAccess() []string {
 type DatakitPluginOrdering struct {
 	After  *DatakitPluginAfter  `json:"after,omitempty"`
 	Before *DatakitPluginBefore `json:"before,omitempty"`
+}
+
+func (d DatakitPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginOrdering) GetAfter() *DatakitPluginAfter {
@@ -56,6 +89,17 @@ type DatakitPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (d DatakitPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginPartials) GetID() *string {
@@ -1053,13 +1097,13 @@ const (
 )
 
 type Nodes struct {
-	Branch     *Branch     `queryParam:"inline,name=nodes"`
-	NodesCache *NodesCache `queryParam:"inline,name=nodes"`
-	Call       *Call       `queryParam:"inline,name=nodes"`
-	Exit       *Exit       `queryParam:"inline,name=nodes"`
-	Jq         *Jq         `queryParam:"inline,name=nodes"`
-	Property   *Property   `queryParam:"inline,name=nodes"`
-	Static     *Static     `queryParam:"inline,name=nodes"`
+	Branch     *Branch     `queryParam:"inline" union:"member"`
+	NodesCache *NodesCache `queryParam:"inline" union:"member"`
+	Call       *Call       `queryParam:"inline" union:"member"`
+	Exit       *Exit       `queryParam:"inline" union:"member"`
+	Jq         *Jq         `queryParam:"inline" union:"member"`
+	Property   *Property   `queryParam:"inline" union:"member"`
+	Static     *Static     `queryParam:"inline" union:"member"`
 
 	Type NodesUnionType
 }
@@ -1129,52 +1173,98 @@ func CreateNodesStatic(static Static) Nodes {
 
 func (u *Nodes) UnmarshalJSON(data []byte) error {
 
-	var call Call = Call{}
-	if err := utils.UnmarshalJSON(data, &call, "", true, nil); err == nil {
-		u.Call = &call
-		u.Type = NodesUnionTypeCall
-		return nil
-	}
+	var candidates []utils.UnionCandidate
 
-	var jq Jq = Jq{}
-	if err := utils.UnmarshalJSON(data, &jq, "", true, nil); err == nil {
-		u.Jq = &jq
-		u.Type = NodesUnionTypeJq
-		return nil
-	}
-
-	var property Property = Property{}
-	if err := utils.UnmarshalJSON(data, &property, "", true, nil); err == nil {
-		u.Property = &property
-		u.Type = NodesUnionTypeProperty
-		return nil
-	}
-
-	var static Static = Static{}
-	if err := utils.UnmarshalJSON(data, &static, "", true, nil); err == nil {
-		u.Static = &static
-		u.Type = NodesUnionTypeStatic
-		return nil
-	}
-
+	// Collect all valid candidates
 	var branch Branch = Branch{}
 	if err := utils.UnmarshalJSON(data, &branch, "", true, nil); err == nil {
-		u.Branch = &branch
-		u.Type = NodesUnionTypeBranch
-		return nil
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeBranch,
+			Value: &branch,
+		})
 	}
 
 	var nodesCache NodesCache = NodesCache{}
 	if err := utils.UnmarshalJSON(data, &nodesCache, "", true, nil); err == nil {
-		u.NodesCache = &nodesCache
-		u.Type = NodesUnionTypeNodesCache
-		return nil
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeNodesCache,
+			Value: &nodesCache,
+		})
+	}
+
+	var call Call = Call{}
+	if err := utils.UnmarshalJSON(data, &call, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeCall,
+			Value: &call,
+		})
 	}
 
 	var exit Exit = Exit{}
 	if err := utils.UnmarshalJSON(data, &exit, "", true, nil); err == nil {
-		u.Exit = &exit
-		u.Type = NodesUnionTypeExit
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeExit,
+			Value: &exit,
+		})
+	}
+
+	var jq Jq = Jq{}
+	if err := utils.UnmarshalJSON(data, &jq, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeJq,
+			Value: &jq,
+		})
+	}
+
+	var property Property = Property{}
+	if err := utils.UnmarshalJSON(data, &property, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeProperty,
+			Value: &property,
+		})
+	}
+
+	var static Static = Static{}
+	if err := utils.UnmarshalJSON(data, &static, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeStatic,
+			Value: &static,
+		})
+	}
+
+	if len(candidates) == 0 {
+		return fmt.Errorf("could not unmarshal `%s` into any supported union types for Nodes", string(data))
+	}
+
+	// Pick the best candidate using multi-stage filtering
+	best := utils.PickBestUnionCandidate(candidates, data)
+	if best == nil {
+		return fmt.Errorf("could not unmarshal `%s` into any supported union types for Nodes", string(data))
+	}
+
+	// Set the union type and value based on the best candidate
+	u.Type = best.Type.(NodesUnionType)
+	switch best.Type {
+	case NodesUnionTypeBranch:
+		u.Branch = best.Value.(*Branch)
+		return nil
+	case NodesUnionTypeNodesCache:
+		u.NodesCache = best.Value.(*NodesCache)
+		return nil
+	case NodesUnionTypeCall:
+		u.Call = best.Value.(*Call)
+		return nil
+	case NodesUnionTypeExit:
+		u.Exit = best.Value.(*Exit)
+		return nil
+	case NodesUnionTypeJq:
+		u.Jq = best.Value.(*Jq)
+		return nil
+	case NodesUnionTypeProperty:
+		u.Property = best.Value.(*Property)
+		return nil
+	case NodesUnionTypeStatic:
+		u.Static = best.Value.(*Static)
 		return nil
 	}
 
@@ -1218,6 +1308,17 @@ type DatakitPluginMemory struct {
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
+func (d DatakitPluginMemory) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginMemory) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DatakitPluginMemory) GetDictionaryName() *string {
 	if d == nil {
 		return nil
@@ -1230,6 +1331,17 @@ type DatakitPluginClusterNodes struct {
 	IP *string `json:"ip,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (d DatakitPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginClusterNodes) GetIP() *string {
@@ -1251,6 +1363,17 @@ type DatakitPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (d DatakitPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginSentinelNodes) GetHost() *string {
@@ -1340,6 +1463,17 @@ type DatakitPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (d DatakitPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1523,6 +1657,17 @@ type DatakitPluginCache struct {
 	Strategy *DatakitPluginStrategy `json:"strategy,omitempty"`
 }
 
+func (d DatakitPluginCache) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginCache) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DatakitPluginCache) GetMemory() *DatakitPluginMemory {
 	if d == nil {
 		return nil
@@ -1549,6 +1694,17 @@ type Resources struct {
 	Vault map[string]any      `json:"vault,omitempty"`
 }
 
+func (r Resources) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *Resources) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *Resources) GetCache() *DatakitPluginCache {
 	if r == nil {
 		return nil
@@ -1567,6 +1723,17 @@ type DatakitPluginConfig struct {
 	Debug     *bool      `json:"debug,omitempty"`
 	Nodes     []Nodes    `json:"nodes"`
 	Resources *Resources `json:"resources,omitempty"`
+}
+
+func (d DatakitPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"nodes"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginConfig) GetDebug() *bool {
@@ -1595,6 +1762,17 @@ type DatakitPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (d DatakitPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DatakitPluginConsumer) GetID() *string {
 	if d == nil {
 		return nil
@@ -1605,6 +1783,17 @@ func (d *DatakitPluginConsumer) GetID() *string {
 // DatakitPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type DatakitPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (d DatakitPluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginConsumerGroup) GetID() *string {
@@ -1651,6 +1840,17 @@ type DatakitPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (d DatakitPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DatakitPluginRoute) GetID() *string {
 	if d == nil {
 		return nil
@@ -1661,6 +1861,17 @@ func (d *DatakitPluginRoute) GetID() *string {
 // DatakitPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type DatakitPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (d DatakitPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DatakitPluginService) GetID() *string {

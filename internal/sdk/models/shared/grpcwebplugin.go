@@ -12,6 +12,17 @@ type GrpcWebPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (g GrpcWebPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GrpcWebPluginAfter) GetAccess() []string {
 	if g == nil {
 		return nil
@@ -21,6 +32,17 @@ func (g *GrpcWebPluginAfter) GetAccess() []string {
 
 type GrpcWebPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (g GrpcWebPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GrpcWebPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (g *GrpcWebPluginBefore) GetAccess() []string {
 type GrpcWebPluginOrdering struct {
 	After  *GrpcWebPluginAfter  `json:"after,omitempty"`
 	Before *GrpcWebPluginBefore `json:"before,omitempty"`
+}
+
+func (g GrpcWebPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GrpcWebPluginOrdering) GetAfter() *GrpcWebPluginAfter {
@@ -55,6 +88,17 @@ type GrpcWebPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (g GrpcWebPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GrpcWebPluginPartials) GetID() *string {
@@ -87,6 +131,17 @@ type GrpcWebPluginConfig struct {
 	Proto *string `json:"proto,omitempty"`
 }
 
+func (g GrpcWebPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GrpcWebPluginConfig) GetAllowOriginHeader() *string {
 	if g == nil {
 		return nil
@@ -111,6 +166,17 @@ func (g *GrpcWebPluginConfig) GetProto() *string {
 // GrpcWebPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 type GrpcWebPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (g GrpcWebPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GrpcWebPluginConsumer) GetID() *string {
@@ -176,6 +242,17 @@ type GrpcWebPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (g GrpcWebPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GrpcWebPluginRoute) GetID() *string {
 	if g == nil {
 		return nil
@@ -186,6 +263,17 @@ func (g *GrpcWebPluginRoute) GetID() *string {
 // GrpcWebPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type GrpcWebPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (g GrpcWebPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GrpcWebPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GrpcWebPluginService) GetID() *string {

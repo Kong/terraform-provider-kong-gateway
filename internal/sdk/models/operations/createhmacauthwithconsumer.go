@@ -60,6 +60,17 @@ type CreateHmacAuthWithConsumerResponse struct {
 	HMACAuth *shared.HMACAuth
 }
 
+func (c CreateHmacAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateHmacAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CreateHmacAuthWithConsumerResponse) GetContentType() string {
 	if c == nil {
 		return ""

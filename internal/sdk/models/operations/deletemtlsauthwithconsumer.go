@@ -57,6 +57,17 @@ type DeleteMtlsAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 }
 
+func (d DeleteMtlsAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteMtlsAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *DeleteMtlsAuthWithConsumerResponse) GetContentType() string {
 	if d == nil {
 		return ""

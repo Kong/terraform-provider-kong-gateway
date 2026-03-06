@@ -101,11 +101,11 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -114,17 +114,17 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -153,6 +153,8 @@ func (r *PluginStatsdAdvancedResourceModel) RefreshFromSharedStatsdAdvancedPlugi
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -272,8 +274,8 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 		var after *shared.StatsdAdvancedPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.StatsdAdvancedPluginAfter{
 				Access: access,
@@ -282,8 +284,8 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 		var before *shared.StatsdAdvancedPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.StatsdAdvancedPluginBefore{
 				Access: access1,
@@ -295,22 +297,22 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 		}
 	}
 	partials := make([]shared.StatsdAdvancedPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -323,8 +325,8 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -336,8 +338,8 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 	var config *shared.StatsdAdvancedPluginConfig
 	if r.Config != nil {
 		allowStatusCodes := make([]string, 0, len(r.Config.AllowStatusCodes))
-		for _, allowStatusCodesItem := range r.Config.AllowStatusCodes {
-			allowStatusCodes = append(allowStatusCodes, allowStatusCodesItem.ValueString())
+		for allowStatusCodesIndex := range r.Config.AllowStatusCodes {
+			allowStatusCodes = append(allowStatusCodes, r.Config.AllowStatusCodes[allowStatusCodesIndex].ValueString())
 		}
 		consumerIdentifierDefault := new(shared.StatsdAdvancedPluginConsumerIdentifierDefault)
 		if !r.Config.ConsumerIdentifierDefault.IsUnknown() && !r.Config.ConsumerIdentifierDefault.IsNull() {
@@ -358,30 +360,30 @@ func (r *PluginStatsdAdvancedResourceModel) ToSharedStatsdAdvancedPlugin(ctx con
 			hostnameInPrefix = nil
 		}
 		metrics := make([]shared.StatsdAdvancedPluginMetrics, 0, len(r.Config.Metrics))
-		for _, metricsItem := range r.Config.Metrics {
+		for metricsIndex := range r.Config.Metrics {
 			consumerIdentifier := new(shared.StatsdAdvancedPluginConsumerIdentifier)
-			if !metricsItem.ConsumerIdentifier.IsUnknown() && !metricsItem.ConsumerIdentifier.IsNull() {
-				*consumerIdentifier = shared.StatsdAdvancedPluginConsumerIdentifier(metricsItem.ConsumerIdentifier.ValueString())
+			if !r.Config.Metrics[metricsIndex].ConsumerIdentifier.IsUnknown() && !r.Config.Metrics[metricsIndex].ConsumerIdentifier.IsNull() {
+				*consumerIdentifier = shared.StatsdAdvancedPluginConsumerIdentifier(r.Config.Metrics[metricsIndex].ConsumerIdentifier.ValueString())
 			} else {
 				consumerIdentifier = nil
 			}
-			name1 := shared.StatsdAdvancedPluginName(metricsItem.Name.ValueString())
+			name1 := shared.StatsdAdvancedPluginName(r.Config.Metrics[metricsIndex].Name.ValueString())
 			sampleRate := new(float64)
-			if !metricsItem.SampleRate.IsUnknown() && !metricsItem.SampleRate.IsNull() {
-				*sampleRate = metricsItem.SampleRate.ValueFloat64()
+			if !r.Config.Metrics[metricsIndex].SampleRate.IsUnknown() && !r.Config.Metrics[metricsIndex].SampleRate.IsNull() {
+				*sampleRate = r.Config.Metrics[metricsIndex].SampleRate.ValueFloat64()
 			} else {
 				sampleRate = nil
 			}
 			serviceIdentifier := new(shared.StatsdAdvancedPluginServiceIdentifier)
-			if !metricsItem.ServiceIdentifier.IsUnknown() && !metricsItem.ServiceIdentifier.IsNull() {
-				*serviceIdentifier = shared.StatsdAdvancedPluginServiceIdentifier(metricsItem.ServiceIdentifier.ValueString())
+			if !r.Config.Metrics[metricsIndex].ServiceIdentifier.IsUnknown() && !r.Config.Metrics[metricsIndex].ServiceIdentifier.IsNull() {
+				*serviceIdentifier = shared.StatsdAdvancedPluginServiceIdentifier(r.Config.Metrics[metricsIndex].ServiceIdentifier.ValueString())
 			} else {
 				serviceIdentifier = nil
 			}
-			statType := shared.StatsdAdvancedPluginStatType(metricsItem.StatType.ValueString())
+			statType := shared.StatsdAdvancedPluginStatType(r.Config.Metrics[metricsIndex].StatType.ValueString())
 			workspaceIdentifier := new(shared.StatsdAdvancedPluginWorkspaceIdentifier)
-			if !metricsItem.WorkspaceIdentifier.IsUnknown() && !metricsItem.WorkspaceIdentifier.IsNull() {
-				*workspaceIdentifier = shared.StatsdAdvancedPluginWorkspaceIdentifier(metricsItem.WorkspaceIdentifier.ValueString())
+			if !r.Config.Metrics[metricsIndex].WorkspaceIdentifier.IsUnknown() && !r.Config.Metrics[metricsIndex].WorkspaceIdentifier.IsNull() {
+				*workspaceIdentifier = shared.StatsdAdvancedPluginWorkspaceIdentifier(r.Config.Metrics[metricsIndex].WorkspaceIdentifier.ValueString())
 			} else {
 				workspaceIdentifier = nil
 			}

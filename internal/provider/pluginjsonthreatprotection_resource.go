@@ -42,8 +42,8 @@ type PluginJSONThreatProtectionResourceModel struct {
 	Enabled      types.Bool                                `tfsdk:"enabled"`
 	ID           types.String                              `tfsdk:"id"`
 	InstanceName types.String                              `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering                `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials               `tfsdk:"partials"`
+	Ordering     *tfTypes.ACLPluginOrdering                `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials               `tfsdk:"partials"`
 	Protocols    []types.String                            `tfsdk:"protocols"`
 	Route        *tfTypes.Set                              `tfsdk:"route"`
 	Service      *tfTypes.Set                              `tfsdk:"service"`
@@ -98,7 +98,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max number of elements in an array. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 					"max_body_size": schema.Int64Attribute{
@@ -106,7 +106,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max size of the request body. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 					"max_container_depth": schema.Int64Attribute{
@@ -114,7 +114,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max nested depth of objects and arrays. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 					"max_object_entry_count": schema.Int64Attribute{
@@ -122,7 +122,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max number of entries in an object. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 					"max_object_entry_name_length": schema.Int64Attribute{
@@ -130,7 +130,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max string length of object name. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 					"max_string_value_length": schema.Int64Attribute{
@@ -138,7 +138,7 @@ func (r *PluginJSONThreatProtectionResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `Max string value length. -1 means unlimited.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(2147483648),
+							int64validator.Between(-1, 2147483648),
 						},
 					},
 				},
@@ -502,7 +502,10 @@ func (r *PluginJSONThreatProtectionResource) Delete(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -523,12 +526,12 @@ func (r *PluginJSONThreatProtectionResource) ImportState(ctx context.Context, re
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

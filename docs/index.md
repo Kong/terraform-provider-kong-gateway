@@ -21,13 +21,17 @@ terraform {
   required_providers {
     kong-gateway = {
       source  = "kong/kong-gateway"
-      version = "1.0.1"
+      version = "1.0.2"
     }
   }
 }
 
 provider "kong-gateway" {
-  # Configuration options
+  hostname   = "..." # Optional
+  path       = "..." # Optional
+  port       = "..." # Optional
+  protocol   = "..." # Optional
+  server_url = "..." # Optional
 }
 ```
 
@@ -41,5 +45,5 @@ provider "kong-gateway" {
 - `http_headers` (Map of String) HTTP headers to include in all requests
 - `path` (String) Base path for Kong's Admin API (defaults to /)
 - `port` (String) Port for Kong's Admin API (defaults to 8001)
-- `protocol` (String) Protocol for requests to Kong's Admin API (defaults to http)
+- `protocol` (String) Protocol for requests to Kong's Admin API (defaults to http); must be one of ["http", "https"]
 - `server_url` (String) Server URL (defaults to {protocol}://{hostname}:{port}{path})

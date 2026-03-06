@@ -5,6 +5,7 @@ package shared
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
 // UpstreamAlgorithm - Which load balancing algorithm to use.
@@ -46,6 +47,17 @@ func (e *UpstreamAlgorithm) UnmarshalJSON(data []byte) error {
 // UpstreamClientCertificate - If set, the certificate to be used as client certificate while TLS handshaking to the upstream server.
 type UpstreamClientCertificate struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (u UpstreamClientCertificate) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpstreamClientCertificate) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpstreamClientCertificate) GetID() *string {
@@ -151,6 +163,17 @@ type Healthy struct {
 	Successes    *int64   `json:"successes,omitempty"`
 }
 
+func (h Healthy) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(h, "", false)
+}
+
+func (h *Healthy) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (h *Healthy) GetHTTPStatuses() []int64 {
 	if h == nil {
 		return nil
@@ -215,6 +238,17 @@ type Unhealthy struct {
 	Timeouts     *int64   `json:"timeouts,omitempty"`
 }
 
+func (u Unhealthy) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *Unhealthy) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *Unhealthy) GetHTTPFailures() *int64 {
 	if u == nil {
 		return nil
@@ -263,6 +297,17 @@ type Active struct {
 	Timeout                *float64   `json:"timeout,omitempty"`
 	Type                   *Type      `json:"type,omitempty"`
 	Unhealthy              *Unhealthy `json:"unhealthy,omitempty"`
+}
+
+func (a Active) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *Active) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *Active) GetConcurrency() *int64 {
@@ -333,6 +378,17 @@ type UpstreamHealthy struct {
 	Successes    *int64  `json:"successes,omitempty"`
 }
 
+func (u UpstreamHealthy) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpstreamHealthy) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *UpstreamHealthy) GetHTTPStatuses() []int64 {
 	if u == nil {
 		return nil
@@ -389,6 +445,17 @@ type UpstreamUnhealthy struct {
 	Timeouts     *int64  `json:"timeouts,omitempty"`
 }
 
+func (u UpstreamUnhealthy) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpstreamUnhealthy) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *UpstreamUnhealthy) GetHTTPFailures() *int64 {
 	if u == nil {
 		return nil
@@ -423,6 +490,17 @@ type Passive struct {
 	Unhealthy *UpstreamUnhealthy `json:"unhealthy,omitempty"`
 }
 
+func (p Passive) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Passive) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *Passive) GetHealthy() *UpstreamHealthy {
 	if p == nil {
 		return nil
@@ -449,6 +527,17 @@ type Healthchecks struct {
 	Active    *Active  `json:"active,omitempty"`
 	Passive   *Passive `json:"passive,omitempty"`
 	Threshold *float64 `json:"threshold,omitempty"`
+}
+
+func (h Healthchecks) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(h, "", false)
+}
+
+func (h *Healthchecks) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *Healthchecks) GetActive() *Active {
@@ -520,6 +609,17 @@ type Upstream struct {
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 	// If set, the balancer will use SRV hostname(if DNS Answer has SRV record) as the proxy upstream `Host`.
 	UseSrvName *bool `json:"use_srv_name,omitempty"`
+}
+
+func (u Upstream) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *Upstream) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *Upstream) GetAlgorithm() *UpstreamAlgorithm {

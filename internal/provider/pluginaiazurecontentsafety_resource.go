@@ -38,19 +38,19 @@ type PluginAiAzureContentSafetyResource struct {
 
 // PluginAiAzureContentSafetyResourceModel describes the resource data model.
 type PluginAiAzureContentSafetyResourceModel struct {
-	Config       tfTypes.AiAzureContentSafetyPluginConfig `tfsdk:"config"`
-	CreatedAt    types.Int64                              `tfsdk:"created_at"`
-	Enabled      types.Bool                               `tfsdk:"enabled"`
-	ID           types.String                             `tfsdk:"id"`
-	InstanceName types.String                             `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering               `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials              `tfsdk:"partials"`
-	Protocols    []types.String                           `tfsdk:"protocols"`
-	Route        *tfTypes.Set                             `tfsdk:"route"`
-	Service      *tfTypes.Set                             `tfsdk:"service"`
-	Tags         []types.String                           `tfsdk:"tags"`
-	UpdatedAt    types.Int64                              `tfsdk:"updated_at"`
-	Workspace    types.String                             `tfsdk:"workspace"`
+	Config       *tfTypes.AiAzureContentSafetyPluginConfig `tfsdk:"config"`
+	CreatedAt    types.Int64                               `tfsdk:"created_at"`
+	Enabled      types.Bool                                `tfsdk:"enabled"`
+	ID           types.String                              `tfsdk:"id"`
+	InstanceName types.String                              `tfsdk:"instance_name"`
+	Ordering     *tfTypes.ACLPluginOrdering                `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials               `tfsdk:"partials"`
+	Protocols    []types.String                            `tfsdk:"protocols"`
+	Route        *tfTypes.Set                              `tfsdk:"route"`
+	Service      *tfTypes.Set                              `tfsdk:"service"`
+	Tags         []types.String                            `tfsdk:"tags"`
+	UpdatedAt    types.Int64                               `tfsdk:"updated_at"`
+	Workspace    types.String                              `tfsdk:"workspace"`
 }
 
 func (r *PluginAiAzureContentSafetyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -550,7 +550,10 @@ func (r *PluginAiAzureContentSafetyResource) Delete(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -571,12 +574,12 @@ func (r *PluginAiAzureContentSafetyResource) ImportState(ctx context.Context, re
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

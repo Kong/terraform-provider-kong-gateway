@@ -38,6 +38,8 @@ func (r *KeyResourceModel) RefreshFromSharedKey(ctx context.Context, resp *share
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 		r.X5t = types.StringPointerValue(resp.X5t)
@@ -190,8 +192,8 @@ func (r *KeyResourceModel) ToSharedKey(ctx context.Context) (*shared.Key, diag.D
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

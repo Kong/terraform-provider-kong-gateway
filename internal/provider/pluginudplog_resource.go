@@ -37,14 +37,14 @@ type PluginUDPLogResource struct {
 
 // PluginUDPLogResourceModel describes the resource data model.
 type PluginUDPLogResourceModel struct {
-	Config       tfTypes.UDPLogPluginConfig  `tfsdk:"config"`
+	Config       *tfTypes.UDPLogPluginConfig `tfsdk:"config"`
 	Consumer     *tfTypes.Set                `tfsdk:"consumer"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
 	ID           types.String                `tfsdk:"id"`
 	InstanceName types.String                `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Ordering     *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials `tfsdk:"partials"`
 	Protocols    []types.String              `tfsdk:"protocols"`
 	Route        *tfTypes.Set                `tfsdk:"route"`
 	Service      *tfTypes.Set                `tfsdk:"service"`
@@ -78,7 +78,7 @@ func (r *PluginUDPLogResource) Schema(ctx context.Context, req resource.SchemaRe
 						Required:    true,
 						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(65535),
+							int64validator.Between(0, 65535),
 						},
 					},
 					"timeout": schema.Float64Attribute{
@@ -458,7 +458,10 @@ func (r *PluginUDPLogResource) Delete(ctx context.Context, req resource.DeleteRe
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -479,12 +482,12 @@ func (r *PluginUDPLogResource) ImportState(ctx context.Context, req resource.Imp
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

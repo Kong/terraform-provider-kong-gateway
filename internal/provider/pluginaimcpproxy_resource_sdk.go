@@ -17,6 +17,7 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.AiMcpProxyPluginConfig{}
 		if resp.Config.Logging == nil {
 			r.Config.Logging = nil
 		} else {
@@ -88,11 +89,11 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -101,17 +102,17 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -140,6 +141,8 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -259,8 +262,8 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 		var after *shared.AiMcpProxyPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.AiMcpProxyPluginAfter{
 				Access: access,
@@ -269,8 +272,8 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 		var before *shared.AiMcpProxyPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.AiMcpProxyPluginBefore{
 				Access: access1,
@@ -282,22 +285,22 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 		}
 	}
 	partials := make([]shared.AiMcpProxyPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -310,8 +313,8 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -373,36 +376,36 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 		}
 	}
 	tools := make([]shared.Tools, 0, len(r.Config.Tools))
-	for _, toolsItem := range r.Config.Tools {
+	for toolsIndex := range r.Config.Tools {
 		var annotations *shared.Annotations
-		if toolsItem.Annotations != nil {
+		if r.Config.Tools[toolsIndex].Annotations != nil {
 			destructiveHint := new(bool)
-			if !toolsItem.Annotations.DestructiveHint.IsUnknown() && !toolsItem.Annotations.DestructiveHint.IsNull() {
-				*destructiveHint = toolsItem.Annotations.DestructiveHint.ValueBool()
+			if !r.Config.Tools[toolsIndex].Annotations.DestructiveHint.IsUnknown() && !r.Config.Tools[toolsIndex].Annotations.DestructiveHint.IsNull() {
+				*destructiveHint = r.Config.Tools[toolsIndex].Annotations.DestructiveHint.ValueBool()
 			} else {
 				destructiveHint = nil
 			}
 			idempotentHint := new(bool)
-			if !toolsItem.Annotations.IdempotentHint.IsUnknown() && !toolsItem.Annotations.IdempotentHint.IsNull() {
-				*idempotentHint = toolsItem.Annotations.IdempotentHint.ValueBool()
+			if !r.Config.Tools[toolsIndex].Annotations.IdempotentHint.IsUnknown() && !r.Config.Tools[toolsIndex].Annotations.IdempotentHint.IsNull() {
+				*idempotentHint = r.Config.Tools[toolsIndex].Annotations.IdempotentHint.ValueBool()
 			} else {
 				idempotentHint = nil
 			}
 			openWorldHint := new(bool)
-			if !toolsItem.Annotations.OpenWorldHint.IsUnknown() && !toolsItem.Annotations.OpenWorldHint.IsNull() {
-				*openWorldHint = toolsItem.Annotations.OpenWorldHint.ValueBool()
+			if !r.Config.Tools[toolsIndex].Annotations.OpenWorldHint.IsUnknown() && !r.Config.Tools[toolsIndex].Annotations.OpenWorldHint.IsNull() {
+				*openWorldHint = r.Config.Tools[toolsIndex].Annotations.OpenWorldHint.ValueBool()
 			} else {
 				openWorldHint = nil
 			}
 			readOnlyHint := new(bool)
-			if !toolsItem.Annotations.ReadOnlyHint.IsUnknown() && !toolsItem.Annotations.ReadOnlyHint.IsNull() {
-				*readOnlyHint = toolsItem.Annotations.ReadOnlyHint.ValueBool()
+			if !r.Config.Tools[toolsIndex].Annotations.ReadOnlyHint.IsUnknown() && !r.Config.Tools[toolsIndex].Annotations.ReadOnlyHint.IsNull() {
+				*readOnlyHint = r.Config.Tools[toolsIndex].Annotations.ReadOnlyHint.ValueBool()
 			} else {
 				readOnlyHint = nil
 			}
 			title := new(string)
-			if !toolsItem.Annotations.Title.IsUnknown() && !toolsItem.Annotations.Title.IsNull() {
-				*title = toolsItem.Annotations.Title.ValueString()
+			if !r.Config.Tools[toolsIndex].Annotations.Title.IsUnknown() && !r.Config.Tools[toolsIndex].Annotations.Title.IsNull() {
+				*title = r.Config.Tools[toolsIndex].Annotations.Title.ValueString()
 			} else {
 				title = nil
 			}
@@ -415,53 +418,53 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 			}
 		}
 		var description string
-		description = toolsItem.Description.ValueString()
+		description = r.Config.Tools[toolsIndex].Description.ValueString()
 
 		headers := make(map[string]interface{})
-		for headersKey, headersValue := range toolsItem.Headers {
+		for headersKey := range r.Config.Tools[toolsIndex].Headers {
 			var headersInst interface{}
-			_ = json.Unmarshal([]byte(headersValue.ValueString()), &headersInst)
+			_ = json.Unmarshal([]byte(r.Config.Tools[toolsIndex].Headers[headersKey].ValueString()), &headersInst)
 			headers[headersKey] = headersInst
 		}
 		host := new(string)
-		if !toolsItem.Host.IsUnknown() && !toolsItem.Host.IsNull() {
-			*host = toolsItem.Host.ValueString()
+		if !r.Config.Tools[toolsIndex].Host.IsUnknown() && !r.Config.Tools[toolsIndex].Host.IsNull() {
+			*host = r.Config.Tools[toolsIndex].Host.ValueString()
 		} else {
 			host = nil
 		}
 		method := new(shared.AiMcpProxyPluginMethod)
-		if !toolsItem.Method.IsUnknown() && !toolsItem.Method.IsNull() {
-			*method = shared.AiMcpProxyPluginMethod(toolsItem.Method.ValueString())
+		if !r.Config.Tools[toolsIndex].Method.IsUnknown() && !r.Config.Tools[toolsIndex].Method.IsNull() {
+			*method = shared.AiMcpProxyPluginMethod(r.Config.Tools[toolsIndex].Method.ValueString())
 		} else {
 			method = nil
 		}
 		parameters := new(string)
-		if !toolsItem.Parameters.IsUnknown() && !toolsItem.Parameters.IsNull() {
-			*parameters = toolsItem.Parameters.ValueString()
+		if !r.Config.Tools[toolsIndex].Parameters.IsUnknown() && !r.Config.Tools[toolsIndex].Parameters.IsNull() {
+			*parameters = r.Config.Tools[toolsIndex].Parameters.ValueString()
 		} else {
 			parameters = nil
 		}
 		path1 := new(string)
-		if !toolsItem.Path.IsUnknown() && !toolsItem.Path.IsNull() {
-			*path1 = toolsItem.Path.ValueString()
+		if !r.Config.Tools[toolsIndex].Path.IsUnknown() && !r.Config.Tools[toolsIndex].Path.IsNull() {
+			*path1 = r.Config.Tools[toolsIndex].Path.ValueString()
 		} else {
 			path1 = nil
 		}
 		query := make(map[string]interface{})
-		for queryKey, queryValue := range toolsItem.Query {
+		for queryKey := range r.Config.Tools[toolsIndex].Query {
 			var queryInst interface{}
-			_ = json.Unmarshal([]byte(queryValue.ValueString()), &queryInst)
+			_ = json.Unmarshal([]byte(r.Config.Tools[toolsIndex].Query[queryKey].ValueString()), &queryInst)
 			query[queryKey] = queryInst
 		}
 		requestBody := new(string)
-		if !toolsItem.RequestBody.IsUnknown() && !toolsItem.RequestBody.IsNull() {
-			*requestBody = toolsItem.RequestBody.ValueString()
+		if !r.Config.Tools[toolsIndex].RequestBody.IsUnknown() && !r.Config.Tools[toolsIndex].RequestBody.IsNull() {
+			*requestBody = r.Config.Tools[toolsIndex].RequestBody.ValueString()
 		} else {
 			requestBody = nil
 		}
 		scheme := new(shared.Scheme)
-		if !toolsItem.Scheme.IsUnknown() && !toolsItem.Scheme.IsNull() {
-			*scheme = shared.Scheme(toolsItem.Scheme.ValueString())
+		if !r.Config.Tools[toolsIndex].Scheme.IsUnknown() && !r.Config.Tools[toolsIndex].Scheme.IsNull() {
+			*scheme = shared.Scheme(r.Config.Tools[toolsIndex].Scheme.ValueString())
 		} else {
 			scheme = nil
 		}

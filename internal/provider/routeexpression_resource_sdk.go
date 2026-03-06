@@ -36,6 +36,8 @@ func (r *RouteExpressionResourceModel) RefreshFromSharedRouteExpression(ctx cont
 			for _, v := range resp.Protocols {
 				r.Protocols = append(r.Protocols, types.StringValue(string(v)))
 			}
+		} else {
+			r.Protocols = nil
 		}
 		r.RequestBuffering = types.BoolPointerValue(resp.RequestBuffering)
 		r.ResponseBuffering = types.BoolPointerValue(resp.ResponseBuffering)
@@ -51,6 +53,8 @@ func (r *RouteExpressionResourceModel) RefreshFromSharedRouteExpression(ctx cont
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -229,8 +233,8 @@ func (r *RouteExpressionResourceModel) ToSharedRouteExpression(ctx context.Conte
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

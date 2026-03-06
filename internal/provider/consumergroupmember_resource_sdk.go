@@ -26,6 +26,8 @@ func (r *ConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsumerToGro
 				for _, v := range resp.ConsumerGroup.Tags {
 					r.ConsumerGroup.Tags = append(r.ConsumerGroup.Tags, types.StringValue(v))
 				}
+			} else {
+				r.ConsumerGroup.Tags = nil
 			}
 			r.ConsumerGroup.UpdatedAt = types.Int64PointerValue(resp.ConsumerGroup.UpdatedAt)
 		}
@@ -42,6 +44,8 @@ func (r *ConsumerGroupMemberResourceModel) RefreshFromOperationsAddConsumerToGro
 				for _, v := range consumersItem.Tags {
 					consumers.Tags = append(consumers.Tags, types.StringValue(v))
 				}
+			} else {
+				consumers.Tags = nil
 			}
 			consumers.UpdatedAt = types.Int64PointerValue(consumersItem.UpdatedAt)
 			consumers.Username = types.StringPointerValue(consumersItem.Username)

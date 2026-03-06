@@ -41,13 +41,13 @@ type PluginAcmeResource struct {
 
 // PluginAcmeResourceModel describes the resource data model.
 type PluginAcmeResourceModel struct {
-	Config       tfTypes.AcmePluginConfig    `tfsdk:"config"`
+	Config       *tfTypes.AcmePluginConfig   `tfsdk:"config"`
 	CreatedAt    types.Int64                 `tfsdk:"created_at"`
 	Enabled      types.Bool                  `tfsdk:"enabled"`
 	ID           types.String                `tfsdk:"id"`
 	InstanceName types.String                `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering  `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials `tfsdk:"partials"`
+	Ordering     *tfTypes.ACLPluginOrdering  `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials `tfsdk:"partials"`
 	Protocols    []types.String              `tfsdk:"protocols"`
 	Tags         []types.String              `tfsdk:"tags"`
 	UpdatedAt    types.Int64                 `tfsdk:"updated_at"`
@@ -150,7 +150,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 					"rsa_key_size": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `RSA private key size for the certificate. The possible values are 2048, 3072, or 4096. must be one of ["2048", "3072", "4096"]`,
+						Description: `RSA private key size for the certificate. The possible values are 2048, 3072, or 4096. must be one of [2048, 3072, 4096]`,
 						Validators: []validator.Int64{
 							int64validator.OneOf(
 								2048,
@@ -201,7 +201,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Optional:    true,
 										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 										Validators: []validator.Int64{
-											int64validator.AtMost(65535),
+											int64validator.Between(0, 65535),
 										},
 									},
 									"timeout": schema.Float64Attribute{
@@ -265,7 +265,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Optional:    true,
 										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 										Validators: []validator.Int64{
-											int64validator.AtMost(65535),
+											int64validator.Between(0, 65535),
 										},
 									},
 									"server_name": schema.StringAttribute{
@@ -288,7 +288,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Optional:    true,
 										Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 										Validators: []validator.Int64{
-											int64validator.AtMost(2147483646),
+											int64validator.Between(0, 2147483646),
 										},
 									},
 									"username": schema.StringAttribute{
@@ -359,7 +359,7 @@ func (r *PluginAcmeResource) Schema(ctx context.Context, req resource.SchemaRequ
 										Optional:    true,
 										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 										Validators: []validator.Int64{
-											int64validator.AtMost(65535),
+											int64validator.Between(0, 65535),
 										},
 									},
 									"timeout": schema.Float64Attribute{
@@ -730,7 +730,10 @@ func (r *PluginAcmeResource) Delete(ctx context.Context, req resource.DeleteRequ
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -751,12 +754,12 @@ func (r *PluginAcmeResource) ImportState(ctx context.Context, req resource.Impor
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

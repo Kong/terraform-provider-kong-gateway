@@ -12,6 +12,17 @@ type SolaceLogPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (s SolaceLogPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SolaceLogPluginAfter) GetAccess() []string {
 	if s == nil {
 		return nil
@@ -21,6 +32,17 @@ func (s *SolaceLogPluginAfter) GetAccess() []string {
 
 type SolaceLogPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (s SolaceLogPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SolaceLogPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (s *SolaceLogPluginBefore) GetAccess() []string {
 type SolaceLogPluginOrdering struct {
 	After  *SolaceLogPluginAfter  `json:"after,omitempty"`
 	Before *SolaceLogPluginBefore `json:"before,omitempty"`
+}
+
+func (s SolaceLogPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SolaceLogPluginOrdering) GetAfter() *SolaceLogPluginAfter {
@@ -55,6 +88,17 @@ type SolaceLogPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (s SolaceLogPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SolaceLogPluginPartials) GetID() *string {
@@ -139,6 +183,17 @@ type SolaceLogPluginDestinations struct {
 	Type *SolaceLogPluginType `json:"type,omitempty"`
 }
 
+func (s SolaceLogPluginDestinations) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginDestinations) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SolaceLogPluginDestinations) GetName() string {
 	if s == nil {
 		return ""
@@ -175,6 +230,17 @@ type Message struct {
 	TracingSampled *bool `json:"tracing_sampled,omitempty"`
 	// Sets the time to live (TTL) in milliseconds for the log message. Setting the time to live to zero disables the TTL for the log message.
 	TTL *int64 `json:"ttl,omitempty"`
+}
+
+func (m Message) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(m, "", false)
+}
+
+func (m *Message) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"destinations"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *Message) GetAckTimeout() *int64 {
@@ -293,6 +359,17 @@ type SolaceLogPluginAuthentication struct {
 	Username *string `json:"username,omitempty"`
 }
 
+func (s SolaceLogPluginAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SolaceLogPluginAuthentication) GetAccessToken() *string {
 	if s == nil {
 		return nil
@@ -366,6 +443,17 @@ type SolaceLogPluginSession struct {
 	SslValidateCertificate *bool `json:"ssl_validate_certificate,omitempty"`
 	// The name of the Message VPN to attempt to join when connecting to an event broker.
 	VpnName *string `json:"vpn_name,omitempty"`
+}
+
+func (s SolaceLogPluginSession) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginSession) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"host"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SolaceLogPluginSession) GetAuthentication() *SolaceLogPluginAuthentication {
@@ -452,6 +540,17 @@ type SolaceLogPluginConfig struct {
 	Session SolaceLogPluginSession `json:"session"`
 }
 
+func (s SolaceLogPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"message", "session"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SolaceLogPluginConfig) GetMessage() Message {
 	if s == nil {
 		return Message{}
@@ -509,6 +608,17 @@ type SolaceLogPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (s SolaceLogPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SolaceLogPluginRoute) GetID() *string {
 	if s == nil {
 		return nil
@@ -519,6 +629,17 @@ func (s *SolaceLogPluginRoute) GetID() *string {
 // SolaceLogPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type SolaceLogPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s SolaceLogPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceLogPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SolaceLogPluginService) GetID() *string {
@@ -560,7 +681,7 @@ func (s SolaceLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *SolaceLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

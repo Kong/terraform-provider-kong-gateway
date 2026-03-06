@@ -20,7 +20,7 @@ func (d DeleteInjectionprotectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteInjectionprotectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -49,6 +49,17 @@ type DeleteInjectionprotectionPluginResponse struct {
 	RawResponse *http.Response
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (d DeleteInjectionprotectionPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteInjectionprotectionPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteInjectionprotectionPluginResponse) GetContentType() string {

@@ -19,7 +19,7 @@ func (c CreateXmlthreatprotectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateXmlthreatprotectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "XmlThreatProtectionPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateXmlthreatprotectionPluginResponse struct {
 	XMLThreatProtectionPlugin *shared.XMLThreatProtectionPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateXmlthreatprotectionPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateXmlthreatprotectionPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateXmlthreatprotectionPluginResponse) GetContentType() string {

@@ -19,7 +19,7 @@ func (c CreateSolaceconsumePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateSolaceconsumePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "SolaceConsumePlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateSolaceconsumePluginResponse struct {
 	SolaceConsumePlugin *shared.SolaceConsumePlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateSolaceconsumePluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateSolaceconsumePluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateSolaceconsumePluginResponse) GetContentType() string {

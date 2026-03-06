@@ -21,7 +21,7 @@ func (u UpdateJwtPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateJwtPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "JwtPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateJwtPluginResponse struct {
 	JwtPlugin *shared.JwtPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateJwtPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateJwtPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateJwtPluginResponse) GetContentType() string {

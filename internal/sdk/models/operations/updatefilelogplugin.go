@@ -21,7 +21,7 @@ func (u UpdateFilelogPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateFilelogPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "FileLogPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateFilelogPluginResponse struct {
 	FileLogPlugin *shared.FileLogPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateFilelogPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateFilelogPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateFilelogPluginResponse) GetContentType() string {

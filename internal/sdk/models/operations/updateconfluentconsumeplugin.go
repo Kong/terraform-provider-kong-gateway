@@ -21,7 +21,7 @@ func (u UpdateConfluentconsumePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateConfluentconsumePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ConfluentConsumePlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateConfluentconsumePluginResponse struct {
 	ConfluentConsumePlugin *shared.ConfluentConsumePlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateConfluentconsumePluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateConfluentconsumePluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateConfluentconsumePluginResponse) GetContentType() string {

@@ -20,7 +20,7 @@ func (g GetStatsdPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetStatsdPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetStatsdPluginResponse struct {
 	StatsdPlugin *shared.StatsdPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetStatsdPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetStatsdPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetStatsdPluginResponse) GetContentType() string {

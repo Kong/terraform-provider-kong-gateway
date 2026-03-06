@@ -19,7 +19,7 @@ func (c CreatePostfunctionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreatePostfunctionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "PostFunctionPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreatePostfunctionPluginResponse struct {
 	PostFunctionPlugin *shared.PostFunctionPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreatePostfunctionPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreatePostfunctionPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreatePostfunctionPluginResponse) GetContentType() string {

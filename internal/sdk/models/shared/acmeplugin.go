@@ -12,6 +12,17 @@ type AcmePluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AcmePluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AcmePluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AcmePluginAfter) GetAccess() []string {
 
 type AcmePluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AcmePluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AcmePluginBefore) GetAccess() []string {
 type AcmePluginOrdering struct {
 	After  *AcmePluginAfter  `json:"after,omitempty"`
 	Before *AcmePluginBefore `json:"before,omitempty"`
+}
+
+func (a AcmePluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginOrdering) GetAfter() *AcmePluginAfter {
@@ -55,6 +88,17 @@ type AcmePluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AcmePluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginPartials) GetID() *string {
@@ -84,6 +128,17 @@ type AccountKey struct {
 	KeyID string `json:"key_id"`
 	// The ID of the key set to associate the Key ID with.
 	KeySet *string `json:"key_set,omitempty"`
+}
+
+func (a AccountKey) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AccountKey) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"key_id"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AccountKey) GetKeyID() string {
@@ -208,6 +263,17 @@ type Consul struct {
 	Token *string `json:"token,omitempty"`
 }
 
+func (c Consul) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Consul) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Consul) GetHost() *string {
 	if c == nil {
 		return nil
@@ -258,6 +324,17 @@ type ExtraOptions struct {
 	ScanCount *float64 `json:"scan_count,omitempty"`
 }
 
+func (e ExtraOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(e, "", false)
+}
+
+func (e *ExtraOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &e, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (e *ExtraOptions) GetNamespace() *string {
 	if e == nil {
 		return nil
@@ -293,6 +370,17 @@ type AcmePluginRedis struct {
 	Timeout *int64 `json:"timeout,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (a AcmePluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginRedis) GetDatabase() *int64 {
@@ -370,6 +458,17 @@ type Shm struct {
 	ShmName *string `json:"shm_name,omitempty"`
 }
 
+func (s Shm) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *Shm) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Shm) GetShmName() *string {
 	if s == nil {
 		return nil
@@ -429,6 +528,17 @@ type AcmePluginVault struct {
 	TLSVerify *bool `json:"tls_verify,omitempty"`
 	// Consul ACL token.
 	Token *string `json:"token,omitempty"`
+}
+
+func (a AcmePluginVault) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginVault) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginVault) GetAuthMethod() *AcmePluginAuthMethod {
@@ -523,6 +633,17 @@ type StorageConfig struct {
 	Vault  *AcmePluginVault `json:"vault,omitempty"`
 }
 
+func (s StorageConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *StorageConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *StorageConfig) GetConsul() *Consul {
 	if s == nil {
 		return nil
@@ -591,6 +712,17 @@ type AcmePluginConfig struct {
 	StorageConfig *StorageConfig `json:"storage_config,omitempty"`
 	// If you are using Let's Encrypt, you must set this to `true` to agree the terms of service.
 	TosAccepted *bool `json:"tos_accepted,omitempty"`
+}
+
+func (a AcmePluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"account_email"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcmePluginConfig) GetAccountEmail() string {
@@ -765,7 +897,7 @@ func (a AcmePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AcmePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

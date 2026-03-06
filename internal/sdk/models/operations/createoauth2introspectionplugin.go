@@ -19,7 +19,7 @@ func (c CreateOauth2introspectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateOauth2introspectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Oauth2IntrospectionPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateOauth2introspectionPluginResponse struct {
 	Oauth2IntrospectionPlugin *shared.Oauth2IntrospectionPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateOauth2introspectionPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateOauth2introspectionPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateOauth2introspectionPluginResponse) GetContentType() string {

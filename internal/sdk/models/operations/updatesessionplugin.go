@@ -21,7 +21,7 @@ func (u UpdateSessionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateSessionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SessionPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateSessionPluginResponse struct {
 	SessionPlugin *shared.SessionPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateSessionPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateSessionPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateSessionPluginResponse) GetContentType() string {

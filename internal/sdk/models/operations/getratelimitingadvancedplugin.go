@@ -20,7 +20,7 @@ func (g GetRatelimitingadvancedPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetRatelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetRatelimitingadvancedPluginResponse struct {
 	RateLimitingAdvancedPlugin *shared.RateLimitingAdvancedPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetRatelimitingadvancedPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetRatelimitingadvancedPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetRatelimitingadvancedPluginResponse) GetContentType() string {

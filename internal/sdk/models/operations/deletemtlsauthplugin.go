@@ -20,7 +20,7 @@ func (d DeleteMtlsauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteMtlsauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -49,6 +49,17 @@ type DeleteMtlsauthPluginResponse struct {
 	RawResponse *http.Response
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (d DeleteMtlsauthPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteMtlsauthPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteMtlsauthPluginResponse) GetContentType() string {

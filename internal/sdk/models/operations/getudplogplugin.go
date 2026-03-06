@@ -20,7 +20,7 @@ func (g GetUdplogPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetUdplogPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetUdplogPluginResponse struct {
 	UDPLogPlugin *shared.UDPLogPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetUdplogPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetUdplogPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetUdplogPluginResponse) GetContentType() string {

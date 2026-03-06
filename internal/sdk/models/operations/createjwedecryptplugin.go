@@ -19,7 +19,7 @@ func (c CreateJwedecryptPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateJwedecryptPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JweDecryptPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateJwedecryptPluginResponse struct {
 	JweDecryptPlugin *shared.JweDecryptPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateJwedecryptPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateJwedecryptPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateJwedecryptPluginResponse) GetContentType() string {

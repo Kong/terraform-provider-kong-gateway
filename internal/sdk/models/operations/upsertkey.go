@@ -22,7 +22,7 @@ func (u UpsertKeyRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertKeyRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"KeyIdOrName", "workspace", "Key"}); err != nil {
 		return err
 	}
 	return nil
@@ -60,6 +60,17 @@ type UpsertKeyResponse struct {
 	Key *shared.Key
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpsertKeyResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpsertKeyResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpsertKeyResponse) GetContentType() string {

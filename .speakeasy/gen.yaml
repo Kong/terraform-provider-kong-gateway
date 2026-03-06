@@ -57,6 +57,6 @@ terraform:
   includeEmptyObjects: false
   inferUnionDiscriminators: false
   packageName: kong-gateway
-  respectRequiredFields: false
+  respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
   unionStrategy: populated-fields

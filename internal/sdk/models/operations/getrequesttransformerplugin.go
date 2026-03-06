@@ -20,7 +20,7 @@ func (g GetRequesttransformerPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetRequesttransformerPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetRequesttransformerPluginResponse struct {
 	RequestTransformerPlugin *shared.RequestTransformerPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetRequesttransformerPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetRequesttransformerPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetRequesttransformerPluginResponse) GetContentType() string {

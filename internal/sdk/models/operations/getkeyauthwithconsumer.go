@@ -22,7 +22,7 @@ func (g GetKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type GetKeyAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully fetched API-key
 	KeyAuth *shared.KeyAuth
+}
+
+func (g GetKeyAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetKeyAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetKeyAuthWithConsumerResponse) GetContentType() string {

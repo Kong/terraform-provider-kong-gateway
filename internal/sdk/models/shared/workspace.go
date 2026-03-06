@@ -2,6 +2,10 @@
 
 package shared
 
+import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
 type WorkspaceConfig struct {
 	Meta                          map[string]any `json:"meta,omitempty"`
 	Portal                        *bool          `json:"portal,omitempty"`
@@ -23,6 +27,17 @@ type WorkspaceConfig struct {
 	PortalSessionConf             *string        `json:"portal_session_conf,omitempty"`
 	PortalSMTPAdminEmails         []string       `json:"portal_smtp_admin_emails,omitempty"`
 	PortalTokenExp                *int64         `json:"portal_token_exp,omitempty"`
+}
+
+func (w WorkspaceConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WorkspaceConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WorkspaceConfig) GetMeta() map[string]any {
@@ -170,6 +185,17 @@ type Meta struct {
 	Thumbnail *string `json:"thumbnail,omitempty"`
 }
 
+func (m Meta) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(m, "", false)
+}
+
+func (m *Meta) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &m, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Meta) GetColor() *string {
 	if m == nil {
 		return nil
@@ -197,6 +223,17 @@ type Workspace struct {
 	Name string `json:"name"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (w Workspace) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *Workspace) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, []string{"name"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *Workspace) GetComment() *string {

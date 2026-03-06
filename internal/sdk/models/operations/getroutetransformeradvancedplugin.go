@@ -20,7 +20,7 @@ func (g GetRoutetransformeradvancedPluginRequest) MarshalJSON() ([]byte, error) 
 }
 
 func (g *GetRoutetransformeradvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetRoutetransformeradvancedPluginResponse struct {
 	RouteTransformerAdvancedPlugin *shared.RouteTransformerAdvancedPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetRoutetransformeradvancedPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetRoutetransformeradvancedPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetRoutetransformeradvancedPluginResponse) GetContentType() string {

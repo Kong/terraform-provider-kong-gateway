@@ -22,7 +22,7 @@ func (u UpsertConsumerGroupRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertConsumerGroupRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ConsumerGroupId", "workspace", "ConsumerGroup"}); err != nil {
 		return err
 	}
 	return nil
@@ -60,6 +60,17 @@ type UpsertConsumerGroupResponse struct {
 	ConsumerGroup *shared.ConsumerGroup
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpsertConsumerGroupResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpsertConsumerGroupResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpsertConsumerGroupResponse) GetContentType() string {

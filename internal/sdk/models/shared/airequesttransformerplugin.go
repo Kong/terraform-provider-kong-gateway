@@ -12,6 +12,17 @@ type AiRequestTransformerPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AiRequestTransformerPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AiRequestTransformerPluginAfter) GetAccess() []string {
 
 type AiRequestTransformerPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AiRequestTransformerPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AiRequestTransformerPluginBefore) GetAccess() []string {
 type AiRequestTransformerPluginOrdering struct {
 	After  *AiRequestTransformerPluginAfter  `json:"after,omitempty"`
 	Before *AiRequestTransformerPluginBefore `json:"before,omitempty"`
+}
+
+func (a AiRequestTransformerPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginOrdering) GetAfter() *AiRequestTransformerPluginAfter {
@@ -55,6 +88,17 @@ type AiRequestTransformerPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AiRequestTransformerPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginPartials) GetID() *string {
@@ -134,6 +178,17 @@ type AiRequestTransformerPluginAuth struct {
 	ParamName *string `json:"param_name,omitempty"`
 	// Specify the full parameter value for 'param_name'.
 	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (a AiRequestTransformerPluginAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginAuth) GetAllowOverride() *bool {
@@ -241,6 +296,17 @@ type AiRequestTransformerPluginLogging struct {
 	LogStatistics *bool `json:"log_statistics,omitempty"`
 }
 
+func (a AiRequestTransformerPluginLogging) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginLogging) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginLogging) GetLogPayloads() *bool {
 	if a == nil {
 		return nil
@@ -268,6 +334,17 @@ type AiRequestTransformerPluginBedrock struct {
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+}
+
+func (a AiRequestTransformerPluginBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginBedrock) GetAwsAssumeRoleArn() *string {
@@ -355,6 +432,17 @@ type AiRequestTransformerPluginCohere struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
+func (a AiRequestTransformerPluginCohere) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginCohere) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginCohere) GetEmbeddingInputType() *AiRequestTransformerPluginEmbeddingInputType {
 	if a == nil {
 		return nil
@@ -378,6 +466,17 @@ type AiRequestTransformerPluginGemini struct {
 	LocationID *string `json:"location_id,omitempty"`
 	// If running Gemini on Vertex, specify the project ID.
 	ProjectID *string `json:"project_id,omitempty"`
+}
+
+func (a AiRequestTransformerPluginGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginGemini) GetAPIEndpoint() *string {
@@ -413,6 +512,17 @@ type AiRequestTransformerPluginHuggingface struct {
 	UseCache *bool `json:"use_cache,omitempty"`
 	// Wait for the model if it is not ready
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (a AiRequestTransformerPluginHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginHuggingface) GetUseCache() *bool {
@@ -522,6 +632,17 @@ type AiRequestTransformerPluginOptions struct {
 	UpstreamPath *string `json:"upstream_path,omitempty"`
 	// Manually specify or override the full URL to the AI operation endpoints, when calling (self-)hosted models, or for running via a private endpoint.
 	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (a AiRequestTransformerPluginOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginOptions) GetAnthropicVersion() *string {
@@ -714,6 +835,17 @@ type AiRequestTransformerPluginModel struct {
 	Provider AiRequestTransformerPluginProvider `json:"provider"`
 }
 
+func (a AiRequestTransformerPluginModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginModel) GetName() *string {
 	if a == nil {
 		return nil
@@ -806,6 +938,17 @@ type AiRequestTransformerPluginLlm struct {
 	RouteType AiRequestTransformerPluginRouteType `json:"route_type"`
 }
 
+func (a AiRequestTransformerPluginLlm) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginLlm) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"model", "route_type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginLlm) GetAuth() *AiRequestTransformerPluginAuth {
 	if a == nil {
 		return nil
@@ -854,6 +997,17 @@ type AiRequestTransformerPluginConfig struct {
 	Prompt string `json:"prompt"`
 	// Defines the regular expression that must match to indicate a successful AI transformation at the request phase. The first match will be set as the outgoing body. If the AI service's response doesn't match this pattern, it is marked as a failure.
 	TransformationExtractPattern *string `json:"transformation_extract_pattern,omitempty"`
+}
+
+func (a AiRequestTransformerPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"llm", "prompt"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginConfig) GetHTTPProxyHost() *string {
@@ -931,6 +1085,17 @@ type AiRequestTransformerPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiRequestTransformerPluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginConsumerGroup) GetID() *string {
 	if a == nil {
 		return nil
@@ -975,6 +1140,17 @@ type AiRequestTransformerPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiRequestTransformerPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRequestTransformerPluginRoute) GetID() *string {
 	if a == nil {
 		return nil
@@ -985,6 +1161,17 @@ func (a *AiRequestTransformerPluginRoute) GetID() *string {
 // AiRequestTransformerPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type AiRequestTransformerPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiRequestTransformerPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRequestTransformerPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRequestTransformerPluginService) GetID() *string {
@@ -1028,7 +1215,7 @@ func (a AiRequestTransformerPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiRequestTransformerPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

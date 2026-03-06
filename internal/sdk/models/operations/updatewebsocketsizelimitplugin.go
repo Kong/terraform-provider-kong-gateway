@@ -21,7 +21,7 @@ func (u UpdateWebsocketsizelimitPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateWebsocketsizelimitPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "WebsocketSizeLimitPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateWebsocketsizelimitPluginResponse struct {
 	WebsocketSizeLimitPlugin *shared.WebsocketSizeLimitPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateWebsocketsizelimitPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateWebsocketsizelimitPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateWebsocketsizelimitPluginResponse) GetContentType() string {

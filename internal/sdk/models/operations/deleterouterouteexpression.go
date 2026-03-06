@@ -20,7 +20,7 @@ func (d DeleteRouteRouteExpressionRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteRouteRouteExpressionRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"RouteIdOrName", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -49,6 +49,17 @@ type DeleteRouteRouteExpressionResponse struct {
 	RawResponse *http.Response
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (d DeleteRouteRouteExpressionResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteRouteRouteExpressionResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteRouteRouteExpressionResponse) GetContentType() string {

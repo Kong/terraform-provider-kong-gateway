@@ -19,7 +19,7 @@ func (c CreateAigcpmodelarmorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAigcpmodelarmorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiGcpModelArmorPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAigcpmodelarmorPluginResponse struct {
 	AiGcpModelArmorPlugin *shared.AiGcpModelArmorPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAigcpmodelarmorPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAigcpmodelarmorPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAigcpmodelarmorPluginResponse) GetContentType() string {

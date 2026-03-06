@@ -19,7 +19,7 @@ func (c CreateRequestsizelimitingPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateRequestsizelimitingPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RequestSizeLimitingPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateRequestsizelimitingPluginResponse struct {
 	RequestSizeLimitingPlugin *shared.RequestSizeLimitingPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateRequestsizelimitingPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRequestsizelimitingPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateRequestsizelimitingPluginResponse) GetContentType() string {

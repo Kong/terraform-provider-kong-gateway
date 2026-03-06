@@ -21,7 +21,7 @@ func (u UpdateGraphqlproxycacheadvancedPluginRequest) MarshalJSON() ([]byte, err
 }
 
 func (u *UpdateGraphqlproxycacheadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "GraphqlProxyCacheAdvancedPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateGraphqlproxycacheadvancedPluginResponse struct {
 	GraphqlProxyCacheAdvancedPlugin *shared.GraphqlProxyCacheAdvancedPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateGraphqlproxycacheadvancedPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateGraphqlproxycacheadvancedPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateGraphqlproxycacheadvancedPluginResponse) GetContentType() string {

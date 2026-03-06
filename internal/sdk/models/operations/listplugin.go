@@ -24,7 +24,7 @@ func (l ListPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (l *ListPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -67,6 +67,17 @@ type ListPluginResponseBody struct {
 	Offset *string `json:"offset,omitempty"`
 }
 
+func (l ListPluginResponseBody) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(l, "", false)
+}
+
+func (l *ListPluginResponseBody) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &l, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (l *ListPluginResponseBody) GetData() []shared.Plugin {
 	if l == nil {
 		return nil
@@ -99,6 +110,17 @@ type ListPluginResponse struct {
 	Object *ListPluginResponseBody
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (l ListPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(l, "", false)
+}
+
+func (l *ListPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (l *ListPluginResponse) GetContentType() string {

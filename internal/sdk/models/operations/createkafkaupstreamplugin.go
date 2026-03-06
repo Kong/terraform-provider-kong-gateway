@@ -19,7 +19,7 @@ func (c CreateKafkaupstreamPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateKafkaupstreamPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "KafkaUpstreamPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateKafkaupstreamPluginResponse struct {
 	KafkaUpstreamPlugin *shared.KafkaUpstreamPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateKafkaupstreamPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKafkaupstreamPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateKafkaupstreamPluginResponse) GetContentType() string {

@@ -12,6 +12,17 @@ type WebsocketSizeLimitPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (w WebsocketSizeLimitPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (w *WebsocketSizeLimitPluginAfter) GetAccess() []string {
 	if w == nil {
 		return nil
@@ -21,6 +32,17 @@ func (w *WebsocketSizeLimitPluginAfter) GetAccess() []string {
 
 type WebsocketSizeLimitPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (w WebsocketSizeLimitPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WebsocketSizeLimitPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (w *WebsocketSizeLimitPluginBefore) GetAccess() []string {
 type WebsocketSizeLimitPluginOrdering struct {
 	After  *WebsocketSizeLimitPluginAfter  `json:"after,omitempty"`
 	Before *WebsocketSizeLimitPluginBefore `json:"before,omitempty"`
+}
+
+func (w WebsocketSizeLimitPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WebsocketSizeLimitPluginOrdering) GetAfter() *WebsocketSizeLimitPluginAfter {
@@ -55,6 +88,17 @@ type WebsocketSizeLimitPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (w WebsocketSizeLimitPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WebsocketSizeLimitPluginPartials) GetID() *string {
@@ -83,6 +127,17 @@ type WebsocketSizeLimitPluginConfig struct {
 	UpstreamMaxPayload *int64 `json:"upstream_max_payload,omitempty"`
 }
 
+func (w WebsocketSizeLimitPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (w *WebsocketSizeLimitPluginConfig) GetClientMaxPayload() *int64 {
 	if w == nil {
 		return nil
@@ -100,6 +155,17 @@ func (w *WebsocketSizeLimitPluginConfig) GetUpstreamMaxPayload() *int64 {
 // WebsocketSizeLimitPluginConsumer - If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 type WebsocketSizeLimitPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (w WebsocketSizeLimitPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WebsocketSizeLimitPluginConsumer) GetID() *string {
@@ -140,6 +206,17 @@ type WebsocketSizeLimitPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (w WebsocketSizeLimitPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (w *WebsocketSizeLimitPluginRoute) GetID() *string {
 	if w == nil {
 		return nil
@@ -150,6 +227,17 @@ func (w *WebsocketSizeLimitPluginRoute) GetID() *string {
 // WebsocketSizeLimitPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type WebsocketSizeLimitPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (w WebsocketSizeLimitPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(w, "", false)
+}
+
+func (w *WebsocketSizeLimitPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (w *WebsocketSizeLimitPluginService) GetID() *string {
@@ -193,7 +281,7 @@ func (w WebsocketSizeLimitPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (w *WebsocketSizeLimitPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &w, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &w, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil

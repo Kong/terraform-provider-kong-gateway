@@ -20,7 +20,7 @@ func (c CreateKeySetRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateKeySetRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateKeySetResponse struct {
 	KeySet *shared.KeySet
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateKeySetResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKeySetResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateKeySetResponse) GetContentType() string {

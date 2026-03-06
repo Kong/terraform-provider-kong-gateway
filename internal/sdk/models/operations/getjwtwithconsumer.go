@@ -22,7 +22,7 @@ func (g GetJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "JWTId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type GetJwtWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully fetched JWT
 	Jwt *shared.Jwt
+}
+
+func (g GetJwtWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetJwtWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetJwtWithConsumerResponse) GetContentType() string {

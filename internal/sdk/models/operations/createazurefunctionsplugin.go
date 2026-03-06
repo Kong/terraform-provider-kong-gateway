@@ -19,7 +19,7 @@ func (c CreateAzurefunctionsPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAzurefunctionsPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AzureFunctionsPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAzurefunctionsPluginResponse struct {
 	AzureFunctionsPlugin *shared.AzureFunctionsPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAzurefunctionsPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAzurefunctionsPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAzurefunctionsPluginResponse) GetContentType() string {

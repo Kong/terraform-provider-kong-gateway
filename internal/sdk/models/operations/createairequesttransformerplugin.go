@@ -19,7 +19,7 @@ func (c CreateAirequesttransformerPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAirequesttransformerPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiRequestTransformerPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAirequesttransformerPluginResponse struct {
 	AiRequestTransformerPlugin *shared.AiRequestTransformerPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAirequesttransformerPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAirequesttransformerPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAirequesttransformerPluginResponse) GetContentType() string {

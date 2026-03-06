@@ -19,7 +19,7 @@ func (c CreateUpstreamtimeoutPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateUpstreamtimeoutPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "UpstreamTimeoutPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateUpstreamtimeoutPluginResponse struct {
 	UpstreamTimeoutPlugin *shared.UpstreamTimeoutPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateUpstreamtimeoutPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateUpstreamtimeoutPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateUpstreamtimeoutPluginResponse) GetContentType() string {

@@ -20,7 +20,7 @@ func (c CreateServiceRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateServiceRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Service"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateServiceResponse struct {
 	Service *shared.ServiceOutput
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateServiceResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateServiceResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateServiceResponse) GetContentType() string {

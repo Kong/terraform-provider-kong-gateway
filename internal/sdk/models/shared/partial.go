@@ -326,7 +326,7 @@ func (p PartialRedisEe) MarshalJSON() ([]byte, error) {
 }
 
 func (p *PartialRedisEe) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
 		return err
 	}
 	return nil
@@ -493,7 +493,7 @@ func (p PartialRedisCe) MarshalJSON() ([]byte, error) {
 }
 
 func (p *PartialRedisCe) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
 		return err
 	}
 	return nil

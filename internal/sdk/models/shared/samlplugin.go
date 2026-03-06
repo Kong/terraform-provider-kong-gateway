@@ -12,6 +12,17 @@ type SamlPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (s SamlPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SamlPluginAfter) GetAccess() []string {
 	if s == nil {
 		return nil
@@ -21,6 +32,17 @@ func (s *SamlPluginAfter) GetAccess() []string {
 
 type SamlPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (s SamlPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (s *SamlPluginBefore) GetAccess() []string {
 type SamlPluginOrdering struct {
 	After  *SamlPluginAfter  `json:"after,omitempty"`
 	Before *SamlPluginBefore `json:"before,omitempty"`
+}
+
+func (s SamlPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginOrdering) GetAfter() *SamlPluginAfter {
@@ -55,6 +88,17 @@ type SamlPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (s SamlPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginPartials) GetID() *string {
@@ -118,6 +162,17 @@ type SamlPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (s SamlPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SamlPluginClusterNodes) GetIP() *string {
 	if s == nil {
 		return nil
@@ -137,6 +192,17 @@ type SamlPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (s SamlPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginSentinelNodes) GetHost() *string {
@@ -230,6 +296,17 @@ type SamlPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (s SamlPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -737,6 +814,17 @@ type SamlPluginConfig struct {
 	ValidateAssertionSignature *bool `json:"validate_assertion_signature,omitempty"`
 }
 
+func (s SamlPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"assertion_consumer_path", "idp_sso_url", "issuer", "session_secret"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SamlPluginConfig) GetAnonymous() *string {
 	if s == nil {
 		return nil
@@ -1061,6 +1149,17 @@ type SamlPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (s SamlPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SamlPluginRoute) GetID() *string {
 	if s == nil {
 		return nil
@@ -1071,6 +1170,17 @@ func (s *SamlPluginRoute) GetID() *string {
 // SamlPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type SamlPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (s SamlPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SamlPluginService) GetID() *string {
@@ -1112,7 +1222,7 @@ func (s SamlPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *SamlPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

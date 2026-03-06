@@ -12,6 +12,17 @@ type OpenidConnectPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (o OpenidConnectPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *OpenidConnectPluginAfter) GetAccess() []string {
 	if o == nil {
 		return nil
@@ -21,6 +32,17 @@ func (o *OpenidConnectPluginAfter) GetAccess() []string {
 
 type OpenidConnectPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (o OpenidConnectPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (o *OpenidConnectPluginBefore) GetAccess() []string {
 type OpenidConnectPluginOrdering struct {
 	After  *OpenidConnectPluginAfter  `json:"after,omitempty"`
 	Before *OpenidConnectPluginBefore `json:"before,omitempty"`
+}
+
+func (o OpenidConnectPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginOrdering) GetAfter() *OpenidConnectPluginAfter {
@@ -55,6 +88,17 @@ type OpenidConnectPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (o OpenidConnectPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginPartials) GetID() *string {
@@ -347,6 +391,17 @@ type ClientJwk struct {
 	Y             *string  `json:"y,omitempty"`
 }
 
+func (c ClientJwk) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ClientJwk) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ClientJwk) GetAlg() *string {
 	if c == nil {
 		return nil
@@ -529,6 +584,17 @@ type OpenidConnectPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (o OpenidConnectPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *OpenidConnectPluginClusterNodes) GetIP() *string {
 	if o == nil {
 		return nil
@@ -548,6 +614,17 @@ type OpenidConnectPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (o OpenidConnectPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginSentinelNodes) GetHost() *string {
@@ -637,6 +714,17 @@ type ClusterCacheRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (c ClusterCacheRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ClusterCacheRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ClusterCacheRedis) GetClusterMaxRedirections() *int64 {
@@ -1337,6 +1425,17 @@ type OpenidConnectPluginConfigClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (o OpenidConnectPluginConfigClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginConfigClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *OpenidConnectPluginConfigClusterNodes) GetIP() *string {
 	if o == nil {
 		return nil
@@ -1356,6 +1455,17 @@ type OpenidConnectPluginConfigSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (o OpenidConnectPluginConfigSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginConfigSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginConfigSentinelNodes) GetHost() *string {
@@ -1449,6 +1559,17 @@ type OpenidConnectPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (o OpenidConnectPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -2452,6 +2573,17 @@ type OpenidConnectPluginConfig struct {
 	VerifyParameters *bool `json:"verify_parameters,omitempty"`
 	// Verify signature of tokens.
 	VerifySignature *bool `json:"verify_signature,omitempty"`
+}
+
+func (o OpenidConnectPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"issuer"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginConfig) GetAnonymous() *string {
@@ -4059,6 +4191,17 @@ type OpenidConnectPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (o OpenidConnectPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (o *OpenidConnectPluginRoute) GetID() *string {
 	if o == nil {
 		return nil
@@ -4069,6 +4212,17 @@ func (o *OpenidConnectPluginRoute) GetID() *string {
 // OpenidConnectPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type OpenidConnectPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (o OpenidConnectPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (o *OpenidConnectPluginService) GetID() *string {
@@ -4110,7 +4264,7 @@ func (o OpenidConnectPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpenidConnectPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

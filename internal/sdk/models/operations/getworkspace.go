@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,6 +11,17 @@ import (
 type GetWorkspaceRequest struct {
 	// ID or name of the Workspace to lookup
 	WorkspaceIDOrName string `pathParam:"style=simple,explode=false,name=WorkspaceIdOrName"`
+}
+
+func (g GetWorkspaceRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetWorkspaceRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"WorkspaceIdOrName"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetWorkspaceRequest) GetWorkspaceIDOrName() string {
@@ -30,6 +42,17 @@ type GetWorkspaceResponse struct {
 	Workspace *shared.Workspace
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetWorkspaceResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetWorkspaceResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetWorkspaceResponse) GetContentType() string {

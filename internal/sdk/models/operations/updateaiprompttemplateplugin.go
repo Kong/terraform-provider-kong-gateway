@@ -21,7 +21,7 @@ func (u UpdateAiprompttemplatePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAiprompttemplatePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiPromptTemplatePlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateAiprompttemplatePluginResponse struct {
 	AiPromptTemplatePlugin *shared.AiPromptTemplatePlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateAiprompttemplatePluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateAiprompttemplatePluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateAiprompttemplatePluginResponse) GetContentType() string {

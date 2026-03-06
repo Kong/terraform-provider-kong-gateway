@@ -20,7 +20,7 @@ func (c CreateVaultRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateVaultRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Vault"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateVaultResponse struct {
 	Vault *shared.Vault
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateVaultResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateVaultResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateVaultResponse) GetContentType() string {

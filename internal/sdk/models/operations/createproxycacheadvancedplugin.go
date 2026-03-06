@@ -19,7 +19,7 @@ func (c CreateProxycacheadvancedPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateProxycacheadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ProxyCacheAdvancedPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateProxycacheadvancedPluginResponse struct {
 	ProxyCacheAdvancedPlugin *shared.ProxyCacheAdvancedPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateProxycacheadvancedPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateProxycacheadvancedPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateProxycacheadvancedPluginResponse) GetContentType() string {

@@ -21,7 +21,7 @@ func (d DeleteJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "JWTId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -55,6 +55,17 @@ type DeleteJwtWithConsumerResponse struct {
 	StatusCode int
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
+}
+
+func (d DeleteJwtWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteJwtWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteJwtWithConsumerResponse) GetContentType() string {

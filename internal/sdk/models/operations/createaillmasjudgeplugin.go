@@ -19,7 +19,7 @@ func (c CreateAillmasjudgePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAillmasjudgePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiLlmAsJudgePlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAillmasjudgePluginResponse struct {
 	AiLlmAsJudgePlugin *shared.AiLlmAsJudgePlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAillmasjudgePluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAillmasjudgePluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAillmasjudgePluginResponse) GetContentType() string {

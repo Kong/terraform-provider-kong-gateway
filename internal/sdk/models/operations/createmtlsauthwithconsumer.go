@@ -22,7 +22,7 @@ func (c CreateMtlsAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateMtlsAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "MTLSAuthWithoutParents"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateMtlsAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully created MTLS-auth credential
 	MTLSAuth *shared.MTLSAuth
+}
+
+func (c CreateMtlsAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateMtlsAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateMtlsAuthWithConsumerResponse) GetContentType() string {

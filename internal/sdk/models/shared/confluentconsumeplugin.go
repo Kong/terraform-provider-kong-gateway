@@ -12,6 +12,17 @@ type ConfluentConsumePluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (c ConfluentConsumePluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginAfter) GetAccess() []string {
 	if c == nil {
 		return nil
@@ -21,6 +32,17 @@ func (c *ConfluentConsumePluginAfter) GetAccess() []string {
 
 type ConfluentConsumePluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (c ConfluentConsumePluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (c *ConfluentConsumePluginBefore) GetAccess() []string {
 type ConfluentConsumePluginOrdering struct {
 	After  *ConfluentConsumePluginAfter  `json:"after,omitempty"`
 	Before *ConfluentConsumePluginBefore `json:"before,omitempty"`
+}
+
+func (c ConfluentConsumePluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginOrdering) GetAfter() *ConfluentConsumePluginAfter {
@@ -55,6 +88,17 @@ type ConfluentConsumePluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (c ConfluentConsumePluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginPartials) GetID() *string {
@@ -110,6 +154,17 @@ type ConfluentConsumePluginBootstrapServers struct {
 	Host string `json:"host"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port int64 `json:"port"`
+}
+
+func (c ConfluentConsumePluginBootstrapServers) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginBootstrapServers) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"host", "port"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginBootstrapServers) GetHost() string {
@@ -215,6 +270,17 @@ type ConfluentConsumePluginBasic struct {
 	Username string `json:"username"`
 }
 
+func (c ConfluentConsumePluginBasic) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginBasic) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"password", "username"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginBasic) GetPassword() string {
 	if c == nil {
 		return ""
@@ -307,6 +373,17 @@ type ConfluentConsumePluginOauth2 struct {
 	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (c ConfluentConsumePluginOauth2) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginOauth2) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"token_endpoint"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginOauth2) GetAudience() []string {
@@ -464,6 +541,17 @@ type ConfluentConsumePluginOauth2Client struct {
 	Timeout *int64 `json:"timeout,omitempty"`
 }
 
+func (c ConfluentConsumePluginOauth2Client) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginOauth2Client) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginOauth2Client) GetAuthMethod() *ConfluentConsumePluginAuthMethod {
 	if c == nil {
 		return nil
@@ -549,6 +637,17 @@ type ConfluentConsumePluginAuthentication struct {
 	Oauth2Client *ConfluentConsumePluginOauth2Client `json:"oauth2_client,omitempty"`
 }
 
+func (c ConfluentConsumePluginAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginAuthentication) GetBasic() *ConfluentConsumePluginBasic {
 	if c == nil {
 		return nil
@@ -587,6 +686,17 @@ type ConfluentConsumePluginConfluent struct {
 	URL *string `json:"url,omitempty"`
 }
 
+func (c ConfluentConsumePluginConfluent) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfluent) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConfluent) GetAuthentication() *ConfluentConsumePluginAuthentication {
 	if c == nil {
 		return nil
@@ -620,6 +730,17 @@ type ConfluentConsumePluginSchemaRegistry struct {
 	Confluent *ConfluentConsumePluginConfluent `json:"confluent,omitempty"`
 }
 
+func (c ConfluentConsumePluginSchemaRegistry) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginSchemaRegistry) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginSchemaRegistry) GetConfluent() *ConfluentConsumePluginConfluent {
 	if c == nil {
 		return nil
@@ -630,6 +751,17 @@ func (c *ConfluentConsumePluginSchemaRegistry) GetConfluent() *ConfluentConsumeP
 type ConfluentConsumePluginConfigBasic struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
+}
+
+func (c ConfluentConsumePluginConfigBasic) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigBasic) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"password", "username"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginConfigBasic) GetPassword() string {
@@ -724,6 +856,17 @@ type ConfluentConsumePluginConfigOauth2 struct {
 	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (c ConfluentConsumePluginConfigOauth2) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigOauth2) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"token_endpoint"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginConfigOauth2) GetAudience() []string {
@@ -881,6 +1024,17 @@ type ConfluentConsumePluginConfigOauth2Client struct {
 	Timeout *int64 `json:"timeout,omitempty"`
 }
 
+func (c ConfluentConsumePluginConfigOauth2Client) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigOauth2Client) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConfigOauth2Client) GetAuthMethod() *ConfluentConsumePluginConfigAuthMethod {
 	if c == nil {
 		return nil
@@ -966,6 +1120,17 @@ type ConfluentConsumePluginConfigAuthentication struct {
 	Oauth2Client *ConfluentConsumePluginConfigOauth2Client `json:"oauth2_client,omitempty"`
 }
 
+func (c ConfluentConsumePluginConfigAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConfigAuthentication) GetBasic() *ConfluentConsumePluginConfigBasic {
 	if c == nil {
 		return nil
@@ -1004,6 +1169,17 @@ type ConfluentConsumePluginConfigConfluent struct {
 	URL *string `json:"url,omitempty"`
 }
 
+func (c ConfluentConsumePluginConfigConfluent) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigConfluent) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConfigConfluent) GetAuthentication() *ConfluentConsumePluginConfigAuthentication {
 	if c == nil {
 		return nil
@@ -1037,6 +1213,17 @@ type ConfluentConsumePluginConfigSchemaRegistry struct {
 	Confluent *ConfluentConsumePluginConfigConfluent `json:"confluent,omitempty"`
 }
 
+func (c ConfluentConsumePluginConfigSchemaRegistry) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfigSchemaRegistry) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConfigSchemaRegistry) GetConfluent() *ConfluentConsumePluginConfigConfluent {
 	if c == nil {
 		return nil
@@ -1048,6 +1235,17 @@ type Topics struct {
 	Name string `json:"name"`
 	// The plugin-global schema registry configuration.
 	SchemaRegistry *ConfluentConsumePluginConfigSchemaRegistry `json:"schema_registry,omitempty"`
+}
+
+func (t Topics) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *Topics) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, []string{"name"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *Topics) GetName() string {
@@ -1100,6 +1298,17 @@ type ConfluentConsumePluginConfig struct {
 	Timeout *int64 `json:"timeout,omitempty"`
 	// The Kafka topics and their configuration you want to consume from.
 	Topics []Topics `json:"topics"`
+}
+
+func (c ConfluentConsumePluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"cluster_api_key", "cluster_api_secret", "topics"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginConfig) GetAutoOffsetReset() *AutoOffsetReset {
@@ -1233,6 +1442,17 @@ type ConfluentConsumePluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (c ConfluentConsumePluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginConsumer) GetID() *string {
 	if c == nil {
 		return nil
@@ -1283,6 +1503,17 @@ type ConfluentConsumePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (c ConfluentConsumePluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *ConfluentConsumePluginRoute) GetID() *string {
 	if c == nil {
 		return nil
@@ -1293,6 +1524,17 @@ func (c *ConfluentConsumePluginRoute) GetID() *string {
 // ConfluentConsumePluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type ConfluentConsumePluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (c ConfluentConsumePluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *ConfluentConsumePluginService) GetID() *string {
@@ -1336,7 +1578,7 @@ func (c ConfluentConsumePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentConsumePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

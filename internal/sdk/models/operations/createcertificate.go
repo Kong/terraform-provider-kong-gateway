@@ -20,7 +20,7 @@ func (c CreateCertificateRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateCertificateRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Certificate"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateCertificateResponse struct {
 	Certificate *shared.Certificate
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateCertificateResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateCertificateResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateCertificateResponse) GetContentType() string {

@@ -21,7 +21,7 @@ func (u UpdateAiazurecontentsafetyPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAiazurecontentsafetyPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiAzureContentSafetyPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateAiazurecontentsafetyPluginResponse struct {
 	AiAzureContentSafetyPlugin *shared.AiAzureContentSafetyPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateAiazurecontentsafetyPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateAiazurecontentsafetyPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateAiazurecontentsafetyPluginResponse) GetContentType() string {

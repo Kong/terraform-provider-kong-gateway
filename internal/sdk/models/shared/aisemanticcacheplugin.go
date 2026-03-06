@@ -12,6 +12,17 @@ type AiSemanticCachePluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AiSemanticCachePluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AiSemanticCachePluginAfter) GetAccess() []string {
 
 type AiSemanticCachePluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AiSemanticCachePluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AiSemanticCachePluginBefore) GetAccess() []string {
 type AiSemanticCachePluginOrdering struct {
 	After  *AiSemanticCachePluginAfter  `json:"after,omitempty"`
 	Before *AiSemanticCachePluginBefore `json:"before,omitempty"`
+}
+
+func (a AiSemanticCachePluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginOrdering) GetAfter() *AiSemanticCachePluginAfter {
@@ -55,6 +88,17 @@ type AiSemanticCachePluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AiSemanticCachePluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginPartials) GetID() *string {
@@ -134,6 +178,17 @@ type AiSemanticCachePluginAuth struct {
 	ParamName *string `json:"param_name,omitempty"`
 	// Specify the full parameter value for 'param_name'.
 	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (a AiSemanticCachePluginAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginAuth) GetAllowOverride() *bool {
@@ -243,6 +298,17 @@ type AiSemanticCachePluginAzure struct {
 	Instance *string `json:"instance,omitempty"`
 }
 
+func (a AiSemanticCachePluginAzure) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginAzure) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginAzure) GetAPIVersion() *string {
 	if a == nil {
 		return nil
@@ -277,6 +343,17 @@ type AiSemanticCachePluginBedrock struct {
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+}
+
+func (a AiSemanticCachePluginBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginBedrock) GetAwsAssumeRoleArn() *string {
@@ -330,6 +407,17 @@ type AiSemanticCachePluginGemini struct {
 	ProjectID *string `json:"project_id,omitempty"`
 }
 
+func (a AiSemanticCachePluginGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginGemini) GetAPIEndpoint() *string {
 	if a == nil {
 		return nil
@@ -358,6 +446,17 @@ type AiSemanticCachePluginHuggingface struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
+func (a AiSemanticCachePluginHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginHuggingface) GetUseCache() *bool {
 	if a == nil {
 		return nil
@@ -380,6 +479,17 @@ type AiSemanticCachePluginOptions struct {
 	Huggingface *AiSemanticCachePluginHuggingface `json:"huggingface,omitempty"`
 	// upstream url for the embeddings
 	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (a AiSemanticCachePluginOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginOptions) GetAzure() *AiSemanticCachePluginAzure {
@@ -465,6 +575,17 @@ type AiSemanticCachePluginModel struct {
 	Provider AiSemanticCachePluginProvider `json:"provider"`
 }
 
+func (a AiSemanticCachePluginModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginModel) GetName() string {
 	if a == nil {
 		return ""
@@ -489,6 +610,17 @@ func (a *AiSemanticCachePluginModel) GetProvider() AiSemanticCachePluginProvider
 type AiSemanticCachePluginEmbeddings struct {
 	Auth  *AiSemanticCachePluginAuth `json:"auth,omitempty"`
 	Model AiSemanticCachePluginModel `json:"model"`
+}
+
+func (a AiSemanticCachePluginEmbeddings) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginEmbeddings) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"model"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginEmbeddings) GetAuth() *AiSemanticCachePluginAuth {
@@ -625,6 +757,17 @@ type AiSemanticCachePluginPgvector struct {
 	User *string `json:"user,omitempty"`
 }
 
+func (a AiSemanticCachePluginPgvector) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginPgvector) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginPgvector) GetDatabase() *string {
 	if a == nil {
 		return nil
@@ -716,6 +859,17 @@ type AiSemanticCachePluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (a AiSemanticCachePluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginClusterNodes) GetIP() *string {
 	if a == nil {
 		return nil
@@ -735,6 +889,17 @@ type AiSemanticCachePluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (a AiSemanticCachePluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginSentinelNodes) GetHost() *string {
@@ -824,6 +989,17 @@ type AiSemanticCachePluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (a AiSemanticCachePluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1013,6 +1189,17 @@ type AiSemanticCachePluginVectordb struct {
 	Threshold float64 `json:"threshold"`
 }
 
+func (a AiSemanticCachePluginVectordb) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginVectordb) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"dimensions", "distance_metric", "strategy", "threshold"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginVectordb) GetDimensions() int64 {
 	if a == nil {
 		return 0
@@ -1076,6 +1263,17 @@ type AiSemanticCachePluginConfig struct {
 	// Halt the LLM request process in case of a caching system failure
 	StopOnFailure *bool                         `json:"stop_on_failure,omitempty"`
 	Vectordb      AiSemanticCachePluginVectordb `json:"vectordb"`
+}
+
+func (a AiSemanticCachePluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"embeddings", "vectordb"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginConfig) GetCacheControl() *bool {
@@ -1160,6 +1358,17 @@ type AiSemanticCachePluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiSemanticCachePluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginConsumer) GetID() *string {
 	if a == nil {
 		return nil
@@ -1170,6 +1379,17 @@ func (a *AiSemanticCachePluginConsumer) GetID() *string {
 // AiSemanticCachePluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type AiSemanticCachePluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiSemanticCachePluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginConsumerGroup) GetID() *string {
@@ -1216,6 +1436,17 @@ type AiSemanticCachePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiSemanticCachePluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiSemanticCachePluginRoute) GetID() *string {
 	if a == nil {
 		return nil
@@ -1226,6 +1457,17 @@ func (a *AiSemanticCachePluginRoute) GetID() *string {
 // AiSemanticCachePluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type AiSemanticCachePluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiSemanticCachePluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiSemanticCachePluginService) GetID() *string {
@@ -1271,7 +1513,7 @@ func (a AiSemanticCachePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiSemanticCachePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

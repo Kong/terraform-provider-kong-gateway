@@ -19,7 +19,7 @@ func (c CreateGraphqlratelimitingadvancedPluginRequest) MarshalJSON() ([]byte, e
 }
 
 func (c *CreateGraphqlratelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GraphqlRateLimitingAdvancedPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateGraphqlratelimitingadvancedPluginResponse struct {
 	GraphqlRateLimitingAdvancedPlugin *shared.GraphqlRateLimitingAdvancedPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateGraphqlratelimitingadvancedPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateGraphqlratelimitingadvancedPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateGraphqlratelimitingadvancedPluginResponse) GetContentType() string {

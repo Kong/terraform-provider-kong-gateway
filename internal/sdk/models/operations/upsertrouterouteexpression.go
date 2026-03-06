@@ -22,7 +22,7 @@ func (u UpsertRouteRouteExpressionRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertRouteRouteExpressionRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"RouteIdOrName", "workspace", "RouteExpression"}); err != nil {
 		return err
 	}
 	return nil
@@ -60,6 +60,17 @@ type UpsertRouteRouteExpressionResponse struct {
 	RouteExpression *shared.RouteExpression
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpsertRouteRouteExpressionResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpsertRouteRouteExpressionResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpsertRouteRouteExpressionResponse) GetContentType() string {

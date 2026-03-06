@@ -22,7 +22,7 @@ func (c CreateTargetWithUpstreamRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateTargetWithUpstreamRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"UpstreamIdForTarget", "workspace", "TargetWithoutParents"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateTargetWithUpstreamResponse struct {
 	RawResponse *http.Response
 	// Successfully created Target
 	Target *shared.Target
+}
+
+func (c CreateTargetWithUpstreamResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateTargetWithUpstreamResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateTargetWithUpstreamResponse) GetContentType() string {

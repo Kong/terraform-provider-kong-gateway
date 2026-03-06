@@ -21,7 +21,7 @@ func (u UpdateTlsmetadataheadersPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateTlsmetadataheadersPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "TlsMetadataHeadersPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateTlsmetadataheadersPluginResponse struct {
 	TLSMetadataHeadersPlugin *shared.TLSMetadataHeadersPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateTlsmetadataheadersPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateTlsmetadataheadersPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateTlsmetadataheadersPluginResponse) GetContentType() string {

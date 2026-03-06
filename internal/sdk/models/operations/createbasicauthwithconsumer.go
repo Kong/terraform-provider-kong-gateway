@@ -22,7 +22,7 @@ func (c CreateBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "BasicAuthWithoutParents"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateBasicAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully created Basic-auth credential
 	BasicAuth *shared.BasicAuth
+}
+
+func (c CreateBasicAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateBasicAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateBasicAuthWithConsumerResponse) GetContentType() string {

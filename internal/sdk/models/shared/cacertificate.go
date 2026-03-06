@@ -2,6 +2,10 @@
 
 package shared
 
+import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
+)
+
 // CACertificate - A CA certificate object represents a trusted CA. These objects are used by Kong to verify the validity of a client or server certificate.
 type CACertificate struct {
 	// PEM-encoded public certificate of the CA.
@@ -16,6 +20,17 @@ type CACertificate struct {
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (c CACertificate) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CACertificate) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"cert"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CACertificate) GetCert() string {

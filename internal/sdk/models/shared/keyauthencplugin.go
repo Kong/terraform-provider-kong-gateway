@@ -12,6 +12,17 @@ type KeyAuthEncPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (k KeyAuthEncPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (k *KeyAuthEncPluginAfter) GetAccess() []string {
 	if k == nil {
 		return nil
@@ -21,6 +32,17 @@ func (k *KeyAuthEncPluginAfter) GetAccess() []string {
 
 type KeyAuthEncPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (k KeyAuthEncPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *KeyAuthEncPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (k *KeyAuthEncPluginBefore) GetAccess() []string {
 type KeyAuthEncPluginOrdering struct {
 	After  *KeyAuthEncPluginAfter  `json:"after,omitempty"`
 	Before *KeyAuthEncPluginBefore `json:"before,omitempty"`
+}
+
+func (k KeyAuthEncPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *KeyAuthEncPluginOrdering) GetAfter() *KeyAuthEncPluginAfter {
@@ -55,6 +88,17 @@ type KeyAuthEncPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (k KeyAuthEncPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *KeyAuthEncPluginPartials) GetID() *string {
@@ -95,6 +139,17 @@ type KeyAuthEncPluginConfig struct {
 	Realm *string `json:"realm,omitempty"`
 	// A boolean value that indicates whether the plugin should run (and try to authenticate) on `OPTIONS` preflight requests. If set to `false`, then `OPTIONS` requests are always allowed.
 	RunOnPreflight *bool `json:"run_on_preflight,omitempty"`
+}
+
+func (k KeyAuthEncPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *KeyAuthEncPluginConfig) GetAnonymous() *string {
@@ -196,6 +251,17 @@ type KeyAuthEncPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (k KeyAuthEncPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (k *KeyAuthEncPluginRoute) GetID() *string {
 	if k == nil {
 		return nil
@@ -206,6 +272,17 @@ func (k *KeyAuthEncPluginRoute) GetID() *string {
 // KeyAuthEncPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type KeyAuthEncPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (k KeyAuthEncPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KeyAuthEncPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (k *KeyAuthEncPluginService) GetID() *string {
@@ -247,7 +324,7 @@ func (k KeyAuthEncPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (k *KeyAuthEncPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil

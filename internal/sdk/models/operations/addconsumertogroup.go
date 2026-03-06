@@ -12,6 +12,17 @@ type AddConsumerToGroupRequestBody struct {
 	ConsumerID *string `json:"consumer,omitempty"`
 }
 
+func (a AddConsumerToGroupRequestBody) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AddConsumerToGroupRequestBody) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AddConsumerToGroupRequestBody) GetConsumerID() *string {
 	if a == nil {
 		return nil
@@ -32,7 +43,7 @@ func (a AddConsumerToGroupRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AddConsumerToGroupRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"ConsumerGroupId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -65,6 +76,17 @@ type AddConsumerToGroupResponseBody struct {
 	Consumers     []shared.Consumer     `json:"consumers,omitempty"`
 }
 
+func (a AddConsumerToGroupResponseBody) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AddConsumerToGroupResponseBody) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AddConsumerToGroupResponseBody) GetConsumerGroup() *shared.ConsumerGroup {
 	if a == nil {
 		return nil
@@ -88,6 +110,17 @@ type AddConsumerToGroupResponse struct {
 	RawResponse *http.Response
 	// Consumer added to group
 	Object *AddConsumerToGroupResponseBody
+}
+
+func (a AddConsumerToGroupResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AddConsumerToGroupResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AddConsumerToGroupResponse) GetContentType() string {

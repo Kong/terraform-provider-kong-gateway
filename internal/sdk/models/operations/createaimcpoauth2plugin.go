@@ -19,7 +19,7 @@ func (c CreateAimcpoauth2PluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAimcpoauth2PluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiMcpOauth2Plugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAimcpoauth2PluginResponse struct {
 	AiMcpOauth2Plugin *shared.AiMcpOauth2Plugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAimcpoauth2PluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAimcpoauth2PluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAimcpoauth2PluginResponse) GetContentType() string {

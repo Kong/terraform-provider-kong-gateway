@@ -21,7 +21,7 @@ func (d DeleteKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -55,6 +55,17 @@ type DeleteKeyAuthWithConsumerResponse struct {
 	StatusCode int
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
+}
+
+func (d DeleteKeyAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteKeyAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteKeyAuthWithConsumerResponse) GetContentType() string {

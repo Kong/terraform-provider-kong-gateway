@@ -3,6 +3,7 @@
 package operations
 
 import (
+	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 	"net/http"
 )
@@ -10,6 +11,17 @@ import (
 type FetchPluginSchemaRequest struct {
 	// The name of the plugin
 	PluginName string `pathParam:"style=simple,explode=false,name=pluginName"`
+}
+
+func (f FetchPluginSchemaRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(f, "", false)
+}
+
+func (f *FetchPluginSchemaRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &f, "", false, []string{"pluginName"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *FetchPluginSchemaRequest) GetPluginName() string {
@@ -28,6 +40,17 @@ type FetchPluginSchemaResponse struct {
 	RawResponse *http.Response
 	// The schema for the plugin
 	GetPluginSchemaResponse *shared.GetPluginSchemaResponse
+}
+
+func (f FetchPluginSchemaResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(f, "", false)
+}
+
+func (f *FetchPluginSchemaResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &f, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (f *FetchPluginSchemaResponse) GetContentType() string {

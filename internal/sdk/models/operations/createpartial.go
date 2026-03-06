@@ -20,7 +20,7 @@ func (c CreatePartialRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreatePartialRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Partial"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type CreatePartialResponse struct {
 	Partial *shared.Partial
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreatePartialResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreatePartialResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreatePartialResponse) GetContentType() string {

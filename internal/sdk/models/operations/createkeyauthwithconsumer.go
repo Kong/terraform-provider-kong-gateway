@@ -22,7 +22,7 @@ func (c CreateKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateKeyAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully created API-key
 	KeyAuth *shared.KeyAuth
+}
+
+func (c CreateKeyAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateKeyAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateKeyAuthWithConsumerResponse) GetContentType() string {

@@ -20,7 +20,7 @@ func (c CreateConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Consumer"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateConsumerResponse struct {
 	Consumer *shared.Consumer
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateConsumerResponse) GetContentType() string {

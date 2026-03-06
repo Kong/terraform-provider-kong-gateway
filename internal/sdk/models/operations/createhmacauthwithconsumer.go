@@ -22,7 +22,7 @@ func (c CreateHmacAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateHmacAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "HMACAuthWithoutParents"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateHmacAuthWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully created HMAC-auth credential
 	HMACAuth *shared.HMACAuth
+}
+
+func (c CreateHmacAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateHmacAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateHmacAuthWithConsumerResponse) GetContentType() string {

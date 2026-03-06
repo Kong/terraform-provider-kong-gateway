@@ -22,7 +22,7 @@ func (c CreateACLWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateACLWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "ACLWithoutParents"}); err != nil {
 		return err
 	}
 	return nil
@@ -58,6 +58,17 @@ type CreateACLWithConsumerResponse struct {
 	RawResponse *http.Response
 	// Successfully created ACL
 	ACL *shared.ACL
+}
+
+func (c CreateACLWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateACLWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateACLWithConsumerResponse) GetContentType() string {

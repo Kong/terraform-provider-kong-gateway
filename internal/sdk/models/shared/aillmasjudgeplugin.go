@@ -12,6 +12,17 @@ type AiLlmAsJudgePluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AiLlmAsJudgePluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AiLlmAsJudgePluginAfter) GetAccess() []string {
 
 type AiLlmAsJudgePluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AiLlmAsJudgePluginBefore) GetAccess() []string {
 type AiLlmAsJudgePluginOrdering struct {
 	After  *AiLlmAsJudgePluginAfter  `json:"after,omitempty"`
 	Before *AiLlmAsJudgePluginBefore `json:"before,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginOrdering) GetAfter() *AiLlmAsJudgePluginAfter {
@@ -55,6 +88,17 @@ type AiLlmAsJudgePluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginPartials) GetID() *string {
@@ -134,6 +178,17 @@ type AiLlmAsJudgePluginAuth struct {
 	ParamName *string `json:"param_name,omitempty"`
 	// Specify the full parameter value for 'param_name'.
 	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginAuth) GetAllowOverride() *bool {
@@ -241,6 +296,17 @@ type AiLlmAsJudgePluginLogging struct {
 	LogStatistics *bool `json:"log_statistics,omitempty"`
 }
 
+func (a AiLlmAsJudgePluginLogging) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginLogging) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginLogging) GetLogPayloads() *bool {
 	if a == nil {
 		return nil
@@ -268,6 +334,17 @@ type AiLlmAsJudgePluginBedrock struct {
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginBedrock) GetAwsAssumeRoleArn() *string {
@@ -355,6 +432,17 @@ type AiLlmAsJudgePluginCohere struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
+func (a AiLlmAsJudgePluginCohere) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginCohere) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginCohere) GetEmbeddingInputType() *AiLlmAsJudgePluginEmbeddingInputType {
 	if a == nil {
 		return nil
@@ -378,6 +466,17 @@ type AiLlmAsJudgePluginGemini struct {
 	LocationID *string `json:"location_id,omitempty"`
 	// If running Gemini on Vertex, specify the project ID.
 	ProjectID *string `json:"project_id,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginGemini) GetAPIEndpoint() *string {
@@ -413,6 +512,17 @@ type AiLlmAsJudgePluginHuggingface struct {
 	UseCache *bool `json:"use_cache,omitempty"`
 	// Wait for the model if it is not ready
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginHuggingface) GetUseCache() *bool {
@@ -522,6 +632,17 @@ type AiLlmAsJudgePluginOptions struct {
 	UpstreamPath *string `json:"upstream_path,omitempty"`
 	// Manually specify or override the full URL to the AI operation endpoints, when calling (self-)hosted models, or for running via a private endpoint.
 	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginOptions) GetAnthropicVersion() *string {
@@ -714,6 +835,17 @@ type AiLlmAsJudgePluginModel struct {
 	Provider AiLlmAsJudgePluginProvider `json:"provider"`
 }
 
+func (a AiLlmAsJudgePluginModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginModel) GetName() *string {
 	if a == nil {
 		return nil
@@ -806,6 +938,17 @@ type Llm struct {
 	RouteType AiLlmAsJudgePluginRouteType `json:"route_type"`
 }
 
+func (l Llm) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(l, "", false)
+}
+
+func (l *Llm) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"model", "route_type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (l *Llm) GetAuth() *AiLlmAsJudgePluginAuth {
 	if l == nil {
 		return nil
@@ -860,6 +1003,17 @@ type AiLlmAsJudgePluginConfig struct {
 	Prompt *string `json:"prompt,omitempty"`
 	// Judging request sampling rate for configuring the probability-based sampler.
 	SamplingRate *float64 `json:"sampling_rate,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"llm"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginConfig) GetHTTPProxyHost() *string {
@@ -958,6 +1112,17 @@ type AiLlmAsJudgePluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiLlmAsJudgePluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginConsumer) GetID() *string {
 	if a == nil {
 		return nil
@@ -968,6 +1133,17 @@ func (a *AiLlmAsJudgePluginConsumer) GetID() *string {
 // AiLlmAsJudgePluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type AiLlmAsJudgePluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginConsumerGroup) GetID() *string {
@@ -1014,6 +1190,17 @@ type AiLlmAsJudgePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiLlmAsJudgePluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiLlmAsJudgePluginRoute) GetID() *string {
 	if a == nil {
 		return nil
@@ -1024,6 +1211,17 @@ func (a *AiLlmAsJudgePluginRoute) GetID() *string {
 // AiLlmAsJudgePluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type AiLlmAsJudgePluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiLlmAsJudgePluginService) GetID() *string {
@@ -1069,7 +1267,7 @@ func (a AiLlmAsJudgePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiLlmAsJudgePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

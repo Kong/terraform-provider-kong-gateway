@@ -12,6 +12,17 @@ type RateLimitingAdvancedPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (r RateLimitingAdvancedPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RateLimitingAdvancedPluginAfter) GetAccess() []string {
 	if r == nil {
 		return nil
@@ -21,6 +32,17 @@ func (r *RateLimitingAdvancedPluginAfter) GetAccess() []string {
 
 type RateLimitingAdvancedPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (r *RateLimitingAdvancedPluginBefore) GetAccess() []string {
 type RateLimitingAdvancedPluginOrdering struct {
 	After  *RateLimitingAdvancedPluginAfter  `json:"after,omitempty"`
 	Before *RateLimitingAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginOrdering) GetAfter() *RateLimitingAdvancedPluginAfter {
@@ -55,6 +88,17 @@ type RateLimitingAdvancedPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginPartials) GetID() *string {
@@ -168,6 +212,17 @@ type RateLimitingAdvancedPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (r RateLimitingAdvancedPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RateLimitingAdvancedPluginClusterNodes) GetIP() *string {
 	if r == nil {
 		return nil
@@ -211,6 +266,17 @@ type RateLimitingAdvancedPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginSentinelNodes) GetHost() *string {
@@ -302,6 +368,17 @@ type RateLimitingAdvancedPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -499,6 +576,17 @@ type Throttling struct {
 	RetryTimes *float64 `json:"retry_times,omitempty"`
 }
 
+func (t Throttling) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *Throttling) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *Throttling) GetEnabled() *bool {
 	if t == nil {
 		return nil
@@ -595,6 +683,17 @@ type RateLimitingAdvancedPluginConfig struct {
 	WindowSize []float64 `json:"window_size"`
 	// Sets the time window type to either `sliding` (default) or `fixed`. Sliding windows apply the rate limiting logic while taking into account previous hit rates (from the window that immediately precedes the current) using a dynamic weight. Fixed windows consist of buckets that are statically assigned to a definitive time range, each request is mapped to only one fixed window based on its timestamp and will affect only that window's counters.
 	WindowType *RateLimitingAdvancedPluginWindowType `json:"window_type,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"limit", "window_size"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginConfig) GetCompoundIdentifier() []CompoundIdentifier {
@@ -749,6 +848,17 @@ type RateLimitingAdvancedPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (r RateLimitingAdvancedPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RateLimitingAdvancedPluginConsumer) GetID() *string {
 	if r == nil {
 		return nil
@@ -759,6 +869,17 @@ func (r *RateLimitingAdvancedPluginConsumer) GetID() *string {
 // RateLimitingAdvancedPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type RateLimitingAdvancedPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginConsumerGroup) GetID() *string {
@@ -805,6 +926,17 @@ type RateLimitingAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (r RateLimitingAdvancedPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RateLimitingAdvancedPluginRoute) GetID() *string {
 	if r == nil {
 		return nil
@@ -815,6 +947,17 @@ func (r *RateLimitingAdvancedPluginRoute) GetID() *string {
 // RateLimitingAdvancedPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type RateLimitingAdvancedPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RateLimitingAdvancedPluginService) GetID() *string {
@@ -860,7 +1003,7 @@ func (r RateLimitingAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

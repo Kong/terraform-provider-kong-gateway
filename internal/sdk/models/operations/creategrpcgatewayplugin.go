@@ -19,7 +19,7 @@ func (c CreateGrpcgatewayPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateGrpcgatewayPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GrpcGatewayPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateGrpcgatewayPluginResponse struct {
 	GrpcGatewayPlugin *shared.GrpcGatewayPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateGrpcgatewayPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateGrpcgatewayPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateGrpcgatewayPluginResponse) GetContentType() string {

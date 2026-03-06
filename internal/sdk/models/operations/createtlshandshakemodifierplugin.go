@@ -19,7 +19,7 @@ func (c CreateTlshandshakemodifierPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateTlshandshakemodifierPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "TlsHandshakeModifierPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateTlshandshakemodifierPluginResponse struct {
 	TLSHandshakeModifierPlugin *shared.TLSHandshakeModifierPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateTlshandshakemodifierPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateTlshandshakemodifierPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateTlshandshakemodifierPluginResponse) GetContentType() string {

@@ -12,6 +12,17 @@ type RequestCalloutPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (r RequestCalloutPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginAfter) GetAccess() []string {
 	if r == nil {
 		return nil
@@ -21,6 +32,17 @@ func (r *RequestCalloutPluginAfter) GetAccess() []string {
 
 type RequestCalloutPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (r RequestCalloutPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (r *RequestCalloutPluginBefore) GetAccess() []string {
 type RequestCalloutPluginOrdering struct {
 	After  *RequestCalloutPluginAfter  `json:"after,omitempty"`
 	Before *RequestCalloutPluginBefore `json:"before,omitempty"`
+}
+
+func (r RequestCalloutPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginOrdering) GetAfter() *RequestCalloutPluginAfter {
@@ -55,6 +88,17 @@ type RequestCalloutPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (r RequestCalloutPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginPartials) GetID() *string {
@@ -83,6 +127,17 @@ type RequestCalloutPluginMemory struct {
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
+func (r RequestCalloutPluginMemory) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginMemory) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginMemory) GetDictionaryName() *string {
 	if r == nil {
 		return nil
@@ -95,6 +150,17 @@ type RequestCalloutPluginClusterNodes struct {
 	IP *string `json:"ip,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (r RequestCalloutPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginClusterNodes) GetIP() *string {
@@ -116,6 +182,17 @@ type RequestCalloutPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (r RequestCalloutPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginSentinelNodes) GetHost() *string {
@@ -205,6 +282,17 @@ type RequestCalloutPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (r RequestCalloutPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -394,6 +482,17 @@ type Cache struct {
 	Strategy *RequestCalloutPluginStrategy `json:"strategy,omitempty"`
 }
 
+func (c Cache) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Cache) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Cache) GetCacheTTL() *int64 {
 	if c == nil {
 		return nil
@@ -428,6 +527,17 @@ type RequestCalloutPluginCache struct {
 	Bypass *bool `json:"bypass,omitempty"`
 }
 
+func (r RequestCalloutPluginCache) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginCache) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginCache) GetBypass() *bool {
 	if r == nil {
 		return nil
@@ -443,6 +553,17 @@ type RequestCalloutPluginConfigBody struct {
 	Decode *bool `json:"decode,omitempty"`
 	// If `true`, forwards the incoming request's body to the callout request.
 	Forward *bool `json:"forward,omitempty"`
+}
+
+func (r RequestCalloutPluginConfigBody) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginConfigBody) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginConfigBody) GetCustom() map[string]any {
@@ -508,6 +629,17 @@ type Error struct {
 	Retries *int64 `json:"retries,omitempty"`
 }
 
+func (e Error) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(e, "", false)
+}
+
+func (e *Error) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &e, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (e *Error) GetErrorResponseCode() *int64 {
 	if e == nil {
 		return nil
@@ -551,6 +683,17 @@ type RequestCalloutPluginConfigHeaders struct {
 	Forward *bool `json:"forward,omitempty"`
 }
 
+func (r RequestCalloutPluginConfigHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginConfigHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginConfigHeaders) GetCustom() map[string]any {
 	if r == nil {
 		return nil
@@ -575,6 +718,17 @@ type Proxy struct {
 	HTTPProxy *string `json:"http_proxy,omitempty"`
 	// The HTTPS proxy URL. This proxy server will be used for HTTPS requests.
 	HTTPSProxy *string `json:"https_proxy,omitempty"`
+}
+
+func (p Proxy) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Proxy) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Proxy) GetAuthPassword() *string {
@@ -615,6 +769,17 @@ type Timeouts struct {
 	Write *int64 `json:"write,omitempty"`
 }
 
+func (t Timeouts) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(t, "", false)
+}
+
+func (t *Timeouts) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &t, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *Timeouts) GetConnect() *int64 {
 	if t == nil {
 		return nil
@@ -646,6 +811,17 @@ type HTTPOpts struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Socket timeouts in milliseconds. All or none must be set.
 	Timeouts *Timeouts `json:"timeouts,omitempty"`
+}
+
+func (h HTTPOpts) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(h, "", false)
+}
+
+func (h *HTTPOpts) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *HTTPOpts) GetProxy() *Proxy {
@@ -684,6 +860,17 @@ type RequestCalloutPluginQuery struct {
 	Forward *bool `json:"forward,omitempty"`
 }
 
+func (r RequestCalloutPluginQuery) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginQuery) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginQuery) GetCustom() map[string]any {
 	if r == nil {
 		return nil
@@ -716,6 +903,17 @@ type Request struct {
 	Query *RequestCalloutPluginQuery `json:"query,omitempty"`
 	// The URL that will be requested. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	URL string `json:"url"`
+}
+
+func (r Request) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *Request) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"url"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Request) GetBody() *RequestCalloutPluginConfigBody {
@@ -781,6 +979,17 @@ type RequestCalloutPluginBody struct {
 	Store *bool `json:"store,omitempty"`
 }
 
+func (r RequestCalloutPluginBody) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginBody) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginBody) GetDecode() *bool {
 	if r == nil {
 		return nil
@@ -801,6 +1010,17 @@ type RequestCalloutPluginHeaders struct {
 	Store *bool `json:"store,omitempty"`
 }
 
+func (r RequestCalloutPluginHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginHeaders) GetStore() *bool {
 	if r == nil {
 		return nil
@@ -815,6 +1035,17 @@ type Response struct {
 	ByLua *string `json:"by_lua,omitempty"`
 	// Callout response header customizations.
 	Headers *RequestCalloutPluginHeaders `json:"headers,omitempty"`
+}
+
+func (r Response) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *Response) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Response) GetBody() *RequestCalloutPluginBody {
@@ -849,6 +1080,17 @@ type Callouts struct {
 	Request Request `json:"request"`
 	// Configurations of callout response handling.
 	Response *Response `json:"response,omitempty"`
+}
+
+func (c Callouts) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Callouts) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name", "request"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *Callouts) GetCache() *RequestCalloutPluginCache {
@@ -896,6 +1138,17 @@ type Body struct {
 	Forward *bool `json:"forward,omitempty"`
 }
 
+func (b Body) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *Body) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *Body) GetCustom() map[string]any {
 	if b == nil {
 		return nil
@@ -925,6 +1178,17 @@ type Headers struct {
 	Forward *bool `json:"forward,omitempty"`
 }
 
+func (h Headers) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(h, "", false)
+}
+
+func (h *Headers) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (h *Headers) GetCustom() map[string]any {
 	if h == nil {
 		return nil
@@ -945,6 +1209,17 @@ type Query struct {
 	Custom map[string]any `json:"custom,omitempty"`
 	// If `false`, does not forward request query params to upstream request.
 	Forward *bool `json:"forward,omitempty"`
+}
+
+func (q Query) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(q, "", false)
+}
+
+func (q *Query) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &q, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (q *Query) GetCustom() map[string]any {
@@ -971,6 +1246,17 @@ type RequestCalloutPluginUpstream struct {
 	Headers *Headers `json:"headers,omitempty"`
 	// Upstream request query param customizations.
 	Query *Query `json:"query,omitempty"`
+}
+
+func (r RequestCalloutPluginUpstream) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginUpstream) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginUpstream) GetBody() *Body {
@@ -1010,6 +1296,17 @@ type RequestCalloutPluginConfig struct {
 	Upstream *RequestCalloutPluginUpstream `json:"upstream,omitempty"`
 }
 
+func (r RequestCalloutPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"callouts"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginConfig) GetCache() *Cache {
 	if r == nil {
 		return nil
@@ -1036,6 +1333,17 @@ type RequestCalloutPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (r RequestCalloutPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginConsumer) GetID() *string {
 	if r == nil {
 		return nil
@@ -1046,6 +1354,17 @@ func (r *RequestCalloutPluginConsumer) GetID() *string {
 // RequestCalloutPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type RequestCalloutPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (r RequestCalloutPluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginConsumerGroup) GetID() *string {
@@ -1092,6 +1411,17 @@ type RequestCalloutPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (r RequestCalloutPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RequestCalloutPluginRoute) GetID() *string {
 	if r == nil {
 		return nil
@@ -1102,6 +1432,17 @@ func (r *RequestCalloutPluginRoute) GetID() *string {
 // RequestCalloutPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type RequestCalloutPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (r RequestCalloutPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *RequestCalloutPluginService) GetID() *string {
@@ -1147,7 +1488,7 @@ func (r RequestCalloutPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RequestCalloutPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

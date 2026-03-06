@@ -21,7 +21,7 @@ func (d DeleteBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "BasicAuthId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -55,6 +55,17 @@ type DeleteBasicAuthWithConsumerResponse struct {
 	StatusCode int
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
+}
+
+func (d DeleteBasicAuthWithConsumerResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DeleteBasicAuthWithConsumerResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *DeleteBasicAuthWithConsumerResponse) GetContentType() string {

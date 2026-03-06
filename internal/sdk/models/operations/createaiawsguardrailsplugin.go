@@ -19,7 +19,7 @@ func (c CreateAiawsguardrailsPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAiawsguardrailsPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiAwsGuardrailsPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateAiawsguardrailsPluginResponse struct {
 	AiAwsGuardrailsPlugin *shared.AiAwsGuardrailsPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateAiawsguardrailsPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateAiawsguardrailsPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateAiawsguardrailsPluginResponse) GetContentType() string {

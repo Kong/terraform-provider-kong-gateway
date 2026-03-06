@@ -20,7 +20,7 @@ func (c CreateUpstreamRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateUpstreamRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Upstream"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type CreateUpstreamResponse struct {
 	Upstream *shared.Upstream
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateUpstreamResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateUpstreamResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateUpstreamResponse) GetContentType() string {

@@ -19,7 +19,7 @@ func (c CreateStandardwebhooksPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateStandardwebhooksPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "StandardWebhooksPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateStandardwebhooksPluginResponse struct {
 	StandardWebhooksPlugin *shared.StandardWebhooksPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateStandardwebhooksPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateStandardwebhooksPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateStandardwebhooksPluginResponse) GetContentType() string {

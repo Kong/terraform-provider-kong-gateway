@@ -12,6 +12,17 @@ type AiRagInjectorPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AiRagInjectorPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AiRagInjectorPluginAfter) GetAccess() []string {
 
 type AiRagInjectorPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AiRagInjectorPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AiRagInjectorPluginBefore) GetAccess() []string {
 type AiRagInjectorPluginOrdering struct {
 	After  *AiRagInjectorPluginAfter  `json:"after,omitempty"`
 	Before *AiRagInjectorPluginBefore `json:"before,omitempty"`
+}
+
+func (a AiRagInjectorPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginOrdering) GetAfter() *AiRagInjectorPluginAfter {
@@ -55,6 +88,17 @@ type AiRagInjectorPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AiRagInjectorPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginPartials) GetID() *string {
@@ -134,6 +178,17 @@ type AiRagInjectorPluginAuth struct {
 	ParamName *string `json:"param_name,omitempty"`
 	// Specify the full parameter value for 'param_name'.
 	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (a AiRagInjectorPluginAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginAuth) GetAllowOverride() *bool {
@@ -243,6 +298,17 @@ type AiRagInjectorPluginAzure struct {
 	Instance *string `json:"instance,omitempty"`
 }
 
+func (a AiRagInjectorPluginAzure) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginAzure) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginAzure) GetAPIVersion() *string {
 	if a == nil {
 		return nil
@@ -277,6 +343,17 @@ type AiRagInjectorPluginBedrock struct {
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+}
+
+func (a AiRagInjectorPluginBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginBedrock) GetAwsAssumeRoleArn() *string {
@@ -330,6 +407,17 @@ type AiRagInjectorPluginGemini struct {
 	ProjectID *string `json:"project_id,omitempty"`
 }
 
+func (a AiRagInjectorPluginGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginGemini) GetAPIEndpoint() *string {
 	if a == nil {
 		return nil
@@ -358,6 +446,17 @@ type AiRagInjectorPluginHuggingface struct {
 	WaitForModel *bool `json:"wait_for_model,omitempty"`
 }
 
+func (a AiRagInjectorPluginHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginHuggingface) GetUseCache() *bool {
 	if a == nil {
 		return nil
@@ -380,6 +479,17 @@ type AiRagInjectorPluginOptions struct {
 	Huggingface *AiRagInjectorPluginHuggingface `json:"huggingface,omitempty"`
 	// upstream url for the embeddings
 	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (a AiRagInjectorPluginOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginOptions) GetAzure() *AiRagInjectorPluginAzure {
@@ -465,6 +575,17 @@ type AiRagInjectorPluginModel struct {
 	Provider AiRagInjectorPluginProvider `json:"provider"`
 }
 
+func (a AiRagInjectorPluginModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginModel) GetName() string {
 	if a == nil {
 		return ""
@@ -489,6 +610,17 @@ func (a *AiRagInjectorPluginModel) GetProvider() AiRagInjectorPluginProvider {
 type AiRagInjectorPluginEmbeddings struct {
 	Auth  *AiRagInjectorPluginAuth `json:"auth,omitempty"`
 	Model AiRagInjectorPluginModel `json:"model"`
+}
+
+func (a AiRagInjectorPluginEmbeddings) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginEmbeddings) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"model"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginEmbeddings) GetAuth() *AiRagInjectorPluginAuth {
@@ -618,6 +750,17 @@ type AiRagInjectorPluginPgvector struct {
 	User *string `json:"user,omitempty"`
 }
 
+func (a AiRagInjectorPluginPgvector) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginPgvector) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginPgvector) GetDatabase() *string {
 	if a == nil {
 		return nil
@@ -709,6 +852,17 @@ type AiRagInjectorPluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (a AiRagInjectorPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginClusterNodes) GetIP() *string {
 	if a == nil {
 		return nil
@@ -728,6 +882,17 @@ type AiRagInjectorPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (a AiRagInjectorPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginSentinelNodes) GetHost() *string {
@@ -817,6 +982,17 @@ type AiRagInjectorPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (a AiRagInjectorPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1004,6 +1180,17 @@ type AiRagInjectorPluginVectordb struct {
 	Strategy AiRagInjectorPluginStrategy `json:"strategy"`
 }
 
+func (a AiRagInjectorPluginVectordb) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginVectordb) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"dimensions", "distance_metric", "strategy"}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginVectordb) GetDimensions() int64 {
 	if a == nil {
 		return 0
@@ -1050,6 +1237,17 @@ type AiRagInjectorPluginConfig struct {
 	Vectordb      AiRagInjectorPluginVectordb `json:"vectordb"`
 	// The namespace of the vectordb to use for embeddings lookup
 	VectordbNamespace *string `json:"vectordb_namespace,omitempty"`
+}
+
+func (a AiRagInjectorPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"embeddings", "vectordb"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginConfig) GetEmbeddings() AiRagInjectorPluginEmbeddings {
@@ -1106,6 +1304,17 @@ type AiRagInjectorPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiRagInjectorPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginConsumer) GetID() *string {
 	if a == nil {
 		return nil
@@ -1116,6 +1325,17 @@ func (a *AiRagInjectorPluginConsumer) GetID() *string {
 // AiRagInjectorPluginConsumerGroup - If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 type AiRagInjectorPluginConsumerGroup struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiRagInjectorPluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginConsumerGroup) GetID() *string {
@@ -1162,6 +1382,17 @@ type AiRagInjectorPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AiRagInjectorPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AiRagInjectorPluginRoute) GetID() *string {
 	if a == nil {
 		return nil
@@ -1172,6 +1403,17 @@ func (a *AiRagInjectorPluginRoute) GetID() *string {
 // AiRagInjectorPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type AiRagInjectorPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AiRagInjectorPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AiRagInjectorPluginService) GetID() *string {
@@ -1217,7 +1459,7 @@ func (a AiRagInjectorPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiRagInjectorPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
 		return err
 	}
 	return nil

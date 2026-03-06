@@ -19,7 +19,7 @@ func (c CreateRoutebyheaderPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateRoutebyheaderPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RouteByHeaderPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -50,6 +50,17 @@ type CreateRoutebyheaderPluginResponse struct {
 	RouteByHeaderPlugin *shared.RouteByHeaderPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (c CreateRoutebyheaderPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CreateRoutebyheaderPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *CreateRoutebyheaderPluginResponse) GetContentType() string {

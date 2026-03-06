@@ -12,6 +12,17 @@ type AcePluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (a AcePluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AcePluginAfter) GetAccess() []string {
 	if a == nil {
 		return nil
@@ -21,6 +32,17 @@ func (a *AcePluginAfter) GetAccess() []string {
 
 type AcePluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (a AcePluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (a *AcePluginBefore) GetAccess() []string {
 type AcePluginOrdering struct {
 	After  *AcePluginAfter  `json:"after,omitempty"`
 	Before *AcePluginBefore `json:"before,omitempty"`
+}
+
+func (a AcePluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginOrdering) GetAfter() *AcePluginAfter {
@@ -55,6 +88,17 @@ type AcePluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (a AcePluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginPartials) GetID() *string {
@@ -111,6 +155,17 @@ type AcePluginClusterNodes struct {
 	Port *int64 `json:"port,omitempty"`
 }
 
+func (a AcePluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AcePluginClusterNodes) GetIP() *string {
 	if a == nil {
 		return nil
@@ -130,6 +185,17 @@ type AcePluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (a AcePluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginSentinelNodes) GetHost() *string {
@@ -219,6 +285,17 @@ type AcePluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (a AcePluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginRedis) GetClusterMaxRedirections() *int64 {
@@ -373,6 +450,17 @@ type RateLimiting struct {
 	SyncRate *float64        `json:"sync_rate,omitempty"`
 }
 
+func (r RateLimiting) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimiting) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RateLimiting) GetRedis() *AcePluginRedis {
 	if r == nil {
 		return nil
@@ -391,6 +479,17 @@ type AcePluginConfig struct {
 	Anonymous    *string       `json:"anonymous,omitempty"`
 	MatchPolicy  *MatchPolicy  `json:"match_policy,omitempty"`
 	RateLimiting *RateLimiting `json:"rate_limiting,omitempty"`
+}
+
+func (a AcePluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginConfig) GetAnonymous() *string {
@@ -451,6 +550,17 @@ type AcePluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (a AcePluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AcePluginRoute) GetID() *string {
 	if a == nil {
 		return nil
@@ -461,6 +571,17 @@ func (a *AcePluginRoute) GetID() *string {
 // AcePluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type AcePluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (a AcePluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcePluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (a *AcePluginService) GetID() *string {
@@ -502,7 +623,7 @@ func (a AcePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AcePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil

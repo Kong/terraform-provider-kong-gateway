@@ -12,6 +12,17 @@ type GraphqlProxyCacheAdvancedPluginAfter struct {
 	Access []string `json:"access,omitempty"`
 }
 
+func (g GraphqlProxyCacheAdvancedPluginAfter) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginAfter) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GraphqlProxyCacheAdvancedPluginAfter) GetAccess() []string {
 	if g == nil {
 		return nil
@@ -21,6 +32,17 @@ func (g *GraphqlProxyCacheAdvancedPluginAfter) GetAccess() []string {
 
 type GraphqlProxyCacheAdvancedPluginBefore struct {
 	Access []string `json:"access,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginBefore) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginBefore) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginBefore) GetAccess() []string {
@@ -33,6 +55,17 @@ func (g *GraphqlProxyCacheAdvancedPluginBefore) GetAccess() []string {
 type GraphqlProxyCacheAdvancedPluginOrdering struct {
 	After  *GraphqlProxyCacheAdvancedPluginAfter  `json:"after,omitempty"`
 	Before *GraphqlProxyCacheAdvancedPluginBefore `json:"before,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginOrdering) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginOrdering) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginOrdering) GetAfter() *GraphqlProxyCacheAdvancedPluginAfter {
@@ -55,6 +88,17 @@ type GraphqlProxyCacheAdvancedPluginPartials struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	Path *string `json:"path,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginPartials) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginPartials) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginPartials) GetID() *string {
@@ -83,6 +127,17 @@ type Memory struct {
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 }
 
+func (m Memory) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(m, "", false)
+}
+
+func (m *Memory) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &m, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Memory) GetDictionaryName() *string {
 	if m == nil {
 		return nil
@@ -95,6 +150,17 @@ type GraphqlProxyCacheAdvancedPluginClusterNodes struct {
 	IP *string `json:"ip,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginClusterNodes) GetIP() *string {
@@ -116,6 +182,17 @@ type GraphqlProxyCacheAdvancedPluginSentinelNodes struct {
 	Host *string `json:"host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginSentinelNodes) GetHost() *string {
@@ -205,6 +282,17 @@ type GraphqlProxyCacheAdvancedPluginRedis struct {
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 	Username *string `json:"username,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -394,6 +482,17 @@ type GraphqlProxyCacheAdvancedPluginConfig struct {
 	VaryHeaders []string `json:"vary_headers,omitempty"`
 }
 
+func (g GraphqlProxyCacheAdvancedPluginConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GraphqlProxyCacheAdvancedPluginConfig) GetBypassOnErr() *bool {
 	if g == nil {
 		return nil
@@ -441,6 +540,17 @@ type GraphqlProxyCacheAdvancedPluginConsumer struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (g GraphqlProxyCacheAdvancedPluginConsumer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginConsumer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GraphqlProxyCacheAdvancedPluginConsumer) GetID() *string {
 	if g == nil {
 		return nil
@@ -485,6 +595,17 @@ type GraphqlProxyCacheAdvancedPluginRoute struct {
 	ID *string `json:"id,omitempty"`
 }
 
+func (g GraphqlProxyCacheAdvancedPluginRoute) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginRoute) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *GraphqlProxyCacheAdvancedPluginRoute) GetID() *string {
 	if g == nil {
 		return nil
@@ -495,6 +616,17 @@ func (g *GraphqlProxyCacheAdvancedPluginRoute) GetID() *string {
 // GraphqlProxyCacheAdvancedPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type GraphqlProxyCacheAdvancedPluginService struct {
 	ID *string `json:"id,omitempty"`
+}
+
+func (g GraphqlProxyCacheAdvancedPluginService) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlProxyCacheAdvancedPluginService) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GraphqlProxyCacheAdvancedPluginService) GetID() *string {
@@ -538,7 +670,7 @@ func (g GraphqlProxyCacheAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GraphqlProxyCacheAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil

@@ -20,7 +20,7 @@ func (g GetAisemanticpromptguardPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetAisemanticpromptguardPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
 		return err
 	}
 	return nil
@@ -51,6 +51,17 @@ type GetAisemanticpromptguardPluginResponse struct {
 	AiSemanticPromptGuardPlugin *shared.AiSemanticPromptGuardPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (g GetAisemanticpromptguardPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GetAisemanticpromptguardPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (g *GetAisemanticpromptguardPluginResponse) GetContentType() string {

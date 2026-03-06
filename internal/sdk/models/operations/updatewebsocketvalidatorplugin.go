@@ -21,7 +21,7 @@ func (u UpdateWebsocketvalidatorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateWebsocketvalidatorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "WebsocketValidatorPlugin"}); err != nil {
 		return err
 	}
 	return nil
@@ -59,6 +59,17 @@ type UpdateWebsocketvalidatorPluginResponse struct {
 	WebsocketValidatorPlugin *shared.WebsocketValidatorPlugin
 	// Unauthorized
 	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
+}
+
+func (u UpdateWebsocketvalidatorPluginResponse) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpdateWebsocketvalidatorPluginResponse) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ContentType", "StatusCode", "RawResponse"}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UpdateWebsocketvalidatorPluginResponse) GetContentType() string {

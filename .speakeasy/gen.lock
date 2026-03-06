@@ -5,12 +5,12 @@ management:
   docVersion: 0.0.1
   speakeasyVersion: 1.744.1
   generationVersion: 2.850.5
-  releaseVersion: 1.0.1
-  configChecksum: eb94a9e4e33a6dc94f7e01c875f0295d
+  releaseVersion: 1.0.2
+  configChecksum: 5f72a9e3d3130d67d2adc2f58254217d
 persistentEdits:
-  generation_id: 7011a2cb-125c-4a14-bcbe-6c00d5dcf41a
-  pristine_commit_hash: 7cc30af22354e36f0fe63bb9f1f0feea9bb3b454
-  pristine_tree_hash: 78a4bbec3aa817f586774efe6aece6d7e2fc61f4
+  generation_id: a23d18a7-6ea4-4c53-8ed2-11b41e926ad1
+  pristine_commit_hash: 181848a76ede183901a60914b4d98b7900b00f96
+  pristine_tree_hash: da6912a419d957abac4012f0a496473f8b4fb6d3
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -35,8 +35,8 @@ trackedFiles:
     pristine_git_object: 8e707bb129af1da185ba30b4c289b0160819c437
   examples/provider/provider.tf:
     id: 954e955c0240
-    last_write_checksum: sha1:a359ba10761e2c227a9faba27f1b471cdc4c2d7e
-    pristine_git_object: 9cbca10000c87afe6220bc27909b6b06dc5ed24b
+    last_write_checksum: sha1:28c623ef2fcf8988127d8ec2731ca63b9bd9a66b
+    pristine_git_object: 1a764d0b328ebeffad9acf741a80536b3e0cfcf4
   examples/resources/kong-gateway_acl/import-by-string-id.tf:
     id: 7f29f70a1a5b
     last_write_checksum: sha1:5890cc49d1ab13108da75f3013537cfd64757ee8
@@ -3995,8 +3995,8 @@ trackedFiles:
     pristine_git_object: 402553581b4b2f6e6f1195534cb873908698b074
   internal/sdk/konggateway.go:
     id: "00e542406092"
-    last_write_checksum: sha1:9d60f014d2d9b291aafd5c7394e776d149f7b2cf
-    pristine_git_object: 638399040c3c9d66039808027620112672a899cd
+    last_write_checksum: sha1:abffe6b7cde829794beef96e7186dc3e4782aa29
+    pristine_git_object: 785f5628f4cf75f9d178f2ad01372d02852433b8
   internal/sdk/models/errors/sdkerror.go:
     id: 19b5a8d3586b
     last_write_checksum: sha1:5d65fce5049df7c5113e11c9ccb1e4c46b91901c

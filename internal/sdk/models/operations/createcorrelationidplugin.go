@@ -19,7 +19,7 @@ func (c CreateCorrelationidPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateCorrelationidPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "CorrelationIdPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

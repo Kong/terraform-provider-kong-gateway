@@ -19,7 +19,7 @@ func (c CreateGrpcgatewayPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateGrpcgatewayPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GrpcGatewayPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -19,7 +19,7 @@ func (c CreateAipromptguardPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAipromptguardPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiPromptGuardPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

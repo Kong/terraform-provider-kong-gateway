@@ -22,7 +22,7 @@ func (g GetACLWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetACLWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "ACLId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

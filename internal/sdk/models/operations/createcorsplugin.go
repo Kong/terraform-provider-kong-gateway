@@ -19,7 +19,7 @@ func (c CreateCorsPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateCorsPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "CorsPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

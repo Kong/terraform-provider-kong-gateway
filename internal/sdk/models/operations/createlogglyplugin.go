@@ -19,7 +19,7 @@ func (c CreateLogglyPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateLogglyPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "LogglyPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

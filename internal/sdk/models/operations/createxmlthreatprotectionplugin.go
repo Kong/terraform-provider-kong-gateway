@@ -19,7 +19,7 @@ func (c CreateXmlthreatprotectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateXmlthreatprotectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "XmlThreatProtectionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

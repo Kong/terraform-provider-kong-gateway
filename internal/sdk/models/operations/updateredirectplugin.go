@@ -21,7 +21,7 @@ func (u UpdateRedirectPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateRedirectPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RedirectPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

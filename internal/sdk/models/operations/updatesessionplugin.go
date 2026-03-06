@@ -21,7 +21,7 @@ func (u UpdateSessionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateSessionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SessionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

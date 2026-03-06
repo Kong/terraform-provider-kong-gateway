@@ -19,7 +19,7 @@ func (c CreateLdapauthadvancedPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateLdapauthadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "LdapAuthAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

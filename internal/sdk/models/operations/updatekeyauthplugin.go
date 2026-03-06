@@ -21,7 +21,7 @@ func (u UpdateKeyauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateKeyauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "KeyAuthPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

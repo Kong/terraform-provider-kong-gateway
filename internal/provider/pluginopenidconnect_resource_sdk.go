@@ -15,6 +15,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.OpenidConnectPluginConfig{}
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 		r.Config.Audience = make([]types.String, 0, len(resp.Config.Audience))
 		for _, v := range resp.Config.Audience {
@@ -662,11 +663,11 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -675,17 +676,17 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -714,6 +715,8 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -833,8 +836,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		var after *shared.OpenidConnectPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.OpenidConnectPluginAfter{
 				Access: access,
@@ -843,8 +846,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		var before *shared.OpenidConnectPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.OpenidConnectPluginBefore{
 				Access: access1,
@@ -856,22 +859,22 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		}
 	}
 	partials := make([]shared.OpenidConnectPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -884,8 +887,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -901,24 +904,24 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		anonymous = nil
 	}
 	audience := make([]string, 0, len(r.Config.Audience))
-	for _, audienceItem := range r.Config.Audience {
-		audience = append(audience, audienceItem.ValueString())
+	for audienceIndex := range r.Config.Audience {
+		audience = append(audience, r.Config.Audience[audienceIndex].ValueString())
 	}
 	audienceClaim := make([]string, 0, len(r.Config.AudienceClaim))
-	for _, audienceClaimItem := range r.Config.AudienceClaim {
-		audienceClaim = append(audienceClaim, audienceClaimItem.ValueString())
+	for audienceClaimIndex := range r.Config.AudienceClaim {
+		audienceClaim = append(audienceClaim, r.Config.AudienceClaim[audienceClaimIndex].ValueString())
 	}
 	audienceRequired := make([]string, 0, len(r.Config.AudienceRequired))
-	for _, audienceRequiredItem := range r.Config.AudienceRequired {
-		audienceRequired = append(audienceRequired, audienceRequiredItem.ValueString())
+	for audienceRequiredIndex := range r.Config.AudienceRequired {
+		audienceRequired = append(audienceRequired, r.Config.AudienceRequired[audienceRequiredIndex].ValueString())
 	}
 	authMethods := make([]shared.AuthMethods, 0, len(r.Config.AuthMethods))
 	for _, authMethodsItem := range r.Config.AuthMethods {
 		authMethods = append(authMethods, shared.AuthMethods(authMethodsItem.ValueString()))
 	}
 	authenticatedGroupsClaim := make([]string, 0, len(r.Config.AuthenticatedGroupsClaim))
-	for _, authenticatedGroupsClaimItem := range r.Config.AuthenticatedGroupsClaim {
-		authenticatedGroupsClaim = append(authenticatedGroupsClaim, authenticatedGroupsClaimItem.ValueString())
+	for authenticatedGroupsClaimIndex := range r.Config.AuthenticatedGroupsClaim {
+		authenticatedGroupsClaim = append(authenticatedGroupsClaim, r.Config.AuthenticatedGroupsClaim[authenticatedGroupsClaimIndex].ValueString())
 	}
 	authorizationCookieDomain := new(string)
 	if !r.Config.AuthorizationCookieDomain.IsUnknown() && !r.Config.AuthorizationCookieDomain.IsNull() {
@@ -963,16 +966,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		authorizationEndpoint = nil
 	}
 	authorizationQueryArgsClient := make([]string, 0, len(r.Config.AuthorizationQueryArgsClient))
-	for _, authorizationQueryArgsClientItem := range r.Config.AuthorizationQueryArgsClient {
-		authorizationQueryArgsClient = append(authorizationQueryArgsClient, authorizationQueryArgsClientItem.ValueString())
+	for authorizationQueryArgsClientIndex := range r.Config.AuthorizationQueryArgsClient {
+		authorizationQueryArgsClient = append(authorizationQueryArgsClient, r.Config.AuthorizationQueryArgsClient[authorizationQueryArgsClientIndex].ValueString())
 	}
 	authorizationQueryArgsNames := make([]string, 0, len(r.Config.AuthorizationQueryArgsNames))
-	for _, authorizationQueryArgsNamesItem := range r.Config.AuthorizationQueryArgsNames {
-		authorizationQueryArgsNames = append(authorizationQueryArgsNames, authorizationQueryArgsNamesItem.ValueString())
+	for authorizationQueryArgsNamesIndex := range r.Config.AuthorizationQueryArgsNames {
+		authorizationQueryArgsNames = append(authorizationQueryArgsNames, r.Config.AuthorizationQueryArgsNames[authorizationQueryArgsNamesIndex].ValueString())
 	}
 	authorizationQueryArgsValues := make([]string, 0, len(r.Config.AuthorizationQueryArgsValues))
-	for _, authorizationQueryArgsValuesItem := range r.Config.AuthorizationQueryArgsValues {
-		authorizationQueryArgsValues = append(authorizationQueryArgsValues, authorizationQueryArgsValuesItem.ValueString())
+	for authorizationQueryArgsValuesIndex := range r.Config.AuthorizationQueryArgsValues {
+		authorizationQueryArgsValues = append(authorizationQueryArgsValues, r.Config.AuthorizationQueryArgsValues[authorizationQueryArgsValuesIndex].ValueString())
 	}
 	authorizationRollingTimeout := new(float64)
 	if !r.Config.AuthorizationRollingTimeout.IsUnknown() && !r.Config.AuthorizationRollingTimeout.IsNull() {
@@ -1057,8 +1060,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		cacheUserInfo = nil
 	}
 	claimsForbidden := make([]string, 0, len(r.Config.ClaimsForbidden))
-	for _, claimsForbiddenItem := range r.Config.ClaimsForbidden {
-		claimsForbidden = append(claimsForbidden, claimsForbiddenItem.ValueString())
+	for claimsForbiddenIndex := range r.Config.ClaimsForbidden {
+		claimsForbidden = append(claimsForbidden, r.Config.ClaimsForbidden[claimsForbiddenIndex].ValueString())
 	}
 	clientAlg := make([]shared.OpenidConnectPluginClientAlg, 0, len(r.Config.ClientAlg))
 	for _, clientAlgItem := range r.Config.ClientAlg {
@@ -1079,154 +1082,154 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		clientCredentialsParamType = append(clientCredentialsParamType, shared.ClientCredentialsParamType(clientCredentialsParamTypeItem.ValueString()))
 	}
 	clientID := make([]string, 0, len(r.Config.ClientID))
-	for _, clientIDItem := range r.Config.ClientID {
-		clientID = append(clientID, clientIDItem.ValueString())
+	for clientIDIndex := range r.Config.ClientID {
+		clientID = append(clientID, r.Config.ClientID[clientIDIndex].ValueString())
 	}
 	clientJwk := make([]shared.ClientJwk, 0, len(r.Config.ClientJwk))
-	for _, clientJwkItem := range r.Config.ClientJwk {
+	for clientJwkIndex := range r.Config.ClientJwk {
 		alg := new(string)
-		if !clientJwkItem.Alg.IsUnknown() && !clientJwkItem.Alg.IsNull() {
-			*alg = clientJwkItem.Alg.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Alg.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Alg.IsNull() {
+			*alg = r.Config.ClientJwk[clientJwkIndex].Alg.ValueString()
 		} else {
 			alg = nil
 		}
 		crv := new(string)
-		if !clientJwkItem.Crv.IsUnknown() && !clientJwkItem.Crv.IsNull() {
-			*crv = clientJwkItem.Crv.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Crv.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Crv.IsNull() {
+			*crv = r.Config.ClientJwk[clientJwkIndex].Crv.ValueString()
 		} else {
 			crv = nil
 		}
 		d := new(string)
-		if !clientJwkItem.D.IsUnknown() && !clientJwkItem.D.IsNull() {
-			*d = clientJwkItem.D.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].D.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].D.IsNull() {
+			*d = r.Config.ClientJwk[clientJwkIndex].D.ValueString()
 		} else {
 			d = nil
 		}
 		dp := new(string)
-		if !clientJwkItem.Dp.IsUnknown() && !clientJwkItem.Dp.IsNull() {
-			*dp = clientJwkItem.Dp.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Dp.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Dp.IsNull() {
+			*dp = r.Config.ClientJwk[clientJwkIndex].Dp.ValueString()
 		} else {
 			dp = nil
 		}
 		dq := new(string)
-		if !clientJwkItem.Dq.IsUnknown() && !clientJwkItem.Dq.IsNull() {
-			*dq = clientJwkItem.Dq.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Dq.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Dq.IsNull() {
+			*dq = r.Config.ClientJwk[clientJwkIndex].Dq.ValueString()
 		} else {
 			dq = nil
 		}
 		e := new(string)
-		if !clientJwkItem.E.IsUnknown() && !clientJwkItem.E.IsNull() {
-			*e = clientJwkItem.E.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].E.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].E.IsNull() {
+			*e = r.Config.ClientJwk[clientJwkIndex].E.ValueString()
 		} else {
 			e = nil
 		}
 		issuer := new(string)
-		if !clientJwkItem.Issuer.IsUnknown() && !clientJwkItem.Issuer.IsNull() {
-			*issuer = clientJwkItem.Issuer.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Issuer.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Issuer.IsNull() {
+			*issuer = r.Config.ClientJwk[clientJwkIndex].Issuer.ValueString()
 		} else {
 			issuer = nil
 		}
 		k := new(string)
-		if !clientJwkItem.K.IsUnknown() && !clientJwkItem.K.IsNull() {
-			*k = clientJwkItem.K.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].K.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].K.IsNull() {
+			*k = r.Config.ClientJwk[clientJwkIndex].K.ValueString()
 		} else {
 			k = nil
 		}
-		keyOps := make([]string, 0, len(clientJwkItem.KeyOps))
-		for _, keyOpsItem := range clientJwkItem.KeyOps {
-			keyOps = append(keyOps, keyOpsItem.ValueString())
+		keyOps := make([]string, 0, len(r.Config.ClientJwk[clientJwkIndex].KeyOps))
+		for keyOpsIndex := range r.Config.ClientJwk[clientJwkIndex].KeyOps {
+			keyOps = append(keyOps, r.Config.ClientJwk[clientJwkIndex].KeyOps[keyOpsIndex].ValueString())
 		}
 		kid := new(string)
-		if !clientJwkItem.Kid.IsUnknown() && !clientJwkItem.Kid.IsNull() {
-			*kid = clientJwkItem.Kid.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Kid.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Kid.IsNull() {
+			*kid = r.Config.ClientJwk[clientJwkIndex].Kid.ValueString()
 		} else {
 			kid = nil
 		}
 		kty := new(string)
-		if !clientJwkItem.Kty.IsUnknown() && !clientJwkItem.Kty.IsNull() {
-			*kty = clientJwkItem.Kty.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Kty.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Kty.IsNull() {
+			*kty = r.Config.ClientJwk[clientJwkIndex].Kty.ValueString()
 		} else {
 			kty = nil
 		}
 		n := new(string)
-		if !clientJwkItem.N.IsUnknown() && !clientJwkItem.N.IsNull() {
-			*n = clientJwkItem.N.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].N.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].N.IsNull() {
+			*n = r.Config.ClientJwk[clientJwkIndex].N.ValueString()
 		} else {
 			n = nil
 		}
 		oth := new(string)
-		if !clientJwkItem.Oth.IsUnknown() && !clientJwkItem.Oth.IsNull() {
-			*oth = clientJwkItem.Oth.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Oth.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Oth.IsNull() {
+			*oth = r.Config.ClientJwk[clientJwkIndex].Oth.ValueString()
 		} else {
 			oth = nil
 		}
 		p := new(string)
-		if !clientJwkItem.P.IsUnknown() && !clientJwkItem.P.IsNull() {
-			*p = clientJwkItem.P.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].P.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].P.IsNull() {
+			*p = r.Config.ClientJwk[clientJwkIndex].P.ValueString()
 		} else {
 			p = nil
 		}
 		q := new(string)
-		if !clientJwkItem.Q.IsUnknown() && !clientJwkItem.Q.IsNull() {
-			*q = clientJwkItem.Q.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Q.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Q.IsNull() {
+			*q = r.Config.ClientJwk[clientJwkIndex].Q.ValueString()
 		} else {
 			q = nil
 		}
 		qi := new(string)
-		if !clientJwkItem.Qi.IsUnknown() && !clientJwkItem.Qi.IsNull() {
-			*qi = clientJwkItem.Qi.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Qi.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Qi.IsNull() {
+			*qi = r.Config.ClientJwk[clientJwkIndex].Qi.ValueString()
 		} else {
 			qi = nil
 		}
 		r1 := new(string)
-		if !clientJwkItem.R.IsUnknown() && !clientJwkItem.R.IsNull() {
-			*r1 = clientJwkItem.R.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].R.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].R.IsNull() {
+			*r1 = r.Config.ClientJwk[clientJwkIndex].R.ValueString()
 		} else {
 			r1 = nil
 		}
 		t := new(string)
-		if !clientJwkItem.T.IsUnknown() && !clientJwkItem.T.IsNull() {
-			*t = clientJwkItem.T.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].T.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].T.IsNull() {
+			*t = r.Config.ClientJwk[clientJwkIndex].T.ValueString()
 		} else {
 			t = nil
 		}
 		use := new(string)
-		if !clientJwkItem.Use.IsUnknown() && !clientJwkItem.Use.IsNull() {
-			*use = clientJwkItem.Use.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Use.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Use.IsNull() {
+			*use = r.Config.ClientJwk[clientJwkIndex].Use.ValueString()
 		} else {
 			use = nil
 		}
 		x := new(string)
-		if !clientJwkItem.X.IsUnknown() && !clientJwkItem.X.IsNull() {
-			*x = clientJwkItem.X.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].X.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].X.IsNull() {
+			*x = r.Config.ClientJwk[clientJwkIndex].X.ValueString()
 		} else {
 			x = nil
 		}
-		x5c := make([]string, 0, len(clientJwkItem.X5c))
-		for _, x5cItem := range clientJwkItem.X5c {
-			x5c = append(x5c, x5cItem.ValueString())
+		x5c := make([]string, 0, len(r.Config.ClientJwk[clientJwkIndex].X5c))
+		for x5cIndex := range r.Config.ClientJwk[clientJwkIndex].X5c {
+			x5c = append(x5c, r.Config.ClientJwk[clientJwkIndex].X5c[x5cIndex].ValueString())
 		}
 		x5t := new(string)
-		if !clientJwkItem.X5t.IsUnknown() && !clientJwkItem.X5t.IsNull() {
-			*x5t = clientJwkItem.X5t.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].X5t.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].X5t.IsNull() {
+			*x5t = r.Config.ClientJwk[clientJwkIndex].X5t.ValueString()
 		} else {
 			x5t = nil
 		}
 		x5tNumberS256 := new(string)
-		if !clientJwkItem.X5tNumberS256.IsUnknown() && !clientJwkItem.X5tNumberS256.IsNull() {
-			*x5tNumberS256 = clientJwkItem.X5tNumberS256.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].X5tNumberS256.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].X5tNumberS256.IsNull() {
+			*x5tNumberS256 = r.Config.ClientJwk[clientJwkIndex].X5tNumberS256.ValueString()
 		} else {
 			x5tNumberS256 = nil
 		}
 		x5u := new(string)
-		if !clientJwkItem.X5u.IsUnknown() && !clientJwkItem.X5u.IsNull() {
-			*x5u = clientJwkItem.X5u.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].X5u.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].X5u.IsNull() {
+			*x5u = r.Config.ClientJwk[clientJwkIndex].X5u.ValueString()
 		} else {
 			x5u = nil
 		}
 		y := new(string)
-		if !clientJwkItem.Y.IsUnknown() && !clientJwkItem.Y.IsNull() {
-			*y = clientJwkItem.Y.ValueString()
+		if !r.Config.ClientJwk[clientJwkIndex].Y.IsUnknown() && !r.Config.ClientJwk[clientJwkIndex].Y.IsNull() {
+			*y = r.Config.ClientJwk[clientJwkIndex].Y.ValueString()
 		} else {
 			y = nil
 		}
@@ -1259,8 +1262,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		})
 	}
 	clientSecret := make([]string, 0, len(r.Config.ClientSecret))
-	for _, clientSecretItem := range r.Config.ClientSecret {
-		clientSecret = append(clientSecret, clientSecretItem.ValueString())
+	for clientSecretIndex := range r.Config.ClientSecret {
+		clientSecret = append(clientSecret, r.Config.ClientSecret[clientSecretIndex].ValueString())
 	}
 	var clusterCacheRedis *shared.ClusterCacheRedis
 	if r.Config.ClusterCacheRedis != nil {
@@ -1271,16 +1274,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			clusterMaxRedirections = nil
 		}
 		clusterNodes := make([]shared.OpenidConnectPluginClusterNodes, 0, len(r.Config.ClusterCacheRedis.ClusterNodes))
-		for _, clusterNodesItem := range r.Config.ClusterCacheRedis.ClusterNodes {
+		for clusterNodesIndex := range r.Config.ClusterCacheRedis.ClusterNodes {
 			ip := new(string)
-			if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
-				*ip = clusterNodesItem.IP.ValueString()
+			if !r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].IP.IsUnknown() && !r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].IP.IsNull() {
+				*ip = r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].IP.ValueString()
 			} else {
 				ip = nil
 			}
 			port := new(int64)
-			if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
-				*port = clusterNodesItem.Port.ValueInt64()
+			if !r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].Port.IsUnknown() && !r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].Port.IsNull() {
+				*port = r.Config.ClusterCacheRedis.ClusterNodes[clusterNodesIndex].Port.ValueInt64()
 			} else {
 				port = nil
 			}
@@ -1356,16 +1359,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			sentinelMaster = nil
 		}
 		sentinelNodes := make([]shared.OpenidConnectPluginSentinelNodes, 0, len(r.Config.ClusterCacheRedis.SentinelNodes))
-		for _, sentinelNodesItem := range r.Config.ClusterCacheRedis.SentinelNodes {
+		for sentinelNodesIndex := range r.Config.ClusterCacheRedis.SentinelNodes {
 			host1 := new(string)
-			if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
-				*host1 = sentinelNodesItem.Host.ValueString()
+			if !r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Host.IsUnknown() && !r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Host.IsNull() {
+				*host1 = r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Host.ValueString()
 			} else {
 				host1 = nil
 			}
 			port2 := new(int64)
-			if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
-				*port2 = sentinelNodesItem.Port.ValueInt64()
+			if !r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Port.IsUnknown() && !r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Port.IsNull() {
+				*port2 = r.Config.ClusterCacheRedis.SentinelNodes[sentinelNodesIndex].Port.ValueInt64()
 			} else {
 				port2 = nil
 			}
@@ -1451,12 +1454,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		consumerBy = append(consumerBy, shared.OpenidConnectPluginConsumerBy(consumerByItem.ValueString()))
 	}
 	consumerClaim := make([]string, 0, len(r.Config.ConsumerClaim))
-	for _, consumerClaimItem := range r.Config.ConsumerClaim {
-		consumerClaim = append(consumerClaim, consumerClaimItem.ValueString())
+	for consumerClaimIndex := range r.Config.ConsumerClaim {
+		consumerClaim = append(consumerClaim, r.Config.ConsumerClaim[consumerClaimIndex].ValueString())
 	}
 	consumerGroupsClaim := make([]string, 0, len(r.Config.ConsumerGroupsClaim))
-	for _, consumerGroupsClaimItem := range r.Config.ConsumerGroupsClaim {
-		consumerGroupsClaim = append(consumerGroupsClaim, consumerGroupsClaimItem.ValueString())
+	for consumerGroupsClaimIndex := range r.Config.ConsumerGroupsClaim {
+		consumerGroupsClaim = append(consumerGroupsClaim, r.Config.ConsumerGroupsClaim[consumerGroupsClaimIndex].ValueString())
 	}
 	consumerGroupsOptional := new(bool)
 	if !r.Config.ConsumerGroupsOptional.IsUnknown() && !r.Config.ConsumerGroupsOptional.IsNull() {
@@ -1471,20 +1474,20 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		consumerOptional = nil
 	}
 	credentialClaim := make([]string, 0, len(r.Config.CredentialClaim))
-	for _, credentialClaimItem := range r.Config.CredentialClaim {
-		credentialClaim = append(credentialClaim, credentialClaimItem.ValueString())
+	for credentialClaimIndex := range r.Config.CredentialClaim {
+		credentialClaim = append(credentialClaim, r.Config.CredentialClaim[credentialClaimIndex].ValueString())
 	}
 	disableSession := make([]shared.DisableSession, 0, len(r.Config.DisableSession))
 	for _, disableSessionItem := range r.Config.DisableSession {
 		disableSession = append(disableSession, shared.DisableSession(disableSessionItem.ValueString()))
 	}
 	discoveryHeadersNames := make([]string, 0, len(r.Config.DiscoveryHeadersNames))
-	for _, discoveryHeadersNamesItem := range r.Config.DiscoveryHeadersNames {
-		discoveryHeadersNames = append(discoveryHeadersNames, discoveryHeadersNamesItem.ValueString())
+	for discoveryHeadersNamesIndex := range r.Config.DiscoveryHeadersNames {
+		discoveryHeadersNames = append(discoveryHeadersNames, r.Config.DiscoveryHeadersNames[discoveryHeadersNamesIndex].ValueString())
 	}
 	discoveryHeadersValues := make([]string, 0, len(r.Config.DiscoveryHeadersValues))
-	for _, discoveryHeadersValuesItem := range r.Config.DiscoveryHeadersValues {
-		discoveryHeadersValues = append(discoveryHeadersValues, discoveryHeadersValuesItem.ValueString())
+	for discoveryHeadersValuesIndex := range r.Config.DiscoveryHeadersValues {
+		discoveryHeadersValues = append(discoveryHeadersValues, r.Config.DiscoveryHeadersValues[discoveryHeadersValuesIndex].ValueString())
 	}
 	displayErrors := new(bool)
 	if !r.Config.DisplayErrors.IsUnknown() && !r.Config.DisplayErrors.IsNull() {
@@ -1493,8 +1496,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		displayErrors = nil
 	}
 	domains := make([]string, 0, len(r.Config.Domains))
-	for _, domainsItem := range r.Config.Domains {
-		domains = append(domains, domainsItem.ValueString())
+	for domainsIndex := range r.Config.Domains {
+		domains = append(domains, r.Config.Domains[domainsIndex].ValueString())
 	}
 	downstreamAccessTokenHeader := new(string)
 	if !r.Config.DownstreamAccessTokenHeader.IsUnknown() && !r.Config.DownstreamAccessTokenHeader.IsNull() {
@@ -1509,12 +1512,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		downstreamAccessTokenJwkHeader = nil
 	}
 	downstreamHeadersClaims := make([]string, 0, len(r.Config.DownstreamHeadersClaims))
-	for _, downstreamHeadersClaimsItem := range r.Config.DownstreamHeadersClaims {
-		downstreamHeadersClaims = append(downstreamHeadersClaims, downstreamHeadersClaimsItem.ValueString())
+	for downstreamHeadersClaimsIndex := range r.Config.DownstreamHeadersClaims {
+		downstreamHeadersClaims = append(downstreamHeadersClaims, r.Config.DownstreamHeadersClaims[downstreamHeadersClaimsIndex].ValueString())
 	}
 	downstreamHeadersNames := make([]string, 0, len(r.Config.DownstreamHeadersNames))
-	for _, downstreamHeadersNamesItem := range r.Config.DownstreamHeadersNames {
-		downstreamHeadersNames = append(downstreamHeadersNames, downstreamHeadersNamesItem.ValueString())
+	for downstreamHeadersNamesIndex := range r.Config.DownstreamHeadersNames {
+		downstreamHeadersNames = append(downstreamHeadersNames, r.Config.DownstreamHeadersNames[downstreamHeadersNamesIndex].ValueString())
 	}
 	downstreamIDTokenHeader := new(string)
 	if !r.Config.DownstreamIDTokenHeader.IsUnknown() && !r.Config.DownstreamIDTokenHeader.IsNull() {
@@ -1595,8 +1598,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		exposeErrorCode = nil
 	}
 	extraJwksUris := make([]string, 0, len(r.Config.ExtraJwksUris))
-	for _, extraJwksUrisItem := range r.Config.ExtraJwksUris {
-		extraJwksUris = append(extraJwksUris, extraJwksUrisItem.ValueString())
+	for extraJwksUrisIndex := range r.Config.ExtraJwksUris {
+		extraJwksUris = append(extraJwksUris, r.Config.ExtraJwksUris[extraJwksUrisIndex].ValueString())
 	}
 	forbiddenDestroySession := new(bool)
 	if !r.Config.ForbiddenDestroySession.IsUnknown() && !r.Config.ForbiddenDestroySession.IsNull() {
@@ -1611,16 +1614,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		forbiddenErrorMessage = nil
 	}
 	forbiddenRedirectURI := make([]string, 0, len(r.Config.ForbiddenRedirectURI))
-	for _, forbiddenRedirectURIItem := range r.Config.ForbiddenRedirectURI {
-		forbiddenRedirectURI = append(forbiddenRedirectURI, forbiddenRedirectURIItem.ValueString())
+	for forbiddenRedirectURIIndex := range r.Config.ForbiddenRedirectURI {
+		forbiddenRedirectURI = append(forbiddenRedirectURI, r.Config.ForbiddenRedirectURI[forbiddenRedirectURIIndex].ValueString())
 	}
 	groupsClaim := make([]string, 0, len(r.Config.GroupsClaim))
-	for _, groupsClaimItem := range r.Config.GroupsClaim {
-		groupsClaim = append(groupsClaim, groupsClaimItem.ValueString())
+	for groupsClaimIndex := range r.Config.GroupsClaim {
+		groupsClaim = append(groupsClaim, r.Config.GroupsClaim[groupsClaimIndex].ValueString())
 	}
 	groupsRequired := make([]string, 0, len(r.Config.GroupsRequired))
-	for _, groupsRequiredItem := range r.Config.GroupsRequired {
-		groupsRequired = append(groupsRequired, groupsRequiredItem.ValueString())
+	for groupsRequiredIndex := range r.Config.GroupsRequired {
+		groupsRequired = append(groupsRequired, r.Config.GroupsRequired[groupsRequiredIndex].ValueString())
 	}
 	hideCredentials := new(bool)
 	if !r.Config.HideCredentials.IsUnknown() && !r.Config.HideCredentials.IsNull() {
@@ -1703,16 +1706,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		introspectionEndpointAuthMethod = nil
 	}
 	introspectionHeadersClient := make([]string, 0, len(r.Config.IntrospectionHeadersClient))
-	for _, introspectionHeadersClientItem := range r.Config.IntrospectionHeadersClient {
-		introspectionHeadersClient = append(introspectionHeadersClient, introspectionHeadersClientItem.ValueString())
+	for introspectionHeadersClientIndex := range r.Config.IntrospectionHeadersClient {
+		introspectionHeadersClient = append(introspectionHeadersClient, r.Config.IntrospectionHeadersClient[introspectionHeadersClientIndex].ValueString())
 	}
 	introspectionHeadersNames := make([]string, 0, len(r.Config.IntrospectionHeadersNames))
-	for _, introspectionHeadersNamesItem := range r.Config.IntrospectionHeadersNames {
-		introspectionHeadersNames = append(introspectionHeadersNames, introspectionHeadersNamesItem.ValueString())
+	for introspectionHeadersNamesIndex := range r.Config.IntrospectionHeadersNames {
+		introspectionHeadersNames = append(introspectionHeadersNames, r.Config.IntrospectionHeadersNames[introspectionHeadersNamesIndex].ValueString())
 	}
 	introspectionHeadersValues := make([]string, 0, len(r.Config.IntrospectionHeadersValues))
-	for _, introspectionHeadersValuesItem := range r.Config.IntrospectionHeadersValues {
-		introspectionHeadersValues = append(introspectionHeadersValues, introspectionHeadersValuesItem.ValueString())
+	for introspectionHeadersValuesIndex := range r.Config.IntrospectionHeadersValues {
+		introspectionHeadersValues = append(introspectionHeadersValues, r.Config.IntrospectionHeadersValues[introspectionHeadersValuesIndex].ValueString())
 	}
 	introspectionHint := new(string)
 	if !r.Config.IntrospectionHint.IsUnknown() && !r.Config.IntrospectionHint.IsNull() {
@@ -1721,20 +1724,20 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		introspectionHint = nil
 	}
 	introspectionPostArgsClient := make([]string, 0, len(r.Config.IntrospectionPostArgsClient))
-	for _, introspectionPostArgsClientItem := range r.Config.IntrospectionPostArgsClient {
-		introspectionPostArgsClient = append(introspectionPostArgsClient, introspectionPostArgsClientItem.ValueString())
+	for introspectionPostArgsClientIndex := range r.Config.IntrospectionPostArgsClient {
+		introspectionPostArgsClient = append(introspectionPostArgsClient, r.Config.IntrospectionPostArgsClient[introspectionPostArgsClientIndex].ValueString())
 	}
 	introspectionPostArgsClientHeaders := make([]string, 0, len(r.Config.IntrospectionPostArgsClientHeaders))
-	for _, introspectionPostArgsClientHeadersItem := range r.Config.IntrospectionPostArgsClientHeaders {
-		introspectionPostArgsClientHeaders = append(introspectionPostArgsClientHeaders, introspectionPostArgsClientHeadersItem.ValueString())
+	for introspectionPostArgsClientHeadersIndex := range r.Config.IntrospectionPostArgsClientHeaders {
+		introspectionPostArgsClientHeaders = append(introspectionPostArgsClientHeaders, r.Config.IntrospectionPostArgsClientHeaders[introspectionPostArgsClientHeadersIndex].ValueString())
 	}
 	introspectionPostArgsNames := make([]string, 0, len(r.Config.IntrospectionPostArgsNames))
-	for _, introspectionPostArgsNamesItem := range r.Config.IntrospectionPostArgsNames {
-		introspectionPostArgsNames = append(introspectionPostArgsNames, introspectionPostArgsNamesItem.ValueString())
+	for introspectionPostArgsNamesIndex := range r.Config.IntrospectionPostArgsNames {
+		introspectionPostArgsNames = append(introspectionPostArgsNames, r.Config.IntrospectionPostArgsNames[introspectionPostArgsNamesIndex].ValueString())
 	}
 	introspectionPostArgsValues := make([]string, 0, len(r.Config.IntrospectionPostArgsValues))
-	for _, introspectionPostArgsValuesItem := range r.Config.IntrospectionPostArgsValues {
-		introspectionPostArgsValues = append(introspectionPostArgsValues, introspectionPostArgsValuesItem.ValueString())
+	for introspectionPostArgsValuesIndex := range r.Config.IntrospectionPostArgsValues {
+		introspectionPostArgsValues = append(introspectionPostArgsValues, r.Config.IntrospectionPostArgsValues[introspectionPostArgsValuesIndex].ValueString())
 	}
 	introspectionTokenParamName := new(string)
 	if !r.Config.IntrospectionTokenParamName.IsUnknown() && !r.Config.IntrospectionTokenParamName.IsNull() {
@@ -1746,8 +1749,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	issuer1 = r.Config.Issuer.ValueString()
 
 	issuersAllowed := make([]string, 0, len(r.Config.IssuersAllowed))
-	for _, issuersAllowedItem := range r.Config.IssuersAllowed {
-		issuersAllowed = append(issuersAllowed, issuersAllowedItem.ValueString())
+	for issuersAllowedIndex := range r.Config.IssuersAllowed {
+		issuersAllowed = append(issuersAllowed, r.Config.IssuersAllowed[issuersAllowedIndex].ValueString())
 	}
 	jwtSessionClaim := new(string)
 	if !r.Config.JwtSessionClaim.IsUnknown() && !r.Config.JwtSessionClaim.IsNull() {
@@ -1790,8 +1793,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		loginRedirectMode = nil
 	}
 	loginRedirectURI := make([]string, 0, len(r.Config.LoginRedirectURI))
-	for _, loginRedirectURIItem := range r.Config.LoginRedirectURI {
-		loginRedirectURI = append(loginRedirectURI, loginRedirectURIItem.ValueString())
+	for loginRedirectURIIndex := range r.Config.LoginRedirectURI {
+		loginRedirectURI = append(loginRedirectURI, r.Config.LoginRedirectURI[loginRedirectURIIndex].ValueString())
 	}
 	loginTokens := make([]shared.LoginTokens, 0, len(r.Config.LoginTokens))
 	for _, loginTokensItem := range r.Config.LoginTokens {
@@ -1814,8 +1817,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		logoutQueryArg = nil
 	}
 	logoutRedirectURI := make([]string, 0, len(r.Config.LogoutRedirectURI))
-	for _, logoutRedirectURIItem := range r.Config.LogoutRedirectURI {
-		logoutRedirectURI = append(logoutRedirectURI, logoutRedirectURIItem.ValueString())
+	for logoutRedirectURIIndex := range r.Config.LogoutRedirectURI {
+		logoutRedirectURI = append(logoutRedirectURI, r.Config.LogoutRedirectURI[logoutRedirectURIIndex].ValueString())
 	}
 	logoutRevoke := new(bool)
 	if !r.Config.LogoutRevoke.IsUnknown() && !r.Config.LogoutRevoke.IsNull() {
@@ -1912,8 +1915,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		pushedAuthorizationRequestEndpointAuthMethod = nil
 	}
 	redirectURI := make([]string, 0, len(r.Config.RedirectURI))
-	for _, redirectURIItem := range r.Config.RedirectURI {
-		redirectURI = append(redirectURI, redirectURIItem.ValueString())
+	for redirectURIIndex := range r.Config.RedirectURI {
+		redirectURI = append(redirectURI, r.Config.RedirectURI[redirectURIIndex].ValueString())
 	}
 	var redis *shared.OpenidConnectPluginRedis
 	if r.Config.Redis != nil {
@@ -1924,16 +1927,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			clusterMaxRedirections1 = nil
 		}
 		clusterNodes1 := make([]shared.OpenidConnectPluginConfigClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
-		for _, clusterNodesItem1 := range r.Config.Redis.ClusterNodes {
+		for clusterNodesIndex1 := range r.Config.Redis.ClusterNodes {
 			ip1 := new(string)
-			if !clusterNodesItem1.IP.IsUnknown() && !clusterNodesItem1.IP.IsNull() {
-				*ip1 = clusterNodesItem1.IP.ValueString()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex1].IP.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex1].IP.IsNull() {
+				*ip1 = r.Config.Redis.ClusterNodes[clusterNodesIndex1].IP.ValueString()
 			} else {
 				ip1 = nil
 			}
 			port3 := new(int64)
-			if !clusterNodesItem1.Port.IsUnknown() && !clusterNodesItem1.Port.IsNull() {
-				*port3 = clusterNodesItem1.Port.ValueInt64()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex1].Port.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex1].Port.IsNull() {
+				*port3 = r.Config.Redis.ClusterNodes[clusterNodesIndex1].Port.ValueInt64()
 			} else {
 				port3 = nil
 			}
@@ -2015,16 +2018,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			sentinelMaster1 = nil
 		}
 		sentinelNodes1 := make([]shared.OpenidConnectPluginConfigSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
-		for _, sentinelNodesItem1 := range r.Config.Redis.SentinelNodes {
+		for sentinelNodesIndex1 := range r.Config.Redis.SentinelNodes {
 			host3 := new(string)
-			if !sentinelNodesItem1.Host.IsUnknown() && !sentinelNodesItem1.Host.IsNull() {
-				*host3 = sentinelNodesItem1.Host.ValueString()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Host.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Host.IsNull() {
+				*host3 = r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Host.ValueString()
 			} else {
 				host3 = nil
 			}
 			port5 := new(int64)
-			if !sentinelNodesItem1.Port.IsUnknown() && !sentinelNodesItem1.Port.IsNull() {
-				*port5 = sentinelNodesItem1.Port.ValueInt64()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Port.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Port.IsNull() {
+				*port5 = r.Config.Redis.SentinelNodes[sentinelNodesIndex1].Port.ValueInt64()
 			} else {
 				port5 = nil
 			}
@@ -2160,8 +2163,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		responseMode = nil
 	}
 	responseType := make([]string, 0, len(r.Config.ResponseType))
-	for _, responseTypeItem := range r.Config.ResponseType {
-		responseType = append(responseType, responseTypeItem.ValueString())
+	for responseTypeIndex := range r.Config.ResponseType {
+		responseType = append(responseType, r.Config.ResponseType[responseTypeIndex].ValueString())
 	}
 	reverify := new(bool)
 	if !r.Config.Reverify.IsUnknown() && !r.Config.Reverify.IsNull() {
@@ -2188,12 +2191,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		revocationTokenParamName = nil
 	}
 	rolesClaim := make([]string, 0, len(r.Config.RolesClaim))
-	for _, rolesClaimItem := range r.Config.RolesClaim {
-		rolesClaim = append(rolesClaim, rolesClaimItem.ValueString())
+	for rolesClaimIndex := range r.Config.RolesClaim {
+		rolesClaim = append(rolesClaim, r.Config.RolesClaim[rolesClaimIndex].ValueString())
 	}
 	rolesRequired := make([]string, 0, len(r.Config.RolesRequired))
-	for _, rolesRequiredItem := range r.Config.RolesRequired {
-		rolesRequired = append(rolesRequired, rolesRequiredItem.ValueString())
+	for rolesRequiredIndex := range r.Config.RolesRequired {
+		rolesRequired = append(rolesRequired, r.Config.RolesRequired[rolesRequiredIndex].ValueString())
 	}
 	runOnPreflight := new(bool)
 	if !r.Config.RunOnPreflight.IsUnknown() && !r.Config.RunOnPreflight.IsNull() {
@@ -2202,16 +2205,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		runOnPreflight = nil
 	}
 	scopes := make([]string, 0, len(r.Config.Scopes))
-	for _, scopesItem := range r.Config.Scopes {
-		scopes = append(scopes, scopesItem.ValueString())
+	for scopesIndex := range r.Config.Scopes {
+		scopes = append(scopes, r.Config.Scopes[scopesIndex].ValueString())
 	}
 	scopesClaim := make([]string, 0, len(r.Config.ScopesClaim))
-	for _, scopesClaimItem := range r.Config.ScopesClaim {
-		scopesClaim = append(scopesClaim, scopesClaimItem.ValueString())
+	for scopesClaimIndex := range r.Config.ScopesClaim {
+		scopesClaim = append(scopesClaim, r.Config.ScopesClaim[scopesClaimIndex].ValueString())
 	}
 	scopesRequired := make([]string, 0, len(r.Config.ScopesRequired))
-	for _, scopesRequiredItem := range r.Config.ScopesRequired {
-		scopesRequired = append(scopesRequired, scopesRequiredItem.ValueString())
+	for scopesRequiredIndex := range r.Config.ScopesRequired {
+		scopesRequired = append(scopesRequired, r.Config.ScopesRequired[scopesRequiredIndex].ValueString())
 	}
 	searchUserInfo := new(bool)
 	if !r.Config.SearchUserInfo.IsUnknown() && !r.Config.SearchUserInfo.IsNull() {
@@ -2424,16 +2427,16 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		tokenExchangeEndpoint = nil
 	}
 	tokenHeadersClient := make([]string, 0, len(r.Config.TokenHeadersClient))
-	for _, tokenHeadersClientItem := range r.Config.TokenHeadersClient {
-		tokenHeadersClient = append(tokenHeadersClient, tokenHeadersClientItem.ValueString())
+	for tokenHeadersClientIndex := range r.Config.TokenHeadersClient {
+		tokenHeadersClient = append(tokenHeadersClient, r.Config.TokenHeadersClient[tokenHeadersClientIndex].ValueString())
 	}
 	tokenHeadersGrants := make([]shared.TokenHeadersGrants, 0, len(r.Config.TokenHeadersGrants))
 	for _, tokenHeadersGrantsItem := range r.Config.TokenHeadersGrants {
 		tokenHeadersGrants = append(tokenHeadersGrants, shared.TokenHeadersGrants(tokenHeadersGrantsItem.ValueString()))
 	}
 	tokenHeadersNames := make([]string, 0, len(r.Config.TokenHeadersNames))
-	for _, tokenHeadersNamesItem := range r.Config.TokenHeadersNames {
-		tokenHeadersNames = append(tokenHeadersNames, tokenHeadersNamesItem.ValueString())
+	for tokenHeadersNamesIndex := range r.Config.TokenHeadersNames {
+		tokenHeadersNames = append(tokenHeadersNames, r.Config.TokenHeadersNames[tokenHeadersNamesIndex].ValueString())
 	}
 	tokenHeadersPrefix := new(string)
 	if !r.Config.TokenHeadersPrefix.IsUnknown() && !r.Config.TokenHeadersPrefix.IsNull() {
@@ -2442,24 +2445,24 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		tokenHeadersPrefix = nil
 	}
 	tokenHeadersReplay := make([]string, 0, len(r.Config.TokenHeadersReplay))
-	for _, tokenHeadersReplayItem := range r.Config.TokenHeadersReplay {
-		tokenHeadersReplay = append(tokenHeadersReplay, tokenHeadersReplayItem.ValueString())
+	for tokenHeadersReplayIndex := range r.Config.TokenHeadersReplay {
+		tokenHeadersReplay = append(tokenHeadersReplay, r.Config.TokenHeadersReplay[tokenHeadersReplayIndex].ValueString())
 	}
 	tokenHeadersValues := make([]string, 0, len(r.Config.TokenHeadersValues))
-	for _, tokenHeadersValuesItem := range r.Config.TokenHeadersValues {
-		tokenHeadersValues = append(tokenHeadersValues, tokenHeadersValuesItem.ValueString())
+	for tokenHeadersValuesIndex := range r.Config.TokenHeadersValues {
+		tokenHeadersValues = append(tokenHeadersValues, r.Config.TokenHeadersValues[tokenHeadersValuesIndex].ValueString())
 	}
 	tokenPostArgsClient := make([]string, 0, len(r.Config.TokenPostArgsClient))
-	for _, tokenPostArgsClientItem := range r.Config.TokenPostArgsClient {
-		tokenPostArgsClient = append(tokenPostArgsClient, tokenPostArgsClientItem.ValueString())
+	for tokenPostArgsClientIndex := range r.Config.TokenPostArgsClient {
+		tokenPostArgsClient = append(tokenPostArgsClient, r.Config.TokenPostArgsClient[tokenPostArgsClientIndex].ValueString())
 	}
 	tokenPostArgsNames := make([]string, 0, len(r.Config.TokenPostArgsNames))
-	for _, tokenPostArgsNamesItem := range r.Config.TokenPostArgsNames {
-		tokenPostArgsNames = append(tokenPostArgsNames, tokenPostArgsNamesItem.ValueString())
+	for tokenPostArgsNamesIndex := range r.Config.TokenPostArgsNames {
+		tokenPostArgsNames = append(tokenPostArgsNames, r.Config.TokenPostArgsNames[tokenPostArgsNamesIndex].ValueString())
 	}
 	tokenPostArgsValues := make([]string, 0, len(r.Config.TokenPostArgsValues))
-	for _, tokenPostArgsValuesItem := range r.Config.TokenPostArgsValues {
-		tokenPostArgsValues = append(tokenPostArgsValues, tokenPostArgsValuesItem.ValueString())
+	for tokenPostArgsValuesIndex := range r.Config.TokenPostArgsValues {
+		tokenPostArgsValues = append(tokenPostArgsValues, r.Config.TokenPostArgsValues[tokenPostArgsValuesIndex].ValueString())
 	}
 	unauthorizedDestroySession := new(bool)
 	if !r.Config.UnauthorizedDestroySession.IsUnknown() && !r.Config.UnauthorizedDestroySession.IsNull() {
@@ -2474,12 +2477,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		unauthorizedErrorMessage = nil
 	}
 	unauthorizedRedirectURI := make([]string, 0, len(r.Config.UnauthorizedRedirectURI))
-	for _, unauthorizedRedirectURIItem := range r.Config.UnauthorizedRedirectURI {
-		unauthorizedRedirectURI = append(unauthorizedRedirectURI, unauthorizedRedirectURIItem.ValueString())
+	for unauthorizedRedirectURIIndex := range r.Config.UnauthorizedRedirectURI {
+		unauthorizedRedirectURI = append(unauthorizedRedirectURI, r.Config.UnauthorizedRedirectURI[unauthorizedRedirectURIIndex].ValueString())
 	}
 	unexpectedRedirectURI := make([]string, 0, len(r.Config.UnexpectedRedirectURI))
-	for _, unexpectedRedirectURIItem := range r.Config.UnexpectedRedirectURI {
-		unexpectedRedirectURI = append(unexpectedRedirectURI, unexpectedRedirectURIItem.ValueString())
+	for unexpectedRedirectURIIndex := range r.Config.UnexpectedRedirectURI {
+		unexpectedRedirectURI = append(unexpectedRedirectURI, r.Config.UnexpectedRedirectURI[unexpectedRedirectURIIndex].ValueString())
 	}
 	upstreamAccessTokenHeader := new(string)
 	if !r.Config.UpstreamAccessTokenHeader.IsUnknown() && !r.Config.UpstreamAccessTokenHeader.IsNull() {
@@ -2494,12 +2497,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		upstreamAccessTokenJwkHeader = nil
 	}
 	upstreamHeadersClaims := make([]string, 0, len(r.Config.UpstreamHeadersClaims))
-	for _, upstreamHeadersClaimsItem := range r.Config.UpstreamHeadersClaims {
-		upstreamHeadersClaims = append(upstreamHeadersClaims, upstreamHeadersClaimsItem.ValueString())
+	for upstreamHeadersClaimsIndex := range r.Config.UpstreamHeadersClaims {
+		upstreamHeadersClaims = append(upstreamHeadersClaims, r.Config.UpstreamHeadersClaims[upstreamHeadersClaimsIndex].ValueString())
 	}
 	upstreamHeadersNames := make([]string, 0, len(r.Config.UpstreamHeadersNames))
-	for _, upstreamHeadersNamesItem := range r.Config.UpstreamHeadersNames {
-		upstreamHeadersNames = append(upstreamHeadersNames, upstreamHeadersNamesItem.ValueString())
+	for upstreamHeadersNamesIndex := range r.Config.UpstreamHeadersNames {
+		upstreamHeadersNames = append(upstreamHeadersNames, r.Config.UpstreamHeadersNames[upstreamHeadersNamesIndex].ValueString())
 	}
 	upstreamIDTokenHeader := new(string)
 	if !r.Config.UpstreamIDTokenHeader.IsUnknown() && !r.Config.UpstreamIDTokenHeader.IsNull() {
@@ -2562,28 +2565,28 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		userinfoEndpoint = nil
 	}
 	userinfoHeadersClient := make([]string, 0, len(r.Config.UserinfoHeadersClient))
-	for _, userinfoHeadersClientItem := range r.Config.UserinfoHeadersClient {
-		userinfoHeadersClient = append(userinfoHeadersClient, userinfoHeadersClientItem.ValueString())
+	for userinfoHeadersClientIndex := range r.Config.UserinfoHeadersClient {
+		userinfoHeadersClient = append(userinfoHeadersClient, r.Config.UserinfoHeadersClient[userinfoHeadersClientIndex].ValueString())
 	}
 	userinfoHeadersNames := make([]string, 0, len(r.Config.UserinfoHeadersNames))
-	for _, userinfoHeadersNamesItem := range r.Config.UserinfoHeadersNames {
-		userinfoHeadersNames = append(userinfoHeadersNames, userinfoHeadersNamesItem.ValueString())
+	for userinfoHeadersNamesIndex := range r.Config.UserinfoHeadersNames {
+		userinfoHeadersNames = append(userinfoHeadersNames, r.Config.UserinfoHeadersNames[userinfoHeadersNamesIndex].ValueString())
 	}
 	userinfoHeadersValues := make([]string, 0, len(r.Config.UserinfoHeadersValues))
-	for _, userinfoHeadersValuesItem := range r.Config.UserinfoHeadersValues {
-		userinfoHeadersValues = append(userinfoHeadersValues, userinfoHeadersValuesItem.ValueString())
+	for userinfoHeadersValuesIndex := range r.Config.UserinfoHeadersValues {
+		userinfoHeadersValues = append(userinfoHeadersValues, r.Config.UserinfoHeadersValues[userinfoHeadersValuesIndex].ValueString())
 	}
 	userinfoQueryArgsClient := make([]string, 0, len(r.Config.UserinfoQueryArgsClient))
-	for _, userinfoQueryArgsClientItem := range r.Config.UserinfoQueryArgsClient {
-		userinfoQueryArgsClient = append(userinfoQueryArgsClient, userinfoQueryArgsClientItem.ValueString())
+	for userinfoQueryArgsClientIndex := range r.Config.UserinfoQueryArgsClient {
+		userinfoQueryArgsClient = append(userinfoQueryArgsClient, r.Config.UserinfoQueryArgsClient[userinfoQueryArgsClientIndex].ValueString())
 	}
 	userinfoQueryArgsNames := make([]string, 0, len(r.Config.UserinfoQueryArgsNames))
-	for _, userinfoQueryArgsNamesItem := range r.Config.UserinfoQueryArgsNames {
-		userinfoQueryArgsNames = append(userinfoQueryArgsNames, userinfoQueryArgsNamesItem.ValueString())
+	for userinfoQueryArgsNamesIndex := range r.Config.UserinfoQueryArgsNames {
+		userinfoQueryArgsNames = append(userinfoQueryArgsNames, r.Config.UserinfoQueryArgsNames[userinfoQueryArgsNamesIndex].ValueString())
 	}
 	userinfoQueryArgsValues := make([]string, 0, len(r.Config.UserinfoQueryArgsValues))
-	for _, userinfoQueryArgsValuesItem := range r.Config.UserinfoQueryArgsValues {
-		userinfoQueryArgsValues = append(userinfoQueryArgsValues, userinfoQueryArgsValuesItem.ValueString())
+	for userinfoQueryArgsValuesIndex := range r.Config.UserinfoQueryArgsValues {
+		userinfoQueryArgsValues = append(userinfoQueryArgsValues, r.Config.UserinfoQueryArgsValues[userinfoQueryArgsValuesIndex].ValueString())
 	}
 	usingPseudoIssuer := new(bool)
 	if !r.Config.UsingPseudoIssuer.IsUnknown() && !r.Config.UsingPseudoIssuer.IsNull() {

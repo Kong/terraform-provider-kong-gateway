@@ -21,7 +21,7 @@ func (u UpdateHttplogPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateHttplogPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "HttpLogPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -20,6 +20,8 @@ func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(ctx context.Contex
 			for _, v := range resp.CaCertificates {
 				r.CaCertificates = append(r.CaCertificates, types.StringValue(v))
 			}
+		} else {
+			r.CaCertificates = nil
 		}
 		if resp.ClientCertificate == nil {
 			r.ClientCertificate = nil
@@ -47,6 +49,8 @@ func (r *ServiceResourceModel) RefreshFromSharedServiceOutput(ctx context.Contex
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		if resp.TLSSans == nil {
 			r.TLSSans = nil
@@ -156,8 +160,8 @@ func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Ser
 	var caCertificates []string
 	if r.CaCertificates != nil {
 		caCertificates = make([]string, 0, len(r.CaCertificates))
-		for _, caCertificatesItem := range r.CaCertificates {
-			caCertificates = append(caCertificates, caCertificatesItem.ValueString())
+		for caCertificatesIndex := range r.CaCertificates {
+			caCertificates = append(caCertificates, r.CaCertificates[caCertificatesIndex].ValueString())
 		}
 	}
 	var clientCertificate *shared.ClientCertificate
@@ -238,19 +242,19 @@ func (r *ServiceResourceModel) ToSharedService(ctx context.Context) (*shared.Ser
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	var tlsSans *shared.TLSSans
 	if r.TLSSans != nil {
 		dnsnames := make([]string, 0, len(r.TLSSans.Dnsnames))
-		for _, dnsnamesItem := range r.TLSSans.Dnsnames {
-			dnsnames = append(dnsnames, dnsnamesItem.ValueString())
+		for dnsnamesIndex := range r.TLSSans.Dnsnames {
+			dnsnames = append(dnsnames, r.TLSSans.Dnsnames[dnsnamesIndex].ValueString())
 		}
 		uris := make([]string, 0, len(r.TLSSans.Uris))
-		for _, urisItem := range r.TLSSans.Uris {
-			uris = append(uris, urisItem.ValueString())
+		for urisIndex := range r.TLSSans.Uris {
+			uris = append(uris, r.TLSSans.Uris[urisIndex].ValueString())
 		}
 		tlsSans = &shared.TLSSans{
 			Dnsnames: dnsnames,

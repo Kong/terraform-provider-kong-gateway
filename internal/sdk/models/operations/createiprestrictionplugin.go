@@ -19,7 +19,7 @@ func (c CreateIprestrictionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateIprestrictionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "IpRestrictionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

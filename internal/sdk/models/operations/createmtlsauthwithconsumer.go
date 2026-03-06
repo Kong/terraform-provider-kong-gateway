@@ -22,7 +22,7 @@ func (c CreateMtlsAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateMtlsAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "MTLSAuthWithoutParents"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

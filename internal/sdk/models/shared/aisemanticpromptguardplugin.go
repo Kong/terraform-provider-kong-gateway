@@ -1323,7 +1323,7 @@ func (a AiSemanticPromptGuardPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiSemanticPromptGuardPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
 		return err
 	}
 	return nil

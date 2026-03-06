@@ -19,7 +19,7 @@ func (c CreateJwtPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateJwtPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JwtPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

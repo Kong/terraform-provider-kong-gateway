@@ -25,12 +25,16 @@ func (r *CertificateResourceModel) RefreshFromSharedCertificate(ctx context.Cont
 			for _, v := range resp.Snis {
 				r.Snis = append(r.Snis, types.StringValue(v))
 			}
+		} else {
+			r.Snis = nil
 		}
 		if resp.Tags != nil {
 			r.Tags = make([]types.String, 0, len(resp.Tags))
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -154,15 +158,15 @@ func (r *CertificateResourceModel) ToSharedCertificate(ctx context.Context) (*sh
 	var snis []string
 	if r.Snis != nil {
 		snis = make([]string, 0, len(r.Snis))
-		for _, snisItem := range r.Snis {
-			snis = append(snis, snisItem.ValueString())
+		for snisIndex := range r.Snis {
+			snis = append(snis, r.Snis[snisIndex].ValueString())
 		}
 	}
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

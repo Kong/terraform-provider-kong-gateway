@@ -21,7 +21,7 @@ func (u UpdateSamlPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateSamlPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SamlPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

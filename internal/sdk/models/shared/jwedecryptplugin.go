@@ -205,7 +205,7 @@ func (j JweDecryptPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (j *JweDecryptPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
 		return err
 	}
 	return nil

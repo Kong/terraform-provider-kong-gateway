@@ -22,7 +22,7 @@ func (g GetKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

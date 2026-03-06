@@ -19,7 +19,7 @@ func (c CreateRatelimitingadvancedPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateRatelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RateLimitingAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

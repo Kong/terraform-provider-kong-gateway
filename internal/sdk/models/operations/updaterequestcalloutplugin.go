@@ -21,7 +21,7 @@ func (u UpdateRequestcalloutPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateRequestcalloutPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RequestCalloutPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

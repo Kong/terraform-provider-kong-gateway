@@ -20,7 +20,7 @@ func (d DeleteAipromptguardPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteAipromptguardPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PluginId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

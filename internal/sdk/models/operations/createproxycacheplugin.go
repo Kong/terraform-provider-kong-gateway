@@ -19,7 +19,7 @@ func (c CreateProxycachePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateProxycachePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ProxyCachePlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

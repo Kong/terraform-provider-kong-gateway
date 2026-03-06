@@ -20,7 +20,7 @@ func (c CreateUpstreamRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateUpstreamRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Upstream"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

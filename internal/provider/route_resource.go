@@ -92,7 +92,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Optional:    true,
 							Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 							Validators: []validator.Int64{
-								int64validator.AtMost(65535),
+								int64validator.Between(0, 65535),
 							},
 						},
 					},
@@ -116,7 +116,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"https_redirect_status_code": schema.Int64Attribute{
 				Computed:    true,
 				Optional:    true,
-				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of ["301", "302", "307", "308", "426"]`,
+				Description: `The status code Kong responds with when all properties of a Route match except the protocol i.e. if the protocol of the request is ` + "`" + `HTTP` + "`" + ` instead of ` + "`" + `HTTPS` + "`" + `. ` + "`" + `Location` + "`" + ` header is injected by Kong if the field is set to 301, 302, 307 or 308. Note: This config applies only if the Route is configured to only accept the ` + "`" + `https` + "`" + ` protocol. must be one of [301, 302, 307, 308, 426]`,
 				Validators: []validator.Int64{
 					int64validator.OneOf(
 						301,
@@ -218,7 +218,7 @@ func (r *RouteResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							Optional:    true,
 							Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 							Validators: []validator.Int64{
-								int64validator.AtMost(65535),
+								int64validator.Between(0, 65535),
 							},
 						},
 					},
@@ -481,7 +481,10 @@ func (r *RouteResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -502,12 +505,12 @@ func (r *RouteResource) ImportState(ctx context.Context, req resource.ImportStat
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

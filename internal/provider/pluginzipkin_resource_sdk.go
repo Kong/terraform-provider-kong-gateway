@@ -117,11 +117,11 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Co
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -130,17 +130,17 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Co
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -169,6 +169,8 @@ func (r *PluginZipkinResourceModel) RefreshFromSharedZipkinPlugin(ctx context.Co
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -288,8 +290,8 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 		var after *shared.ZipkinPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.ZipkinPluginAfter{
 				Access: access,
@@ -298,8 +300,8 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 		var before *shared.ZipkinPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.ZipkinPluginBefore{
 				Access: access1,
@@ -311,22 +313,22 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 		}
 	}
 	partials := make([]shared.ZipkinPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -339,8 +341,8 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -414,8 +416,8 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 		var propagation *shared.ZipkinPluginPropagation
 		if r.Config.Propagation != nil {
 			clear := make([]string, 0, len(r.Config.Propagation.Clear))
-			for _, clearItem := range r.Config.Propagation.Clear {
-				clear = append(clear, clearItem.ValueString())
+			for clearIndex := range r.Config.Propagation.Clear {
+				clear = append(clear, r.Config.Propagation.Clear[clearIndex].ValueString())
 			}
 			defaultFormat := new(shared.ZipkinPluginDefaultFormat)
 			if !r.Config.Propagation.DefaultFormat.IsUnknown() && !r.Config.Propagation.DefaultFormat.IsNull() {
@@ -518,12 +520,12 @@ func (r *PluginZipkinResourceModel) ToSharedZipkinPlugin(ctx context.Context) (*
 			sendTimeout = nil
 		}
 		staticTags := make([]shared.StaticTags, 0, len(r.Config.StaticTags))
-		for _, staticTagsItem := range r.Config.StaticTags {
+		for staticTagsIndex := range r.Config.StaticTags {
 			var name1 string
-			name1 = staticTagsItem.Name.ValueString()
+			name1 = r.Config.StaticTags[staticTagsIndex].Name.ValueString()
 
 			var value string
-			value = staticTagsItem.Value.ValueString()
+			value = r.Config.StaticTags[staticTagsIndex].Value.ValueString()
 
 			staticTags = append(staticTags, shared.StaticTags{
 				Name:  name1,

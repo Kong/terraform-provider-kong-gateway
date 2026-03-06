@@ -22,7 +22,7 @@ func (u UpsertSniRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertSniRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"SNIIdOrName", "workspace", "SNI"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

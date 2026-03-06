@@ -20,7 +20,7 @@ func (d DeletePartialRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeletePartialRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PartialId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

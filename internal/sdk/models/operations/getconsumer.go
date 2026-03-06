@@ -20,7 +20,7 @@ func (g GetConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdOrUsername", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

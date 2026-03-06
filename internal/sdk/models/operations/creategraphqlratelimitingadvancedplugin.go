@@ -19,7 +19,7 @@ func (c CreateGraphqlratelimitingadvancedPluginRequest) MarshalJSON() ([]byte, e
 }
 
 func (c *CreateGraphqlratelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GraphqlRateLimitingAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

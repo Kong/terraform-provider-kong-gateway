@@ -230,7 +230,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 								},
@@ -278,7 +278,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 									"http_statuses": schema.ListAttribute{
@@ -297,14 +297,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 								},
@@ -328,7 +328,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 								},
@@ -355,7 +355,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 									"http_statuses": schema.ListAttribute{
@@ -367,14 +367,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.AtMost(255),
+											int64validator.Between(0, 255),
 										},
 									},
 								},
@@ -679,7 +679,10 @@ func (r *UpstreamResource) Delete(ctx context.Context, req resource.DeleteReques
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -700,12 +703,12 @@ func (r *UpstreamResource) ImportState(ctx context.Context, req resource.ImportS
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"426d620c-7058-4ae6-aacc-f85a3204a2c5"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"426d620c-7058-4ae6-aacc-f85a3204a2c5"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

@@ -21,7 +21,7 @@ func (u UpdateAipromptdecoratorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAipromptdecoratorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiPromptDecoratorPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

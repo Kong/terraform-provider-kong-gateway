@@ -19,7 +19,7 @@ func (c CreateCanaryPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateCanaryPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "CanaryPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

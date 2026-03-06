@@ -22,7 +22,7 @@ func (c CreateBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "BasicAuthWithoutParents"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

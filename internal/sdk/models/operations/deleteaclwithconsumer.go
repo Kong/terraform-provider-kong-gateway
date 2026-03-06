@@ -21,7 +21,7 @@ func (d DeleteACLWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteACLWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "ACLId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

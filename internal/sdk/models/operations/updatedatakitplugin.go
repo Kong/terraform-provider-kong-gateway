@@ -21,7 +21,7 @@ func (u UpdateDatakitPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateDatakitPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "DatakitPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

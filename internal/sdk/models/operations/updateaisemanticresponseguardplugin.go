@@ -21,7 +21,7 @@ func (u UpdateAisemanticresponseguardPluginRequest) MarshalJSON() ([]byte, error
 }
 
 func (u *UpdateAisemanticresponseguardPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiSemanticResponseGuardPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

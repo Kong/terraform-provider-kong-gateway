@@ -19,7 +19,7 @@ func (c CreateAimcpoauth2PluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAimcpoauth2PluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiMcpOauth2Plugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

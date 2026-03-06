@@ -19,7 +19,7 @@ func (c CreateAipromptcompressorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAipromptcompressorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiPromptCompressorPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

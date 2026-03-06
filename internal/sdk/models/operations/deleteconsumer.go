@@ -20,7 +20,7 @@ func (d DeleteConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdOrUsername", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

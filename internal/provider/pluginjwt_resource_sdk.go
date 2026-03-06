@@ -49,11 +49,11 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context,
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -62,17 +62,17 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context,
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -101,6 +101,8 @@ func (r *PluginJwtResourceModel) RefreshFromSharedJwtPlugin(ctx context.Context,
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -220,8 +222,8 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 		var after *shared.JwtPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.JwtPluginAfter{
 				Access: access,
@@ -230,8 +232,8 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 		var before *shared.JwtPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.JwtPluginBefore{
 				Access: access1,
@@ -243,22 +245,22 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 		}
 	}
 	partials := make([]shared.JwtPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -271,8 +273,8 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -294,12 +296,12 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 			claimsToVerify = append(claimsToVerify, shared.ClaimsToVerify(claimsToVerifyItem.ValueString()))
 		}
 		cookieNames := make([]string, 0, len(r.Config.CookieNames))
-		for _, cookieNamesItem := range r.Config.CookieNames {
-			cookieNames = append(cookieNames, cookieNamesItem.ValueString())
+		for cookieNamesIndex := range r.Config.CookieNames {
+			cookieNames = append(cookieNames, r.Config.CookieNames[cookieNamesIndex].ValueString())
 		}
 		headerNames := make([]string, 0, len(r.Config.HeaderNames))
-		for _, headerNamesItem := range r.Config.HeaderNames {
-			headerNames = append(headerNames, headerNamesItem.ValueString())
+		for headerNamesIndex := range r.Config.HeaderNames {
+			headerNames = append(headerNames, r.Config.HeaderNames[headerNamesIndex].ValueString())
 		}
 		keyClaimName := new(string)
 		if !r.Config.KeyClaimName.IsUnknown() && !r.Config.KeyClaimName.IsNull() {
@@ -332,8 +334,8 @@ func (r *PluginJwtResourceModel) ToSharedJwtPlugin(ctx context.Context) (*shared
 			secretIsBase64 = nil
 		}
 		uriParamNames := make([]string, 0, len(r.Config.URIParamNames))
-		for _, uriParamNamesItem := range r.Config.URIParamNames {
-			uriParamNames = append(uriParamNames, uriParamNamesItem.ValueString())
+		for uriParamNamesIndex := range r.Config.URIParamNames {
+			uriParamNames = append(uriParamNames, r.Config.URIParamNames[uriParamNamesIndex].ValueString())
 		}
 		config = &shared.JwtPluginConfig{
 			Anonymous:         anonymous,

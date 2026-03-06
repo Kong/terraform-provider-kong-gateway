@@ -20,7 +20,7 @@ func (g GetServiceRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetServiceRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ServiceIdOrName", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -19,7 +19,7 @@ func (c CreateRoutebyheaderPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateRoutebyheaderPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RouteByHeaderPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

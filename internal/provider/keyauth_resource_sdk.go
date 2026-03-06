@@ -22,6 +22,8 @@ func (r *KeyAuthResourceModel) RefreshFromSharedKeyAuth(ctx context.Context, res
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.TTL = types.Int64PointerValue(resp.TTL)
 	}
@@ -120,8 +122,8 @@ func (r *KeyAuthResourceModel) ToSharedKeyAuthWithoutParents(ctx context.Context
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	ttl := new(int64)

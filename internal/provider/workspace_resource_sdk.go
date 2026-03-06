@@ -130,9 +130,9 @@ func (r *WorkspaceResourceModel) ToSharedWorkspace(ctx context.Context) (*shared
 	var config *shared.WorkspaceConfig
 	if r.Config != nil {
 		meta := make(map[string]interface{})
-		for metaKey, metaValue := range r.Config.Meta {
+		for metaKey := range r.Config.Meta {
 			var metaInst interface{}
-			_ = json.Unmarshal([]byte(metaValue.ValueString()), &metaInst)
+			_ = json.Unmarshal([]byte(r.Config.Meta[metaKey].ValueString()), &metaInst)
 			meta[metaKey] = metaInst
 		}
 		portal := new(bool)
@@ -184,8 +184,8 @@ func (r *WorkspaceResourceModel) ToSharedWorkspace(ctx context.Context) (*shared
 			portalAutoApprove = nil
 		}
 		portalCorsOrigins := make([]string, 0, len(r.Config.PortalCorsOrigins))
-		for _, portalCorsOriginsItem := range r.Config.PortalCorsOrigins {
-			portalCorsOrigins = append(portalCorsOrigins, portalCorsOriginsItem.ValueString())
+		for portalCorsOriginsIndex := range r.Config.PortalCorsOrigins {
+			portalCorsOrigins = append(portalCorsOrigins, r.Config.PortalCorsOrigins[portalCorsOriginsIndex].ValueString())
 		}
 		portalDeveloperMetaFields := new(string)
 		if !r.Config.PortalDeveloperMetaFields.IsUnknown() && !r.Config.PortalDeveloperMetaFields.IsNull() {
@@ -236,8 +236,8 @@ func (r *WorkspaceResourceModel) ToSharedWorkspace(ctx context.Context) (*shared
 			portalSessionConf = nil
 		}
 		portalSMTPAdminEmails := make([]string, 0, len(r.Config.PortalSMTPAdminEmails))
-		for _, portalSMTPAdminEmailsItem := range r.Config.PortalSMTPAdminEmails {
-			portalSMTPAdminEmails = append(portalSMTPAdminEmails, portalSMTPAdminEmailsItem.ValueString())
+		for portalSMTPAdminEmailsIndex := range r.Config.PortalSMTPAdminEmails {
+			portalSMTPAdminEmails = append(portalSMTPAdminEmails, r.Config.PortalSMTPAdminEmails[portalSMTPAdminEmailsIndex].ValueString())
 		}
 		portalTokenExp := new(int64)
 		if !r.Config.PortalTokenExp.IsUnknown() && !r.Config.PortalTokenExp.IsNull() {

@@ -22,8 +22,25 @@ func (r *ConsumerGroupResourceModel) RefreshFromSharedConsumerGroup(ctx context.
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
+	}
+
+	return diags
+}
+
+func (r *ConsumerGroupResourceModel) RefreshFromSharedConsumerGroupInsideWrapper(ctx context.Context, resp *shared.ConsumerGroupInsideWrapper) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if resp != nil {
+		diags.Append(r.RefreshFromSharedConsumerGroup(ctx, resp.ConsumerGroup)...)
+
+		if diags.HasError() {
+			return diags
+		}
+
 	}
 
 	return diags
@@ -130,8 +147,8 @@ func (r *ConsumerGroupResourceModel) ToSharedConsumerGroup(ctx context.Context) 
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

@@ -21,7 +21,7 @@ func (u UpdateJwedecryptPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateJwedecryptPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "JweDecryptPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

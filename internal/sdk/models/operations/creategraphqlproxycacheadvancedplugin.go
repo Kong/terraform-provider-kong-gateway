@@ -19,7 +19,7 @@ func (c CreateGraphqlproxycacheadvancedPluginRequest) MarshalJSON() ([]byte, err
 }
 
 func (c *CreateGraphqlproxycacheadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "GraphqlProxyCacheAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

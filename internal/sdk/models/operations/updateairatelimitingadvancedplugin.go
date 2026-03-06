@@ -21,7 +21,7 @@ func (u UpdateAiratelimitingadvancedPluginRequest) MarshalJSON() ([]byte, error)
 }
 
 func (u *UpdateAiratelimitingadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiRateLimitingAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

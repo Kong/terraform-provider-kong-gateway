@@ -21,7 +21,7 @@ func (u UpdateAigcpmodelarmorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAigcpmodelarmorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiGcpModelArmorPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

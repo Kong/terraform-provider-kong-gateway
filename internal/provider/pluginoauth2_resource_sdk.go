@@ -52,11 +52,11 @@ func (r *PluginOauth2ResourceModel) RefreshFromSharedOauth2Plugin(ctx context.Co
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -65,17 +65,17 @@ func (r *PluginOauth2ResourceModel) RefreshFromSharedOauth2Plugin(ctx context.Co
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -104,6 +104,8 @@ func (r *PluginOauth2ResourceModel) RefreshFromSharedOauth2Plugin(ctx context.Co
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -223,8 +225,8 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 		var after *shared.Oauth2PluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.Oauth2PluginAfter{
 				Access: access,
@@ -233,8 +235,8 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 		var before *shared.Oauth2PluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.Oauth2PluginBefore{
 				Access: access1,
@@ -246,22 +248,22 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 		}
 	}
 	partials := make([]shared.Oauth2PluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -274,8 +276,8 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -383,8 +385,8 @@ func (r *PluginOauth2ResourceModel) ToSharedOauth2Plugin(ctx context.Context) (*
 			reuseRefreshToken = nil
 		}
 		scopes := make([]string, 0, len(r.Config.Scopes))
-		for _, scopesItem := range r.Config.Scopes {
-			scopes = append(scopes, scopesItem.ValueString())
+		for scopesIndex := range r.Config.Scopes {
+			scopes = append(scopes, r.Config.Scopes[scopesIndex].ValueString())
 		}
 		tokenExpiration := new(float64)
 		if !r.Config.TokenExpiration.IsUnknown() && !r.Config.TokenExpiration.IsNull() {

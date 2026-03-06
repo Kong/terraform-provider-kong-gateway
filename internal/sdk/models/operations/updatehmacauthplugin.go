@@ -21,7 +21,7 @@ func (u UpdateHmacauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateHmacauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "HmacAuthPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

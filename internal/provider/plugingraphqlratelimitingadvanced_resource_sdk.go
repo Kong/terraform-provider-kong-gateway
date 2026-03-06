@@ -15,6 +15,7 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) RefreshFromSharedGraphq
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Config = &tfTypes.GraphqlRateLimitingAdvancedPluginConfig{}
 		if resp.Config.CostStrategy != nil {
 			r.Config.CostStrategy = types.StringValue(string(*resp.Config.CostStrategy))
 		} else {
@@ -111,11 +112,11 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) RefreshFromSharedGraphq
 		if resp.Ordering == nil {
 			r.Ordering = nil
 		} else {
-			r.Ordering = &tfTypes.AcePluginOrdering{}
+			r.Ordering = &tfTypes.ACLPluginOrdering{}
 			if resp.Ordering.After == nil {
 				r.Ordering.After = nil
 			} else {
-				r.Ordering.After = &tfTypes.AcePluginAfter{}
+				r.Ordering.After = &tfTypes.ACLPluginAfter{}
 				r.Ordering.After.Access = make([]types.String, 0, len(resp.Ordering.After.Access))
 				for _, v := range resp.Ordering.After.Access {
 					r.Ordering.After.Access = append(r.Ordering.After.Access, types.StringValue(v))
@@ -124,17 +125,17 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) RefreshFromSharedGraphq
 			if resp.Ordering.Before == nil {
 				r.Ordering.Before = nil
 			} else {
-				r.Ordering.Before = &tfTypes.AcePluginAfter{}
+				r.Ordering.Before = &tfTypes.ACLPluginAfter{}
 				r.Ordering.Before.Access = make([]types.String, 0, len(resp.Ordering.Before.Access))
 				for _, v := range resp.Ordering.Before.Access {
 					r.Ordering.Before.Access = append(r.Ordering.Before.Access, types.StringValue(v))
 				}
 			}
 		}
-		r.Partials = []tfTypes.AcePluginPartials{}
+		r.Partials = []tfTypes.ACLPluginPartials{}
 
 		for _, partialsItem := range resp.Partials {
-			var partials tfTypes.AcePluginPartials
+			var partials tfTypes.ACLPluginPartials
 
 			partials.ID = types.StringPointerValue(partialsItem.ID)
 			partials.Name = types.StringPointerValue(partialsItem.Name)
@@ -163,6 +164,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) RefreshFromSharedGraphq
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -282,8 +285,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 		var after *shared.GraphqlRateLimitingAdvancedPluginAfter
 		if r.Ordering.After != nil {
 			access := make([]string, 0, len(r.Ordering.After.Access))
-			for _, accessItem := range r.Ordering.After.Access {
-				access = append(access, accessItem.ValueString())
+			for accessIndex := range r.Ordering.After.Access {
+				access = append(access, r.Ordering.After.Access[accessIndex].ValueString())
 			}
 			after = &shared.GraphqlRateLimitingAdvancedPluginAfter{
 				Access: access,
@@ -292,8 +295,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 		var before *shared.GraphqlRateLimitingAdvancedPluginBefore
 		if r.Ordering.Before != nil {
 			access1 := make([]string, 0, len(r.Ordering.Before.Access))
-			for _, accessItem1 := range r.Ordering.Before.Access {
-				access1 = append(access1, accessItem1.ValueString())
+			for accessIndex1 := range r.Ordering.Before.Access {
+				access1 = append(access1, r.Ordering.Before.Access[accessIndex1].ValueString())
 			}
 			before = &shared.GraphqlRateLimitingAdvancedPluginBefore{
 				Access: access1,
@@ -305,22 +308,22 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 		}
 	}
 	partials := make([]shared.GraphqlRateLimitingAdvancedPluginPartials, 0, len(r.Partials))
-	for _, partialsItem := range r.Partials {
+	for partialsIndex := range r.Partials {
 		id1 := new(string)
-		if !partialsItem.ID.IsUnknown() && !partialsItem.ID.IsNull() {
-			*id1 = partialsItem.ID.ValueString()
+		if !r.Partials[partialsIndex].ID.IsUnknown() && !r.Partials[partialsIndex].ID.IsNull() {
+			*id1 = r.Partials[partialsIndex].ID.ValueString()
 		} else {
 			id1 = nil
 		}
 		name := new(string)
-		if !partialsItem.Name.IsUnknown() && !partialsItem.Name.IsNull() {
-			*name = partialsItem.Name.ValueString()
+		if !r.Partials[partialsIndex].Name.IsUnknown() && !r.Partials[partialsIndex].Name.IsNull() {
+			*name = r.Partials[partialsIndex].Name.ValueString()
 		} else {
 			name = nil
 		}
 		path := new(string)
-		if !partialsItem.Path.IsUnknown() && !partialsItem.Path.IsNull() {
-			*path = partialsItem.Path.ValueString()
+		if !r.Partials[partialsIndex].Path.IsUnknown() && !r.Partials[partialsIndex].Path.IsNull() {
+			*path = r.Partials[partialsIndex].Path.ValueString()
 		} else {
 			path = nil
 		}
@@ -333,8 +336,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)
@@ -368,8 +371,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 		identifier = nil
 	}
 	limit := make([]float64, 0, len(r.Config.Limit))
-	for _, limitItem := range r.Config.Limit {
-		limit = append(limit, limitItem.ValueFloat64())
+	for limitIndex := range r.Config.Limit {
+		limit = append(limit, r.Config.Limit[limitIndex].ValueFloat64())
 	}
 	maxCost := new(float64)
 	if !r.Config.MaxCost.IsUnknown() && !r.Config.MaxCost.IsNull() {
@@ -398,16 +401,16 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 			clusterMaxRedirections = nil
 		}
 		clusterNodes := make([]shared.GraphqlRateLimitingAdvancedPluginClusterNodes, 0, len(r.Config.Redis.ClusterNodes))
-		for _, clusterNodesItem := range r.Config.Redis.ClusterNodes {
+		for clusterNodesIndex := range r.Config.Redis.ClusterNodes {
 			ip := new(string)
-			if !clusterNodesItem.IP.IsUnknown() && !clusterNodesItem.IP.IsNull() {
-				*ip = clusterNodesItem.IP.ValueString()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.IsNull() {
+				*ip = r.Config.Redis.ClusterNodes[clusterNodesIndex].IP.ValueString()
 			} else {
 				ip = nil
 			}
 			port := new(int64)
-			if !clusterNodesItem.Port.IsUnknown() && !clusterNodesItem.Port.IsNull() {
-				*port = clusterNodesItem.Port.ValueInt64()
+			if !r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.IsUnknown() && !r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.IsNull() {
+				*port = r.Config.Redis.ClusterNodes[clusterNodesIndex].Port.ValueInt64()
 			} else {
 				port = nil
 			}
@@ -483,16 +486,16 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 			sentinelMaster = nil
 		}
 		sentinelNodes := make([]shared.GraphqlRateLimitingAdvancedPluginSentinelNodes, 0, len(r.Config.Redis.SentinelNodes))
-		for _, sentinelNodesItem := range r.Config.Redis.SentinelNodes {
+		for sentinelNodesIndex := range r.Config.Redis.SentinelNodes {
 			host1 := new(string)
-			if !sentinelNodesItem.Host.IsUnknown() && !sentinelNodesItem.Host.IsNull() {
-				*host1 = sentinelNodesItem.Host.ValueString()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.IsNull() {
+				*host1 = r.Config.Redis.SentinelNodes[sentinelNodesIndex].Host.ValueString()
 			} else {
 				host1 = nil
 			}
 			port2 := new(int64)
-			if !sentinelNodesItem.Port.IsUnknown() && !sentinelNodesItem.Port.IsNull() {
-				*port2 = sentinelNodesItem.Port.ValueInt64()
+			if !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.IsUnknown() && !r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.IsNull() {
+				*port2 = r.Config.Redis.SentinelNodes[sentinelNodesIndex].Port.ValueInt64()
 			} else {
 				port2 = nil
 			}
@@ -583,8 +586,8 @@ func (r *PluginGraphqlRateLimitingAdvancedResourceModel) ToSharedGraphqlRateLimi
 	syncRate = r.Config.SyncRate.ValueFloat64()
 
 	windowSize := make([]float64, 0, len(r.Config.WindowSize))
-	for _, windowSizeItem := range r.Config.WindowSize {
-		windowSize = append(windowSize, windowSizeItem.ValueFloat64())
+	for windowSizeIndex := range r.Config.WindowSize {
+		windowSize = append(windowSize, r.Config.WindowSize[windowSizeIndex].ValueFloat64())
 	}
 	windowType := new(shared.GraphqlRateLimitingAdvancedPluginWindowType)
 	if !r.Config.WindowType.IsUnknown() && !r.Config.WindowType.IsNull() {

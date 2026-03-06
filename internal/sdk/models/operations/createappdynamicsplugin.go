@@ -19,7 +19,7 @@ func (c CreateAppdynamicsPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAppdynamicsPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AppDynamicsPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

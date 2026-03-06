@@ -20,7 +20,7 @@ func (c CreateSniRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateSniRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "SNI"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

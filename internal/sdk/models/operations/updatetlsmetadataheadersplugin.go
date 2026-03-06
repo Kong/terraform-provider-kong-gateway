@@ -21,7 +21,7 @@ func (u UpdateTlsmetadataheadersPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateTlsmetadataheadersPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "TlsMetadataHeadersPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

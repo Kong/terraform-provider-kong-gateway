@@ -21,7 +21,7 @@ func (u UpdateProxycacheadvancedPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateProxycacheadvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ProxyCacheAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

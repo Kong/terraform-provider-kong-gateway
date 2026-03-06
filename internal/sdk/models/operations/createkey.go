@@ -20,7 +20,7 @@ func (c CreateKeyRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateKeyRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Key"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

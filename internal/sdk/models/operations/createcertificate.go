@@ -20,7 +20,7 @@ func (c CreateCertificateRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateCertificateRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "Certificate"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

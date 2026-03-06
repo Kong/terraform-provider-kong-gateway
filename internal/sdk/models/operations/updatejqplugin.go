@@ -21,7 +21,7 @@ func (u UpdateJqPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateJqPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "JqPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

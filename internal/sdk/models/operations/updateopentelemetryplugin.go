@@ -21,7 +21,7 @@ func (u UpdateOpentelemetryPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateOpentelemetryPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "OpentelemetryPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

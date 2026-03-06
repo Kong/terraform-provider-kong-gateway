@@ -20,7 +20,7 @@ func (d DeleteKeyauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteKeyauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"PluginId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

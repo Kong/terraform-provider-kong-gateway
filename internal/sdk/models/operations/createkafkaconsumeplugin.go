@@ -19,7 +19,7 @@ func (c CreateKafkaconsumePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateKafkaconsumePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "KafkaConsumePlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

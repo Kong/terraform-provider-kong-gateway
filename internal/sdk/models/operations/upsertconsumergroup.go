@@ -22,7 +22,7 @@ func (u UpsertConsumerGroupRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertConsumerGroupRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"ConsumerGroupId", "workspace", "ConsumerGroup"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

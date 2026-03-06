@@ -21,7 +21,7 @@ func (d DeleteKeyAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteKeyAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "KeyAuthId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

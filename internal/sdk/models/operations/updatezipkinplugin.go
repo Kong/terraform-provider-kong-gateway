@@ -21,7 +21,7 @@ func (u UpdateZipkinPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateZipkinPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ZipkinPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -38,20 +38,20 @@ type PluginAiRequestTransformerResource struct {
 
 // PluginAiRequestTransformerResourceModel describes the resource data model.
 type PluginAiRequestTransformerResourceModel struct {
-	Config        tfTypes.AiRequestTransformerPluginConfig `tfsdk:"config"`
-	ConsumerGroup *tfTypes.Set                             `tfsdk:"consumer_group"`
-	CreatedAt     types.Int64                              `tfsdk:"created_at"`
-	Enabled       types.Bool                               `tfsdk:"enabled"`
-	ID            types.String                             `tfsdk:"id"`
-	InstanceName  types.String                             `tfsdk:"instance_name"`
-	Ordering      *tfTypes.AcePluginOrdering               `tfsdk:"ordering"`
-	Partials      []tfTypes.AcePluginPartials              `tfsdk:"partials"`
-	Protocols     []types.String                           `tfsdk:"protocols"`
-	Route         *tfTypes.Set                             `tfsdk:"route"`
-	Service       *tfTypes.Set                             `tfsdk:"service"`
-	Tags          []types.String                           `tfsdk:"tags"`
-	UpdatedAt     types.Int64                              `tfsdk:"updated_at"`
-	Workspace     types.String                             `tfsdk:"workspace"`
+	Config        *tfTypes.AiRequestTransformerPluginConfig `tfsdk:"config"`
+	ConsumerGroup *tfTypes.Set                              `tfsdk:"consumer_group"`
+	CreatedAt     types.Int64                               `tfsdk:"created_at"`
+	Enabled       types.Bool                                `tfsdk:"enabled"`
+	ID            types.String                              `tfsdk:"id"`
+	InstanceName  types.String                              `tfsdk:"instance_name"`
+	Ordering      *tfTypes.ACLPluginOrdering                `tfsdk:"ordering"`
+	Partials      []tfTypes.ACLPluginPartials               `tfsdk:"partials"`
+	Protocols     []types.String                            `tfsdk:"protocols"`
+	Route         *tfTypes.Set                              `tfsdk:"route"`
+	Service       *tfTypes.Set                              `tfsdk:"service"`
+	Tags          []types.String                            `tfsdk:"tags"`
+	UpdatedAt     types.Int64                               `tfsdk:"updated_at"`
+	Workspace     types.String                              `tfsdk:"workspace"`
 }
 
 func (r *PluginAiRequestTransformerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -75,7 +75,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(65535),
+							int64validator.Between(0, 65535),
 						},
 					},
 					"http_timeout": schema.Int64Attribute{
@@ -93,7 +93,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 						Optional:    true,
 						Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 						Validators: []validator.Int64{
-							int64validator.AtMost(65535),
+							int64validator.Between(0, 65535),
 						},
 					},
 					"https_verify": schema.BoolAttribute{
@@ -393,7 +393,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 												Optional:    true,
 												Description: `Defines the top-k most likely tokens, if supported.`,
 												Validators: []validator.Int64{
-													int64validator.AtMost(500),
+													int64validator.Between(0, 500),
 												},
 											},
 											"top_p": schema.Float64Attribute{
@@ -846,7 +846,10 @@ func (r *PluginAiRequestTransformerResource) Delete(ctx context.Context, req res
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -867,12 +870,12 @@ func (r *PluginAiRequestTransformerResource) ImportState(ctx context.Context, re
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

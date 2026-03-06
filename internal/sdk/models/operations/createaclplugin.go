@@ -19,7 +19,7 @@ func (c CreateACLPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateACLPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ACLPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

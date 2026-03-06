@@ -22,7 +22,7 @@ func (g GetJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"ConsumerIdForNestedEntities", "JWTId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -19,7 +19,7 @@ func (c CreateSolacelogPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateSolacelogPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "SolaceLogPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

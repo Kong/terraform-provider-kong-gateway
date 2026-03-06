@@ -1399,7 +1399,7 @@ func (k KafkaConsumePlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (k *KafkaConsumePlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -9,6 +9,6 @@ import (
 type Llm struct {
 	Auth      *AiLlmAsJudgePluginAuth    `tfsdk:"auth"`
 	Logging   *AiLlmAsJudgePluginLogging `tfsdk:"logging"`
-	Model     AiLlmAsJudgePluginModel    `tfsdk:"model"`
+	Model     *AiLlmAsJudgePluginModel   `tfsdk:"model"`
 	RouteType types.String               `tfsdk:"route_type"`
 }

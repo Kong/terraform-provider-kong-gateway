@@ -599,7 +599,7 @@ func (s SolaceUpstreamPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *SolaceUpstreamPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
 		return err
 	}
 	return nil

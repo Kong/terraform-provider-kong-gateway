@@ -20,7 +20,7 @@ func (g GetVaultRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetVaultRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"VaultIdOrPrefix", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

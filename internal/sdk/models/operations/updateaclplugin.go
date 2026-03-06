@@ -21,7 +21,7 @@ func (u UpdateACLPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateACLPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ACLPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

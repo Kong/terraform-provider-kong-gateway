@@ -19,7 +19,7 @@ func (c CreateAisemanticcachePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAisemanticcachePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiSemanticCachePlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

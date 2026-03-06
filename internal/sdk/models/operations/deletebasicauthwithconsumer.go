@@ -21,7 +21,7 @@ func (d DeleteBasicAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteBasicAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "BasicAuthId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -21,7 +21,7 @@ func (u UpdateExittransformerPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateExittransformerPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ExitTransformerPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

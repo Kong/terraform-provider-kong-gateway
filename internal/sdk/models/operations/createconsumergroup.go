@@ -20,7 +20,7 @@ func (c CreateConsumerGroupRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateConsumerGroupRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ConsumerGroup"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -22,7 +22,7 @@ func (u UpsertPartialRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertPartialRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PartialId", "workspace", "Partial"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

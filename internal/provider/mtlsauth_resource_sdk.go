@@ -29,6 +29,8 @@ func (r *MTLSAuthResourceModel) RefreshFromSharedMTLSAuth(ctx context.Context, r
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 	}
 
@@ -135,8 +137,8 @@ func (r *MTLSAuthResourceModel) ToSharedMTLSAuthWithoutParents(ctx context.Conte
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	out := shared.MTLSAuthWithoutParents{

@@ -21,7 +21,7 @@ func (u UpdateResponsetransformeradvancedPluginRequest) MarshalJSON() ([]byte, e
 }
 
 func (u *UpdateResponsetransformeradvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ResponseTransformerAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -20,7 +20,7 @@ func (g GetOauth2PluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GetOauth2PluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &g, "", false, []string{"PluginId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
 		return err
 	}
 	return nil

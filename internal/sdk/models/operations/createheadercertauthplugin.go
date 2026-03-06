@@ -19,7 +19,7 @@ func (c CreateHeadercertauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateHeadercertauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "HeaderCertAuthPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

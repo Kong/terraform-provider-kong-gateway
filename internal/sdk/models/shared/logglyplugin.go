@@ -461,7 +461,7 @@ func (l LogglyPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (l *LogglyPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &l, "", false, nil); err != nil {
 		return err
 	}
 	return nil

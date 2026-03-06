@@ -21,7 +21,7 @@ func (d DeleteJwtWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteJwtWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ConsumerIdForNestedEntities", "JWTId", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

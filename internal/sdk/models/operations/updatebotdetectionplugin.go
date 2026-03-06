@@ -21,7 +21,7 @@ func (u UpdateBotdetectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateBotdetectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "BotDetectionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

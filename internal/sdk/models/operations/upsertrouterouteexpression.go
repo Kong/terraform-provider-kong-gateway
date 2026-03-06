@@ -22,7 +22,7 @@ func (u UpsertRouteRouteExpressionRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertRouteRouteExpressionRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"RouteIdOrName", "workspace", "RouteExpression"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

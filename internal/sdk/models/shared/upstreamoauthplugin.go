@@ -917,7 +917,7 @@ func (u UpstreamOauthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpstreamOauthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -22,7 +22,7 @@ func (u UpsertKeyRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertKeyRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"KeyIdOrName", "workspace", "Key"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

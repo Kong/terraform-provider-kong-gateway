@@ -19,7 +19,7 @@ func (c CreateJsonthreatprotectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateJsonthreatprotectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JsonThreatProtectionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

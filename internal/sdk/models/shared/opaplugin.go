@@ -294,7 +294,7 @@ func (o OpaPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpaPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
 		return err
 	}
 	return nil

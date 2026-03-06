@@ -19,7 +19,7 @@ func (c CreateOpenidconnectPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateOpenidconnectPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OpenidConnectPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

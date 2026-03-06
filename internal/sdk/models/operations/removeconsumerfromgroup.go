@@ -20,7 +20,7 @@ func (r RemoveConsumerFromGroupRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (r *RemoveConsumerFromGroupRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"ConsumerGroupId", "ConsumerIdOrUsername", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
 		return err
 	}
 	return nil

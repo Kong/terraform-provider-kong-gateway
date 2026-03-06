@@ -21,7 +21,7 @@ func (u UpdateSyslogPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateSyslogPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "SyslogPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

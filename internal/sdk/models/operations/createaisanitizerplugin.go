@@ -19,7 +19,7 @@ func (c CreateAisanitizerPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAisanitizerPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiSanitizerPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

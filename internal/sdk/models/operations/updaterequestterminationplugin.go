@@ -21,7 +21,7 @@ func (u UpdateRequestterminationPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateRequestterminationPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "RequestTerminationPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

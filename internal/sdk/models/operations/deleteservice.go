@@ -20,7 +20,7 @@ func (d DeleteServiceRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteServiceRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"ServiceIdOrName", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

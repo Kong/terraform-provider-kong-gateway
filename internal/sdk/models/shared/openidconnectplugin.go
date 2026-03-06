@@ -4110,7 +4110,7 @@ func (o OpenidConnectPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (o *OpenidConnectPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
 		return err
 	}
 	return nil

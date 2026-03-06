@@ -21,7 +21,7 @@ func (u UpdateGrpcgatewayPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateGrpcgatewayPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "GrpcGatewayPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -21,7 +21,7 @@ func (u UpdateCorrelationidPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateCorrelationidPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "CorrelationIdPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -229,7 +229,7 @@ func (f FileLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (f *FileLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &f, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &f, "", false, nil); err != nil {
 		return err
 	}
 	return nil

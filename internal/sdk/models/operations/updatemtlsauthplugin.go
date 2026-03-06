@@ -21,7 +21,7 @@ func (u UpdateMtlsauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateMtlsauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "MtlsAuthPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

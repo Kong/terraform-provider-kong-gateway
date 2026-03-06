@@ -20,7 +20,7 @@ func (d DeleteUpstreamRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (d *DeleteUpstreamRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"UpstreamIdOrName", "workspace"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
 		return err
 	}
 	return nil

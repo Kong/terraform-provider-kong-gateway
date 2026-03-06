@@ -441,7 +441,7 @@ func (h HeaderCertAuthPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (h *HeaderCertAuthPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -43,20 +43,20 @@ type PluginKafkaUpstreamResource struct {
 
 // PluginKafkaUpstreamResourceModel describes the resource data model.
 type PluginKafkaUpstreamResourceModel struct {
-	Config       tfTypes.KafkaUpstreamPluginConfig `tfsdk:"config"`
-	Consumer     *tfTypes.Set                      `tfsdk:"consumer"`
-	CreatedAt    types.Int64                       `tfsdk:"created_at"`
-	Enabled      types.Bool                        `tfsdk:"enabled"`
-	ID           types.String                      `tfsdk:"id"`
-	InstanceName types.String                      `tfsdk:"instance_name"`
-	Ordering     *tfTypes.AcePluginOrdering        `tfsdk:"ordering"`
-	Partials     []tfTypes.AcePluginPartials       `tfsdk:"partials"`
-	Protocols    []types.String                    `tfsdk:"protocols"`
-	Route        *tfTypes.Set                      `tfsdk:"route"`
-	Service      *tfTypes.Set                      `tfsdk:"service"`
-	Tags         []types.String                    `tfsdk:"tags"`
-	UpdatedAt    types.Int64                       `tfsdk:"updated_at"`
-	Workspace    types.String                      `tfsdk:"workspace"`
+	Config       *tfTypes.KafkaUpstreamPluginConfig `tfsdk:"config"`
+	Consumer     *tfTypes.Set                       `tfsdk:"consumer"`
+	CreatedAt    types.Int64                        `tfsdk:"created_at"`
+	Enabled      types.Bool                         `tfsdk:"enabled"`
+	ID           types.String                       `tfsdk:"id"`
+	InstanceName types.String                       `tfsdk:"instance_name"`
+	Ordering     *tfTypes.ACLPluginOrdering         `tfsdk:"ordering"`
+	Partials     []tfTypes.ACLPluginPartials        `tfsdk:"partials"`
+	Protocols    []types.String                     `tfsdk:"protocols"`
+	Route        *tfTypes.Set                       `tfsdk:"route"`
+	Service      *tfTypes.Set                       `tfsdk:"service"`
+	Tags         []types.String                     `tfsdk:"tags"`
+	UpdatedAt    types.Int64                        `tfsdk:"updated_at"`
+	Workspace    types.String                       `tfsdk:"workspace"`
 }
 
 func (r *PluginKafkaUpstreamResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -139,7 +139,7 @@ func (r *PluginKafkaUpstreamResource) Schema(ctx context.Context, req resource.S
 									Description: `An integer representing a port number between 0 and 65535, inclusive. Not Null`,
 									Validators: []validator.Int64{
 										speakeasy_int64validators.NotNull(),
-										int64validator.AtMost(65535),
+										int64validator.Between(0, 65535),
 									},
 								},
 							},
@@ -209,7 +209,7 @@ func (r *PluginKafkaUpstreamResource) Schema(ctx context.Context, req resource.S
 					"producer_request_acks": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set). must be one of ["-1", "0", "1"]`,
+						Description: `The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set). must be one of [-1, 0, 1]`,
 						Validators: []validator.Int64{
 							int64validator.OneOf(-1, 0, 1),
 						},
@@ -433,7 +433,7 @@ func (r *PluginKafkaUpstreamResource) Schema(ctx context.Context, req resource.S
 														Optional:    true,
 														Description: `Network I/O timeout for requests to the IdP in milliseconds.`,
 														Validators: []validator.Int64{
-															int64validator.AtMost(2147483646),
+															int64validator.Between(0, 2147483646),
 														},
 													},
 												},
@@ -897,7 +897,10 @@ func (r *PluginKafkaUpstreamResource) Delete(ctx context.Context, req resource.D
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -918,12 +921,12 @@ func (r *PluginKafkaUpstreamResource) ImportState(ctx context.Context, req resou
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '"3473c251-5b6c-4f45-b1ff-7ede735a366d"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

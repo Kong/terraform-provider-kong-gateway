@@ -19,7 +19,7 @@ func (c CreateJwedecryptPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateJwedecryptPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "JweDecryptPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

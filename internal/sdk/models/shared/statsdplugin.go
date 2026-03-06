@@ -808,7 +808,7 @@ func (s StatsdPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (s *StatsdPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"name"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
 		return err
 	}
 	return nil

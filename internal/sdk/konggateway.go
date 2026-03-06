@@ -2,7 +2,7 @@
 
 package sdk
 
-// Generated from OpenAPI doc version 0.0.1 and generator version 2.723.2
+// Generated from OpenAPI doc version 0.0.1 and generator version 2.850.5
 
 import (
 	"context"
@@ -160,7 +160,7 @@ type KongGateway struct {
 
 type SDKOption func(*KongGateway)
 
-// WithServerURL allows the overriding of the default server URL
+// WithServerURL allows providing an alternative server URL
 func WithServerURL(serverURL string) SDKOption {
 	return func(sdk *KongGateway) {
 		sdk.sdkConfiguration.ServerURL = serverURL
@@ -309,7 +309,7 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
 		SDKVersion: "1.0.1",
 		sdkConfiguration: config.SDKConfiguration{
-			UserAgent:  "speakeasy-sdk/terraform 1.0.1 2.723.2 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			UserAgent:  "speakeasy-sdk/terraform 1.0.1 2.850.5 0.0.1 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerList: ServerList,
 			ServerVariables: []map[string]string{
 				{

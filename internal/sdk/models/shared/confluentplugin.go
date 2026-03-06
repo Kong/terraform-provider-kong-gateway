@@ -960,7 +960,7 @@ func (c ConfluentPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

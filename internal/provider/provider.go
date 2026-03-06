@@ -4,11 +4,16 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/action"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
+	"github.com/hashicorp/terraform-plugin-framework/function"
+	"github.com/hashicorp/terraform-plugin-framework/list"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
@@ -17,7 +22,9 @@ import (
 )
 
 var _ provider.Provider = (*KongGatewayProvider)(nil)
+var _ provider.ProviderWithActions = (*KongGatewayProvider)(nil)
 var _ provider.ProviderWithEphemeralResources = (*KongGatewayProvider)(nil)
+var _ provider.ProviderWithFunctions = (*KongGatewayProvider)(nil)
 
 type KongGatewayProvider struct {
 	// version is set to the provider version on release, "dev" when the
@@ -68,8 +75,14 @@ func (p *KongGatewayProvider) Schema(ctx context.Context, req provider.SchemaReq
 				Optional:            true,
 			},
 			"protocol": schema.StringAttribute{
-				MarkdownDescription: `Protocol for requests to Kong's Admin API (defaults to http)`,
+				MarkdownDescription: `Protocol for requests to Kong's Admin API (defaults to http); must be one of ["http", "https"]`,
 				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"http",
+						"https",
+					),
+				},
 			},
 			"server_url": schema.StringAttribute{
 				Description: `Server URL (defaults to {protocol}://{hostname}:{port}{path})`,
@@ -158,9 +171,19 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	client := sdk.New(opts...)
+	resp.ActionData = client
 	resp.DataSourceData = client
 	resp.EphemeralResourceData = client
+	resp.ListResourceData = client
 	resp.ResourceData = client
+}
+
+func (p *KongGatewayProvider) Functions(_ context.Context) []func() function.Function {
+	return []func() function.Function{}
+}
+
+func (p *KongGatewayProvider) Actions(_ context.Context) []func() action.Action {
+	return []func() action.Action{}
 }
 
 func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.Resource {
@@ -179,8 +202,8 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewKeySetResource,
 		NewMTLSAuthResource,
 		NewPartialResource,
-		NewPluginAceResource,
 		NewPluginACLResource,
+		NewPluginAceResource,
 		NewPluginAcmeResource,
 		NewPluginAiAwsGuardrailsResource,
 		NewPluginAiAzureContentSafetyResource,
@@ -290,8 +313,8 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginZipkinResource,
 		NewRouteResource,
 		NewRouteExpressionResource,
-		NewServiceResource,
 		NewSniResource,
+		NewServiceResource,
 		NewTargetResource,
 		NewUpstreamResource,
 		NewVaultResource,
@@ -306,6 +329,10 @@ func (p *KongGatewayProvider) DataSources(ctx context.Context) []func() datasour
 
 func (p *KongGatewayProvider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
 	return []func() ephemeral.EphemeralResource{}
+}
+
+func (p *KongGatewayProvider) ListResources(ctx context.Context) []func() list.ListResource {
+	return []func() list.ListResource{}
 }
 
 func New(version string) func() provider.Provider {

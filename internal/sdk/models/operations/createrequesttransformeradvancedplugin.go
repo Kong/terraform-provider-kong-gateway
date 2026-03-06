@@ -19,7 +19,7 @@ func (c CreateRequesttransformeradvancedPluginRequest) MarshalJSON() ([]byte, er
 }
 
 func (c *CreateRequesttransformeradvancedPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RequestTransformerAdvancedPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

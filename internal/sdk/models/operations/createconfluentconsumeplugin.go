@@ -19,7 +19,7 @@ func (c CreateConfluentconsumePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateConfluentconsumePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "ConfluentConsumePlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

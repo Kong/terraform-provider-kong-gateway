@@ -19,7 +19,7 @@ func (c CreateAiproxyPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateAiproxyPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "AiProxyPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

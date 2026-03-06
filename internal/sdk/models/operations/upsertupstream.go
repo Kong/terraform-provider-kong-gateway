@@ -22,7 +22,7 @@ func (u UpsertUpstreamRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpsertUpstreamRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"UpstreamIdOrName", "workspace", "Upstream"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

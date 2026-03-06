@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/operations"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/models/shared"
 )
@@ -14,6 +15,7 @@ func (r *SniResourceModel) RefreshFromSharedSni(ctx context.Context, resp *share
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Certificate = &tfTypes.Set{}
 		r.Certificate.ID = types.StringPointerValue(resp.Certificate.ID)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -23,6 +25,8 @@ func (r *SniResourceModel) RefreshFromSharedSni(ctx context.Context, resp *share
 			for _, v := range resp.Tags {
 				r.Tags = append(r.Tags, types.StringValue(v))
 			}
+		} else {
+			r.Tags = nil
 		}
 		r.UpdatedAt = types.Int64PointerValue(resp.UpdatedAt)
 	}
@@ -140,8 +144,8 @@ func (r *SniResourceModel) ToSharedSni(ctx context.Context) (*shared.Sni, diag.D
 	var tags []string
 	if r.Tags != nil {
 		tags = make([]string, 0, len(r.Tags))
-		for _, tagsItem := range r.Tags {
-			tags = append(tags, tagsItem.ValueString())
+		for tagsIndex := range r.Tags {
+			tags = append(tags, r.Tags[tagsIndex].ValueString())
 		}
 	}
 	updatedAt := new(int64)

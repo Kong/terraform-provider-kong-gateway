@@ -1014,7 +1014,7 @@ func (k KafkaLogPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (k *KafkaLogPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &k, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
 		return err
 	}
 	return nil

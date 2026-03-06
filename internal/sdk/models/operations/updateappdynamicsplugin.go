@@ -21,7 +21,7 @@ func (u UpdateAppdynamicsPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAppdynamicsPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AppDynamicsPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

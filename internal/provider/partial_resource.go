@@ -13,10 +13,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	speakeasy_int64planmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/int64planmodifier"
+	speakeasy_stringplanmodifier "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/stringplanmodifier"
+	speakeasy_planmodifierutils "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/utils"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
@@ -41,8 +45,8 @@ type PartialResourceModel struct {
 	CreatedAt types.Int64             `tfsdk:"created_at"`
 	ID        types.String            `tfsdk:"id"`
 	Name      types.String            `tfsdk:"name"`
-	RedisCe   *tfTypes.PartialRedisCe `queryParam:"inline" tfsdk:"redis_ce" tfPlanOnly:"true"`
-	RedisEe   *tfTypes.PartialRedisEe `queryParam:"inline" tfsdk:"redis_ee" tfPlanOnly:"true"`
+	RedisCe   *tfTypes.PartialRedisCe `queryParam:"inline" tfsdk:"redis_ce"`
+	RedisEe   *tfTypes.PartialRedisEe `queryParam:"inline" tfsdk:"redis_ee"`
 	UpdatedAt types.Int64             `tfsdk:"updated_at"`
 	Workspace types.String            `tfsdk:"workspace"`
 }
@@ -56,19 +60,27 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 		MarkdownDescription: "Partial Resource",
 		Attributes: map[string]schema.Attribute{
 			"created_at": schema.Int64Attribute{
-				Computed:    true,
+				Computed: true,
+				PlanModifiers: []planmodifier.Int64{
+					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("created_at")}}),
+				},
 				Description: `Unix epoch when the resource was created.`,
 			},
 			"id": schema.StringAttribute{
-				Computed:    true,
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("id")}}),
+				},
 				Description: `A string representing a UUID (universally unique identifier).`,
 			},
 			"name": schema.StringAttribute{
-				Computed:    true,
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("name")}}),
+				},
 				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
 			"redis_ce": schema.SingleNestedAttribute{
-				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"config": schema.SingleNestedAttribute{
@@ -95,7 +107,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(65535),
+									int64validator.Between(0, 65535),
 								},
 							},
 							"server_name": schema.StringAttribute{
@@ -118,7 +130,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"username": schema.StringAttribute{
@@ -166,7 +178,6 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"redis_ee": schema.SingleNestedAttribute{
-				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
 					"config": schema.SingleNestedAttribute{
@@ -196,7 +207,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 											Optional:    true,
 											Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 											Validators: []validator.Int64{
-												int64validator.AtMost(65535),
+												int64validator.Between(0, 65535),
 											},
 										},
 									},
@@ -208,7 +219,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"connection_is_proxied": schema.BoolAttribute{
@@ -231,7 +242,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return ` + "`" + `nil` + "`" + `. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than ` + "`" + `keepalive_pool_size` + "`" + `. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than ` + "`" + `keepalive_pool_size` + "`" + `.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"keepalive_pool_size": schema.Int64Attribute{
@@ -252,7 +263,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(65535),
+									int64validator.Between(0, 65535),
 								},
 							},
 							"read_timeout": schema.Int64Attribute{
@@ -260,7 +271,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"send_timeout": schema.Int64Attribute{
@@ -268,7 +279,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 								Optional:    true,
 								Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
 								Validators: []validator.Int64{
-									int64validator.AtMost(2147483646),
+									int64validator.Between(0, 2147483646),
 								},
 							},
 							"sentinel_master": schema.StringAttribute{
@@ -294,7 +305,7 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 											Optional:    true,
 											Description: `An integer representing a port number between 0 and 65535, inclusive.`,
 											Validators: []validator.Int64{
-												int64validator.AtMost(65535),
+												int64validator.Between(0, 65535),
 											},
 										},
 									},
@@ -383,7 +394,10 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 			},
 			"updated_at": schema.Int64Attribute{
-				Computed:    true,
+				Computed: true,
+				PlanModifiers: []planmodifier.Int64{
+					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("updated_at")}}),
+				},
 				Description: `Unix epoch when the resource was last updated.`,
 			},
 			"workspace": schema.StringAttribute{
@@ -626,7 +640,10 @@ func (r *PartialResource) Delete(ctx context.Context, req resource.DeleteRequest
 		resp.Diagnostics.AddError("unexpected response from API", fmt.Sprintf("%v", res))
 		return
 	}
-	if res.StatusCode != 204 {
+	switch res.StatusCode {
+	case 204, 404:
+		break
+	default:
 		resp.Diagnostics.AddError(fmt.Sprintf("unexpected response from API. Got an unexpected response code %v", res.StatusCode), debugResponse(res.RawResponse))
 		return
 	}
@@ -647,12 +664,12 @@ func (r *PartialResource) ImportState(ctx context.Context, req resource.ImportSt
 	}
 
 	if len(data.ID) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '""`)
+		resp.Diagnostics.AddError("Missing required field", `The field id is required but was not found in the json encoded ID. It's expected to be a value alike '""'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

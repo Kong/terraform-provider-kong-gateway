@@ -19,7 +19,7 @@ func (c CreateWebsocketsizelimitPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateWebsocketsizelimitPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "WebsocketSizeLimitPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

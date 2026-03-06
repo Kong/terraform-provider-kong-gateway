@@ -19,7 +19,7 @@ func (c CreateRequestvalidatorPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateRequestvalidatorPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "RequestValidatorPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

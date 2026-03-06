@@ -19,7 +19,7 @@ func (c CreatePrometheusPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreatePrometheusPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "PrometheusPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

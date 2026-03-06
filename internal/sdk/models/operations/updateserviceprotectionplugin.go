@@ -21,7 +21,7 @@ func (u UpdateServiceprotectionPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateServiceprotectionPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "ServiceProtectionPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -21,7 +21,7 @@ func (u UpdateAillmasjudgePluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateAillmasjudgePluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "AiLlmAsJudgePlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

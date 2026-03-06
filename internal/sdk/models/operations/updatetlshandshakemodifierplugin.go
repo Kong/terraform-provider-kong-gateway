@@ -21,7 +21,7 @@ func (u UpdateTlshandshakemodifierPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateTlshandshakemodifierPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "TlsHandshakeModifierPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

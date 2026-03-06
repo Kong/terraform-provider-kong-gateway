@@ -19,7 +19,7 @@ func (c CreateDegraphqlPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateDegraphqlPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "DegraphqlPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

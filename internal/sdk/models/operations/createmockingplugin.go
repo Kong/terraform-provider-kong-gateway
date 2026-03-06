@@ -19,7 +19,7 @@ func (c CreateMockingPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateMockingPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "MockingPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -292,7 +292,7 @@ func (a AzureFunctionsPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AzureFunctionsPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -19,7 +19,7 @@ func (c CreateOpaPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateOpaPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"workspace", "OpaPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -22,7 +22,7 @@ func (c CreateHmacAuthWithConsumerRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (c *CreateHmacAuthWithConsumerRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"ConsumerIdForNestedEntities", "workspace", "HMACAuthWithoutParents"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil

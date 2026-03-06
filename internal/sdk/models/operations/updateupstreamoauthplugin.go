@@ -21,7 +21,7 @@ func (u UpdateUpstreamoauthPluginRequest) MarshalJSON() ([]byte, error) {
 }
 
 func (u *UpdateUpstreamoauthPluginRequest) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &u, "", false, []string{"PluginId", "workspace", "UpstreamOauthPlugin"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
 		return err
 	}
 	return nil

@@ -14,28 +14,33 @@ PluginDatakit Resource
 
 ```terraform
 resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
+  condition = "...my_condition..."
   config = {
     debug = true
     nodes = [
       {
-        cache = {
-          bypass_on_error = false
-          input           = "...my_input..."
+        jwt_sign = {
+          algorithm  = "PS384"
+          expires_in = 9
+          input      = "...my_input..."
           inputs = {
-            data = "...my_data..."
-            key  = "...my_key..."
-            ttl  = "...my_ttl..."
+            claims = "...my_claims..."
+            key    = "...my_key..."
           }
-          name   = "...my_name..."
-          output = "...my_output..."
+          kid        = "...my_kid..."
+          name       = "...my_name..."
+          not_before = 6
+          output     = "...my_output..."
           outputs = {
-            data   = "...my_data..."
-            hit    = "...my_hit..."
-            miss   = "...my_miss..."
-            stored = "...my_stored..."
+            claims = "...my_claims..."
+            header = "...my_header..."
+            token  = "...my_token..."
           }
-          ttl  = 2
-          type = "cache"
+          static_claims = {
+            key = "value"
+          }
+          typ  = "...my_typ..."
+          type = "jwt_sign"
         }
       }
     ]
@@ -45,6 +50,20 @@ resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
           dictionary_name = "...my_dictionary_name..."
         }
         redis = {
+          cloud_authentication = {
+            auth_provider            = "azure"
+            aws_access_key_id        = "...my_aws_access_key_id..."
+            aws_assume_role_arn      = "...my_aws_assume_role_arn..."
+            aws_cache_name           = "...my_aws_cache_name..."
+            aws_is_serverless        = true
+            aws_region               = "...my_aws_region..."
+            aws_role_session_name    = "...my_aws_role_session_name..."
+            aws_secret_access_key    = "...my_aws_secret_access_key..."
+            azure_client_id          = "...my_azure_client_id..."
+            azure_client_secret      = "...my_azure_client_secret..."
+            azure_tenant_id          = "...my_azure_tenant_id..."
+            gcp_service_account_json = "...my_gcp_service_account_json..."
+          }
           cluster_max_redirections = 3
           cluster_nodes = [
             {
@@ -80,7 +99,7 @@ resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
         strategy = "redis"
       }
       vault = {
-        key = jsonencode("value")
+        key = "value"
       }
     }
   }
@@ -126,7 +145,7 @@ resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
     "..."
   ]
   updated_at = 1
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -139,6 +158,7 @@ resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -152,7 +172,7 @@ resource "kong-gateway_plugin_datakit" "my_plugindatakit" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -176,8 +196,13 @@ Optional:
 - `call` (Attributes) Make an external HTTP request (see [below for nested schema](#nestedatt--config--nodes--call))
 - `exit` (Attributes) Terminate the request and send a response to the client (see [below for nested schema](#nestedatt--config--nodes--exit))
 - `jq` (Attributes) Process data using `jq` syntax (see [below for nested schema](#nestedatt--config--nodes--jq))
+- `json_to_xml` (Attributes) transform JSON or lua table to XML (see [below for nested schema](#nestedatt--config--nodes--json_to_xml))
+- `jwt_decode` (Attributes) Decode JWT without signature verification (see [below for nested schema](#nestedatt--config--nodes--jwt_decode))
+- `jwt_sign` (Attributes) Create and sign a JWT (see [below for nested schema](#nestedatt--config--nodes--jwt_sign))
+- `jwt_verify` (Attributes) Verify JWT signature and validate claims (see [below for nested schema](#nestedatt--config--nodes--jwt_verify))
 - `property` (Attributes) Get or set a property (see [below for nested schema](#nestedatt--config--nodes--property))
 - `static` (Attributes) Produce reusable outputs from statically-configured values (see [below for nested schema](#nestedatt--config--nodes--static))
+- `xml_to_json` (Attributes) convert XML to JSON (see [below for nested schema](#nestedatt--config--nodes--xml_to_json))
 
 <a id="nestedatt--config--nodes--branch"></a>
 ### Nested Schema for `config.nodes.branch`
@@ -250,9 +275,10 @@ Optional:
 - `output` (String) call node output
 - `outputs` (Attributes) call node outputs (see [below for nested schema](#nestedatt--config--nodes--call--outputs))
 - `ssl_server_name` (String) A string representing an SNI (server name indication) value for TLS.
+- `ssl_verify` (Boolean) Whether to verify the TLS certificate when making HTTPS requests.
 - `timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `type` (String) must be "call"
-- `url` (String) A string representing a URL, such as https://example.com/path/to/resource?q=search. Not Null
+- `url` (String) A string representing a URL, such as https://example.com/path/to/resource?q=search.
 
 <a id="nestedatt--config--nodes--call--inputs"></a>
 ### Nested Schema for `config.nodes.call.inputs`
@@ -261,7 +287,12 @@ Optional:
 
 - `body` (String) HTTP request body
 - `headers` (String) HTTP request headers
+- `http_proxy` (String) The HTTP proxy URL. This proxy server will be used for HTTP requests.
+- `https_proxy` (String) The HTTPS proxy URL. This proxy server will be used for HTTPS requests.
+- `proxy_auth_password` (String) The password to authenticate with, if the forward proxy is protected by basic authentication.
+- `proxy_auth_username` (String) The username to authenticate with, if the forward proxy is protected by basic authentication.
 - `query` (String) HTTP request query
+- `url` (String) HTTP request URL
 
 
 <a id="nestedatt--config--nodes--call--outputs"></a>
@@ -271,6 +302,7 @@ Optional:
 
 - `body` (String) HTTP response body
 - `headers` (String) HTTP response headers
+- `raw_body` (String) The raw, non-decoded HTTP response body
 - `status` (String) HTTP response status code
 
 
@@ -310,6 +342,120 @@ Optional:
 - `type` (String) must be "jq"
 
 
+<a id="nestedatt--config--nodes--json_to_xml"></a>
+### Nested Schema for `config.nodes.json_to_xml`
+
+Optional:
+
+- `attributes_block_name` (String)
+- `attributes_name_prefix` (String)
+- `input` (String) JSON string or table
+- `inputs` (Map of String) JSON string or table
+- `name` (String) A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+- `output` (String) XML document converted from JSON
+- `root_element_name` (String)
+- `text_block_name` (String) The name of the block to treat as XML text content.
+- `type` (String) must be "json_to_xml"
+
+
+<a id="nestedatt--config--nodes--jwt_decode"></a>
+### Nested Schema for `config.nodes.jwt_decode`
+
+Optional:
+
+- `input` (String) JWT token (with or without Bearer prefix)
+- `name` (String) A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+- `output` (String) jwt_decode node output
+- `outputs` (Attributes) jwt_decode node outputs (see [below for nested schema](#nestedatt--config--nodes--jwt_decode--outputs))
+- `type` (String) must be "jwt_decode"
+
+<a id="nestedatt--config--nodes--jwt_decode--outputs"></a>
+### Nested Schema for `config.nodes.jwt_decode.outputs`
+
+Optional:
+
+- `header` (String) Decoded JWT header (alg, kid, typ)
+- `payload` (String) Decoded JWT payload (claims)
+- `signature` (String) Raw signature (base64url encoded)
+
+
+
+<a id="nestedatt--config--nodes--jwt_sign"></a>
+### Nested Schema for `config.nodes.jwt_sign`
+
+Optional:
+
+- `algorithm` (String) Signing algorithm. Not Null; must be one of ["ES256", "ES384", "ES512", "EdDSA", "HS256", "HS384", "HS512", "PS256", "PS384", "PS512", "RS256", "RS384", "RS512"]
+- `expires_in` (Number) Seconds until token expires (for exp claim)
+- `input` (String) jwt_sign node input
+- `inputs` (Attributes) jwt_sign node inputs (see [below for nested schema](#nestedatt--config--nodes--jwt_sign--inputs))
+- `kid` (String) Key ID for header
+- `name` (String) A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+- `not_before` (Number) Seconds until token becomes valid (for nbf claim)
+- `output` (String) jwt_sign node output
+- `outputs` (Attributes) jwt_sign node outputs (see [below for nested schema](#nestedatt--config--nodes--jwt_sign--outputs))
+- `static_claims` (Map of String) Static claims always included
+- `typ` (String) Token type for header
+- `type` (String) must be "jwt_sign"
+
+<a id="nestedatt--config--nodes--jwt_sign--inputs"></a>
+### Nested Schema for `config.nodes.jwt_sign.inputs`
+
+Optional:
+
+- `claims` (String) Dynamic claims to include
+- `key` (String) Signing key (PEM, JWK JSON string, or HMAC secret)
+
+
+<a id="nestedatt--config--nodes--jwt_sign--outputs"></a>
+### Nested Schema for `config.nodes.jwt_sign.outputs`
+
+Optional:
+
+- `claims` (String) Complete claims used
+- `header` (String) JWT header
+- `token` (String) Signed JWT
+
+
+
+<a id="nestedatt--config--nodes--jwt_verify"></a>
+### Nested Schema for `config.nodes.jwt_verify`
+
+Optional:
+
+- `allowed_algorithms` (List of String) Allowed signing algorithms (empty = any supported)
+- `audiences` (List of String) Allowed audiences (empty = any)
+- `input` (String) jwt_verify node input
+- `inputs` (Attributes) jwt_verify node inputs (see [below for nested schema](#nestedatt--config--nodes--jwt_verify--inputs))
+- `issuers` (List of String) Allowed issuers (empty = any)
+- `leeway` (Number) Allowed clock skew in seconds for exp/nbf validation
+- `name` (String) A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+- `output` (String) jwt_verify node output
+- `outputs` (Attributes) jwt_verify node outputs (see [below for nested schema](#nestedatt--config--nodes--jwt_verify--outputs))
+- `required_claims` (List of String) Claims that must be present
+- `type` (String) must be "jwt_verify"
+- `validate_exp` (Boolean) Validate expiration claim
+- `validate_nbf` (Boolean) Validate not-before claim
+
+<a id="nestedatt--config--nodes--jwt_verify--inputs"></a>
+### Nested Schema for `config.nodes.jwt_verify.inputs`
+
+Optional:
+
+- `key` (String) Verification key: JWKS, JWK, PEM string, or HMAC secret
+- `token` (String) JWT token (with or without Bearer prefix)
+
+
+<a id="nestedatt--config--nodes--jwt_verify--outputs"></a>
+### Nested Schema for `config.nodes.jwt_verify.outputs`
+
+Optional:
+
+- `claims` (String) JWT payload claims
+- `header` (String) JWT header
+
+
+
 <a id="nestedatt--config--nodes--property"></a>
 ### Nested Schema for `config.nodes.property`
 
@@ -332,7 +478,24 @@ Optional:
 - `output` (String) The entire `.values` map
 - `outputs` (Map of String) Individual items from `.values`, referenced by key
 - `type` (String) must be "static"
-- `values` (String) An object with string keys and freeform values. Not Null
+- `values` (String) An object with string keys and freeform values. Not Null; Parsed as JSON.
+
+
+<a id="nestedatt--config--nodes--xml_to_json"></a>
+### Nested Schema for `config.nodes.xml_to_json`
+
+Optional:
+
+- `attributes_block_name` (String)
+- `attributes_name_prefix` (String)
+- `input` (String) XML document string
+- `name` (String) A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+- `output` (String) a map object converted from XML document. If connected to `request.body` or `response.body`, the output will be a JSON object.
+- `recognize_type` (Boolean)
+- `text_as_property` (Boolean)
+- `text_block_name` (String)
+- `type` (String) must be "xml_to_json"
+- `xpath` (String)
 
 
 
@@ -366,6 +529,7 @@ Optional:
 
 Optional:
 
+- `cloud_authentication` (Attributes) Cloud auth related configs for connecting to a Cloud Provider's Redis instance. (see [below for nested schema](#nestedatt--config--resources--cache--redis--cloud_authentication))
 - `cluster_max_redirections` (Number) Maximum retry attempts for redirection.
 - `cluster_nodes` (Attributes List) Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element. (see [below for nested schema](#nestedatt--config--resources--cache--redis--cluster_nodes))
 - `connect_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
@@ -387,6 +551,25 @@ Optional:
 - `ssl` (Boolean) If set to true, uses SSL to connect to Redis.
 - `ssl_verify` (Boolean) If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
 - `username` (String) Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+
+<a id="nestedatt--config--resources--cache--redis--cloud_authentication"></a>
+### Nested Schema for `config.resources.cache.redis.cloud_authentication`
+
+Optional:
+
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+- `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+- `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+- `aws_is_serverless` (Boolean) This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+- `aws_region` (String) The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+- `aws_role_session_name` (String) The session name for the temporary credentials when assuming the IAM role.
+- `aws_secret_access_key` (String) AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+- `azure_client_id` (String) Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+- `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+
 
 <a id="nestedatt--config--resources--cache--redis--cluster_nodes"></a>
 ### Nested Schema for `config.resources.cache.redis.cluster_nodes`
@@ -487,7 +670,7 @@ import {
   to = kong-gateway_plugin_datakit.my_kong-gateway_plugin_datakit
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -495,5 +678,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_datakit.my_kong-gateway_plugin_datakit '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_datakit.my_kong-gateway_plugin_datakit '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

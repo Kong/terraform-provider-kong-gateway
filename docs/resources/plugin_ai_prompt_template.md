@@ -14,6 +14,7 @@ PluginAiPromptTemplate Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_prompt_template" "my_pluginaiprompttemplate" {
+  condition = "...my_condition..."
   config = {
     allow_untemplated_requests = false
     log_original_request       = false
@@ -67,7 +68,7 @@ resource "kong-gateway_plugin_ai_prompt_template" "my_pluginaiprompttemplate" {
     "..."
   ]
   updated_at = 1
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -80,6 +81,7 @@ resource "kong-gateway_plugin_ai_prompt_template" "my_pluginaiprompttemplate" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -93,7 +95,7 @@ resource "kong-gateway_plugin_ai_prompt_template" "my_pluginaiprompttemplate" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -195,7 +197,7 @@ import {
   to = kong-gateway_plugin_ai_prompt_template.my_kong-gateway_plugin_ai_prompt_template
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -203,5 +205,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_prompt_template.my_kong-gateway_plugin_ai_prompt_template '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_prompt_template.my_kong-gateway_plugin_ai_prompt_template '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

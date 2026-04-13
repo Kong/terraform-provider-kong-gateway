@@ -17,7 +17,7 @@ resource "kong-gateway_workspace" "my_workspace" {
   comment = "...my_comment..."
   config = {
     meta = {
-      key = jsonencode("value")
+      key = "value"
     }
     portal                           = true
     portal_access_request_email      = true

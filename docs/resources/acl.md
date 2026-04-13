@@ -14,14 +14,14 @@ ACL Resource
 
 ```terraform
 resource "kong-gateway_acl" "my_acl" {
-  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  consumer_id = ""
   created_at  = 9
   group       = "...my_group..."
   id          = "...my_id..."
   tags = [
     "..."
   ]
-  workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace = "team-payments"
 }
 ```
 
@@ -38,7 +38,7 @@ resource "kong-gateway_acl" "my_acl" {
 - `created_at` (Number) Unix epoch when the resource was created. Requires replacement if changed.
 - `id` (String) A string representing a UUID (universally unique identifier). Requires replacement if changed.
 - `tags` (List of String) A set of strings representing tags. Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `workspace` (String) The name of the workspace. Default: "default"; Requires replacement if changed.
 
 ## Import
 
@@ -50,9 +50,9 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_acl.my_kong-gateway_acl
   id = jsonencode({
-    consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+    consumer_id = ""
     id          = "f28acbfa-c866-4587-b688-0208ac24df21"
-    workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace   = "team-payments"
   })
 }
 ```
@@ -60,5 +60,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_acl.my_kong-gateway_acl '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "f28acbfa-c866-4587-b688-0208ac24df21", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_acl.my_kong-gateway_acl '{"consumer_id": "", "id": "f28acbfa-c866-4587-b688-0208ac24df21", "workspace": "team-payments"}'
 ```

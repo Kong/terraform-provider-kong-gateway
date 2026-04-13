@@ -14,7 +14,7 @@ HMACAuth Resource
 
 ```terraform
 resource "kong-gateway_hmac_auth" "my_hmacauth" {
-  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  consumer_id = ""
   created_at  = 3
   id          = "...my_id..."
   secret      = "...my_secret..."
@@ -22,7 +22,7 @@ resource "kong-gateway_hmac_auth" "my_hmacauth" {
     "..."
   ]
   username  = "...my_username..."
-  workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace = "team-payments"
 }
 ```
 
@@ -40,7 +40,7 @@ resource "kong-gateway_hmac_auth" "my_hmacauth" {
 - `id` (String) A string representing a UUID (universally unique identifier). Requires replacement if changed.
 - `secret` (String) Requires replacement if changed.
 - `tags` (List of String) A set of strings representing tags. Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `workspace` (String) The name of the workspace. Default: "default"; Requires replacement if changed.
 
 ## Import
 
@@ -52,9 +52,9 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_hmac_auth.my_kong-gateway_hmac_auth
   id = jsonencode({
-    consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+    consumer_id = ""
     id          = "70e7b00b-72f2-471b-a5ce-9c4171775360"
-    workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace   = "team-payments"
   })
 }
 ```
@@ -62,5 +62,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "70e7b00b-72f2-471b-a5ce-9c4171775360", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_hmac_auth.my_kong-gateway_hmac_auth '{"consumer_id": "", "id": "70e7b00b-72f2-471b-a5ce-9c4171775360", "workspace": "team-payments"}'
 ```

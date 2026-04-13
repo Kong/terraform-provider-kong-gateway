@@ -46,7 +46,7 @@ resource "kong-gateway_service" "my_service" {
   tls_verify_depth = 4
   updated_at       = 10
   url              = "...my_url..."
-  workspace        = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace        = "team-payments"
   write_timeout    = 870025639
 }
 ```
@@ -78,7 +78,7 @@ resource "kong-gateway_service" "my_service" {
 - `tls_verify_depth` (Number) Maximum depth of chain while verifying Upstream server's TLS certificate. If set to `null`, then the Nginx default is respected.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
 - `url` (String) Helper field to set `protocol`, `host`, `port` and `path` using a URL. This field is write-only and is not returned in responses.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 - `write_timeout` (Number) The timeout in milliseconds between two successive write operations for transmitting a request to the upstream server.
 
 <a id="nestedatt--client_certificate"></a>
@@ -108,7 +108,7 @@ import {
   to = kong-gateway_service.my_kong-gateway_service
   id = jsonencode({
     id        = "7fca84d6-7d37-4a74-a7b0-93e576089a41"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -116,5 +116,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_service.my_kong-gateway_service '{"id": "7fca84d6-7d37-4a74-a7b0-93e576089a41", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_service.my_kong-gateway_service '{"id": "7fca84d6-7d37-4a74-a7b0-93e576089a41", "workspace": "team-payments"}'
 ```

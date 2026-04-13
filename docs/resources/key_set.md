@@ -21,7 +21,7 @@ resource "kong-gateway_key_set" "my_keyset" {
     "..."
   ]
   updated_at = 4
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -35,7 +35,7 @@ resource "kong-gateway_key_set" "my_keyset" {
 - `name` (String) The name to associate with the given key-set.
 - `tags` (List of String) A set of strings representing tags.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 ## Import
 
@@ -48,7 +48,7 @@ import {
   to = kong-gateway_key_set.my_kong-gateway_key_set
   id = jsonencode({
     id        = "6cc34248-50b4-4a81-9201-3bdf7a83f712"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -56,5 +56,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_key_set.my_kong-gateway_key_set '{"id": "6cc34248-50b4-4a81-9201-3bdf7a83f712", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_key_set.my_kong-gateway_key_set '{"id": "6cc34248-50b4-4a81-9201-3bdf7a83f712", "workspace": "team-payments"}'
 ```

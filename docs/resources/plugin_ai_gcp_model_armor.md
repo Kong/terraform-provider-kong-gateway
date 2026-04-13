@@ -14,12 +14,16 @@ PluginAiGcpModelArmor Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_gcp_model_armor" "my_pluginaigcpmodelarmor" {
+  condition = "...my_condition..."
   config = {
     enable_multi_language_detection = true
+    gcp_metadata_url                = "...my_gcp_metadata_url..."
+    gcp_oauth_token_url             = "...my_gcp_oauth_token_url..."
     gcp_service_account_json        = "...my_gcp_service_account_json..."
     gcp_use_service_account         = false
     guarding_mode                   = "BOTH"
     location_id                     = "...my_location_id..."
+    log_blocked_content             = true
     project_id                      = "...my_project_id..."
     request_failure_message         = "...my_request_failure_message..."
     response_buffer_size            = 0.74
@@ -73,7 +77,7 @@ resource "kong-gateway_plugin_ai_gcp_model_armor" "my_pluginaigcpmodelarmor" {
     "..."
   ]
   updated_at = 6
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -86,6 +90,7 @@ resource "kong-gateway_plugin_ai_gcp_model_armor" "my_pluginaigcpmodelarmor" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -99,7 +104,7 @@ resource "kong-gateway_plugin_ai_gcp_model_armor" "my_pluginaigcpmodelarmor" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -113,9 +118,12 @@ Required:
 Optional:
 
 - `enable_multi_language_detection` (Boolean) Enables multi-language detection mode. Must be used with 'source_language'.
+- `gcp_metadata_url` (String) Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+- `gcp_oauth_token_url` (String) Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
 - `gcp_service_account_json` (String) Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT` or from the instance/container metadata service.
 - `gcp_use_service_account` (Boolean) Use service account auth for GCP-based providers and models.
 - `guarding_mode` (String) The guardrail mode to use for the request. must be one of ["BOTH", "INPUT", "OUTPUT"]
+- `log_blocked_content` (Boolean) Whether to log prompts and responses that are blocked by the guardrail.
 - `request_failure_message` (String) The message to return when a failure occurs on the request phase.
 - `response_buffer_size` (Number) The amount of bytes receiving from upstream to be buffered before sending to the model armor service. This only applies to the response content guard.
 - `response_failure_message` (String) The message to return when a failure occurs on the response phase.
@@ -203,7 +211,7 @@ import {
   to = kong-gateway_plugin_ai_gcp_model_armor.my_kong-gateway_plugin_ai_gcp_model_armor
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -211,5 +219,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_gcp_model_armor.my_kong-gateway_plugin_ai_gcp_model_armor '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_gcp_model_armor.my_kong-gateway_plugin_ai_gcp_model_armor '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

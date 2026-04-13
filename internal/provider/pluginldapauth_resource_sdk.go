@@ -15,6 +15,7 @@ func (r *PluginLdapAuthResourceModel) RefreshFromSharedLdapAuthPlugin(ctx contex
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.LdapAuthPluginConfig{}
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 		r.Config.Attribute = types.StringValue(resp.Config.Attribute)
@@ -181,6 +182,12 @@ func (r *PluginLdapAuthResourceModel) ToOperationsUpdateLdapauthPluginRequest(ct
 func (r *PluginLdapAuthResourceModel) ToSharedLdapAuthPlugin(ctx context.Context) (*shared.LdapAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -391,6 +398,7 @@ func (r *PluginLdapAuthResourceModel) ToSharedLdapAuthPlugin(ctx context.Context
 		}
 	}
 	out := shared.LdapAuthPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

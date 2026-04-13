@@ -15,10 +15,12 @@ func (r *PluginAiSanitizerResourceModel) RefreshFromSharedAiSanitizerPlugin(ctx 
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.AiSanitizerPluginConfig{}
+			r.Config.AllowAllConversationHistory = types.BoolPointerValue(resp.Config.AllowAllConversationHistory)
 			r.Config.Anonymize = make([]types.String, 0, len(resp.Config.Anonymize))
 			for _, v := range resp.Config.Anonymize {
 				r.Config.Anonymize = append(r.Config.Anonymize, types.StringValue(string(v)))
@@ -50,6 +52,7 @@ func (r *PluginAiSanitizerResourceModel) RefreshFromSharedAiSanitizerPlugin(ctx 
 				r.Config.SanitizationMode = types.StringNull()
 			}
 			r.Config.Scheme = types.StringPointerValue(resp.Config.Scheme)
+			r.Config.SkipLoggingSanitizedItems = types.BoolPointerValue(resp.Config.SkipLoggingSanitizedItems)
 			r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
 			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		}
@@ -216,6 +219,12 @@ func (r *PluginAiSanitizerResourceModel) ToOperationsUpdateAisanitizerPluginRequ
 func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.Context) (*shared.AiSanitizerPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -308,6 +317,12 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 	}
 	var config *shared.AiSanitizerPluginConfig
 	if r.Config != nil {
+		allowAllConversationHistory := new(bool)
+		if !r.Config.AllowAllConversationHistory.IsUnknown() && !r.Config.AllowAllConversationHistory.IsNull() {
+			*allowAllConversationHistory = r.Config.AllowAllConversationHistory.ValueBool()
+		} else {
+			allowAllConversationHistory = nil
+		}
 		anonymize := make([]shared.Anonymize, 0, len(r.Config.Anonymize))
 		for _, anonymizeItem := range r.Config.Anonymize {
 			anonymize = append(anonymize, shared.Anonymize(anonymizeItem.ValueString()))
@@ -380,6 +395,12 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 		} else {
 			scheme = nil
 		}
+		skipLoggingSanitizedItems := new(bool)
+		if !r.Config.SkipLoggingSanitizedItems.IsUnknown() && !r.Config.SkipLoggingSanitizedItems.IsNull() {
+			*skipLoggingSanitizedItems = r.Config.SkipLoggingSanitizedItems.ValueBool()
+		} else {
+			skipLoggingSanitizedItems = nil
+		}
 		stopOnError := new(bool)
 		if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
 			*stopOnError = r.Config.StopOnError.ValueBool()
@@ -393,18 +414,20 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 			timeout = nil
 		}
 		config = &shared.AiSanitizerPluginConfig{
-			Anonymize:        anonymize,
-			BlockIfDetected:  blockIfDetected,
-			CustomPatterns:   customPatterns,
-			Host:             host,
-			KeepaliveTimeout: keepaliveTimeout,
-			Port:             port,
-			RecoverRedacted:  recoverRedacted,
-			RedactType:       redactType,
-			SanitizationMode: sanitizationMode,
-			Scheme:           scheme,
-			StopOnError:      stopOnError,
-			Timeout:          timeout,
+			AllowAllConversationHistory: allowAllConversationHistory,
+			Anonymize:                   anonymize,
+			BlockIfDetected:             blockIfDetected,
+			CustomPatterns:              customPatterns,
+			Host:                        host,
+			KeepaliveTimeout:            keepaliveTimeout,
+			Port:                        port,
+			RecoverRedacted:             recoverRedacted,
+			RedactType:                  redactType,
+			SanitizationMode:            sanitizationMode,
+			Scheme:                      scheme,
+			SkipLoggingSanitizedItems:   skipLoggingSanitizedItems,
+			StopOnError:                 stopOnError,
+			Timeout:                     timeout,
 		}
 	}
 	var consumer *shared.AiSanitizerPluginConsumer
@@ -460,6 +483,7 @@ func (r *PluginAiSanitizerResourceModel) ToSharedAiSanitizerPlugin(ctx context.C
 		}
 	}
 	out := shared.AiSanitizerPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

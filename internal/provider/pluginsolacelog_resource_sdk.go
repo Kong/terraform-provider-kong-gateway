@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginSolaceLogResourceModel) RefreshFromSharedSolaceLogPlugin(ctx cont
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.SolaceLogPluginConfig{}
 		r.Config.Message = &tfTypes.Message{}
 		r.Config.Message.AckTimeout = types.Int64PointerValue(resp.Config.Message.AckTimeout)
@@ -58,6 +57,7 @@ func (r *PluginSolaceLogResourceModel) RefreshFromSharedSolaceLogPlugin(ctx cont
 			r.Config.Session.Authentication = &tfTypes.SolaceConsumePluginAuthentication{}
 			r.Config.Session.Authentication.AccessToken = types.StringPointerValue(resp.Config.Session.Authentication.AccessToken)
 			r.Config.Session.Authentication.AccessTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.AccessTokenHeader)
+			r.Config.Session.Authentication.BasicAuthHeader = types.StringPointerValue(resp.Config.Session.Authentication.BasicAuthHeader)
 			r.Config.Session.Authentication.IDToken = types.StringPointerValue(resp.Config.Session.Authentication.IDToken)
 			r.Config.Session.Authentication.IDTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.IDTokenHeader)
 			r.Config.Session.Authentication.Password = types.StringPointerValue(resp.Config.Session.Authentication.Password)
@@ -76,10 +76,9 @@ func (r *PluginSolaceLogResourceModel) RefreshFromSharedSolaceLogPlugin(ctx cont
 		r.Config.Session.GenerateSequenceNumber = types.BoolPointerValue(resp.Config.Session.GenerateSequenceNumber)
 		r.Config.Session.Host = types.StringValue(resp.Config.Session.Host)
 		if len(resp.Config.Session.Properties) > 0 {
-			r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
+			r.Config.Session.Properties = make(map[string]types.String, len(resp.Config.Session.Properties))
 			for key1, value1 := range resp.Config.Session.Properties {
-				result, _ := json.Marshal(value1)
-				r.Config.Session.Properties[key1] = jsontypes.NewNormalizedValue(string(result))
+				r.Config.Session.Properties[key1] = types.StringValue(value1)
 			}
 		}
 		r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
@@ -235,6 +234,12 @@ func (r *PluginSolaceLogResourceModel) ToOperationsUpdateSolacelogPluginRequest(
 func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Context) (*shared.SolaceLogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -422,6 +427,12 @@ func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Conte
 		} else {
 			accessTokenHeader = nil
 		}
+		basicAuthHeader := new(string)
+		if !r.Config.Session.Authentication.BasicAuthHeader.IsUnknown() && !r.Config.Session.Authentication.BasicAuthHeader.IsNull() {
+			*basicAuthHeader = r.Config.Session.Authentication.BasicAuthHeader.ValueString()
+		} else {
+			basicAuthHeader = nil
+		}
 		idToken := new(string)
 		if !r.Config.Session.Authentication.IDToken.IsUnknown() && !r.Config.Session.Authentication.IDToken.IsNull() {
 			*idToken = r.Config.Session.Authentication.IDToken.ValueString()
@@ -455,6 +466,7 @@ func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Conte
 		authentication = &shared.SolaceLogPluginAuthentication{
 			AccessToken:       accessToken,
 			AccessTokenHeader: accessTokenHeader,
+			BasicAuthHeader:   basicAuthHeader,
 			IDToken:           idToken,
 			IDTokenHeader:     idTokenHeader,
 			Password:          password,
@@ -501,10 +513,11 @@ func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Conte
 	var host string
 	host = r.Config.Session.Host.ValueString()
 
-	properties := make(map[string]interface{})
+	properties := make(map[string]string)
 	for propertiesKey := range r.Config.Session.Properties {
-		var propertiesInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.Session.Properties[propertiesKey].ValueString()), &propertiesInst)
+		var propertiesInst string
+		propertiesInst = r.Config.Session.Properties[propertiesKey].ValueString()
+
 		properties[propertiesKey] = propertiesInst
 	}
 	sslValidateCertificate := new(bool)
@@ -565,6 +578,7 @@ func (r *PluginSolaceLogResourceModel) ToSharedSolaceLogPlugin(ctx context.Conte
 		}
 	}
 	out := shared.SolaceLogPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

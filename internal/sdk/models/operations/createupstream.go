@@ -9,7 +9,7 @@ import (
 )
 
 type CreateUpstreamRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Upstream for creation
 	Upstream shared.Upstream `request:"mediaType=application/json"`

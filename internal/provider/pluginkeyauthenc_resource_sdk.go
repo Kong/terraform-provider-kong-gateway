@@ -15,6 +15,7 @@ func (r *PluginKeyAuthEncResourceModel) RefreshFromSharedKeyAuthEncPlugin(ctx co
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -182,6 +183,12 @@ func (r *PluginKeyAuthEncResourceModel) ToOperationsUpdateKeyauthencPluginReques
 func (r *PluginKeyAuthEncResourceModel) ToSharedKeyAuthEncPlugin(ctx context.Context) (*shared.KeyAuthEncPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -360,6 +367,7 @@ func (r *PluginKeyAuthEncResourceModel) ToSharedKeyAuthEncPlugin(ctx context.Con
 		}
 	}
 	out := shared.KeyAuthEncPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

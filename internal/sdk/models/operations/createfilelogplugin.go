@@ -9,7 +9,7 @@ import (
 )
 
 type CreateFilelogPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	FileLogPlugin shared.FileLogPlugin `request:"mediaType=application/json"`
 }

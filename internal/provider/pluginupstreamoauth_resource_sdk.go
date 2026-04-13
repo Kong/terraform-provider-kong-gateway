@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginUpstreamOauthResourceModel) RefreshFromSharedUpstreamOauthPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.UpstreamOauthPluginConfig{}
 		if resp.Config.Behavior == nil {
 			r.Config.Behavior = nil
@@ -48,6 +47,27 @@ func (r *PluginUpstreamOauthResourceModel) RefreshFromSharedUpstreamOauthPlugin(
 				r.Config.Cache.Redis = nil
 			} else {
 				r.Config.Cache.Redis = &tfTypes.PartialRedisEeConfig{}
+				if resp.Config.Cache.Redis.CloudAuthentication == nil {
+					r.Config.Cache.Redis.CloudAuthentication = nil
+				} else {
+					r.Config.Cache.Redis.CloudAuthentication = &tfTypes.PartialRedisCeCloudAuthentication{}
+					if resp.Config.Cache.Redis.CloudAuthentication.AuthProvider != nil {
+						r.Config.Cache.Redis.CloudAuthentication.AuthProvider = types.StringValue(string(*resp.Config.Cache.Redis.CloudAuthentication.AuthProvider))
+					} else {
+						r.Config.Cache.Redis.CloudAuthentication.AuthProvider = types.StringNull()
+					}
+					r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID)
+					r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn)
+					r.Config.Cache.Redis.CloudAuthentication.AwsCacheName = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsCacheName)
+					r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless = types.BoolPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsIsServerless)
+					r.Config.Cache.Redis.CloudAuthentication.AwsRegion = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsRegion)
+					r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName)
+					r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey)
+					r.Config.Cache.Redis.CloudAuthentication.AzureClientID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureClientID)
+					r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureClientSecret)
+					r.Config.Cache.Redis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureTenantID)
+					r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON)
+				}
 				r.Config.Cache.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Cache.Redis.ClusterMaxRedirections)
 				r.Config.Cache.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
 
@@ -141,17 +161,15 @@ func (r *PluginUpstreamOauthResourceModel) RefreshFromSharedUpstreamOauthPlugin(
 		}
 		r.Config.Oauth.TokenEndpoint = types.StringValue(resp.Config.Oauth.TokenEndpoint)
 		if len(resp.Config.Oauth.TokenHeaders) > 0 {
-			r.Config.Oauth.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.Oauth.TokenHeaders))
+			r.Config.Oauth.TokenHeaders = make(map[string]types.String, len(resp.Config.Oauth.TokenHeaders))
 			for key, value := range resp.Config.Oauth.TokenHeaders {
-				result, _ := json.Marshal(value)
-				r.Config.Oauth.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+				r.Config.Oauth.TokenHeaders[key] = types.StringValue(value)
 			}
 		}
 		if len(resp.Config.Oauth.TokenPostArgs) > 0 {
-			r.Config.Oauth.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.Oauth.TokenPostArgs))
+			r.Config.Oauth.TokenPostArgs = make(map[string]types.String, len(resp.Config.Oauth.TokenPostArgs))
 			for key1, value1 := range resp.Config.Oauth.TokenPostArgs {
-				result1, _ := json.Marshal(value1)
-				r.Config.Oauth.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+				r.Config.Oauth.TokenPostArgs[key1] = types.StringValue(value1)
 			}
 		}
 		r.Config.Oauth.Username = types.StringPointerValue(resp.Config.Oauth.Username)
@@ -318,6 +336,12 @@ func (r *PluginUpstreamOauthResourceModel) ToOperationsUpdateUpstreamoauthPlugin
 func (r *PluginUpstreamOauthResourceModel) ToSharedUpstreamOauthPlugin(ctx context.Context) (*shared.UpstreamOauthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -481,6 +505,95 @@ func (r *PluginUpstreamOauthResourceModel) ToSharedUpstreamOauthPlugin(ctx conte
 		}
 		var redis *shared.UpstreamOauthPluginRedis
 		if r.Config.Cache.Redis != nil {
+			var cloudAuthentication *shared.UpstreamOauthPluginCloudAuthentication
+			if r.Config.Cache.Redis.CloudAuthentication != nil {
+				authProvider := new(shared.UpstreamOauthPluginAuthProvider)
+				if !r.Config.Cache.Redis.CloudAuthentication.AuthProvider.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AuthProvider.IsNull() {
+					*authProvider = shared.UpstreamOauthPluginAuthProvider(r.Config.Cache.Redis.CloudAuthentication.AuthProvider.ValueString())
+				} else {
+					authProvider = nil
+				}
+				awsAccessKeyID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.IsNull() {
+					*awsAccessKeyID = r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.ValueString()
+				} else {
+					awsAccessKeyID = nil
+				}
+				awsAssumeRoleArn := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.IsNull() {
+					*awsAssumeRoleArn = r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.ValueString()
+				} else {
+					awsAssumeRoleArn = nil
+				}
+				awsCacheName := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.IsNull() {
+					*awsCacheName = r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.ValueString()
+				} else {
+					awsCacheName = nil
+				}
+				awsIsServerless := new(bool)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.IsNull() {
+					*awsIsServerless = r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.ValueBool()
+				} else {
+					awsIsServerless = nil
+				}
+				awsRegion := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsRegion.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsRegion.IsNull() {
+					*awsRegion = r.Config.Cache.Redis.CloudAuthentication.AwsRegion.ValueString()
+				} else {
+					awsRegion = nil
+				}
+				awsRoleSessionName := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.IsNull() {
+					*awsRoleSessionName = r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.ValueString()
+				} else {
+					awsRoleSessionName = nil
+				}
+				awsSecretAccessKey := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.IsNull() {
+					*awsSecretAccessKey = r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.ValueString()
+				} else {
+					awsSecretAccessKey = nil
+				}
+				azureClientID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureClientID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureClientID.IsNull() {
+					*azureClientID = r.Config.Cache.Redis.CloudAuthentication.AzureClientID.ValueString()
+				} else {
+					azureClientID = nil
+				}
+				azureClientSecret := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.IsNull() {
+					*azureClientSecret = r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.ValueString()
+				} else {
+					azureClientSecret = nil
+				}
+				azureTenantID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.IsNull() {
+					*azureTenantID = r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.ValueString()
+				} else {
+					azureTenantID = nil
+				}
+				gcpServiceAccountJSON := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.IsNull() {
+					*gcpServiceAccountJSON = r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.ValueString()
+				} else {
+					gcpServiceAccountJSON = nil
+				}
+				cloudAuthentication = &shared.UpstreamOauthPluginCloudAuthentication{
+					AuthProvider:          authProvider,
+					AwsAccessKeyID:        awsAccessKeyID,
+					AwsAssumeRoleArn:      awsAssumeRoleArn,
+					AwsCacheName:          awsCacheName,
+					AwsIsServerless:       awsIsServerless,
+					AwsRegion:             awsRegion,
+					AwsRoleSessionName:    awsRoleSessionName,
+					AwsSecretAccessKey:    awsSecretAccessKey,
+					AzureClientID:         azureClientID,
+					AzureClientSecret:     azureClientSecret,
+					AzureTenantID:         azureTenantID,
+					GcpServiceAccountJSON: gcpServiceAccountJSON,
+				}
+			}
 			clusterMaxRedirections := new(int64)
 			if !r.Config.Cache.Redis.ClusterMaxRedirections.IsUnknown() && !r.Config.Cache.Redis.ClusterMaxRedirections.IsNull() {
 				*clusterMaxRedirections = r.Config.Cache.Redis.ClusterMaxRedirections.ValueInt64()
@@ -634,6 +747,7 @@ func (r *PluginUpstreamOauthResourceModel) ToSharedUpstreamOauthPlugin(ctx conte
 				username = nil
 			}
 			redis = &shared.UpstreamOauthPluginRedis{
+				CloudAuthentication:    cloudAuthentication,
 				ClusterMaxRedirections: clusterMaxRedirections,
 				ClusterNodes:           clusterNodes,
 				ConnectTimeout:         connectTimeout,
@@ -788,16 +902,18 @@ func (r *PluginUpstreamOauthResourceModel) ToSharedUpstreamOauthPlugin(ctx conte
 	var tokenEndpoint string
 	tokenEndpoint = r.Config.Oauth.TokenEndpoint.ValueString()
 
-	tokenHeaders := make(map[string]interface{})
+	tokenHeaders := make(map[string]string)
 	for tokenHeadersKey := range r.Config.Oauth.TokenHeaders {
-		var tokenHeadersInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.Oauth.TokenHeaders[tokenHeadersKey].ValueString()), &tokenHeadersInst)
+		var tokenHeadersInst string
+		tokenHeadersInst = r.Config.Oauth.TokenHeaders[tokenHeadersKey].ValueString()
+
 		tokenHeaders[tokenHeadersKey] = tokenHeadersInst
 	}
-	tokenPostArgs := make(map[string]interface{})
+	tokenPostArgs := make(map[string]string)
 	for tokenPostArgsKey := range r.Config.Oauth.TokenPostArgs {
-		var tokenPostArgsInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.Oauth.TokenPostArgs[tokenPostArgsKey].ValueString()), &tokenPostArgsInst)
+		var tokenPostArgsInst string
+		tokenPostArgsInst = r.Config.Oauth.TokenPostArgs[tokenPostArgsKey].ValueString()
+
 		tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
 	}
 	username1 := new(string)
@@ -877,6 +993,7 @@ func (r *PluginUpstreamOauthResourceModel) ToSharedUpstreamOauthPlugin(ctx conte
 		}
 	}
 	out := shared.UpstreamOauthPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

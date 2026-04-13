@@ -15,10 +15,11 @@ func (r *PluginBotDetectionResourceModel) RefreshFromSharedBotDetectionPlugin(ct
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
-			r.Config = &tfTypes.BotDetectionPluginConfig{}
+			r.Config = &tfTypes.AiMcpProxyPluginACL{}
 			r.Config.Allow = make([]types.String, 0, len(resp.Config.Allow))
 			for _, v := range resp.Config.Allow {
 				r.Config.Allow = append(r.Config.Allow, types.StringValue(v))
@@ -179,6 +180,12 @@ func (r *PluginBotDetectionResourceModel) ToOperationsUpdateBotdetectionPluginRe
 func (r *PluginBotDetectionResourceModel) ToSharedBotDetectionPlugin(ctx context.Context) (*shared.BotDetectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -313,6 +320,7 @@ func (r *PluginBotDetectionResourceModel) ToSharedBotDetectionPlugin(ctx context
 		}
 	}
 	out := shared.BotDetectionPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

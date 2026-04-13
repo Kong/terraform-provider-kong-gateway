@@ -7,6 +7,7 @@ import (
 )
 
 type AiAwsGuardrailsPluginConfig struct {
+	AllowMasking       types.Bool    `tfsdk:"allow_masking"`
 	AwsAccessKeyID     types.String  `tfsdk:"aws_access_key_id"`
 	AwsAssumeRoleArn   types.String  `tfsdk:"aws_assume_role_arn"`
 	AwsRegion          types.String  `tfsdk:"aws_region"`
@@ -16,7 +17,9 @@ type AiAwsGuardrailsPluginConfig struct {
 	GuardingMode       types.String  `tfsdk:"guarding_mode"`
 	GuardrailsID       types.String  `tfsdk:"guardrails_id"`
 	GuardrailsVersion  types.String  `tfsdk:"guardrails_version"`
+	LogBlockedContent  types.Bool    `tfsdk:"log_blocked_content"`
 	ResponseBufferSize types.Float64 `tfsdk:"response_buffer_size"`
+	SslVerify          types.Bool    `tfsdk:"ssl_verify"`
 	StopOnError        types.Bool    `tfsdk:"stop_on_error"`
 	TextSource         types.String  `tfsdk:"text_source"`
 	Timeout            types.Float64 `tfsdk:"timeout"`

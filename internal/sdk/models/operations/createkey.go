@@ -9,7 +9,7 @@ import (
 )
 
 type CreateKeyRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Key for creation
 	Key shared.Key `request:"mediaType=application/json"`

@@ -123,26 +123,147 @@ func (d *DatakitPluginPartials) GetPath() *string {
 	return d.Path
 }
 
-type DatakitPluginNodesConfig7Type string
+type DatakitPluginNodesConfig12Type string
 
 const (
-	DatakitPluginNodesConfig7TypeStatic DatakitPluginNodesConfig7Type = "static"
+	DatakitPluginNodesConfig12TypeXMLToJSON DatakitPluginNodesConfig12Type = "xml_to_json"
 )
 
-func (e DatakitPluginNodesConfig7Type) ToPointer() *DatakitPluginNodesConfig7Type {
+func (e DatakitPluginNodesConfig12Type) ToPointer() *DatakitPluginNodesConfig12Type {
 	return &e
 }
-func (e *DatakitPluginNodesConfig7Type) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesConfig12Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "xml_to_json":
+		*e = DatakitPluginNodesConfig12Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig12Type: %v", v)
+	}
+}
+
+// XMLToJSON - convert XML to JSON
+type XMLToJSON struct {
+	AttributesBlockName  *string `json:"attributes_block_name,omitempty"`
+	AttributesNamePrefix *string `json:"attributes_name_prefix,omitempty"`
+	// XML document string
+	Input *string `json:"input,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// a map object converted from XML document. If connected to `request.body` or `response.body`, the output will be a JSON object.
+	Output         *string                         `json:"output,omitempty"`
+	RecognizeType  *bool                           `json:"recognize_type,omitempty"`
+	TextAsProperty *bool                           `json:"text_as_property,omitempty"`
+	TextBlockName  *string                         `json:"text_block_name,omitempty"`
+	Type           *DatakitPluginNodesConfig12Type `json:"type,omitempty"`
+	Xpath          *string                         `json:"xpath,omitempty"`
+}
+
+func (x XMLToJSON) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(x, "", false)
+}
+
+func (x *XMLToJSON) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &x, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (x *XMLToJSON) GetAttributesBlockName() *string {
+	if x == nil {
+		return nil
+	}
+	return x.AttributesBlockName
+}
+
+func (x *XMLToJSON) GetAttributesNamePrefix() *string {
+	if x == nil {
+		return nil
+	}
+	return x.AttributesNamePrefix
+}
+
+func (x *XMLToJSON) GetInput() *string {
+	if x == nil {
+		return nil
+	}
+	return x.Input
+}
+
+func (x *XMLToJSON) GetName() *string {
+	if x == nil {
+		return nil
+	}
+	return x.Name
+}
+
+func (x *XMLToJSON) GetOutput() *string {
+	if x == nil {
+		return nil
+	}
+	return x.Output
+}
+
+func (x *XMLToJSON) GetRecognizeType() *bool {
+	if x == nil {
+		return nil
+	}
+	return x.RecognizeType
+}
+
+func (x *XMLToJSON) GetTextAsProperty() *bool {
+	if x == nil {
+		return nil
+	}
+	return x.TextAsProperty
+}
+
+func (x *XMLToJSON) GetTextBlockName() *string {
+	if x == nil {
+		return nil
+	}
+	return x.TextBlockName
+}
+
+func (x *XMLToJSON) GetType() *DatakitPluginNodesConfig12Type {
+	if x == nil {
+		return nil
+	}
+	return x.Type
+}
+
+func (x *XMLToJSON) GetXpath() *string {
+	if x == nil {
+		return nil
+	}
+	return x.Xpath
+}
+
+type DatakitPluginNodesConfig11Type string
+
+const (
+	DatakitPluginNodesConfig11TypeStatic DatakitPluginNodesConfig11Type = "static"
+)
+
+func (e DatakitPluginNodesConfig11Type) ToPointer() *DatakitPluginNodesConfig11Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig11Type) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "static":
-		*e = DatakitPluginNodesConfig7Type(v)
+		*e = DatakitPluginNodesConfig11Type(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for DatakitPluginNodesConfig7Type: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig11Type: %v", v)
 	}
 }
 
@@ -153,10 +274,10 @@ type Static struct {
 	// The entire `.values` map
 	Output *string `json:"output,omitempty"`
 	// Individual items from `.values`, referenced by key
-	Outputs map[string]any                 `json:"outputs,omitempty"`
-	Type    *DatakitPluginNodesConfig7Type `json:"type,omitempty"`
+	Outputs map[string]string               `json:"outputs,omitempty"`
+	Type    *DatakitPluginNodesConfig11Type `json:"type,omitempty"`
 	// An object with string keys and freeform values
-	Values string `json:"values"`
+	Values any `json:"values"`
 }
 
 func (s Static) MarshalJSON() ([]byte, error) {
@@ -184,23 +305,23 @@ func (s *Static) GetOutput() *string {
 	return s.Output
 }
 
-func (s *Static) GetOutputs() map[string]any {
+func (s *Static) GetOutputs() map[string]string {
 	if s == nil {
 		return nil
 	}
 	return s.Outputs
 }
 
-func (s *Static) GetType() *DatakitPluginNodesConfig7Type {
+func (s *Static) GetType() *DatakitPluginNodesConfig11Type {
 	if s == nil {
 		return nil
 	}
 	return s.Type
 }
 
-func (s *Static) GetValues() string {
+func (s *Static) GetValues() any {
 	if s == nil {
-		return ""
+		return nil
 	}
 	return s.Values
 }
@@ -235,26 +356,26 @@ func (e *NodesContentType) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type DatakitPluginNodesConfig6Type string
+type DatakitPluginNodesConfig10Type string
 
 const (
-	DatakitPluginNodesConfig6TypeProperty DatakitPluginNodesConfig6Type = "property"
+	DatakitPluginNodesConfig10TypeProperty DatakitPluginNodesConfig10Type = "property"
 )
 
-func (e DatakitPluginNodesConfig6Type) ToPointer() *DatakitPluginNodesConfig6Type {
+func (e DatakitPluginNodesConfig10Type) ToPointer() *DatakitPluginNodesConfig10Type {
 	return &e
 }
-func (e *DatakitPluginNodesConfig6Type) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesConfig10Type) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "property":
-		*e = DatakitPluginNodesConfig6Type(v)
+		*e = DatakitPluginNodesConfig10Type(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for DatakitPluginNodesConfig6Type: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig10Type: %v", v)
 	}
 }
 
@@ -269,8 +390,8 @@ type Property struct {
 	// Property output. This can be connected regardless of whether the node is operating in GET mode or SET mode.
 	Output *string `json:"output,omitempty"`
 	// The property name to get/set
-	Property string                         `json:"property"`
-	Type     *DatakitPluginNodesConfig6Type `json:"type,omitempty"`
+	Property string                          `json:"property"`
+	Type     *DatakitPluginNodesConfig10Type `json:"type,omitempty"`
 }
 
 func (p Property) MarshalJSON() ([]byte, error) {
@@ -319,11 +440,818 @@ func (p *Property) GetProperty() string {
 	return p.Property
 }
 
-func (p *Property) GetType() *DatakitPluginNodesConfig6Type {
+func (p *Property) GetType() *DatakitPluginNodesConfig10Type {
 	if p == nil {
 		return nil
 	}
 	return p.Type
+}
+
+type AllowedAlgorithms string
+
+const (
+	AllowedAlgorithmsEs256 AllowedAlgorithms = "ES256"
+	AllowedAlgorithmsEs384 AllowedAlgorithms = "ES384"
+	AllowedAlgorithmsEs512 AllowedAlgorithms = "ES512"
+	AllowedAlgorithmsEdDsa AllowedAlgorithms = "EdDSA"
+	AllowedAlgorithmsHs256 AllowedAlgorithms = "HS256"
+	AllowedAlgorithmsHs384 AllowedAlgorithms = "HS384"
+	AllowedAlgorithmsHs512 AllowedAlgorithms = "HS512"
+	AllowedAlgorithmsPs256 AllowedAlgorithms = "PS256"
+	AllowedAlgorithmsPs384 AllowedAlgorithms = "PS384"
+	AllowedAlgorithmsPs512 AllowedAlgorithms = "PS512"
+	AllowedAlgorithmsRs256 AllowedAlgorithms = "RS256"
+	AllowedAlgorithmsRs384 AllowedAlgorithms = "RS384"
+	AllowedAlgorithmsRs512 AllowedAlgorithms = "RS512"
+)
+
+func (e AllowedAlgorithms) ToPointer() *AllowedAlgorithms {
+	return &e
+}
+func (e *AllowedAlgorithms) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ES256":
+		fallthrough
+	case "ES384":
+		fallthrough
+	case "ES512":
+		fallthrough
+	case "EdDSA":
+		fallthrough
+	case "HS256":
+		fallthrough
+	case "HS384":
+		fallthrough
+	case "HS512":
+		fallthrough
+	case "PS256":
+		fallthrough
+	case "PS384":
+		fallthrough
+	case "PS512":
+		fallthrough
+	case "RS256":
+		fallthrough
+	case "RS384":
+		fallthrough
+	case "RS512":
+		*e = AllowedAlgorithms(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AllowedAlgorithms: %v", v)
+	}
+}
+
+// DatakitPluginNodesConfig9Inputs - jwt_verify node inputs
+type DatakitPluginNodesConfig9Inputs struct {
+	// Verification key: JWKS, JWK, PEM string, or HMAC secret
+	Key *string `json:"key,omitempty"`
+	// JWT token (with or without Bearer prefix)
+	Token *string `json:"token,omitempty"`
+}
+
+func (d DatakitPluginNodesConfig9Inputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesConfig9Inputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesConfig9Inputs) GetKey() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Key
+}
+
+func (d *DatakitPluginNodesConfig9Inputs) GetToken() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Token
+}
+
+// #region class-body-datakitpluginnodesconfig9inputs
+// #endregion class-body-datakitpluginnodesconfig9inputs
+
+// DatakitPluginNodesConfig9Outputs - jwt_verify node outputs
+type DatakitPluginNodesConfig9Outputs struct {
+	// JWT payload claims
+	Claims *string `json:"claims,omitempty"`
+	// JWT header
+	Header *string `json:"header,omitempty"`
+}
+
+func (d DatakitPluginNodesConfig9Outputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesConfig9Outputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesConfig9Outputs) GetClaims() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Claims
+}
+
+func (d *DatakitPluginNodesConfig9Outputs) GetHeader() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Header
+}
+
+// #region class-body-datakitpluginnodesconfig9outputs
+// #endregion class-body-datakitpluginnodesconfig9outputs
+
+type DatakitPluginNodesConfig9Type string
+
+const (
+	DatakitPluginNodesConfig9TypeJwtVerify DatakitPluginNodesConfig9Type = "jwt_verify"
+)
+
+func (e DatakitPluginNodesConfig9Type) ToPointer() *DatakitPluginNodesConfig9Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig9Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "jwt_verify":
+		*e = DatakitPluginNodesConfig9Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig9Type: %v", v)
+	}
+}
+
+// JwtVerify - Verify JWT signature and validate claims
+type JwtVerify struct {
+	// Allowed signing algorithms (empty = any supported)
+	AllowedAlgorithms []AllowedAlgorithms `json:"allowed_algorithms,omitempty"`
+	// Allowed audiences (empty = any)
+	Audiences []string `json:"audiences,omitempty"`
+	// jwt_verify node input
+	Input *string `json:"input,omitempty"`
+	// jwt_verify node inputs
+	Inputs *DatakitPluginNodesConfig9Inputs `json:"inputs,omitempty"`
+	// Allowed issuers (empty = any)
+	Issuers []string `json:"issuers,omitempty"`
+	// Allowed clock skew in seconds for exp/nbf validation
+	Leeway *int64 `json:"leeway,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// jwt_verify node output
+	Output *string `json:"output,omitempty"`
+	// jwt_verify node outputs
+	Outputs *DatakitPluginNodesConfig9Outputs `json:"outputs,omitempty"`
+	// Claims that must be present
+	RequiredClaims []string                       `json:"required_claims,omitempty"`
+	Type           *DatakitPluginNodesConfig9Type `json:"type,omitempty"`
+	// Validate expiration claim
+	ValidateExp *bool `json:"validate_exp,omitempty"`
+	// Validate not-before claim
+	ValidateNbf *bool `json:"validate_nbf,omitempty"`
+}
+
+func (j JwtVerify) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JwtVerify) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *JwtVerify) GetAllowedAlgorithms() []AllowedAlgorithms {
+	if j == nil {
+		return nil
+	}
+	return j.AllowedAlgorithms
+}
+
+func (j *JwtVerify) GetAudiences() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Audiences
+}
+
+func (j *JwtVerify) GetInput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Input
+}
+
+func (j *JwtVerify) GetInputs() *DatakitPluginNodesConfig9Inputs {
+	if j == nil {
+		return nil
+	}
+	return j.Inputs
+}
+
+func (j *JwtVerify) GetIssuers() []string {
+	if j == nil {
+		return nil
+	}
+	return j.Issuers
+}
+
+func (j *JwtVerify) GetLeeway() *int64 {
+	if j == nil {
+		return nil
+	}
+	return j.Leeway
+}
+
+func (j *JwtVerify) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JwtVerify) GetOutput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Output
+}
+
+func (j *JwtVerify) GetOutputs() *DatakitPluginNodesConfig9Outputs {
+	if j == nil {
+		return nil
+	}
+	return j.Outputs
+}
+
+func (j *JwtVerify) GetRequiredClaims() []string {
+	if j == nil {
+		return nil
+	}
+	return j.RequiredClaims
+}
+
+func (j *JwtVerify) GetType() *DatakitPluginNodesConfig9Type {
+	if j == nil {
+		return nil
+	}
+	return j.Type
+}
+
+func (j *JwtVerify) GetValidateExp() *bool {
+	if j == nil {
+		return nil
+	}
+	return j.ValidateExp
+}
+
+func (j *JwtVerify) GetValidateNbf() *bool {
+	if j == nil {
+		return nil
+	}
+	return j.ValidateNbf
+}
+
+// NodesAlgorithm - Signing algorithm
+type NodesAlgorithm string
+
+const (
+	NodesAlgorithmEs256 NodesAlgorithm = "ES256"
+	NodesAlgorithmEs384 NodesAlgorithm = "ES384"
+	NodesAlgorithmEs512 NodesAlgorithm = "ES512"
+	NodesAlgorithmEdDsa NodesAlgorithm = "EdDSA"
+	NodesAlgorithmHs256 NodesAlgorithm = "HS256"
+	NodesAlgorithmHs384 NodesAlgorithm = "HS384"
+	NodesAlgorithmHs512 NodesAlgorithm = "HS512"
+	NodesAlgorithmPs256 NodesAlgorithm = "PS256"
+	NodesAlgorithmPs384 NodesAlgorithm = "PS384"
+	NodesAlgorithmPs512 NodesAlgorithm = "PS512"
+	NodesAlgorithmRs256 NodesAlgorithm = "RS256"
+	NodesAlgorithmRs384 NodesAlgorithm = "RS384"
+	NodesAlgorithmRs512 NodesAlgorithm = "RS512"
+)
+
+func (e NodesAlgorithm) ToPointer() *NodesAlgorithm {
+	return &e
+}
+func (e *NodesAlgorithm) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ES256":
+		fallthrough
+	case "ES384":
+		fallthrough
+	case "ES512":
+		fallthrough
+	case "EdDSA":
+		fallthrough
+	case "HS256":
+		fallthrough
+	case "HS384":
+		fallthrough
+	case "HS512":
+		fallthrough
+	case "PS256":
+		fallthrough
+	case "PS384":
+		fallthrough
+	case "PS512":
+		fallthrough
+	case "RS256":
+		fallthrough
+	case "RS384":
+		fallthrough
+	case "RS512":
+		*e = NodesAlgorithm(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for NodesAlgorithm: %v", v)
+	}
+}
+
+// DatakitPluginNodesConfigInputs - jwt_sign node inputs
+type DatakitPluginNodesConfigInputs struct {
+	// Dynamic claims to include
+	Claims *string `json:"claims,omitempty"`
+	// Signing key (PEM, JWK JSON string, or HMAC secret)
+	Key *string `json:"key,omitempty"`
+}
+
+func (d DatakitPluginNodesConfigInputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesConfigInputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesConfigInputs) GetClaims() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Claims
+}
+
+func (d *DatakitPluginNodesConfigInputs) GetKey() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Key
+}
+
+// DatakitPluginNodesConfig8Outputs - jwt_sign node outputs
+type DatakitPluginNodesConfig8Outputs struct {
+	// Complete claims used
+	Claims *string `json:"claims,omitempty"`
+	// JWT header
+	Header *string `json:"header,omitempty"`
+	// Signed JWT
+	Token *string `json:"token,omitempty"`
+}
+
+func (d DatakitPluginNodesConfig8Outputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesConfig8Outputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesConfig8Outputs) GetClaims() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Claims
+}
+
+func (d *DatakitPluginNodesConfig8Outputs) GetHeader() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Header
+}
+
+func (d *DatakitPluginNodesConfig8Outputs) GetToken() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Token
+}
+
+// #region class-body-datakitpluginnodesconfig8outputs
+// #endregion class-body-datakitpluginnodesconfig8outputs
+
+type DatakitPluginNodesConfig8Type string
+
+const (
+	DatakitPluginNodesConfig8TypeJwtSign DatakitPluginNodesConfig8Type = "jwt_sign"
+)
+
+func (e DatakitPluginNodesConfig8Type) ToPointer() *DatakitPluginNodesConfig8Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig8Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "jwt_sign":
+		*e = DatakitPluginNodesConfig8Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig8Type: %v", v)
+	}
+}
+
+// JwtSign - Create and sign a JWT
+type JwtSign struct {
+	// Signing algorithm
+	Algorithm NodesAlgorithm `json:"algorithm"`
+	// Seconds until token expires (for exp claim)
+	ExpiresIn *int64 `json:"expires_in,omitempty"`
+	// jwt_sign node input
+	Input *string `json:"input,omitempty"`
+	// jwt_sign node inputs
+	Inputs *DatakitPluginNodesConfigInputs `json:"inputs,omitempty"`
+	// Key ID for header
+	Kid *string `json:"kid,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// Seconds until token becomes valid (for nbf claim)
+	NotBefore *int64 `json:"not_before,omitempty"`
+	// jwt_sign node output
+	Output *string `json:"output,omitempty"`
+	// jwt_sign node outputs
+	Outputs *DatakitPluginNodesConfig8Outputs `json:"outputs,omitempty"`
+	// Static claims always included
+	StaticClaims map[string]string `json:"static_claims,omitempty"`
+	// Token type for header
+	Typ  *string                        `json:"typ,omitempty"`
+	Type *DatakitPluginNodesConfig8Type `json:"type,omitempty"`
+}
+
+func (j JwtSign) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JwtSign) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, []string{"algorithm"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *JwtSign) GetAlgorithm() NodesAlgorithm {
+	if j == nil {
+		return NodesAlgorithm("")
+	}
+	return j.Algorithm
+}
+
+func (j *JwtSign) GetExpiresIn() *int64 {
+	if j == nil {
+		return nil
+	}
+	return j.ExpiresIn
+}
+
+func (j *JwtSign) GetInput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Input
+}
+
+func (j *JwtSign) GetInputs() *DatakitPluginNodesConfigInputs {
+	if j == nil {
+		return nil
+	}
+	return j.Inputs
+}
+
+func (j *JwtSign) GetKid() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Kid
+}
+
+func (j *JwtSign) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JwtSign) GetNotBefore() *int64 {
+	if j == nil {
+		return nil
+	}
+	return j.NotBefore
+}
+
+func (j *JwtSign) GetOutput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Output
+}
+
+func (j *JwtSign) GetOutputs() *DatakitPluginNodesConfig8Outputs {
+	if j == nil {
+		return nil
+	}
+	return j.Outputs
+}
+
+func (j *JwtSign) GetStaticClaims() map[string]string {
+	if j == nil {
+		return nil
+	}
+	return j.StaticClaims
+}
+
+func (j *JwtSign) GetTyp() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Typ
+}
+
+func (j *JwtSign) GetType() *DatakitPluginNodesConfig8Type {
+	if j == nil {
+		return nil
+	}
+	return j.Type
+}
+
+// DatakitPluginNodesConfigOutputs - jwt_decode node outputs
+type DatakitPluginNodesConfigOutputs struct {
+	// Decoded JWT header (alg, kid, typ)
+	Header *string `json:"header,omitempty"`
+	// Decoded JWT payload (claims)
+	Payload *string `json:"payload,omitempty"`
+	// Raw signature (base64url encoded)
+	Signature *string `json:"signature,omitempty"`
+}
+
+func (d DatakitPluginNodesConfigOutputs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginNodesConfigOutputs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginNodesConfigOutputs) GetHeader() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Header
+}
+
+func (d *DatakitPluginNodesConfigOutputs) GetPayload() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Payload
+}
+
+func (d *DatakitPluginNodesConfigOutputs) GetSignature() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Signature
+}
+
+type DatakitPluginNodesConfig7Type string
+
+const (
+	DatakitPluginNodesConfig7TypeJwtDecode DatakitPluginNodesConfig7Type = "jwt_decode"
+)
+
+func (e DatakitPluginNodesConfig7Type) ToPointer() *DatakitPluginNodesConfig7Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig7Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "jwt_decode":
+		*e = DatakitPluginNodesConfig7Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig7Type: %v", v)
+	}
+}
+
+// JwtDecode - Decode JWT without signature verification
+type JwtDecode struct {
+	// JWT token (with or without Bearer prefix)
+	Input *string `json:"input,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// jwt_decode node output
+	Output *string `json:"output,omitempty"`
+	// jwt_decode node outputs
+	Outputs *DatakitPluginNodesConfigOutputs `json:"outputs,omitempty"`
+	Type    *DatakitPluginNodesConfig7Type   `json:"type,omitempty"`
+}
+
+func (j JwtDecode) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JwtDecode) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *JwtDecode) GetInput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Input
+}
+
+func (j *JwtDecode) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JwtDecode) GetOutput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Output
+}
+
+func (j *JwtDecode) GetOutputs() *DatakitPluginNodesConfigOutputs {
+	if j == nil {
+		return nil
+	}
+	return j.Outputs
+}
+
+func (j *JwtDecode) GetType() *DatakitPluginNodesConfig7Type {
+	if j == nil {
+		return nil
+	}
+	return j.Type
+}
+
+type DatakitPluginNodesConfig6Type string
+
+const (
+	DatakitPluginNodesConfig6TypeJSONToXML DatakitPluginNodesConfig6Type = "json_to_xml"
+)
+
+func (e DatakitPluginNodesConfig6Type) ToPointer() *DatakitPluginNodesConfig6Type {
+	return &e
+}
+func (e *DatakitPluginNodesConfig6Type) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "json_to_xml":
+		*e = DatakitPluginNodesConfig6Type(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig6Type: %v", v)
+	}
+}
+
+// JSONToXML - transform JSON or lua table to XML
+type JSONToXML struct {
+	AttributesBlockName  *string `json:"attributes_block_name,omitempty"`
+	AttributesNamePrefix *string `json:"attributes_name_prefix,omitempty"`
+	// JSON string or table
+	Input *string `json:"input,omitempty"`
+	// JSON string or table
+	Inputs map[string]string `json:"inputs,omitempty"`
+	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
+	Name *string `json:"name,omitempty"`
+	// XML document converted from JSON
+	Output          *string `json:"output,omitempty"`
+	RootElementName *string `json:"root_element_name,omitempty"`
+	// The name of the block to treat as XML text content.
+	TextBlockName *string                        `json:"text_block_name,omitempty"`
+	Type          *DatakitPluginNodesConfig6Type `json:"type,omitempty"`
+}
+
+func (j JSONToXML) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(j, "", false)
+}
+
+func (j *JSONToXML) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &j, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (j *JSONToXML) GetAttributesBlockName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.AttributesBlockName
+}
+
+func (j *JSONToXML) GetAttributesNamePrefix() *string {
+	if j == nil {
+		return nil
+	}
+	return j.AttributesNamePrefix
+}
+
+func (j *JSONToXML) GetInput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Input
+}
+
+func (j *JSONToXML) GetInputs() map[string]string {
+	if j == nil {
+		return nil
+	}
+	return j.Inputs
+}
+
+func (j *JSONToXML) GetName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Name
+}
+
+func (j *JSONToXML) GetOutput() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Output
+}
+
+func (j *JSONToXML) GetRootElementName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.RootElementName
+}
+
+func (j *JSONToXML) GetTextBlockName() *string {
+	if j == nil {
+		return nil
+	}
+	return j.TextBlockName
+}
+
+func (j *JSONToXML) GetType() *DatakitPluginNodesConfig6Type {
+	if j == nil {
+		return nil
+	}
+	return j.Type
 }
 
 type DatakitPluginNodesConfig5Type string
@@ -354,7 +1282,7 @@ type Jq struct {
 	// filter input(s)
 	Input *string `json:"input,omitempty"`
 	// filter input(s)
-	Inputs map[string]any `json:"inputs,omitempty"`
+	Inputs map[string]string `json:"inputs,omitempty"`
 	// The jq filter text. Refer to https://jqlang.org/manual/ for full documentation.
 	Jq string `json:"jq"`
 	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
@@ -382,7 +1310,7 @@ func (j *Jq) GetInput() *string {
 	return j.Input
 }
 
-func (j *Jq) GetInputs() map[string]any {
+func (j *Jq) GetInputs() map[string]string {
 	if j == nil {
 		return nil
 	}
@@ -450,26 +1378,26 @@ func (d *DatakitPluginNodesInputs) GetHeaders() *string {
 	return d.Headers
 }
 
-type DatakitPluginNodesConfigType string
+type DatakitPluginNodesConfig4Type string
 
 const (
-	DatakitPluginNodesConfigTypeExit DatakitPluginNodesConfigType = "exit"
+	DatakitPluginNodesConfig4TypeExit DatakitPluginNodesConfig4Type = "exit"
 )
 
-func (e DatakitPluginNodesConfigType) ToPointer() *DatakitPluginNodesConfigType {
+func (e DatakitPluginNodesConfig4Type) ToPointer() *DatakitPluginNodesConfig4Type {
 	return &e
 }
-func (e *DatakitPluginNodesConfigType) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesConfig4Type) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "exit":
-		*e = DatakitPluginNodesConfigType(v)
+		*e = DatakitPluginNodesConfig4Type(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for DatakitPluginNodesConfigType: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfig4Type: %v", v)
 	}
 }
 
@@ -482,9 +1410,9 @@ type Exit struct {
 	// A label that uniquely identifies the node within the plugin configuration so that it can be used for input/output connections. Must be valid `snake_case` or `kebab-case`.
 	Name *string `json:"name,omitempty"`
 	// HTTP status code
-	Status          *int64                        `json:"status,omitempty"`
-	Type            *DatakitPluginNodesConfigType `json:"type,omitempty"`
-	WarnHeadersSent *bool                         `json:"warn_headers_sent,omitempty"`
+	Status          *int64                         `json:"status,omitempty"`
+	Type            *DatakitPluginNodesConfig4Type `json:"type,omitempty"`
+	WarnHeadersSent *bool                          `json:"warn_headers_sent,omitempty"`
 }
 
 func (e Exit) MarshalJSON() ([]byte, error) {
@@ -526,7 +1454,7 @@ func (e *Exit) GetStatus() *int64 {
 	return e.Status
 }
 
-func (e *Exit) GetType() *DatakitPluginNodesConfigType {
+func (e *Exit) GetType() *DatakitPluginNodesConfig4Type {
 	if e == nil {
 		return nil
 	}
@@ -546,8 +1474,18 @@ type NodesInputs struct {
 	Body *string `json:"body,omitempty"`
 	// HTTP request headers
 	Headers *string `json:"headers,omitempty"`
+	// The HTTP proxy URL. This proxy server will be used for HTTP requests.
+	HTTPProxy *string `json:"http_proxy,omitempty"`
+	// The HTTPS proxy URL. This proxy server will be used for HTTPS requests.
+	HTTPSProxy *string `json:"https_proxy,omitempty"`
+	// The password to authenticate with, if the forward proxy is protected by basic authentication.
+	ProxyAuthPassword *string `json:"proxy_auth_password,omitempty"`
+	// The username to authenticate with, if the forward proxy is protected by basic authentication.
+	ProxyAuthUsername *string `json:"proxy_auth_username,omitempty"`
 	// HTTP request query
 	Query *string `json:"query,omitempty"`
+	// HTTP request URL
+	URL *string `json:"url,omitempty"`
 }
 
 func (n NodesInputs) MarshalJSON() ([]byte, error) {
@@ -575,11 +1513,46 @@ func (n *NodesInputs) GetHeaders() *string {
 	return n.Headers
 }
 
+func (n *NodesInputs) GetHTTPProxy() *string {
+	if n == nil {
+		return nil
+	}
+	return n.HTTPProxy
+}
+
+func (n *NodesInputs) GetHTTPSProxy() *string {
+	if n == nil {
+		return nil
+	}
+	return n.HTTPSProxy
+}
+
+func (n *NodesInputs) GetProxyAuthPassword() *string {
+	if n == nil {
+		return nil
+	}
+	return n.ProxyAuthPassword
+}
+
+func (n *NodesInputs) GetProxyAuthUsername() *string {
+	if n == nil {
+		return nil
+	}
+	return n.ProxyAuthUsername
+}
+
 func (n *NodesInputs) GetQuery() *string {
 	if n == nil {
 		return nil
 	}
 	return n.Query
+}
+
+func (n *NodesInputs) GetURL() *string {
+	if n == nil {
+		return nil
+	}
+	return n.URL
 }
 
 // DatakitPluginNodesOutputs - call node outputs
@@ -588,6 +1561,8 @@ type DatakitPluginNodesOutputs struct {
 	Body *string `json:"body,omitempty"`
 	// HTTP response headers
 	Headers *string `json:"headers,omitempty"`
+	// The raw, non-decoded HTTP response body
+	RawBody *string `json:"raw_body,omitempty"`
 	// HTTP response status code
 	Status *string `json:"status,omitempty"`
 }
@@ -617,6 +1592,13 @@ func (d *DatakitPluginNodesOutputs) GetHeaders() *string {
 	return d.Headers
 }
 
+func (d *DatakitPluginNodesOutputs) GetRawBody() *string {
+	if d == nil {
+		return nil
+	}
+	return d.RawBody
+}
+
 func (d *DatakitPluginNodesOutputs) GetStatus() *string {
 	if d == nil {
 		return nil
@@ -624,26 +1606,26 @@ func (d *DatakitPluginNodesOutputs) GetStatus() *string {
 	return d.Status
 }
 
-type DatakitPluginNodesType string
+type DatakitPluginNodesConfigType string
 
 const (
-	DatakitPluginNodesTypeCall DatakitPluginNodesType = "call"
+	DatakitPluginNodesConfigTypeCall DatakitPluginNodesConfigType = "call"
 )
 
-func (e DatakitPluginNodesType) ToPointer() *DatakitPluginNodesType {
+func (e DatakitPluginNodesConfigType) ToPointer() *DatakitPluginNodesConfigType {
 	return &e
 }
-func (e *DatakitPluginNodesType) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesConfigType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "call":
-		*e = DatakitPluginNodesType(v)
+		*e = DatakitPluginNodesConfigType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for DatakitPluginNodesType: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesConfigType: %v", v)
 	}
 }
 
@@ -663,11 +1645,13 @@ type Call struct {
 	Outputs *DatakitPluginNodesOutputs `json:"outputs,omitempty"`
 	// A string representing an SNI (server name indication) value for TLS.
 	SslServerName *string `json:"ssl_server_name,omitempty"`
+	// Whether to verify the TLS certificate when making HTTPS requests.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
-	Timeout *int64                  `json:"timeout,omitempty"`
-	Type    *DatakitPluginNodesType `json:"type,omitempty"`
+	Timeout *int64                        `json:"timeout,omitempty"`
+	Type    *DatakitPluginNodesConfigType `json:"type,omitempty"`
 	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
-	URL string `json:"url"`
+	URL *string `json:"url,omitempty"`
 }
 
 func (c Call) MarshalJSON() ([]byte, error) {
@@ -675,7 +1659,7 @@ func (c Call) MarshalJSON() ([]byte, error) {
 }
 
 func (c *Call) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"url"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
 		return err
 	}
 	return nil
@@ -730,6 +1714,13 @@ func (c *Call) GetSslServerName() *string {
 	return c.SslServerName
 }
 
+func (c *Call) GetSslVerify() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.SslVerify
+}
+
 func (c *Call) GetTimeout() *int64 {
 	if c == nil {
 		return nil
@@ -737,16 +1728,16 @@ func (c *Call) GetTimeout() *int64 {
 	return c.Timeout
 }
 
-func (c *Call) GetType() *DatakitPluginNodesType {
+func (c *Call) GetType() *DatakitPluginNodesConfigType {
 	if c == nil {
 		return nil
 	}
 	return c.Type
 }
 
-func (c *Call) GetURL() string {
+func (c *Call) GetURL() *string {
 	if c == nil {
-		return ""
+		return nil
 	}
 	return c.URL
 }
@@ -844,26 +1835,26 @@ func (n *NodesOutputs) GetStored() *string {
 	return n.Stored
 }
 
-type NodesType string
+type DatakitPluginNodesType string
 
 const (
-	NodesTypeCache NodesType = "cache"
+	DatakitPluginNodesTypeCache DatakitPluginNodesType = "cache"
 )
 
-func (e NodesType) ToPointer() *NodesType {
+func (e DatakitPluginNodesType) ToPointer() *DatakitPluginNodesType {
 	return &e
 }
-func (e *NodesType) UnmarshalJSON(data []byte) error {
+func (e *DatakitPluginNodesType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "cache":
-		*e = NodesType(v)
+		*e = DatakitPluginNodesType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for NodesType: %v", v)
+		return fmt.Errorf("invalid value for DatakitPluginNodesType: %v", v)
 	}
 }
 
@@ -879,9 +1870,9 @@ type NodesCache struct {
 	// cache node output
 	Output *string `json:"output,omitempty"`
 	// cache node outputs
-	Outputs *NodesOutputs `json:"outputs,omitempty"`
-	TTL     *int64        `json:"ttl,omitempty"`
-	Type    *NodesType    `json:"type,omitempty"`
+	Outputs *NodesOutputs           `json:"outputs,omitempty"`
+	TTL     *int64                  `json:"ttl,omitempty"`
+	Type    *DatakitPluginNodesType `json:"type,omitempty"`
 }
 
 func (n NodesCache) MarshalJSON() ([]byte, error) {
@@ -944,7 +1935,7 @@ func (n *NodesCache) GetTTL() *int64 {
 	return n.TTL
 }
 
-func (n *NodesCache) GetType() *NodesType {
+func (n *NodesCache) GetType() *DatakitPluginNodesType {
 	if n == nil {
 		return nil
 	}
@@ -984,26 +1975,26 @@ func (o *Outputs) GetThen() *string {
 	return o.Then
 }
 
-type DatakitPluginNodesConfig1Type string
+type NodesType string
 
 const (
-	DatakitPluginNodesConfig1TypeBranch DatakitPluginNodesConfig1Type = "branch"
+	NodesTypeBranch NodesType = "branch"
 )
 
-func (e DatakitPluginNodesConfig1Type) ToPointer() *DatakitPluginNodesConfig1Type {
+func (e NodesType) ToPointer() *NodesType {
 	return &e
 }
-func (e *DatakitPluginNodesConfig1Type) UnmarshalJSON(data []byte) error {
+func (e *NodesType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	switch v {
 	case "branch":
-		*e = DatakitPluginNodesConfig1Type(v)
+		*e = NodesType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for DatakitPluginNodesConfig1Type: %v", v)
+		return fmt.Errorf("invalid value for NodesType: %v", v)
 	}
 }
 
@@ -1020,8 +2011,8 @@ type Branch struct {
 	// branch node outputs
 	Outputs *Outputs `json:"outputs,omitempty"`
 	// nodes to execute if the input condition is `true`
-	Then []string                       `json:"then,omitempty"`
-	Type *DatakitPluginNodesConfig1Type `json:"type,omitempty"`
+	Then []string   `json:"then,omitempty"`
+	Type *NodesType `json:"type,omitempty"`
 }
 
 func (b Branch) MarshalJSON() ([]byte, error) {
@@ -1077,7 +2068,7 @@ func (b *Branch) GetThen() []string {
 	return b.Then
 }
 
-func (b *Branch) GetType() *DatakitPluginNodesConfig1Type {
+func (b *Branch) GetType() *NodesType {
 	if b == nil {
 		return nil
 	}
@@ -1092,8 +2083,13 @@ const (
 	NodesUnionTypeCall       NodesUnionType = "call"
 	NodesUnionTypeExit       NodesUnionType = "exit"
 	NodesUnionTypeJq         NodesUnionType = "jq"
+	NodesUnionTypeJSONToXML  NodesUnionType = "json_to_xml"
+	NodesUnionTypeJwtDecode  NodesUnionType = "jwt_decode"
+	NodesUnionTypeJwtSign    NodesUnionType = "jwt_sign"
+	NodesUnionTypeJwtVerify  NodesUnionType = "jwt_verify"
 	NodesUnionTypeProperty   NodesUnionType = "property"
 	NodesUnionTypeStatic     NodesUnionType = "static"
+	NodesUnionTypeXMLToJSON  NodesUnionType = "xml_to_json"
 )
 
 type Nodes struct {
@@ -1102,8 +2098,13 @@ type Nodes struct {
 	Call       *Call       `queryParam:"inline" union:"member"`
 	Exit       *Exit       `queryParam:"inline" union:"member"`
 	Jq         *Jq         `queryParam:"inline" union:"member"`
+	JSONToXML  *JSONToXML  `queryParam:"inline" union:"member"`
+	JwtDecode  *JwtDecode  `queryParam:"inline" union:"member"`
+	JwtSign    *JwtSign    `queryParam:"inline" union:"member"`
+	JwtVerify  *JwtVerify  `queryParam:"inline" union:"member"`
 	Property   *Property   `queryParam:"inline" union:"member"`
 	Static     *Static     `queryParam:"inline" union:"member"`
+	XMLToJSON  *XMLToJSON  `queryParam:"inline" union:"member"`
 
 	Type NodesUnionType
 }
@@ -1153,6 +2154,42 @@ func CreateNodesJq(jq Jq) Nodes {
 	}
 }
 
+func CreateNodesJSONToXML(jsonToXML JSONToXML) Nodes {
+	typ := NodesUnionTypeJSONToXML
+
+	return Nodes{
+		JSONToXML: &jsonToXML,
+		Type:      typ,
+	}
+}
+
+func CreateNodesJwtDecode(jwtDecode JwtDecode) Nodes {
+	typ := NodesUnionTypeJwtDecode
+
+	return Nodes{
+		JwtDecode: &jwtDecode,
+		Type:      typ,
+	}
+}
+
+func CreateNodesJwtSign(jwtSign JwtSign) Nodes {
+	typ := NodesUnionTypeJwtSign
+
+	return Nodes{
+		JwtSign: &jwtSign,
+		Type:    typ,
+	}
+}
+
+func CreateNodesJwtVerify(jwtVerify JwtVerify) Nodes {
+	typ := NodesUnionTypeJwtVerify
+
+	return Nodes{
+		JwtVerify: &jwtVerify,
+		Type:      typ,
+	}
+}
+
 func CreateNodesProperty(property Property) Nodes {
 	typ := NodesUnionTypeProperty
 
@@ -1168,6 +2205,15 @@ func CreateNodesStatic(static Static) Nodes {
 	return Nodes{
 		Static: &static,
 		Type:   typ,
+	}
+}
+
+func CreateNodesXMLToJSON(xmlToJSON XMLToJSON) Nodes {
+	typ := NodesUnionTypeXMLToJSON
+
+	return Nodes{
+		XMLToJSON: &xmlToJSON,
+		Type:      typ,
 	}
 }
 
@@ -1216,6 +2262,38 @@ func (u *Nodes) UnmarshalJSON(data []byte) error {
 		})
 	}
 
+	var jsonToXML JSONToXML = JSONToXML{}
+	if err := utils.UnmarshalJSON(data, &jsonToXML, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeJSONToXML,
+			Value: &jsonToXML,
+		})
+	}
+
+	var jwtDecode JwtDecode = JwtDecode{}
+	if err := utils.UnmarshalJSON(data, &jwtDecode, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeJwtDecode,
+			Value: &jwtDecode,
+		})
+	}
+
+	var jwtSign JwtSign = JwtSign{}
+	if err := utils.UnmarshalJSON(data, &jwtSign, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeJwtSign,
+			Value: &jwtSign,
+		})
+	}
+
+	var jwtVerify JwtVerify = JwtVerify{}
+	if err := utils.UnmarshalJSON(data, &jwtVerify, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeJwtVerify,
+			Value: &jwtVerify,
+		})
+	}
+
 	var property Property = Property{}
 	if err := utils.UnmarshalJSON(data, &property, "", true, nil); err == nil {
 		candidates = append(candidates, utils.UnionCandidate{
@@ -1229,6 +2307,14 @@ func (u *Nodes) UnmarshalJSON(data []byte) error {
 		candidates = append(candidates, utils.UnionCandidate{
 			Type:  NodesUnionTypeStatic,
 			Value: &static,
+		})
+	}
+
+	var xmlToJSON XMLToJSON = XMLToJSON{}
+	if err := utils.UnmarshalJSON(data, &xmlToJSON, "", true, nil); err == nil {
+		candidates = append(candidates, utils.UnionCandidate{
+			Type:  NodesUnionTypeXMLToJSON,
+			Value: &xmlToJSON,
 		})
 	}
 
@@ -1260,11 +2346,26 @@ func (u *Nodes) UnmarshalJSON(data []byte) error {
 	case NodesUnionTypeJq:
 		u.Jq = best.Value.(*Jq)
 		return nil
+	case NodesUnionTypeJSONToXML:
+		u.JSONToXML = best.Value.(*JSONToXML)
+		return nil
+	case NodesUnionTypeJwtDecode:
+		u.JwtDecode = best.Value.(*JwtDecode)
+		return nil
+	case NodesUnionTypeJwtSign:
+		u.JwtSign = best.Value.(*JwtSign)
+		return nil
+	case NodesUnionTypeJwtVerify:
+		u.JwtVerify = best.Value.(*JwtVerify)
+		return nil
 	case NodesUnionTypeProperty:
 		u.Property = best.Value.(*Property)
 		return nil
 	case NodesUnionTypeStatic:
 		u.Static = best.Value.(*Static)
+		return nil
+	case NodesUnionTypeXMLToJSON:
+		u.XMLToJSON = best.Value.(*XMLToJSON)
 		return nil
 	}
 
@@ -1292,12 +2393,32 @@ func (u Nodes) MarshalJSON() ([]byte, error) {
 		return utils.MarshalJSON(u.Jq, "", true)
 	}
 
+	if u.JSONToXML != nil {
+		return utils.MarshalJSON(u.JSONToXML, "", true)
+	}
+
+	if u.JwtDecode != nil {
+		return utils.MarshalJSON(u.JwtDecode, "", true)
+	}
+
+	if u.JwtSign != nil {
+		return utils.MarshalJSON(u.JwtSign, "", true)
+	}
+
+	if u.JwtVerify != nil {
+		return utils.MarshalJSON(u.JwtVerify, "", true)
+	}
+
 	if u.Property != nil {
 		return utils.MarshalJSON(u.Property, "", true)
 	}
 
 	if u.Static != nil {
 		return utils.MarshalJSON(u.Static, "", true)
+	}
+
+	if u.XMLToJSON != nil {
+		return utils.MarshalJSON(u.XMLToJSON, "", true)
 	}
 
 	return nil, errors.New("could not marshal union type Nodes: all fields are null")
@@ -1324,6 +2445,159 @@ func (d *DatakitPluginMemory) GetDictionaryName() *string {
 		return nil
 	}
 	return d.DictionaryName
+}
+
+// DatakitPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type DatakitPluginAuthProvider string
+
+const (
+	DatakitPluginAuthProviderAws   DatakitPluginAuthProvider = "aws"
+	DatakitPluginAuthProviderAzure DatakitPluginAuthProvider = "azure"
+	DatakitPluginAuthProviderGcp   DatakitPluginAuthProvider = "gcp"
+)
+
+func (e DatakitPluginAuthProvider) ToPointer() *DatakitPluginAuthProvider {
+	return &e
+}
+func (e *DatakitPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = DatakitPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginAuthProvider: %v", v)
+	}
+}
+
+// DatakitPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type DatakitPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *DatakitPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (d DatakitPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAuthProvider() *DatakitPluginAuthProvider {
+	if d == nil {
+		return nil
+	}
+	return d.AuthProvider
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsAccessKeyID
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsAssumeRoleArn
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsCacheName() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsCacheName
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if d == nil {
+		return nil
+	}
+	return d.AwsIsServerless
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsRegion() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsRegion
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsRoleSessionName
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AwsSecretAccessKey
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAzureClientID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AzureClientID
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AzureClientSecret
+}
+
+func (d *DatakitPluginCloudAuthentication) GetAzureTenantID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.AzureTenantID
+}
+
+func (d *DatakitPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if d == nil {
+		return nil
+	}
+	return d.GcpServiceAccountJSON
 }
 
 type DatakitPluginClusterNodes struct {
@@ -1421,6 +2695,8 @@ func (e *DatakitPluginSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type DatakitPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *DatakitPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -1474,6 +2750,13 @@ func (d *DatakitPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (d *DatakitPluginRedis) GetCloudAuthentication() *DatakitPluginCloudAuthentication {
+	if d == nil {
+		return nil
+	}
+	return d.CloudAuthentication
 }
 
 func (d *DatakitPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1691,7 +2974,7 @@ func (d *DatakitPluginCache) GetStrategy() *DatakitPluginStrategy {
 
 type Resources struct {
 	Cache *DatakitPluginCache `json:"cache,omitempty"`
-	Vault map[string]any      `json:"vault,omitempty"`
+	Vault map[string]string   `json:"vault,omitempty"`
 }
 
 func (r Resources) MarshalJSON() ([]byte, error) {
@@ -1712,7 +2995,7 @@ func (r *Resources) GetCache() *DatakitPluginCache {
 	return r.Cache
 }
 
-func (r *Resources) GetVault() map[string]any {
+func (r *Resources) GetVault() map[string]string {
 	if r == nil {
 		return nil
 	}
@@ -1883,6 +3166,8 @@ func (d *DatakitPluginService) GetID() *string {
 
 // DatakitPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type DatakitPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1922,6 +3207,13 @@ func (d *DatakitPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (d *DatakitPlugin) GetCondition() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Condition
 }
 
 func (d *DatakitPlugin) GetCreatedAt() *int64 {

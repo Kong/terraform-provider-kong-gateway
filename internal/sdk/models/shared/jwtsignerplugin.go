@@ -341,7 +341,7 @@ func (e *ChannelTokenIntrospectionConsumerBy) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// ChannelTokenJwksURIClientCertificate - The client certificate that will be used to authenticate Kong if `access_token_jwks_uri` is an https uri that requires mTLS Auth.
+// ChannelTokenJwksURIClientCertificate - The client certificate that will be used to authenticate Kong if `channel_token_jwks_uri` is an https uri that requires mTLS Auth.
 type ChannelTokenJwksURIClientCertificate struct {
 	ID *string `json:"id,omitempty"`
 }
@@ -449,10 +449,12 @@ type JwtSignerPluginConfig struct {
 	AccessTokenAudienceClaim []string `json:"access_token_audience_claim,omitempty"`
 	// The audiences allowed to be present in the access token claim specified by `config.access_token_audience_claim`.
 	AccessTokenAudiencesAllowed []string `json:"access_token_audiences_allowed,omitempty"`
-	// When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of alues. Valid values are `id`, `username`, and `custom_id`.
+	// When the plugin tries to apply an access token to a Kong consumer mapping, it tries to find a matching Kong consumer from properties defined using this configuration parameter. The parameter can take an array of values. Valid values are `id`, `username`, and `custom_id`.
 	AccessTokenConsumerBy []AccessTokenConsumerBy `json:"access_token_consumer_by,omitempty"`
 	// When you set a value for this parameter, the plugin tries to map an arbitrary claim specified with this configuration parameter (for example, `sub` or `username`) in an access token to Kong consumer entity.
 	AccessTokenConsumerClaim []string `json:"access_token_consumer_claim,omitempty"`
+	// Whether to verify the TLS certificate if any of `access_token_introspection_endpoint`, `access_token_jwks_uri`, or `access_token_keyset` is an HTTPS URI.
+	AccessTokenEndpointsSslVerify *bool `json:"access_token_endpoints_ssl_verify,omitempty"`
 	// Specify the expiry claim in an access token to verify if the default `exp` is not used.
 	AccessTokenExpiryClaim []string `json:"access_token_expiry_claim,omitempty"`
 	// Specify the claim in an access token introspection to verify against values of `config.access_token_introspection_audiences_allowed`.
@@ -487,7 +489,7 @@ type JwtSignerPluginConfig struct {
 	AccessTokenIntrospectionOptionalClaims [][]string `json:"access_token_introspection_optional_claims,omitempty"`
 	// Specify the required claims that must be present in the access token introspection result. Every claim is specified by an array. If the array has multiple elements, it means the claim is inside a nested object of the payload.
 	AccessTokenIntrospectionRequiredClaims [][]string `json:"access_token_introspection_required_claims,omitempty"`
-	// Specify the claim/property in access token introspection results (`JSON`) to be verified against values of `config.access_token_introspection_scopes_required`. This supports nested claims. For example, with Keycloak you could use `[ "realm_access", "roles" ]`, hich can be given as `realm_access,roles` (form post). If the claim is not found in access token introspection results, and you have specified `config.access_token_introspection_scopes_required`, the plugin responds with `403 Forbidden`.
+	// Specify the claim/property in access token introspection results (`JSON`) to be verified against values of `config.access_token_introspection_scopes_required`. This supports nested claims. For example, with Keycloak you could use `[ "realm_access", "roles" ]`, which can be given as `realm_access,roles` (form post). If the claim is not found in access token introspection results, and you have specified `config.access_token_introspection_scopes_required`, the plugin responds with `403 Forbidden`.
 	AccessTokenIntrospectionScopesClaim []string `json:"access_token_introspection_scopes_claim,omitempty"`
 	// Specify the required values (or scopes) that are checked by an introspection claim/property specified by `config.access_token_introspection_scopes_claim`.
 	AccessTokenIntrospectionScopesRequired []string `json:"access_token_introspection_scopes_required,omitempty"`
@@ -552,11 +554,11 @@ type JwtSignerPluginConfig struct {
 	// If you want to add or subtract (using a negative value) expiry time (in seconds) of the original access token, you can specify a value that is added to the original access token's `exp` claim.
 	AccessTokenUpstreamLeeway *float64 `json:"access_token_upstream_leeway,omitempty"`
 	// Add customized claims if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	AddAccessTokenClaims map[string]any `json:"add_access_token_claims,omitempty"`
+	AddAccessTokenClaims map[string]string `json:"add_access_token_claims,omitempty"`
 	// Add customized claims if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	AddChannelTokenClaims map[string]any `json:"add_channel_token_claims,omitempty"`
+	AddChannelTokenClaims map[string]string `json:"add_channel_token_claims,omitempty"`
 	// Add customized claims to both tokens if they are not present yet. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	AddClaims map[string]any `json:"add_claims,omitempty"`
+	AddClaims map[string]string `json:"add_claims,omitempty"`
 	// Whether to cache access token introspection results.
 	CacheAccessTokenIntrospection *bool `json:"cache_access_token_introspection,omitempty"`
 	// Whether to cache channel token introspection results.
@@ -569,6 +571,8 @@ type JwtSignerPluginConfig struct {
 	ChannelTokenConsumerBy []ChannelTokenConsumerBy `json:"channel_token_consumer_by,omitempty"`
 	// When you set a value for this parameter, the plugin tries to map an arbitrary claim specified with this configuration parameter. Kong consumers have an `id`, a `username`, and a `custom_id`. If this parameter is enabled but the mapping fails, such as when there's a non-existent Kong consumer, the plugin responds with `403 Forbidden`.
 	ChannelTokenConsumerClaim []string `json:"channel_token_consumer_claim,omitempty"`
+	// Whether to verify the TLS certificate if any of `channel_token_introspection_endpoint`, `channel_token_jwks_uri`, or `channel_token_keyset` is an HTTPS URI.
+	ChannelTokenEndpointsSslVerify *bool `json:"channel_token_endpoints_ssl_verify,omitempty"`
 	// Specify the expiry claim in a channel token to verify if the default `exp` is not used.
 	ChannelTokenExpiryClaim []string `json:"channel_token_expiry_claim,omitempty"`
 	// Specify the claim in a channel token introspection to verify against values of `config.channel_token_introspection_audiences_allowed`.
@@ -621,7 +625,7 @@ type JwtSignerPluginConfig struct {
 	ChannelTokenIssuersAllowed []string `json:"channel_token_issuers_allowed,omitempty"`
 	// If you want to use `config.verify_channel_token_signature`, you must specify the URI where the plugin can fetch the public keys (JWKS) to verify the signature of the channel token. If you don't specify a URI and you pass a JWT token to the plugin, then the plugin responds with `401 Unauthorized`.
 	ChannelTokenJwksURI *string `json:"channel_token_jwks_uri,omitempty"`
-	// The client certificate that will be used to authenticate Kong if `access_token_jwks_uri` is an https uri that requires mTLS Auth.
+	// The client certificate that will be used to authenticate Kong if `channel_token_jwks_uri` is an https uri that requires mTLS Auth.
 	ChannelTokenJwksURIClientCertificate *ChannelTokenJwksURIClientCertificate `json:"channel_token_jwks_uri_client_certificate,omitempty"`
 	// The client password that will be used to authenticate Kong if `channel_token_jwks_uri` is a uri that requires Basic Auth. Should be configured together with `channel_token_jwks_uri_client_username`
 	ChannelTokenJwksURIClientPassword *string `json:"channel_token_jwks_uri_client_password,omitempty"`
@@ -679,18 +683,18 @@ type JwtSignerPluginConfig struct {
 	OriginalAccessTokenUpstreamHeader *string `json:"original_access_token_upstream_header,omitempty"`
 	// The HTTP header name used to store the original channel token.
 	OriginalChannelTokenUpstreamHeader *string `json:"original_channel_token_upstream_header,omitempty"`
-	// When authentication or authorization fails, or there is an unexpected error, the plugin sends an `WWW-Authenticate` header with the `realm` attribute value.
+	// When authentication or authorization fails, or there is an unexpected error, the plugin sends a `WWW-Authenticate` header with the `realm` attribute value.
 	Realm *string `json:"realm,omitempty"`
 	// remove claims. It should be an array, and each element is a claim key string.
 	RemoveAccessTokenClaims []string `json:"remove_access_token_claims,omitempty"`
 	// remove claims. It should be an array, and each element is a claim key string.
 	RemoveChannelTokenClaims []string `json:"remove_channel_token_claims,omitempty"`
 	// Set customized claims. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	SetAccessTokenClaims map[string]any `json:"set_access_token_claims,omitempty"`
+	SetAccessTokenClaims map[string]string `json:"set_access_token_claims,omitempty"`
 	// Set customized claims. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	SetChannelTokenClaims map[string]any `json:"set_channel_token_claims,omitempty"`
+	SetChannelTokenClaims map[string]string `json:"set_channel_token_claims,omitempty"`
 	// Set customized claims to both tokens. If a claim is already present, it will be overwritten. Value can be a regular or JSON string; if JSON, decoded data is used as the claim's value.
-	SetClaims map[string]any `json:"set_claims,omitempty"`
+	SetClaims map[string]string `json:"set_claims,omitempty"`
 	// Use this parameter to enable and disable further checks on a payload before the new token is signed. If you set this to `true`, the expiry or scopes are not checked on a payload.
 	TrustAccessTokenIntrospection *bool `json:"trust_access_token_introspection,omitempty"`
 	// Providing an opaque channel token for plugin introspection, and verifying expiry and scopes on introspection results may make further payload checks unnecessary before the plugin signs a new token. This also applies when using a JWT token with introspection JSON as per config.channel_token_introspection_jwt_claim. Use this parameter to manage additional payload checks before signing a new token. With true (default), payload's expiry or scopes aren't checked.
@@ -785,6 +789,13 @@ func (j *JwtSignerPluginConfig) GetAccessTokenConsumerClaim() []string {
 		return nil
 	}
 	return j.AccessTokenConsumerClaim
+}
+
+func (j *JwtSignerPluginConfig) GetAccessTokenEndpointsSslVerify() *bool {
+	if j == nil {
+		return nil
+	}
+	return j.AccessTokenEndpointsSslVerify
 }
 
 func (j *JwtSignerPluginConfig) GetAccessTokenExpiryClaim() []string {
@@ -1130,21 +1141,21 @@ func (j *JwtSignerPluginConfig) GetAccessTokenUpstreamLeeway() *float64 {
 	return j.AccessTokenUpstreamLeeway
 }
 
-func (j *JwtSignerPluginConfig) GetAddAccessTokenClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetAddAccessTokenClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
 	return j.AddAccessTokenClaims
 }
 
-func (j *JwtSignerPluginConfig) GetAddChannelTokenClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetAddChannelTokenClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
 	return j.AddChannelTokenClaims
 }
 
-func (j *JwtSignerPluginConfig) GetAddClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetAddClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
@@ -1191,6 +1202,13 @@ func (j *JwtSignerPluginConfig) GetChannelTokenConsumerClaim() []string {
 		return nil
 	}
 	return j.ChannelTokenConsumerClaim
+}
+
+func (j *JwtSignerPluginConfig) GetChannelTokenEndpointsSslVerify() *bool {
+	if j == nil {
+		return nil
+	}
+	return j.ChannelTokenEndpointsSslVerify
 }
 
 func (j *JwtSignerPluginConfig) GetChannelTokenExpiryClaim() []string {
@@ -1599,21 +1617,21 @@ func (j *JwtSignerPluginConfig) GetRemoveChannelTokenClaims() []string {
 	return j.RemoveChannelTokenClaims
 }
 
-func (j *JwtSignerPluginConfig) GetSetAccessTokenClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetSetAccessTokenClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
 	return j.SetAccessTokenClaims
 }
 
-func (j *JwtSignerPluginConfig) GetSetChannelTokenClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetSetChannelTokenClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
 	return j.SetChannelTokenClaims
 }
 
-func (j *JwtSignerPluginConfig) GetSetClaims() map[string]any {
+func (j *JwtSignerPluginConfig) GetSetClaims() map[string]string {
 	if j == nil {
 		return nil
 	}
@@ -1896,6 +1914,8 @@ func (j *JwtSignerPluginService) GetID() *string {
 
 // JwtSignerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type JwtSignerPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1931,6 +1951,13 @@ func (j *JwtSignerPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (j *JwtSignerPlugin) GetCondition() *string {
+	if j == nil {
+		return nil
+	}
+	return j.Condition
 }
 
 func (j *JwtSignerPlugin) GetCreatedAt() *int64 {

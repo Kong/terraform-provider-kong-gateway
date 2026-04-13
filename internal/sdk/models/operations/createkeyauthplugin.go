@@ -9,7 +9,7 @@ import (
 )
 
 type CreateKeyauthPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	KeyAuthPlugin shared.KeyAuthPlugin `request:"mediaType=application/json"`
 }

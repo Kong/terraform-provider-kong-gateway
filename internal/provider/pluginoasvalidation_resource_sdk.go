@@ -15,10 +15,12 @@ func (r *PluginOasValidationResourceModel) RefreshFromSharedOasValidationPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.OasValidationPluginConfig{}
 		r.Config.AllowedHeaderParameters = types.StringPointerValue(resp.Config.AllowedHeaderParameters)
 		r.Config.APISpec = types.StringValue(resp.Config.APISpec)
 		r.Config.APISpecEncoded = types.BoolPointerValue(resp.Config.APISpecEncoded)
+		r.Config.CollectAllErrors = types.BoolPointerValue(resp.Config.CollectAllErrors)
 		r.Config.CustomBasePath = types.StringPointerValue(resp.Config.CustomBasePath)
 		r.Config.HeaderParameterCheck = types.BoolPointerValue(resp.Config.HeaderParameterCheck)
 		r.Config.IncludeBasePath = types.BoolPointerValue(resp.Config.IncludeBasePath)
@@ -188,6 +190,12 @@ func (r *PluginOasValidationResourceModel) ToOperationsUpdateOasvalidationPlugin
 func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx context.Context) (*shared.OasValidationPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -293,6 +301,12 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 	} else {
 		apiSpecEncoded = nil
 	}
+	collectAllErrors := new(bool)
+	if !r.Config.CollectAllErrors.IsUnknown() && !r.Config.CollectAllErrors.IsNull() {
+		*collectAllErrors = r.Config.CollectAllErrors.ValueBool()
+	} else {
+		collectAllErrors = nil
+	}
 	customBasePath := new(string)
 	if !r.Config.CustomBasePath.IsUnknown() && !r.Config.CustomBasePath.IsNull() {
 		*customBasePath = r.Config.CustomBasePath.ValueString()
@@ -369,6 +383,7 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 		AllowedHeaderParameters:                 allowedHeaderParameters,
 		APISpec:                                 apiSpec,
 		APISpecEncoded:                          apiSpecEncoded,
+		CollectAllErrors:                        collectAllErrors,
 		CustomBasePath:                          customBasePath,
 		HeaderParameterCheck:                    headerParameterCheck,
 		IncludeBasePath:                         includeBasePath,
@@ -423,6 +438,7 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 		}
 	}
 	out := shared.OasValidationPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

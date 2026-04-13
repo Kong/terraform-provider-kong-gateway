@@ -368,9 +368,9 @@ type ConfluentConsumePluginOauth2 struct {
 	// The token endpoint URI.
 	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
-	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
-	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
 }
@@ -435,14 +435,14 @@ func (c *ConfluentConsumePluginOauth2) GetTokenEndpoint() string {
 	return c.TokenEndpoint
 }
 
-func (c *ConfluentConsumePluginOauth2) GetTokenHeaders() map[string]any {
+func (c *ConfluentConsumePluginOauth2) GetTokenHeaders() map[string]string {
 	if c == nil {
 		return nil
 	}
 	return c.TokenHeaders
 }
 
-func (c *ConfluentConsumePluginOauth2) GetTokenPostArgs() map[string]any {
+func (c *ConfluentConsumePluginOauth2) GetTokenPostArgs() map[string]string {
 	if c == nil {
 		return nil
 	}
@@ -754,6 +754,29 @@ func (c *ConfluentConsumePluginSchemaRegistry) GetConfluent() *ConfluentConsumeP
 	return c.Confluent
 }
 
+type ConfluentConsumePluginSecurity struct {
+	// Enables verification of the certificate presented by the server.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+}
+
+func (c ConfluentConsumePluginSecurity) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginSecurity) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ConfluentConsumePluginSecurity) GetSslVerify() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.SslVerify
+}
+
 type ConfluentConsumePluginConfigBasic struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
@@ -857,9 +880,9 @@ type ConfluentConsumePluginConfigOauth2 struct {
 	// The token endpoint URI.
 	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
-	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
-	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
 }
@@ -924,14 +947,14 @@ func (c *ConfluentConsumePluginConfigOauth2) GetTokenEndpoint() string {
 	return c.TokenEndpoint
 }
 
-func (c *ConfluentConsumePluginConfigOauth2) GetTokenHeaders() map[string]any {
+func (c *ConfluentConsumePluginConfigOauth2) GetTokenHeaders() map[string]string {
 	if c == nil {
 		return nil
 	}
 	return c.TokenHeaders
 }
 
-func (c *ConfluentConsumePluginConfigOauth2) GetTokenPostArgs() map[string]any {
+func (c *ConfluentConsumePluginConfigOauth2) GetTokenPostArgs() map[string]string {
 	if c == nil {
 		return nil
 	}
@@ -1295,6 +1318,8 @@ type ConfluentConsumePluginConfig struct {
 	DlqTopic *string `json:"dlq_topic,omitempty"`
 	// Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the `message_by_lua_functions`, it will be forwarded to `dlq_topic` that can be processed later.
 	EnableDlq *bool `json:"enable_dlq,omitempty"`
+	// When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.
+	EnforceLatestOffsetReset *bool `json:"enforce_latest_offset_reset,omitempty"`
 	// Keepalive timeout in milliseconds.
 	Keepalive        *int64 `json:"keepalive,omitempty"`
 	KeepaliveEnabled *bool  `json:"keepalive_enabled,omitempty"`
@@ -1306,6 +1331,7 @@ type ConfluentConsumePluginConfig struct {
 	Mode *ConfluentConsumePluginMode `json:"mode,omitempty"`
 	// The plugin-global schema registry configuration.
 	SchemaRegistry *ConfluentConsumePluginSchemaRegistry `json:"schema_registry,omitempty"`
+	Security       *ConfluentConsumePluginSecurity       `json:"security,omitempty"`
 	// Socket timeout in milliseconds.
 	Timeout *int64 `json:"timeout,omitempty"`
 	// The Kafka topics and their configuration you want to consume from.
@@ -1393,6 +1419,13 @@ func (c *ConfluentConsumePluginConfig) GetEnableDlq() *bool {
 	return c.EnableDlq
 }
 
+func (c *ConfluentConsumePluginConfig) GetEnforceLatestOffsetReset() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.EnforceLatestOffsetReset
+}
+
 func (c *ConfluentConsumePluginConfig) GetKeepalive() *int64 {
 	if c == nil {
 		return nil
@@ -1433,6 +1466,13 @@ func (c *ConfluentConsumePluginConfig) GetSchemaRegistry() *ConfluentConsumePlug
 		return nil
 	}
 	return c.SchemaRegistry
+}
+
+func (c *ConfluentConsumePluginConfig) GetSecurity() *ConfluentConsumePluginSecurity {
+	if c == nil {
+		return nil
+	}
+	return c.Security
 }
 
 func (c *ConfluentConsumePluginConfig) GetTimeout() *int64 {
@@ -1558,6 +1598,8 @@ func (c *ConfluentConsumePluginService) GetID() *string {
 
 // ConfluentConsumePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ConfluentConsumePlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1595,6 +1637,13 @@ func (c *ConfluentConsumePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (c *ConfluentConsumePlugin) GetCondition() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Condition
 }
 
 func (c *ConfluentConsumePlugin) GetCreatedAt() *int64 {

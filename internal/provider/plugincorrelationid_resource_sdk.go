@@ -15,6 +15,7 @@ func (r *PluginCorrelationIDResourceModel) RefreshFromSharedCorrelationIDPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -184,6 +185,12 @@ func (r *PluginCorrelationIDResourceModel) ToOperationsUpdateCorrelationidPlugin
 func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx context.Context) (*shared.CorrelationIDPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -341,6 +348,7 @@ func (r *PluginCorrelationIDResourceModel) ToSharedCorrelationIDPlugin(ctx conte
 		}
 	}
 	out := shared.CorrelationIDPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

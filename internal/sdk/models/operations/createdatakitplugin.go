@@ -9,7 +9,7 @@ import (
 )
 
 type CreateDatakitPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	DatakitPlugin shared.DatakitPlugin `request:"mediaType=application/json"`
 }

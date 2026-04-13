@@ -122,6 +122,38 @@ func (o *OpentelemetryPluginPartials) GetPath() *string {
 	return o.Path
 }
 
+type AccessLogs struct {
+	// A key-value map that dynamically modifies access log fields using Lua code.
+	CustomAttributesByLua map[string]string `json:"custom_attributes_by_lua,omitempty"`
+	// An HTTP URL endpoint where access logs (e.g. request/response, route/service, latency, etc.) are exported.
+	Endpoint *string `json:"endpoint,omitempty"`
+}
+
+func (a AccessLogs) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AccessLogs) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AccessLogs) GetCustomAttributesByLua() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.CustomAttributesByLua
+}
+
+func (a *AccessLogs) GetEndpoint() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Endpoint
+}
+
 type HeaderType string
 
 const (
@@ -173,6 +205,92 @@ func (e *HeaderType) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("invalid value for HeaderType: %v", v)
 	}
+}
+
+type OpentelemetryPluginMetrics struct {
+	// A boolean value that determines if AI metrics should be collected. If enabled, `gen_ai.*`, `mcp.*`, `kong.gen_ai.*`, `kong.gen_ai.a2a.*` and `kong.mcp.*` metrics will be exported. To enable latency metrics for AI metrics, `enable_latency_metrics` must also be set to `true`. To enable `error.type` attribute for AI metrics, `enable_request_metrics` must also be set to `true`.
+	EnableAiMetrics *bool `json:"enable_ai_metrics,omitempty"`
+	// A boolean value that determines if bandwidth metrics should be collected. If enabled, `http.server.request.size` and `http.server.response.size` metrics will be exported.
+	EnableBandwidthMetrics *bool `json:"enable_bandwidth_metrics,omitempty"`
+	// A boolean value that determines if `http.server.request.count`, `http.server.request.size` and `http.server.response.size` metrics should fill in the consumer attribute when available.
+	EnableConsumerAttribute *bool `json:"enable_consumer_attribute,omitempty"`
+	// A boolean value that determines if latency metrics should be collected. If enabled, `kong.latency.total`, `kong.latency.internal` and `kong.latency.upstream` metrics will be exported.
+	EnableLatencyMetrics *bool `json:"enable_latency_metrics,omitempty"`
+	// A boolean value that determines if request count metrics should be collected. If enabled, `http.server.request.count` metrics will be exported.
+	EnableRequestMetrics *bool `json:"enable_request_metrics,omitempty"`
+	// A boolean value that determines if upstream health metrics should be collected. If enabled, `kong.upstream.target.status` metrics will be exported.
+	EnableUpstreamHealthMetrics *bool `json:"enable_upstream_health_metrics,omitempty"`
+	// An HTTP URL endpoint where metrics are exported.
+	Endpoint *string `json:"endpoint,omitempty"`
+	// The interval in seconds at which metrics are pushed to the OTLP server. This setting is only applicable when `endpoint` is set.
+	PushInterval *float64 `json:"push_interval,omitempty"`
+}
+
+func (o OpentelemetryPluginMetrics) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpentelemetryPluginMetrics) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableAiMetrics() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableAiMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableBandwidthMetrics() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableBandwidthMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableConsumerAttribute() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableConsumerAttribute
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableLatencyMetrics() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableLatencyMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableRequestMetrics() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableRequestMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnableUpstreamHealthMetrics() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnableUpstreamHealthMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEndpoint() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Endpoint
+}
+
+func (o *OpentelemetryPluginMetrics) GetPushInterval() *float64 {
+	if o == nil {
+		return nil
+	}
+	return o.PushInterval
 }
 
 // DefaultFormat - The default header format to use when extractors did not match any format in the incoming headers and `inject` is configured with the value: `preserve`. This can happen when no tracing header was found in the request, or the incoming tracing header formats were not included in `extract`.
@@ -508,6 +626,7 @@ func (e *SamplingStrategy) UnmarshalJSON(data []byte) error {
 }
 
 type OpentelemetryPluginConfig struct {
+	AccessLogs *AccessLogs `json:"access_logs,omitempty"`
 	// The delay, in seconds, between two consecutive batches.
 	BatchFlushDelay *int64 `json:"batch_flush_delay,omitempty"`
 	// The number of spans to be sent in a single batch.
@@ -518,13 +637,14 @@ type OpentelemetryPluginConfig struct {
 	// The custom headers to be added in the HTTP request sent to the OTLP server. This setting is useful for adding the authentication headers (token) for the APM backend.
 	Headers                      map[string]string `json:"headers,omitempty"`
 	HTTPResponseHeaderForTraceid *string           `json:"http_response_header_for_traceid,omitempty"`
-	// A string representing a URL, such as https://example.com/path/to/resource?q=search.
-	LogsEndpoint *string                   `json:"logs_endpoint,omitempty"`
-	Propagation  *Propagation              `json:"propagation,omitempty"`
-	Queue        *OpentelemetryPluginQueue `json:"queue,omitempty"`
+	// An HTTP URL endpoint where internal logs are exported.
+	LogsEndpoint *string                     `json:"logs_endpoint,omitempty"`
+	Metrics      *OpentelemetryPluginMetrics `json:"metrics,omitempty"`
+	Propagation  *Propagation                `json:"propagation,omitempty"`
+	Queue        *OpentelemetryPluginQueue   `json:"queue,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
-	ReadTimeout        *int64         `json:"read_timeout,omitempty"`
-	ResourceAttributes map[string]any `json:"resource_attributes,omitempty"`
+	ReadTimeout        *int64            `json:"read_timeout,omitempty"`
+	ResourceAttributes map[string]string `json:"resource_attributes,omitempty"`
 	// Tracing sampling rate for configuring the probability-based sampler. When set, this value supersedes the global `tracing_sampling_rate` setting from kong.conf.
 	SamplingRate *float64 `json:"sampling_rate,omitempty"`
 	// The sampling strategy to use for OTLP `traces`. Set `parent_drop_probability_fallback` if you want parent-based sampling when the parent span contains a `false` sampled flag, and fallback to probability-based sampling otherwise. Set `parent_probability_fallback` if you want parent-based sampling when the parent span contains a valid sampled flag (`true` or `false`), and fallback to probability-based sampling otherwise.
@@ -544,6 +664,13 @@ func (o *OpentelemetryPluginConfig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *OpentelemetryPluginConfig) GetAccessLogs() *AccessLogs {
+	if o == nil {
+		return nil
+	}
+	return o.AccessLogs
 }
 
 func (o *OpentelemetryPluginConfig) GetBatchFlushDelay() *int64 {
@@ -595,6 +722,13 @@ func (o *OpentelemetryPluginConfig) GetLogsEndpoint() *string {
 	return o.LogsEndpoint
 }
 
+func (o *OpentelemetryPluginConfig) GetMetrics() *OpentelemetryPluginMetrics {
+	if o == nil {
+		return nil
+	}
+	return o.Metrics
+}
+
 func (o *OpentelemetryPluginConfig) GetPropagation() *Propagation {
 	if o == nil {
 		return nil
@@ -616,7 +750,7 @@ func (o *OpentelemetryPluginConfig) GetReadTimeout() *int64 {
 	return o.ReadTimeout
 }
 
-func (o *OpentelemetryPluginConfig) GetResourceAttributes() map[string]any {
+func (o *OpentelemetryPluginConfig) GetResourceAttributes() map[string]string {
 	if o == nil {
 		return nil
 	}
@@ -674,13 +808,20 @@ func (o *OpentelemetryPluginConsumer) GetID() *string {
 	return o.ID
 }
 
+// OpentelemetryPluginProtocols - A string representing a protocol, such as HTTP or HTTPS.
 type OpentelemetryPluginProtocols string
 
 const (
-	OpentelemetryPluginProtocolsGrpc  OpentelemetryPluginProtocols = "grpc"
-	OpentelemetryPluginProtocolsGrpcs OpentelemetryPluginProtocols = "grpcs"
-	OpentelemetryPluginProtocolsHTTP  OpentelemetryPluginProtocols = "http"
-	OpentelemetryPluginProtocolsHTTPS OpentelemetryPluginProtocols = "https"
+	OpentelemetryPluginProtocolsGrpc           OpentelemetryPluginProtocols = "grpc"
+	OpentelemetryPluginProtocolsGrpcs          OpentelemetryPluginProtocols = "grpcs"
+	OpentelemetryPluginProtocolsHTTP           OpentelemetryPluginProtocols = "http"
+	OpentelemetryPluginProtocolsHTTPS          OpentelemetryPluginProtocols = "https"
+	OpentelemetryPluginProtocolsTCP            OpentelemetryPluginProtocols = "tcp"
+	OpentelemetryPluginProtocolsTLS            OpentelemetryPluginProtocols = "tls"
+	OpentelemetryPluginProtocolsTLSPassthrough OpentelemetryPluginProtocols = "tls_passthrough"
+	OpentelemetryPluginProtocolsUDP            OpentelemetryPluginProtocols = "udp"
+	OpentelemetryPluginProtocolsWs             OpentelemetryPluginProtocols = "ws"
+	OpentelemetryPluginProtocolsWss            OpentelemetryPluginProtocols = "wss"
 )
 
 func (e OpentelemetryPluginProtocols) ToPointer() *OpentelemetryPluginProtocols {
@@ -699,6 +840,18 @@ func (e *OpentelemetryPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
+		fallthrough
+	case "tcp":
+		fallthrough
+	case "tls":
+		fallthrough
+	case "tls_passthrough":
+		fallthrough
+	case "udp":
+		fallthrough
+	case "ws":
+		fallthrough
+	case "wss":
 		*e = OpentelemetryPluginProtocols(v)
 		return nil
 	default:
@@ -754,6 +907,8 @@ func (o *OpentelemetryPluginService) GetID() *string {
 
 // OpentelemetryPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type OpentelemetryPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -774,7 +929,7 @@ type OpentelemetryPlugin struct {
 	Config    *OpentelemetryPluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *OpentelemetryPluginConsumer `json:"consumer,omitempty"`
-	// A set of strings representing HTTP protocols.
+	// A set of strings representing protocols.
 	Protocols []OpentelemetryPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *OpentelemetryPluginRoute `json:"route,omitempty"`
@@ -791,6 +946,13 @@ func (o *OpentelemetryPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *OpentelemetryPlugin) GetCondition() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Condition
 }
 
 func (o *OpentelemetryPlugin) GetCreatedAt() *int64 {

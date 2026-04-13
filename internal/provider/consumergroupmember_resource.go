@@ -126,7 +126,7 @@ func (r *ConsumerGroupMemberResource) Schema(ctx context.Context, req resource.S
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
-				Description: `The name or UUID of the workspace. Default: "default"; Requires replacement if changed.`,
+				Description: `The name of the workspace. Default: "default"; Requires replacement if changed.`,
 			},
 		},
 	}

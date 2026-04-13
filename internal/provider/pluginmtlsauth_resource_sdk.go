@@ -15,6 +15,7 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(ctx contex
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.MtlsAuthPluginConfig{}
 		r.Config.AllowPartialChain = types.BoolPointerValue(resp.Config.AllowPartialChain)
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
@@ -44,8 +45,13 @@ func (r *PluginMtlsAuthResourceModel) RefreshFromSharedMtlsAuthPlugin(ctx contex
 		} else {
 			r.Config.RevocationCheckMode = types.StringNull()
 		}
+		r.Config.SanDirnameMatcher = make([]types.String, 0, len(resp.Config.SanDirnameMatcher))
+		for _, v := range resp.Config.SanDirnameMatcher {
+			r.Config.SanDirnameMatcher = append(r.Config.SanDirnameMatcher, types.StringValue(v))
+		}
 		r.Config.SendCaDn = types.BoolPointerValue(resp.Config.SendCaDn)
 		r.Config.SkipConsumerLookup = types.BoolPointerValue(resp.Config.SkipConsumerLookup)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -197,6 +203,12 @@ func (r *PluginMtlsAuthResourceModel) ToOperationsUpdateMtlsauthPluginRequest(ct
 func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context) (*shared.MtlsAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -367,6 +379,10 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context
 	} else {
 		revocationCheckMode = nil
 	}
+	sanDirnameMatcher := make([]string, 0, len(r.Config.SanDirnameMatcher))
+	for sanDirnameMatcherIndex := range r.Config.SanDirnameMatcher {
+		sanDirnameMatcher = append(sanDirnameMatcher, r.Config.SanDirnameMatcher[sanDirnameMatcherIndex].ValueString())
+	}
 	sendCaDn := new(bool)
 	if !r.Config.SendCaDn.IsUnknown() && !r.Config.SendCaDn.IsNull() {
 		*sendCaDn = r.Config.SendCaDn.ValueBool()
@@ -378,6 +394,12 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context
 		*skipConsumerLookup = r.Config.SkipConsumerLookup.ValueBool()
 	} else {
 		skipConsumerLookup = nil
+	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
 	}
 	config := shared.MtlsAuthPluginConfig{
 		AllowPartialChain:    allowPartialChain,
@@ -394,8 +416,10 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context
 		HTTPSProxyHost:       httpsProxyHost,
 		HTTPSProxyPort:       httpsProxyPort,
 		RevocationCheckMode:  revocationCheckMode,
+		SanDirnameMatcher:    sanDirnameMatcher,
 		SendCaDn:             sendCaDn,
 		SkipConsumerLookup:   skipConsumerLookup,
+		SslVerify:            sslVerify,
 	}
 	protocols := make([]shared.MtlsAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -426,6 +450,7 @@ func (r *PluginMtlsAuthResourceModel) ToSharedMtlsAuthPlugin(ctx context.Context
 		}
 	}
 	out := shared.MtlsAuthPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

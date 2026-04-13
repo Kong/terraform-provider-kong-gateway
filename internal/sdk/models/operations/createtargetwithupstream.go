@@ -11,7 +11,7 @@ import (
 type CreateTargetWithUpstreamRequest struct {
 	// ID or target of the Target to lookup
 	UpstreamID string `pathParam:"style=simple,explode=false,name=UpstreamIdForTarget"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new Target for creation
 	TargetWithoutParents shared.TargetWithoutParents `request:"mediaType=application/json"`

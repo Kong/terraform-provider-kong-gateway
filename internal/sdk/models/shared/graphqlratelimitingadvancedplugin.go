@@ -179,6 +179,159 @@ func (e *GraphqlRateLimitingAdvancedPluginIdentifier) UnmarshalJSON(data []byte)
 	}
 }
 
+// GraphqlRateLimitingAdvancedPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type GraphqlRateLimitingAdvancedPluginAuthProvider string
+
+const (
+	GraphqlRateLimitingAdvancedPluginAuthProviderAws   GraphqlRateLimitingAdvancedPluginAuthProvider = "aws"
+	GraphqlRateLimitingAdvancedPluginAuthProviderAzure GraphqlRateLimitingAdvancedPluginAuthProvider = "azure"
+	GraphqlRateLimitingAdvancedPluginAuthProviderGcp   GraphqlRateLimitingAdvancedPluginAuthProvider = "gcp"
+)
+
+func (e GraphqlRateLimitingAdvancedPluginAuthProvider) ToPointer() *GraphqlRateLimitingAdvancedPluginAuthProvider {
+	return &e
+}
+func (e *GraphqlRateLimitingAdvancedPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = GraphqlRateLimitingAdvancedPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginAuthProvider: %v", v)
+	}
+}
+
+// GraphqlRateLimitingAdvancedPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type GraphqlRateLimitingAdvancedPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *GraphqlRateLimitingAdvancedPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (g GraphqlRateLimitingAdvancedPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAuthProvider() *GraphqlRateLimitingAdvancedPluginAuthProvider {
+	if g == nil {
+		return nil
+	}
+	return g.AuthProvider
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsAccessKeyID
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsAssumeRoleArn
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsCacheName() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsCacheName
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if g == nil {
+		return nil
+	}
+	return g.AwsIsServerless
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsRegion() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsRegion
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsRoleSessionName
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AwsSecretAccessKey
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAzureClientID() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AzureClientID
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AzureClientSecret
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetAzureTenantID() *string {
+	if g == nil {
+		return nil
+	}
+	return g.AzureTenantID
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if g == nil {
+		return nil
+	}
+	return g.GcpServiceAccountJSON
+}
+
 type GraphqlRateLimitingAdvancedPluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -274,6 +427,8 @@ func (e *GraphqlRateLimitingAdvancedPluginSentinelRole) UnmarshalJSON(data []byt
 }
 
 type GraphqlRateLimitingAdvancedPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *GraphqlRateLimitingAdvancedPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -327,6 +482,13 @@ func (g *GraphqlRateLimitingAdvancedPluginRedis) UnmarshalJSON(data []byte) erro
 		return err
 	}
 	return nil
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginRedis) GetCloudAuthentication() *GraphqlRateLimitingAdvancedPluginCloudAuthentication {
+	if g == nil {
+		return nil
+	}
+	return g.CloudAuthentication
 }
 
 func (g *GraphqlRateLimitingAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -772,6 +934,8 @@ func (g *GraphqlRateLimitingAdvancedPluginService) GetID() *string {
 
 // GraphqlRateLimitingAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type GraphqlRateLimitingAdvancedPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -809,6 +973,13 @@ func (g *GraphqlRateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (g *GraphqlRateLimitingAdvancedPlugin) GetCondition() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Condition
 }
 
 func (g *GraphqlRateLimitingAdvancedPlugin) GetCreatedAt() *int64 {

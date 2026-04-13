@@ -15,6 +15,7 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(ctx context.
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.HTTPLogPluginConfig{}
 		if resp.Config.ContentType != nil {
 			r.Config.ContentType = types.StringValue(string(*resp.Config.ContentType))
@@ -60,6 +61,7 @@ func (r *PluginHTTPLogResourceModel) RefreshFromSharedHTTPLogPlugin(ctx context.
 		}
 		r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
 		r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		if resp.Consumer == nil {
 			r.Consumer = nil
@@ -218,6 +220,12 @@ func (r *PluginHTTPLogResourceModel) ToOperationsUpdateHttplogPluginRequest(ctx 
 func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) (*shared.HTTPLogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -422,6 +430,12 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) 
 	} else {
 		retryCount = nil
 	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
+	}
 	timeout := new(float64)
 	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
 		*timeout = r.Config.Timeout.ValueFloat64()
@@ -439,6 +453,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) 
 		Queue:             queue,
 		QueueSize:         queueSize,
 		RetryCount:        retryCount,
+		SslVerify:         sslVerify,
 		Timeout:           timeout,
 	}
 	var consumer *shared.HTTPLogPluginConsumer
@@ -482,6 +497,7 @@ func (r *PluginHTTPLogResourceModel) ToSharedHTTPLogPlugin(ctx context.Context) 
 		}
 	}
 	out := shared.HTTPLogPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

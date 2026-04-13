@@ -9,7 +9,7 @@ import (
 )
 
 type CreateOasvalidationPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace           string                     `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	OasValidationPlugin shared.OasValidationPlugin `request:"mediaType=application/json"`
 }

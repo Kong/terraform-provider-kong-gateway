@@ -131,6 +131,7 @@ const (
 	CompoundIdentifierHeader        CompoundIdentifier = "header"
 	CompoundIdentifierIP            CompoundIdentifier = "ip"
 	CompoundIdentifierPath          CompoundIdentifier = "path"
+	CompoundIdentifierRoute         CompoundIdentifier = "route"
 	CompoundIdentifierService       CompoundIdentifier = "service"
 )
 
@@ -155,6 +156,8 @@ func (e *CompoundIdentifier) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "path":
 		fallthrough
+	case "route":
+		fallthrough
 	case "service":
 		*e = CompoundIdentifier(v)
 		return nil
@@ -163,7 +166,7 @@ func (e *CompoundIdentifier) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// RateLimitingAdvancedPluginIdentifier - The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Can be `ip`, `credential`, `consumer`, `service`, `header`, `path` or `consumer-group`. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
+// RateLimitingAdvancedPluginIdentifier - The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
 type RateLimitingAdvancedPluginIdentifier string
 
 const (
@@ -173,6 +176,7 @@ const (
 	RateLimitingAdvancedPluginIdentifierHeader        RateLimitingAdvancedPluginIdentifier = "header"
 	RateLimitingAdvancedPluginIdentifierIP            RateLimitingAdvancedPluginIdentifier = "ip"
 	RateLimitingAdvancedPluginIdentifierPath          RateLimitingAdvancedPluginIdentifier = "path"
+	RateLimitingAdvancedPluginIdentifierRoute         RateLimitingAdvancedPluginIdentifier = "route"
 	RateLimitingAdvancedPluginIdentifierService       RateLimitingAdvancedPluginIdentifier = "service"
 )
 
@@ -197,12 +201,167 @@ func (e *RateLimitingAdvancedPluginIdentifier) UnmarshalJSON(data []byte) error 
 		fallthrough
 	case "path":
 		fallthrough
+	case "route":
+		fallthrough
 	case "service":
 		*e = RateLimitingAdvancedPluginIdentifier(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginIdentifier: %v", v)
 	}
+}
+
+// RateLimitingAdvancedPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type RateLimitingAdvancedPluginAuthProvider string
+
+const (
+	RateLimitingAdvancedPluginAuthProviderAws   RateLimitingAdvancedPluginAuthProvider = "aws"
+	RateLimitingAdvancedPluginAuthProviderAzure RateLimitingAdvancedPluginAuthProvider = "azure"
+	RateLimitingAdvancedPluginAuthProviderGcp   RateLimitingAdvancedPluginAuthProvider = "gcp"
+)
+
+func (e RateLimitingAdvancedPluginAuthProvider) ToPointer() *RateLimitingAdvancedPluginAuthProvider {
+	return &e
+}
+func (e *RateLimitingAdvancedPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = RateLimitingAdvancedPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginAuthProvider: %v", v)
+	}
+}
+
+// RateLimitingAdvancedPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type RateLimitingAdvancedPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *RateLimitingAdvancedPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAuthProvider() *RateLimitingAdvancedPluginAuthProvider {
+	if r == nil {
+		return nil
+	}
+	return r.AuthProvider
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAccessKeyID
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAssumeRoleArn
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsCacheName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsCacheName
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.AwsIsServerless
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsRegion() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRegion
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRoleSessionName
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsSecretAccessKey
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAzureClientID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientID
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientSecret
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetAzureTenantID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureTenantID
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if r == nil {
+		return nil
+	}
+	return r.GcpServiceAccountJSON
 }
 
 type RateLimitingAdvancedPluginClusterNodes struct {
@@ -324,6 +483,8 @@ func (e *RateLimitingAdvancedPluginSentinelRole) UnmarshalJSON(data []byte) erro
 }
 
 type RateLimitingAdvancedPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *RateLimitingAdvancedPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -379,6 +540,13 @@ func (r *RateLimitingAdvancedPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RateLimitingAdvancedPluginRedis) GetCloudAuthentication() *RateLimitingAdvancedPluginCloudAuthentication {
+	if r == nil {
+		return nil
+	}
+	return r.CloudAuthentication
 }
 
 func (r *RateLimitingAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -535,7 +703,7 @@ func (r *RateLimitingAdvancedPluginRedis) GetUsername() *string {
 	return r.Username
 }
 
-// RateLimitingAdvancedPluginStrategy - The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local` and `cluster`.
+// RateLimitingAdvancedPluginStrategy - The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local`, `redis` and `cluster`.
 type RateLimitingAdvancedPluginStrategy string
 
 const (
@@ -661,20 +829,20 @@ type RateLimitingAdvancedPluginConfig struct {
 	HeaderName *string `json:"header_name,omitempty"`
 	// Optionally hide informative response headers that would otherwise provide information about the current status of limits and counters.
 	HideClientHeaders *bool `json:"hide_client_headers,omitempty"`
-	// The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Can be `ip`, `credential`, `consumer`, `service`, `header`, `path` or `consumer-group`. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
+	// The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
 	Identifier *RateLimitingAdvancedPluginIdentifier `json:"identifier,omitempty"`
 	// One or more requests-per-window limits to apply. There must be a matching number of window limits and sizes specified.
 	Limit []float64 `json:"limit"`
 	// The shared dictionary where concurrency control locks are stored. The default shared dictionary is `kong_locks`. The shared dictionary should be declare in nginx-kong.conf.
 	LockDictionaryName *string `json:"lock_dictionary_name,omitempty"`
-	// The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. NOTE: For the plugin instances sharing the same namespace, all the configurations that are required for synchronizing counters, e.g. `strategy`, `redis`, `sync_rate`, `dictionary_name`, need to be the same.
+	// Specifies the rate-limiting namespace for this plugin instance. A namespace acts as a logical grouping for configuration and counter data used by the rate-limiting algorithm. Namespaces define how and where counter data is stored and synchronized. When multiple plugin instances share the same namespace, they also share the same rate-limiting counters and synchronization configuration. Conversely, using different namespaces ensures that each plugin instance maintains its own independent counters.
 	Namespace *string `json:"namespace,omitempty"`
 	// A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).
 	Path  *string                          `json:"path,omitempty"`
 	Redis *RateLimitingAdvancedPluginRedis `json:"redis,omitempty"`
 	// The upper bound of a jitter (random delay) in seconds to be added to the `Retry-After` header of denied requests (status = `429`) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is `0`; in this case, the `Retry-After` header is equal to the `RateLimit-Reset` header.
 	RetryAfterJitterMax *float64 `json:"retry_after_jitter_max,omitempty"`
-	// The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local` and `cluster`.
+	// The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local`, `redis` and `cluster`.
 	Strategy *RateLimitingAdvancedPluginStrategy `json:"strategy,omitempty"`
 	// How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).
 	SyncRate   *float64    `json:"sync_rate,omitempty"`
@@ -969,6 +1137,8 @@ func (r *RateLimitingAdvancedPluginService) GetID() *string {
 
 // RateLimitingAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RateLimitingAdvancedPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1008,6 +1178,13 @@ func (r *RateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RateLimitingAdvancedPlugin) GetCondition() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Condition
 }
 
 func (r *RateLimitingAdvancedPlugin) GetCreatedAt() *int64 {

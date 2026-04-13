@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -15,6 +17,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.AiLlmAsJudgePluginConfig{}
 		r.Config.HTTPProxyHost = types.StringPointerValue(resp.Config.HTTPProxyHost)
 		r.Config.HTTPProxyPort = types.Int64PointerValue(resp.Config.HTTPProxyPort)
@@ -25,11 +28,11 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 		r.Config.IgnoreAssistantPrompts = types.BoolPointerValue(resp.Config.IgnoreAssistantPrompts)
 		r.Config.IgnoreSystemPrompts = types.BoolPointerValue(resp.Config.IgnoreSystemPrompts)
 		r.Config.IgnoreToolPrompts = types.BoolPointerValue(resp.Config.IgnoreToolPrompts)
-		r.Config.Llm = &tfTypes.Llm{}
+		r.Config.Llm = &tfTypes.PartialModelConfig{}
 		if resp.Config.Llm.Auth == nil {
 			r.Config.Llm.Auth = nil
 		} else {
-			r.Config.Llm.Auth = &tfTypes.AiLlmAsJudgePluginAuth{}
+			r.Config.Llm.Auth = &tfTypes.PartialEmbeddingsAuth{}
 			r.Config.Llm.Auth.AllowOverride = types.BoolPointerValue(resp.Config.Llm.Auth.AllowOverride)
 			r.Config.Llm.Auth.AwsAccessKeyID = types.StringPointerValue(resp.Config.Llm.Auth.AwsAccessKeyID)
 			r.Config.Llm.Auth.AwsSecretAccessKey = types.StringPointerValue(resp.Config.Llm.Auth.AwsSecretAccessKey)
@@ -37,6 +40,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			r.Config.Llm.Auth.AzureClientSecret = types.StringPointerValue(resp.Config.Llm.Auth.AzureClientSecret)
 			r.Config.Llm.Auth.AzureTenantID = types.StringPointerValue(resp.Config.Llm.Auth.AzureTenantID)
 			r.Config.Llm.Auth.AzureUseManagedIdentity = types.BoolPointerValue(resp.Config.Llm.Auth.AzureUseManagedIdentity)
+			r.Config.Llm.Auth.GcpMetadataURL = types.StringPointerValue(resp.Config.Llm.Auth.GcpMetadataURL)
+			r.Config.Llm.Auth.GcpOauthTokenURL = types.StringPointerValue(resp.Config.Llm.Auth.GcpOauthTokenURL)
 			r.Config.Llm.Auth.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.Llm.Auth.GcpServiceAccountJSON)
 			r.Config.Llm.Auth.GcpUseServiceAccount = types.BoolPointerValue(resp.Config.Llm.Auth.GcpUseServiceAccount)
 			r.Config.Llm.Auth.HeaderName = types.StringPointerValue(resp.Config.Llm.Auth.HeaderName)
@@ -49,19 +54,27 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			r.Config.Llm.Auth.ParamName = types.StringPointerValue(resp.Config.Llm.Auth.ParamName)
 			r.Config.Llm.Auth.ParamValue = types.StringPointerValue(resp.Config.Llm.Auth.ParamValue)
 		}
+		r.Config.Llm.Description = types.StringPointerValue(resp.Config.Llm.Description)
 		if resp.Config.Llm.Logging == nil {
 			r.Config.Llm.Logging = nil
 		} else {
-			r.Config.Llm.Logging = &tfTypes.AiLlmAsJudgePluginLogging{}
+			r.Config.Llm.Logging = &tfTypes.PartialModelLogging{}
 			r.Config.Llm.Logging.LogPayloads = types.BoolPointerValue(resp.Config.Llm.Logging.LogPayloads)
 			r.Config.Llm.Logging.LogStatistics = types.BoolPointerValue(resp.Config.Llm.Logging.LogStatistics)
 		}
-		r.Config.Llm.Model = &tfTypes.AiLlmAsJudgePluginModel{}
+		if resp.Config.Llm.Metadata == nil {
+			r.Config.Llm.Metadata = jsontypes.NewNormalizedNull()
+		} else {
+			metadataResult, _ := json.Marshal(resp.Config.Llm.Metadata)
+			r.Config.Llm.Metadata = jsontypes.NewNormalizedValue(string(metadataResult))
+		}
+		r.Config.Llm.Model = &tfTypes.PartialModelModel{}
+		r.Config.Llm.Model.ModelAlias = types.StringPointerValue(resp.Config.Llm.Model.ModelAlias)
 		r.Config.Llm.Model.Name = types.StringPointerValue(resp.Config.Llm.Model.Name)
 		if resp.Config.Llm.Model.Options == nil {
 			r.Config.Llm.Model.Options = nil
 		} else {
-			r.Config.Llm.Model.Options = &tfTypes.AiLlmAsJudgePluginOptions{}
+			r.Config.Llm.Model.Options = &tfTypes.PartialModelOptions{}
 			r.Config.Llm.Model.Options.AnthropicVersion = types.StringPointerValue(resp.Config.Llm.Model.Options.AnthropicVersion)
 			r.Config.Llm.Model.Options.AzureAPIVersion = types.StringPointerValue(resp.Config.Llm.Model.Options.AzureAPIVersion)
 			r.Config.Llm.Model.Options.AzureDeploymentID = types.StringPointerValue(resp.Config.Llm.Model.Options.AzureDeploymentID)
@@ -69,18 +82,21 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			if resp.Config.Llm.Model.Options.Bedrock == nil {
 				r.Config.Llm.Model.Options.Bedrock = nil
 			} else {
-				r.Config.Llm.Model.Options.Bedrock = &tfTypes.AiLlmAsJudgePluginBedrock{}
+				r.Config.Llm.Model.Options.Bedrock = &tfTypes.PartialEmbeddingsBedrock{}
 				r.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsAssumeRoleArn)
 				r.Config.Llm.Model.Options.Bedrock.AwsRegion = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRegion)
 				r.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsRoleSessionName)
 				r.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.AwsStsEndpointURL)
+				r.Config.Llm.Model.Options.Bedrock.BatchBucketPrefix = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.BatchBucketPrefix)
+				r.Config.Llm.Model.Options.Bedrock.BatchRoleArn = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.BatchRoleArn)
 				r.Config.Llm.Model.Options.Bedrock.EmbeddingsNormalize = types.BoolPointerValue(resp.Config.Llm.Model.Options.Bedrock.EmbeddingsNormalize)
 				r.Config.Llm.Model.Options.Bedrock.PerformanceConfigLatency = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.PerformanceConfigLatency)
+				r.Config.Llm.Model.Options.Bedrock.VideoOutputS3URI = types.StringPointerValue(resp.Config.Llm.Model.Options.Bedrock.VideoOutputS3URI)
 			}
 			if resp.Config.Llm.Model.Options.Cohere == nil {
 				r.Config.Llm.Model.Options.Cohere = nil
 			} else {
-				r.Config.Llm.Model.Options.Cohere = &tfTypes.AiLlmAsJudgePluginCohere{}
+				r.Config.Llm.Model.Options.Cohere = &tfTypes.PartialModelCohere{}
 				if resp.Config.Llm.Model.Options.Cohere.EmbeddingInputType != nil {
 					r.Config.Llm.Model.Options.Cohere.EmbeddingInputType = types.StringValue(string(*resp.Config.Llm.Model.Options.Cohere.EmbeddingInputType))
 				} else {
@@ -88,11 +104,23 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 				}
 				r.Config.Llm.Model.Options.Cohere.WaitForModel = types.BoolPointerValue(resp.Config.Llm.Model.Options.Cohere.WaitForModel)
 			}
+			if resp.Config.Llm.Model.Options.Dashscope == nil {
+				r.Config.Llm.Model.Options.Dashscope = nil
+			} else {
+				r.Config.Llm.Model.Options.Dashscope = &tfTypes.PartialModelDashscope{}
+				r.Config.Llm.Model.Options.Dashscope.International = types.BoolPointerValue(resp.Config.Llm.Model.Options.Dashscope.International)
+			}
+			if resp.Config.Llm.Model.Options.Databricks == nil {
+				r.Config.Llm.Model.Options.Databricks = nil
+			} else {
+				r.Config.Llm.Model.Options.Databricks = &tfTypes.PartialModelDatabricks{}
+				r.Config.Llm.Model.Options.Databricks.WorkspaceInstanceID = types.StringPointerValue(resp.Config.Llm.Model.Options.Databricks.WorkspaceInstanceID)
+			}
 			r.Config.Llm.Model.Options.EmbeddingsDimensions = types.Int64PointerValue(resp.Config.Llm.Model.Options.EmbeddingsDimensions)
 			if resp.Config.Llm.Model.Options.Gemini == nil {
 				r.Config.Llm.Model.Options.Gemini = nil
 			} else {
-				r.Config.Llm.Model.Options.Gemini = &tfTypes.AiLlmAsJudgePluginGemini{}
+				r.Config.Llm.Model.Options.Gemini = &tfTypes.PartialModelGemini{}
 				r.Config.Llm.Model.Options.Gemini.APIEndpoint = types.StringPointerValue(resp.Config.Llm.Model.Options.Gemini.APIEndpoint)
 				r.Config.Llm.Model.Options.Gemini.EndpointID = types.StringPointerValue(resp.Config.Llm.Model.Options.Gemini.EndpointID)
 				r.Config.Llm.Model.Options.Gemini.LocationID = types.StringPointerValue(resp.Config.Llm.Model.Options.Gemini.LocationID)
@@ -101,7 +129,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 			if resp.Config.Llm.Model.Options.Huggingface == nil {
 				r.Config.Llm.Model.Options.Huggingface = nil
 			} else {
-				r.Config.Llm.Model.Options.Huggingface = &tfTypes.AiLlmAsJudgePluginHuggingface{}
+				r.Config.Llm.Model.Options.Huggingface = &tfTypes.PartialEmbeddingsHuggingface{}
 				r.Config.Llm.Model.Options.Huggingface.UseCache = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.UseCache)
 				r.Config.Llm.Model.Options.Huggingface.WaitForModel = types.BoolPointerValue(resp.Config.Llm.Model.Options.Huggingface.WaitForModel)
 			}
@@ -126,6 +154,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) RefreshFromSharedAiLlmAsJudgePlugin(ct
 		}
 		r.Config.Llm.Model.Provider = types.StringValue(string(resp.Config.Llm.Model.Provider))
 		r.Config.Llm.RouteType = types.StringValue(string(resp.Config.Llm.RouteType))
+		r.Config.Llm.Weight = types.Int64PointerValue(resp.Config.Llm.Weight)
 		r.Config.MessageCountback = types.Float64PointerValue(resp.Config.MessageCountback)
 		r.Config.Prompt = types.StringPointerValue(resp.Config.Prompt)
 		r.Config.SamplingRate = types.Float64PointerValue(resp.Config.SamplingRate)
@@ -292,6 +321,12 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToOperationsUpdateAillmasjudgePluginRe
 func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context.Context) (*shared.AiLlmAsJudgePlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -480,6 +515,18 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 		} else {
 			azureUseManagedIdentity = nil
 		}
+		gcpMetadataURL := new(string)
+		if !r.Config.Llm.Auth.GcpMetadataURL.IsUnknown() && !r.Config.Llm.Auth.GcpMetadataURL.IsNull() {
+			*gcpMetadataURL = r.Config.Llm.Auth.GcpMetadataURL.ValueString()
+		} else {
+			gcpMetadataURL = nil
+		}
+		gcpOauthTokenURL := new(string)
+		if !r.Config.Llm.Auth.GcpOauthTokenURL.IsUnknown() && !r.Config.Llm.Auth.GcpOauthTokenURL.IsNull() {
+			*gcpOauthTokenURL = r.Config.Llm.Auth.GcpOauthTokenURL.ValueString()
+		} else {
+			gcpOauthTokenURL = nil
+		}
 		gcpServiceAccountJSON := new(string)
 		if !r.Config.Llm.Auth.GcpServiceAccountJSON.IsUnknown() && !r.Config.Llm.Auth.GcpServiceAccountJSON.IsNull() {
 			*gcpServiceAccountJSON = r.Config.Llm.Auth.GcpServiceAccountJSON.ValueString()
@@ -530,6 +577,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			AzureClientSecret:       azureClientSecret,
 			AzureTenantID:           azureTenantID,
 			AzureUseManagedIdentity: azureUseManagedIdentity,
+			GcpMetadataURL:          gcpMetadataURL,
+			GcpOauthTokenURL:        gcpOauthTokenURL,
 			GcpServiceAccountJSON:   gcpServiceAccountJSON,
 			GcpUseServiceAccount:    gcpUseServiceAccount,
 			HeaderName:              headerName,
@@ -538,6 +587,12 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			ParamName:               paramName,
 			ParamValue:              paramValue,
 		}
+	}
+	description := new(string)
+	if !r.Config.Llm.Description.IsUnknown() && !r.Config.Llm.Description.IsNull() {
+		*description = r.Config.Llm.Description.ValueString()
+	} else {
+		description = nil
 	}
 	var logging *shared.AiLlmAsJudgePluginLogging
 	if r.Config.Llm.Logging != nil {
@@ -557,6 +612,16 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			LogPayloads:   logPayloads,
 			LogStatistics: logStatistics,
 		}
+	}
+	var metadata interface{}
+	if !r.Config.Llm.Metadata.IsUnknown() && !r.Config.Llm.Metadata.IsNull() {
+		_ = json.Unmarshal([]byte(r.Config.Llm.Metadata.ValueString()), &metadata)
+	}
+	modelAlias := new(string)
+	if !r.Config.Llm.Model.ModelAlias.IsUnknown() && !r.Config.Llm.Model.ModelAlias.IsNull() {
+		*modelAlias = r.Config.Llm.Model.ModelAlias.ValueString()
+	} else {
+		modelAlias = nil
 	}
 	name1 := new(string)
 	if !r.Config.Llm.Model.Name.IsUnknown() && !r.Config.Llm.Model.Name.IsNull() {
@@ -616,6 +681,18 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			} else {
 				awsStsEndpointURL = nil
 			}
+			batchBucketPrefix := new(string)
+			if !r.Config.Llm.Model.Options.Bedrock.BatchBucketPrefix.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.BatchBucketPrefix.IsNull() {
+				*batchBucketPrefix = r.Config.Llm.Model.Options.Bedrock.BatchBucketPrefix.ValueString()
+			} else {
+				batchBucketPrefix = nil
+			}
+			batchRoleArn := new(string)
+			if !r.Config.Llm.Model.Options.Bedrock.BatchRoleArn.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.BatchRoleArn.IsNull() {
+				*batchRoleArn = r.Config.Llm.Model.Options.Bedrock.BatchRoleArn.ValueString()
+			} else {
+				batchRoleArn = nil
+			}
 			embeddingsNormalize := new(bool)
 			if !r.Config.Llm.Model.Options.Bedrock.EmbeddingsNormalize.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.EmbeddingsNormalize.IsNull() {
 				*embeddingsNormalize = r.Config.Llm.Model.Options.Bedrock.EmbeddingsNormalize.ValueBool()
@@ -628,13 +705,22 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			} else {
 				performanceConfigLatency = nil
 			}
+			videoOutputS3URI := new(string)
+			if !r.Config.Llm.Model.Options.Bedrock.VideoOutputS3URI.IsUnknown() && !r.Config.Llm.Model.Options.Bedrock.VideoOutputS3URI.IsNull() {
+				*videoOutputS3URI = r.Config.Llm.Model.Options.Bedrock.VideoOutputS3URI.ValueString()
+			} else {
+				videoOutputS3URI = nil
+			}
 			bedrock = &shared.AiLlmAsJudgePluginBedrock{
 				AwsAssumeRoleArn:         awsAssumeRoleArn,
 				AwsRegion:                awsRegion,
 				AwsRoleSessionName:       awsRoleSessionName,
 				AwsStsEndpointURL:        awsStsEndpointURL,
+				BatchBucketPrefix:        batchBucketPrefix,
+				BatchRoleArn:             batchRoleArn,
 				EmbeddingsNormalize:      embeddingsNormalize,
 				PerformanceConfigLatency: performanceConfigLatency,
+				VideoOutputS3URI:         videoOutputS3URI,
 			}
 		}
 		var cohere *shared.AiLlmAsJudgePluginCohere
@@ -654,6 +740,30 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			cohere = &shared.AiLlmAsJudgePluginCohere{
 				EmbeddingInputType: embeddingInputType,
 				WaitForModel:       waitForModel,
+			}
+		}
+		var dashscope *shared.AiLlmAsJudgePluginDashscope
+		if r.Config.Llm.Model.Options.Dashscope != nil {
+			international := new(bool)
+			if !r.Config.Llm.Model.Options.Dashscope.International.IsUnknown() && !r.Config.Llm.Model.Options.Dashscope.International.IsNull() {
+				*international = r.Config.Llm.Model.Options.Dashscope.International.ValueBool()
+			} else {
+				international = nil
+			}
+			dashscope = &shared.AiLlmAsJudgePluginDashscope{
+				International: international,
+			}
+		}
+		var databricks *shared.AiLlmAsJudgePluginDatabricks
+		if r.Config.Llm.Model.Options.Databricks != nil {
+			workspaceInstanceID := new(string)
+			if !r.Config.Llm.Model.Options.Databricks.WorkspaceInstanceID.IsUnknown() && !r.Config.Llm.Model.Options.Databricks.WorkspaceInstanceID.IsNull() {
+				*workspaceInstanceID = r.Config.Llm.Model.Options.Databricks.WorkspaceInstanceID.ValueString()
+			} else {
+				workspaceInstanceID = nil
+			}
+			databricks = &shared.AiLlmAsJudgePluginDatabricks{
+				WorkspaceInstanceID: workspaceInstanceID,
 			}
 		}
 		embeddingsDimensions := new(int64)
@@ -781,6 +891,8 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 			AzureInstance:        azureInstance,
 			Bedrock:              bedrock,
 			Cohere:               cohere,
+			Dashscope:            dashscope,
+			Databricks:           databricks,
 			EmbeddingsDimensions: embeddingsDimensions,
 			Gemini:               gemini,
 			Huggingface:          huggingface,
@@ -798,16 +910,26 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 	}
 	provider := shared.AiLlmAsJudgePluginProvider(r.Config.Llm.Model.Provider.ValueString())
 	model := shared.AiLlmAsJudgePluginModel{
-		Name:     name1,
-		Options:  optionsVar,
-		Provider: provider,
+		ModelAlias: modelAlias,
+		Name:       name1,
+		Options:    optionsVar,
+		Provider:   provider,
 	}
 	routeType := shared.AiLlmAsJudgePluginRouteType(r.Config.Llm.RouteType.ValueString())
+	weight := new(int64)
+	if !r.Config.Llm.Weight.IsUnknown() && !r.Config.Llm.Weight.IsNull() {
+		*weight = r.Config.Llm.Weight.ValueInt64()
+	} else {
+		weight = nil
+	}
 	llm := shared.Llm{
-		Auth:      auth,
-		Logging:   logging,
-		Model:     model,
-		RouteType: routeType,
+		Auth:        auth,
+		Description: description,
+		Logging:     logging,
+		Metadata:    metadata,
+		Model:       model,
+		RouteType:   routeType,
+		Weight:      weight,
 	}
 	messageCountback := new(float64)
 	if !r.Config.MessageCountback.IsUnknown() && !r.Config.MessageCountback.IsNull() {
@@ -895,6 +1017,7 @@ func (r *PluginAiLlmAsJudgeResourceModel) ToSharedAiLlmAsJudgePlugin(ctx context
 		}
 	}
 	out := shared.AiLlmAsJudgePlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

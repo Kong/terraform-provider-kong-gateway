@@ -481,9 +481,9 @@ type KafkaConsumePluginOauth2 struct {
 	// The token endpoint URI.
 	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
-	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
-	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
 }
@@ -548,14 +548,14 @@ func (k *KafkaConsumePluginOauth2) GetTokenEndpoint() string {
 	return k.TokenEndpoint
 }
 
-func (k *KafkaConsumePluginOauth2) GetTokenHeaders() map[string]any {
+func (k *KafkaConsumePluginOauth2) GetTokenHeaders() map[string]string {
 	if k == nil {
 		return nil
 	}
 	return k.TokenHeaders
 }
 
-func (k *KafkaConsumePluginOauth2) GetTokenPostArgs() map[string]any {
+func (k *KafkaConsumePluginOauth2) GetTokenPostArgs() map[string]string {
 	if k == nil {
 		return nil
 	}
@@ -872,6 +872,8 @@ type KafkaConsumePluginSecurity struct {
 	CertificateID *string `json:"certificate_id,omitempty"`
 	// Enables TLS.
 	Ssl *bool `json:"ssl,omitempty"`
+	// When using TLS, this option enables verification of the certificate presented by the server.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
 }
 
 func (k KafkaConsumePluginSecurity) MarshalJSON() ([]byte, error) {
@@ -897,6 +899,13 @@ func (k *KafkaConsumePluginSecurity) GetSsl() *bool {
 		return nil
 	}
 	return k.Ssl
+}
+
+func (k *KafkaConsumePluginSecurity) GetSslVerify() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.SslVerify
 }
 
 type KafkaConsumePluginConfigBasic struct {
@@ -1002,9 +1011,9 @@ type KafkaConsumePluginConfigOauth2 struct {
 	// The token endpoint URI.
 	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
-	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
-	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
 }
@@ -1069,14 +1078,14 @@ func (k *KafkaConsumePluginConfigOauth2) GetTokenEndpoint() string {
 	return k.TokenEndpoint
 }
 
-func (k *KafkaConsumePluginConfigOauth2) GetTokenHeaders() map[string]any {
+func (k *KafkaConsumePluginConfigOauth2) GetTokenHeaders() map[string]string {
 	if k == nil {
 		return nil
 	}
 	return k.TokenHeaders
 }
 
-func (k *KafkaConsumePluginConfigOauth2) GetTokenPostArgs() map[string]any {
+func (k *KafkaConsumePluginConfigOauth2) GetTokenPostArgs() map[string]string {
 	if k == nil {
 		return nil
 	}
@@ -1433,6 +1442,8 @@ type KafkaConsumePluginConfig struct {
 	DlqTopic *string `json:"dlq_topic,omitempty"`
 	// Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the `message_by_lua_functions`, it will be forwarded to `dlq_topic` that can be processed later.
 	EnableDlq *bool `json:"enable_dlq,omitempty"`
+	// When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.
+	EnforceLatestOffsetReset *bool `json:"enforce_latest_offset_reset,omitempty"`
 	// The Lua functions that manipulates the message being sent to the client.
 	MessageByLuaFunctions []string `json:"message_by_lua_functions,omitempty"`
 	// The deserializer to use for the consumed messages.
@@ -1504,6 +1515,13 @@ func (k *KafkaConsumePluginConfig) GetEnableDlq() *bool {
 		return nil
 	}
 	return k.EnableDlq
+}
+
+func (k *KafkaConsumePluginConfig) GetEnforceLatestOffsetReset() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.EnforceLatestOffsetReset
 }
 
 func (k *KafkaConsumePluginConfig) GetMessageByLuaFunctions() []string {
@@ -1634,6 +1652,8 @@ func (k *KafkaConsumePluginRoute) GetID() *string {
 
 // KafkaConsumePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KafkaConsumePlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1669,6 +1689,13 @@ func (k *KafkaConsumePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (k *KafkaConsumePlugin) GetCondition() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Condition
 }
 
 func (k *KafkaConsumePlugin) GetCreatedAt() *int64 {

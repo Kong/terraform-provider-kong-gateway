@@ -577,6 +577,159 @@ func (c *ClientJwk) GetY() *string {
 	return c.Y
 }
 
+// OpenidConnectPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type OpenidConnectPluginAuthProvider string
+
+const (
+	OpenidConnectPluginAuthProviderAws   OpenidConnectPluginAuthProvider = "aws"
+	OpenidConnectPluginAuthProviderAzure OpenidConnectPluginAuthProvider = "azure"
+	OpenidConnectPluginAuthProviderGcp   OpenidConnectPluginAuthProvider = "gcp"
+)
+
+func (e OpenidConnectPluginAuthProvider) ToPointer() *OpenidConnectPluginAuthProvider {
+	return &e
+}
+func (e *OpenidConnectPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = OpenidConnectPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for OpenidConnectPluginAuthProvider: %v", v)
+	}
+}
+
+// OpenidConnectPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type OpenidConnectPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *OpenidConnectPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (o OpenidConnectPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAuthProvider() *OpenidConnectPluginAuthProvider {
+	if o == nil {
+		return nil
+	}
+	return o.AuthProvider
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsAccessKeyID
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsAssumeRoleArn
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsCacheName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsCacheName
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.AwsIsServerless
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsRegion() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsRegion
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsRoleSessionName
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsSecretAccessKey
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAzureClientID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureClientID
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureClientSecret
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetAzureTenantID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureTenantID
+}
+
+func (o *OpenidConnectPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if o == nil {
+		return nil
+	}
+	return o.GcpServiceAccountJSON
+}
+
 type OpenidConnectPluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -672,6 +825,8 @@ func (e *OpenidConnectPluginSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type ClusterCacheRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *OpenidConnectPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -725,6 +880,13 @@ func (c *ClusterCacheRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (c *ClusterCacheRedis) GetCloudAuthentication() *OpenidConnectPluginCloudAuthentication {
+	if c == nil {
+		return nil
+	}
+	return c.CloudAuthentication
 }
 
 func (c *ClusterCacheRedis) GetClusterMaxRedirections() *int64 {
@@ -975,6 +1137,38 @@ func (e *DisableSession) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("invalid value for DisableSession: %v", v)
 	}
+}
+
+type DownstreamHeaders struct {
+	// The name of the header.
+	Header string `json:"header"`
+	// The path of the header value.
+	Path []string `json:"path"`
+}
+
+func (d DownstreamHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DownstreamHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"header", "path"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DownstreamHeaders) GetHeader() string {
+	if d == nil {
+		return ""
+	}
+	return d.Header
+}
+
+func (d *DownstreamHeaders) GetPath() []string {
+	if d == nil {
+		return []string{}
+	}
+	return d.Path
 }
 
 type IDTokenParamType string
@@ -1418,6 +1612,159 @@ func (e *PushedAuthorizationRequestEndpointAuthMethod) UnmarshalJSON(data []byte
 	}
 }
 
+// OpenidConnectPluginConfigAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type OpenidConnectPluginConfigAuthProvider string
+
+const (
+	OpenidConnectPluginConfigAuthProviderAws   OpenidConnectPluginConfigAuthProvider = "aws"
+	OpenidConnectPluginConfigAuthProviderAzure OpenidConnectPluginConfigAuthProvider = "azure"
+	OpenidConnectPluginConfigAuthProviderGcp   OpenidConnectPluginConfigAuthProvider = "gcp"
+)
+
+func (e OpenidConnectPluginConfigAuthProvider) ToPointer() *OpenidConnectPluginConfigAuthProvider {
+	return &e
+}
+func (e *OpenidConnectPluginConfigAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = OpenidConnectPluginConfigAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for OpenidConnectPluginConfigAuthProvider: %v", v)
+	}
+}
+
+// OpenidConnectPluginConfigCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type OpenidConnectPluginConfigCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *OpenidConnectPluginConfigAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (o OpenidConnectPluginConfigCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAuthProvider() *OpenidConnectPluginConfigAuthProvider {
+	if o == nil {
+		return nil
+	}
+	return o.AuthProvider
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsAccessKeyID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsAccessKeyID
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsAssumeRoleArn
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsCacheName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsCacheName
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsIsServerless() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.AwsIsServerless
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsRegion() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsRegion
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsRoleSessionName() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsRoleSessionName
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AwsSecretAccessKey
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAzureClientID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureClientID
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAzureClientSecret() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureClientSecret
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetAzureTenantID() *string {
+	if o == nil {
+		return nil
+	}
+	return o.AzureTenantID
+}
+
+func (o *OpenidConnectPluginConfigCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if o == nil {
+		return nil
+	}
+	return o.GcpServiceAccountJSON
+}
+
 type OpenidConnectPluginConfigClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -1513,6 +1860,8 @@ func (e *OpenidConnectPluginConfigSentinelRole) UnmarshalJSON(data []byte) error
 }
 
 type OpenidConnectPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *OpenidConnectPluginConfigCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -1570,6 +1919,13 @@ func (o *OpenidConnectPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *OpenidConnectPluginRedis) GetCloudAuthentication() *OpenidConnectPluginConfigCloudAuthentication {
+	if o == nil {
+		return nil
+	}
+	return o.CloudAuthentication
 }
 
 func (o *OpenidConnectPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -2065,6 +2421,211 @@ func (e *TokenEndpointAuthMethod) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// OpenidConnectPluginCache - Cache support for token exchange
+type OpenidConnectPluginCache struct {
+	// Whether to enable caching.
+	Enabled *bool `json:"enabled,omitempty"`
+	// Cache ttl in seconds used when caching exchanged tokens, use it to override `conf.cache_ttl`. Token expiry will be used if shorter than this value.
+	TTL *int64 `json:"ttl,omitempty"`
+}
+
+func (o OpenidConnectPluginCache) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginCache) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginCache) GetEnabled() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.Enabled
+}
+
+func (o *OpenidConnectPluginCache) GetTTL() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.TTL
+}
+
+// OpenidConnectPluginRequest - Parameters used in the token exchange request.
+type OpenidConnectPluginRequest struct {
+	// Audiences used in the token exchange request. Values defined here override those defined in `config.audience`.
+	Audience []string `json:"audience,omitempty"`
+	// Use empty audiences. Use this field to override audiences defined in `config.audience`.
+	EmptyAudience *bool `json:"empty_audience,omitempty"`
+	// Use empty scopes. Use this field to override scopes defined in `config.scopes`.
+	EmptyScopes *bool `json:"empty_scopes,omitempty"`
+	// Scopes used in the token exchange request. Values defined here override those defined in `config.scopes`.
+	Scopes []string `json:"scopes,omitempty"`
+}
+
+func (o OpenidConnectPluginRequest) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginRequest) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginRequest) GetAudience() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Audience
+}
+
+func (o *OpenidConnectPluginRequest) GetEmptyAudience() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EmptyAudience
+}
+
+func (o *OpenidConnectPluginRequest) GetEmptyScopes() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EmptyScopes
+}
+
+func (o *OpenidConnectPluginRequest) GetScopes() []string {
+	if o == nil {
+		return nil
+	}
+	return o.Scopes
+}
+
+// Conditions - A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined.
+type Conditions struct {
+	HasAudience     []string `json:"has_audience,omitempty"`
+	HasScopes       []string `json:"has_scopes,omitempty"`
+	MissingAudience []string `json:"missing_audience,omitempty"`
+	MissingScopes   []string `json:"missing_scopes,omitempty"`
+}
+
+func (c Conditions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *Conditions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Conditions) GetHasAudience() []string {
+	if c == nil {
+		return nil
+	}
+	return c.HasAudience
+}
+
+func (c *Conditions) GetHasScopes() []string {
+	if c == nil {
+		return nil
+	}
+	return c.HasScopes
+}
+
+func (c *Conditions) GetMissingAudience() []string {
+	if c == nil {
+		return nil
+	}
+	return c.MissingAudience
+}
+
+func (c *Conditions) GetMissingScopes() []string {
+	if c == nil {
+		return nil
+	}
+	return c.MissingScopes
+}
+
+type SubjectTokenIssuers struct {
+	// A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined.
+	Conditions *Conditions `json:"conditions,omitempty"`
+	// Tokens of whose iss claim matches this value will be exchanged.
+	Issuer string `json:"issuer"`
+}
+
+func (s SubjectTokenIssuers) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SubjectTokenIssuers) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"issuer"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SubjectTokenIssuers) GetConditions() *Conditions {
+	if s == nil {
+		return nil
+	}
+	return s.Conditions
+}
+
+func (s *SubjectTokenIssuers) GetIssuer() string {
+	if s == nil {
+		return ""
+	}
+	return s.Issuer
+}
+
+// OpenidConnectPluginTokenExchange - Details on how to accept tokens from other identity providers.
+type OpenidConnectPluginTokenExchange struct {
+	// Cache support for token exchange
+	Cache *OpenidConnectPluginCache `json:"cache,omitempty"`
+	// Parameters used in the token exchange request.
+	Request *OpenidConnectPluginRequest `json:"request,omitempty"`
+	// Trusted token issuers from which the upstream may accept tokens to be exchanged. If a JWT bearer matches all the conditions of a subject token issuer item, the token will be exchanged.
+	SubjectTokenIssuers []SubjectTokenIssuers `json:"subject_token_issuers"`
+}
+
+func (o OpenidConnectPluginTokenExchange) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginTokenExchange) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"subject_token_issuers"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginTokenExchange) GetCache() *OpenidConnectPluginCache {
+	if o == nil {
+		return nil
+	}
+	return o.Cache
+}
+
+func (o *OpenidConnectPluginTokenExchange) GetRequest() *OpenidConnectPluginRequest {
+	if o == nil {
+		return nil
+	}
+	return o.Request
+}
+
+func (o *OpenidConnectPluginTokenExchange) GetSubjectTokenIssuers() []SubjectTokenIssuers {
+	if o == nil {
+		return []SubjectTokenIssuers{}
+	}
+	return o.SubjectTokenIssuers
+}
+
 type TokenHeadersGrants string
 
 const (
@@ -2095,6 +2656,38 @@ func (e *TokenHeadersGrants) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("invalid value for TokenHeadersGrants: %v", v)
 	}
+}
+
+type OpenidConnectPluginUpstreamHeaders struct {
+	// The name of the header.
+	Header string `json:"header"`
+	// The path of the header value.
+	Path []string `json:"path"`
+}
+
+func (o OpenidConnectPluginUpstreamHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(o, "", false)
+}
+
+func (o *OpenidConnectPluginUpstreamHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &o, "", false, []string{"header", "path"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *OpenidConnectPluginUpstreamHeaders) GetHeader() string {
+	if o == nil {
+		return ""
+	}
+	return o.Header
+}
+
+func (o *OpenidConnectPluginUpstreamHeaders) GetPath() []string {
+	if o == nil {
+		return []string{}
+	}
+	return o.Path
 }
 
 // UserinfoAccept - The value of `Accept` header for user info requests: - `application/json`: user info response as JSON - `application/jwt`: user info response as JWT (from the obsolete IETF draft document).
@@ -2167,7 +2760,7 @@ type OpenidConnectPluginConfig struct {
 	ByUsernameIgnoreCase *bool `json:"by_username_ignore_case,omitempty"`
 	// Cache the introspection endpoint requests.
 	CacheIntrospection *bool `json:"cache_introspection,omitempty"`
-	// Cache the token exchange endpoint requests.
+	// Cache the legacy token exchange endpoint requests.
 	CacheTokenExchange *bool `json:"cache_token_exchange,omitempty"`
 	// Cache the token endpoint requests.
 	CacheTokens *bool `json:"cache_tokens,omitempty"`
@@ -2206,8 +2799,8 @@ type OpenidConnectPluginConfig struct {
 	ClusterCacheStrategy *ClusterCacheStrategy `json:"cluster_cache_strategy,omitempty"`
 	// Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
 	ConsumerBy []OpenidConnectPluginConsumerBy `json:"consumer_by,omitempty"`
-	// The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
-	ConsumerClaim []string `json:"consumer_claim,omitempty"`
+	// The claims used for consumer mapping. Each entry represents a claim path inside the token payload. The paths are evaluated in order, and the first matching claim is used.
+	ConsumerClaims [][]string `json:"consumer_claims,omitempty"`
 	// The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
 	ConsumerGroupsClaim []string `json:"consumer_groups_claim,omitempty"`
 	// Do not terminate the request if consumer groups mapping fails.
@@ -2230,7 +2823,9 @@ type OpenidConnectPluginConfig struct {
 	DownstreamAccessTokenHeader *string `json:"downstream_access_token_header,omitempty"`
 	// The downstream access token JWK header.
 	DownstreamAccessTokenJwkHeader *string `json:"downstream_access_token_jwk_header,omitempty"`
-	// The downstream header claims. If multiple values are set, it means the claim is inside a nested object of the token payload.
+	// The downstream claim to header mappings.
+	DownstreamHeaders []DownstreamHeaders `json:"downstream_headers,omitempty"`
+	// The downstream header claims. Only top level claims are supported.
 	DownstreamHeadersClaims []string `json:"downstream_headers_claims,omitempty"`
 	// The downstream header names for the claim values.
 	DownstreamHeadersNames []string `json:"downstream_headers_names,omitempty"`
@@ -2322,6 +2917,8 @@ type OpenidConnectPluginConfig struct {
 	Issuer string `json:"issuer"`
 	// The issuers allowed to be present in the tokens (`iss` claim).
 	IssuersAllowed []string `json:"issuers_allowed,omitempty"`
+	// Overrides the `jwks_uri` returned by discovery. Use when the IdP exposes a non-standard JWKS endpoint.
+	JwksEndpoint *string `json:"jwks_endpoint,omitempty"`
 	// The claim to match against the JWT session cookie.
 	JwtSessionClaim *string `json:"jwt_session_claim,omitempty"`
 	// The name of the JWT session cookie.
@@ -2461,6 +3058,10 @@ type OpenidConnectPluginConfig struct {
 	SessionMemcachedPrefix *string `json:"session_memcached_prefix,omitempty"`
 	// The memcached unix socket path.
 	SessionMemcachedSocket *string `json:"session_memcached_socket,omitempty"`
+	// If set to true, uses SSL to connect to memcached
+	SessionMemcachedSsl *bool `json:"session_memcached_ssl,omitempty"`
+	// If set to true, verifies the validity of the memcached server SSL certificate
+	SessionMemcachedSslVerify *bool `json:"session_memcached_ssl_verify,omitempty"`
 	// Enables or disables persistent sessions.
 	SessionRemember *bool `json:"session_remember,omitempty"`
 	// Limits how long the persistent session can be renewed in seconds, until re-authentication is required. 0 disables the checks.
@@ -2495,7 +3096,9 @@ type OpenidConnectPluginConfig struct {
 	TokenEndpoint *string `json:"token_endpoint,omitempty"`
 	// The token endpoint authentication method: `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, or `none`: do not authenticate
 	TokenEndpointAuthMethod *TokenEndpointAuthMethod `json:"token_endpoint_auth_method,omitempty"`
-	// The token exchange endpoint.
+	// Details on how to accept tokens from other identity providers.
+	TokenExchange *OpenidConnectPluginTokenExchange `json:"token_exchange,omitempty"`
+	// Endpoint used to perform the legacy token exchange.
 	TokenExchangeEndpoint *string `json:"token_exchange_endpoint,omitempty"`
 	// Extra headers passed from the client to the token endpoint.
 	TokenHeadersClient []string `json:"token_headers_client,omitempty"`
@@ -2527,6 +3130,8 @@ type OpenidConnectPluginConfig struct {
 	UpstreamAccessTokenHeader *string `json:"upstream_access_token_header,omitempty"`
 	// The upstream access token JWK header.
 	UpstreamAccessTokenJwkHeader *string `json:"upstream_access_token_jwk_header,omitempty"`
+	// The upstream claim to header mappings.
+	UpstreamHeaders []OpenidConnectPluginUpstreamHeaders `json:"upstream_headers,omitempty"`
 	// The upstream header claims. Only top level claims are supported.
 	UpstreamHeadersClaims []string `json:"upstream_headers_claims,omitempty"`
 	// The upstream header names for the claim values.
@@ -2873,11 +3478,11 @@ func (o *OpenidConnectPluginConfig) GetConsumerBy() []OpenidConnectPluginConsume
 	return o.ConsumerBy
 }
 
-func (o *OpenidConnectPluginConfig) GetConsumerClaim() []string {
+func (o *OpenidConnectPluginConfig) GetConsumerClaims() [][]string {
 	if o == nil {
 		return nil
 	}
-	return o.ConsumerClaim
+	return o.ConsumerClaims
 }
 
 func (o *OpenidConnectPluginConfig) GetConsumerGroupsClaim() []string {
@@ -2955,6 +3560,13 @@ func (o *OpenidConnectPluginConfig) GetDownstreamAccessTokenJwkHeader() *string 
 		return nil
 	}
 	return o.DownstreamAccessTokenJwkHeader
+}
+
+func (o *OpenidConnectPluginConfig) GetDownstreamHeaders() []DownstreamHeaders {
+	if o == nil {
+		return nil
+	}
+	return o.DownstreamHeaders
 }
 
 func (o *OpenidConnectPluginConfig) GetDownstreamHeadersClaims() []string {
@@ -3277,6 +3889,13 @@ func (o *OpenidConnectPluginConfig) GetIssuersAllowed() []string {
 		return nil
 	}
 	return o.IssuersAllowed
+}
+
+func (o *OpenidConnectPluginConfig) GetJwksEndpoint() *string {
+	if o == nil {
+		return nil
+	}
+	return o.JwksEndpoint
 }
 
 func (o *OpenidConnectPluginConfig) GetJwtSessionClaim() *string {
@@ -3762,6 +4381,20 @@ func (o *OpenidConnectPluginConfig) GetSessionMemcachedSocket() *string {
 	return o.SessionMemcachedSocket
 }
 
+func (o *OpenidConnectPluginConfig) GetSessionMemcachedSsl() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.SessionMemcachedSsl
+}
+
+func (o *OpenidConnectPluginConfig) GetSessionMemcachedSslVerify() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.SessionMemcachedSslVerify
+}
+
 func (o *OpenidConnectPluginConfig) GetSessionRemember() *bool {
 	if o == nil {
 		return nil
@@ -3881,6 +4514,13 @@ func (o *OpenidConnectPluginConfig) GetTokenEndpointAuthMethod() *TokenEndpointA
 	return o.TokenEndpointAuthMethod
 }
 
+func (o *OpenidConnectPluginConfig) GetTokenExchange() *OpenidConnectPluginTokenExchange {
+	if o == nil {
+		return nil
+	}
+	return o.TokenExchange
+}
+
 func (o *OpenidConnectPluginConfig) GetTokenExchangeEndpoint() *string {
 	if o == nil {
 		return nil
@@ -3991,6 +4631,13 @@ func (o *OpenidConnectPluginConfig) GetUpstreamAccessTokenJwkHeader() *string {
 		return nil
 	}
 	return o.UpstreamAccessTokenJwkHeader
+}
+
+func (o *OpenidConnectPluginConfig) GetUpstreamHeaders() []OpenidConnectPluginUpstreamHeaders {
+	if o == nil {
+		return nil
+	}
+	return o.UpstreamHeaders
 }
 
 func (o *OpenidConnectPluginConfig) GetUpstreamHeadersClaims() []string {
@@ -4161,6 +4808,8 @@ const (
 	OpenidConnectPluginProtocolsGrpcs OpenidConnectPluginProtocols = "grpcs"
 	OpenidConnectPluginProtocolsHTTP  OpenidConnectPluginProtocols = "http"
 	OpenidConnectPluginProtocolsHTTPS OpenidConnectPluginProtocols = "https"
+	OpenidConnectPluginProtocolsWs    OpenidConnectPluginProtocols = "ws"
+	OpenidConnectPluginProtocolsWss   OpenidConnectPluginProtocols = "wss"
 )
 
 func (e OpenidConnectPluginProtocols) ToPointer() *OpenidConnectPluginProtocols {
@@ -4179,6 +4828,10 @@ func (e *OpenidConnectPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
+		fallthrough
+	case "ws":
+		fallthrough
+	case "wss":
 		*e = OpenidConnectPluginProtocols(v)
 		return nil
 	default:
@@ -4234,6 +4887,8 @@ func (o *OpenidConnectPluginService) GetID() *string {
 
 // OpenidConnectPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type OpenidConnectPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -4252,7 +4907,7 @@ type OpenidConnectPlugin struct {
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64                    `json:"updated_at,omitempty"`
 	Config    OpenidConnectPluginConfig `json:"config"`
-	// A set of strings representing HTTP protocols.
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []OpenidConnectPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *OpenidConnectPluginRoute `json:"route,omitempty"`
@@ -4269,6 +4924,13 @@ func (o *OpenidConnectPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *OpenidConnectPlugin) GetCondition() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Condition
 }
 
 func (o *OpenidConnectPlugin) GetCreatedAt() *int64 {

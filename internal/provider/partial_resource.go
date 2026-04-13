@@ -7,6 +7,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -23,7 +25,9 @@ import (
 	speakeasy_planmodifierutils "github.com/kong/terraform-provider-kong-gateway/internal/planmodifiers/utils"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -42,13 +46,16 @@ type PartialResource struct {
 
 // PartialResourceModel describes the resource data model.
 type PartialResourceModel struct {
-	CreatedAt types.Int64             `tfsdk:"created_at"`
-	ID        types.String            `tfsdk:"id"`
-	Name      types.String            `tfsdk:"name"`
-	RedisCe   *tfTypes.PartialRedisCe `queryParam:"inline" tfsdk:"redis_ce"`
-	RedisEe   *tfTypes.PartialRedisEe `queryParam:"inline" tfsdk:"redis_ee"`
-	UpdatedAt types.Int64             `tfsdk:"updated_at"`
-	Workspace types.String            `tfsdk:"workspace"`
+	CreatedAt  types.Int64                `tfsdk:"created_at"`
+	Embeddings *tfTypes.PartialEmbeddings `queryParam:"inline" tfsdk:"embeddings"`
+	ID         types.String               `tfsdk:"id"`
+	Model      *tfTypes.PartialModel      `queryParam:"inline" tfsdk:"model"`
+	Name       types.String               `tfsdk:"name"`
+	RedisCe    *tfTypes.PartialRedisCe    `queryParam:"inline" tfsdk:"redis_ce"`
+	RedisEe    *tfTypes.PartialRedisEe    `queryParam:"inline" tfsdk:"redis_ee"`
+	UpdatedAt  types.Int64                `tfsdk:"updated_at"`
+	Vectordb   *tfTypes.PartialVectordb   `queryParam:"inline" tfsdk:"vectordb"`
+	Workspace  types.String               `tfsdk:"workspace"`
 }
 
 func (r *PartialResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,21 +69,810 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 			"created_at": schema.Int64Attribute{
 				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
-					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("created_at")}}),
+					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("vectordb"), FieldPath: path.Root("vectordb").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("embeddings"), FieldPath: path.Root("embeddings").AtName("created_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("model"), FieldPath: path.Root("model").AtName("created_at")}}),
 				},
 				Description: `Unix epoch when the resource was created.`,
+			},
+			"embeddings": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"config": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"auth": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"allow_override": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If enabled, the authorization header or parameter can be overridden in the request by the value configured in the plugin.`,
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_ACCESS_KEY_ID environment variable for this plugin instance.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_SECRET_ACCESS_KEY environment variable for this plugin instance.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client ID.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client secret.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the tenant ID.`,
+									},
+									"azure_use_managed_identity": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.`,
+									},
+									"gcp_metadata_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.`,
+									},
+									"gcp_oauth_token_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable ` + "`" + `GCP_SERVICE_ACCOUNT` + "`" + `.`,
+									},
+									"gcp_use_service_account": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use service account auth for GCP-based providers and models.`,
+									},
+									"header_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If AI model requires authentication via Authorization or API key header, specify its name here.`,
+									},
+									"header_value": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify the full auth header value for 'header_name', for example 'Bearer key' or just 'key'.`,
+									},
+									"param_location": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body. must be one of ["body", "query"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"body",
+												"query",
+											),
+										},
+									},
+									"param_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If AI model requires authentication via query parameter, specify its name here.`,
+									},
+									"param_value": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify the full parameter value for 'param_name'.`,
+									},
+								},
+							},
+							"model": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Model name to execute. Not Null`,
+										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
+										},
+									},
+									"options": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"azure": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"api_version": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `'api-version' for Azure OpenAI instances.`,
+													},
+													"deployment_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Deployment ID for Azure OpenAI instances.`,
+													},
+													"instance": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Instance name for Azure OpenAI hosted models.`,
+													},
+												},
+											},
+											"bedrock": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"aws_assume_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+													},
+													"aws_region": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+													},
+													"aws_role_session_name": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+													},
+													"aws_sts_endpoint_url": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+													"batch_bucket_prefix": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.`,
+													},
+													"batch_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `AWS role arn used for calling batch API. Try to get the value from request if ommited.`,
+													},
+													"embeddings_normalize": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set to true to normalize the embeddings.`,
+													},
+													"performance_config_latency": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
+													},
+													"video_output_s3_uri": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.`,
+													},
+												},
+											},
+											"gemini": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"api_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the regional API endpoint (hostname only).`,
+													},
+													"location_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the location ID.`,
+													},
+													"project_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the project ID.`,
+													},
+												},
+											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
+											"upstream_url": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `upstream url for the embeddings`,
+											},
+										},
+										Description: `Key/value settings for the model`,
+									},
+									"provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AI provider format to use for embeddings API. Not Null; must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "ollama", "openai"]`,
+										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
+											stringvalidator.OneOf(
+												"azure",
+												"bedrock",
+												"gemini",
+												"huggingface",
+												"mistral",
+												"ollama",
+												"openai",
+											),
+										},
+									},
+								},
+								Description: `Not Null`,
+								Validators: []validator.Object{
+									speakeasy_objectvalidators.NotNull(),
+								},
+							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
+						},
+					},
+					"created_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was created.`,
+					},
+					"id": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A string representing a UUID (universally unique identifier).`,
+					},
+					"name": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A unique string representing a UTF-8 encoded name.`,
+					},
+					"tags": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `A set of strings representing tags.`,
+					},
+					"updated_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was last updated.`,
+					},
+				},
+				Validators: []validator.Object{
+					objectvalidator.ConflictsWith(path.Expressions{
+						path.MatchRelative().AtParent().AtName("model"),
+						path.MatchRelative().AtParent().AtName("redis_ce"),
+						path.MatchRelative().AtParent().AtName("redis_ee"),
+						path.MatchRelative().AtParent().AtName("vectordb"),
+					}...),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("id")}}),
+					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("vectordb"), FieldPath: path.Root("vectordb").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("embeddings"), FieldPath: path.Root("embeddings").AtName("id")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("model"), FieldPath: path.Root("model").AtName("id")}}),
 				},
 				Description: `A string representing a UUID (universally unique identifier).`,
+			},
+			"model": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"config": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"auth": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"allow_override": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If enabled, the authorization header or parameter can be overridden in the request by the value configured in the plugin.`,
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_ACCESS_KEY_ID environment variable for this plugin instance.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_SECRET_ACCESS_KEY environment variable for this plugin instance.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client ID.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client secret.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the tenant ID.`,
+									},
+									"azure_use_managed_identity": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.`,
+									},
+									"gcp_metadata_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.`,
+									},
+									"gcp_oauth_token_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable ` + "`" + `GCP_SERVICE_ACCOUNT` + "`" + `.`,
+									},
+									"gcp_use_service_account": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use service account auth for GCP-based providers and models.`,
+									},
+									"header_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If AI model requires authentication via Authorization or API key header, specify its name here.`,
+									},
+									"header_value": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify the full auth header value for 'header_name', for example 'Bearer key' or just 'key'.`,
+									},
+									"param_location": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body. must be one of ["body", "query"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"body",
+												"query",
+											),
+										},
+									},
+									"param_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If AI model requires authentication via query parameter, specify its name here.`,
+									},
+									"param_value": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specify the full parameter value for 'param_name'.`,
+									},
+								},
+							},
+							"description": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.`,
+							},
+							"logging": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"log_payloads": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.`,
+									},
+									"log_statistics": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.`,
+									},
+								},
+							},
+							"metadata": schema.StringAttribute{
+								CustomType:  jsontypes.NormalizedType{},
+								Computed:    true,
+								Optional:    true,
+								Description: `For internal use only. Parsed as JSON.`,
+							},
+							"model": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"model_alias": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The model name parameter from the request that this model should map to.`,
+									},
+									"name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Model name to execute.`,
+									},
+									"options": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"anthropic_version": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the schema/API version, if using Anthropic provider.`,
+											},
+											"azure_api_version": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `'api-version' for Azure OpenAI instances.`,
+											},
+											"azure_deployment_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Deployment ID for Azure OpenAI instances.`,
+											},
+											"azure_instance": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Instance name for Azure OpenAI hosted models.`,
+											},
+											"bedrock": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"aws_assume_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.`,
+													},
+													"aws_region": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock) you can override the ` + "`" + `AWS_REGION` + "`" + ` environment variable by setting this option.`,
+													},
+													"aws_role_session_name": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set the identifier of the assumed role session.`,
+													},
+													"aws_sts_endpoint_url": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
+													},
+													"batch_bucket_prefix": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.`,
+													},
+													"batch_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `AWS role arn used for calling batch API. Try to get the value from request if ommited.`,
+													},
+													"embeddings_normalize": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If using AWS providers (Bedrock), set to true to normalize the embeddings.`,
+													},
+													"performance_config_latency": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
+													},
+													"video_output_s3_uri": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.`,
+													},
+												},
+											},
+											"cohere": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"embedding_input_type": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `The purpose of the input text to calculate embedding vectors. must be one of ["classification", "clustering", "image", "search_document", "search_query"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"classification",
+																"clustering",
+																"image",
+																"search_document",
+																"search_query",
+															),
+														},
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
+											"dashscope": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"international": schema.BoolAttribute{
+														Computed: true,
+														Optional: true,
+														MarkdownDescription: `Two Dashscope endpoints are available, and the international endpoint will be used when this is set to ` + "`" + `true` + "`" + `.` + "\n" +
+															`It is recommended to set this to ` + "`" + `true` + "`" + ` when using international version of dashscope.`,
+													},
+												},
+											},
+											"databricks": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"workspace_instance_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.`,
+													},
+												},
+											},
+											"embeddings_dimensions": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using embeddings models, set the number of dimensions to generate.`,
+											},
+											"gemini": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"api_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the regional API endpoint (hostname only).`,
+													},
+													"endpoint_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex Model Garden, specify the endpoint ID.`,
+													},
+													"location_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the location ID.`,
+													},
+													"project_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `If running Gemini on Vertex, specify the project ID.`,
+													},
+												},
+											},
+											"huggingface": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"use_cache": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Use the cache layer on the inference API`,
+													},
+													"wait_for_model": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
+											"input_cost": schema.Float64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the cost per 1M tokens in your prompt.`,
+											},
+											"llama2_format": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using llama2 provider, select the upstream message format. must be one of ["ollama", "openai", "raw"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"ollama",
+														"openai",
+														"raw",
+													),
+												},
+											},
+											"max_tokens": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the max_tokens, if using chat or completion models.`,
+											},
+											"mistral_format": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If using mistral provider, select the upstream message format. must be one of ["ollama", "openai"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"ollama",
+														"openai",
+													),
+												},
+											},
+											"output_cost": schema.Float64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the cost per 1M tokens in the output of the AI.`,
+											},
+											"temperature": schema.Float64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the matching temperature, if using chat or completion models.`,
+												Validators: []validator.Float64{
+													float64validator.Between(0, 5),
+												},
+											},
+											"top_k": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the top-k most likely tokens, if supported.`,
+												Validators: []validator.Int64{
+													int64validator.Between(0, 500),
+												},
+											},
+											"top_p": schema.Float64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Defines the top-p probability mass, if supported.`,
+												Validators: []validator.Float64{
+													float64validator.Between(0, 1),
+												},
+											},
+											"upstream_path": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Manually specify or override the AI operation path, used when e.g. using the 'preserve' route_type.`,
+											},
+											"upstream_url": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Manually specify or override the full URL to the AI operation endpoints, when calling (self-)hosted models, or for running via a private endpoint.`,
+											},
+										},
+										Description: `Key/value settings for the model`,
+									},
+									"provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. Not Null; must be one of ["anthropic", "azure", "bedrock", "cerebras", "cohere", "dashscope", "databricks", "deepseek", "gemini", "huggingface", "llama2", "mistral", "ollama", "openai", "vllm", "xai"]`,
+										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
+											stringvalidator.OneOf(
+												"anthropic",
+												"azure",
+												"bedrock",
+												"cerebras",
+												"cohere",
+												"dashscope",
+												"databricks",
+												"deepseek",
+												"gemini",
+												"huggingface",
+												"llama2",
+												"mistral",
+												"ollama",
+												"openai",
+												"vllm",
+												"xai",
+											),
+										},
+									},
+								},
+								Description: `Not Null`,
+								Validators: []validator.Object{
+									speakeasy_objectvalidators.NotNull(),
+								},
+							},
+							"route_type": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The model's operation implementation, for this provider. Not Null; must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime", "video/v1/videos/generations"]`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+									stringvalidator.OneOf(
+										"audio/v1/audio/speech",
+										"audio/v1/audio/transcriptions",
+										"audio/v1/audio/translations",
+										"image/v1/images/edits",
+										"image/v1/images/generations",
+										"llm/v1/assistants",
+										"llm/v1/batches",
+										"llm/v1/chat",
+										"llm/v1/completions",
+										"llm/v1/embeddings",
+										"llm/v1/files",
+										"llm/v1/responses",
+										"preserve",
+										"realtime/v1/realtime",
+										"video/v1/videos/generations",
+									),
+								},
+							},
+							"weight": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.`,
+								Validators: []validator.Int64{
+									int64validator.Between(1, 65535),
+								},
+							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
+						},
+					},
+					"created_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was created.`,
+					},
+					"id": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A string representing a UUID (universally unique identifier).`,
+					},
+					"name": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A unique string representing a UTF-8 encoded name.`,
+					},
+					"tags": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `A set of strings representing tags.`,
+					},
+					"updated_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was last updated.`,
+					},
+				},
+				Validators: []validator.Object{
+					objectvalidator.ConflictsWith(path.Expressions{
+						path.MatchRelative().AtParent().AtName("embeddings"),
+						path.MatchRelative().AtParent().AtName("redis_ce"),
+						path.MatchRelative().AtParent().AtName("redis_ee"),
+						path.MatchRelative().AtParent().AtName("vectordb"),
+					}...),
+				},
 			},
 			"name": schema.StringAttribute{
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("name")}}),
+					speakeasy_stringplanmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("vectordb"), FieldPath: path.Root("vectordb").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("embeddings"), FieldPath: path.Root("embeddings").AtName("name")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("model"), FieldPath: path.Root("model").AtName("name")}}),
 				},
 				Description: `A unique string representing a UTF-8 encoded name.`,
 			},
@@ -87,6 +883,80 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"cloud_authentication": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"auth_provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"aws",
+												"azure",
+												"gcp",
+											),
+										},
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_assume_role_arn": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+									},
+									"aws_cache_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_is_serverless": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_region": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_role_session_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The session name for the temporary credentials when assuming the IAM role.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+								},
+								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+							},
 							"database": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
@@ -173,7 +1043,10 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 				Validators: []validator.Object{
 					objectvalidator.ConflictsWith(path.Expressions{
+						path.MatchRelative().AtParent().AtName("embeddings"),
+						path.MatchRelative().AtParent().AtName("model"),
 						path.MatchRelative().AtParent().AtName("redis_ee"),
+						path.MatchRelative().AtParent().AtName("vectordb"),
 					}...),
 				},
 			},
@@ -184,6 +1057,80 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"cloud_authentication": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"auth_provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"aws",
+												"azure",
+												"gcp",
+											),
+										},
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_assume_role_arn": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+									},
+									"aws_cache_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_is_serverless": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_region": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_role_session_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The session name for the temporary credentials when assuming the IAM role.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+								},
+								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+							},
 							"cluster_max_redirections": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
@@ -389,22 +1336,434 @@ func (r *PartialResource) Schema(ctx context.Context, req resource.SchemaRequest
 				},
 				Validators: []validator.Object{
 					objectvalidator.ConflictsWith(path.Expressions{
+						path.MatchRelative().AtParent().AtName("embeddings"),
+						path.MatchRelative().AtParent().AtName("model"),
 						path.MatchRelative().AtParent().AtName("redis_ce"),
+						path.MatchRelative().AtParent().AtName("vectordb"),
 					}...),
 				},
 			},
 			"updated_at": schema.Int64Attribute{
 				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
-					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("updated_at")}}),
+					speakeasy_int64planmodifier.UseHoistedValue([]speakeasy_planmodifierutils.HoistedSource{speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ce"), FieldPath: path.Root("redis_ce").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("redis_ee"), FieldPath: path.Root("redis_ee").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("vectordb"), FieldPath: path.Root("vectordb").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("embeddings"), FieldPath: path.Root("embeddings").AtName("updated_at")}, speakeasy_planmodifierutils.HoistedSource{AssociatedTypePath: path.Root("model"), FieldPath: path.Root("model").AtName("updated_at")}}),
 				},
 				Description: `Unix epoch when the resource was last updated.`,
+			},
+			"vectordb": schema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]schema.Attribute{
+					"config": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"dimensions": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `the desired dimensionality for the vectors. Not Null`,
+								Validators: []validator.Int64{
+									speakeasy_int64validators.NotNull(),
+								},
+							},
+							"distance_metric": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `the distance metric to use for vector searches. Not Null; must be one of ["cosine", "euclidean"]`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+									stringvalidator.OneOf(
+										"cosine",
+										"euclidean",
+									),
+								},
+							},
+							"pgvector": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"database": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the database of the pgvector database`,
+									},
+									"host": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the host of the pgvector database`,
+									},
+									"password": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the password of the pgvector database`,
+									},
+									"port": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the port of the pgvector database`,
+									},
+									"ssl": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether to use ssl for the pgvector database`,
+									},
+									"ssl_cert": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the path of ssl cert to use for the pgvector database`,
+									},
+									"ssl_cert_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the path of ssl cert key to use for the pgvector database`,
+									},
+									"ssl_required": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether ssl is required for the pgvector database`,
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `whether to verify ssl for the pgvector database`,
+									},
+									"ssl_version": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the ssl version to use for the pgvector database. must be one of ["any", "tlsv1_2", "tlsv1_3"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"any",
+												"tlsv1_2",
+												"tlsv1_3",
+											),
+										},
+									},
+									"timeout": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the timeout of the pgvector database`,
+									},
+									"user": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `the user of the pgvector database`,
+									},
+								},
+							},
+							"redis": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"cloud_authentication": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_provider": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"aws",
+														"azure",
+														"gcp",
+													),
+												},
+											},
+											"aws_access_key_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_assume_role_arn": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+											},
+											"aws_cache_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_is_serverless": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_region": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_role_session_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The session name for the temporary credentials when assuming the IAM role.`,
+											},
+											"aws_secret_access_key": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"azure_client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_tenant_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"gcp_service_account_json": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+											},
+										},
+										Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+									},
+									"cluster_max_redirections": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Maximum retry attempts for redirection.`,
+									},
+									"cluster_nodes": schema.ListNestedAttribute{
+										Computed: true,
+										Optional: true,
+										NestedObject: schema.NestedAttributeObject{
+											Validators: []validator.Object{
+												speakeasy_objectvalidators.NotNull(),
+											},
+											Attributes: map[string]schema.Attribute{
+												"ip": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `A string representing a host name, such as example.com.`,
+												},
+												"port": schema.Int64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+													Validators: []validator.Int64{
+														int64validator.Between(0, 65535),
+													},
+												},
+											},
+										},
+										Description: `Cluster addresses to use for Redis connections when the ` + "`" + `redis` + "`" + ` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.`,
+									},
+									"connect_timeout": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
+										Validators: []validator.Int64{
+											int64validator.Between(0, 2147483646),
+										},
+									},
+									"connection_is_proxied": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If the connection to Redis is proxied (e.g. Envoy), set it ` + "`" + `true` + "`" + `. Set the ` + "`" + `host` + "`" + ` and ` + "`" + `port` + "`" + ` to point to the proxy address.`,
+									},
+									"database": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Database to use for the Redis connection when using the ` + "`" + `redis` + "`" + ` strategy`,
+									},
+									"host": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `A string representing a host name, such as example.com.`,
+									},
+									"keepalive_backlog": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return ` + "`" + `nil` + "`" + `. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than ` + "`" + `keepalive_pool_size` + "`" + `. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than ` + "`" + `keepalive_pool_size` + "`" + `.`,
+										Validators: []validator.Int64{
+											int64validator.Between(0, 2147483646),
+										},
+									},
+									"keepalive_pool_size": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The size limit for every cosocket connection pool associated with every remote server, per worker process. If neither ` + "`" + `keepalive_pool_size` + "`" + ` nor ` + "`" + `keepalive_backlog` + "`" + ` is specified, no pool is created. If ` + "`" + `keepalive_pool_size` + "`" + ` isn't specified but ` + "`" + `keepalive_backlog` + "`" + ` is specified, then the pool uses the default value. Try to increase (e.g. 512) this value if latency is high or throughput is low.`,
+										Validators: []validator.Int64{
+											int64validator.Between(1, 2147483646),
+										},
+									},
+									"password": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.`,
+									},
+									"port": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+										Validators: []validator.Int64{
+											int64validator.Between(0, 65535),
+										},
+									},
+									"read_timeout": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
+										Validators: []validator.Int64{
+											int64validator.Between(0, 2147483646),
+										},
+									},
+									"send_timeout": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.`,
+										Validators: []validator.Int64{
+											int64validator.Between(0, 2147483646),
+										},
+									},
+									"sentinel_master": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.`,
+									},
+									"sentinel_nodes": schema.ListNestedAttribute{
+										Computed: true,
+										Optional: true,
+										NestedObject: schema.NestedAttributeObject{
+											Validators: []validator.Object{
+												speakeasy_objectvalidators.NotNull(),
+											},
+											Attributes: map[string]schema.Attribute{
+												"host": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `A string representing a host name, such as example.com.`,
+												},
+												"port": schema.Int64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+													Validators: []validator.Int64{
+														int64validator.Between(0, 65535),
+													},
+												},
+											},
+										},
+										Description: `Sentinel node addresses to use for Redis connections when the ` + "`" + `redis` + "`" + ` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.`,
+									},
+									"sentinel_password": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.`,
+									},
+									"sentinel_role": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Sentinel role to use for Redis connections when the ` + "`" + `redis` + "`" + ` strategy is defined. Defining this value implies using Redis Sentinel. must be one of ["any", "master", "slave"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"any",
+												"master",
+												"slave",
+											),
+										},
+									},
+									"sentinel_username": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.`,
+									},
+									"server_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `A string representing an SNI (server name indication) value for TLS.`,
+									},
+									"ssl": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If set to true, uses SSL to connect to Redis.`,
+									},
+									"ssl_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure ` + "`" + `lua_ssl_trusted_certificate` + "`" + ` in ` + "`" + `kong.conf` + "`" + ` to specify the CA (or server) certificate used by your Redis server. You may also need to configure ` + "`" + `lua_ssl_verify_depth` + "`" + ` accordingly.`,
+									},
+									"username": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to ` + "`" + `default` + "`" + `.`,
+									},
+								},
+							},
+							"strategy": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `which vector database driver to use. Not Null; must be one of ["pgvector", "redis"]`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+									stringvalidator.OneOf(
+										"pgvector",
+										"redis",
+									),
+								},
+							},
+							"threshold": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `the default similarity threshold for accepting semantic search results (float). Higher threshold means more results are considered similar.`,
+							},
+						},
+						Description: `Not Null`,
+						Validators: []validator.Object{
+							speakeasy_objectvalidators.NotNull(),
+						},
+					},
+					"created_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was created.`,
+					},
+					"id": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A string representing a UUID (universally unique identifier).`,
+					},
+					"name": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `A unique string representing a UTF-8 encoded name.`,
+					},
+					"tags": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `A set of strings representing tags.`,
+					},
+					"updated_at": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Unix epoch when the resource was last updated.`,
+					},
+				},
+				Validators: []validator.Object{
+					objectvalidator.ConflictsWith(path.Expressions{
+						path.MatchRelative().AtParent().AtName("embeddings"),
+						path.MatchRelative().AtParent().AtName("model"),
+						path.MatchRelative().AtParent().AtName("redis_ce"),
+						path.MatchRelative().AtParent().AtName("redis_ee"),
+					}...),
+				},
 			},
 			"workspace": schema.StringAttribute{
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -659,7 +2018,7 @@ func (r *PartialResource) ImportState(ctx context.Context, req resource.ImportSt
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -669,7 +2028,7 @@ func (r *PartialResource) ImportState(ctx context.Context, req resource.ImportSt
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

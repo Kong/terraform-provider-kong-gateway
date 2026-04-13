@@ -9,7 +9,7 @@ import (
 )
 
 type CreatePluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Plugin for creation
 	Plugin shared.Plugin `request:"mediaType=application/json"`

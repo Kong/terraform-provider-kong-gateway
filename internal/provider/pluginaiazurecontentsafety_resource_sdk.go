@@ -15,6 +15,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.AiAzureContentSafetyPluginConfig{}
 		r.Config.AzureAPIVersion = types.StringPointerValue(resp.Config.AzureAPIVersion)
 		r.Config.AzureClientID = types.StringPointerValue(resp.Config.AzureClientID)
@@ -43,6 +44,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 			r.Config.GuardingMode = types.StringNull()
 		}
 		r.Config.HaltOnBlocklistHit = types.BoolPointerValue(resp.Config.HaltOnBlocklistHit)
+		r.Config.LogBlockedContent = types.BoolPointerValue(resp.Config.LogBlockedContent)
 		if resp.Config.OutputType != nil {
 			r.Config.OutputType = types.StringValue(string(*resp.Config.OutputType))
 		} else {
@@ -50,6 +52,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) RefreshFromSharedAiAzureConten
 		}
 		r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
 		r.Config.RevealFailureReason = types.BoolPointerValue(resp.Config.RevealFailureReason)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
 		if resp.Config.TextSource != nil {
 			r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
@@ -207,6 +210,12 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToOperationsUpdateAiazureconte
 func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPlugin(ctx context.Context) (*shared.AiAzureContentSafetyPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -365,6 +374,12 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 	} else {
 		haltOnBlocklistHit = nil
 	}
+	logBlockedContent := new(bool)
+	if !r.Config.LogBlockedContent.IsUnknown() && !r.Config.LogBlockedContent.IsNull() {
+		*logBlockedContent = r.Config.LogBlockedContent.ValueBool()
+	} else {
+		logBlockedContent = nil
+	}
 	outputType := new(shared.OutputType)
 	if !r.Config.OutputType.IsUnknown() && !r.Config.OutputType.IsNull() {
 		*outputType = shared.OutputType(r.Config.OutputType.ValueString())
@@ -382,6 +397,12 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		*revealFailureReason = r.Config.RevealFailureReason.ValueBool()
 	} else {
 		revealFailureReason = nil
+	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
 	}
 	stopOnError := new(bool)
 	if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
@@ -407,9 +428,11 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		ContentSafetyURL:        contentSafetyURL,
 		GuardingMode:            guardingMode,
 		HaltOnBlocklistHit:      haltOnBlocklistHit,
+		LogBlockedContent:       logBlockedContent,
 		OutputType:              outputType,
 		ResponseBufferSize:      responseBufferSize,
 		RevealFailureReason:     revealFailureReason,
+		SslVerify:               sslVerify,
 		StopOnError:             stopOnError,
 		TextSource:              textSource,
 	}
@@ -442,6 +465,7 @@ func (r *PluginAiAzureContentSafetyResourceModel) ToSharedAiAzureContentSafetyPl
 		}
 	}
 	out := shared.AiAzureContentSafetyPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

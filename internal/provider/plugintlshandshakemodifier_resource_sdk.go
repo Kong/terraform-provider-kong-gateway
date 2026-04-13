@@ -15,6 +15,7 @@ func (r *PluginTLSHandshakeModifierResourceModel) RefreshFromSharedTLSHandshakeM
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -176,6 +177,12 @@ func (r *PluginTLSHandshakeModifierResourceModel) ToOperationsUpdateTlshandshake
 func (r *PluginTLSHandshakeModifierResourceModel) ToSharedTLSHandshakeModifierPlugin(ctx context.Context) (*shared.TLSHandshakeModifierPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -307,6 +314,7 @@ func (r *PluginTLSHandshakeModifierResourceModel) ToSharedTLSHandshakeModifierPl
 		}
 	}
 	out := shared.TLSHandshakeModifierPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

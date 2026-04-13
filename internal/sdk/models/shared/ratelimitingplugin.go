@@ -194,8 +194,163 @@ func (e *Policy) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// RateLimitingPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type RateLimitingPluginAuthProvider string
+
+const (
+	RateLimitingPluginAuthProviderAws   RateLimitingPluginAuthProvider = "aws"
+	RateLimitingPluginAuthProviderAzure RateLimitingPluginAuthProvider = "azure"
+	RateLimitingPluginAuthProviderGcp   RateLimitingPluginAuthProvider = "gcp"
+)
+
+func (e RateLimitingPluginAuthProvider) ToPointer() *RateLimitingPluginAuthProvider {
+	return &e
+}
+func (e *RateLimitingPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = RateLimitingPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RateLimitingPluginAuthProvider: %v", v)
+	}
+}
+
+// RateLimitingPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type RateLimitingPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *RateLimitingPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (r RateLimitingPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAuthProvider() *RateLimitingPluginAuthProvider {
+	if r == nil {
+		return nil
+	}
+	return r.AuthProvider
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAccessKeyID
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAssumeRoleArn
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsCacheName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsCacheName
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.AwsIsServerless
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsRegion() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRegion
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRoleSessionName
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsSecretAccessKey
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAzureClientID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientID
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientSecret
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetAzureTenantID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureTenantID
+}
+
+func (r *RateLimitingPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if r == nil {
+		return nil
+	}
+	return r.GcpServiceAccountJSON
+}
+
 // RateLimitingPluginRedis - Redis configuration
 type RateLimitingPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *RateLimitingPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Database to use for the Redis connection when using the `redis` strategy
 	Database *int64 `json:"database,omitempty"`
 	// A string representing a host name, such as example.com.
@@ -225,6 +380,13 @@ func (r *RateLimitingPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RateLimitingPluginRedis) GetCloudAuthentication() *RateLimitingPluginCloudAuthentication {
+	if r == nil {
+		return nil
+	}
+	return r.CloudAuthentication
 }
 
 func (r *RateLimitingPluginRedis) GetDatabase() *int64 {
@@ -574,6 +736,8 @@ func (r *RateLimitingPluginService) GetID() *string {
 
 // RateLimitingPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RateLimitingPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -613,6 +777,13 @@ func (r *RateLimitingPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RateLimitingPlugin) GetCondition() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Condition
 }
 
 func (r *RateLimitingPlugin) GetCreatedAt() *int64 {

@@ -11,7 +11,7 @@ import (
 type DeleteKeyRequest struct {
 	// ID or name of the Key to lookup
 	KeyIDOrName string `pathParam:"style=simple,explode=false,name=KeyIdOrName"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

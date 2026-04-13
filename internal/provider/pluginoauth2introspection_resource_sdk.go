@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.Oauth2IntrospectionPluginConfig{}
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 		r.Config.AuthorizationValue = types.StringValue(resp.Config.AuthorizationValue)
@@ -30,10 +29,9 @@ func (r *PluginOauth2IntrospectionResourceModel) RefreshFromSharedOauth2Introspe
 			r.Config.CustomClaimsForward = append(r.Config.CustomClaimsForward, types.StringValue(v))
 		}
 		if len(resp.Config.CustomIntrospectionHeaders) > 0 {
-			r.Config.CustomIntrospectionHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.CustomIntrospectionHeaders))
+			r.Config.CustomIntrospectionHeaders = make(map[string]types.String, len(resp.Config.CustomIntrospectionHeaders))
 			for key, value := range resp.Config.CustomIntrospectionHeaders {
-				result, _ := json.Marshal(value)
-				r.Config.CustomIntrospectionHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+				r.Config.CustomIntrospectionHeaders[key] = types.StringValue(value)
 			}
 		}
 		r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
@@ -195,6 +193,12 @@ func (r *PluginOauth2IntrospectionResourceModel) ToOperationsUpdateOauth2introsp
 func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlugin(ctx context.Context) (*shared.Oauth2IntrospectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -304,10 +308,11 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 	for customClaimsForwardIndex := range r.Config.CustomClaimsForward {
 		customClaimsForward = append(customClaimsForward, r.Config.CustomClaimsForward[customClaimsForwardIndex].ValueString())
 	}
-	customIntrospectionHeaders := make(map[string]interface{})
+	customIntrospectionHeaders := make(map[string]string)
 	for customIntrospectionHeadersKey := range r.Config.CustomIntrospectionHeaders {
-		var customIntrospectionHeadersInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.CustomIntrospectionHeaders[customIntrospectionHeadersKey].ValueString()), &customIntrospectionHeadersInst)
+		var customIntrospectionHeadersInst string
+		customIntrospectionHeadersInst = r.Config.CustomIntrospectionHeaders[customIntrospectionHeadersKey].ValueString()
+
 		customIntrospectionHeaders[customIntrospectionHeadersKey] = customIntrospectionHeadersInst
 	}
 	hideCredentials := new(bool)
@@ -399,6 +404,7 @@ func (r *PluginOauth2IntrospectionResourceModel) ToSharedOauth2IntrospectionPlug
 		}
 	}
 	out := shared.Oauth2IntrospectionPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

@@ -40,6 +40,9 @@ func (g *GetOauth2PluginRequest) GetWorkspace() string {
 	return g.Workspace
 }
 
+// #region class-body-getoauth2pluginrequest
+// #endregion class-body-getoauth2pluginrequest
+
 type GetOauth2PluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
@@ -98,3 +101,6 @@ func (g *GetOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.GatewayU
 	}
 	return g.GatewayUnauthorizedError
 }
+
+// #region class-body-getoauth2pluginresponse
+// #endregion class-body-getoauth2pluginresponse

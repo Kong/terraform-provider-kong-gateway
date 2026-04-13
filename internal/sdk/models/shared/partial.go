@@ -315,8 +315,9 @@ type PartialRedisEe struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	// A set of strings representing tags.
-	Tags  []string `json:"tags,omitempty"`
-	type_ string   `const:"redis-ee" json:"type"`
+	Tags []string `json:"tags,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	type_ string `const:"redis-ee" json:"type"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }
@@ -482,8 +483,9 @@ type PartialRedisCe struct {
 	// A unique string representing a UTF-8 encoded name.
 	Name *string `json:"name,omitempty"`
 	// A set of strings representing tags.
-	Tags  []string `json:"tags,omitempty"`
-	type_ string   `const:"redis-ce" json:"type"`
+	Tags []string `json:"tags,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	type_ string `const:"redis-ce" json:"type"`
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64 `json:"updated_at,omitempty"`
 }

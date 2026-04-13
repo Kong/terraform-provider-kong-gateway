@@ -40,6 +40,9 @@ func (d *DeleteOauth2PluginRequest) GetWorkspace() string {
 	return d.Workspace
 }
 
+// #region class-body-deleteoauth2pluginrequest
+// #endregion class-body-deleteoauth2pluginrequest
+
 type DeleteOauth2PluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
@@ -89,3 +92,6 @@ func (d *DeleteOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.Gatew
 	}
 	return d.GatewayUnauthorizedError
 }
+
+// #region class-body-deleteoauth2pluginresponse
+// #endregion class-body-deleteoauth2pluginresponse

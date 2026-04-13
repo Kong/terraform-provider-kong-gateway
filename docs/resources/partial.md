@@ -191,7 +191,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_partial.my_kong-gateway_partial
   id = jsonencode({
-    id = ""
+    id        = ""
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

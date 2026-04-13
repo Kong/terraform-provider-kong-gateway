@@ -219,7 +219,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_upstream.my_kong-gateway_upstream
   id = jsonencode({
-    id = "426d620c-7058-4ae6-aacc-f85a3204a2c5"
+    id        = "426d620c-7058-4ae6-aacc-f85a3204a2c5"
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

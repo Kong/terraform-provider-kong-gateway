@@ -11268,6 +11268,401 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - Plugins
+  '/{workspace}/rbac/roles':
+    parameters: []
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRole#create
+      operationId: create-rbac_role
+      summary: Create a new RBAC Role
+      description: Create a new RBAC Role
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC Role for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACRole'
+      responses:
+        '201':
+          description: Successfully created RBAC Role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRole'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoles
+  '/{workspace}/rbac/roles/{RBACRoleId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRole#delete
+      operationId: delete-rbac_role
+      summary: Delete a RBAC Role
+      description: Delete a RBAC Role
+      parameters:
+        - $ref: '#/components/parameters/RBACRoleId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted RBAC Role or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoles
+    get:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRole#read
+      operationId: get-rbac_role
+      summary: Get a RBAC Role
+      description: Get a RBAC Role using ID.
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          description: Successfully fetched RBAC Role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRole'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      tags:
+        - RBACRoles
+    parameters:
+      - $ref: '#/components/parameters/RBACRoleId'
+    put:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRole#update
+      operationId: upsert-rbac_role
+      summary: Upsert a RBAC Role
+      description: Create or Update RBAC Role using ID.
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the RBAC Role
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACRole'
+      responses:
+        '200':
+          description: Successfully upserted RBAC Role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRole'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoles
+  '/{workspace}/rbac/roles/{RBACRoleIdForNestedEntities}/endpoints':
+    parameters:
+      - $ref: '#/components/parameters/RBACRoleIdForNestedEntities'
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRoleEndpoint#create
+      operationId: create-rbac_role_endpoint
+      summary: Create a new RBAC Role Endpoint
+      description: Create a new RBAC Role Endpoint
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC Role Endpoint for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACRoleEndpoint'
+      responses:
+        '201':
+          description: Successfully created RBAC Role Endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRoleEndpoint'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoleEndpoints
+  '/{workspace}/rbac/roles/{RBACRoleIdForNestedEntities}/endpoints/{workspace}{RBACRoleEndpointId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRoleEndpoint#delete
+      operationId: delete-rbac_role_endpoint
+      summary: Delete a RBAC Role Endpoint
+      description: Delete a RBAC Role Endpoint
+      parameters:
+        - $ref: '#/components/parameters/RBACRoleEndpointId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted RBAC Role Endpoint or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoleEndpoints
+    parameters:
+      - $ref: '#/components/parameters/RBACRoleEndpointId'
+      - $ref: '#/components/parameters/RBACRoleIdForNestedEntities'
+  '/{workspace}/rbac/roles/{RBACRoleIdForNestedEntities}/entities':
+    parameters:
+      - $ref: '#/components/parameters/RBACRoleIdForNestedEntities'
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRoleEntity#create
+      operationId: create-rbac_role_entitie
+      summary: Create a new RBAC Role Entity
+      description: Create a new RBAC Role Entity
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC Role Entity for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACRoleEntity'
+      responses:
+        '201':
+          description: Successfully created RBAC Role Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRoleEntity'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoleEntities
+  '/{workspace}/rbac/roles/{RBACRoleIdForNestedEntities}/entities/{RBACRoleEntityId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRoleEntity#delete
+      operationId: delete-rbac_role_entitie
+      summary: Delete a RBAC Role Entity
+      description: Delete a RBAC Role Entity
+      parameters:
+        - $ref: '#/components/parameters/RBACRoleEntityId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted RBAC Role Entity or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACRoleEntities
+    get:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacRoleEntity#read
+      operationId: get-rbac_role_entitie
+      summary: Get a RBAC Role Entity
+      description: Get a RBAC Role Entity using ID.
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          description: Successfully fetched RBAC Role Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACRoleEntity'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      tags:
+        - RBACRoleEntities
+    parameters:
+      - $ref: '#/components/parameters/RBACRoleEntityId'
+      - $ref: '#/components/parameters/RBACRoleIdForNestedEntities'
+  '/{workspace}/rbac/users':
+    parameters: []
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUser#create
+      operationId: create-rbac_user
+      summary: Create a new RBAC User
+      description: Create a new RBAC User
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC User for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACUser'
+      responses:
+        '201':
+          description: Successfully created RBAC User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACUser'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUsers
+  '/{workspace}/rbac/users/{RBACUserId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUser#delete
+      operationId: delete-rbac_user
+      summary: Delete a RBAC User
+      description: Delete a RBAC User
+      parameters:
+        - $ref: '#/components/parameters/RBACUserId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted RBAC User or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUsers
+    get:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUser#read
+      operationId: get-rbac_user
+      summary: Get a RBAC User
+      description: Get a RBAC User using ID.
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '200':
+          description: Successfully fetched RBAC User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACUser'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      tags:
+        - RBACUsers
+    parameters:
+      - $ref: '#/components/parameters/RBACUserId'
+  '/{workspace}/rbac/users/{RBACUserIdForNestedEntities}/groups':
+    parameters:
+      - $ref: '#/components/parameters/RBACUserIdForNestedEntities'
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUserGroup#create
+      operationId: create-rbac_user_group
+      summary: Create a new RBAC User Group
+      description: Create a new RBAC User Group
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC User Group for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACUserGroup'
+      responses:
+        '201':
+          description: Successfully created RBAC User Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACUserGroup'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUserGroups
+  '/{workspace}/rbac/users/{RBACUserIdForNestedEntities}/groups/{RBACUserGroupId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUserGroup#delete
+      operationId: delete-rbac_user_group
+      summary: Delete a RBAC User Group
+      description: Delete a RBAC User Group
+      parameters:
+        - $ref: '#/components/parameters/RBACUserGroupId'
+        - $ref: '#/components/parameters/Workspace'
+      responses:
+        '204':
+          description: Successfully deleted RBAC User Group or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUserGroups
+    parameters:
+      - $ref: '#/components/parameters/RBACUserGroupId'
+      - $ref: '#/components/parameters/RBACUserIdForNestedEntities'
+  '/{workspace}/rbac/users/{RBACUserIdForNestedEntities}/roles':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUserRole#delete
+      operationId: delete-rbac_user_role
+      summary: Delete a RBAC User Role
+      description: Delete a RBAC User Role
+      requestBody:
+        description: Request body for deleting an RBAC role. Must include the role name in the 'role' field.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACUserRole'
+      responses:
+        '204':
+          description: Successfully deleted RBAC User Role or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUserRoles
+    parameters:
+      - $ref: '#/components/parameters/Workspace'
+      - $ref: '#/components/parameters/RBACUserIdForNestedEntities'
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: RbacUserRole#create
+      operationId: create-rbac_user_role
+      summary: Create a new RBAC User Role
+      description: Create a new RBAC User Role
+      parameters:
+        - $ref: '#/components/parameters/Workspace'
+      requestBody:
+        description: Description of the new RBAC User Role for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RBACUserRole'
+      responses:
+        '201':
+          description: Successfully created RBAC User Role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RBACUserRole'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - RBACUserRoles
   '/{workspace}/routes':
     post:
       x-speakeasy-entity-operation:
@@ -11967,6 +12362,142 @@ paths:
           $ref: '#/components/responses/HTTP401Error'
       tags:
         - CA Certificates
+  /groups:
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Group#create
+      operationId: create-group
+      summary: Create a new Group
+      description: Create a new Group
+      requestBody:
+        description: Description of the new Group for creation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Successfully created Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - Groups
+  '/groups/{GroupId}':
+    delete:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Group#delete
+      operationId: delete-group
+      summary: Delete a Group
+      description: Delete a Group
+      parameters:
+        - $ref: '#/components/parameters/GroupId'
+      responses:
+        '204':
+          description: Successfully deleted Group or the resource didn't exist
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - Groups
+    get:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Group#read
+      operationId: get-group
+      summary: Get a Group
+      description: Get a Group using ID.
+      responses:
+        '200':
+          description: Successfully fetched Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+        '404':
+          description: Resource does not exist
+      tags:
+        - Groups
+    parameters:
+      - $ref: '#/components/parameters/GroupId'
+    put:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: Group#update
+      operationId: upsert-group
+      summary: Upsert a Group
+      description: Create or Update Group using ID.
+      requestBody:
+        description: Description of the Group
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '200':
+          description: Successfully upserted Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/HTTP401Error'
+      tags:
+        - Groups
+  '/groups/{GroupId}/roles':
+    delete:
+      x-speakeasy-entity-operation: GroupRole#delete
+      operationId: delete-groups-group_id_or_name-roles
+      summary: Delete a Group’s Role
+      description: Delete a group's roles.
+      parameters:
+        - name: rbac_role_id
+          in: query
+          description: ID of the role to remove from the group.
+          required: true
+          schema:
+            type: string
+          example: 12773c9a-7f7c-45f2-bcea-5285eb18fd2f
+          x-speakeasy-match: role_id
+        - name: workspace_id
+          in: query
+          required: true
+          schema:
+            type: string
+          x-speakeasy-match: workspace
+      responses:
+        '204':
+          description: Successfully deleted role.
+        '401':
+          $ref: '#/components/responses/UnauthorizedRequest'
+      tags:
+        - Groups
+    parameters:
+      - $ref: '#/components/parameters/GroupRoleId'
+    post:
+      x-speakeasy-entity-operation:
+        terraform-datasource: null
+        terraform-resource: GroupRole#create
+      operationId: create-groups-group_id_or_name-roles
+      summary: Create Group's Roles
+      description: Create roles for a specified group
+      requestBody:
+        $ref: '#/components/requestBodies/GroupRoleRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreateGroupRolesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedRequest'
+      tags:
+        - Groups
   '/schemas/plugins/{pluginName}':
     get:
       operationId: fetch-plugin-schema
@@ -12149,6 +12680,24 @@ components:
       schema:
         type: string
       x-speakeasy-match: id
+    GroupId:
+      description: ID of the Group to lookup
+      example: ''
+      in: path
+      name: GroupId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: id
+    GroupRoleId:
+      description: ID of the Group to lookup
+      example: ''
+      in: path
+      name: GroupId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-name-override: group_id
     HMACAuthId:
       description: ID of the HMAC-auth credential to lookup
       example: 70e7b00b-72f2-471b-a5ce-9c4171775360
@@ -12245,6 +12794,69 @@ components:
       schema:
         type: string
       x-speakeasy-match: id
+    RBACRoleEndpointId:
+      description: ID of the RBAC Role Endpoint to lookup
+      example: ''
+      in: path
+      name: RBACRoleEndpointId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: endpoint
+    RBACRoleEntityId:
+      description: ID of the RBAC Role Entity to lookup
+      example: ''
+      in: path
+      name: RBACRoleEntityId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: entity_id
+    RBACRoleId:
+      description: ID of the RBAC Role to lookup
+      example: ''
+      in: path
+      name: RBACRoleId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: id
+    RBACRoleIdForNestedEntities:
+      description: ID of the RBAC Role to lookup
+      example: ''
+      in: path
+      name: RBACRoleIdForNestedEntities
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: role_id
+    RBACUserGroupId:
+      description: ID of the RBAC User Group to lookup
+      example: ''
+      in: path
+      name: RBACUserGroupId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: group_id
+    RBACUserId:
+      description: ID of the RBAC User to lookup
+      example: ''
+      in: path
+      name: RBACUserId
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: id
+    RBACUserIdForNestedEntities:
+      description: ID of the RBAC User to lookup
+      example: ''
+      in: path
+      name: RBACUserIdForNestedEntities
+      required: true
+      schema:
+        type: string
+      x-speakeasy-match: user_id
     RouteIdOrName:
       description: ID or name of the Route to lookup
       example: a4326a41-aa12-44e3-93e4-6b6e58bfb9d7
@@ -24628,6 +25240,107 @@ components:
               type: string
       required:
         - config
+    Group:
+      x-speakeasy-entity: Group
+      type: object
+      properties:
+        comment:
+          description: Any comments associated with the specific group.
+          type: string
+          nullable: true
+        created_at:
+          description: Unix epoch when the resource was created.
+          type: integer
+          nullable: true
+        id:
+          description: A string representing a UUID (universally unique identifier).
+          type: string
+          nullable: true
+        name:
+          description: The name of the group
+          type: string
+        updated_at:
+          description: Unix epoch when the resource was last updated.
+          type: integer
+          nullable: true
+      example:
+        comment: This is an example comment for the group.
+        created_at: 1706598432
+        id: d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92
+        name: example-group
+        updated_at: 1706684832
+      additionalProperties: false
+      required:
+        - name
+    GroupRole:
+      x-speakeasy-entity: GroupRole
+      type: object
+      properties:
+        group:
+          type: object
+          nullable: true
+          properties:
+            comment:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            updated_at:
+              type: string
+              format: date-time
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        group_id:
+          description: ID of the group.
+          type: string
+          nullable: true
+        rbac_role:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+          x-speakeasy-terraform-ignore: true
+        role_id:
+          description: ID of the RBAC role assigned to the group.
+          type: string
+          nullable: true
+        workspace:
+          description: Workspace ID.
+          type: string
+          nullable: true
+      additionalProperties: false
+      x-speakeasy-transform-from-api:
+        jq: |
+          .
+          | if .group != null and .group.id != null
+            then . + { group_id: .group.id }
+            else .
+            end
+          | if .rbac_role != null and .rbac_role.id != null
+            then . + { role_id: .rbac_role.id }
+            else .
+            end
+          | if .workspace != null and (.workspace | type) == "object" and .workspace.id != null
+            then .workspace = .workspace.id
+            else .
+            end
+          | del(.group, .rbac_role)
+      x-speakeasy-transform-to-api:
+        jq: |
+          .
+          | if .workspace != null
+            then . + { workspace_id: .workspace }
+            else .
+            end
+          | if .role_id != null
+            then . + { rbac_role_id: .role_id }
+            else .
+            end
+          | del(.group_id, .role_id, .workspace, .group, .rbac_role)
     GrpcGatewayPlugin:
       allOf:
         - $ref: '#/components/schemas/PluginBase'
@@ -34058,6 +34771,290 @@ components:
               type: string
       required:
         - config
+    RBACRole:
+      x-speakeasy-entity: RbacRole
+      type: object
+      properties:
+        comment:
+          description: Additional comment or description for the RBAC role.
+          type: string
+          nullable: true
+        created_at:
+          description: Unix epoch when the resource was created.
+          type: integer
+          nullable: true
+        id:
+          description: A string representing a UUID (universally unique identifier).
+          type: string
+          nullable: true
+          x-speakeasy-param-suppress-computed-diff: true
+        is_default:
+          description: Indicates whether the RBAC role is the default role.
+          type: boolean
+          default: false
+          nullable: true
+        name:
+          description: The name of the RBAC role.
+          type: string
+          nullable: true
+        updated_at:
+          description: Unix epoch when the resource was last updated.
+          type: integer
+          nullable: true
+      additionalProperties: false
+      required:
+        - name
+    RBACRoleEndpoint:
+      x-speakeasy-entity: RbacRoleEndpoint
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            type: string
+          format: set
+        comment:
+          description: Additional comment or description for the RBAC role endpoint.
+          type: string
+          nullable: true
+        created_at:
+          description: Unix epoch when the resource was created.
+          type: integer
+          nullable: true
+        endpoint:
+          description: The endpoint associated with the RBAC role.
+          type: string
+          nullable: true
+        negative:
+          description: Indicates whether the RBAC role has negative permissions for the endpoint.
+          type: boolean
+          default: false
+          nullable: true
+        role:
+          description: The RBAC role associated with the endpoint.
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        updated_at:
+          description: Unix epoch when the resource was last updated.
+          type: integer
+          nullable: true
+        workspace:
+          description: The workspace associated with the endpoint.
+          type: string
+          default: default
+          nullable: true
+        role_id:
+          type: string
+          nullable: true
+      additionalProperties: false
+      required:
+        - actions
+        - endpoint
+      x-speakeasy-transform-from-api:
+        jq: |
+          .
+          | if .role != null and .role.id != null then . + { role_id: .role.id } else . end
+          | del(.role)
+      x-speakeasy-transform-to-api:
+        jq: |
+          .
+          | if .role_id != null then .role = { id: .role_id } else . end
+          | del(.role_id)
+    RBACRoleEntity:
+      x-speakeasy-entity: RbacRoleEntity
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            type: string
+          format: set
+        comment:
+          description: Additional comment or description for the RBAC role entity.
+          type: string
+          nullable: true
+        created_at:
+          description: Unix epoch when the resource was created.
+          type: integer
+          nullable: true
+        entity_id:
+          description: The ID of the entity associated with the RBAC role.
+          type: string
+          nullable: true
+        entity_type:
+          description: The type of the entity associated with the RBAC role.
+          type: string
+          nullable: true
+        negative:
+          description: Indicates whether the RBAC role has negative permissions for the entity.
+          type: boolean
+          default: false
+          nullable: true
+        role:
+          description: The RBAC role associated with the entity.
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        updated_at:
+          description: Unix epoch when the resource was last updated.
+          type: integer
+          nullable: true
+        role_id:
+          type: string
+          nullable: true
+      additionalProperties: false
+      required:
+        - actions
+        - entity_id
+        - entity_type
+      x-speakeasy-transform-from-api:
+        jq: |
+          .
+          | if .role != null and .role.id != null then . + { role_id: .role.id } else . end
+          | del(.role)
+      x-speakeasy-transform-to-api:
+        jq: |
+          .
+          | if .role_id != null then .role = { id: .role_id } else . end
+          | del(.role_id)
+    RBACUser:
+      x-speakeasy-entity: RbacUser
+      type: object
+      properties:
+        comment:
+          description: Any comments associated with the user.
+          type: string
+          nullable: true
+        created_at:
+          description: Unix epoch when the resource was created.
+          type: integer
+          nullable: true
+        enabled:
+          description: Wether or not the user has RBAC enabled.
+          type: boolean
+          default: true
+          nullable: true
+        id:
+          description: A string representing a UUID (universally unique identifier).
+          type: string
+          nullable: true
+        name:
+          description: The name of the user.
+          type: string
+          nullable: true
+        updated_at:
+          description: Unix epoch when the resource was last updated.
+          type: integer
+          nullable: true
+        user_token:
+          type: string
+          nullable: true
+          writeOnly: true
+        user_token_ident:
+          description: The user token.
+          type: string
+          nullable: true
+      additionalProperties: false
+      required:
+        - name
+        - user_token
+    RBACUserGroup:
+      x-speakeasy-entity: RbacUserGroup
+      type: object
+      properties:
+        group:
+          description: The group assigned to the user.
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        user:
+          description: The RBAC user associated with the group.
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        group_id:
+          type: string
+          nullable: true
+        user_id:
+          type: string
+          nullable: true
+      additionalProperties: false
+      x-speakeasy-transform-from-api:
+        jq: |
+          .
+          | if .group != null and .group.id != null then . + { group_id: .group.id } else . end
+          | if .user != null and .user.id != null then . + { user_id: .user.id } else . end
+          | del(.group, .user)
+      x-speakeasy-transform-to-api:
+        jq: |
+          .
+          | if .group_id != null then .group = { id: .group_id } else . end
+          | if .user_id != null then .user = { id: .user_id } else . end
+          | del(.group_id, .user_id)
+    RBACUserRole:
+      x-speakeasy-entity: RbacUserRole
+      type: object
+      properties:
+        role:
+          description: The RBAC role assigned to the user.
+          type: string
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+        role_source:
+          description: The origin of the RBAC user role.
+          type: string
+          default: local
+          enum:
+            - idp
+            - local
+          nullable: true
+          x-speakeasy-terraform-ignore: true
+        user:
+          description: The RBAC user associated with the role.
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+          x-foreign: true
+          x-speakeasy-terraform-ignore: true
+        user_id:
+          description: The RBAC user ID associated with the role.
+          type: string
+          nullable: true
+      additionalProperties: false
+      x-speakeasy-transform-from-api:
+        jq: |
+          .
+          | if .roles != null then .role = .roles[0].name else . end
+          | if .user != null and .user.id != null then . + { user_id: .user.id } else . end
+          | del(.user, .role_source)
+      x-speakeasy-transform-to-api:
+        jq: |
+          .
+          | if .role != null then .roles = .role else . end
+          | if .user_id != null then .user = { id: .user_id } else . end
+          | del(.user_id, .role)
     RateLimitingAdvancedPlugin:
       allOf:
         - $ref: '#/components/schemas/PluginBase'
@@ -39748,6 +40745,16 @@ components:
               type: string
       required:
         - config
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+      required:
+        - status
+        - message
     Upstream:
       x-speakeasy-entity: Upstream
       description: 'The upstream object represents a virtual hostname and can be used to loadbalance incoming requests over multiple services (targets). So for example an upstream named `service.v1.xyz` for a Service object whose `host` is `service.v1.xyz`. Requests for this Service would be proxied to the targets defined within the upstream. An upstream also includes a [health checker][healthchecks], which is able to enable and disable targets based on their ability or inability to serve requests. The configuration for the health checker is stored in the upstream object, and applies to all of its targets.'
@@ -41612,7 +42619,31 @@ components:
           properties:
             id:
               type: string
+  requestBodies:
+    GroupRoleRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GroupRole'
+      description: Request body schema for assigning or updating roles for a group.
   responses:
+    CreateGroupRolesResponse:
+      description: Successfully created or updated roles.
+      content:
+        application/json:
+          example:
+            group:
+              comment: 'Read access to all endpoints, across all workspaces'
+              id: 7574eb1d-c9fa-46a9-bd3a-3f1b4b196287
+              name: read-only
+              updated_at: '2024-04-23T18:25:43Z'
+            rbac_role:
+              id: 7fdea5c8-2bfa-4aa9-9c21-7bb9e607186d
+              name: admin
+            workspace:
+              id: 99bd8d18-f5b6-410e-aefe-d75f4252f13c
+          schema:
+            $ref: '#/components/schemas/GroupRole'
     GetPluginSchemaResponse:
       description: The schema for the plugin
       content:
@@ -41647,6 +42678,12 @@ components:
                 status: 401
           schema:
             $ref: '#/components/schemas/GatewayUnauthorizedError'
+    UnauthorizedRequest:
+      description: Unauthorized request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
   securitySchemes:
     adminToken:
       in: header
@@ -41675,6 +42712,8 @@ tags:
       The consumer object represents a consumer - or a user - of a service.
       You can either rely on Kong Gateway as the primary datastore, or you can map the consumer list with your database to keep consistency between Kong Gateway and your existing primary datastore.
     name: Consumers
+  - description: Group routes
+    name: Groups
   - name: HMAC-auth credentials
   - name: JWTs
   - description: |
@@ -41692,6 +42731,12 @@ tags:
       <br><br>
       When adding a plugin configuration to a service, the plugin will run on every request made by a client to that service. If a plugin needs to be tuned to different values for some specific consumers, you can do so by creating a separate plugin instance that specifies both the service and the consumer, through the service and consumer fields.
     name: Plugins
+  - name: RBACRoleEndpoints
+  - name: RBACRoleEntities
+  - name: RBACRoles
+  - name: RBACUserGroups
+  - name: RBACUserRoles
+  - name: RBACUsers
   - description: |
       Route entities define rules to match client requests. Each route is associated with a service, and a service may have multiple routes associated to it. Every request matching a given route will be proxied to the associated service. You need at least one matching rule that applies to the protocol being matched by the route.
       <br><br>

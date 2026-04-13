@@ -134,7 +134,7 @@ resource "kong-gateway_plugin_ldap_auth" "my_ldap_auth" {
     ldap_port        = 636
     ldaps            = true
     base_dn          = "dc=example,dc=com"
-    verify_ldap_host = false
+    verify_ldap_host = true
     attribute        = "cn"
     cache_ttl        = 60
     header_type      = "ldap"
@@ -158,7 +158,7 @@ resource "kong-gateway_plugin_ldap_auth_advanced" "my_ldap_auth_advanced" {
     ldap_port        = 389
     start_tls        = true
     base_dn          = "dc=example,dc=com"
-    verify_ldap_host = false
+    verify_ldap_host = true
     attribute        = "cn"
     cache_ttl        = 60
     header_type      = "ldap"

@@ -1,3 +1,87 @@
+resource "kong-gateway_plugin_ai_a2a_proxy" "my_ai_a2a_proxy" {
+  enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
+
+  config = {
+    logging = {
+      log_payloads     = true
+      log_statistics   = true
+      max_payload_size = 4096
+    }
+    max_request_body_size = 16384
+  }
+
+  service = {
+    id = kong-gateway_service.httpbin.id
+  }
+}
+
+resource "kong-gateway_plugin_ai_custom_guardrail" "my_ai_custom_guardrail" {
+  enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
+
+  config = {
+    request = {
+      url = "https://guardrail.example.com/v1/check"
+      auth = {
+        location = "header"
+        name     = "Authorization"
+        value    = "Bearer my-guardrail-token"
+      }
+    }
+    response = {
+      block         = "$(response.body.flagged)"
+      block_message = "Request blocked by custom guardrail."
+    }
+    guarding_mode        = "BOTH"
+    stop_on_error        = true
+    ssl_verify           = true
+    timeout              = 10000
+    response_buffer_size = 4096
+    text_source          = "concatenate_all_content"
+  }
+
+  route = {
+    id = kong-gateway_route.hello.id
+  }
+}
+
+resource "kong-gateway_plugin_ai_lakera_guard" "my_ai_lakera_guard" {
+  enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
+
+  config = {
+    api_key                   = "lakera-api-key-123"
+    guarding_mode             = "BOTH"
+    lakera_service_url        = "https://api.lakera.ai/v2/guard"
+    log_blocked_content       = true
+    request_failure_message   = "Your request was blocked by Lakera Guard."
+    response_failure_message  = "The model's response was filtered by Lakera Guard."
+    reveal_failure_categories = true
+    stop_on_error             = true
+    text_source               = "concatenate_all_content"
+    timeout                   = 15000
+    response_buffer_size      = 4096
+    verify_ssl                = false
+  }
+
+  route = {
+    id = kong-gateway_route.hello.id
+  }
+}
+
 resource "kong-gateway_plugin_ai_aws_guardrails" "my_ai_aws_guardrails" {
   enabled = true
 

@@ -1,3 +1,50 @@
+resource "kong-gateway_plugin_metering_and_billing" "my_metering_and_billing" {
+  enabled = true
+
+  protocols = [
+    "http",
+    "https"
+  ]
+
+  config = {
+    api_token       = "my-billing-api-token"
+    ingest_endpoint = "https://billing.example.com/v1/events"
+    keepalive       = 60000
+    timeout         = 10000
+    ssl_verify      = true
+
+    meter_api_requests   = true
+    meter_ai_token_usage = false
+
+    subject = {
+      field            = "custom_id"
+      look_up_value_in = "consumer"
+    }
+
+    attributes = [
+      {
+        event_property_name = "department"
+        look_up_value_in    = "x-department-id"
+        source              = "header"
+      }
+    ]
+
+    queue = {
+      concurrency_limit    = 1
+      initial_retry_delay  = 0.01
+      max_batch_size       = 100
+      max_coalescing_delay = 1
+      max_entries          = 10000
+      max_retry_delay      = 60
+      max_retry_time       = 60
+    }
+  }
+
+  service = {
+    id = kong-gateway_service.httpbin.id
+  }
+}
+
 resource "kong-gateway_plugin_datadog" "my_datadog" {
   enabled = true
 

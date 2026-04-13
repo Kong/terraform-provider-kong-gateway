@@ -60,7 +60,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_certificate.my_kong-gateway_certificate
   id = jsonencode({
-    id = "ddf3cdaa-3329-4961-822a-ce6dbd38eff7"
+    id        = "ddf3cdaa-3329-4961-822a-ce6dbd38eff7"
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

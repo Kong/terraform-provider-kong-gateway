@@ -62,8 +62,8 @@ import {
   to = kong-gateway_mtls_auth.my_kong-gateway_mtls_auth
   id = jsonencode({
     consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
-    id = ""
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id          = ""
+    workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }
 ```

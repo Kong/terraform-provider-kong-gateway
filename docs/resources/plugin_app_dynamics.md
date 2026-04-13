@@ -148,7 +148,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_app_dynamics.my_kong-gateway_plugin_app_dynamics
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

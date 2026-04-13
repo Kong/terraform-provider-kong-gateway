@@ -49,7 +49,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_consumer.my_kong-gateway_consumer
   id = jsonencode({
-    id = "c1059869-6fa7-4329-a5f5-5946d14ca2c5"
+    id        = "c1059869-6fa7-4329-a5f5-5946d14ca2c5"
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

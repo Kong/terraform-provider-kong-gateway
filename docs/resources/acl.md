@@ -51,8 +51,8 @@ import {
   to = kong-gateway_acl.my_kong-gateway_acl
   id = jsonencode({
     consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
-    id = "f28acbfa-c866-4587-b688-0208ac24df21"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id          = "f28acbfa-c866-4587-b688-0208ac24df21"
+    workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }
 ```

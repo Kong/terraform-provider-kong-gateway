@@ -61,7 +61,7 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_sni.my_kong-gateway_sni
   id = jsonencode({
-    id = "64c17a1a-b7d7-4a65-a5a4-42e4a7016e7f"
+    id        = "64c17a1a-b7d7-4a65-a5a4-42e4a7016e7f"
     workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }

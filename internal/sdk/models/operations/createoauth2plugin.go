@@ -39,6 +39,9 @@ func (c *CreateOauth2PluginRequest) GetOauth2Plugin() shared.Oauth2Plugin {
 	return c.Oauth2Plugin
 }
 
+// #region class-body-createoauth2pluginrequest
+// #endregion class-body-createoauth2pluginrequest
+
 type CreateOauth2PluginResponse struct {
 	// HTTP response content type for this operation
 	ContentType string
@@ -97,3 +100,6 @@ func (c *CreateOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.Gatew
 	}
 	return c.GatewayUnauthorizedError
 }
+
+// #region class-body-createoauth2pluginresponse
+// #endregion class-body-createoauth2pluginresponse

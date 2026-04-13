@@ -53,8 +53,8 @@ import {
   to = kong-gateway_hmac_auth.my_kong-gateway_hmac_auth
   id = jsonencode({
     consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
-    id = "70e7b00b-72f2-471b-a5ce-9c4171775360"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id          = "70e7b00b-72f2-471b-a5ce-9c4171775360"
+    workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
   })
 }
 ```

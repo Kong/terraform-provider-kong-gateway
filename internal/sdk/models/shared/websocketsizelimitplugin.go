@@ -256,9 +256,10 @@ type WebsocketSizeLimitPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                           `json:"instance_name,omitempty"`
-	name         string                            `const:"websocket-size-limit" json:"name"`
-	Ordering     *WebsocketSizeLimitPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                            `const:"websocket-size-limit" json:"name"`
+	Ordering *WebsocketSizeLimitPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []WebsocketSizeLimitPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.

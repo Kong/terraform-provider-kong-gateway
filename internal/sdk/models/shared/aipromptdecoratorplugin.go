@@ -161,18 +161,18 @@ func (e *LlmFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type Role string
+type AiPromptDecoratorPluginConfigRole string
 
 const (
-	RoleAssistant Role = "assistant"
-	RoleSystem    Role = "system"
-	RoleUser      Role = "user"
+	AiPromptDecoratorPluginConfigRoleAssistant AiPromptDecoratorPluginConfigRole = "assistant"
+	AiPromptDecoratorPluginConfigRoleSystem    AiPromptDecoratorPluginConfigRole = "system"
+	AiPromptDecoratorPluginConfigRoleUser      AiPromptDecoratorPluginConfigRole = "user"
 )
 
-func (e Role) ToPointer() *Role {
+func (e AiPromptDecoratorPluginConfigRole) ToPointer() *AiPromptDecoratorPluginConfigRole {
 	return &e
 }
-func (e *Role) UnmarshalJSON(data []byte) error {
+func (e *AiPromptDecoratorPluginConfigRole) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -183,16 +183,16 @@ func (e *Role) UnmarshalJSON(data []byte) error {
 	case "system":
 		fallthrough
 	case "user":
-		*e = Role(v)
+		*e = AiPromptDecoratorPluginConfigRole(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Role: %v", v)
+		return fmt.Errorf("invalid value for AiPromptDecoratorPluginConfigRole: %v", v)
 	}
 }
 
 type AiPromptDecoratorPluginAppend struct {
-	Content string `json:"content"`
-	Role    *Role  `json:"role,omitempty"`
+	Content string                             `json:"content"`
+	Role    *AiPromptDecoratorPluginConfigRole `json:"role,omitempty"`
 }
 
 func (a AiPromptDecoratorPluginAppend) MarshalJSON() ([]byte, error) {
@@ -213,7 +213,7 @@ func (a *AiPromptDecoratorPluginAppend) GetContent() string {
 	return a.Content
 }
 
-func (a *AiPromptDecoratorPluginAppend) GetRole() *Role {
+func (a *AiPromptDecoratorPluginAppend) GetRole() *AiPromptDecoratorPluginConfigRole {
 	if a == nil {
 		return nil
 	}

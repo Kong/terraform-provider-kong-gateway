@@ -89,7 +89,13 @@ type KongGateway struct {
 	// You can find more information about available plugins and which values each plugin accepts at the [Plugin Hub](https://developer.konghq.com/plugins/).
 	// <br><br>
 	// When adding a plugin configuration to a service, the plugin will run on every request made by a client to that service. If a plugin needs to be tuned to different values for some specific consumers, you can do so by creating a separate plugin instance that specifies both the service and the consumer, through the service and consumer fields.
-	Plugins *Plugins
+	Plugins           *Plugins
+	RBACRoles         *RBACRoles
+	RBACRoleEndpoints *RBACRoleEndpoints
+	RBACRoleEntities  *RBACRoleEntities
+	RBACUsers         *RBACUsers
+	RBACUserGroups    *RBACUserGroups
+	RBACUserRoles     *RBACUserRoles
 	// Route entities define rules to match client requests. Each route is associated with a service, and a service may have multiple routes associated to it. Every request matching a given route will be proxied to the associated service. You need at least one matching rule that applies to the protocol being matched by the route.
 	// <br><br>
 	// The combination of routes and services, and the separation of concerns between them, offers a powerful routing mechanism with which it is possible to define fine-grained entrypoints in Kong Gateway leading to different upstream services of your infrastructure.
@@ -148,6 +154,8 @@ type KongGateway struct {
 	// A CA certificate object represents a trusted certificate authority.
 	// These objects are used by Kong Gateway to verify the validity of a client or server certificate.
 	CACertificates *CACertificates
+	// Group routes
+	Groups *Groups
 	// The workspace object describes the workspace entity, which has an ID and a name.
 	// <br><br>
 	// Workspaces provide a way to segment Kong Gateway entities. Entities in a workspace are isolated from those in other workspaces.
@@ -351,6 +359,12 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk.Keys = newKeys(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Partials = newPartials(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Plugins = newPlugins(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACRoles = newRBACRoles(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACRoleEndpoints = newRBACRoleEndpoints(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACRoleEntities = newRBACRoleEntities(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACUsers = newRBACUsers(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACUserGroups = newRBACUserGroups(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.RBACUserRoles = newRBACUserRoles(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Routes = newRoutes(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Services = newServices(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.SNIs = newSNIs(sdk, sdk.sdkConfiguration, sdk.hooks)
@@ -358,6 +372,7 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk.Targets = newTargets(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Vaults = newVaults(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.CACertificates = newCACertificates(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.Groups = newGroups(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Workspaces = newWorkspaces(sdk, sdk.sdkConfiguration, sdk.hooks)
 
 	return sdk

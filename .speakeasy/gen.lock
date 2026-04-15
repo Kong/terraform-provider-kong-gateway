@@ -1,16 +1,16 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: 56654fc40b8a12d17d43149ec329236a
+  docChecksum: 969e1f40fabdda2c2587b9a62bf8ceac
   docVersion: 3.14.0
   speakeasyVersion: 1.761.3
   generationVersion: 2.879.11
   releaseVersion: 1.0.2
   configChecksum: b277a86cee06126f3807801ac41afa52
 persistentEdits:
-  generation_id: 1976a861-652f-4f00-bda7-cfcd29763f57
-  pristine_commit_hash: 98ec64ec7c7c835edb09b55e9ab6bda7f4eeb9b1
-  pristine_tree_hash: 7267265db36d03cfe024e0fc78866f4f3ff7ee9e
+  generation_id: 711715a3-df33-4fe8-8cf2-770939c9eec4
+  pristine_commit_hash: d5dc62b300af87ec86e31290d3277b67cdf0fb03
+  pristine_tree_hash: 81bf1b6e1ffea001d0be7175b869601beb2efcf1
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -22,6 +22,7 @@ features:
     nameOverrides: 2.81.7
     nullables: 0.0.0
     sets: 0.1.2
+    transformJq: 0.0.1
     typeOverrides: 2.81.1
     unions: 2.82.15
 trackedFiles:
@@ -113,6 +114,22 @@ trackedFiles:
     id: 093e12133ecb
     last_write_checksum: sha1:fe43f8dc6a855d9deeb46bf9662ac6b72ca638bd
     pristine_git_object: ffbee42663c694e9b67135732dacf667e414e849
+  examples/resources/kong-gateway_group/import-by-string-id.tf:
+    id: 1abc0dc1f4a0
+    last_write_checksum: sha1:5713c232ff6b3c129d97ad1f1e86ceada7bd6247
+    pristine_git_object: f36777ebe4352bf3396c1c7c3e6e2bf14c67a4b3
+  examples/resources/kong-gateway_group/import.sh:
+    id: 4f70131b5829
+    last_write_checksum: sha1:22ce37838d02293d72d8bdb594b17d4995527d1f
+    pristine_git_object: d4b99d0124699c067286e93563a60689abdfd55c
+  examples/resources/kong-gateway_group/resource.tf:
+    id: 40df5814de77
+    last_write_checksum: sha1:9b8bc59ffd645c0bea2fca011ba675a5bea5e548
+    pristine_git_object: 37fa34a0079160ca34d21b452a25b03db08c404e
+  examples/resources/kong-gateway_group_role/resource.tf:
+    id: 307d2ab70435
+    last_write_checksum: sha1:77deddbd421ca213283ce8700b33a8cf40b14a72
+    pristine_git_object: a099cc2f90b3afc45e64b71b9254d8ab12c8e37d
   examples/resources/kong-gateway_hmac_auth/import-by-string-id.tf:
     id: 46fc5b0b7dde
     last_write_checksum: sha1:f94494a3ebe337d9e0b451d312ca50be0b2844b4
@@ -1553,6 +1570,54 @@ trackedFiles:
     id: 44b80004edc8
     last_write_checksum: sha1:b4a67daee808611c99ed16164895fed6d1232ef6
     pristine_git_object: 889be22be60d3f00001be4d7cfa81b7bbbc0f622
+  examples/resources/kong-gateway_rbac_role/import-by-string-id.tf:
+    id: dff43fb24841
+    last_write_checksum: sha1:9d3710352eb4bb819c726bcc0a701b592d3f7e72
+    pristine_git_object: d211ed189f8ff45929fb85aee8be33844a1ab101
+  examples/resources/kong-gateway_rbac_role/import.sh:
+    id: d5c9b8088205
+    last_write_checksum: sha1:076123ab2f39f14aedadd214aefdd86e94a07169
+    pristine_git_object: 79f58c028d4d5828084e43b6cba0e418ee8344c5
+  examples/resources/kong-gateway_rbac_role/resource.tf:
+    id: f8d4cc8f24d7
+    last_write_checksum: sha1:0418c9861ffe2f530d63eb41809a32f909d47498
+    pristine_git_object: 3dec6d241e15a6feb6dd3218ff2f543be2c43291
+  examples/resources/kong-gateway_rbac_role_endpoint/resource.tf:
+    id: 5486e24e30bd
+    last_write_checksum: sha1:1c37b0af8b7723c481fbce74f8b5a2e3e72fdf54
+    pristine_git_object: fd63ecad9dbc0c0def2405d4d164a30702cabfba
+  examples/resources/kong-gateway_rbac_role_entity/import-by-string-id.tf:
+    id: 50f0e809b8ea
+    last_write_checksum: sha1:1a53514f5f3e804b60b1af10fe2abe8af861d045
+    pristine_git_object: 758e248eda416452317d5308d1ee52f4c6c8b60f
+  examples/resources/kong-gateway_rbac_role_entity/import.sh:
+    id: 95e2d473e245
+    last_write_checksum: sha1:99045c7c589b589bcb32d163e06ba4f698511e57
+    pristine_git_object: 773c1206350209d1372da034c5d07ff1d8875f10
+  examples/resources/kong-gateway_rbac_role_entity/resource.tf:
+    id: ed268f9eae11
+    last_write_checksum: sha1:3f5f25de1226982ecb06a1b0303bfae9901c48bd
+    pristine_git_object: 1044f24d102a823c3a13d91242b149b20c7232cc
+  examples/resources/kong-gateway_rbac_user/import-by-string-id.tf:
+    id: 5e9e6961c9dc
+    last_write_checksum: sha1:3fcfb00db363e8d6973df267f70ce0d6908f60e8
+    pristine_git_object: 494e07e8f3c09f545fddd2e748077bd430dabec7
+  examples/resources/kong-gateway_rbac_user/import.sh:
+    id: c4ed84d5353a
+    last_write_checksum: sha1:c875ac2c5af934cd23f2a4fe9f15b79aa110b831
+    pristine_git_object: 1dcb9c6a02d001e29d34ae411c4cadaa574fb9cc
+  examples/resources/kong-gateway_rbac_user/resource.tf:
+    id: 2234eafebf8d
+    last_write_checksum: sha1:6bea241f01a1eefc7348ea4aff36c7ebca0481d2
+    pristine_git_object: 820ce1ac2483c423286bea4c962545df0bdef991
+  examples/resources/kong-gateway_rbac_user_group/resource.tf:
+    id: 1e3ea03f8980
+    last_write_checksum: sha1:70f9fe3f8a8a6b23fca41bdba105f94f787b2aef
+    pristine_git_object: 916f88655012ed6b72ec6c639bde085047ab0a47
+  examples/resources/kong-gateway_rbac_user_role/resource.tf:
+    id: 92b7c5dcd946
+    last_write_checksum: sha1:aacf73d4867c7d3b2ac5c06788f7366bc221963b
+    pristine_git_object: d30c35de232c3ea5205079c5f1b24ee6eaf45b61
   examples/resources/kong-gateway_route/import-by-string-id.tf:
     id: 9d3681e9810a
     last_write_checksum: sha1:1f26700cc75b16834d6b81fc3a4eed8e00cfc586
@@ -1643,8 +1708,8 @@ trackedFiles:
     pristine_git_object: 28c7e1cffe60ba2f3c8cb783dce79fc928934496
   go.mod:
     id: c47645c391ad
-    last_write_checksum: sha1:7e2b138ce11a01306a07cd3a8ef9a4ab4dca8ce5
-    pristine_git_object: f77bacc0fb8840ae85235019030a13817700d330
+    last_write_checksum: sha1:91492b7c5949d299e9199951a790ba58a61ce942
+    pristine_git_object: 83824490c43999f7f481cec0ede6201ebe5b3829
   internal/planmodifiers/boolplanmodifier/suppress_diff.go:
     id: 3cf85b98963e
     last_write_checksum: sha1:263e1cf5d14ed18c531ecfd6cfee477db3f58032
@@ -1841,6 +1906,22 @@ trackedFiles:
     id: a772ac6926f0
     last_write_checksum: sha1:0487eb6170ec0ffa2e4bdd91868035656a8f817a
     pristine_git_object: 225fd2623ab2f19c19dcea2ea2ce75ac7c0636d7
+  internal/provider/group_resource.go:
+    id: 77b83309e259
+    last_write_checksum: sha1:130453acdb9a038b07c67fbbfdf74c56d2034f76
+    pristine_git_object: bb8921801c10ab9c6aa81ef220bac06ab79c3bd6
+  internal/provider/group_resource_sdk.go:
+    id: 318ed979ef04
+    last_write_checksum: sha1:10a5eedf9a7caa52c494914c082d9de259dc3d31
+    pristine_git_object: 48109b9720c0d179f7aa3cbdd61efc18cb298cfb
+  internal/provider/grouprole_resource.go:
+    id: 77b04c9c7fd9
+    last_write_checksum: sha1:a0fc74913cc9ca608239a95c9b3dfe8b3e308ba0
+    pristine_git_object: 471d7a9e8ea6b714027e3f0830221b6ad189fdbd
+  internal/provider/grouprole_resource_sdk.go:
+    id: 50c1e35558e8
+    last_write_checksum: sha1:9b87a0467534d45bb956cfe8ba13efa53d2e3236
+    pristine_git_object: bc23fa11e49907db9f9009016757f88b27746a84
   internal/provider/hmacauth_resource.go:
     id: 074585430ded
     last_write_checksum: sha1:dfdecd34f9b060bda44a42e011add93862f2ca4d
@@ -2007,8 +2088,8 @@ trackedFiles:
     pristine_git_object: f40aacafe696f2b45d0e1a8f5e052264f3f9dfad
   internal/provider/pluginaipromptdecorator_resource_sdk.go:
     id: e1b852bf96cd
-    last_write_checksum: sha1:e635ad4b5f330510fde4c20d80cb9950dbc266ab
-    pristine_git_object: de67a51245fdda4dc1986548ea82093e458826f0
+    last_write_checksum: sha1:35f59968a3c9721e804d16e3189db33806c2741c
+    pristine_git_object: 77d2953069277416af72b8c572dc02a40c56597e
   internal/provider/pluginaipromptguard_resource.go:
     id: dea2b9ff2aa2
     last_write_checksum: sha1:45b8ae7e0cf05a07b8fb901ac725bb9d38ff1d85
@@ -2803,8 +2884,56 @@ trackedFiles:
     pristine_git_object: 96a41cc4167af820920d1c7a671ad3f8b2ff564e
   internal/provider/provider.go:
     id: 1e7e86841cf3
-    last_write_checksum: sha1:ec57a3c4a9e29202047ffb20d90d9e04959599b6
-    pristine_git_object: e10e02eaf489d39d1d3c14dc2309aebe6b4f72ad
+    last_write_checksum: sha1:786a78bc6c4046f266955301f700401741192410
+    pristine_git_object: c9353a42c2edc53cf600f10f479f6cda19274762
+  internal/provider/rbacrole_resource.go:
+    id: 7986ba914ace
+    last_write_checksum: sha1:192819983cc3a230cc2de4a3c217ebb2c81645a8
+    pristine_git_object: 7e9194dec368fdc960e73e6ddbc624305b8de813
+  internal/provider/rbacrole_resource_sdk.go:
+    id: cfce3aa515d6
+    last_write_checksum: sha1:3b39cca0c864ffd0fd12499217066d618bf9ad46
+    pristine_git_object: e818e6f30685160673bc290c4382e0264b304307
+  internal/provider/rbacroleendpoint_resource.go:
+    id: d049b257d2ff
+    last_write_checksum: sha1:423c223c8b7e12974a83f17a6db138c5c13bcbf1
+    pristine_git_object: d84a19d3866dd5b40a90608a5d227a68eca89e3f
+  internal/provider/rbacroleendpoint_resource_sdk.go:
+    id: cd231a9aa289
+    last_write_checksum: sha1:d84737a897c696b6d54e3f3e64c84bca34a6d737
+    pristine_git_object: 2173a4889f52b906ba798861002df2c4704812fe
+  internal/provider/rbacroleentity_resource.go:
+    id: 47b5cd19b552
+    last_write_checksum: sha1:d7cd3f5e97cd89ec71d75b837266bada13c78deb
+    pristine_git_object: e1f9882b663da8de4b05bacb9d74cb761c68dbff
+  internal/provider/rbacroleentity_resource_sdk.go:
+    id: 98d26d3dcf63
+    last_write_checksum: sha1:69ed08da02198b105187794cda777be20e36b8d4
+    pristine_git_object: 72a4b2eb3c007062615a73adfed56915929af1d8
+  internal/provider/rbacuser_resource.go:
+    id: 01981c9c720f
+    last_write_checksum: sha1:20c248807c650a7ee98766d1d1a688fb0467e023
+    pristine_git_object: 2039c02118d530957a6c0400651c50aa7cfcf7cc
+  internal/provider/rbacuser_resource_sdk.go:
+    id: 0a58b5fc144d
+    last_write_checksum: sha1:e538ba53eb63c9353e0376132771da22f79fa1bc
+    pristine_git_object: 3c1abc0a931e6ad01b314d45c2bc41c85f411e53
+  internal/provider/rbacusergroup_resource.go:
+    id: 06ac4baa2c09
+    last_write_checksum: sha1:8d7b5e6a8ec89f8bc1b08de1148c71671f503e7d
+    pristine_git_object: 997314febae8f6276b23fb5bf6798c7b415dc95d
+  internal/provider/rbacusergroup_resource_sdk.go:
+    id: e71bfa10ded6
+    last_write_checksum: sha1:94093182e410a85142f5c502cb0bd04ded3486e8
+    pristine_git_object: 6e3ac86bdd25b46ebad421ff9baaf53188246204
+  internal/provider/rbacuserrole_resource.go:
+    id: 721ec01e57c8
+    last_write_checksum: sha1:f0f8353f1046001d7fb8bc7651f70c3b6b8fe920
+    pristine_git_object: 96600825afab9421342e7574a97ea4a118058cf7
+  internal/provider/rbacuserrole_resource_sdk.go:
+    id: 0917281c22e0
+    last_write_checksum: sha1:93267c5c460eb0fef64ad87fd4115d006d74bfed
+    pristine_git_object: b928e7579c57a4c49ee5dc57aff80c614c8ad5be
   internal/provider/reflect/diags.go:
     id: 35b6b44972e2
     last_write_checksum: sha1:ace8bc53054bb1d8ee8689acf3e4323de75a6297
@@ -4193,6 +4322,10 @@ trackedFiles:
     id: 3f951f808a54
     last_write_checksum: sha1:40f4a82efd5ec6e8bb2587b0d56a76bd4428c2a2
     pristine_git_object: 7f49478ee4781961f5e7383b1ac7c46fd594a547
+  internal/sdk/groups.go:
+    id: 2bfe17bcb000
+    last_write_checksum: sha1:0d50b09f4c8d925075ccb7a4e5acc59e7779b6f8
+    pristine_git_object: 168e88441075d8cd81f001b38e20e29dd5811ade
   internal/sdk/hmacauthcredentials.go:
     id: 9c92676a2fe0
     last_write_checksum: sha1:57b2005b4ce15e3c347c7e34f0ebe8a3979d0939
@@ -4221,6 +4354,10 @@ trackedFiles:
     id: f035883ac0ff
     last_write_checksum: sha1:4dbf56a2d816f4722cef2d63a71f102c0d65963b
     pristine_git_object: f2f7c641f903f5f11d98dd2dc04737f80fc5308e
+  internal/sdk/internal/utils/jq.go:
+    id: 05a9c3aef5f6
+    last_write_checksum: sha1:2e75ed7a7db1f91e97dac1ac4ca7801b2beb69b5
+    pristine_git_object: 24827e92d9ceb6d7a3eea097902ed1b309bc5e14
   internal/sdk/internal/utils/json.go:
     id: 2231afac3add
     last_write_checksum: sha1:d5d9893986b79451eafff59f7c90f3ffe5786bd0
@@ -4271,8 +4408,8 @@ trackedFiles:
     pristine_git_object: 402553581b4b2f6e6f1195534cb873908698b074
   internal/sdk/konggateway.go:
     id: "00e542406092"
-    last_write_checksum: sha1:a5aa7e97e091674c0fa607ff4e86945dd33da811
-    pristine_git_object: 1813b453f3ec94d59bb91b6c96cbd41768d09d71
+    last_write_checksum: sha1:037437e64bc6f680d164a9ffb51eed5632bb2c44
+    pristine_git_object: 123a35c884e597ac371baacfd73d2f9b3368e1ec
   internal/sdk/models/errors/sdkerror.go:
     id: 19b5a8d3586b
     last_write_checksum: sha1:5d65fce5049df7c5113e11c9ccb1e4c46b91901c
@@ -4481,6 +4618,14 @@ trackedFiles:
     id: 10f318d89245
     last_write_checksum: sha1:e991ba517bd2ca9bf88c6913aacc27e959e78444
     pristine_git_object: e3fb73220976e4d9d9c637ec9af41f3c6000bdda
+  internal/sdk/models/operations/creategroup.go:
+    id: b5d908361ccf
+    last_write_checksum: sha1:9bb6737792a01965b2d58ba14fc40016553cd673
+    pristine_git_object: 5a07968daafbc69d5586e60de966460e876e4064
+  internal/sdk/models/operations/creategroupsgroupidornameroles.go:
+    id: e668df519f9e
+    last_write_checksum: sha1:4097442fd991c3d8716ebae3223aad6518b16581
+    pristine_git_object: bce1f8e56230a2007d2aac8ffa8f403110ac1a2b
   internal/sdk/models/operations/creategrpcgatewayplugin.go:
     id: 76d5be7d8b67
     last_write_checksum: sha1:8c9fd1facb010cce55ae403cdefbd9680425ea80
@@ -4657,6 +4802,30 @@ trackedFiles:
     id: 27a8460c3508
     last_write_checksum: sha1:d49d93cda76db7d6df630d3aead04d2b36be83cd
     pristine_git_object: 20bb4509a98f971478eba4230d962ed143dc176d
+  internal/sdk/models/operations/createrbacrole.go:
+    id: 388bb3c2dc72
+    last_write_checksum: sha1:87f31adc8bf402891a9d0b9f4ae556255c5ad13c
+    pristine_git_object: 91a72554625d1f39723ff14e4a1d2fef715dfb8c
+  internal/sdk/models/operations/createrbacroleendpoint.go:
+    id: 5712877aa527
+    last_write_checksum: sha1:af154a3f11baedf15e46fc21889789e2551fed51
+    pristine_git_object: f429ebee5489f0a19b0541fdd04a92e4a16571b9
+  internal/sdk/models/operations/createrbacroleentitie.go:
+    id: 8c2ea54c401e
+    last_write_checksum: sha1:64e2e86d130bdf38722fd0bdf0107c77476125ed
+    pristine_git_object: a3afc37bcf2501b82906cbfa4b2125218c89615f
+  internal/sdk/models/operations/createrbacuser.go:
+    id: b2482dcbd318
+    last_write_checksum: sha1:9ea840fc5de2d7f39dcb2860320c7d2d5e7b91aa
+    pristine_git_object: 7077303633505c540c9b1e2015fd8b00e2b59ce4
+  internal/sdk/models/operations/createrbacusergroup.go:
+    id: df48147f9c9e
+    last_write_checksum: sha1:1fe98b6ff883166e94216fded3157a7c4ba6403f
+    pristine_git_object: f362f3c8f2257d73a1347466121f2984f9151491
+  internal/sdk/models/operations/createrbacuserrole.go:
+    id: d39dc1949926
+    last_write_checksum: sha1:b59db293d73860a48ee04cd753a5370f90533704
+    pristine_git_object: 743d97e9087b38e820e6b60b47152f302ec393ac
   internal/sdk/models/operations/createredirectplugin.go:
     id: 4f1a4fe88d29
     last_write_checksum: sha1:e39447e048ef8689a64680b14f3c0eb4f9883a57
@@ -5021,6 +5190,14 @@ trackedFiles:
     id: 26fdfcdb58d4
     last_write_checksum: sha1:45f1700435d74871a8bb180d5911c008c0d8b5ae
     pristine_git_object: 430dc0452051ddfaa8730233cac240116abfca9d
+  internal/sdk/models/operations/deletegroup.go:
+    id: 0a472bbb782d
+    last_write_checksum: sha1:9fe3b69655e6e99dd60a2960061fdcb6969e1ef6
+    pristine_git_object: 0f322ac71678f4d6f51e58d219a66c00c26003c6
+  internal/sdk/models/operations/deletegroupsgroupidornameroles.go:
+    id: 1b9176a34d79
+    last_write_checksum: sha1:814676666cf395e0cc7cdcd711190b1b6b913048
+    pristine_git_object: 98a790e37b833e6ad06901211cee7d87783d1043
   internal/sdk/models/operations/deletegrpcgatewayplugin.go:
     id: e2f3a11779c4
     last_write_checksum: sha1:8dc8fc1ed0cd3e7e3ed3841d5e90d901854698ed
@@ -5197,6 +5374,30 @@ trackedFiles:
     id: 5d6f4a9b0804
     last_write_checksum: sha1:d07e4f65d10fe5d8680cc68585b28f61581eaa36
     pristine_git_object: d27f94842c7ff8e571c550072be3d383878326d9
+  internal/sdk/models/operations/deleterbacrole.go:
+    id: b45c884f0ec7
+    last_write_checksum: sha1:547ea157a38fbda99b38d8fa122c211469eeb5ff
+    pristine_git_object: 3f6918be4373f807f1341705a945fa5705f58c8a
+  internal/sdk/models/operations/deleterbacroleendpoint.go:
+    id: 71177f471a9e
+    last_write_checksum: sha1:abba607760f6c54cae4593f37e13f5292bee38d1
+    pristine_git_object: 351b9291b1d323eb325686615962c0afc612fd8c
+  internal/sdk/models/operations/deleterbacroleentitie.go:
+    id: 6b07211de24a
+    last_write_checksum: sha1:f07eed9a59b195d9d7558927298044b88ee2dfcd
+    pristine_git_object: f3074e9542dff69e5a7f1cdd6af778a3841faa8f
+  internal/sdk/models/operations/deleterbacuser.go:
+    id: 2f14ee2b767c
+    last_write_checksum: sha1:2acd359e90824052ac1597ac28dc33dfb6750e7f
+    pristine_git_object: 64fb56e302eab9f3bcd498077fa501607cb18ea5
+  internal/sdk/models/operations/deleterbacusergroup.go:
+    id: 35636d923767
+    last_write_checksum: sha1:820618c8b0c33e7c0f0932c39ca783c65efd3c6d
+    pristine_git_object: e90675928c942793803ff1942bd993fb6d4e05aa
+  internal/sdk/models/operations/deleterbacuserrole.go:
+    id: 9bcc9c89027f
+    last_write_checksum: sha1:8fea855a0d7ebf3f88d2ef5655bb308f8a232f97
+    pristine_git_object: 25358c7ca3153feece99e223edb6636a3a87fe2f
   internal/sdk/models/operations/deleteredirectplugin.go:
     id: 89f90b449e09
     last_write_checksum: sha1:f329dbc23a783986eec94b4dd88c42123d2befd4
@@ -5561,6 +5762,10 @@ trackedFiles:
     id: bee66c1babe5
     last_write_checksum: sha1:8f4dce330dc9788e45598774fcdcd3ce8db62d16
     pristine_git_object: 1174f41bb3f3a801a49266987e46161cc8c6ac26
+  internal/sdk/models/operations/getgroup.go:
+    id: 9dd8a5ce6f45
+    last_write_checksum: sha1:bd771c82d4a22239c88756e2452e782f1bd3efa8
+    pristine_git_object: 07f8fc147fe53b6e625ee84e16eeb1d58f947796
   internal/sdk/models/operations/getgrpcgatewayplugin.go:
     id: 5ffebb58a338
     last_write_checksum: sha1:5fce44d6511036b4754d4f5a21ed93adc0d90d6b
@@ -5737,6 +5942,18 @@ trackedFiles:
     id: af0e595efd4f
     last_write_checksum: sha1:35d71a69285e43509fada1155f95dc26d99b388d
     pristine_git_object: a2d9bc4265b5b38d70c97a4a9d66606c830f8568
+  internal/sdk/models/operations/getrbacrole.go:
+    id: a06b61bea847
+    last_write_checksum: sha1:00347a3fe9bb99aa1d00b731045998eeb3f4e881
+    pristine_git_object: 9326ddd93c55c516afcf8213607540e6ffad8201
+  internal/sdk/models/operations/getrbacroleentitie.go:
+    id: f934254bb569
+    last_write_checksum: sha1:1b55d912239af2ccecfc158d911544f1e57a7df7
+    pristine_git_object: c84772c7e81590baf3fc984badd7d099bb520eba
+  internal/sdk/models/operations/getrbacuser.go:
+    id: 8c6b97ddde09
+    last_write_checksum: sha1:ad3298724efa08dcc926fb3ad297c115993a5d79
+    pristine_git_object: 1efab384c712df462365cc9e9b569d92fc1cc594
   internal/sdk/models/operations/getredirectplugin.go:
     id: 0168e3c4ce8f
     last_write_checksum: sha1:fbc538a7b2d613b68536d43bdee86252d0f73af3
@@ -6381,6 +6598,10 @@ trackedFiles:
     id: ee56d8ede390
     last_write_checksum: sha1:d9e90defaf4209138658a688d541d5a1d739a9a2
     pristine_git_object: 7a35117d2a35b8441eaf51f51b4c67517cbb8b7d
+  internal/sdk/models/operations/upsertgroup.go:
+    id: 04494740ecd9
+    last_write_checksum: sha1:924634f4c5c52d2ca439f2f05a0ce126a119a7e0
+    pristine_git_object: 03203cb96d2ab42318b2e9c99e8dd0e9b65888e7
   internal/sdk/models/operations/upsertkey.go:
     id: 28f2cdb3a09b
     last_write_checksum: sha1:dc4692fc8a5f279ea6cdc87a5c0f2fe49f4e08d8
@@ -6397,6 +6618,10 @@ trackedFiles:
     id: 68f1648f8628
     last_write_checksum: sha1:b21c7a9bb414253a5379b150f2f7c4841eff967e
     pristine_git_object: e210601d1f9ad6efff43b358866084164bd30f3e
+  internal/sdk/models/operations/upsertrbacrole.go:
+    id: 3fc2cf71aae1
+    last_write_checksum: sha1:572566f86d7eef2974b45a5e0ab6e330d087159c
+    pristine_git_object: e057965e7979217e8f6ec9ba1c2515d7d822f006
   internal/sdk/models/operations/upsertroute.go:
     id: bf28ee677c59
     last_write_checksum: sha1:cb6dc512745be296447370c8dc22bd21583e69d4
@@ -6487,8 +6712,8 @@ trackedFiles:
     pristine_git_object: dfa088ee852f9d9ed4a30489b570efa3b7592236
   internal/sdk/models/shared/aipromptdecoratorplugin.go:
     id: 72ca4ffdf739
-    last_write_checksum: sha1:5955d8009d5b7fc720c67e6ea7aa3da678d7b73b
-    pristine_git_object: cde6901fa8615557edbd7345f149a2ac91a861de
+    last_write_checksum: sha1:61aadf9244fea27b03b12c7265ec0f847df5b971
+    pristine_git_object: ff20d43cd2127c87791b2274555e1ef3f2877776
   internal/sdk/models/shared/aipromptguardplugin.go:
     id: 65e00a53e974
     last_write_checksum: sha1:fe467d4ed3f5e988c4a43e7c12034d9282437f14
@@ -6645,6 +6870,14 @@ trackedFiles:
     id: 084dff660b7e
     last_write_checksum: sha1:ae25737af554db718f045f1401abd336d104c19f
     pristine_git_object: f37c37bc3cdab2ac801f33b700df2ca63db165c6
+  internal/sdk/models/shared/group.go:
+    id: 941f75eafff0
+    last_write_checksum: sha1:1abf4b21dfff6278b07ba06c12f9c42c216ff77c
+    pristine_git_object: 999a08762089d0068a18f2470a59f9091af98aa0
+  internal/sdk/models/shared/grouprole.go:
+    id: 4c51337620ce
+    last_write_checksum: sha1:a400b47ffa10102081a84dae36d94a27448fe9cb
+    pristine_git_object: 518b0775ab641d8bf1450681f921aac67357be8d
   internal/sdk/models/shared/grpcgatewayplugin.go:
     id: eca49a1cefa3
     last_write_checksum: sha1:adec15c5f2493f436b210b46e99cd4cd9cbeca76
@@ -6837,6 +7070,34 @@ trackedFiles:
     id: a4be9fbbd0d0
     last_write_checksum: sha1:0bd177be5ba561df17bdf0b9b18d91e50c8e8de5
     pristine_git_object: 0e488d13936b2c3ec35c0edaaffe0862f766a705
+  internal/sdk/models/shared/rbacrole.go:
+    id: 49f137e7307b
+    last_write_checksum: sha1:30c67a2b67b914593f68e06cbf44d6909c237b9a
+    pristine_git_object: 63fb54d2bb10c6ab44039eff6440d8ea6f898f6f
+  internal/sdk/models/shared/rbacroleendpoint.go:
+    id: 54b4feda6123
+    last_write_checksum: sha1:fd95b3ae41d410d1408c3ee9ab40ccbbaf1188ff
+    pristine_git_object: 62c48c153fcae28ce4fe950869308436833d58c5
+  internal/sdk/models/shared/rbacroleentity.go:
+    id: 064cdb9598af
+    last_write_checksum: sha1:58197218524f7ce8c744227e8b440940448267c2
+    pristine_git_object: eeb0f5c166dbb2150be7086586b849eecafedefc
+  internal/sdk/models/shared/rbacuser.go:
+    id: a65e6392b46e
+    last_write_checksum: sha1:8ad616404a8d5d027ec085f921f5e7e210d67114
+    pristine_git_object: 42f1e4bafd34b77386dc54503b39f59ea40884b6
+  internal/sdk/models/shared/rbacusergroup.go:
+    id: 8a16051a0bbf
+    last_write_checksum: sha1:06574319117ee631c0467181acb434ee5127b117
+    pristine_git_object: 5768ed23986d9087c0ca1f4ace42985b22094711
+  internal/sdk/models/shared/rbacuseroutput.go:
+    id: 4611873f580a
+    last_write_checksum: sha1:a5fc17fbcc5df6554e0528646e4733fba73f358a
+    pristine_git_object: 4e41fe335e4eb531e57f93f846f13c24749abd46
+  internal/sdk/models/shared/rbacuserrole.go:
+    id: f1695a5adea1
+    last_write_checksum: sha1:c19e3a23cbd7ca6a5aa4190149d663ac04bc7969
+    pristine_git_object: 49bac00bc0fd82fff4280e88ed1517c6ac5678f3
   internal/sdk/models/shared/redirectplugin.go:
     id: 7f1f692881f0
     last_write_checksum: sha1:ac2e83b11a8f711713e686db6a98ce801056736b
@@ -6969,6 +7230,10 @@ trackedFiles:
     id: 385b91d3c5f0
     last_write_checksum: sha1:1e11565414fcad6147d3ec8080f16b3335589fbf
     pristine_git_object: 1b32c7ac3870f98938c931253b0f9464a6073fc0
+  internal/sdk/models/shared/unauthorizederror.go:
+    id: b1f2c9811673
+    last_write_checksum: sha1:7f7676d8ae6add2927210ffef3c2102351a79d1f
+    pristine_git_object: 3a6b19a6044f99afc4b7291511165acd8aa71292
   internal/sdk/models/shared/upstream.go:
     id: 432d706f098e
     last_write_checksum: sha1:5e7e0890f751415c94b9bc8f164db15c91cc8bdc
@@ -7029,6 +7294,30 @@ trackedFiles:
     id: 3d72db6b4bbc
     last_write_checksum: sha1:296f3d63d361e094352e9b0d7c811d9098f86bdd
     pristine_git_object: c5590acab4ccb0bc46e9daf50ebf4874c1e60132
+  internal/sdk/rbacroleendpoints.go:
+    id: adf81f3de824
+    last_write_checksum: sha1:cfade50e4ceb5eb600a28622a4e4813219b6dc47
+    pristine_git_object: 244d61f2047da5b628a781fd02260758b621881e
+  internal/sdk/rbacroleentities.go:
+    id: cc5a8f20db75
+    last_write_checksum: sha1:bb2de27185f2af3ad5a46981133613167e79aa2f
+    pristine_git_object: 152cdb560603fd8ec6116e565b6d49cffca4a395
+  internal/sdk/rbacroles.go:
+    id: ba774c862405
+    last_write_checksum: sha1:9a3a10682a0d50d87c0e6c44ef6bdeac89939594
+    pristine_git_object: c813089e42eeec0df855be730d2c61a1ab0eeb4c
+  internal/sdk/rbacusergroups.go:
+    id: 3f8282fe349c
+    last_write_checksum: sha1:c1352ee0345778c7e867b3c24e9f7c37b9750855
+    pristine_git_object: c419186b7b3de9d6b033791f2841120138ef8812
+  internal/sdk/rbacuserroles.go:
+    id: ea3545dfcc90
+    last_write_checksum: sha1:cbd7fb37014586e32fbbf494380b8eb7f1e25781
+    pristine_git_object: ec1814adbe903cb4c0351e9e4dbbb7f741f14521
+  internal/sdk/rbacusers.go:
+    id: feb7cf4de86f
+    last_write_checksum: sha1:35a577204a2d19c621a8d6528d863218e71b3806
+    pristine_git_object: dbc25240130cde59c72f857d8fa75cb7a8bbcdc5
   internal/sdk/retry/config.go:
     id: 7ea5fa9128b6
     last_write_checksum: sha1:7f7d96b59a18e95bac847ae09c63bbd911ee8432
@@ -27932,6 +28221,765 @@ examples:
       responses:
         "401":
           application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_role:
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+    speakeasy-default-create-rbac-role:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>"}
+      responses:
+        "201":
+          application/json: {"name": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 310561}
+  delete-rbac_role:
+    speakeasy-default-delete-rbac-role:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 930844}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  get-rbac_role:
+    speakeasy-default-get-rbac-role:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "200":
+          application/json: {"name": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 996566}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  upsert-rbac_role:
+    speakeasy-default-upsert-rbac-role:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": null}
+      responses:
+        "200":
+          application/json: {"name": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 660908}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": null}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": null}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleId: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": null}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_role_endpoint:
+    speakeasy-default-create-rbac-role-endpoint:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>", "<value 2>"], "endpoint": "<value>"}
+      responses:
+        "201":
+          application/json: {"actions": [], "endpoint": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 791224}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>", "<value 2>"], "endpoint": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>", "<value 2>"], "endpoint": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>", "<value 2>"], "endpoint": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-rbac_role_endpoint:
+    speakeasy-default-delete-rbac-role-endpoint:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEndpointId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 346829}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEndpointId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEndpointId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEndpointId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_role_entitie:
+    speakeasy-default-create-rbac-role-entitie:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>"], "entity_id": "<id>", "entity_type": "<value>"}
+      responses:
+        "201":
+          application/json: {"actions": ["<value 1>"], "entity_id": "<id>", "entity_type": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 928583}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>"], "entity_id": "<id>", "entity_type": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>"], "entity_id": "<id>", "entity_type": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"actions": ["<value 1>"], "entity_id": "<id>", "entity_type": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-rbac_role_entitie:
+    speakeasy-default-delete-rbac-role-entitie:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEntityId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 363063}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEntityId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEntityId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleIdForNestedEntities: ""
+          RBACRoleEntityId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  get-rbac_role_entitie:
+    speakeasy-default-get-rbac-role-entitie:
+      parameters:
+        path:
+          RBACRoleEntityId: ""
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      responses:
+        "200":
+          application/json: {"actions": [], "entity_id": "<id>", "entity_type": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 879211}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACRoleEntityId: ""
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACRoleEntityId: ""
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACRoleEntityId: ""
+          RBACRoleIdForNestedEntities: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_user:
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>", "user_token": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>", "user_token": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>", "user_token": "<value>"}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+    speakeasy-default-create-rbac-user:
+      parameters:
+        path:
+          workspace: "team-payments"
+      requestBody:
+        application/json: {"name": "<value>", "user_token": "<value>"}
+      responses:
+        "201":
+          application/json: {"name": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 561496}
+  delete-rbac_user:
+    speakeasy-default-delete-rbac-user:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserId: ""
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 569150}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserId: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserId: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserId: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  get-rbac_user:
+    speakeasy-default-get-rbac-user:
+      parameters:
+        path:
+          RBACUserId: ""
+          workspace: "team-payments"
+      responses:
+        "200":
+          application/json: {"name": "<value>"}
+        "401":
+          application/json: {"message": "<value>", "status": 299744}
+    DuplicateApiKey:
+      parameters:
+        path:
+          RBACUserId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          RBACUserId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          RBACUserId: ""
+          workspace: "team-payments"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_user_group:
+    speakeasy-default-create-rbac-user-group:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "201":
+          application/json: {}
+        "401":
+          application/json: {"message": "<value>", "status": 555164}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-rbac_user_group:
+    speakeasy-default-delete-rbac-user-group:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+          RBACUserGroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 396955}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+          RBACUserGroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+          RBACUserGroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+          RBACUserGroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-rbac_user_role:
+    speakeasy-default-delete-rbac-user-role:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 330389}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-rbac_user_role:
+    speakeasy-default-create-rbac-user-role:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "201":
+          application/json: {}
+        "401":
+          application/json: {"message": "<value>", "status": 883408}
+    DuplicateApiKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          workspace: "team-payments"
+          RBACUserIdForNestedEntities: ""
+      requestBody:
+        application/json: {}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  create-group:
+    DuplicateApiKey:
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+    speakeasy-default-create-group:
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "201":
+          application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+        "401":
+          application/json: {"message": "<value>", "status": 42665}
+  delete-group:
+    speakeasy-default-delete-group:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 709608}
+    DuplicateApiKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  get-group:
+    speakeasy-default-get-group:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "200":
+          application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+        "401":
+          application/json: {"message": "<value>", "status": 285481}
+    DuplicateApiKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  upsert-group:
+    speakeasy-default-upsert-group:
+      parameters:
+        path:
+          GroupId: ""
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "200":
+          application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+        "401":
+          application/json: {"message": "<value>", "status": 284637}
+    DuplicateApiKey:
+      parameters:
+        path:
+          GroupId: ""
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          GroupId: ""
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          GroupId: ""
+      requestBody:
+        application/json: {"comment": "This is an example comment for the group.", "created_at": 1706598432, "id": "d4e7f2c9-8a7b-4e89-b3a1-9c3d6f1e5b92", "name": "example-group", "updated_at": 1706684832}
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
+  delete-groups-group_id_or_name-roles:
+    speakeasy-default-delete-groups-group-id-or-name-roles:
+      parameters:
+        path:
+          GroupId: ""
+        query:
+          rbac_role_id: "12773c9a-7f7c-45f2-bcea-5285eb18fd2f"
+          workspace_id: "<id>"
+      responses:
+        "401":
+          application/json: {"message": "<value>", "status": 665735}
+  create-groups-group_id_or_name-roles:
+    speakeasy-default-create-groups-group-id-or-name-roles:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "201":
+          application/json: {}
+        "401":
+          application/json: {"message": "<value>", "status": 602618}
 examplesVersion: 1.0.2
 generatedTests: {}
 generatedFiles:

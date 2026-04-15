@@ -11,7 +11,7 @@ import (
 type UpdatePluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Fields of the Plugin that need to be updated
 	Plugin shared.Plugin `request:"mediaType=application/json"`

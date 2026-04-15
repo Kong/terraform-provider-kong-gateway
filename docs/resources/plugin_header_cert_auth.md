@@ -14,6 +14,7 @@ PluginHeaderCertAuth Resource
 
 ```terraform
 resource "kong-gateway_plugin_header_cert_auth" "my_pluginheadercertauth" {
+  condition = "...my_condition..."
   config = {
     allow_partial_chain    = false
     anonymous              = "...my_anonymous..."
@@ -37,6 +38,7 @@ resource "kong-gateway_plugin_header_cert_auth" "my_pluginheadercertauth" {
     revocation_check_mode = "IGNORE_CA_ERROR"
     secure_source         = true
     skip_consumer_lookup  = false
+    ssl_verify            = true
   }
   created_at    = 2
   enabled       = false
@@ -74,7 +76,7 @@ resource "kong-gateway_plugin_header_cert_auth" "my_pluginheadercertauth" {
     "..."
   ]
   updated_at = 7
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -87,6 +89,7 @@ resource "kong-gateway_plugin_header_cert_auth" "my_pluginheadercertauth" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
 - `id` (String) A string representing a UUID (universally unique identifier).
@@ -98,7 +101,7 @@ resource "kong-gateway_plugin_header_cert_auth" "my_pluginheadercertauth" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -126,6 +129,7 @@ Optional:
 - `revocation_check_mode` (String) Controls client certificate revocation check behavior. If set to `SKIP`, no revocation check is performed. If set to `IGNORE_CA_ERROR`, the plugin respects the revocation status when either OCSP or CRL URL is set, and doesn't fail on network issues. If set to `STRICT`, the plugin only treats the certificate as valid when it's able to verify the revocation status. must be one of ["IGNORE_CA_ERROR", "SKIP", "STRICT"]
 - `secure_source` (Boolean) Whether to secure the source of the request. If set to `true`, the plugin will only allow requests from trusted IPs (configured by the `trusted_ips` config option).
 - `skip_consumer_lookup` (Boolean) Skip consumer lookup once certificate is trusted against the configured CA list.
+- `ssl_verify` (Boolean) This option enables verification of the certificate presented by the server of the OCSP responder's URL and by the server of the CRL Distribution Point.
 
 
 <a id="nestedatt--ordering"></a>
@@ -189,7 +193,7 @@ import {
   to = kong-gateway_plugin_header_cert_auth.my_kong-gateway_plugin_header_cert_auth
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -197,5 +201,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_header_cert_auth.my_kong-gateway_plugin_header_cert_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_header_cert_auth.my_kong-gateway_plugin_header_cert_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

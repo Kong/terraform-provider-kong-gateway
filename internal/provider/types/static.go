@@ -8,9 +8,9 @@ import (
 )
 
 type Static struct {
-	Name    types.String                    `tfsdk:"name"`
-	Output  types.String                    `tfsdk:"output"`
-	Outputs map[string]jsontypes.Normalized `tfsdk:"outputs"`
-	Type    types.String                    `tfsdk:"type"`
-	Values  types.String                    `tfsdk:"values"`
+	Name    types.String            `tfsdk:"name"`
+	Output  types.String            `tfsdk:"output"`
+	Outputs map[string]types.String `tfsdk:"outputs"`
+	Type    types.String            `tfsdk:"type"`
+	Values  jsontypes.Normalized    `tfsdk:"values"`
 }

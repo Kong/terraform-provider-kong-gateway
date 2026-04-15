@@ -164,6 +164,10 @@ type AiLlmAsJudgePluginAuth struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
 	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
 	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
 	// Use service account auth for GCP-based providers and models.
@@ -240,6 +244,20 @@ func (a *AiLlmAsJudgePluginAuth) GetAzureUseManagedIdentity() *bool {
 	return a.AzureUseManagedIdentity
 }
 
+func (a *AiLlmAsJudgePluginAuth) GetGcpMetadataURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpMetadataURL
+}
+
+func (a *AiLlmAsJudgePluginAuth) GetGcpOauthTokenURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpOauthTokenURL
+}
+
 func (a *AiLlmAsJudgePluginAuth) GetGcpServiceAccountJSON() *string {
 	if a == nil {
 		return nil
@@ -290,7 +308,7 @@ func (a *AiLlmAsJudgePluginAuth) GetParamValue() *string {
 }
 
 type AiLlmAsJudgePluginLogging struct {
-	// If enabled, will log the request and response body into the Kong log plugin(s) output.
+	// If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
 	// If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
 	LogStatistics *bool `json:"log_statistics,omitempty"`
@@ -330,10 +348,16 @@ type AiLlmAsJudgePluginBedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
 	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
 }
 
 func (a AiLlmAsJudgePluginBedrock) MarshalJSON() ([]byte, error) {
@@ -375,6 +399,20 @@ func (a *AiLlmAsJudgePluginBedrock) GetAwsStsEndpointURL() *string {
 	return a.AwsStsEndpointURL
 }
 
+func (a *AiLlmAsJudgePluginBedrock) GetBatchBucketPrefix() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchBucketPrefix
+}
+
+func (a *AiLlmAsJudgePluginBedrock) GetBatchRoleArn() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchRoleArn
+}
+
 func (a *AiLlmAsJudgePluginBedrock) GetEmbeddingsNormalize() *bool {
 	if a == nil {
 		return nil
@@ -387,6 +425,13 @@ func (a *AiLlmAsJudgePluginBedrock) GetPerformanceConfigLatency() *string {
 		return nil
 	}
 	return a.PerformanceConfigLatency
+}
+
+func (a *AiLlmAsJudgePluginBedrock) GetVideoOutputS3URI() *string {
+	if a == nil {
+		return nil
+	}
+	return a.VideoOutputS3URI
 }
 
 // AiLlmAsJudgePluginEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
@@ -455,6 +500,54 @@ func (a *AiLlmAsJudgePluginCohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return a.WaitForModel
+}
+
+type AiLlmAsJudgePluginDashscope struct {
+	// Two Dashscope endpoints are available, and the international endpoint will be used when this is set to `true`.
+	// It is recommended to set this to `true` when using international version of dashscope.
+	//
+	International *bool `json:"international,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginDashscope) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginDashscope) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiLlmAsJudgePluginDashscope) GetInternational() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.International
+}
+
+type AiLlmAsJudgePluginDatabricks struct {
+	// Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.
+	WorkspaceInstanceID *string `json:"workspace_instance_id,omitempty"`
+}
+
+func (a AiLlmAsJudgePluginDatabricks) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginDatabricks) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiLlmAsJudgePluginDatabricks) GetWorkspaceInstanceID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.WorkspaceInstanceID
 }
 
 type AiLlmAsJudgePluginGemini struct {
@@ -605,9 +698,11 @@ type AiLlmAsJudgePluginOptions struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string                    `json:"azure_instance,omitempty"`
-	Bedrock       *AiLlmAsJudgePluginBedrock `json:"bedrock,omitempty"`
-	Cohere        *AiLlmAsJudgePluginCohere  `json:"cohere,omitempty"`
+	AzureInstance *string                       `json:"azure_instance,omitempty"`
+	Bedrock       *AiLlmAsJudgePluginBedrock    `json:"bedrock,omitempty"`
+	Cohere        *AiLlmAsJudgePluginCohere     `json:"cohere,omitempty"`
+	Dashscope     *AiLlmAsJudgePluginDashscope  `json:"dashscope,omitempty"`
+	Databricks    *AiLlmAsJudgePluginDatabricks `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64                         `json:"embeddings_dimensions,omitempty"`
 	Gemini               *AiLlmAsJudgePluginGemini      `json:"gemini,omitempty"`
@@ -685,6 +780,20 @@ func (a *AiLlmAsJudgePluginOptions) GetCohere() *AiLlmAsJudgePluginCohere {
 		return nil
 	}
 	return a.Cohere
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetDashscope() *AiLlmAsJudgePluginDashscope {
+	if a == nil {
+		return nil
+	}
+	return a.Dashscope
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetDatabricks() *AiLlmAsJudgePluginDatabricks {
+	if a == nil {
+		return nil
+	}
+	return a.Databricks
 }
 
 func (a *AiLlmAsJudgePluginOptions) GetEmbeddingsDimensions() *int64 {
@@ -785,12 +894,19 @@ const (
 	AiLlmAsJudgePluginProviderAnthropic   AiLlmAsJudgePluginProvider = "anthropic"
 	AiLlmAsJudgePluginProviderAzure       AiLlmAsJudgePluginProvider = "azure"
 	AiLlmAsJudgePluginProviderBedrock     AiLlmAsJudgePluginProvider = "bedrock"
+	AiLlmAsJudgePluginProviderCerebras    AiLlmAsJudgePluginProvider = "cerebras"
 	AiLlmAsJudgePluginProviderCohere      AiLlmAsJudgePluginProvider = "cohere"
+	AiLlmAsJudgePluginProviderDashscope   AiLlmAsJudgePluginProvider = "dashscope"
+	AiLlmAsJudgePluginProviderDatabricks  AiLlmAsJudgePluginProvider = "databricks"
+	AiLlmAsJudgePluginProviderDeepseek    AiLlmAsJudgePluginProvider = "deepseek"
 	AiLlmAsJudgePluginProviderGemini      AiLlmAsJudgePluginProvider = "gemini"
 	AiLlmAsJudgePluginProviderHuggingface AiLlmAsJudgePluginProvider = "huggingface"
 	AiLlmAsJudgePluginProviderLlama2      AiLlmAsJudgePluginProvider = "llama2"
 	AiLlmAsJudgePluginProviderMistral     AiLlmAsJudgePluginProvider = "mistral"
+	AiLlmAsJudgePluginProviderOllama      AiLlmAsJudgePluginProvider = "ollama"
 	AiLlmAsJudgePluginProviderOpenai      AiLlmAsJudgePluginProvider = "openai"
+	AiLlmAsJudgePluginProviderVllm        AiLlmAsJudgePluginProvider = "vllm"
+	AiLlmAsJudgePluginProviderXai         AiLlmAsJudgePluginProvider = "xai"
 )
 
 func (e AiLlmAsJudgePluginProvider) ToPointer() *AiLlmAsJudgePluginProvider {
@@ -808,7 +924,15 @@ func (e *AiLlmAsJudgePluginProvider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "bedrock":
 		fallthrough
+	case "cerebras":
+		fallthrough
 	case "cohere":
+		fallthrough
+	case "dashscope":
+		fallthrough
+	case "databricks":
+		fallthrough
+	case "deepseek":
 		fallthrough
 	case "gemini":
 		fallthrough
@@ -818,7 +942,13 @@ func (e *AiLlmAsJudgePluginProvider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "mistral":
 		fallthrough
+	case "ollama":
+		fallthrough
 	case "openai":
+		fallthrough
+	case "vllm":
+		fallthrough
+	case "xai":
 		*e = AiLlmAsJudgePluginProvider(v)
 		return nil
 	default:
@@ -827,6 +957,8 @@ func (e *AiLlmAsJudgePluginProvider) UnmarshalJSON(data []byte) error {
 }
 
 type AiLlmAsJudgePluginModel struct {
+	// The model name parameter from the request that this model should map to.
+	ModelAlias *string `json:"model_alias,omitempty"`
 	// Model name to execute.
 	Name *string `json:"name,omitempty"`
 	// Key/value settings for the model
@@ -844,6 +976,13 @@ func (a *AiLlmAsJudgePluginModel) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiLlmAsJudgePluginModel) GetModelAlias() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ModelAlias
 }
 
 func (a *AiLlmAsJudgePluginModel) GetName() *string {
@@ -885,6 +1024,7 @@ const (
 	AiLlmAsJudgePluginRouteTypeLlmV1Responses             AiLlmAsJudgePluginRouteType = "llm/v1/responses"
 	AiLlmAsJudgePluginRouteTypePreserve                   AiLlmAsJudgePluginRouteType = "preserve"
 	AiLlmAsJudgePluginRouteTypeRealtimeV1Realtime         AiLlmAsJudgePluginRouteType = "realtime/v1/realtime"
+	AiLlmAsJudgePluginRouteTypeVideoV1VideosGenerations   AiLlmAsJudgePluginRouteType = "video/v1/videos/generations"
 )
 
 func (e AiLlmAsJudgePluginRouteType) ToPointer() *AiLlmAsJudgePluginRouteType {
@@ -923,6 +1063,8 @@ func (e *AiLlmAsJudgePluginRouteType) UnmarshalJSON(data []byte) error {
 	case "preserve":
 		fallthrough
 	case "realtime/v1/realtime":
+		fallthrough
+	case "video/v1/videos/generations":
 		*e = AiLlmAsJudgePluginRouteType(v)
 		return nil
 	default:
@@ -931,11 +1073,17 @@ func (e *AiLlmAsJudgePluginRouteType) UnmarshalJSON(data []byte) error {
 }
 
 type Llm struct {
-	Auth    *AiLlmAsJudgePluginAuth    `json:"auth,omitempty"`
-	Logging *AiLlmAsJudgePluginLogging `json:"logging,omitempty"`
-	Model   AiLlmAsJudgePluginModel    `json:"model"`
+	Auth *AiLlmAsJudgePluginAuth `json:"auth,omitempty"`
+	// The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.
+	Description *string                    `json:"description,omitempty"`
+	Logging     *AiLlmAsJudgePluginLogging `json:"logging,omitempty"`
+	// For internal use only.
+	Metadata any                     `json:"metadata,omitempty"`
+	Model    AiLlmAsJudgePluginModel `json:"model"`
 	// The model's operation implementation, for this provider.
 	RouteType AiLlmAsJudgePluginRouteType `json:"route_type"`
+	// The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.
+	Weight *int64 `json:"weight,omitempty"`
 }
 
 func (l Llm) MarshalJSON() ([]byte, error) {
@@ -956,11 +1104,25 @@ func (l *Llm) GetAuth() *AiLlmAsJudgePluginAuth {
 	return l.Auth
 }
 
+func (l *Llm) GetDescription() *string {
+	if l == nil {
+		return nil
+	}
+	return l.Description
+}
+
 func (l *Llm) GetLogging() *AiLlmAsJudgePluginLogging {
 	if l == nil {
 		return nil
 	}
 	return l.Logging
+}
+
+func (l *Llm) GetMetadata() any {
+	if l == nil {
+		return nil
+	}
+	return l.Metadata
 }
 
 func (l *Llm) GetModel() AiLlmAsJudgePluginModel {
@@ -975,6 +1137,13 @@ func (l *Llm) GetRouteType() AiLlmAsJudgePluginRouteType {
 		return AiLlmAsJudgePluginRouteType("")
 	}
 	return l.RouteType
+}
+
+func (l *Llm) GetWeight() *int64 {
+	if l == nil {
+		return nil
+	}
+	return l.Weight
 }
 
 type AiLlmAsJudgePluginConfig struct {
@@ -1233,6 +1402,8 @@ func (a *AiLlmAsJudgePluginService) GetID() *string {
 
 // AiLlmAsJudgePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiLlmAsJudgePlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1272,6 +1443,13 @@ func (a *AiLlmAsJudgePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiLlmAsJudgePlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiLlmAsJudgePlugin) GetCreatedAt() *int64 {

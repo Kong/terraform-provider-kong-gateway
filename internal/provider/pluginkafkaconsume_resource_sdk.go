@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.KafkaConsumePluginConfig{}
 		if resp.Config.Authentication == nil {
 			r.Config.Authentication = nil
@@ -59,6 +58,7 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 		}
 		r.Config.DlqTopic = types.StringPointerValue(resp.Config.DlqTopic)
 		r.Config.EnableDlq = types.BoolPointerValue(resp.Config.EnableDlq)
+		r.Config.EnforceLatestOffsetReset = types.BoolPointerValue(resp.Config.EnforceLatestOffsetReset)
 		r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
 		for _, v := range resp.Config.MessageByLuaFunctions {
 			r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
@@ -119,17 +119,15 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 							for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-								result, _ := json.Marshal(value)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = types.StringValue(value)
 							}
 						}
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 							for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-								result1, _ := json.Marshal(value1)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = types.StringValue(value1)
 							}
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -170,6 +168,7 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 			r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
 			r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
 			r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
+			r.Config.Security.SslVerify = types.BoolPointerValue(resp.Config.Security.SslVerify)
 		}
 		r.Config.Topics = []tfTypes.Topics{}
 
@@ -223,17 +222,15 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 							}
 							topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
 							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]types.String, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 								for key2, value2 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-									result2, _ := json.Marshal(value2)
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = jsontypes.NewNormalizedValue(string(result2))
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = types.StringValue(value2)
 								}
 							}
 							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]types.String, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 								for key3, value3 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-									result3, _ := json.Marshal(value3)
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = jsontypes.NewNormalizedValue(string(result3))
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = types.StringValue(value3)
 								}
 							}
 							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -422,6 +419,12 @@ func (r *PluginKafkaConsumeResourceModel) ToOperationsUpdateKafkaconsumePluginRe
 func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context.Context) (*shared.KafkaConsumePlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -595,6 +598,12 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 	} else {
 		enableDlq = nil
 	}
+	enforceLatestOffsetReset := new(bool)
+	if !r.Config.EnforceLatestOffsetReset.IsUnknown() && !r.Config.EnforceLatestOffsetReset.IsNull() {
+		*enforceLatestOffsetReset = r.Config.EnforceLatestOffsetReset.ValueBool()
+	} else {
+		enforceLatestOffsetReset = nil
+	}
 	messageByLuaFunctions := make([]string, 0, len(r.Config.MessageByLuaFunctions))
 	for messageByLuaFunctionsIndex := range r.Config.MessageByLuaFunctions {
 		messageByLuaFunctions = append(messageByLuaFunctions, r.Config.MessageByLuaFunctions[messageByLuaFunctionsIndex].ValueString())
@@ -673,16 +682,18 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 					var tokenEndpoint string
 					tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
-					tokenHeaders := make(map[string]interface{})
+					tokenHeaders := make(map[string]string)
 					for tokenHeadersKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-						var tokenHeadersInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()), &tokenHeadersInst)
+						var tokenHeadersInst string
+						tokenHeadersInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()
+
 						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
 					}
-					tokenPostArgs := make(map[string]interface{})
+					tokenPostArgs := make(map[string]string)
 					for tokenPostArgsKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-						var tokenPostArgsInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()), &tokenPostArgsInst)
+						var tokenPostArgsInst string
+						tokenPostArgsInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()
+
 						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
 					}
 					username1 := new(string)
@@ -836,9 +847,16 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 		} else {
 			ssl = nil
 		}
+		sslVerify2 := new(bool)
+		if !r.Config.Security.SslVerify.IsUnknown() && !r.Config.Security.SslVerify.IsNull() {
+			*sslVerify2 = r.Config.Security.SslVerify.ValueBool()
+		} else {
+			sslVerify2 = nil
+		}
 		security = &shared.KafkaConsumePluginSecurity{
 			CertificateID: certificateID,
 			Ssl:           ssl,
+			SslVerify:     sslVerify2,
 		}
 	}
 	topics := make([]shared.KafkaConsumePluginTopics, 0, len(r.Config.Topics))
@@ -908,16 +926,18 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 						var tokenEndpoint1 string
 						tokenEndpoint1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
-						tokenHeaders1 := make(map[string]interface{})
+						tokenHeaders1 := make(map[string]string)
 						for tokenHeadersKey1 := range r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-							var tokenHeadersInst1 interface{}
-							_ = json.Unmarshal([]byte(r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey1].ValueString()), &tokenHeadersInst1)
+							var tokenHeadersInst1 string
+							tokenHeadersInst1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey1].ValueString()
+
 							tokenHeaders1[tokenHeadersKey1] = tokenHeadersInst1
 						}
-						tokenPostArgs1 := make(map[string]interface{})
+						tokenPostArgs1 := make(map[string]string)
 						for tokenPostArgsKey1 := range r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-							var tokenPostArgsInst1 interface{}
-							_ = json.Unmarshal([]byte(r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey1].ValueString()), &tokenPostArgsInst1)
+							var tokenPostArgsInst1 string
+							tokenPostArgsInst1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey1].ValueString()
+
 							tokenPostArgs1[tokenPostArgsKey1] = tokenPostArgsInst1
 						}
 						username3 := new(string)
@@ -995,11 +1015,11 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 						} else {
 							noProxy1 = nil
 						}
-						sslVerify2 := new(bool)
+						sslVerify3 := new(bool)
 						if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
-							*sslVerify2 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
+							*sslVerify3 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
 						} else {
-							sslVerify2 = nil
+							sslVerify3 = nil
 						}
 						timeout1 := new(int64)
 						if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
@@ -1017,7 +1037,7 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 							HTTPSProxyAuthorization: httpsProxyAuthorization1,
 							KeepAlive:               keepAlive1,
 							NoProxy:                 noProxy1,
-							SslVerify:               sslVerify2,
+							SslVerify:               sslVerify3,
 							Timeout:                 timeout1,
 						}
 					}
@@ -1028,11 +1048,11 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 						Oauth2Client: oauth2Client1,
 					}
 				}
-				sslVerify3 := new(bool)
+				sslVerify4 := new(bool)
 				if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.IsNull() {
-					*sslVerify3 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.ValueBool()
+					*sslVerify4 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.ValueBool()
 				} else {
-					sslVerify3 = nil
+					sslVerify4 = nil
 				}
 				ttl1 := new(float64)
 				if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.TTL.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.TTL.IsNull() {
@@ -1048,7 +1068,7 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 				}
 				confluent1 = &shared.KafkaConsumePluginConfigConfluent{
 					Authentication: authentication2,
-					SslVerify:      sslVerify3,
+					SslVerify:      sslVerify4,
 					TTL:            ttl1,
 					URL:            url1,
 				}
@@ -1063,19 +1083,20 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 		})
 	}
 	config := shared.KafkaConsumePluginConfig{
-		Authentication:        authentication,
-		AutoOffsetReset:       autoOffsetReset,
-		BootstrapServers:      bootstrapServers,
-		ClusterName:           clusterName,
-		CommitStrategy:        commitStrategy,
-		DlqTopic:              dlqTopic,
-		EnableDlq:             enableDlq,
-		MessageByLuaFunctions: messageByLuaFunctions,
-		MessageDeserializer:   messageDeserializer,
-		Mode:                  mode,
-		SchemaRegistry:        schemaRegistry,
-		Security:              security,
-		Topics:                topics,
+		Authentication:           authentication,
+		AutoOffsetReset:          autoOffsetReset,
+		BootstrapServers:         bootstrapServers,
+		ClusterName:              clusterName,
+		CommitStrategy:           commitStrategy,
+		DlqTopic:                 dlqTopic,
+		EnableDlq:                enableDlq,
+		EnforceLatestOffsetReset: enforceLatestOffsetReset,
+		MessageByLuaFunctions:    messageByLuaFunctions,
+		MessageDeserializer:      messageDeserializer,
+		Mode:                     mode,
+		SchemaRegistry:           schemaRegistry,
+		Security:                 security,
+		Topics:                   topics,
 	}
 	var consumer *shared.KafkaConsumePluginConsumer
 	if r.Consumer != nil {
@@ -1106,6 +1127,7 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 		}
 	}
 	out := shared.KafkaConsumePlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

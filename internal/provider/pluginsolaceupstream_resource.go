@@ -7,9 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
@@ -41,6 +38,7 @@ type PluginSolaceUpstreamResource struct {
 
 // PluginSolaceUpstreamResourceModel describes the resource data model.
 type PluginSolaceUpstreamResourceModel struct {
+	Condition    types.String                        `tfsdk:"condition"`
 	Config       *tfTypes.SolaceUpstreamPluginConfig `tfsdk:"config"`
 	CreatedAt    types.Int64                         `tfsdk:"created_at"`
 	Enabled      types.Bool                          `tfsdk:"enabled"`
@@ -64,6 +62,14 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginSolaceUpstream Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -78,10 +84,20 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 									int64validator.Between(1, 100000),
 								},
 							},
+							"content_encoding": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Sets the HTTP Content-Encoding applied to the Solace message payload (for example, gzip). If unset, the request Content-Encoding header is used when available.`,
+							},
+							"content_type": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Sets the HTTP Content-Type applied to the Solace message payload. If unset, the request Content-Type header is used when available.`,
+							},
 							"default_content": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `When not using ` + "`" + `forward_method` + "`" + `, ` + "`" + `forward_uri` + "`" + `, ` + "`" + `forward_headers` + "`" + ` or ` + "`" + `forward_body` + "`" + `, this sets the message content.`,
+								Description: `When not using ` + "`" + `forward_method` + "`" + `, ` + "`" + `forward_uri` + "`" + `, ` + "`" + `forward_headers` + "`" + `, ` + "`" + `forward_body` + "`" + ` or ` + "`" + `forward_body_raw_only` + "`" + `, this sets the message content.`,
 							},
 							"delivery_mode": schema.StringAttribute{
 								Computed:    true,
@@ -134,6 +150,11 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 								Optional:    true,
 								Description: `Include the request body and the body arguments in the message.`,
 							},
+							"forward_body_raw_only": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Forward only the raw request body without wrapping it in a JSON payload or adding extra fields.`,
+							},
 							"forward_headers": schema.BoolAttribute{
 								Computed:    true,
 								Optional:    true,
@@ -171,17 +192,55 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 							"tracing": schema.BoolAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `Enable or disable the tracing. This is primarily used for distributed tracing and message correlation, especially in debugging or tracking message flows across multiple systems.`,
+								Description: `Enable or disable the tracing propagation. This is primarily used for distributed tracing and message correlation, especially in debugging or tracking message flows across multiple systems.`,
 							},
 							"tracing_sampled": schema.BoolAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `Indicates whether the message should be included in distributed tracing (i.e., if it should be "sampled" for the tracing)`,
+								Description: `Forcibly turn on the tracing on all the messages for distributed tracing (tracing needs to be enabled as well).`,
 							},
 							"ttl": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `Sets the time to live (TTL) in milliseconds for the message. Setting the time to live to zero disables the TTL for the message.`,
+							},
+							"user_properties": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"headers": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"exclude_headers": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Headers that must not be forwarded into user properties. This is used to exclude sensitive headers such as authorization from being forwarded as user properties, or to avoid duplication when a header is mapped to a user property but you don't want the original header to be included as well.`,
+											},
+											"include_headers": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Headers to include as user properties even without explicit mapping.`,
+											},
+											"mappings": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Header-to-user_property mapping (key = HTTP header name, value = target user property name).`,
+											},
+										},
+										Description: `Header settings for user properties (mapping, inclusion and exclusion).`,
+									},
+									"predefined_properties": schema.MapAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Predefined user properties to set on every message (key = property name, value = property value).`,
+									},
+								},
+								Description: `User defined properties to be included in the message. Separate static properties from header mappings.`,
 							},
 						},
 						Description: `The message related configuration.`,
@@ -199,8 +258,14 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 										Description: `The OAuth2 access token used with ` + "`" + `OAUTH2` + "`" + ` authentication scheme when connecting to an event broker.`,
 									},
 									"access_token_header": schema.StringAttribute{
-										Computed: true,
-										Optional: true,
+										Computed:    true,
+										Optional:    true,
+										Description: `Specifies the header that contains access token for the ` + "`" + `OAUTH2` + "`" + ` authentication scheme when connecting to an event broker. This header takes precedence over the ` + "`" + `access_token` + "`" + ` field.`,
+									},
+									"basic_auth_header": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Specifies the header that contains Basic Authentication credentials for the ` + "`" + `BASIC` + "`" + ` authentication scheme when connecting to an event broker. This header takes precedence over the ` + "`" + `username` + "`" + ` and ` + "`" + `password` + "`" + ` fields.`,
 									},
 									"id_token": schema.StringAttribute{
 										Computed:    true,
@@ -208,8 +273,9 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 										Description: `The OpenID Connect ID token used with ` + "`" + `OAUTH2` + "`" + ` authentication scheme when connecting to an event broker.`,
 									},
 									"id_token_header": schema.StringAttribute{
-										Computed: true,
-										Optional: true,
+										Computed:    true,
+										Optional:    true,
+										Description: `Specifies the header that contains id token for the ` + "`" + `OAUTH2` + "`" + ` authentication scheme when connecting to an event broker. This header takes precedence over the ` + "`" + `id_token` + "`" + ` field.`,
 									},
 									"password": schema.StringAttribute{
 										Computed:    true,
@@ -282,11 +348,8 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 							"properties": schema.MapAttribute{
 								Computed:    true,
 								Optional:    true,
-								ElementType: jsontypes.NormalizedType{},
+								ElementType: types.StringType,
 								Description: `Additional Solace session properties (each setting needs to have ` + "`" + `SESSION_` + "`" + ` prefix).`,
-								Validators: []validator.Map{
-									mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-								},
 							},
 							"ssl_validate_certificate": schema.BoolAttribute{
 								Computed:    true,
@@ -429,7 +492,7 @@ func (r *PluginSolaceUpstreamResource) Schema(ctx context.Context, req resource.
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -684,7 +747,7 @@ func (r *PluginSolaceUpstreamResource) ImportState(ctx context.Context, req reso
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -694,7 +757,7 @@ func (r *PluginSolaceUpstreamResource) ImportState(ctx context.Context, req reso
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

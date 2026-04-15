@@ -1,6 +1,14 @@
 # Changelog
 
-## 1.0.0
+## 1.1.0
+> Released on 2026/??/??
+
+### Features
+
+* Upgrade to Kong Gateway 3.14
+  * Add `plugin_ai_a2a_proxy`, `plugin_ai_custom_guardrail`, `plugin_ai_lakera_guard` and `plugin_metering_and_billing` resources
+
+## 1.0.1
 > Released on 2025/11/07
 
 ### Bug fixes

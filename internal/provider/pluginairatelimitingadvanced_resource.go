@@ -18,6 +18,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
+	speakeasy_int64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/int64validators"
 	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
@@ -39,6 +41,7 @@ type PluginAiRateLimitingAdvancedResource struct {
 
 // PluginAiRateLimitingAdvancedResourceModel describes the resource data model.
 type PluginAiRateLimitingAdvancedResourceModel struct {
+	Condition     types.String                                `tfsdk:"condition"`
 	Config        *tfTypes.AiRateLimitingAdvancedPluginConfig `tfsdk:"config"`
 	Consumer      *tfTypes.Set                                `tfsdk:"consumer"`
 	ConsumerGroup *tfTypes.Set                                `tfsdk:"consumer_group"`
@@ -64,13 +67,32 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginAiRateLimitingAdvanced Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
-				Required: true,
+				Computed: true,
+				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"custom_cost_count_function": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `If defined, it uses custom function to generate cost for the inference request`,
+					},
+					"decrease_by_fractions_in_redis": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `By default, Kong decreates the AI rate limiting counters by whole number in Redis. This setting allows to decrease the counters by float number.`,
+					},
 					"dictionary_name": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is ` + "`" + `config.strategy` + "`" + ` is ` + "`" + `cluster` + "`" + ` or ` + "`" + `redis` + "`" + ` and ` + "`" + `config.sync_rate` + "`" + ` isn't ` + "`" + `-1` + "`" + `), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle.`,
+						Description: `The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is ` + "`" + `config.strategy` + "`" + ` is ` + "`" + `cluster` + "`" + ` or ` + "`" + `redis` + "`" + ` and ` + "`" + `config.sync_rate` + "`" + ` isn't ` + "`" + `-1` + "`" + `), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle. The dictionary must be defined in the nginx configuration using ` + "`" + `lua_shared_dict` + "`" + ` directive (e.g., ` + "`" + `lua_shared_dict kong_rate_limiting_counters 12m` + "`" + `).`,
 					},
 					"disable_penalty": schema.BoolAttribute{
 						Computed:    true,
@@ -121,9 +143,10 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 					"llm_format": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]`,
+						Description: `LLM input and output format and schema to use. must be one of ["anthropic", "bedrock", "cohere", "gemini", "huggingface", "openai"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
+								"anthropic",
 								"bedrock",
 								"cohere",
 								"gemini",
@@ -133,7 +156,8 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 						},
 					},
 					"llm_providers": schema.ListNestedAttribute{
-						Required: true,
+						Computed: true,
+						Optional: true,
 						NestedObject: schema.NestedAttributeObject{
 							Validators: []validator.Object{
 								speakeasy_objectvalidators.NotNull(),
@@ -151,7 +175,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 								"name": schema.StringAttribute{
 									Computed:    true,
 									Optional:    true,
-									Description: `The LLM provider to which the rate limit applies. Not Null; must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai", "requestPrompt"]`,
+									Description: `The LLM provider to which the rate limit applies. Not Null; must be one of ["anthropic", "azure", "bedrock", "cohere", "customCost", "gemini", "huggingface", "llama2", "mistral", "openai", "requestPrompt"]`,
 									Validators: []validator.String{
 										speakeasy_stringvalidators.NotNull(),
 										stringvalidator.OneOf(
@@ -159,6 +183,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 											"azure",
 											"bedrock",
 											"cohere",
+											"customCost",
 											"gemini",
 											"huggingface",
 											"llama2",
@@ -179,7 +204,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 								},
 							},
 						},
-						Description: `The provider config. Takes an array of ` + "`" + `name` + "`" + `, ` + "`" + `limit` + "`" + ` and ` + "`" + `window size` + "`" + ` values.`,
+						Description: `The provider config. Takes an array of ` + "`" + `name` + "`" + `, ` + "`" + `limit` + "`" + ` and ` + "`" + `window size` + "`" + ` values. Mutually exclusive with ` + "`" + `policies` + "`" + `.`,
 					},
 					"namespace": schema.StringAttribute{
 						Computed:    true,
@@ -191,10 +216,198 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 						Optional:    true,
 						Description: `A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).`,
 					},
+					"policies": schema.ListNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Validators: []validator.Object{
+								speakeasy_objectvalidators.NotNull(),
+							},
+							Attributes: map[string]schema.Attribute{
+								"id": schema.StringAttribute{
+									Computed:    true,
+									Optional:    true,
+									Description: `UUID reference to a reusable ai_rate_limiting_policies DAO entity. Mutually exclusive with inline limits.`,
+								},
+								"limits": schema.ListNestedAttribute{
+									Computed: true,
+									Optional: true,
+									NestedObject: schema.NestedAttributeObject{
+										Validators: []validator.Object{
+											speakeasy_objectvalidators.NotNull(),
+										},
+										Attributes: map[string]schema.Attribute{
+											"limit": schema.Float64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The rate limit threshold for this window. Not Null`,
+												Validators: []validator.Float64{
+													speakeasy_float64validators.NotNull(),
+												},
+											},
+											"tokens_count_strategy": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `What to count for this limit. Supported strategies: total_tokens, prompt_tokens, completion_tokens, cost. must be one of ["completion_tokens", "cost", "prompt_tokens", "total_tokens"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"completion_tokens",
+														"cost",
+														"prompt_tokens",
+														"total_tokens",
+													),
+												},
+											},
+											"window_size": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The window size in seconds. Not Null`,
+												Validators: []validator.Int64{
+													speakeasy_int64validators.NotNull(),
+												},
+											},
+										},
+									},
+									Description: `Rate limits to enforce when this policy matches.`,
+								},
+								"match": schema.ListNestedAttribute{
+									Computed: true,
+									Optional: true,
+									NestedObject: schema.NestedAttributeObject{
+										Validators: []validator.Object{
+											speakeasy_objectvalidators.NotNull(),
+										},
+										Attributes: map[string]schema.Attribute{
+											"key": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Sub-key for consumer (id|username|custom_id), consumer_group (id|name), or header (header name).`,
+											},
+											"partition_by": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `If true, the matched value contributes to the composite rate limit counter key.`,
+											},
+											"type": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The attribute to match against. Not Null; must be one of ["consumer", "consumer_group", "header", "ip", "model", "path", "provider"]`,
+												Validators: []validator.String{
+													speakeasy_stringvalidators.NotNull(),
+													stringvalidator.OneOf(
+														"consumer",
+														"consumer_group",
+														"header",
+														"ip",
+														"model",
+														"path",
+														"provider",
+													),
+												},
+											},
+											"values": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Values to match. If omitted, matches any value of this type.`,
+											},
+										},
+									},
+									Description: `Array of match conditions (AND logic). If omitted, this policy acts as a fallback for unmatched requests.`,
+								},
+								"window_type": schema.StringAttribute{
+									Computed:    true,
+									Optional:    true,
+									Description: `The time window type for this policy. must be one of ["fixed", "sliding"]`,
+									Validators: []validator.String{
+										stringvalidator.OneOf(
+											"fixed",
+											"sliding",
+										),
+									},
+								},
+							},
+						},
+						Description: `Policy-based rate limiting. Each policy defines match conditions and limits. Mutually exclusive with ` + "`" + `llm_providers` + "`" + `.`,
+					},
 					"redis": schema.SingleNestedAttribute{
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"cloud_authentication": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"auth_provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"aws",
+												"azure",
+												"gcp",
+											),
+										},
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_assume_role_arn": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+									},
+									"aws_cache_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_is_serverless": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_region": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_role_session_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The session name for the temporary credentials when assuming the IAM role.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+								},
+								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+							},
 							"cluster_max_redirections": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
@@ -380,7 +593,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 					"strategy": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: ` + "`" + `local` + "`" + ` and ` + "`" + `cluster` + "`" + `. must be one of ["cluster", "local", "redis"]`,
+						Description: `The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: ` + "`" + `local` + "`" + `, ` + "`" + `redis` + "`" + ` and ` + "`" + `cluster` + "`" + `. must be one of ["cluster", "local", "redis"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"cluster",
@@ -565,7 +778,7 @@ func (r *PluginAiRateLimitingAdvancedResource) Schema(ctx context.Context, req r
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -820,7 +1033,7 @@ func (r *PluginAiRateLimitingAdvancedResource) ImportState(ctx context.Context, 
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -830,7 +1043,7 @@ func (r *PluginAiRateLimitingAdvancedResource) ImportState(ctx context.Context, 
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

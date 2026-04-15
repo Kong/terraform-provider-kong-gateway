@@ -22,7 +22,7 @@ resource "kong-gateway_consumer" "my_consumer" {
   ]
   updated_at = 1
   username   = "...my_username..."
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -37,7 +37,7 @@ resource "kong-gateway_consumer" "my_consumer" {
 - `tags` (List of String) An optional set of strings associated with the Consumer for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
 - `username` (String) The unique username of the Consumer. You must send either this field or `custom_id` with the request.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 ## Import
 
@@ -50,7 +50,7 @@ import {
   to = kong-gateway_consumer.my_kong-gateway_consumer
   id = jsonencode({
     id        = "c1059869-6fa7-4329-a5f5-5946d14ca2c5"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -58,5 +58,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_consumer.my_kong-gateway_consumer '{"id": "c1059869-6fa7-4329-a5f5-5946d14ca2c5", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_consumer.my_kong-gateway_consumer '{"id": "c1059869-6fa7-4329-a5f5-5946d14ca2c5", "workspace": "team-payments"}'
 ```

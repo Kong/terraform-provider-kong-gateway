@@ -38,6 +38,7 @@ type PluginXMLThreatProtectionResource struct {
 
 // PluginXMLThreatProtectionResourceModel describes the resource data model.
 type PluginXMLThreatProtectionResourceModel struct {
+	Condition    types.String                             `tfsdk:"condition"`
 	Config       *tfTypes.XMLThreatProtectionPluginConfig `tfsdk:"config"`
 	Consumer     *tfTypes.Set                             `tfsdk:"consumer"`
 	CreatedAt    types.Int64                              `tfsdk:"created_at"`
@@ -62,6 +63,14 @@ func (r *PluginXMLThreatProtectionResource) Schema(ctx context.Context, req reso
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginXMLThreatProtection Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Optional: true,
@@ -325,7 +334,7 @@ func (r *PluginXMLThreatProtectionResource) Schema(ctx context.Context, req reso
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -580,7 +589,7 @@ func (r *PluginXMLThreatProtectionResource) ImportState(ctx context.Context, req
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -590,7 +599,7 @@ func (r *PluginXMLThreatProtectionResource) ImportState(ctx context.Context, req
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

@@ -122,19 +122,19 @@ func (d *DatadogPluginPartials) GetPath() *string {
 	return d.Path
 }
 
-// ConsumerIdentifier - Authenticated user detail
-type ConsumerIdentifier string
+// DatadogPluginConsumerIdentifier - Authenticated user detail
+type DatadogPluginConsumerIdentifier string
 
 const (
-	ConsumerIdentifierConsumerID ConsumerIdentifier = "consumer_id"
-	ConsumerIdentifierCustomID   ConsumerIdentifier = "custom_id"
-	ConsumerIdentifierUsername   ConsumerIdentifier = "username"
+	DatadogPluginConsumerIdentifierConsumerID DatadogPluginConsumerIdentifier = "consumer_id"
+	DatadogPluginConsumerIdentifierCustomID   DatadogPluginConsumerIdentifier = "custom_id"
+	DatadogPluginConsumerIdentifierUsername   DatadogPluginConsumerIdentifier = "username"
 )
 
-func (e ConsumerIdentifier) ToPointer() *ConsumerIdentifier {
+func (e DatadogPluginConsumerIdentifier) ToPointer() *DatadogPluginConsumerIdentifier {
 	return &e
 }
-func (e *ConsumerIdentifier) UnmarshalJSON(data []byte) error {
+func (e *DatadogPluginConsumerIdentifier) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -145,10 +145,10 @@ func (e *ConsumerIdentifier) UnmarshalJSON(data []byte) error {
 	case "custom_id":
 		fallthrough
 	case "username":
-		*e = ConsumerIdentifier(v)
+		*e = DatadogPluginConsumerIdentifier(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for ConsumerIdentifier: %v", v)
+		return fmt.Errorf("invalid value for DatadogPluginConsumerIdentifier: %v", v)
 	}
 }
 
@@ -233,9 +233,9 @@ func (e *StatType) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type Metrics struct {
+type DatadogPluginMetrics struct {
 	// Authenticated user detail
-	ConsumerIdentifier *ConsumerIdentifier `json:"consumer_identifier,omitempty"`
+	ConsumerIdentifier *DatadogPluginConsumerIdentifier `json:"consumer_identifier,omitempty"`
 	// Datadog metric’s name
 	Name DatadogPluginName `json:"name"`
 	// Sampling rate
@@ -246,50 +246,50 @@ type Metrics struct {
 	Tags []string `json:"tags,omitempty"`
 }
 
-func (m Metrics) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(m, "", false)
+func (d DatadogPluginMetrics) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
 }
 
-func (m *Metrics) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"name", "stat_type"}); err != nil {
+func (d *DatadogPluginMetrics) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, []string{"name", "stat_type"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Metrics) GetConsumerIdentifier() *ConsumerIdentifier {
-	if m == nil {
+func (d *DatadogPluginMetrics) GetConsumerIdentifier() *DatadogPluginConsumerIdentifier {
+	if d == nil {
 		return nil
 	}
-	return m.ConsumerIdentifier
+	return d.ConsumerIdentifier
 }
 
-func (m *Metrics) GetName() DatadogPluginName {
-	if m == nil {
+func (d *DatadogPluginMetrics) GetName() DatadogPluginName {
+	if d == nil {
 		return DatadogPluginName("")
 	}
-	return m.Name
+	return d.Name
 }
 
-func (m *Metrics) GetSampleRate() *float64 {
-	if m == nil {
+func (d *DatadogPluginMetrics) GetSampleRate() *float64 {
+	if d == nil {
 		return nil
 	}
-	return m.SampleRate
+	return d.SampleRate
 }
 
-func (m *Metrics) GetStatType() StatType {
-	if m == nil {
+func (d *DatadogPluginMetrics) GetStatType() StatType {
+	if d == nil {
 		return StatType("")
 	}
-	return m.StatType
+	return d.StatType
 }
 
-func (m *Metrics) GetTags() []string {
-	if m == nil {
+func (d *DatadogPluginMetrics) GetTags() []string {
+	if d == nil {
 		return nil
 	}
-	return m.Tags
+	return d.Tags
 }
 
 // ConcurrencyLimit - The number of of queue delivery timers. -1 indicates unlimited.
@@ -413,7 +413,7 @@ type DatadogPluginConfig struct {
 	// A string representing a host name, such as example.com.
 	Host *string `json:"host,omitempty"`
 	// List of metrics to be logged.
-	Metrics []Metrics `json:"metrics,omitempty"`
+	Metrics []DatadogPluginMetrics `json:"metrics,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	Port *int64 `json:"port,omitempty"`
 	// String to be attached as a prefix to a metric's name.
@@ -423,6 +423,8 @@ type DatadogPluginConfig struct {
 	QueueSize *int64 `json:"queue_size,omitempty"`
 	// Number of times to retry when sending data to the upstream server.
 	RetryCount *int64 `json:"retry_count,omitempty"`
+	// String to be attached as tag of the route name or ID.
+	RouteNameTag *string `json:"route_name_tag,omitempty"`
 	// String to be attached as the name of the service.
 	ServiceNameTag *string `json:"service_name_tag,omitempty"`
 	// String to be attached as the tag of the HTTP status.
@@ -461,7 +463,7 @@ func (d *DatadogPluginConfig) GetHost() *string {
 	return d.Host
 }
 
-func (d *DatadogPluginConfig) GetMetrics() []Metrics {
+func (d *DatadogPluginConfig) GetMetrics() []DatadogPluginMetrics {
 	if d == nil {
 		return nil
 	}
@@ -501,6 +503,13 @@ func (d *DatadogPluginConfig) GetRetryCount() *int64 {
 		return nil
 	}
 	return d.RetryCount
+}
+
+func (d *DatadogPluginConfig) GetRouteNameTag() *string {
+	if d == nil {
+		return nil
+	}
+	return d.RouteNameTag
 }
 
 func (d *DatadogPluginConfig) GetServiceNameTag() *string {
@@ -639,6 +648,8 @@ func (d *DatadogPluginService) GetID() *string {
 
 // DatadogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type DatadogPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -676,6 +687,13 @@ func (d *DatadogPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (d *DatadogPlugin) GetCondition() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Condition
 }
 
 func (d *DatadogPlugin) GetCreatedAt() *int64 {

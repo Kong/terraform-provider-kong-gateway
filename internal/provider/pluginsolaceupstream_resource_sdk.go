@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,9 +15,12 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.SolaceUpstreamPluginConfig{}
 		r.Config.Message = &tfTypes.SolaceUpstreamPluginMessage{}
 		r.Config.Message.AckTimeout = types.Int64PointerValue(resp.Config.Message.AckTimeout)
+		r.Config.Message.ContentEncoding = types.StringPointerValue(resp.Config.Message.ContentEncoding)
+		r.Config.Message.ContentType = types.StringPointerValue(resp.Config.Message.ContentType)
 		r.Config.Message.DefaultContent = types.StringPointerValue(resp.Config.Message.DefaultContent)
 		if resp.Config.Message.DeliveryMode != nil {
 			r.Config.Message.DeliveryMode = types.StringValue(string(*resp.Config.Message.DeliveryMode))
@@ -42,6 +43,7 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 		}
 		r.Config.Message.DmqEligible = types.BoolPointerValue(resp.Config.Message.DmqEligible)
 		r.Config.Message.ForwardBody = types.BoolPointerValue(resp.Config.Message.ForwardBody)
+		r.Config.Message.ForwardBodyRawOnly = types.BoolPointerValue(resp.Config.Message.ForwardBodyRawOnly)
 		r.Config.Message.ForwardHeaders = types.BoolPointerValue(resp.Config.Message.ForwardHeaders)
 		r.Config.Message.ForwardMethod = types.BoolPointerValue(resp.Config.Message.ForwardMethod)
 		r.Config.Message.ForwardURI = types.BoolPointerValue(resp.Config.Message.ForwardURI)
@@ -54,6 +56,36 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 		r.Config.Message.Tracing = types.BoolPointerValue(resp.Config.Message.Tracing)
 		r.Config.Message.TracingSampled = types.BoolPointerValue(resp.Config.Message.TracingSampled)
 		r.Config.Message.TTL = types.Int64PointerValue(resp.Config.Message.TTL)
+		if resp.Config.Message.UserProperties == nil {
+			r.Config.Message.UserProperties = nil
+		} else {
+			r.Config.Message.UserProperties = &tfTypes.UserProperties{}
+			if resp.Config.Message.UserProperties.Headers == nil {
+				r.Config.Message.UserProperties.Headers = nil
+			} else {
+				r.Config.Message.UserProperties.Headers = &tfTypes.SolaceUpstreamPluginHeaders{}
+				r.Config.Message.UserProperties.Headers.ExcludeHeaders = make([]types.String, 0, len(resp.Config.Message.UserProperties.Headers.ExcludeHeaders))
+				for _, v := range resp.Config.Message.UserProperties.Headers.ExcludeHeaders {
+					r.Config.Message.UserProperties.Headers.ExcludeHeaders = append(r.Config.Message.UserProperties.Headers.ExcludeHeaders, types.StringValue(v))
+				}
+				r.Config.Message.UserProperties.Headers.IncludeHeaders = make([]types.String, 0, len(resp.Config.Message.UserProperties.Headers.IncludeHeaders))
+				for _, v := range resp.Config.Message.UserProperties.Headers.IncludeHeaders {
+					r.Config.Message.UserProperties.Headers.IncludeHeaders = append(r.Config.Message.UserProperties.Headers.IncludeHeaders, types.StringValue(v))
+				}
+				if len(resp.Config.Message.UserProperties.Headers.Mappings) > 0 {
+					r.Config.Message.UserProperties.Headers.Mappings = make(map[string]types.String, len(resp.Config.Message.UserProperties.Headers.Mappings))
+					for key, value := range resp.Config.Message.UserProperties.Headers.Mappings {
+						r.Config.Message.UserProperties.Headers.Mappings[key] = types.StringValue(value)
+					}
+				}
+			}
+			if len(resp.Config.Message.UserProperties.PredefinedProperties) > 0 {
+				r.Config.Message.UserProperties.PredefinedProperties = make(map[string]types.String, len(resp.Config.Message.UserProperties.PredefinedProperties))
+				for key1, value1 := range resp.Config.Message.UserProperties.PredefinedProperties {
+					r.Config.Message.UserProperties.PredefinedProperties[key1] = types.StringValue(value1)
+				}
+			}
+		}
 		r.Config.Session = &tfTypes.Session{}
 		if resp.Config.Session.Authentication == nil {
 			r.Config.Session.Authentication = nil
@@ -61,6 +93,7 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 			r.Config.Session.Authentication = &tfTypes.SolaceConsumePluginAuthentication{}
 			r.Config.Session.Authentication.AccessToken = types.StringPointerValue(resp.Config.Session.Authentication.AccessToken)
 			r.Config.Session.Authentication.AccessTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.AccessTokenHeader)
+			r.Config.Session.Authentication.BasicAuthHeader = types.StringPointerValue(resp.Config.Session.Authentication.BasicAuthHeader)
 			r.Config.Session.Authentication.IDToken = types.StringPointerValue(resp.Config.Session.Authentication.IDToken)
 			r.Config.Session.Authentication.IDTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.IDTokenHeader)
 			r.Config.Session.Authentication.Password = types.StringPointerValue(resp.Config.Session.Authentication.Password)
@@ -79,10 +112,9 @@ func (r *PluginSolaceUpstreamResourceModel) RefreshFromSharedSolaceUpstreamPlugi
 		r.Config.Session.GenerateSequenceNumber = types.BoolPointerValue(resp.Config.Session.GenerateSequenceNumber)
 		r.Config.Session.Host = types.StringValue(resp.Config.Session.Host)
 		if len(resp.Config.Session.Properties) > 0 {
-			r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
-			for key, value := range resp.Config.Session.Properties {
-				result, _ := json.Marshal(value)
-				r.Config.Session.Properties[key] = jsontypes.NewNormalizedValue(string(result))
+			r.Config.Session.Properties = make(map[string]types.String, len(resp.Config.Session.Properties))
+			for key2, value2 := range resp.Config.Session.Properties {
+				r.Config.Session.Properties[key2] = types.StringValue(value2)
 			}
 		}
 		r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
@@ -238,6 +270,12 @@ func (r *PluginSolaceUpstreamResourceModel) ToOperationsUpdateSolaceupstreamPlug
 func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx context.Context) (*shared.SolaceUpstreamPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -334,6 +372,18 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 	} else {
 		ackTimeout = nil
 	}
+	contentEncoding := new(string)
+	if !r.Config.Message.ContentEncoding.IsUnknown() && !r.Config.Message.ContentEncoding.IsNull() {
+		*contentEncoding = r.Config.Message.ContentEncoding.ValueString()
+	} else {
+		contentEncoding = nil
+	}
+	contentType := new(string)
+	if !r.Config.Message.ContentType.IsUnknown() && !r.Config.Message.ContentType.IsNull() {
+		*contentType = r.Config.Message.ContentType.ValueString()
+	} else {
+		contentType = nil
+	}
 	defaultContent := new(string)
 	if !r.Config.Message.DefaultContent.IsUnknown() && !r.Config.Message.DefaultContent.IsNull() {
 		*defaultContent = r.Config.Message.DefaultContent.ValueString()
@@ -373,6 +423,12 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 		*forwardBody = r.Config.Message.ForwardBody.ValueBool()
 	} else {
 		forwardBody = nil
+	}
+	forwardBodyRawOnly := new(bool)
+	if !r.Config.Message.ForwardBodyRawOnly.IsUnknown() && !r.Config.Message.ForwardBodyRawOnly.IsNull() {
+		*forwardBodyRawOnly = r.Config.Message.ForwardBodyRawOnly.ValueBool()
+	} else {
+		forwardBodyRawOnly = nil
 	}
 	forwardHeaders := new(bool)
 	if !r.Config.Message.ForwardHeaders.IsUnknown() && !r.Config.Message.ForwardHeaders.IsNull() {
@@ -426,22 +482,63 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 	} else {
 		ttl = nil
 	}
+	var userProperties *shared.UserProperties
+	if r.Config.Message.UserProperties != nil {
+		var headers *shared.SolaceUpstreamPluginHeaders
+		if r.Config.Message.UserProperties.Headers != nil {
+			excludeHeaders := make([]string, 0, len(r.Config.Message.UserProperties.Headers.ExcludeHeaders))
+			for excludeHeadersIndex := range r.Config.Message.UserProperties.Headers.ExcludeHeaders {
+				excludeHeaders = append(excludeHeaders, r.Config.Message.UserProperties.Headers.ExcludeHeaders[excludeHeadersIndex].ValueString())
+			}
+			includeHeaders := make([]string, 0, len(r.Config.Message.UserProperties.Headers.IncludeHeaders))
+			for includeHeadersIndex := range r.Config.Message.UserProperties.Headers.IncludeHeaders {
+				includeHeaders = append(includeHeaders, r.Config.Message.UserProperties.Headers.IncludeHeaders[includeHeadersIndex].ValueString())
+			}
+			mappings := make(map[string]string)
+			for mappingsKey := range r.Config.Message.UserProperties.Headers.Mappings {
+				var mappingsInst string
+				mappingsInst = r.Config.Message.UserProperties.Headers.Mappings[mappingsKey].ValueString()
+
+				mappings[mappingsKey] = mappingsInst
+			}
+			headers = &shared.SolaceUpstreamPluginHeaders{
+				ExcludeHeaders: excludeHeaders,
+				IncludeHeaders: includeHeaders,
+				Mappings:       mappings,
+			}
+		}
+		predefinedProperties := make(map[string]string)
+		for predefinedPropertiesKey := range r.Config.Message.UserProperties.PredefinedProperties {
+			var predefinedPropertiesInst string
+			predefinedPropertiesInst = r.Config.Message.UserProperties.PredefinedProperties[predefinedPropertiesKey].ValueString()
+
+			predefinedProperties[predefinedPropertiesKey] = predefinedPropertiesInst
+		}
+		userProperties = &shared.UserProperties{
+			Headers:              headers,
+			PredefinedProperties: predefinedProperties,
+		}
+	}
 	message := shared.SolaceUpstreamPluginMessage{
-		AckTimeout:     ackTimeout,
-		DefaultContent: defaultContent,
-		DeliveryMode:   deliveryMode,
-		Destinations:   destinations,
-		DmqEligible:    dmqEligible,
-		ForwardBody:    forwardBody,
-		ForwardHeaders: forwardHeaders,
-		ForwardMethod:  forwardMethod,
-		ForwardURI:     forwardURI,
-		Functions:      functions,
-		Priority:       priority,
-		SenderID:       senderID,
-		Tracing:        tracing,
-		TracingSampled: tracingSampled,
-		TTL:            ttl,
+		AckTimeout:         ackTimeout,
+		ContentEncoding:    contentEncoding,
+		ContentType:        contentType,
+		DefaultContent:     defaultContent,
+		DeliveryMode:       deliveryMode,
+		Destinations:       destinations,
+		DmqEligible:        dmqEligible,
+		ForwardBody:        forwardBody,
+		ForwardBodyRawOnly: forwardBodyRawOnly,
+		ForwardHeaders:     forwardHeaders,
+		ForwardMethod:      forwardMethod,
+		ForwardURI:         forwardURI,
+		Functions:          functions,
+		Priority:           priority,
+		SenderID:           senderID,
+		Tracing:            tracing,
+		TracingSampled:     tracingSampled,
+		TTL:                ttl,
+		UserProperties:     userProperties,
 	}
 	var authentication *shared.SolaceUpstreamPluginAuthentication
 	if r.Config.Session.Authentication != nil {
@@ -456,6 +553,12 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 			*accessTokenHeader = r.Config.Session.Authentication.AccessTokenHeader.ValueString()
 		} else {
 			accessTokenHeader = nil
+		}
+		basicAuthHeader := new(string)
+		if !r.Config.Session.Authentication.BasicAuthHeader.IsUnknown() && !r.Config.Session.Authentication.BasicAuthHeader.IsNull() {
+			*basicAuthHeader = r.Config.Session.Authentication.BasicAuthHeader.ValueString()
+		} else {
+			basicAuthHeader = nil
 		}
 		idToken := new(string)
 		if !r.Config.Session.Authentication.IDToken.IsUnknown() && !r.Config.Session.Authentication.IDToken.IsNull() {
@@ -490,6 +593,7 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 		authentication = &shared.SolaceUpstreamPluginAuthentication{
 			AccessToken:       accessToken,
 			AccessTokenHeader: accessTokenHeader,
+			BasicAuthHeader:   basicAuthHeader,
 			IDToken:           idToken,
 			IDTokenHeader:     idTokenHeader,
 			Password:          password,
@@ -536,10 +640,11 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 	var host string
 	host = r.Config.Session.Host.ValueString()
 
-	properties := make(map[string]interface{})
+	properties := make(map[string]string)
 	for propertiesKey := range r.Config.Session.Properties {
-		var propertiesInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.Session.Properties[propertiesKey].ValueString()), &propertiesInst)
+		var propertiesInst string
+		propertiesInst = r.Config.Session.Properties[propertiesKey].ValueString()
+
 		properties[propertiesKey] = propertiesInst
 	}
 	sslValidateCertificate := new(bool)
@@ -600,6 +705,7 @@ func (r *PluginSolaceUpstreamResourceModel) ToSharedSolaceUpstreamPlugin(ctx con
 		}
 	}
 	out := shared.SolaceUpstreamPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

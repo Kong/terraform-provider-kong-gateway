@@ -14,7 +14,9 @@ PluginAiSanitizer Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
+  condition = "...my_condition..."
   config = {
+    allow_all_conversation_history = true
     anonymize = [
       "ssn"
     ]
@@ -26,15 +28,16 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
         score = 0.71
       }
     ]
-    host              = "...my_host..."
-    keepalive_timeout = 9.88
-    port              = 5.24
-    recover_redacted  = true
-    redact_type       = "placeholder"
-    sanitization_mode = "INPUT"
-    scheme            = "...my_scheme..."
-    stop_on_error     = false
-    timeout           = 3.64
+    host                         = "...my_host..."
+    keepalive_timeout            = 9.88
+    port                         = 5.24
+    recover_redacted             = true
+    redact_type                  = "placeholder"
+    sanitization_mode            = "INPUT"
+    scheme                       = "...my_scheme..."
+    skip_logging_sanitized_items = true
+    stop_on_error                = false
+    timeout                      = 3.64
   }
   consumer = {
     id = "...my_id..."
@@ -78,7 +81,7 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
     "..."
   ]
   updated_at = 0
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -87,6 +90,7 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
@@ -101,13 +105,14 @@ resource "kong-gateway_plugin_ai_sanitizer" "my_pluginaisanitizer" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
 Optional:
 
+- `allow_all_conversation_history` (Boolean) If false, will ignore all previous chat messages from the conversation history.
 - `anonymize` (List of String) List of types to be anonymized
 - `block_if_detected` (Boolean) Whether to block requests containing PII data
 - `custom_patterns` (Attributes List) List of custom patterns to be used for anonymization (see [below for nested schema](#nestedatt--config--custom_patterns))
@@ -118,6 +123,7 @@ Optional:
 - `redact_type` (String) What value to be used to redacted to. must be one of ["placeholder", "synthetic"]
 - `sanitization_mode` (String) The sanitization mode to use for the request. must be one of ["BOTH", "INPUT", "OUTPUT"]
 - `scheme` (String) The protocol can be http and https
+- `skip_logging_sanitized_items` (Boolean) Whether to log sanitized items in the Kong log plugins. Turn it on if you want to hide sensitive data from logs.
 - `stop_on_error` (Boolean) Stop processing if an error occurs.
 - `timeout` (Number) Connection timeout with the sanitizer
 
@@ -209,7 +215,7 @@ import {
   to = kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -217,5 +223,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_sanitizer.my_kong-gateway_plugin_ai_sanitizer '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

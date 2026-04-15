@@ -9,7 +9,7 @@ import (
 )
 
 type CreateVaultRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Vault for creation
 	Vault shared.Vault `request:"mediaType=application/json"`

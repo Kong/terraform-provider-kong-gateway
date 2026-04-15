@@ -15,6 +15,7 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx cont
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -65,6 +66,7 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx cont
 			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
 			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
 			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
+			r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 			r.Config.UnhandledStatus = types.Int64PointerValue(resp.Config.UnhandledStatus)
 		}
@@ -225,6 +227,12 @@ func (r *PluginAwsLambdaResourceModel) ToOperationsUpdateAwslambdaPluginRequest(
 func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Context) (*shared.AwsLambdaPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -473,6 +481,12 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 		} else {
 			skipLargeBodies = nil
 		}
+		sslVerify := new(bool)
+		if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+			*sslVerify = r.Config.SslVerify.ValueBool()
+		} else {
+			sslVerify = nil
+		}
 		timeout := new(float64)
 		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
 			*timeout = r.Config.Timeout.ValueFloat64()
@@ -512,6 +526,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 			ProxyURL:                           proxyURL,
 			Qualifier:                          qualifier,
 			SkipLargeBodies:                    skipLargeBodies,
+			SslVerify:                          sslVerify,
 			Timeout:                            timeout,
 			UnhandledStatus:                    unhandledStatus,
 		}
@@ -557,6 +572,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 		}
 	}
 	out := shared.AwsLambdaPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

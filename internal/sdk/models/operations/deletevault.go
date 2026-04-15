@@ -11,7 +11,7 @@ import (
 type DeleteVaultRequest struct {
 	// ID or prefix of the Vault to lookup
 	VaultIDOrPrefix string `pathParam:"style=simple,explode=false,name=VaultIdOrPrefix"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

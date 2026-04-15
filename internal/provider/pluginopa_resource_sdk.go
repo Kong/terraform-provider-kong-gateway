@@ -15,6 +15,7 @@ func (r *PluginOpaResourceModel) RefreshFromSharedOpaPlugin(ctx context.Context,
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.OpaPluginConfig{}
 		r.Config.IncludeBodyInOpaInput = types.BoolPointerValue(resp.Config.IncludeBodyInOpaInput)
 		r.Config.IncludeConsumerInOpaInput = types.BoolPointerValue(resp.Config.IncludeConsumerInOpaInput)
@@ -182,6 +183,12 @@ func (r *PluginOpaResourceModel) ToOperationsUpdateOpaPluginRequest(ctx context.
 func (r *PluginOpaResourceModel) ToSharedOpaPlugin(ctx context.Context) (*shared.OpaPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -377,6 +384,7 @@ func (r *PluginOpaResourceModel) ToSharedOpaPlugin(ctx context.Context) (*shared
 		}
 	}
 	out := shared.OpaPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

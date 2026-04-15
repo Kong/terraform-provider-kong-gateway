@@ -14,16 +14,18 @@ PluginTCPLog Resource
 
 ```terraform
 resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
+  condition = "...my_condition..."
   config = {
     custom_fields_by_lua = {
       key = "value"
     }
-    host      = "...my_host..."
-    keepalive = 5.51
-    port      = 64594
-    timeout   = 6.84
-    tls       = false
-    tls_sni   = "...my_tls_sni..."
+    host       = "...my_host..."
+    keepalive  = 5.51
+    port       = 64594
+    ssl_verify = false
+    timeout    = 6.84
+    tls        = false
+    tls_sni    = "...my_tls_sni..."
   }
   consumer = {
     id = "...my_id..."
@@ -64,7 +66,7 @@ resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
     "..."
   ]
   updated_at = 7
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -77,6 +79,7 @@ resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -89,7 +92,7 @@ resource "kong-gateway_plugin_tcp_log" "my_plugintcplog" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -103,6 +106,7 @@ Optional:
 
 - `custom_fields_by_lua` (Map of String) A list of key-value pairs, where the key is the name of a log field and the value is a chunk of Lua code, whose return value sets or replaces the log field value.
 - `keepalive` (Number) An optional value in milliseconds that defines how long an idle connection lives before being closed.
+- `ssl_verify` (Boolean) When using TLS, this option enables verification of the certificate presented by the server.
 - `timeout` (Number) An optional timeout in milliseconds when sending data to the upstream server.
 - `tls` (Boolean) Indicates whether to perform a TLS handshake against the remote server.
 - `tls_sni` (String) An optional string that defines the SNI (Server Name Indication) hostname to send in the TLS handshake.
@@ -177,7 +181,7 @@ import {
   to = kong-gateway_plugin_tcp_log.my_kong-gateway_plugin_tcp_log
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -185,5 +189,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_tcp_log.my_kong-gateway_plugin_tcp_log '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_tcp_log.my_kong-gateway_plugin_tcp_log '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

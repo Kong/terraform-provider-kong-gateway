@@ -11,7 +11,7 @@ type RemoveConsumerFromGroupRequest struct {
 	// The UUID or name of the consumer group
 	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
 	ConsumerID      string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

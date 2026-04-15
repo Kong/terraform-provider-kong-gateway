@@ -15,6 +15,7 @@ func (r *PluginCanaryResourceModel) RefreshFromSharedCanaryPlugin(ctx context.Co
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -190,6 +191,12 @@ func (r *PluginCanaryResourceModel) ToOperationsUpdateCanaryPluginRequest(ctx co
 func (r *PluginCanaryResourceModel) ToSharedCanaryPlugin(ctx context.Context) (*shared.CanaryPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -396,6 +403,7 @@ func (r *PluginCanaryResourceModel) ToSharedCanaryPlugin(ctx context.Context) (*
 		}
 	}
 	out := shared.CanaryPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

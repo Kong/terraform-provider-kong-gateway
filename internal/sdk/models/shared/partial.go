@@ -9,6 +9,2696 @@ import (
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk/internal/utils"
 )
 
+// PartialModelParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
+type PartialModelParamLocation string
+
+const (
+	PartialModelParamLocationBody  PartialModelParamLocation = "body"
+	PartialModelParamLocationQuery PartialModelParamLocation = "query"
+)
+
+func (e PartialModelParamLocation) ToPointer() *PartialModelParamLocation {
+	return &e
+}
+func (e *PartialModelParamLocation) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "body":
+		fallthrough
+	case "query":
+		*e = PartialModelParamLocation(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelParamLocation: %v", v)
+	}
+}
+
+type PartialModelAuth struct {
+	// If enabled, the authorization header or parameter can be overridden in the request by the value configured in the plugin.
+	AllowOverride *bool `json:"allow_override,omitempty"`
+	// Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_ACCESS_KEY_ID environment variable for this plugin instance.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_SECRET_ACCESS_KEY environment variable for this plugin instance.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client ID.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client secret.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the tenant ID.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
+	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
+	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// Use service account auth for GCP-based providers and models.
+	GcpUseServiceAccount *bool `json:"gcp_use_service_account,omitempty"`
+	// If AI model requires authentication via Authorization or API key header, specify its name here.
+	HeaderName *string `json:"header_name,omitempty"`
+	// Specify the full auth header value for 'header_name', for example 'Bearer key' or just 'key'.
+	HeaderValue *string `json:"header_value,omitempty"`
+	// Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
+	ParamLocation *PartialModelParamLocation `json:"param_location,omitempty"`
+	// If AI model requires authentication via query parameter, specify its name here.
+	ParamName *string `json:"param_name,omitempty"`
+	// Specify the full parameter value for 'param_name'.
+	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (p PartialModelAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelAuth) GetAllowOverride() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AllowOverride
+}
+
+func (p *PartialModelAuth) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *PartialModelAuth) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *PartialModelAuth) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *PartialModelAuth) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *PartialModelAuth) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *PartialModelAuth) GetAzureUseManagedIdentity() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AzureUseManagedIdentity
+}
+
+func (p *PartialModelAuth) GetGcpMetadataURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpMetadataURL
+}
+
+func (p *PartialModelAuth) GetGcpOauthTokenURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpOauthTokenURL
+}
+
+func (p *PartialModelAuth) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
+func (p *PartialModelAuth) GetGcpUseServiceAccount() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.GcpUseServiceAccount
+}
+
+func (p *PartialModelAuth) GetHeaderName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.HeaderName
+}
+
+func (p *PartialModelAuth) GetHeaderValue() *string {
+	if p == nil {
+		return nil
+	}
+	return p.HeaderValue
+}
+
+func (p *PartialModelAuth) GetParamLocation() *PartialModelParamLocation {
+	if p == nil {
+		return nil
+	}
+	return p.ParamLocation
+}
+
+func (p *PartialModelAuth) GetParamName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ParamName
+}
+
+func (p *PartialModelAuth) GetParamValue() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ParamValue
+}
+
+type PartialModelLogging struct {
+	// If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.
+	LogPayloads *bool `json:"log_payloads,omitempty"`
+	// If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
+	LogStatistics *bool `json:"log_statistics,omitempty"`
+}
+
+func (p PartialModelLogging) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelLogging) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelLogging) GetLogPayloads() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.LogPayloads
+}
+
+func (p *PartialModelLogging) GetLogStatistics() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.LogStatistics
+}
+
+type PartialModelBedrock struct {
+	// If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// If using AWS providers (Bedrock), set the identifier of the assumed role session.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
+	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
+	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
+	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
+}
+
+func (p PartialModelBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelBedrock) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *PartialModelBedrock) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *PartialModelBedrock) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *PartialModelBedrock) GetAwsStsEndpointURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsStsEndpointURL
+}
+
+func (p *PartialModelBedrock) GetBatchBucketPrefix() *string {
+	if p == nil {
+		return nil
+	}
+	return p.BatchBucketPrefix
+}
+
+func (p *PartialModelBedrock) GetBatchRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.BatchRoleArn
+}
+
+func (p *PartialModelBedrock) GetEmbeddingsNormalize() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.EmbeddingsNormalize
+}
+
+func (p *PartialModelBedrock) GetPerformanceConfigLatency() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PerformanceConfigLatency
+}
+
+func (p *PartialModelBedrock) GetVideoOutputS3URI() *string {
+	if p == nil {
+		return nil
+	}
+	return p.VideoOutputS3URI
+}
+
+// PartialModelEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
+type PartialModelEmbeddingInputType string
+
+const (
+	PartialModelEmbeddingInputTypeClassification PartialModelEmbeddingInputType = "classification"
+	PartialModelEmbeddingInputTypeClustering     PartialModelEmbeddingInputType = "clustering"
+	PartialModelEmbeddingInputTypeImage          PartialModelEmbeddingInputType = "image"
+	PartialModelEmbeddingInputTypeSearchDocument PartialModelEmbeddingInputType = "search_document"
+	PartialModelEmbeddingInputTypeSearchQuery    PartialModelEmbeddingInputType = "search_query"
+)
+
+func (e PartialModelEmbeddingInputType) ToPointer() *PartialModelEmbeddingInputType {
+	return &e
+}
+func (e *PartialModelEmbeddingInputType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "classification":
+		fallthrough
+	case "clustering":
+		fallthrough
+	case "image":
+		fallthrough
+	case "search_document":
+		fallthrough
+	case "search_query":
+		*e = PartialModelEmbeddingInputType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelEmbeddingInputType: %v", v)
+	}
+}
+
+type PartialModelCohere struct {
+	// The purpose of the input text to calculate embedding vectors.
+	EmbeddingInputType *PartialModelEmbeddingInputType `json:"embedding_input_type,omitempty"`
+	// Wait for the model if it is not ready
+	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (p PartialModelCohere) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelCohere) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelCohere) GetEmbeddingInputType() *PartialModelEmbeddingInputType {
+	if p == nil {
+		return nil
+	}
+	return p.EmbeddingInputType
+}
+
+func (p *PartialModelCohere) GetWaitForModel() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.WaitForModel
+}
+
+type PartialModelDashscope struct {
+	// Two Dashscope endpoints are available, and the international endpoint will be used when this is set to `true`.
+	// It is recommended to set this to `true` when using international version of dashscope.
+	//
+	International *bool `json:"international,omitempty"`
+}
+
+func (p PartialModelDashscope) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelDashscope) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelDashscope) GetInternational() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.International
+}
+
+type PartialModelDatabricks struct {
+	// Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.
+	WorkspaceInstanceID *string `json:"workspace_instance_id,omitempty"`
+}
+
+func (p PartialModelDatabricks) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelDatabricks) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelDatabricks) GetWorkspaceInstanceID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.WorkspaceInstanceID
+}
+
+type PartialModelGemini struct {
+	// If running Gemini on Vertex, specify the regional API endpoint (hostname only).
+	APIEndpoint *string `json:"api_endpoint,omitempty"`
+	// If running Gemini on Vertex Model Garden, specify the endpoint ID.
+	EndpointID *string `json:"endpoint_id,omitempty"`
+	// If running Gemini on Vertex, specify the location ID.
+	LocationID *string `json:"location_id,omitempty"`
+	// If running Gemini on Vertex, specify the project ID.
+	ProjectID *string `json:"project_id,omitempty"`
+}
+
+func (p PartialModelGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelGemini) GetAPIEndpoint() *string {
+	if p == nil {
+		return nil
+	}
+	return p.APIEndpoint
+}
+
+func (p *PartialModelGemini) GetEndpointID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.EndpointID
+}
+
+func (p *PartialModelGemini) GetLocationID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.LocationID
+}
+
+func (p *PartialModelGemini) GetProjectID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ProjectID
+}
+
+type PartialModelHuggingface struct {
+	// Use the cache layer on the inference API
+	UseCache *bool `json:"use_cache,omitempty"`
+	// Wait for the model if it is not ready
+	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (p PartialModelHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelHuggingface) GetUseCache() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.UseCache
+}
+
+func (p *PartialModelHuggingface) GetWaitForModel() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.WaitForModel
+}
+
+// PartialModelLlama2Format - If using llama2 provider, select the upstream message format.
+type PartialModelLlama2Format string
+
+const (
+	PartialModelLlama2FormatOllama PartialModelLlama2Format = "ollama"
+	PartialModelLlama2FormatOpenai PartialModelLlama2Format = "openai"
+	PartialModelLlama2FormatRaw    PartialModelLlama2Format = "raw"
+)
+
+func (e PartialModelLlama2Format) ToPointer() *PartialModelLlama2Format {
+	return &e
+}
+func (e *PartialModelLlama2Format) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ollama":
+		fallthrough
+	case "openai":
+		fallthrough
+	case "raw":
+		*e = PartialModelLlama2Format(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelLlama2Format: %v", v)
+	}
+}
+
+// PartialModelMistralFormat - If using mistral provider, select the upstream message format.
+type PartialModelMistralFormat string
+
+const (
+	PartialModelMistralFormatOllama PartialModelMistralFormat = "ollama"
+	PartialModelMistralFormatOpenai PartialModelMistralFormat = "openai"
+)
+
+func (e PartialModelMistralFormat) ToPointer() *PartialModelMistralFormat {
+	return &e
+}
+func (e *PartialModelMistralFormat) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ollama":
+		fallthrough
+	case "openai":
+		*e = PartialModelMistralFormat(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelMistralFormat: %v", v)
+	}
+}
+
+// PartialModelOptions - Key/value settings for the model
+type PartialModelOptions struct {
+	// Defines the schema/API version, if using Anthropic provider.
+	AnthropicVersion *string `json:"anthropic_version,omitempty"`
+	// 'api-version' for Azure OpenAI instances.
+	AzureAPIVersion *string `json:"azure_api_version,omitempty"`
+	// Deployment ID for Azure OpenAI instances.
+	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
+	// Instance name for Azure OpenAI hosted models.
+	AzureInstance *string                 `json:"azure_instance,omitempty"`
+	Bedrock       *PartialModelBedrock    `json:"bedrock,omitempty"`
+	Cohere        *PartialModelCohere     `json:"cohere,omitempty"`
+	Dashscope     *PartialModelDashscope  `json:"dashscope,omitempty"`
+	Databricks    *PartialModelDatabricks `json:"databricks,omitempty"`
+	// If using embeddings models, set the number of dimensions to generate.
+	EmbeddingsDimensions *int64                   `json:"embeddings_dimensions,omitempty"`
+	Gemini               *PartialModelGemini      `json:"gemini,omitempty"`
+	Huggingface          *PartialModelHuggingface `json:"huggingface,omitempty"`
+	// Defines the cost per 1M tokens in your prompt.
+	InputCost *float64 `json:"input_cost,omitempty"`
+	// If using llama2 provider, select the upstream message format.
+	Llama2Format *PartialModelLlama2Format `json:"llama2_format,omitempty"`
+	// Defines the max_tokens, if using chat or completion models.
+	MaxTokens *int64 `json:"max_tokens,omitempty"`
+	// If using mistral provider, select the upstream message format.
+	MistralFormat *PartialModelMistralFormat `json:"mistral_format,omitempty"`
+	// Defines the cost per 1M tokens in the output of the AI.
+	OutputCost *float64 `json:"output_cost,omitempty"`
+	// Defines the matching temperature, if using chat or completion models.
+	Temperature *float64 `json:"temperature,omitempty"`
+	// Defines the top-k most likely tokens, if supported.
+	TopK *int64 `json:"top_k,omitempty"`
+	// Defines the top-p probability mass, if supported.
+	TopP *float64 `json:"top_p,omitempty"`
+	// Manually specify or override the AI operation path, used when e.g. using the 'preserve' route_type.
+	UpstreamPath *string `json:"upstream_path,omitempty"`
+	// Manually specify or override the full URL to the AI operation endpoints, when calling (self-)hosted models, or for running via a private endpoint.
+	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (p PartialModelOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelOptions) GetAnthropicVersion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AnthropicVersion
+}
+
+func (p *PartialModelOptions) GetAzureAPIVersion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureAPIVersion
+}
+
+func (p *PartialModelOptions) GetAzureDeploymentID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureDeploymentID
+}
+
+func (p *PartialModelOptions) GetAzureInstance() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureInstance
+}
+
+func (p *PartialModelOptions) GetBedrock() *PartialModelBedrock {
+	if p == nil {
+		return nil
+	}
+	return p.Bedrock
+}
+
+func (p *PartialModelOptions) GetCohere() *PartialModelCohere {
+	if p == nil {
+		return nil
+	}
+	return p.Cohere
+}
+
+func (p *PartialModelOptions) GetDashscope() *PartialModelDashscope {
+	if p == nil {
+		return nil
+	}
+	return p.Dashscope
+}
+
+func (p *PartialModelOptions) GetDatabricks() *PartialModelDatabricks {
+	if p == nil {
+		return nil
+	}
+	return p.Databricks
+}
+
+func (p *PartialModelOptions) GetEmbeddingsDimensions() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.EmbeddingsDimensions
+}
+
+func (p *PartialModelOptions) GetGemini() *PartialModelGemini {
+	if p == nil {
+		return nil
+	}
+	return p.Gemini
+}
+
+func (p *PartialModelOptions) GetHuggingface() *PartialModelHuggingface {
+	if p == nil {
+		return nil
+	}
+	return p.Huggingface
+}
+
+func (p *PartialModelOptions) GetInputCost() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.InputCost
+}
+
+func (p *PartialModelOptions) GetLlama2Format() *PartialModelLlama2Format {
+	if p == nil {
+		return nil
+	}
+	return p.Llama2Format
+}
+
+func (p *PartialModelOptions) GetMaxTokens() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.MaxTokens
+}
+
+func (p *PartialModelOptions) GetMistralFormat() *PartialModelMistralFormat {
+	if p == nil {
+		return nil
+	}
+	return p.MistralFormat
+}
+
+func (p *PartialModelOptions) GetOutputCost() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.OutputCost
+}
+
+func (p *PartialModelOptions) GetTemperature() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.Temperature
+}
+
+func (p *PartialModelOptions) GetTopK() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.TopK
+}
+
+func (p *PartialModelOptions) GetTopP() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.TopP
+}
+
+func (p *PartialModelOptions) GetUpstreamPath() *string {
+	if p == nil {
+		return nil
+	}
+	return p.UpstreamPath
+}
+
+func (p *PartialModelOptions) GetUpstreamURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.UpstreamURL
+}
+
+// PartialModelProvider - AI provider request format - Kong translates requests to and from the specified backend compatible formats.
+type PartialModelProvider string
+
+const (
+	PartialModelProviderAnthropic   PartialModelProvider = "anthropic"
+	PartialModelProviderAzure       PartialModelProvider = "azure"
+	PartialModelProviderBedrock     PartialModelProvider = "bedrock"
+	PartialModelProviderCerebras    PartialModelProvider = "cerebras"
+	PartialModelProviderCohere      PartialModelProvider = "cohere"
+	PartialModelProviderDashscope   PartialModelProvider = "dashscope"
+	PartialModelProviderDatabricks  PartialModelProvider = "databricks"
+	PartialModelProviderDeepseek    PartialModelProvider = "deepseek"
+	PartialModelProviderGemini      PartialModelProvider = "gemini"
+	PartialModelProviderHuggingface PartialModelProvider = "huggingface"
+	PartialModelProviderLlama2      PartialModelProvider = "llama2"
+	PartialModelProviderMistral     PartialModelProvider = "mistral"
+	PartialModelProviderOllama      PartialModelProvider = "ollama"
+	PartialModelProviderOpenai      PartialModelProvider = "openai"
+	PartialModelProviderVllm        PartialModelProvider = "vllm"
+	PartialModelProviderXai         PartialModelProvider = "xai"
+)
+
+func (e PartialModelProvider) ToPointer() *PartialModelProvider {
+	return &e
+}
+func (e *PartialModelProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "anthropic":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "bedrock":
+		fallthrough
+	case "cerebras":
+		fallthrough
+	case "cohere":
+		fallthrough
+	case "dashscope":
+		fallthrough
+	case "databricks":
+		fallthrough
+	case "deepseek":
+		fallthrough
+	case "gemini":
+		fallthrough
+	case "huggingface":
+		fallthrough
+	case "llama2":
+		fallthrough
+	case "mistral":
+		fallthrough
+	case "ollama":
+		fallthrough
+	case "openai":
+		fallthrough
+	case "vllm":
+		fallthrough
+	case "xai":
+		*e = PartialModelProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelProvider: %v", v)
+	}
+}
+
+type PartialModelModel struct {
+	// The model name parameter from the request that this model should map to.
+	ModelAlias *string `json:"model_alias,omitempty"`
+	// Model name to execute.
+	Name *string `json:"name,omitempty"`
+	// Key/value settings for the model
+	Options *PartialModelOptions `json:"options,omitempty"`
+	// AI provider request format - Kong translates requests to and from the specified backend compatible formats.
+	Provider PartialModelProvider `json:"provider"`
+}
+
+func (p PartialModelModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelModel) GetModelAlias() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ModelAlias
+}
+
+func (p *PartialModelModel) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PartialModelModel) GetOptions() *PartialModelOptions {
+	if p == nil {
+		return nil
+	}
+	return p.Options
+}
+
+func (p *PartialModelModel) GetProvider() PartialModelProvider {
+	if p == nil {
+		return PartialModelProvider("")
+	}
+	return p.Provider
+}
+
+// PartialModelRouteType - The model's operation implementation, for this provider.
+type PartialModelRouteType string
+
+const (
+	PartialModelRouteTypeAudioV1AudioSpeech         PartialModelRouteType = "audio/v1/audio/speech"
+	PartialModelRouteTypeAudioV1AudioTranscriptions PartialModelRouteType = "audio/v1/audio/transcriptions"
+	PartialModelRouteTypeAudioV1AudioTranslations   PartialModelRouteType = "audio/v1/audio/translations"
+	PartialModelRouteTypeImageV1ImagesEdits         PartialModelRouteType = "image/v1/images/edits"
+	PartialModelRouteTypeImageV1ImagesGenerations   PartialModelRouteType = "image/v1/images/generations"
+	PartialModelRouteTypeLlmV1Assistants            PartialModelRouteType = "llm/v1/assistants"
+	PartialModelRouteTypeLlmV1Batches               PartialModelRouteType = "llm/v1/batches"
+	PartialModelRouteTypeLlmV1Chat                  PartialModelRouteType = "llm/v1/chat"
+	PartialModelRouteTypeLlmV1Completions           PartialModelRouteType = "llm/v1/completions"
+	PartialModelRouteTypeLlmV1Embeddings            PartialModelRouteType = "llm/v1/embeddings"
+	PartialModelRouteTypeLlmV1Files                 PartialModelRouteType = "llm/v1/files"
+	PartialModelRouteTypeLlmV1Responses             PartialModelRouteType = "llm/v1/responses"
+	PartialModelRouteTypePreserve                   PartialModelRouteType = "preserve"
+	PartialModelRouteTypeRealtimeV1Realtime         PartialModelRouteType = "realtime/v1/realtime"
+	PartialModelRouteTypeVideoV1VideosGenerations   PartialModelRouteType = "video/v1/videos/generations"
+)
+
+func (e PartialModelRouteType) ToPointer() *PartialModelRouteType {
+	return &e
+}
+func (e *PartialModelRouteType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "audio/v1/audio/speech":
+		fallthrough
+	case "audio/v1/audio/transcriptions":
+		fallthrough
+	case "audio/v1/audio/translations":
+		fallthrough
+	case "image/v1/images/edits":
+		fallthrough
+	case "image/v1/images/generations":
+		fallthrough
+	case "llm/v1/assistants":
+		fallthrough
+	case "llm/v1/batches":
+		fallthrough
+	case "llm/v1/chat":
+		fallthrough
+	case "llm/v1/completions":
+		fallthrough
+	case "llm/v1/embeddings":
+		fallthrough
+	case "llm/v1/files":
+		fallthrough
+	case "llm/v1/responses":
+		fallthrough
+	case "preserve":
+		fallthrough
+	case "realtime/v1/realtime":
+		fallthrough
+	case "video/v1/videos/generations":
+		*e = PartialModelRouteType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialModelRouteType: %v", v)
+	}
+}
+
+type PartialModelConfig struct {
+	Auth *PartialModelAuth `json:"auth,omitempty"`
+	// The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.
+	Description *string              `json:"description,omitempty"`
+	Logging     *PartialModelLogging `json:"logging,omitempty"`
+	// For internal use only.
+	Metadata any               `json:"metadata,omitempty"`
+	Model    PartialModelModel `json:"model"`
+	// The model's operation implementation, for this provider.
+	RouteType PartialModelRouteType `json:"route_type"`
+	// The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.
+	Weight *int64 `json:"weight,omitempty"`
+}
+
+func (p PartialModelConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModelConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"model", "route_type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModelConfig) GetAuth() *PartialModelAuth {
+	if p == nil {
+		return nil
+	}
+	return p.Auth
+}
+
+func (p *PartialModelConfig) GetDescription() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Description
+}
+
+func (p *PartialModelConfig) GetLogging() *PartialModelLogging {
+	if p == nil {
+		return nil
+	}
+	return p.Logging
+}
+
+func (p *PartialModelConfig) GetMetadata() any {
+	if p == nil {
+		return nil
+	}
+	return p.Metadata
+}
+
+func (p *PartialModelConfig) GetModel() PartialModelModel {
+	if p == nil {
+		return PartialModelModel{}
+	}
+	return p.Model
+}
+
+func (p *PartialModelConfig) GetRouteType() PartialModelRouteType {
+	if p == nil {
+		return PartialModelRouteType("")
+	}
+	return p.RouteType
+}
+
+func (p *PartialModelConfig) GetWeight() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Weight
+}
+
+type PartialModel struct {
+	Config PartialModelConfig `json:"config"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	type_ string `const:"model" json:"type"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (p PartialModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialModel) GetConfig() PartialModelConfig {
+	if p == nil {
+		return PartialModelConfig{}
+	}
+	return p.Config
+}
+
+func (p *PartialModel) GetCreatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.CreatedAt
+}
+
+func (p *PartialModel) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *PartialModel) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PartialModel) GetTags() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Tags
+}
+
+func (p *PartialModel) GetType() string {
+	return "model"
+}
+
+func (p *PartialModel) GetUpdatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.UpdatedAt
+}
+
+// PartialEmbeddingsParamLocation - Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
+type PartialEmbeddingsParamLocation string
+
+const (
+	PartialEmbeddingsParamLocationBody  PartialEmbeddingsParamLocation = "body"
+	PartialEmbeddingsParamLocationQuery PartialEmbeddingsParamLocation = "query"
+)
+
+func (e PartialEmbeddingsParamLocation) ToPointer() *PartialEmbeddingsParamLocation {
+	return &e
+}
+func (e *PartialEmbeddingsParamLocation) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "body":
+		fallthrough
+	case "query":
+		*e = PartialEmbeddingsParamLocation(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialEmbeddingsParamLocation: %v", v)
+	}
+}
+
+type PartialEmbeddingsAuth struct {
+	// If enabled, the authorization header or parameter can be overridden in the request by the value configured in the plugin.
+	AllowOverride *bool `json:"allow_override,omitempty"`
+	// Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_ACCESS_KEY_ID environment variable for this plugin instance.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// Set this if you are using an AWS provider (Bedrock) and you are authenticating using static IAM User credentials. Setting this will override the AWS_SECRET_ACCESS_KEY environment variable for this plugin instance.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client ID.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client secret.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the tenant ID.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
+	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
+	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// Use service account auth for GCP-based providers and models.
+	GcpUseServiceAccount *bool `json:"gcp_use_service_account,omitempty"`
+	// If AI model requires authentication via Authorization or API key header, specify its name here.
+	HeaderName *string `json:"header_name,omitempty"`
+	// Specify the full auth header value for 'header_name', for example 'Bearer key' or just 'key'.
+	HeaderValue *string `json:"header_value,omitempty"`
+	// Specify whether the 'param_name' and 'param_value' options go in a query string, or the POST form/JSON body.
+	ParamLocation *PartialEmbeddingsParamLocation `json:"param_location,omitempty"`
+	// If AI model requires authentication via query parameter, specify its name here.
+	ParamName *string `json:"param_name,omitempty"`
+	// Specify the full parameter value for 'param_name'.
+	ParamValue *string `json:"param_value,omitempty"`
+}
+
+func (p PartialEmbeddingsAuth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsAuth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsAuth) GetAllowOverride() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AllowOverride
+}
+
+func (p *PartialEmbeddingsAuth) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *PartialEmbeddingsAuth) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *PartialEmbeddingsAuth) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *PartialEmbeddingsAuth) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *PartialEmbeddingsAuth) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *PartialEmbeddingsAuth) GetAzureUseManagedIdentity() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AzureUseManagedIdentity
+}
+
+func (p *PartialEmbeddingsAuth) GetGcpMetadataURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpMetadataURL
+}
+
+func (p *PartialEmbeddingsAuth) GetGcpOauthTokenURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpOauthTokenURL
+}
+
+func (p *PartialEmbeddingsAuth) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
+func (p *PartialEmbeddingsAuth) GetGcpUseServiceAccount() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.GcpUseServiceAccount
+}
+
+func (p *PartialEmbeddingsAuth) GetHeaderName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.HeaderName
+}
+
+func (p *PartialEmbeddingsAuth) GetHeaderValue() *string {
+	if p == nil {
+		return nil
+	}
+	return p.HeaderValue
+}
+
+func (p *PartialEmbeddingsAuth) GetParamLocation() *PartialEmbeddingsParamLocation {
+	if p == nil {
+		return nil
+	}
+	return p.ParamLocation
+}
+
+func (p *PartialEmbeddingsAuth) GetParamName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ParamName
+}
+
+func (p *PartialEmbeddingsAuth) GetParamValue() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ParamValue
+}
+
+type PartialEmbeddingsAzure struct {
+	// 'api-version' for Azure OpenAI instances.
+	APIVersion *string `json:"api_version,omitempty"`
+	// Deployment ID for Azure OpenAI instances.
+	DeploymentID *string `json:"deployment_id,omitempty"`
+	// Instance name for Azure OpenAI hosted models.
+	Instance *string `json:"instance,omitempty"`
+}
+
+func (p PartialEmbeddingsAzure) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsAzure) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsAzure) GetAPIVersion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.APIVersion
+}
+
+func (p *PartialEmbeddingsAzure) GetDeploymentID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.DeploymentID
+}
+
+func (p *PartialEmbeddingsAzure) GetInstance() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Instance
+}
+
+type PartialEmbeddingsBedrock struct {
+	// If using AWS providers (Bedrock) you can assume a different role after authentication with the current IAM context is successful.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// If using AWS providers (Bedrock), set the identifier of the assumed role session.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
+	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
+	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
+	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
+}
+
+func (p PartialEmbeddingsBedrock) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsBedrock) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsBedrock) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *PartialEmbeddingsBedrock) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *PartialEmbeddingsBedrock) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *PartialEmbeddingsBedrock) GetAwsStsEndpointURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsStsEndpointURL
+}
+
+func (p *PartialEmbeddingsBedrock) GetBatchBucketPrefix() *string {
+	if p == nil {
+		return nil
+	}
+	return p.BatchBucketPrefix
+}
+
+func (p *PartialEmbeddingsBedrock) GetBatchRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.BatchRoleArn
+}
+
+func (p *PartialEmbeddingsBedrock) GetEmbeddingsNormalize() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.EmbeddingsNormalize
+}
+
+func (p *PartialEmbeddingsBedrock) GetPerformanceConfigLatency() *string {
+	if p == nil {
+		return nil
+	}
+	return p.PerformanceConfigLatency
+}
+
+func (p *PartialEmbeddingsBedrock) GetVideoOutputS3URI() *string {
+	if p == nil {
+		return nil
+	}
+	return p.VideoOutputS3URI
+}
+
+type PartialEmbeddingsGemini struct {
+	// If running Gemini on Vertex, specify the regional API endpoint (hostname only).
+	APIEndpoint *string `json:"api_endpoint,omitempty"`
+	// If running Gemini on Vertex, specify the location ID.
+	LocationID *string `json:"location_id,omitempty"`
+	// If running Gemini on Vertex, specify the project ID.
+	ProjectID *string `json:"project_id,omitempty"`
+}
+
+func (p PartialEmbeddingsGemini) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsGemini) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsGemini) GetAPIEndpoint() *string {
+	if p == nil {
+		return nil
+	}
+	return p.APIEndpoint
+}
+
+func (p *PartialEmbeddingsGemini) GetLocationID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.LocationID
+}
+
+func (p *PartialEmbeddingsGemini) GetProjectID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ProjectID
+}
+
+type PartialEmbeddingsHuggingface struct {
+	// Use the cache layer on the inference API
+	UseCache *bool `json:"use_cache,omitempty"`
+	// Wait for the model if it is not ready
+	WaitForModel *bool `json:"wait_for_model,omitempty"`
+}
+
+func (p PartialEmbeddingsHuggingface) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsHuggingface) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsHuggingface) GetUseCache() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.UseCache
+}
+
+func (p *PartialEmbeddingsHuggingface) GetWaitForModel() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.WaitForModel
+}
+
+// PartialEmbeddingsOptions - Key/value settings for the model
+type PartialEmbeddingsOptions struct {
+	Azure       *PartialEmbeddingsAzure       `json:"azure,omitempty"`
+	Bedrock     *PartialEmbeddingsBedrock     `json:"bedrock,omitempty"`
+	Gemini      *PartialEmbeddingsGemini      `json:"gemini,omitempty"`
+	Huggingface *PartialEmbeddingsHuggingface `json:"huggingface,omitempty"`
+	// upstream url for the embeddings
+	UpstreamURL *string `json:"upstream_url,omitempty"`
+}
+
+func (p PartialEmbeddingsOptions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsOptions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsOptions) GetAzure() *PartialEmbeddingsAzure {
+	if p == nil {
+		return nil
+	}
+	return p.Azure
+}
+
+func (p *PartialEmbeddingsOptions) GetBedrock() *PartialEmbeddingsBedrock {
+	if p == nil {
+		return nil
+	}
+	return p.Bedrock
+}
+
+func (p *PartialEmbeddingsOptions) GetGemini() *PartialEmbeddingsGemini {
+	if p == nil {
+		return nil
+	}
+	return p.Gemini
+}
+
+func (p *PartialEmbeddingsOptions) GetHuggingface() *PartialEmbeddingsHuggingface {
+	if p == nil {
+		return nil
+	}
+	return p.Huggingface
+}
+
+func (p *PartialEmbeddingsOptions) GetUpstreamURL() *string {
+	if p == nil {
+		return nil
+	}
+	return p.UpstreamURL
+}
+
+// PartialEmbeddingsProvider - AI provider format to use for embeddings API
+type PartialEmbeddingsProvider string
+
+const (
+	PartialEmbeddingsProviderAzure       PartialEmbeddingsProvider = "azure"
+	PartialEmbeddingsProviderBedrock     PartialEmbeddingsProvider = "bedrock"
+	PartialEmbeddingsProviderGemini      PartialEmbeddingsProvider = "gemini"
+	PartialEmbeddingsProviderHuggingface PartialEmbeddingsProvider = "huggingface"
+	PartialEmbeddingsProviderMistral     PartialEmbeddingsProvider = "mistral"
+	PartialEmbeddingsProviderOllama      PartialEmbeddingsProvider = "ollama"
+	PartialEmbeddingsProviderOpenai      PartialEmbeddingsProvider = "openai"
+)
+
+func (e PartialEmbeddingsProvider) ToPointer() *PartialEmbeddingsProvider {
+	return &e
+}
+func (e *PartialEmbeddingsProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "azure":
+		fallthrough
+	case "bedrock":
+		fallthrough
+	case "gemini":
+		fallthrough
+	case "huggingface":
+		fallthrough
+	case "mistral":
+		fallthrough
+	case "ollama":
+		fallthrough
+	case "openai":
+		*e = PartialEmbeddingsProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialEmbeddingsProvider: %v", v)
+	}
+}
+
+type PartialEmbeddingsModel struct {
+	// Model name to execute.
+	Name string `json:"name"`
+	// Key/value settings for the model
+	Options *PartialEmbeddingsOptions `json:"options,omitempty"`
+	// AI provider format to use for embeddings API
+	Provider PartialEmbeddingsProvider `json:"provider"`
+}
+
+func (p PartialEmbeddingsModel) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsModel) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"name", "provider"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsModel) GetName() string {
+	if p == nil {
+		return ""
+	}
+	return p.Name
+}
+
+func (p *PartialEmbeddingsModel) GetOptions() *PartialEmbeddingsOptions {
+	if p == nil {
+		return nil
+	}
+	return p.Options
+}
+
+func (p *PartialEmbeddingsModel) GetProvider() PartialEmbeddingsProvider {
+	if p == nil {
+		return PartialEmbeddingsProvider("")
+	}
+	return p.Provider
+}
+
+type PartialEmbeddingsConfig struct {
+	Auth  *PartialEmbeddingsAuth `json:"auth,omitempty"`
+	Model PartialEmbeddingsModel `json:"model"`
+}
+
+func (p PartialEmbeddingsConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddingsConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"model"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddingsConfig) GetAuth() *PartialEmbeddingsAuth {
+	if p == nil {
+		return nil
+	}
+	return p.Auth
+}
+
+func (p *PartialEmbeddingsConfig) GetModel() PartialEmbeddingsModel {
+	if p == nil {
+		return PartialEmbeddingsModel{}
+	}
+	return p.Model
+}
+
+type PartialEmbeddings struct {
+	Config PartialEmbeddingsConfig `json:"config"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	type_ string `const:"embeddings" json:"type"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (p PartialEmbeddings) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialEmbeddings) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialEmbeddings) GetConfig() PartialEmbeddingsConfig {
+	if p == nil {
+		return PartialEmbeddingsConfig{}
+	}
+	return p.Config
+}
+
+func (p *PartialEmbeddings) GetCreatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.CreatedAt
+}
+
+func (p *PartialEmbeddings) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *PartialEmbeddings) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PartialEmbeddings) GetTags() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Tags
+}
+
+func (p *PartialEmbeddings) GetType() string {
+	return "embeddings"
+}
+
+func (p *PartialEmbeddings) GetUpdatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.UpdatedAt
+}
+
+// PartialVectordbDistanceMetric - the distance metric to use for vector searches
+type PartialVectordbDistanceMetric string
+
+const (
+	PartialVectordbDistanceMetricCosine    PartialVectordbDistanceMetric = "cosine"
+	PartialVectordbDistanceMetricEuclidean PartialVectordbDistanceMetric = "euclidean"
+)
+
+func (e PartialVectordbDistanceMetric) ToPointer() *PartialVectordbDistanceMetric {
+	return &e
+}
+func (e *PartialVectordbDistanceMetric) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "cosine":
+		fallthrough
+	case "euclidean":
+		*e = PartialVectordbDistanceMetric(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbDistanceMetric: %v", v)
+	}
+}
+
+// PartialVectordbSslVersion - the ssl version to use for the pgvector database
+type PartialVectordbSslVersion string
+
+const (
+	PartialVectordbSslVersionAny    PartialVectordbSslVersion = "any"
+	PartialVectordbSslVersionTlsv12 PartialVectordbSslVersion = "tlsv1_2"
+	PartialVectordbSslVersionTlsv13 PartialVectordbSslVersion = "tlsv1_3"
+)
+
+func (e PartialVectordbSslVersion) ToPointer() *PartialVectordbSslVersion {
+	return &e
+}
+func (e *PartialVectordbSslVersion) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "any":
+		fallthrough
+	case "tlsv1_2":
+		fallthrough
+	case "tlsv1_3":
+		*e = PartialVectordbSslVersion(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbSslVersion: %v", v)
+	}
+}
+
+type PartialVectordbPgvector struct {
+	// the database of the pgvector database
+	Database *string `json:"database,omitempty"`
+	// the host of the pgvector database
+	Host *string `json:"host,omitempty"`
+	// the password of the pgvector database
+	Password *string `json:"password,omitempty"`
+	// the port of the pgvector database
+	Port *int64 `json:"port,omitempty"`
+	// whether to use ssl for the pgvector database
+	Ssl *bool `json:"ssl,omitempty"`
+	// the path of ssl cert to use for the pgvector database
+	SslCert *string `json:"ssl_cert,omitempty"`
+	// the path of ssl cert key to use for the pgvector database
+	SslCertKey *string `json:"ssl_cert_key,omitempty"`
+	// whether ssl is required for the pgvector database
+	SslRequired *bool `json:"ssl_required,omitempty"`
+	// whether to verify ssl for the pgvector database
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// the ssl version to use for the pgvector database
+	SslVersion *PartialVectordbSslVersion `json:"ssl_version,omitempty"`
+	// the timeout of the pgvector database
+	Timeout *float64 `json:"timeout,omitempty"`
+	// the user of the pgvector database
+	User *string `json:"user,omitempty"`
+}
+
+func (p PartialVectordbPgvector) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbPgvector) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbPgvector) GetDatabase() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Database
+}
+
+func (p *PartialVectordbPgvector) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialVectordbPgvector) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialVectordbPgvector) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+func (p *PartialVectordbPgvector) GetSsl() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.Ssl
+}
+
+func (p *PartialVectordbPgvector) GetSslCert() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SslCert
+}
+
+func (p *PartialVectordbPgvector) GetSslCertKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SslCertKey
+}
+
+func (p *PartialVectordbPgvector) GetSslRequired() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslRequired
+}
+
+func (p *PartialVectordbPgvector) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialVectordbPgvector) GetSslVersion() *PartialVectordbSslVersion {
+	if p == nil {
+		return nil
+	}
+	return p.SslVersion
+}
+
+func (p *PartialVectordbPgvector) GetTimeout() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.Timeout
+}
+
+func (p *PartialVectordbPgvector) GetUser() *string {
+	if p == nil {
+		return nil
+	}
+	return p.User
+}
+
+// PartialVectordbAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type PartialVectordbAuthProvider string
+
+const (
+	PartialVectordbAuthProviderAws   PartialVectordbAuthProvider = "aws"
+	PartialVectordbAuthProviderAzure PartialVectordbAuthProvider = "azure"
+	PartialVectordbAuthProviderGcp   PartialVectordbAuthProvider = "gcp"
+)
+
+func (e PartialVectordbAuthProvider) ToPointer() *PartialVectordbAuthProvider {
+	return &e
+}
+func (e *PartialVectordbAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = PartialVectordbAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbAuthProvider: %v", v)
+	}
+}
+
+// PartialVectordbCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type PartialVectordbCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *PartialVectordbAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (p PartialVectordbCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAuthProvider() *PartialVectordbAuthProvider {
+	if p == nil {
+		return nil
+	}
+	return p.AuthProvider
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsCacheName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsCacheName
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsIsServerless() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AwsIsServerless
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *PartialVectordbCloudAuthentication) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *PartialVectordbCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
+type PartialVectordbClusterNodes struct {
+	// A string representing a host name, such as example.com.
+	IP *string `json:"ip,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (p PartialVectordbClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbClusterNodes) GetIP() *string {
+	if p == nil {
+		return nil
+	}
+	return p.IP
+}
+
+func (p *PartialVectordbClusterNodes) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+type PartialVectordbSentinelNodes struct {
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (p PartialVectordbSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbSentinelNodes) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialVectordbSentinelNodes) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+// PartialVectordbSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+type PartialVectordbSentinelRole string
+
+const (
+	PartialVectordbSentinelRoleAny    PartialVectordbSentinelRole = "any"
+	PartialVectordbSentinelRoleMaster PartialVectordbSentinelRole = "master"
+	PartialVectordbSentinelRoleSlave  PartialVectordbSentinelRole = "slave"
+)
+
+func (e PartialVectordbSentinelRole) ToPointer() *PartialVectordbSentinelRole {
+	return &e
+}
+func (e *PartialVectordbSentinelRole) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "any":
+		fallthrough
+	case "master":
+		fallthrough
+	case "slave":
+		*e = PartialVectordbSentinelRole(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbSentinelRole: %v", v)
+	}
+}
+
+type PartialVectordbRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *PartialVectordbCloudAuthentication `json:"cloud_authentication,omitempty"`
+	// Maximum retry attempts for redirection.
+	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
+	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
+	ClusterNodes []PartialVectordbClusterNodes `json:"cluster_nodes,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
+	// If the connection to Redis is proxied (e.g. Envoy), set it `true`. Set the `host` and `port` to point to the proxy address.
+	ConnectionIsProxied *bool `json:"connection_is_proxied,omitempty"`
+	// Database to use for the Redis connection when using the `redis` strategy
+	Database *int64 `json:"database,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return `nil`. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than `keepalive_pool_size`. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than `keepalive_pool_size`.
+	KeepaliveBacklog *int64 `json:"keepalive_backlog,omitempty"`
+	// The size limit for every cosocket connection pool associated with every remote server, per worker process. If neither `keepalive_pool_size` nor `keepalive_backlog` is specified, no pool is created. If `keepalive_pool_size` isn't specified but `keepalive_backlog` is specified, then the pool uses the default value. Try to increase (e.g. 512) this value if latency is high or throughput is low.
+	KeepalivePoolSize *int64 `json:"keepalive_pool_size,omitempty"`
+	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+	Password *string `json:"password,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ReadTimeout *int64 `json:"read_timeout,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	SendTimeout *int64 `json:"send_timeout,omitempty"`
+	// Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
+	SentinelMaster *string `json:"sentinel_master,omitempty"`
+	// Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.
+	SentinelNodes []PartialVectordbSentinelNodes `json:"sentinel_nodes,omitempty"`
+	// Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.
+	SentinelPassword *string `json:"sentinel_password,omitempty"`
+	// Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+	SentinelRole *PartialVectordbSentinelRole `json:"sentinel_role,omitempty"`
+	// Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.
+	SentinelUsername *string `json:"sentinel_username,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	ServerName *string `json:"server_name,omitempty"`
+	// If set to true, uses SSL to connect to Redis.
+	Ssl *bool `json:"ssl,omitempty"`
+	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialVectordbRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbRedis) GetCloudAuthentication() *PartialVectordbCloudAuthentication {
+	if p == nil {
+		return nil
+	}
+	return p.CloudAuthentication
+}
+
+func (p *PartialVectordbRedis) GetClusterMaxRedirections() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ClusterMaxRedirections
+}
+
+func (p *PartialVectordbRedis) GetClusterNodes() []PartialVectordbClusterNodes {
+	if p == nil {
+		return nil
+	}
+	return p.ClusterNodes
+}
+
+func (p *PartialVectordbRedis) GetConnectTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ConnectTimeout
+}
+
+func (p *PartialVectordbRedis) GetConnectionIsProxied() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.ConnectionIsProxied
+}
+
+func (p *PartialVectordbRedis) GetDatabase() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Database
+}
+
+func (p *PartialVectordbRedis) GetHost() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Host
+}
+
+func (p *PartialVectordbRedis) GetKeepaliveBacklog() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.KeepaliveBacklog
+}
+
+func (p *PartialVectordbRedis) GetKeepalivePoolSize() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.KeepalivePoolSize
+}
+
+func (p *PartialVectordbRedis) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialVectordbRedis) GetPort() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Port
+}
+
+func (p *PartialVectordbRedis) GetReadTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.ReadTimeout
+}
+
+func (p *PartialVectordbRedis) GetSendTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.SendTimeout
+}
+
+func (p *PartialVectordbRedis) GetSentinelMaster() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelMaster
+}
+
+func (p *PartialVectordbRedis) GetSentinelNodes() []PartialVectordbSentinelNodes {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelNodes
+}
+
+func (p *PartialVectordbRedis) GetSentinelPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelPassword
+}
+
+func (p *PartialVectordbRedis) GetSentinelRole() *PartialVectordbSentinelRole {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelRole
+}
+
+func (p *PartialVectordbRedis) GetSentinelUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.SentinelUsername
+}
+
+func (p *PartialVectordbRedis) GetServerName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ServerName
+}
+
+func (p *PartialVectordbRedis) GetSsl() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.Ssl
+}
+
+func (p *PartialVectordbRedis) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialVectordbRedis) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
+}
+
+// PartialVectordbStrategy - which vector database driver to use
+type PartialVectordbStrategy string
+
+const (
+	PartialVectordbStrategyPgvector PartialVectordbStrategy = "pgvector"
+	PartialVectordbStrategyRedis    PartialVectordbStrategy = "redis"
+)
+
+func (e PartialVectordbStrategy) ToPointer() *PartialVectordbStrategy {
+	return &e
+}
+func (e *PartialVectordbStrategy) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "pgvector":
+		fallthrough
+	case "redis":
+		*e = PartialVectordbStrategy(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbStrategy: %v", v)
+	}
+}
+
+type PartialVectordbConfig struct {
+	// the desired dimensionality for the vectors
+	Dimensions int64 `json:"dimensions"`
+	// the distance metric to use for vector searches
+	DistanceMetric PartialVectordbDistanceMetric `json:"distance_metric"`
+	Pgvector       *PartialVectordbPgvector      `json:"pgvector,omitempty"`
+	Redis          *PartialVectordbRedis         `json:"redis,omitempty"`
+	// which vector database driver to use
+	Strategy PartialVectordbStrategy `json:"strategy"`
+	// the default similarity threshold for accepting semantic search results (float). Higher threshold means more results are considered similar.
+	Threshold *float64 `json:"threshold,omitempty"`
+}
+
+func (p PartialVectordbConfig) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbConfig) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"dimensions", "distance_metric", "strategy"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbConfig) GetDimensions() int64 {
+	if p == nil {
+		return 0
+	}
+	return p.Dimensions
+}
+
+func (p *PartialVectordbConfig) GetDistanceMetric() PartialVectordbDistanceMetric {
+	if p == nil {
+		return PartialVectordbDistanceMetric("")
+	}
+	return p.DistanceMetric
+}
+
+func (p *PartialVectordbConfig) GetPgvector() *PartialVectordbPgvector {
+	if p == nil {
+		return nil
+	}
+	return p.Pgvector
+}
+
+func (p *PartialVectordbConfig) GetRedis() *PartialVectordbRedis {
+	if p == nil {
+		return nil
+	}
+	return p.Redis
+}
+
+func (p *PartialVectordbConfig) GetStrategy() PartialVectordbStrategy {
+	if p == nil {
+		return PartialVectordbStrategy("")
+	}
+	return p.Strategy
+}
+
+func (p *PartialVectordbConfig) GetThreshold() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.Threshold
+}
+
+type PartialVectordb struct {
+	Config PartialVectordbConfig `json:"config"`
+	// Unix epoch when the resource was created.
+	CreatedAt *int64 `json:"created_at,omitempty"`
+	// A string representing a UUID (universally unique identifier).
+	ID *string `json:"id,omitempty"`
+	// A unique string representing a UTF-8 encoded name.
+	Name *string `json:"name,omitempty"`
+	// A set of strings representing tags.
+	Tags []string `json:"tags,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	type_ string `const:"vectordb" json:"type"`
+	// Unix epoch when the resource was last updated.
+	UpdatedAt *int64 `json:"updated_at,omitempty"`
+}
+
+func (p PartialVectordb) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordb) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"config", "type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordb) GetConfig() PartialVectordbConfig {
+	if p == nil {
+		return PartialVectordbConfig{}
+	}
+	return p.Config
+}
+
+func (p *PartialVectordb) GetCreatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.CreatedAt
+}
+
+func (p *PartialVectordb) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *PartialVectordb) GetName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Name
+}
+
+func (p *PartialVectordb) GetTags() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Tags
+}
+
+func (p *PartialVectordb) GetType() string {
+	return "vectordb"
+}
+
+func (p *PartialVectordb) GetUpdatedAt() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.UpdatedAt
+}
+
+// PartialRedisEeAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type PartialRedisEeAuthProvider string
+
+const (
+	PartialRedisEeAuthProviderAws   PartialRedisEeAuthProvider = "aws"
+	PartialRedisEeAuthProviderAzure PartialRedisEeAuthProvider = "azure"
+	PartialRedisEeAuthProviderGcp   PartialRedisEeAuthProvider = "gcp"
+)
+
+func (e PartialRedisEeAuthProvider) ToPointer() *PartialRedisEeAuthProvider {
+	return &e
+}
+func (e *PartialRedisEeAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = PartialRedisEeAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisEeAuthProvider: %v", v)
+	}
+}
+
+// PartialRedisEeCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type PartialRedisEeCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *PartialRedisEeAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (p PartialRedisEeCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisEeCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAuthProvider() *PartialRedisEeAuthProvider {
+	if p == nil {
+		return nil
+	}
+	return p.AuthProvider
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsCacheName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsCacheName
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsIsServerless() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AwsIsServerless
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
 type PartialRedisEeClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -104,6 +2794,8 @@ func (e *PartialRedisEeSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type PartialRedisEeConfig struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *PartialRedisEeCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -157,6 +2849,13 @@ func (p *PartialRedisEeConfig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (p *PartialRedisEeConfig) GetCloudAuthentication() *PartialRedisEeCloudAuthentication {
+	if p == nil {
+		return nil
+	}
+	return p.CloudAuthentication
 }
 
 func (p *PartialRedisEeConfig) GetClusterMaxRedirections() *int64 {
@@ -379,7 +3078,162 @@ func (p *PartialRedisEe) GetUpdatedAt() *int64 {
 	return p.UpdatedAt
 }
 
+// PartialRedisCeAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type PartialRedisCeAuthProvider string
+
+const (
+	PartialRedisCeAuthProviderAws   PartialRedisCeAuthProvider = "aws"
+	PartialRedisCeAuthProviderAzure PartialRedisCeAuthProvider = "azure"
+	PartialRedisCeAuthProviderGcp   PartialRedisCeAuthProvider = "gcp"
+)
+
+func (e PartialRedisCeAuthProvider) ToPointer() *PartialRedisCeAuthProvider {
+	return &e
+}
+func (e *PartialRedisCeAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = PartialRedisCeAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisCeAuthProvider: %v", v)
+	}
+}
+
+// PartialRedisCeCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type PartialRedisCeCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *PartialRedisCeAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (p PartialRedisCeCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisCeCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAuthProvider() *PartialRedisCeAuthProvider {
+	if p == nil {
+		return nil
+	}
+	return p.AuthProvider
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsCacheName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsCacheName
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsIsServerless() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AwsIsServerless
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
 type PartialRedisCeConfig struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *PartialRedisCeCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Database to use for the Redis connection when using the `redis` strategy
 	Database *int64 `json:"database,omitempty"`
 	// A string representing a host name, such as example.com.
@@ -409,6 +3263,13 @@ func (p *PartialRedisCeConfig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (p *PartialRedisCeConfig) GetCloudAuthentication() *PartialRedisCeCloudAuthentication {
+	if p == nil {
+		return nil
+	}
+	return p.CloudAuthentication
 }
 
 func (p *PartialRedisCeConfig) GetDatabase() *int64 {
@@ -550,15 +3411,39 @@ func (p *PartialRedisCe) GetUpdatedAt() *int64 {
 type PartialType string
 
 const (
-	PartialTypeRedisCe PartialType = "redis-ce"
-	PartialTypeRedisEe PartialType = "redis-ee"
+	PartialTypeEmbeddings PartialType = "embeddings"
+	PartialTypeModel      PartialType = "model"
+	PartialTypeRedisCe    PartialType = "redis-ce"
+	PartialTypeRedisEe    PartialType = "redis-ee"
+	PartialTypeVectordb   PartialType = "vectordb"
 )
 
 type Partial struct {
-	PartialRedisCe *PartialRedisCe `queryParam:"inline" union:"member"`
-	PartialRedisEe *PartialRedisEe `queryParam:"inline" union:"member"`
+	PartialRedisCe    *PartialRedisCe    `queryParam:"inline" union:"member"`
+	PartialRedisEe    *PartialRedisEe    `queryParam:"inline" union:"member"`
+	PartialVectordb   *PartialVectordb   `queryParam:"inline" union:"member"`
+	PartialEmbeddings *PartialEmbeddings `queryParam:"inline" union:"member"`
+	PartialModel      *PartialModel      `queryParam:"inline" union:"member"`
 
 	Type PartialType
+}
+
+func CreatePartialEmbeddings(embeddings PartialEmbeddings) Partial {
+	typ := PartialTypeEmbeddings
+
+	return Partial{
+		PartialEmbeddings: &embeddings,
+		Type:              typ,
+	}
+}
+
+func CreatePartialModel(model PartialModel) Partial {
+	typ := PartialTypeModel
+
+	return Partial{
+		PartialModel: &model,
+		Type:         typ,
+	}
 }
 
 func CreatePartialRedisCe(redisCe PartialRedisCe) Partial {
@@ -579,6 +3464,15 @@ func CreatePartialRedisEe(redisEe PartialRedisEe) Partial {
 	}
 }
 
+func CreatePartialVectordb(vectordb PartialVectordb) Partial {
+	typ := PartialTypeVectordb
+
+	return Partial{
+		PartialVectordb: &vectordb,
+		Type:            typ,
+	}
+}
+
 func (u *Partial) UnmarshalJSON(data []byte) error {
 
 	type discriminator struct {
@@ -591,6 +3485,24 @@ func (u *Partial) UnmarshalJSON(data []byte) error {
 	}
 
 	switch dis.Type {
+	case "embeddings":
+		partialEmbeddings := new(PartialEmbeddings)
+		if err := utils.UnmarshalJSON(data, &partialEmbeddings, "", true, nil); err != nil {
+			return fmt.Errorf("could not unmarshal `%s` into expected (Type == embeddings) type PartialEmbeddings within Partial: %w", string(data), err)
+		}
+
+		u.PartialEmbeddings = partialEmbeddings
+		u.Type = PartialTypeEmbeddings
+		return nil
+	case "model":
+		partialModel := new(PartialModel)
+		if err := utils.UnmarshalJSON(data, &partialModel, "", true, nil); err != nil {
+			return fmt.Errorf("could not unmarshal `%s` into expected (Type == model) type PartialModel within Partial: %w", string(data), err)
+		}
+
+		u.PartialModel = partialModel
+		u.Type = PartialTypeModel
+		return nil
 	case "redis-ce":
 		partialRedisCe := new(PartialRedisCe)
 		if err := utils.UnmarshalJSON(data, &partialRedisCe, "", true, nil); err != nil {
@@ -609,6 +3521,15 @@ func (u *Partial) UnmarshalJSON(data []byte) error {
 		u.PartialRedisEe = partialRedisEe
 		u.Type = PartialTypeRedisEe
 		return nil
+	case "vectordb":
+		partialVectordb := new(PartialVectordb)
+		if err := utils.UnmarshalJSON(data, &partialVectordb, "", true, nil); err != nil {
+			return fmt.Errorf("could not unmarshal `%s` into expected (Type == vectordb) type PartialVectordb within Partial: %w", string(data), err)
+		}
+
+		u.PartialVectordb = partialVectordb
+		u.Type = PartialTypeVectordb
+		return nil
 	}
 
 	return fmt.Errorf("could not unmarshal `%s` into any supported union types for Partial", string(data))
@@ -621,6 +3542,18 @@ func (u Partial) MarshalJSON() ([]byte, error) {
 
 	if u.PartialRedisEe != nil {
 		return utils.MarshalJSON(u.PartialRedisEe, "", true)
+	}
+
+	if u.PartialVectordb != nil {
+		return utils.MarshalJSON(u.PartialVectordb, "", true)
+	}
+
+	if u.PartialEmbeddings != nil {
+		return utils.MarshalJSON(u.PartialEmbeddings, "", true)
+	}
+
+	if u.PartialModel != nil {
+		return utils.MarshalJSON(u.PartialModel, "", true)
 	}
 
 	return nil, errors.New("could not marshal union type Partial: all fields are null")

@@ -14,6 +14,7 @@ PluginMtlsAuth Resource
 
 ```terraform
 resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
+  condition = "...my_condition..."
   config = {
     allow_partial_chain    = false
     anonymous              = "...my_anonymous..."
@@ -33,8 +34,12 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
     https_proxy_host      = "...my_https_proxy_host..."
     https_proxy_port      = 35718
     revocation_check_mode = "IGNORE_CA_ERROR"
-    send_ca_dn            = true
-    skip_consumer_lookup  = true
+    san_dirname_matcher = [
+      "..."
+    ]
+    send_ca_dn           = true
+    skip_consumer_lookup = true
+    ssl_verify           = false
   }
   created_at    = 2
   enabled       = true
@@ -60,7 +65,7 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
     }
   ]
   protocols = [
-    "grpcs"
+    "http"
   ]
   route = {
     id = "...my_id..."
@@ -72,7 +77,7 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -85,18 +90,19 @@ resource "kong-gateway_plugin_mtls_auth" "my_pluginmtlsauth" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
 - `id` (String) A string representing a UUID (universally unique identifier).
 - `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
 - `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
-- `protocols` (Set of String) A set of strings representing HTTP protocols.
+- `protocols` (Set of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -120,8 +126,10 @@ Optional:
 - `https_proxy_host` (String) A string representing a host name, such as example.com.
 - `https_proxy_port` (Number) An integer representing a port number between 0 and 65535, inclusive.
 - `revocation_check_mode` (String) Controls client certificate revocation check behavior. If set to `SKIP`, no revocation check is performed. If set to `IGNORE_CA_ERROR`, the plugin respects the revocation status when either OCSP or CRL URL is set, and doesn't fail on network issues. If set to `STRICT`, the plugin only treats the certificate as valid when it's able to verify the revocation status. must be one of ["IGNORE_CA_ERROR", "SKIP", "STRICT"]
+- `san_dirname_matcher` (List of String) Specifies a list of Subject Alternative Name (SAN) DirectoryName attributes to use for consumer lookup. Applicable only when `skip_consumer_lookup` is false. Supported formats: OID, Long Name, or Short Name. Examples: `commonName` (Long Name), `CN` (Short Name), `2.5.4.3` (OID). If left empty (default), all attributes present in the SAN DirectoryName extension are used. The matcher is case sensitive.
 - `send_ca_dn` (Boolean) Sends the distinguished names (DN) of the configured CA list in the TLS handshake message.
 - `skip_consumer_lookup` (Boolean) Skip consumer lookup once certificate is trusted against the configured CA list.
+- `ssl_verify` (Boolean) This option enables verification of the certificate presented by the server of the OCSP responder's URL and by the server of the CRL Distribution Point.
 
 
 <a id="nestedatt--ordering"></a>
@@ -185,7 +193,7 @@ import {
   to = kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -193,5 +201,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_mtls_auth.my_kong-gateway_plugin_mtls_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

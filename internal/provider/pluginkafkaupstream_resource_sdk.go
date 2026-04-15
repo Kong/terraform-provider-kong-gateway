@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.KafkaUpstreamPluginConfig{}
 		r.Config.AllowedTopics = make([]types.String, 0, len(resp.Config.AllowedTopics))
 		for _, v := range resp.Config.AllowedTopics {
@@ -121,17 +120,15 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 							for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-								result, _ := json.Marshal(value)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = types.StringValue(value)
 							}
 						}
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 							for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-								result1, _ := json.Marshal(value1)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = types.StringValue(value1)
 							}
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -186,6 +183,7 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			r.Config.Security = &tfTypes.KafkaConsumePluginSecurity{}
 			r.Config.Security.CertificateID = types.StringPointerValue(resp.Config.Security.CertificateID)
 			r.Config.Security.Ssl = types.BoolPointerValue(resp.Config.Security.Ssl)
+			r.Config.Security.SslVerify = types.BoolPointerValue(resp.Config.Security.SslVerify)
 		}
 		r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 		r.Config.Topic = types.StringValue(resp.Config.Topic)
@@ -347,6 +345,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToOperationsUpdateKafkaupstreamPlugin
 func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx context.Context) (*shared.KafkaUpstreamPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -662,16 +666,18 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 					var tokenEndpoint string
 					tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
-					tokenHeaders := make(map[string]interface{})
+					tokenHeaders := make(map[string]string)
 					for tokenHeadersKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-						var tokenHeadersInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()), &tokenHeadersInst)
+						var tokenHeadersInst string
+						tokenHeadersInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()
+
 						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
 					}
-					tokenPostArgs := make(map[string]interface{})
+					tokenPostArgs := make(map[string]string)
 					for tokenPostArgsKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-						var tokenPostArgsInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()), &tokenPostArgsInst)
+						var tokenPostArgsInst string
+						tokenPostArgsInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()
+
 						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
 					}
 					username1 := new(string)
@@ -865,9 +871,16 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		} else {
 			ssl = nil
 		}
+		sslVerify2 := new(bool)
+		if !r.Config.Security.SslVerify.IsUnknown() && !r.Config.Security.SslVerify.IsNull() {
+			*sslVerify2 = r.Config.Security.SslVerify.ValueBool()
+		} else {
+			sslVerify2 = nil
+		}
 		security = &shared.KafkaUpstreamPluginSecurity{
 			CertificateID: certificateID,
 			Ssl:           ssl,
+			SslVerify:     sslVerify2,
 		}
 	}
 	timeout1 := new(int64)
@@ -954,6 +967,7 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		}
 	}
 	out := shared.KafkaUpstreamPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

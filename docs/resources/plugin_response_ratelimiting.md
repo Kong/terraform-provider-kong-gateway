@@ -14,6 +14,7 @@ PluginResponseRatelimiting Resource
 
 ```terraform
 resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimiting" {
+  condition = "...my_condition..."
   config = {
     block_on_first_violation = true
     fault_tolerant           = false
@@ -32,6 +33,20 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
     }
     policy = "redis"
     redis = {
+      cloud_authentication = {
+        auth_provider            = "azure"
+        aws_access_key_id        = "...my_aws_access_key_id..."
+        aws_assume_role_arn      = "...my_aws_assume_role_arn..."
+        aws_cache_name           = "...my_aws_cache_name..."
+        aws_is_serverless        = false
+        aws_region               = "...my_aws_region..."
+        aws_role_session_name    = "...my_aws_role_session_name..."
+        aws_secret_access_key    = "...my_aws_secret_access_key..."
+        azure_client_id          = "...my_azure_client_id..."
+        azure_client_secret      = "...my_azure_client_secret..."
+        azure_tenant_id          = "...my_azure_tenant_id..."
+        gcp_service_account_json = "...my_gcp_service_account_json..."
+      }
       database    = 10
       host        = "...my_host..."
       password    = "...my_password..."
@@ -82,7 +97,7 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
     "..."
   ]
   updated_at = 9
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -91,6 +106,7 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -104,7 +120,7 @@ resource "kong-gateway_plugin_response_ratelimiting" "my_pluginresponseratelimit
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -138,6 +154,7 @@ Optional:
 
 Optional:
 
+- `cloud_authentication` (Attributes) Cloud auth related configs for connecting to a Cloud Provider's Redis instance. (see [below for nested schema](#nestedatt--config--redis--cloud_authentication))
 - `database` (Number) Database to use for the Redis connection when using the `redis` strategy
 - `host` (String) A string representing a host name, such as example.com.
 - `password` (String) Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
@@ -147,6 +164,25 @@ Optional:
 - `ssl_verify` (Boolean) If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
 - `timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `username` (String) Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+
+<a id="nestedatt--config--redis--cloud_authentication"></a>
+### Nested Schema for `config.redis.cloud_authentication`
+
+Optional:
+
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+- `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+- `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+- `aws_is_serverless` (Boolean) This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+- `aws_region` (String) The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+- `aws_role_session_name` (String) The session name for the temporary credentials when assuming the IAM role.
+- `aws_secret_access_key` (String) AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+- `azure_client_id` (String) Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+- `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+
 
 
 
@@ -219,7 +255,7 @@ import {
   to = kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -227,5 +263,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_response_ratelimiting.my_kong-gateway_plugin_response_ratelimiting '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

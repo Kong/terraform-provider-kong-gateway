@@ -15,6 +15,7 @@ func (r *PluginIPRestrictionResourceModel) RefreshFromSharedIPRestrictionPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -193,6 +194,12 @@ func (r *PluginIPRestrictionResourceModel) ToOperationsUpdateIprestrictionPlugin
 func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx context.Context) (*shared.IPRestrictionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -365,6 +372,7 @@ func (r *PluginIPRestrictionResourceModel) ToSharedIPRestrictionPlugin(ctx conte
 		}
 	}
 	out := shared.IPRestrictionPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

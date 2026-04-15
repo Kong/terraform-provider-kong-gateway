@@ -33,7 +33,7 @@ func (a *AddConsumerToGroupRequestBody) GetConsumerID() *string {
 type AddConsumerToGroupRequest struct {
 	// The UUID or name of the consumer group
 	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace   string                         `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	RequestBody *AddConsumerToGroupRequestBody `request:"mediaType=application/json"`
 }

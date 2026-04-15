@@ -9,7 +9,7 @@ import (
 )
 
 type CreateTlshandshakemodifierPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace                  string                            `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	TLSHandshakeModifierPlugin shared.TLSHandshakeModifierPlugin `request:"mediaType=application/json"`
 }

@@ -15,7 +15,9 @@ func (r *PluginAiAwsGuardrailsResourceModel) RefreshFromSharedAiAwsGuardrailsPlu
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.AiAwsGuardrailsPluginConfig{}
+		r.Config.AllowMasking = types.BoolPointerValue(resp.Config.AllowMasking)
 		r.Config.AwsAccessKeyID = types.StringPointerValue(resp.Config.AwsAccessKeyID)
 		r.Config.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.AwsAssumeRoleArn)
 		r.Config.AwsRegion = types.StringValue(resp.Config.AwsRegion)
@@ -29,7 +31,9 @@ func (r *PluginAiAwsGuardrailsResourceModel) RefreshFromSharedAiAwsGuardrailsPlu
 		}
 		r.Config.GuardrailsID = types.StringValue(resp.Config.GuardrailsID)
 		r.Config.GuardrailsVersion = types.StringValue(resp.Config.GuardrailsVersion)
+		r.Config.LogBlockedContent = types.BoolPointerValue(resp.Config.LogBlockedContent)
 		r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.Config.StopOnError = types.BoolPointerValue(resp.Config.StopOnError)
 		if resp.Config.TextSource != nil {
 			r.Config.TextSource = types.StringValue(string(*resp.Config.TextSource))
@@ -200,6 +204,12 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToOperationsUpdateAiawsguardrailsPl
 func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx context.Context) (*shared.AiAwsGuardrailsPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -290,6 +300,12 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 	} else {
 		updatedAt = nil
 	}
+	allowMasking := new(bool)
+	if !r.Config.AllowMasking.IsUnknown() && !r.Config.AllowMasking.IsNull() {
+		*allowMasking = r.Config.AllowMasking.ValueBool()
+	} else {
+		allowMasking = nil
+	}
 	awsAccessKeyID := new(string)
 	if !r.Config.AwsAccessKeyID.IsUnknown() && !r.Config.AwsAccessKeyID.IsNull() {
 		*awsAccessKeyID = r.Config.AwsAccessKeyID.ValueString()
@@ -335,11 +351,23 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 	var guardrailsVersion string
 	guardrailsVersion = r.Config.GuardrailsVersion.ValueString()
 
+	logBlockedContent := new(bool)
+	if !r.Config.LogBlockedContent.IsUnknown() && !r.Config.LogBlockedContent.IsNull() {
+		*logBlockedContent = r.Config.LogBlockedContent.ValueBool()
+	} else {
+		logBlockedContent = nil
+	}
 	responseBufferSize := new(float64)
 	if !r.Config.ResponseBufferSize.IsUnknown() && !r.Config.ResponseBufferSize.IsNull() {
 		*responseBufferSize = r.Config.ResponseBufferSize.ValueFloat64()
 	} else {
 		responseBufferSize = nil
+	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
 	}
 	stopOnError := new(bool)
 	if !r.Config.StopOnError.IsUnknown() && !r.Config.StopOnError.IsNull() {
@@ -360,6 +388,7 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 		timeout = nil
 	}
 	config := shared.AiAwsGuardrailsPluginConfig{
+		AllowMasking:       allowMasking,
 		AwsAccessKeyID:     awsAccessKeyID,
 		AwsAssumeRoleArn:   awsAssumeRoleArn,
 		AwsRegion:          awsRegion,
@@ -369,7 +398,9 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 		GuardingMode:       guardingMode,
 		GuardrailsID:       guardrailsID,
 		GuardrailsVersion:  guardrailsVersion,
+		LogBlockedContent:  logBlockedContent,
 		ResponseBufferSize: responseBufferSize,
+		SslVerify:          sslVerify,
 		StopOnError:        stopOnError,
 		TextSource:         textSource,
 		Timeout:            timeout,
@@ -427,6 +458,7 @@ func (r *PluginAiAwsGuardrailsResourceModel) ToSharedAiAwsGuardrailsPlugin(ctx c
 		}
 	}
 	out := shared.AiAwsGuardrailsPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

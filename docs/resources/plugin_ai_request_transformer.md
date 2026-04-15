@@ -14,6 +14,7 @@ PluginAiRequestTransformer Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransformer" {
+  condition = "...my_condition..."
   config = {
     http_proxy_host  = "...my_http_proxy_host..."
     http_proxy_port  = 24415
@@ -30,6 +31,8 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
         azure_client_secret        = "...my_azure_client_secret..."
         azure_tenant_id            = "...my_azure_tenant_id..."
         azure_use_managed_identity = true
+        gcp_metadata_url           = "...my_gcp_metadata_url..."
+        gcp_oauth_token_url        = "...my_gcp_oauth_token_url..."
         gcp_service_account_json   = "...my_gcp_service_account_json..."
         gcp_use_service_account    = false
         header_name                = "...my_header_name..."
@@ -38,12 +41,15 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
         param_name                 = "...my_param_name..."
         param_value                = "...my_param_value..."
       }
+      description = "...my_description..."
       logging = {
         log_payloads   = false
         log_statistics = false
       }
+      metadata = "{ \"see\": \"documentation\" }"
       model = {
-        name = "...my_name..."
+        model_alias = "...my_model_alias..."
+        name        = "...my_name..."
         options = {
           anthropic_version   = "...my_anthropic_version..."
           azure_api_version   = "...my_azure_api_version..."
@@ -54,12 +60,21 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
             aws_region                 = "...my_aws_region..."
             aws_role_session_name      = "...my_aws_role_session_name..."
             aws_sts_endpoint_url       = "...my_aws_sts_endpoint_url..."
+            batch_bucket_prefix        = "...my_batch_bucket_prefix..."
+            batch_role_arn             = "...my_batch_role_arn..."
             embeddings_normalize       = true
             performance_config_latency = "...my_performance_config_latency..."
+            video_output_s3_uri        = "...my_video_output_s3_uri..."
           }
           cohere = {
             embedding_input_type = "image"
             wait_for_model       = true
+          }
+          dashscope = {
+            international = true
+          }
+          databricks = {
+            workspace_instance_id = "...my_workspace_instance_id..."
           }
           embeddings_dimensions = 1
           gemini = {
@@ -83,9 +98,10 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
           upstream_path  = "...my_upstream_path..."
           upstream_url   = "...my_upstream_url..."
         }
-        provider = "llama2"
+        provider = "ollama"
       }
       route_type = "image/v1/images/generations"
+      weight     = 46956
     }
     max_request_body_size          = 2
     prompt                         = "...my_prompt..."
@@ -130,7 +146,7 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
     "..."
   ]
   updated_at = 10
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -143,6 +159,7 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -155,7 +172,7 @@ resource "kong-gateway_plugin_ai_request_transformer" "my_pluginairequesttransfo
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -182,22 +199,26 @@ Optional:
 Required:
 
 - `model` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model))
-- `route_type` (String) The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]
+- `route_type` (String) The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime", "video/v1/videos/generations"]
 
 Optional:
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--config--llm--auth))
+- `description` (String) The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.
 - `logging` (Attributes) (see [below for nested schema](#nestedatt--config--llm--logging))
+- `metadata` (String) For internal use only. Parsed as JSON.
+- `weight` (Number) The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.
 
 <a id="nestedatt--config--llm--model"></a>
 ### Nested Schema for `config.llm.model`
 
 Required:
 
-- `provider` (String) AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]
+- `provider` (String) AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cerebras", "cohere", "dashscope", "databricks", "deepseek", "gemini", "huggingface", "llama2", "mistral", "ollama", "openai", "vllm", "xai"]
 
 Optional:
 
+- `model_alias` (String) The model name parameter from the request that this model should map to.
 - `name` (String) Model name to execute.
 - `options` (Attributes) Key/value settings for the model (see [below for nested schema](#nestedatt--config--llm--model--options))
 
@@ -212,6 +233,8 @@ Optional:
 - `azure_instance` (String) Instance name for Azure OpenAI hosted models.
 - `bedrock` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--bedrock))
 - `cohere` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--cohere))
+- `dashscope` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--dashscope))
+- `databricks` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--databricks))
 - `embeddings_dimensions` (Number) If using embeddings models, set the number of dimensions to generate.
 - `gemini` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--gemini))
 - `huggingface` (Attributes) (see [below for nested schema](#nestedatt--config--llm--model--options--huggingface))
@@ -235,8 +258,11 @@ Optional:
 - `aws_region` (String) If using AWS providers (Bedrock) you can override the `AWS_REGION` environment variable by setting this option.
 - `aws_role_session_name` (String) If using AWS providers (Bedrock), set the identifier of the assumed role session.
 - `aws_sts_endpoint_url` (String) If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
+- `batch_bucket_prefix` (String) S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+- `batch_role_arn` (String) AWS role arn used for calling batch API. Try to get the value from request if ommited.
 - `embeddings_normalize` (Boolean) If using AWS providers (Bedrock), set to true to normalize the embeddings.
 - `performance_config_latency` (String) Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
+- `video_output_s3_uri` (String) S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
 
 
 <a id="nestedatt--config--llm--model--options--cohere"></a>
@@ -246,6 +272,23 @@ Optional:
 
 - `embedding_input_type` (String) The purpose of the input text to calculate embedding vectors. must be one of ["classification", "clustering", "image", "search_document", "search_query"]
 - `wait_for_model` (Boolean) Wait for the model if it is not ready
+
+
+<a id="nestedatt--config--llm--model--options--dashscope"></a>
+### Nested Schema for `config.llm.model.options.dashscope`
+
+Optional:
+
+- `international` (Boolean) Two Dashscope endpoints are available, and the international endpoint will be used when this is set to `true`.
+It is recommended to set this to `true` when using international version of dashscope.
+
+
+<a id="nestedatt--config--llm--model--options--databricks"></a>
+### Nested Schema for `config.llm.model.options.databricks`
+
+Optional:
+
+- `workspace_instance_id` (String) Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.
 
 
 <a id="nestedatt--config--llm--model--options--gemini"></a>
@@ -282,6 +325,8 @@ Optional:
 - `azure_client_secret` (String) If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the client secret.
 - `azure_tenant_id` (String) If azure_use_managed_identity is set to true, and you need to use a different user-assigned identity for this LLM instance, set the tenant ID.
 - `azure_use_managed_identity` (Boolean) Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
+- `gcp_metadata_url` (String) Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+- `gcp_oauth_token_url` (String) Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
 - `gcp_service_account_json` (String) Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
 - `gcp_use_service_account` (Boolean) Use service account auth for GCP-based providers and models.
 - `header_name` (String) If AI model requires authentication via Authorization or API key header, specify its name here.
@@ -296,7 +341,7 @@ Optional:
 
 Optional:
 
-- `log_payloads` (Boolean) If enabled, will log the request and response body into the Kong log plugin(s) output.
+- `log_payloads` (Boolean) If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.
 - `log_statistics` (Boolean) If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
 
 
@@ -371,7 +416,7 @@ import {
   to = kong-gateway_plugin_ai_request_transformer.my_kong-gateway_plugin_ai_request_transformer
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -379,5 +424,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_request_transformer.my_kong-gateway_plugin_ai_request_transformer '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_request_transformer.my_kong-gateway_plugin_ai_request_transformer '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

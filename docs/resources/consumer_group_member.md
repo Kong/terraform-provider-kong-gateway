@@ -16,7 +16,7 @@ ConsumerGroupMember Resource
 resource "kong-gateway_consumer_group_member" "my_consumergroupmember" {
   consumer_group_id = "cf4c7e60-11db-49dd-b300-7c7e5f0f7e6b"
   consumer_id       = "cf4c7e60-11db-49dd-b300-7c7e5f0f7e6b"
-  workspace         = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace         = "team-payments"
 }
 ```
 
@@ -30,7 +30,7 @@ resource "kong-gateway_consumer_group_member" "my_consumergroupmember" {
 ### Optional
 
 - `consumer_id` (String) Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `workspace` (String) The name of the workspace. Default: "default"; Requires replacement if changed.
 
 ### Read-Only
 

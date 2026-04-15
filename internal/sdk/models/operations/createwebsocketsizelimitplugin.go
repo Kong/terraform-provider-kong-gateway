@@ -9,7 +9,7 @@ import (
 )
 
 type CreateWebsocketsizelimitPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace                string                          `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	WebsocketSizeLimitPlugin shared.WebsocketSizeLimitPlugin `request:"mediaType=application/json"`
 }

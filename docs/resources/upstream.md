@@ -89,7 +89,7 @@ resource "kong-gateway_upstream" "my_upstream" {
   ]
   updated_at   = 7
   use_srv_name = false
-  workspace    = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace    = "team-payments"
 }
 ```
 
@@ -124,7 +124,7 @@ resource "kong-gateway_upstream" "my_upstream" {
 - `tags` (List of String) An optional set of strings associated with the Upstream for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
 - `use_srv_name` (Boolean) If set, the balancer will use SRV hostname(if DNS Answer has SRV record) as the proxy upstream `Host`.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--client_certificate"></a>
 ### Nested Schema for `client_certificate`
@@ -220,7 +220,7 @@ import {
   to = kong-gateway_upstream.my_kong-gateway_upstream
   id = jsonencode({
     id        = "426d620c-7058-4ae6-aacc-f85a3204a2c5"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -228,5 +228,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_upstream.my_kong-gateway_upstream '{"id": "426d620c-7058-4ae6-aacc-f85a3204a2c5", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_upstream.my_kong-gateway_upstream '{"id": "426d620c-7058-4ae6-aacc-f85a3204a2c5", "workspace": "team-payments"}'
 ```

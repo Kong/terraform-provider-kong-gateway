@@ -9,7 +9,7 @@ import (
 )
 
 type CreateHeadercertauthPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace            string                      `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	HeaderCertAuthPlugin shared.HeaderCertAuthPlugin `request:"mediaType=application/json"`
 }

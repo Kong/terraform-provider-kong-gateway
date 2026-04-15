@@ -9,7 +9,7 @@ import (
 )
 
 type CreateMockingPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	MockingPlugin shared.MockingPlugin `request:"mediaType=application/json"`
 }

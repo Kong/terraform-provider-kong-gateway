@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginSolaceConsumeResourceModel) RefreshFromSharedSolaceConsumePlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.SolaceConsumePluginConfig{}
 		r.Config.Flow = &tfTypes.Flow{}
 		if resp.Config.Flow.AckMode != nil {
@@ -44,10 +43,9 @@ func (r *PluginSolaceConsumeResourceModel) RefreshFromSharedSolaceConsumePlugin(
 		}
 		r.Config.Flow.MaxUnackedMessages = types.Int64PointerValue(resp.Config.Flow.MaxUnackedMessages)
 		if len(resp.Config.Flow.Properties) > 0 {
-			r.Config.Flow.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Flow.Properties))
+			r.Config.Flow.Properties = make(map[string]types.String, len(resp.Config.Flow.Properties))
 			for key, value := range resp.Config.Flow.Properties {
-				result, _ := json.Marshal(value)
-				r.Config.Flow.Properties[key] = jsontypes.NewNormalizedValue(string(result))
+				r.Config.Flow.Properties[key] = types.StringValue(value)
 			}
 		}
 		r.Config.Flow.Selector = types.StringPointerValue(resp.Config.Flow.Selector)
@@ -71,6 +69,7 @@ func (r *PluginSolaceConsumeResourceModel) RefreshFromSharedSolaceConsumePlugin(
 			r.Config.Session.Authentication = &tfTypes.SolaceConsumePluginAuthentication{}
 			r.Config.Session.Authentication.AccessToken = types.StringPointerValue(resp.Config.Session.Authentication.AccessToken)
 			r.Config.Session.Authentication.AccessTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.AccessTokenHeader)
+			r.Config.Session.Authentication.BasicAuthHeader = types.StringPointerValue(resp.Config.Session.Authentication.BasicAuthHeader)
 			r.Config.Session.Authentication.IDToken = types.StringPointerValue(resp.Config.Session.Authentication.IDToken)
 			r.Config.Session.Authentication.IDTokenHeader = types.StringPointerValue(resp.Config.Session.Authentication.IDTokenHeader)
 			r.Config.Session.Authentication.Password = types.StringPointerValue(resp.Config.Session.Authentication.Password)
@@ -89,10 +88,9 @@ func (r *PluginSolaceConsumeResourceModel) RefreshFromSharedSolaceConsumePlugin(
 		r.Config.Session.GenerateSequenceNumber = types.BoolPointerValue(resp.Config.Session.GenerateSequenceNumber)
 		r.Config.Session.Host = types.StringValue(resp.Config.Session.Host)
 		if len(resp.Config.Session.Properties) > 0 {
-			r.Config.Session.Properties = make(map[string]jsontypes.Normalized, len(resp.Config.Session.Properties))
+			r.Config.Session.Properties = make(map[string]types.String, len(resp.Config.Session.Properties))
 			for key1, value1 := range resp.Config.Session.Properties {
-				result1, _ := json.Marshal(value1)
-				r.Config.Session.Properties[key1] = jsontypes.NewNormalizedValue(string(result1))
+				r.Config.Session.Properties[key1] = types.StringValue(value1)
 			}
 		}
 		r.Config.Session.SslValidateCertificate = types.BoolPointerValue(resp.Config.Session.SslValidateCertificate)
@@ -256,6 +254,12 @@ func (r *PluginSolaceConsumeResourceModel) ToOperationsUpdateSolaceconsumePlugin
 func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx context.Context) (*shared.SolaceConsumePlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -378,10 +382,11 @@ func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx conte
 	} else {
 		maxUnackedMessages = nil
 	}
-	properties := make(map[string]interface{})
+	properties := make(map[string]string)
 	for propertiesKey := range r.Config.Flow.Properties {
-		var propertiesInst interface{}
-		_ = json.Unmarshal([]byte(r.Config.Flow.Properties[propertiesKey].ValueString()), &propertiesInst)
+		var propertiesInst string
+		propertiesInst = r.Config.Flow.Properties[propertiesKey].ValueString()
+
 		properties[propertiesKey] = propertiesInst
 	}
 	selector := new(string)
@@ -444,6 +449,12 @@ func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx conte
 		} else {
 			accessTokenHeader = nil
 		}
+		basicAuthHeader := new(string)
+		if !r.Config.Session.Authentication.BasicAuthHeader.IsUnknown() && !r.Config.Session.Authentication.BasicAuthHeader.IsNull() {
+			*basicAuthHeader = r.Config.Session.Authentication.BasicAuthHeader.ValueString()
+		} else {
+			basicAuthHeader = nil
+		}
 		idToken := new(string)
 		if !r.Config.Session.Authentication.IDToken.IsUnknown() && !r.Config.Session.Authentication.IDToken.IsNull() {
 			*idToken = r.Config.Session.Authentication.IDToken.ValueString()
@@ -477,6 +488,7 @@ func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx conte
 		authentication = &shared.SolaceConsumePluginAuthentication{
 			AccessToken:       accessToken,
 			AccessTokenHeader: accessTokenHeader,
+			BasicAuthHeader:   basicAuthHeader,
 			IDToken:           idToken,
 			IDTokenHeader:     idTokenHeader,
 			Password:          password,
@@ -523,10 +535,11 @@ func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx conte
 	var host string
 	host = r.Config.Session.Host.ValueString()
 
-	properties1 := make(map[string]interface{})
+	properties1 := make(map[string]string)
 	for propertiesKey1 := range r.Config.Session.Properties {
-		var propertiesInst1 interface{}
-		_ = json.Unmarshal([]byte(r.Config.Session.Properties[propertiesKey1].ValueString()), &propertiesInst1)
+		var propertiesInst1 string
+		propertiesInst1 = r.Config.Session.Properties[propertiesKey1].ValueString()
+
 		properties1[propertiesKey1] = propertiesInst1
 	}
 	sslValidateCertificate := new(bool)
@@ -616,6 +629,7 @@ func (r *PluginSolaceConsumeResourceModel) ToSharedSolaceConsumePlugin(ctx conte
 		}
 	}
 	out := shared.SolaceConsumePlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

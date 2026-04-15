@@ -11,7 +11,7 @@ import (
 type GetServiceRequest struct {
 	// ID or name of the Service to lookup
 	ServiceIDOrName string `pathParam:"style=simple,explode=false,name=ServiceIdOrName"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

@@ -14,7 +14,9 @@ PluginAiAwsGuardrails Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
+  condition = "...my_condition..."
   config = {
+    allow_masking         = true
     aws_access_key_id     = "...my_aws_access_key_id..."
     aws_assume_role_arn   = "...my_aws_assume_role_arn..."
     aws_region            = "...my_aws_region..."
@@ -24,7 +26,9 @@ resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
     guarding_mode         = "BOTH"
     guardrails_id         = "...my_guardrails_id..."
     guardrails_version    = "...my_guardrails_version..."
+    log_blocked_content   = true
     response_buffer_size  = 7.04
+    ssl_verify            = false
     stop_on_error         = false
     text_source           = "concatenate_user_content"
     timeout               = 9.55
@@ -71,7 +75,7 @@ resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
     "..."
   ]
   updated_at = 5
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -84,6 +88,7 @@ resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `consumer_group` (Attributes) If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups (see [below for nested schema](#nestedatt--consumer_group))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -97,7 +102,7 @@ resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -105,18 +110,21 @@ resource "kong-gateway_plugin_ai_aws_guardrails" "my_pluginaiawsguardrails" {
 Required:
 
 - `aws_region` (String) The AWS region to use for the Bedrock API
-- `guardrails_id` (String) The guardrail identifier used in the request to apply the guardrail
-- `guardrails_version` (String) The guardrail version used in the request to apply the guardrail
+- `guardrails_id` (String) The guardrail identifier used in the request to apply the guardrail.
+- `guardrails_version` (String) The guardrail version used in the request to apply the guardrail. Note that the value of this field must match the pattern `(([1-9][0-9]{0,7})|(DRAFT))` according to the AWS documentation https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ApplyGuardrail.html#API_runtime_ApplyGuardrail_RequestSyntax.
 
 Optional:
 
+- `allow_masking` (Boolean) Allow to masking the request/response instead of blocking it. Streaming will be disabled if this is enabled.
 - `aws_access_key_id` (String) The AWS access key ID to use for authentication
 - `aws_assume_role_arn` (String) The target AWS IAM role ARN used to access the guardrails service
 - `aws_role_session_name` (String) The identifier of the assumed role session
 - `aws_secret_access_key` (String) The AWS secret access key to use for authentication
 - `aws_sts_endpoint_url` (String) Override the STS endpoint URL when assuming a different role
 - `guarding_mode` (String) The guardrail mode to use for the request. must be one of ["BOTH", "INPUT", "OUTPUT"]
+- `log_blocked_content` (Boolean) Whether to log prompts and responses that are blocked by the guardrail.
 - `response_buffer_size` (Number) The amount of bytes receiving from upstream to be buffered before sending to the guardrails service. This only applies to the response content guard.
+- `ssl_verify` (Boolean) Verify TLS certificate when connecting to the bedrock service.
 - `stop_on_error` (Boolean) Stop processing if an error occurs
 - `text_source` (String) Select where to pick the 'text' for the Content Guard Services request. must be one of ["concatenate_all_content", "concatenate_user_content"]
 - `timeout` (Number) Connection timeout with the bedrock service
@@ -199,7 +207,7 @@ import {
   to = kong-gateway_plugin_ai_aws_guardrails.my_kong-gateway_plugin_ai_aws_guardrails
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -207,5 +215,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_aws_guardrails.my_kong-gateway_plugin_ai_aws_guardrails '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_aws_guardrails.my_kong-gateway_plugin_ai_aws_guardrails '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

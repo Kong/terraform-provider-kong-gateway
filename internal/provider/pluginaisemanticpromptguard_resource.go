@@ -37,6 +37,7 @@ type PluginAiSemanticPromptGuardResource struct {
 
 // PluginAiSemanticPromptGuardResourceModel describes the resource data model.
 type PluginAiSemanticPromptGuardResourceModel struct {
+	Condition     types.String                               `tfsdk:"condition"`
 	Config        *tfTypes.AiSemanticPromptGuardPluginConfig `tfsdk:"config"`
 	Consumer      *tfTypes.Set                               `tfsdk:"consumer"`
 	ConsumerGroup *tfTypes.Set                               `tfsdk:"consumer_group"`
@@ -62,6 +63,14 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginAiSemanticPromptGuard Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -106,6 +115,16 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 										Computed:    true,
 										Optional:    true,
 										Description: `Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.`,
+									},
+									"gcp_metadata_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.`,
+									},
+									"gcp_oauth_token_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.`,
 									},
 									"gcp_service_account_json": schema.StringAttribute{
 										Computed:    true,
@@ -206,6 +225,16 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 														Optional:    true,
 														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
 													},
+													"batch_bucket_prefix": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.`,
+													},
+													"batch_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `AWS role arn used for calling batch API. Try to get the value from request if ommited.`,
+													},
 													"embeddings_normalize": schema.BoolAttribute{
 														Computed:    true,
 														Optional:    true,
@@ -215,6 +244,11 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 														Computed:    true,
 														Optional:    true,
 														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
+													},
+													"video_output_s3_uri": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.`,
 													},
 												},
 											},
@@ -265,7 +299,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 									},
 									"provider": schema.StringAttribute{
 										Required:    true,
-										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
+										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "ollama", "openai"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"azure",
@@ -273,6 +307,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 												"gemini",
 												"huggingface",
 												"mistral",
+												"ollama",
 												"openai",
 											),
 										},
@@ -284,7 +319,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 					"genai_category": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation"]`,
+						Description: `Generative AI category of the request. must be one of ["audio/speech", "audio/transcription", "image/generation", "realtime/generation", "text/embeddings", "text/generation", "video/generation"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"audio/speech",
@@ -293,15 +328,17 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 								"realtime/generation",
 								"text/embeddings",
 								"text/generation",
+								"video/generation",
 							),
 						},
 					},
 					"llm_format": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `LLM input and output format and schema to use. must be one of ["bedrock", "cohere", "gemini", "huggingface", "openai"]`,
+						Description: `LLM input and output format and schema to use. must be one of ["anthropic", "bedrock", "cohere", "gemini", "huggingface", "openai"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
+								"anthropic",
 								"bedrock",
 								"cohere",
 								"gemini",
@@ -309,6 +346,11 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 								"openai",
 							),
 						},
+					},
+					"max_request_body_size": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `max allowed body size allowed to be introspected. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.`,
 					},
 					"rules": schema.SingleNestedAttribute{
 						Computed: true,
@@ -448,6 +490,80 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 								Computed: true,
 								Optional: true,
 								Attributes: map[string]schema.Attribute{
+									"cloud_authentication": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_provider": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"aws",
+														"azure",
+														"gcp",
+													),
+												},
+											},
+											"aws_access_key_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_assume_role_arn": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+											},
+											"aws_cache_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_is_serverless": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_region": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_role_session_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The session name for the temporary credentials when assuming the IAM role.`,
+											},
+											"aws_secret_access_key": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"azure_client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_tenant_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"gcp_service_account_json": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+											},
+										},
+										Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+									},
 									"cluster_max_redirections": schema.Int64Attribute{
 										Computed:    true,
 										Optional:    true,
@@ -631,8 +747,9 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 								},
 							},
 							"threshold": schema.Float64Attribute{
-								Required:    true,
-								Description: `the default similarity threshold for accepting semantic search results (float)`,
+								Computed:    true,
+								Optional:    true,
+								Description: `the default similarity threshold for accepting semantic search results (float). Higher threshold means more results are considered similar.`,
 							},
 						},
 					},
@@ -783,7 +900,7 @@ func (r *PluginAiSemanticPromptGuardResource) Schema(ctx context.Context, req re
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -1038,7 +1155,7 @@ func (r *PluginAiSemanticPromptGuardResource) ImportState(ctx context.Context, r
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -1048,7 +1165,7 @@ func (r *PluginAiSemanticPromptGuardResource) ImportState(ctx context.Context, r
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

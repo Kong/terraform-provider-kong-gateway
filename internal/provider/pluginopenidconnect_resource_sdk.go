@@ -15,6 +15,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.OpenidConnectPluginConfig{}
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
 		r.Config.Audience = make([]types.String, 0, len(resp.Config.Audience))
@@ -145,6 +146,27 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.ClusterCacheRedis = nil
 		} else {
 			r.Config.ClusterCacheRedis = &tfTypes.PartialRedisEeConfig{}
+			if resp.Config.ClusterCacheRedis.CloudAuthentication == nil {
+				r.Config.ClusterCacheRedis.CloudAuthentication = nil
+			} else {
+				r.Config.ClusterCacheRedis.CloudAuthentication = &tfTypes.PartialRedisCeCloudAuthentication{}
+				if resp.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider != nil {
+					r.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider = types.StringValue(string(*resp.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider))
+				} else {
+					r.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider = types.StringNull()
+				}
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsAccessKeyID = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsAccessKeyID)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsAssumeRoleArn)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsCacheName = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsCacheName)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsIsServerless = types.BoolPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsIsServerless)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsRegion = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsRegion)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsRoleSessionName = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsRoleSessionName)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AwsSecretAccessKey = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AwsSecretAccessKey)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientID = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AzureClientID)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AzureClientSecret)
+				r.Config.ClusterCacheRedis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.AzureTenantID)
+				r.Config.ClusterCacheRedis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.ClusterCacheRedis.CloudAuthentication.GcpServiceAccountJSON)
+			}
 			r.Config.ClusterCacheRedis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.ClusterCacheRedis.ClusterMaxRedirections)
 			r.Config.ClusterCacheRedis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
 
@@ -198,9 +220,14 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		for _, v := range resp.Config.ConsumerBy {
 			r.Config.ConsumerBy = append(r.Config.ConsumerBy, types.StringValue(string(v)))
 		}
-		r.Config.ConsumerClaim = make([]types.String, 0, len(resp.Config.ConsumerClaim))
-		for _, v := range resp.Config.ConsumerClaim {
-			r.Config.ConsumerClaim = append(r.Config.ConsumerClaim, types.StringValue(v))
+		r.Config.ConsumerClaims = nil
+		for _, consumerClaimsItem := range resp.Config.ConsumerClaims {
+			var consumerClaims []types.String
+			consumerClaims = make([]types.String, 0, len(consumerClaimsItem))
+			for _, v := range consumerClaimsItem {
+				consumerClaims = append(consumerClaims, types.StringValue(v))
+			}
+			r.Config.ConsumerClaims = append(r.Config.ConsumerClaims, consumerClaims)
 		}
 		r.Config.ConsumerGroupsClaim = make([]types.String, 0, len(resp.Config.ConsumerGroupsClaim))
 		for _, v := range resp.Config.ConsumerGroupsClaim {
@@ -231,6 +258,19 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		}
 		r.Config.DownstreamAccessTokenHeader = types.StringPointerValue(resp.Config.DownstreamAccessTokenHeader)
 		r.Config.DownstreamAccessTokenJwkHeader = types.StringPointerValue(resp.Config.DownstreamAccessTokenJwkHeader)
+		r.Config.DownstreamHeaders = []tfTypes.UpstreamHeaders{}
+
+		for _, downstreamHeadersItem := range resp.Config.DownstreamHeaders {
+			var downstreamHeaders tfTypes.UpstreamHeaders
+
+			downstreamHeaders.Header = types.StringValue(downstreamHeadersItem.Header)
+			downstreamHeaders.Path = make([]types.String, 0, len(downstreamHeadersItem.Path))
+			for _, v := range downstreamHeadersItem.Path {
+				downstreamHeaders.Path = append(downstreamHeaders.Path, types.StringValue(v))
+			}
+
+			r.Config.DownstreamHeaders = append(r.Config.DownstreamHeaders, downstreamHeaders)
+		}
 		r.Config.DownstreamHeadersClaims = make([]types.String, 0, len(resp.Config.DownstreamHeadersClaims))
 		for _, v := range resp.Config.DownstreamHeadersClaims {
 			r.Config.DownstreamHeadersClaims = append(r.Config.DownstreamHeadersClaims, types.StringValue(v))
@@ -333,6 +373,7 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		for _, v := range resp.Config.IssuersAllowed {
 			r.Config.IssuersAllowed = append(r.Config.IssuersAllowed, types.StringValue(v))
 		}
+		r.Config.JwksEndpoint = types.StringPointerValue(resp.Config.JwksEndpoint)
 		r.Config.JwtSessionClaim = types.StringPointerValue(resp.Config.JwtSessionClaim)
 		r.Config.JwtSessionCookie = types.StringPointerValue(resp.Config.JwtSessionCookie)
 		r.Config.Keepalive = types.BoolPointerValue(resp.Config.Keepalive)
@@ -408,6 +449,27 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.Redis = nil
 		} else {
 			r.Config.Redis = &tfTypes.OpenidConnectPluginRedis{}
+			if resp.Config.Redis.CloudAuthentication == nil {
+				r.Config.Redis.CloudAuthentication = nil
+			} else {
+				r.Config.Redis.CloudAuthentication = &tfTypes.PartialRedisCeCloudAuthentication{}
+				if resp.Config.Redis.CloudAuthentication.AuthProvider != nil {
+					r.Config.Redis.CloudAuthentication.AuthProvider = types.StringValue(string(*resp.Config.Redis.CloudAuthentication.AuthProvider))
+				} else {
+					r.Config.Redis.CloudAuthentication.AuthProvider = types.StringNull()
+				}
+				r.Config.Redis.CloudAuthentication.AwsAccessKeyID = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsAccessKeyID)
+				r.Config.Redis.CloudAuthentication.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsAssumeRoleArn)
+				r.Config.Redis.CloudAuthentication.AwsCacheName = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsCacheName)
+				r.Config.Redis.CloudAuthentication.AwsIsServerless = types.BoolPointerValue(resp.Config.Redis.CloudAuthentication.AwsIsServerless)
+				r.Config.Redis.CloudAuthentication.AwsRegion = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsRegion)
+				r.Config.Redis.CloudAuthentication.AwsRoleSessionName = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsRoleSessionName)
+				r.Config.Redis.CloudAuthentication.AwsSecretAccessKey = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AwsSecretAccessKey)
+				r.Config.Redis.CloudAuthentication.AzureClientID = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AzureClientID)
+				r.Config.Redis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AzureClientSecret)
+				r.Config.Redis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.AzureTenantID)
+				r.Config.Redis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.Redis.CloudAuthentication.GcpServiceAccountJSON)
+			}
 			r.Config.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Redis.ClusterMaxRedirections)
 			r.Config.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
 
@@ -528,6 +590,8 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		r.Config.SessionMemcachedPort = types.Int64PointerValue(resp.Config.SessionMemcachedPort)
 		r.Config.SessionMemcachedPrefix = types.StringPointerValue(resp.Config.SessionMemcachedPrefix)
 		r.Config.SessionMemcachedSocket = types.StringPointerValue(resp.Config.SessionMemcachedSocket)
+		r.Config.SessionMemcachedSsl = types.BoolPointerValue(resp.Config.SessionMemcachedSsl)
+		r.Config.SessionMemcachedSslVerify = types.BoolPointerValue(resp.Config.SessionMemcachedSslVerify)
 		r.Config.SessionRemember = types.BoolPointerValue(resp.Config.SessionRemember)
 		r.Config.SessionRememberAbsoluteTimeout = types.Float64PointerValue(resp.Config.SessionRememberAbsoluteTimeout)
 		r.Config.SessionRememberCookieName = types.StringPointerValue(resp.Config.SessionRememberCookieName)
@@ -558,6 +622,63 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 			r.Config.TokenEndpointAuthMethod = types.StringValue(string(*resp.Config.TokenEndpointAuthMethod))
 		} else {
 			r.Config.TokenEndpointAuthMethod = types.StringNull()
+		}
+		if resp.Config.TokenExchange == nil {
+			r.Config.TokenExchange = nil
+		} else {
+			r.Config.TokenExchange = &tfTypes.OpenidConnectPluginTokenExchange{}
+			if resp.Config.TokenExchange.Cache == nil {
+				r.Config.TokenExchange.Cache = nil
+			} else {
+				r.Config.TokenExchange.Cache = &tfTypes.AiMcpOauth2PluginCache{}
+				r.Config.TokenExchange.Cache.Enabled = types.BoolPointerValue(resp.Config.TokenExchange.Cache.Enabled)
+				r.Config.TokenExchange.Cache.TTL = types.Int64PointerValue(resp.Config.TokenExchange.Cache.TTL)
+			}
+			if resp.Config.TokenExchange.Request == nil {
+				r.Config.TokenExchange.Request = nil
+			} else {
+				r.Config.TokenExchange.Request = &tfTypes.OpenidConnectPluginRequest{}
+				r.Config.TokenExchange.Request.Audience = make([]types.String, 0, len(resp.Config.TokenExchange.Request.Audience))
+				for _, v := range resp.Config.TokenExchange.Request.Audience {
+					r.Config.TokenExchange.Request.Audience = append(r.Config.TokenExchange.Request.Audience, types.StringValue(v))
+				}
+				r.Config.TokenExchange.Request.EmptyAudience = types.BoolPointerValue(resp.Config.TokenExchange.Request.EmptyAudience)
+				r.Config.TokenExchange.Request.EmptyScopes = types.BoolPointerValue(resp.Config.TokenExchange.Request.EmptyScopes)
+				r.Config.TokenExchange.Request.Scopes = make([]types.String, 0, len(resp.Config.TokenExchange.Request.Scopes))
+				for _, v := range resp.Config.TokenExchange.Request.Scopes {
+					r.Config.TokenExchange.Request.Scopes = append(r.Config.TokenExchange.Request.Scopes, types.StringValue(v))
+				}
+			}
+			r.Config.TokenExchange.SubjectTokenIssuers = []tfTypes.SubjectTokenIssuers{}
+
+			for _, subjectTokenIssuersItem := range resp.Config.TokenExchange.SubjectTokenIssuers {
+				var subjectTokenIssuers tfTypes.SubjectTokenIssuers
+
+				if subjectTokenIssuersItem.Conditions == nil {
+					subjectTokenIssuers.Conditions = nil
+				} else {
+					subjectTokenIssuers.Conditions = &tfTypes.Conditions{}
+					subjectTokenIssuers.Conditions.HasAudience = make([]types.String, 0, len(subjectTokenIssuersItem.Conditions.HasAudience))
+					for _, v := range subjectTokenIssuersItem.Conditions.HasAudience {
+						subjectTokenIssuers.Conditions.HasAudience = append(subjectTokenIssuers.Conditions.HasAudience, types.StringValue(v))
+					}
+					subjectTokenIssuers.Conditions.HasScopes = make([]types.String, 0, len(subjectTokenIssuersItem.Conditions.HasScopes))
+					for _, v := range subjectTokenIssuersItem.Conditions.HasScopes {
+						subjectTokenIssuers.Conditions.HasScopes = append(subjectTokenIssuers.Conditions.HasScopes, types.StringValue(v))
+					}
+					subjectTokenIssuers.Conditions.MissingAudience = make([]types.String, 0, len(subjectTokenIssuersItem.Conditions.MissingAudience))
+					for _, v := range subjectTokenIssuersItem.Conditions.MissingAudience {
+						subjectTokenIssuers.Conditions.MissingAudience = append(subjectTokenIssuers.Conditions.MissingAudience, types.StringValue(v))
+					}
+					subjectTokenIssuers.Conditions.MissingScopes = make([]types.String, 0, len(subjectTokenIssuersItem.Conditions.MissingScopes))
+					for _, v := range subjectTokenIssuersItem.Conditions.MissingScopes {
+						subjectTokenIssuers.Conditions.MissingScopes = append(subjectTokenIssuers.Conditions.MissingScopes, types.StringValue(v))
+					}
+				}
+				subjectTokenIssuers.Issuer = types.StringValue(subjectTokenIssuersItem.Issuer)
+
+				r.Config.TokenExchange.SubjectTokenIssuers = append(r.Config.TokenExchange.SubjectTokenIssuers, subjectTokenIssuers)
+			}
 		}
 		r.Config.TokenExchangeEndpoint = types.StringPointerValue(resp.Config.TokenExchangeEndpoint)
 		r.Config.TokenHeadersClient = make([]types.String, 0, len(resp.Config.TokenHeadersClient))
@@ -605,6 +726,19 @@ func (r *PluginOpenidConnectResourceModel) RefreshFromSharedOpenidConnectPlugin(
 		}
 		r.Config.UpstreamAccessTokenHeader = types.StringPointerValue(resp.Config.UpstreamAccessTokenHeader)
 		r.Config.UpstreamAccessTokenJwkHeader = types.StringPointerValue(resp.Config.UpstreamAccessTokenJwkHeader)
+		r.Config.UpstreamHeaders = []tfTypes.UpstreamHeaders{}
+
+		for _, upstreamHeadersItem := range resp.Config.UpstreamHeaders {
+			var upstreamHeaders tfTypes.UpstreamHeaders
+
+			upstreamHeaders.Header = types.StringValue(upstreamHeadersItem.Header)
+			upstreamHeaders.Path = make([]types.String, 0, len(upstreamHeadersItem.Path))
+			for _, v := range upstreamHeadersItem.Path {
+				upstreamHeaders.Path = append(upstreamHeaders.Path, types.StringValue(v))
+			}
+
+			r.Config.UpstreamHeaders = append(r.Config.UpstreamHeaders, upstreamHeaders)
+		}
 		r.Config.UpstreamHeadersClaims = make([]types.String, 0, len(resp.Config.UpstreamHeadersClaims))
 		for _, v := range resp.Config.UpstreamHeadersClaims {
 			r.Config.UpstreamHeadersClaims = append(r.Config.UpstreamHeadersClaims, types.StringValue(v))
@@ -807,6 +941,12 @@ func (r *PluginOpenidConnectResourceModel) ToOperationsUpdateOpenidconnectPlugin
 func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx context.Context) (*shared.OpenidConnectPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -1267,6 +1407,95 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	}
 	var clusterCacheRedis *shared.ClusterCacheRedis
 	if r.Config.ClusterCacheRedis != nil {
+		var cloudAuthentication *shared.OpenidConnectPluginCloudAuthentication
+		if r.Config.ClusterCacheRedis.CloudAuthentication != nil {
+			authProvider := new(shared.OpenidConnectPluginAuthProvider)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider.IsNull() {
+				*authProvider = shared.OpenidConnectPluginAuthProvider(r.Config.ClusterCacheRedis.CloudAuthentication.AuthProvider.ValueString())
+			} else {
+				authProvider = nil
+			}
+			awsAccessKeyID := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsAccessKeyID.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsAccessKeyID.IsNull() {
+				*awsAccessKeyID = r.Config.ClusterCacheRedis.CloudAuthentication.AwsAccessKeyID.ValueString()
+			} else {
+				awsAccessKeyID = nil
+			}
+			awsAssumeRoleArn := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsAssumeRoleArn.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsAssumeRoleArn.IsNull() {
+				*awsAssumeRoleArn = r.Config.ClusterCacheRedis.CloudAuthentication.AwsAssumeRoleArn.ValueString()
+			} else {
+				awsAssumeRoleArn = nil
+			}
+			awsCacheName := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsCacheName.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsCacheName.IsNull() {
+				*awsCacheName = r.Config.ClusterCacheRedis.CloudAuthentication.AwsCacheName.ValueString()
+			} else {
+				awsCacheName = nil
+			}
+			awsIsServerless := new(bool)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsIsServerless.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsIsServerless.IsNull() {
+				*awsIsServerless = r.Config.ClusterCacheRedis.CloudAuthentication.AwsIsServerless.ValueBool()
+			} else {
+				awsIsServerless = nil
+			}
+			awsRegion := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsRegion.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsRegion.IsNull() {
+				*awsRegion = r.Config.ClusterCacheRedis.CloudAuthentication.AwsRegion.ValueString()
+			} else {
+				awsRegion = nil
+			}
+			awsRoleSessionName := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsRoleSessionName.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsRoleSessionName.IsNull() {
+				*awsRoleSessionName = r.Config.ClusterCacheRedis.CloudAuthentication.AwsRoleSessionName.ValueString()
+			} else {
+				awsRoleSessionName = nil
+			}
+			awsSecretAccessKey := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AwsSecretAccessKey.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AwsSecretAccessKey.IsNull() {
+				*awsSecretAccessKey = r.Config.ClusterCacheRedis.CloudAuthentication.AwsSecretAccessKey.ValueString()
+			} else {
+				awsSecretAccessKey = nil
+			}
+			azureClientID := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientID.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientID.IsNull() {
+				*azureClientID = r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientID.ValueString()
+			} else {
+				azureClientID = nil
+			}
+			azureClientSecret := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientSecret.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientSecret.IsNull() {
+				*azureClientSecret = r.Config.ClusterCacheRedis.CloudAuthentication.AzureClientSecret.ValueString()
+			} else {
+				azureClientSecret = nil
+			}
+			azureTenantID := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.AzureTenantID.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.AzureTenantID.IsNull() {
+				*azureTenantID = r.Config.ClusterCacheRedis.CloudAuthentication.AzureTenantID.ValueString()
+			} else {
+				azureTenantID = nil
+			}
+			gcpServiceAccountJSON := new(string)
+			if !r.Config.ClusterCacheRedis.CloudAuthentication.GcpServiceAccountJSON.IsUnknown() && !r.Config.ClusterCacheRedis.CloudAuthentication.GcpServiceAccountJSON.IsNull() {
+				*gcpServiceAccountJSON = r.Config.ClusterCacheRedis.CloudAuthentication.GcpServiceAccountJSON.ValueString()
+			} else {
+				gcpServiceAccountJSON = nil
+			}
+			cloudAuthentication = &shared.OpenidConnectPluginCloudAuthentication{
+				AuthProvider:          authProvider,
+				AwsAccessKeyID:        awsAccessKeyID,
+				AwsAssumeRoleArn:      awsAssumeRoleArn,
+				AwsCacheName:          awsCacheName,
+				AwsIsServerless:       awsIsServerless,
+				AwsRegion:             awsRegion,
+				AwsRoleSessionName:    awsRoleSessionName,
+				AwsSecretAccessKey:    awsSecretAccessKey,
+				AzureClientID:         azureClientID,
+				AzureClientSecret:     azureClientSecret,
+				AzureTenantID:         azureTenantID,
+				GcpServiceAccountJSON: gcpServiceAccountJSON,
+			}
+		}
 		clusterMaxRedirections := new(int64)
 		if !r.Config.ClusterCacheRedis.ClusterMaxRedirections.IsUnknown() && !r.Config.ClusterCacheRedis.ClusterMaxRedirections.IsNull() {
 			*clusterMaxRedirections = r.Config.ClusterCacheRedis.ClusterMaxRedirections.ValueInt64()
@@ -1420,6 +1649,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			username = nil
 		}
 		clusterCacheRedis = &shared.ClusterCacheRedis{
+			CloudAuthentication:    cloudAuthentication,
 			ClusterMaxRedirections: clusterMaxRedirections,
 			ClusterNodes:           clusterNodes,
 			ConnectTimeout:         connectTimeout,
@@ -1453,9 +1683,13 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	for _, consumerByItem := range r.Config.ConsumerBy {
 		consumerBy = append(consumerBy, shared.OpenidConnectPluginConsumerBy(consumerByItem.ValueString()))
 	}
-	consumerClaim := make([]string, 0, len(r.Config.ConsumerClaim))
-	for consumerClaimIndex := range r.Config.ConsumerClaim {
-		consumerClaim = append(consumerClaim, r.Config.ConsumerClaim[consumerClaimIndex].ValueString())
+	consumerClaims := make([][]string, 0, len(r.Config.ConsumerClaims))
+	for consumerClaimsIndex := range r.Config.ConsumerClaims {
+		consumerClaimsTmp := make([]string, 0, len(r.Config.ConsumerClaims[consumerClaimsIndex]))
+		for index := range r.Config.ConsumerClaims[consumerClaimsIndex] {
+			consumerClaimsTmp = append(consumerClaimsTmp, r.Config.ConsumerClaims[consumerClaimsIndex][index].ValueString())
+		}
+		consumerClaims = append(consumerClaims, consumerClaimsTmp)
 	}
 	consumerGroupsClaim := make([]string, 0, len(r.Config.ConsumerGroupsClaim))
 	for consumerGroupsClaimIndex := range r.Config.ConsumerGroupsClaim {
@@ -1510,6 +1744,20 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		*downstreamAccessTokenJwkHeader = r.Config.DownstreamAccessTokenJwkHeader.ValueString()
 	} else {
 		downstreamAccessTokenJwkHeader = nil
+	}
+	downstreamHeaders := make([]shared.DownstreamHeaders, 0, len(r.Config.DownstreamHeaders))
+	for downstreamHeadersIndex := range r.Config.DownstreamHeaders {
+		var header string
+		header = r.Config.DownstreamHeaders[downstreamHeadersIndex].Header.ValueString()
+
+		path1 := make([]string, 0, len(r.Config.DownstreamHeaders[downstreamHeadersIndex].Path))
+		for pathIndex := range r.Config.DownstreamHeaders[downstreamHeadersIndex].Path {
+			path1 = append(path1, r.Config.DownstreamHeaders[downstreamHeadersIndex].Path[pathIndex].ValueString())
+		}
+		downstreamHeaders = append(downstreamHeaders, shared.DownstreamHeaders{
+			Header: header,
+			Path:   path1,
+		})
 	}
 	downstreamHeadersClaims := make([]string, 0, len(r.Config.DownstreamHeadersClaims))
 	for downstreamHeadersClaimsIndex := range r.Config.DownstreamHeadersClaims {
@@ -1752,6 +2000,12 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	for issuersAllowedIndex := range r.Config.IssuersAllowed {
 		issuersAllowed = append(issuersAllowed, r.Config.IssuersAllowed[issuersAllowedIndex].ValueString())
 	}
+	jwksEndpoint := new(string)
+	if !r.Config.JwksEndpoint.IsUnknown() && !r.Config.JwksEndpoint.IsNull() {
+		*jwksEndpoint = r.Config.JwksEndpoint.ValueString()
+	} else {
+		jwksEndpoint = nil
+	}
 	jwtSessionClaim := new(string)
 	if !r.Config.JwtSessionClaim.IsUnknown() && !r.Config.JwtSessionClaim.IsNull() {
 		*jwtSessionClaim = r.Config.JwtSessionClaim.ValueString()
@@ -1920,6 +2174,95 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	}
 	var redis *shared.OpenidConnectPluginRedis
 	if r.Config.Redis != nil {
+		var cloudAuthentication1 *shared.OpenidConnectPluginConfigCloudAuthentication
+		if r.Config.Redis.CloudAuthentication != nil {
+			authProvider1 := new(shared.OpenidConnectPluginConfigAuthProvider)
+			if !r.Config.Redis.CloudAuthentication.AuthProvider.IsUnknown() && !r.Config.Redis.CloudAuthentication.AuthProvider.IsNull() {
+				*authProvider1 = shared.OpenidConnectPluginConfigAuthProvider(r.Config.Redis.CloudAuthentication.AuthProvider.ValueString())
+			} else {
+				authProvider1 = nil
+			}
+			awsAccessKeyId1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsAccessKeyID.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsAccessKeyID.IsNull() {
+				*awsAccessKeyId1 = r.Config.Redis.CloudAuthentication.AwsAccessKeyID.ValueString()
+			} else {
+				awsAccessKeyId1 = nil
+			}
+			awsAssumeRoleArn1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsAssumeRoleArn.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsAssumeRoleArn.IsNull() {
+				*awsAssumeRoleArn1 = r.Config.Redis.CloudAuthentication.AwsAssumeRoleArn.ValueString()
+			} else {
+				awsAssumeRoleArn1 = nil
+			}
+			awsCacheName1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsCacheName.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsCacheName.IsNull() {
+				*awsCacheName1 = r.Config.Redis.CloudAuthentication.AwsCacheName.ValueString()
+			} else {
+				awsCacheName1 = nil
+			}
+			awsIsServerless1 := new(bool)
+			if !r.Config.Redis.CloudAuthentication.AwsIsServerless.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsIsServerless.IsNull() {
+				*awsIsServerless1 = r.Config.Redis.CloudAuthentication.AwsIsServerless.ValueBool()
+			} else {
+				awsIsServerless1 = nil
+			}
+			awsRegion1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsRegion.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsRegion.IsNull() {
+				*awsRegion1 = r.Config.Redis.CloudAuthentication.AwsRegion.ValueString()
+			} else {
+				awsRegion1 = nil
+			}
+			awsRoleSessionName1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsRoleSessionName.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsRoleSessionName.IsNull() {
+				*awsRoleSessionName1 = r.Config.Redis.CloudAuthentication.AwsRoleSessionName.ValueString()
+			} else {
+				awsRoleSessionName1 = nil
+			}
+			awsSecretAccessKey1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AwsSecretAccessKey.IsUnknown() && !r.Config.Redis.CloudAuthentication.AwsSecretAccessKey.IsNull() {
+				*awsSecretAccessKey1 = r.Config.Redis.CloudAuthentication.AwsSecretAccessKey.ValueString()
+			} else {
+				awsSecretAccessKey1 = nil
+			}
+			azureClientId1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AzureClientID.IsUnknown() && !r.Config.Redis.CloudAuthentication.AzureClientID.IsNull() {
+				*azureClientId1 = r.Config.Redis.CloudAuthentication.AzureClientID.ValueString()
+			} else {
+				azureClientId1 = nil
+			}
+			azureClientSecret1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AzureClientSecret.IsUnknown() && !r.Config.Redis.CloudAuthentication.AzureClientSecret.IsNull() {
+				*azureClientSecret1 = r.Config.Redis.CloudAuthentication.AzureClientSecret.ValueString()
+			} else {
+				azureClientSecret1 = nil
+			}
+			azureTenantId1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.AzureTenantID.IsUnknown() && !r.Config.Redis.CloudAuthentication.AzureTenantID.IsNull() {
+				*azureTenantId1 = r.Config.Redis.CloudAuthentication.AzureTenantID.ValueString()
+			} else {
+				azureTenantId1 = nil
+			}
+			gcpServiceAccountJson1 := new(string)
+			if !r.Config.Redis.CloudAuthentication.GcpServiceAccountJSON.IsUnknown() && !r.Config.Redis.CloudAuthentication.GcpServiceAccountJSON.IsNull() {
+				*gcpServiceAccountJson1 = r.Config.Redis.CloudAuthentication.GcpServiceAccountJSON.ValueString()
+			} else {
+				gcpServiceAccountJson1 = nil
+			}
+			cloudAuthentication1 = &shared.OpenidConnectPluginConfigCloudAuthentication{
+				AuthProvider:          authProvider1,
+				AwsAccessKeyID:        awsAccessKeyId1,
+				AwsAssumeRoleArn:      awsAssumeRoleArn1,
+				AwsCacheName:          awsCacheName1,
+				AwsIsServerless:       awsIsServerless1,
+				AwsRegion:             awsRegion1,
+				AwsRoleSessionName:    awsRoleSessionName1,
+				AwsSecretAccessKey:    awsSecretAccessKey1,
+				AzureClientID:         azureClientId1,
+				AzureClientSecret:     azureClientSecret1,
+				AzureTenantID:         azureTenantId1,
+				GcpServiceAccountJSON: gcpServiceAccountJson1,
+			}
+		}
 		clusterMaxRedirections1 := new(int64)
 		if !r.Config.Redis.ClusterMaxRedirections.IsUnknown() && !r.Config.Redis.ClusterMaxRedirections.IsNull() {
 			*clusterMaxRedirections1 = r.Config.Redis.ClusterMaxRedirections.ValueInt64()
@@ -2085,6 +2428,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 			username1 = nil
 		}
 		redis = &shared.OpenidConnectPluginRedis{
+			CloudAuthentication:    cloudAuthentication1,
 			ClusterMaxRedirections: clusterMaxRedirections1,
 			ClusterNodes:           clusterNodes1,
 			ConnectTimeout:         connectTimeout1,
@@ -2322,6 +2666,18 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	} else {
 		sessionMemcachedSocket = nil
 	}
+	sessionMemcachedSsl := new(bool)
+	if !r.Config.SessionMemcachedSsl.IsUnknown() && !r.Config.SessionMemcachedSsl.IsNull() {
+		*sessionMemcachedSsl = r.Config.SessionMemcachedSsl.ValueBool()
+	} else {
+		sessionMemcachedSsl = nil
+	}
+	sessionMemcachedSslVerify := new(bool)
+	if !r.Config.SessionMemcachedSslVerify.IsUnknown() && !r.Config.SessionMemcachedSslVerify.IsNull() {
+		*sessionMemcachedSslVerify = r.Config.SessionMemcachedSslVerify.ValueBool()
+	} else {
+		sessionMemcachedSslVerify = nil
+	}
 	sessionRemember := new(bool)
 	if !r.Config.SessionRemember.IsUnknown() && !r.Config.SessionRemember.IsNull() {
 		*sessionRemember = r.Config.SessionRemember.ValueBool()
@@ -2420,6 +2776,97 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 	} else {
 		tokenEndpointAuthMethod = nil
 	}
+	var tokenExchange *shared.OpenidConnectPluginTokenExchange
+	if r.Config.TokenExchange != nil {
+		var cache *shared.OpenidConnectPluginCache
+		if r.Config.TokenExchange.Cache != nil {
+			enabled1 := new(bool)
+			if !r.Config.TokenExchange.Cache.Enabled.IsUnknown() && !r.Config.TokenExchange.Cache.Enabled.IsNull() {
+				*enabled1 = r.Config.TokenExchange.Cache.Enabled.ValueBool()
+			} else {
+				enabled1 = nil
+			}
+			ttl := new(int64)
+			if !r.Config.TokenExchange.Cache.TTL.IsUnknown() && !r.Config.TokenExchange.Cache.TTL.IsNull() {
+				*ttl = r.Config.TokenExchange.Cache.TTL.ValueInt64()
+			} else {
+				ttl = nil
+			}
+			cache = &shared.OpenidConnectPluginCache{
+				Enabled: enabled1,
+				TTL:     ttl,
+			}
+		}
+		var request *shared.OpenidConnectPluginRequest
+		if r.Config.TokenExchange.Request != nil {
+			audience1 := make([]string, 0, len(r.Config.TokenExchange.Request.Audience))
+			for audienceIndex1 := range r.Config.TokenExchange.Request.Audience {
+				audience1 = append(audience1, r.Config.TokenExchange.Request.Audience[audienceIndex1].ValueString())
+			}
+			emptyAudience := new(bool)
+			if !r.Config.TokenExchange.Request.EmptyAudience.IsUnknown() && !r.Config.TokenExchange.Request.EmptyAudience.IsNull() {
+				*emptyAudience = r.Config.TokenExchange.Request.EmptyAudience.ValueBool()
+			} else {
+				emptyAudience = nil
+			}
+			emptyScopes := new(bool)
+			if !r.Config.TokenExchange.Request.EmptyScopes.IsUnknown() && !r.Config.TokenExchange.Request.EmptyScopes.IsNull() {
+				*emptyScopes = r.Config.TokenExchange.Request.EmptyScopes.ValueBool()
+			} else {
+				emptyScopes = nil
+			}
+			scopes1 := make([]string, 0, len(r.Config.TokenExchange.Request.Scopes))
+			for scopesIndex1 := range r.Config.TokenExchange.Request.Scopes {
+				scopes1 = append(scopes1, r.Config.TokenExchange.Request.Scopes[scopesIndex1].ValueString())
+			}
+			request = &shared.OpenidConnectPluginRequest{
+				Audience:      audience1,
+				EmptyAudience: emptyAudience,
+				EmptyScopes:   emptyScopes,
+				Scopes:        scopes1,
+			}
+		}
+		subjectTokenIssuers := make([]shared.SubjectTokenIssuers, 0, len(r.Config.TokenExchange.SubjectTokenIssuers))
+		for subjectTokenIssuersIndex := range r.Config.TokenExchange.SubjectTokenIssuers {
+			var conditions *shared.Conditions
+			if r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions != nil {
+				hasAudience := make([]string, 0, len(r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasAudience))
+				for hasAudienceIndex := range r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasAudience {
+					hasAudience = append(hasAudience, r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasAudience[hasAudienceIndex].ValueString())
+				}
+				hasScopes := make([]string, 0, len(r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasScopes))
+				for hasScopesIndex := range r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasScopes {
+					hasScopes = append(hasScopes, r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.HasScopes[hasScopesIndex].ValueString())
+				}
+				missingAudience := make([]string, 0, len(r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingAudience))
+				for missingAudienceIndex := range r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingAudience {
+					missingAudience = append(missingAudience, r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingAudience[missingAudienceIndex].ValueString())
+				}
+				missingScopes := make([]string, 0, len(r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingScopes))
+				for missingScopesIndex := range r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingScopes {
+					missingScopes = append(missingScopes, r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Conditions.MissingScopes[missingScopesIndex].ValueString())
+				}
+				conditions = &shared.Conditions{
+					HasAudience:     hasAudience,
+					HasScopes:       hasScopes,
+					MissingAudience: missingAudience,
+					MissingScopes:   missingScopes,
+				}
+			}
+			var issuer2 string
+			issuer2 = r.Config.TokenExchange.SubjectTokenIssuers[subjectTokenIssuersIndex].Issuer.ValueString()
+
+			subjectTokenIssuers = append(subjectTokenIssuers, shared.SubjectTokenIssuers{
+				Conditions: conditions,
+				Issuer:     issuer2,
+			})
+		}
+		tokenExchange = &shared.OpenidConnectPluginTokenExchange{
+			Cache:               cache,
+			Request:             request,
+			SubjectTokenIssuers: subjectTokenIssuers,
+		}
+	}
 	tokenExchangeEndpoint := new(string)
 	if !r.Config.TokenExchangeEndpoint.IsUnknown() && !r.Config.TokenExchangeEndpoint.IsNull() {
 		*tokenExchangeEndpoint = r.Config.TokenExchangeEndpoint.ValueString()
@@ -2495,6 +2942,20 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		*upstreamAccessTokenJwkHeader = r.Config.UpstreamAccessTokenJwkHeader.ValueString()
 	} else {
 		upstreamAccessTokenJwkHeader = nil
+	}
+	upstreamHeaders := make([]shared.OpenidConnectPluginUpstreamHeaders, 0, len(r.Config.UpstreamHeaders))
+	for upstreamHeadersIndex := range r.Config.UpstreamHeaders {
+		var header1 string
+		header1 = r.Config.UpstreamHeaders[upstreamHeadersIndex].Header.ValueString()
+
+		path2 := make([]string, 0, len(r.Config.UpstreamHeaders[upstreamHeadersIndex].Path))
+		for pathIndex1 := range r.Config.UpstreamHeaders[upstreamHeadersIndex].Path {
+			path2 = append(path2, r.Config.UpstreamHeaders[upstreamHeadersIndex].Path[pathIndex1].ValueString())
+		}
+		upstreamHeaders = append(upstreamHeaders, shared.OpenidConnectPluginUpstreamHeaders{
+			Header: header1,
+			Path:   path2,
+		})
 	}
 	upstreamHeadersClaims := make([]string, 0, len(r.Config.UpstreamHeadersClaims))
 	for upstreamHeadersClaimsIndex := range r.Config.UpstreamHeadersClaims {
@@ -2660,7 +3121,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		ClusterCacheRedis:                      clusterCacheRedis,
 		ClusterCacheStrategy:                   clusterCacheStrategy,
 		ConsumerBy:                             consumerBy,
-		ConsumerClaim:                          consumerClaim,
+		ConsumerClaims:                         consumerClaims,
 		ConsumerGroupsClaim:                    consumerGroupsClaim,
 		ConsumerGroupsOptional:                 consumerGroupsOptional,
 		ConsumerOptional:                       consumerOptional,
@@ -2672,6 +3133,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		Domains:                                domains,
 		DownstreamAccessTokenHeader:            downstreamAccessTokenHeader,
 		DownstreamAccessTokenJwkHeader:         downstreamAccessTokenJwkHeader,
+		DownstreamHeaders:                      downstreamHeaders,
 		DownstreamHeadersClaims:                downstreamHeadersClaims,
 		DownstreamHeadersNames:                 downstreamHeadersNames,
 		DownstreamIDTokenHeader:                downstreamIDTokenHeader,
@@ -2718,6 +3180,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		IntrospectionTokenParamName:            introspectionTokenParamName,
 		Issuer:                                 issuer1,
 		IssuersAllowed:                         issuersAllowed,
+		JwksEndpoint:                           jwksEndpoint,
 		JwtSessionClaim:                        jwtSessionClaim,
 		JwtSessionCookie:                       jwtSessionCookie,
 		Keepalive:                              keepalive,
@@ -2787,6 +3250,8 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		SessionMemcachedPort:               sessionMemcachedPort,
 		SessionMemcachedPrefix:             sessionMemcachedPrefix,
 		SessionMemcachedSocket:             sessionMemcachedSocket,
+		SessionMemcachedSsl:                sessionMemcachedSsl,
+		SessionMemcachedSslVerify:          sessionMemcachedSslVerify,
 		SessionRemember:                    sessionRemember,
 		SessionRememberAbsoluteTimeout:     sessionRememberAbsoluteTimeout,
 		SessionRememberCookieName:          sessionRememberCookieName,
@@ -2804,6 +3269,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		TokenCacheKeyIncludeScope:          tokenCacheKeyIncludeScope,
 		TokenEndpoint:                      tokenEndpoint,
 		TokenEndpointAuthMethod:            tokenEndpointAuthMethod,
+		TokenExchange:                      tokenExchange,
 		TokenExchangeEndpoint:              tokenExchangeEndpoint,
 		TokenHeadersClient:                 tokenHeadersClient,
 		TokenHeadersGrants:                 tokenHeadersGrants,
@@ -2820,6 +3286,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		UnexpectedRedirectURI:              unexpectedRedirectURI,
 		UpstreamAccessTokenHeader:          upstreamAccessTokenHeader,
 		UpstreamAccessTokenJwkHeader:       upstreamAccessTokenJwkHeader,
+		UpstreamHeaders:                    upstreamHeaders,
 		UpstreamHeadersClaims:              upstreamHeadersClaims,
 		UpstreamHeadersNames:               upstreamHeadersNames,
 		UpstreamIDTokenHeader:              upstreamIDTokenHeader,
@@ -2873,6 +3340,7 @@ func (r *PluginOpenidConnectResourceModel) ToSharedOpenidConnectPlugin(ctx conte
 		}
 	}
 	out := shared.OpenidConnectPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

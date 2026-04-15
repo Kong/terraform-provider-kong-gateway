@@ -122,9 +122,333 @@ func (b *BasicAuthPluginPartials) GetPath() *string {
 	return b.Path
 }
 
+// BasicAuthPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type BasicAuthPluginAuthProvider string
+
+const (
+	BasicAuthPluginAuthProviderAws   BasicAuthPluginAuthProvider = "aws"
+	BasicAuthPluginAuthProviderAzure BasicAuthPluginAuthProvider = "azure"
+	BasicAuthPluginAuthProviderGcp   BasicAuthPluginAuthProvider = "gcp"
+)
+
+func (e BasicAuthPluginAuthProvider) ToPointer() *BasicAuthPluginAuthProvider {
+	return &e
+}
+func (e *BasicAuthPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = BasicAuthPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for BasicAuthPluginAuthProvider: %v", v)
+	}
+}
+
+// BasicAuthPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type BasicAuthPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *BasicAuthPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (b BasicAuthPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *BasicAuthPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAuthProvider() *BasicAuthPluginAuthProvider {
+	if b == nil {
+		return nil
+	}
+	return b.AuthProvider
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsAccessKeyID
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsAssumeRoleArn
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsCacheName() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsCacheName
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.AwsIsServerless
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsRegion() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsRegion
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsRoleSessionName
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AwsSecretAccessKey
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAzureClientID() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AzureClientID
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AzureClientSecret
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetAzureTenantID() *string {
+	if b == nil {
+		return nil
+	}
+	return b.AzureTenantID
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if b == nil {
+		return nil
+	}
+	return b.GcpServiceAccountJSON
+}
+
+// BasicAuthPluginRedis - Redis configuration
+type BasicAuthPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *BasicAuthPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
+	// Database to use for the Redis connection when using the `redis` strategy
+	Database *int64 `json:"database,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+	Password *string `json:"password,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	ServerName *string `json:"server_name,omitempty"`
+	// If set to true, uses SSL to connect to Redis.
+	Ssl *bool `json:"ssl,omitempty"`
+	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (b BasicAuthPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *BasicAuthPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *BasicAuthPluginRedis) GetCloudAuthentication() *BasicAuthPluginCloudAuthentication {
+	if b == nil {
+		return nil
+	}
+	return b.CloudAuthentication
+}
+
+func (b *BasicAuthPluginRedis) GetDatabase() *int64 {
+	if b == nil {
+		return nil
+	}
+	return b.Database
+}
+
+func (b *BasicAuthPluginRedis) GetHost() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Host
+}
+
+func (b *BasicAuthPluginRedis) GetPassword() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Password
+}
+
+func (b *BasicAuthPluginRedis) GetPort() *int64 {
+	if b == nil {
+		return nil
+	}
+	return b.Port
+}
+
+func (b *BasicAuthPluginRedis) GetServerName() *string {
+	if b == nil {
+		return nil
+	}
+	return b.ServerName
+}
+
+func (b *BasicAuthPluginRedis) GetSsl() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.Ssl
+}
+
+func (b *BasicAuthPluginRedis) GetSslVerify() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.SslVerify
+}
+
+func (b *BasicAuthPluginRedis) GetTimeout() *int64 {
+	if b == nil {
+		return nil
+	}
+	return b.Timeout
+}
+
+func (b *BasicAuthPluginRedis) GetUsername() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Username
+}
+
+// BasicAuthPluginStrategy - The brute force protection strategy to use for retrieving and incrementing the limits. Available values are: `cluster`, `redis`, `memory`, and `off`.
+type BasicAuthPluginStrategy string
+
+const (
+	BasicAuthPluginStrategyCluster BasicAuthPluginStrategy = "cluster"
+	BasicAuthPluginStrategyMemory  BasicAuthPluginStrategy = "memory"
+	BasicAuthPluginStrategyOff     BasicAuthPluginStrategy = "off"
+	BasicAuthPluginStrategyRedis   BasicAuthPluginStrategy = "redis"
+)
+
+func (e BasicAuthPluginStrategy) ToPointer() *BasicAuthPluginStrategy {
+	return &e
+}
+func (e *BasicAuthPluginStrategy) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "cluster":
+		fallthrough
+	case "memory":
+		fallthrough
+	case "off":
+		fallthrough
+	case "redis":
+		*e = BasicAuthPluginStrategy(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for BasicAuthPluginStrategy: %v", v)
+	}
+}
+
+type BruteForceProtection struct {
+	// Redis configuration
+	Redis *BasicAuthPluginRedis `json:"redis,omitempty"`
+	// The brute force protection strategy to use for retrieving and incrementing the limits. Available values are: `cluster`, `redis`, `memory`, and `off`.
+	Strategy *BasicAuthPluginStrategy `json:"strategy,omitempty"`
+}
+
+func (b BruteForceProtection) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *BruteForceProtection) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *BruteForceProtection) GetRedis() *BasicAuthPluginRedis {
+	if b == nil {
+		return nil
+	}
+	return b.Redis
+}
+
+func (b *BruteForceProtection) GetStrategy() *BasicAuthPluginStrategy {
+	if b == nil {
+		return nil
+	}
+	return b.Strategy
+}
+
 type BasicAuthPluginConfig struct {
 	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
-	Anonymous *string `json:"anonymous,omitempty"`
+	Anonymous            *string               `json:"anonymous,omitempty"`
+	BruteForceProtection *BruteForceProtection `json:"brute_force_protection,omitempty"`
 	// An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
 	HideCredentials *bool `json:"hide_credentials,omitempty"`
 	// When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
@@ -147,6 +471,13 @@ func (b *BasicAuthPluginConfig) GetAnonymous() *string {
 		return nil
 	}
 	return b.Anonymous
+}
+
+func (b *BasicAuthPluginConfig) GetBruteForceProtection() *BruteForceProtection {
+	if b == nil {
+		return nil
+	}
+	return b.BruteForceProtection
 }
 
 func (b *BasicAuthPluginConfig) GetHideCredentials() *bool {
@@ -249,6 +580,8 @@ func (b *BasicAuthPluginService) GetID() *string {
 
 // BasicAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type BasicAuthPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -284,6 +617,13 @@ func (b *BasicAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (b *BasicAuthPlugin) GetCondition() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Condition
 }
 
 func (b *BasicAuthPlugin) GetCreatedAt() *int64 {

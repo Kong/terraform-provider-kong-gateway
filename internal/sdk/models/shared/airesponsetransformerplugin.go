@@ -164,6 +164,10 @@ type AiResponseTransformerPluginAuth struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
 	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
 	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
 	// Use service account auth for GCP-based providers and models.
@@ -240,6 +244,20 @@ func (a *AiResponseTransformerPluginAuth) GetAzureUseManagedIdentity() *bool {
 	return a.AzureUseManagedIdentity
 }
 
+func (a *AiResponseTransformerPluginAuth) GetGcpMetadataURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpMetadataURL
+}
+
+func (a *AiResponseTransformerPluginAuth) GetGcpOauthTokenURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpOauthTokenURL
+}
+
 func (a *AiResponseTransformerPluginAuth) GetGcpServiceAccountJSON() *string {
 	if a == nil {
 		return nil
@@ -290,7 +308,7 @@ func (a *AiResponseTransformerPluginAuth) GetParamValue() *string {
 }
 
 type AiResponseTransformerPluginLogging struct {
-	// If enabled, will log the request and response body into the Kong log plugin(s) output.
+	// If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
 	// If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
 	LogStatistics *bool `json:"log_statistics,omitempty"`
@@ -330,10 +348,16 @@ type AiResponseTransformerPluginBedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
 	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
 }
 
 func (a AiResponseTransformerPluginBedrock) MarshalJSON() ([]byte, error) {
@@ -375,6 +399,20 @@ func (a *AiResponseTransformerPluginBedrock) GetAwsStsEndpointURL() *string {
 	return a.AwsStsEndpointURL
 }
 
+func (a *AiResponseTransformerPluginBedrock) GetBatchBucketPrefix() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchBucketPrefix
+}
+
+func (a *AiResponseTransformerPluginBedrock) GetBatchRoleArn() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchRoleArn
+}
+
 func (a *AiResponseTransformerPluginBedrock) GetEmbeddingsNormalize() *bool {
 	if a == nil {
 		return nil
@@ -387,6 +425,13 @@ func (a *AiResponseTransformerPluginBedrock) GetPerformanceConfigLatency() *stri
 		return nil
 	}
 	return a.PerformanceConfigLatency
+}
+
+func (a *AiResponseTransformerPluginBedrock) GetVideoOutputS3URI() *string {
+	if a == nil {
+		return nil
+	}
+	return a.VideoOutputS3URI
 }
 
 // AiResponseTransformerPluginEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
@@ -455,6 +500,54 @@ func (a *AiResponseTransformerPluginCohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return a.WaitForModel
+}
+
+type AiResponseTransformerPluginDashscope struct {
+	// Two Dashscope endpoints are available, and the international endpoint will be used when this is set to `true`.
+	// It is recommended to set this to `true` when using international version of dashscope.
+	//
+	International *bool `json:"international,omitempty"`
+}
+
+func (a AiResponseTransformerPluginDashscope) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiResponseTransformerPluginDashscope) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiResponseTransformerPluginDashscope) GetInternational() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.International
+}
+
+type AiResponseTransformerPluginDatabricks struct {
+	// Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.
+	WorkspaceInstanceID *string `json:"workspace_instance_id,omitempty"`
+}
+
+func (a AiResponseTransformerPluginDatabricks) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiResponseTransformerPluginDatabricks) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiResponseTransformerPluginDatabricks) GetWorkspaceInstanceID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.WorkspaceInstanceID
 }
 
 type AiResponseTransformerPluginGemini struct {
@@ -605,9 +698,11 @@ type AiResponseTransformerPluginOptions struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string                             `json:"azure_instance,omitempty"`
-	Bedrock       *AiResponseTransformerPluginBedrock `json:"bedrock,omitempty"`
-	Cohere        *AiResponseTransformerPluginCohere  `json:"cohere,omitempty"`
+	AzureInstance *string                                `json:"azure_instance,omitempty"`
+	Bedrock       *AiResponseTransformerPluginBedrock    `json:"bedrock,omitempty"`
+	Cohere        *AiResponseTransformerPluginCohere     `json:"cohere,omitempty"`
+	Dashscope     *AiResponseTransformerPluginDashscope  `json:"dashscope,omitempty"`
+	Databricks    *AiResponseTransformerPluginDatabricks `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64                                  `json:"embeddings_dimensions,omitempty"`
 	Gemini               *AiResponseTransformerPluginGemini      `json:"gemini,omitempty"`
@@ -685,6 +780,20 @@ func (a *AiResponseTransformerPluginOptions) GetCohere() *AiResponseTransformerP
 		return nil
 	}
 	return a.Cohere
+}
+
+func (a *AiResponseTransformerPluginOptions) GetDashscope() *AiResponseTransformerPluginDashscope {
+	if a == nil {
+		return nil
+	}
+	return a.Dashscope
+}
+
+func (a *AiResponseTransformerPluginOptions) GetDatabricks() *AiResponseTransformerPluginDatabricks {
+	if a == nil {
+		return nil
+	}
+	return a.Databricks
 }
 
 func (a *AiResponseTransformerPluginOptions) GetEmbeddingsDimensions() *int64 {
@@ -785,12 +894,19 @@ const (
 	AiResponseTransformerPluginProviderAnthropic   AiResponseTransformerPluginProvider = "anthropic"
 	AiResponseTransformerPluginProviderAzure       AiResponseTransformerPluginProvider = "azure"
 	AiResponseTransformerPluginProviderBedrock     AiResponseTransformerPluginProvider = "bedrock"
+	AiResponseTransformerPluginProviderCerebras    AiResponseTransformerPluginProvider = "cerebras"
 	AiResponseTransformerPluginProviderCohere      AiResponseTransformerPluginProvider = "cohere"
+	AiResponseTransformerPluginProviderDashscope   AiResponseTransformerPluginProvider = "dashscope"
+	AiResponseTransformerPluginProviderDatabricks  AiResponseTransformerPluginProvider = "databricks"
+	AiResponseTransformerPluginProviderDeepseek    AiResponseTransformerPluginProvider = "deepseek"
 	AiResponseTransformerPluginProviderGemini      AiResponseTransformerPluginProvider = "gemini"
 	AiResponseTransformerPluginProviderHuggingface AiResponseTransformerPluginProvider = "huggingface"
 	AiResponseTransformerPluginProviderLlama2      AiResponseTransformerPluginProvider = "llama2"
 	AiResponseTransformerPluginProviderMistral     AiResponseTransformerPluginProvider = "mistral"
+	AiResponseTransformerPluginProviderOllama      AiResponseTransformerPluginProvider = "ollama"
 	AiResponseTransformerPluginProviderOpenai      AiResponseTransformerPluginProvider = "openai"
+	AiResponseTransformerPluginProviderVllm        AiResponseTransformerPluginProvider = "vllm"
+	AiResponseTransformerPluginProviderXai         AiResponseTransformerPluginProvider = "xai"
 )
 
 func (e AiResponseTransformerPluginProvider) ToPointer() *AiResponseTransformerPluginProvider {
@@ -808,7 +924,15 @@ func (e *AiResponseTransformerPluginProvider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "bedrock":
 		fallthrough
+	case "cerebras":
+		fallthrough
 	case "cohere":
+		fallthrough
+	case "dashscope":
+		fallthrough
+	case "databricks":
+		fallthrough
+	case "deepseek":
 		fallthrough
 	case "gemini":
 		fallthrough
@@ -818,7 +942,13 @@ func (e *AiResponseTransformerPluginProvider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "mistral":
 		fallthrough
+	case "ollama":
+		fallthrough
 	case "openai":
+		fallthrough
+	case "vllm":
+		fallthrough
+	case "xai":
 		*e = AiResponseTransformerPluginProvider(v)
 		return nil
 	default:
@@ -827,6 +957,8 @@ func (e *AiResponseTransformerPluginProvider) UnmarshalJSON(data []byte) error {
 }
 
 type AiResponseTransformerPluginModel struct {
+	// The model name parameter from the request that this model should map to.
+	ModelAlias *string `json:"model_alias,omitempty"`
 	// Model name to execute.
 	Name *string `json:"name,omitempty"`
 	// Key/value settings for the model
@@ -844,6 +976,13 @@ func (a *AiResponseTransformerPluginModel) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiResponseTransformerPluginModel) GetModelAlias() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ModelAlias
 }
 
 func (a *AiResponseTransformerPluginModel) GetName() *string {
@@ -885,6 +1024,7 @@ const (
 	AiResponseTransformerPluginRouteTypeLlmV1Responses             AiResponseTransformerPluginRouteType = "llm/v1/responses"
 	AiResponseTransformerPluginRouteTypePreserve                   AiResponseTransformerPluginRouteType = "preserve"
 	AiResponseTransformerPluginRouteTypeRealtimeV1Realtime         AiResponseTransformerPluginRouteType = "realtime/v1/realtime"
+	AiResponseTransformerPluginRouteTypeVideoV1VideosGenerations   AiResponseTransformerPluginRouteType = "video/v1/videos/generations"
 )
 
 func (e AiResponseTransformerPluginRouteType) ToPointer() *AiResponseTransformerPluginRouteType {
@@ -923,6 +1063,8 @@ func (e *AiResponseTransformerPluginRouteType) UnmarshalJSON(data []byte) error 
 	case "preserve":
 		fallthrough
 	case "realtime/v1/realtime":
+		fallthrough
+	case "video/v1/videos/generations":
 		*e = AiResponseTransformerPluginRouteType(v)
 		return nil
 	default:
@@ -931,11 +1073,17 @@ func (e *AiResponseTransformerPluginRouteType) UnmarshalJSON(data []byte) error 
 }
 
 type AiResponseTransformerPluginLlm struct {
-	Auth    *AiResponseTransformerPluginAuth    `json:"auth,omitempty"`
-	Logging *AiResponseTransformerPluginLogging `json:"logging,omitempty"`
-	Model   AiResponseTransformerPluginModel    `json:"model"`
+	Auth *AiResponseTransformerPluginAuth `json:"auth,omitempty"`
+	// The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.
+	Description *string                             `json:"description,omitempty"`
+	Logging     *AiResponseTransformerPluginLogging `json:"logging,omitempty"`
+	// For internal use only.
+	Metadata any                              `json:"metadata,omitempty"`
+	Model    AiResponseTransformerPluginModel `json:"model"`
 	// The model's operation implementation, for this provider.
 	RouteType AiResponseTransformerPluginRouteType `json:"route_type"`
+	// The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.
+	Weight *int64 `json:"weight,omitempty"`
 }
 
 func (a AiResponseTransformerPluginLlm) MarshalJSON() ([]byte, error) {
@@ -956,11 +1104,25 @@ func (a *AiResponseTransformerPluginLlm) GetAuth() *AiResponseTransformerPluginA
 	return a.Auth
 }
 
+func (a *AiResponseTransformerPluginLlm) GetDescription() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Description
+}
+
 func (a *AiResponseTransformerPluginLlm) GetLogging() *AiResponseTransformerPluginLogging {
 	if a == nil {
 		return nil
 	}
 	return a.Logging
+}
+
+func (a *AiResponseTransformerPluginLlm) GetMetadata() any {
+	if a == nil {
+		return nil
+	}
+	return a.Metadata
 }
 
 func (a *AiResponseTransformerPluginLlm) GetModel() AiResponseTransformerPluginModel {
@@ -975,6 +1137,13 @@ func (a *AiResponseTransformerPluginLlm) GetRouteType() AiResponseTransformerPlu
 		return AiResponseTransformerPluginRouteType("")
 	}
 	return a.RouteType
+}
+
+func (a *AiResponseTransformerPluginLlm) GetWeight() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Weight
 }
 
 type AiResponseTransformerPluginConfig struct {
@@ -1215,6 +1384,8 @@ func (a *AiResponseTransformerPluginService) GetID() *string {
 
 // AiResponseTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiResponseTransformerPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1254,6 +1425,13 @@ func (a *AiResponseTransformerPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiResponseTransformerPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiResponseTransformerPlugin) GetCreatedAt() *int64 {

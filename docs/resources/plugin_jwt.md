@@ -14,6 +14,7 @@ PluginJwt Resource
 
 ```terraform
 resource "kong-gateway_plugin_jwt" "my_pluginjwt" {
+  condition = "...my_condition..."
   config = {
     anonymous = "...my_anonymous..."
     claims_to_verify = [
@@ -70,7 +71,7 @@ resource "kong-gateway_plugin_jwt" "my_pluginjwt" {
     "..."
   ]
   updated_at = 5
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -79,6 +80,7 @@ resource "kong-gateway_plugin_jwt" "my_pluginjwt" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -91,7 +93,7 @@ resource "kong-gateway_plugin_jwt" "my_pluginjwt" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -171,7 +173,7 @@ import {
   to = kong-gateway_plugin_jwt.my_kong-gateway_plugin_jwt
   id = jsonencode({
     id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    workspace = "team-payments"
   })
 }
 ```
@@ -179,5 +181,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_jwt.my_kong-gateway_plugin_jwt '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_jwt.my_kong-gateway_plugin_jwt '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

@@ -55,8 +55,8 @@ type DeleteGroupsGroupIDOrNameRolesResponse struct {
 	StatusCode int
 	// Raw HTTP response; suitable for custom response parsing
 	RawResponse *http.Response
-	// Unauthorized request
-	UnauthorizedError *shared.UnauthorizedError
+	// Unauthorized
+	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
 func (d DeleteGroupsGroupIDOrNameRolesResponse) MarshalJSON() ([]byte, error) {
@@ -91,9 +91,9 @@ func (d *DeleteGroupsGroupIDOrNameRolesResponse) GetRawResponse() *http.Response
 	return d.RawResponse
 }
 
-func (d *DeleteGroupsGroupIDOrNameRolesResponse) GetUnauthorizedError() *shared.UnauthorizedError {
+func (d *DeleteGroupsGroupIDOrNameRolesResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if d == nil {
 		return nil
 	}
-	return d.UnauthorizedError
+	return d.GatewayUnauthorizedError
 }

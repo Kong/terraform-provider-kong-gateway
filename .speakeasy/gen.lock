@@ -1,16 +1,16 @@
 lockVersion: 2.0.0
 id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
-  docChecksum: 969e1f40fabdda2c2587b9a62bf8ceac
+  docChecksum: 493702bcd5ba93886f1c40911183851d
   docVersion: 3.14.0
   speakeasyVersion: 1.761.3
   generationVersion: 2.879.11
   releaseVersion: 1.0.2
   configChecksum: b277a86cee06126f3807801ac41afa52
 persistentEdits:
-  generation_id: 711715a3-df33-4fe8-8cf2-770939c9eec4
-  pristine_commit_hash: d5dc62b300af87ec86e31290d3277b67cdf0fb03
-  pristine_tree_hash: 81bf1b6e1ffea001d0be7175b869601beb2efcf1
+  generation_id: 7feee83e-3157-4579-ac4f-0562a0fa9464
+  pristine_commit_hash: 3bbae332af09339890606270e51b3b4b0cb7696c
+  pristine_tree_hash: 9c3ef3277f18bfdd4f909d581067fa168acdfb58
 features:
   terraform:
     additionalDependencies: 0.1.0
@@ -4324,8 +4324,8 @@ trackedFiles:
     pristine_git_object: 7f49478ee4781961f5e7383b1ac7c46fd594a547
   internal/sdk/groups.go:
     id: 2bfe17bcb000
-    last_write_checksum: sha1:0d50b09f4c8d925075ccb7a4e5acc59e7779b6f8
-    pristine_git_object: 168e88441075d8cd81f001b38e20e29dd5811ade
+    last_write_checksum: sha1:cfff64ec159239d5d908c20b79dfd3a2eca3fed9
+    pristine_git_object: ae8f34ad8d33b7a471137f4d50d3b1bab730d450
   internal/sdk/hmacauthcredentials.go:
     id: 9c92676a2fe0
     last_write_checksum: sha1:57b2005b4ce15e3c347c7e34f0ebe8a3979d0939
@@ -4624,8 +4624,8 @@ trackedFiles:
     pristine_git_object: 5a07968daafbc69d5586e60de966460e876e4064
   internal/sdk/models/operations/creategroupsgroupidornameroles.go:
     id: e668df519f9e
-    last_write_checksum: sha1:4097442fd991c3d8716ebae3223aad6518b16581
-    pristine_git_object: bce1f8e56230a2007d2aac8ffa8f403110ac1a2b
+    last_write_checksum: sha1:28f1881371dcd79587c7eddf0a9069f2f99039c7
+    pristine_git_object: b30b085de5203920bf44c6ec575786265387c0f3
   internal/sdk/models/operations/creategrpcgatewayplugin.go:
     id: 76d5be7d8b67
     last_write_checksum: sha1:8c9fd1facb010cce55ae403cdefbd9680425ea80
@@ -5196,8 +5196,8 @@ trackedFiles:
     pristine_git_object: 0f322ac71678f4d6f51e58d219a66c00c26003c6
   internal/sdk/models/operations/deletegroupsgroupidornameroles.go:
     id: 1b9176a34d79
-    last_write_checksum: sha1:814676666cf395e0cc7cdcd711190b1b6b913048
-    pristine_git_object: 98a790e37b833e6ad06901211cee7d87783d1043
+    last_write_checksum: sha1:be12bd1786cfe31f7bc8c8e0f2f7376d53dcebc5
+    pristine_git_object: 0a491dd589495212138acd098f683202d0a85ae5
   internal/sdk/models/operations/deletegrpcgatewayplugin.go:
     id: e2f3a11779c4
     last_write_checksum: sha1:8dc8fc1ed0cd3e7e3ed3841d5e90d901854698ed
@@ -7230,10 +7230,6 @@ trackedFiles:
     id: 385b91d3c5f0
     last_write_checksum: sha1:1e11565414fcad6147d3ec8080f16b3335589fbf
     pristine_git_object: 1b32c7ac3870f98938c931253b0f9464a6073fc0
-  internal/sdk/models/shared/unauthorizederror.go:
-    id: b1f2c9811673
-    last_write_checksum: sha1:7f7676d8ae6add2927210ffef3c2102351a79d1f
-    pristine_git_object: 3a6b19a6044f99afc4b7291511165acd8aa71292
   internal/sdk/models/shared/upstream.go:
     id: 432d706f098e
     last_write_checksum: sha1:5e7e0890f751415c94b9bc8f164db15c91cc8bdc
@@ -28970,6 +28966,36 @@ examples:
       responses:
         "401":
           application/json: {"message": "<value>", "status": 665735}
+    DuplicateApiKey:
+      parameters:
+        path:
+          GroupId: ""
+        query:
+          rbac_role_id: "12773c9a-7f7c-45f2-bcea-5285eb18fd2f"
+          workspace_id: "<id>"
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          GroupId: ""
+        query:
+          rbac_role_id: "12773c9a-7f7c-45f2-bcea-5285eb18fd2f"
+          workspace_id: "<id>"
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          GroupId: ""
+        query:
+          rbac_role_id: "12773c9a-7f7c-45f2-bcea-5285eb18fd2f"
+          workspace_id: "<id>"
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
   create-groups-group_id_or_name-roles:
     speakeasy-default-create-groups-group-id-or-name-roles:
       parameters:
@@ -28980,6 +29006,27 @@ examples:
           application/json: {}
         "401":
           application/json: {"message": "<value>", "status": 602618}
+    DuplicateApiKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Duplicate API key found", "status": 401}
+    InvalidAuthCred:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "Unauthorized", "status": 401}
+    NoAPIKey:
+      parameters:
+        path:
+          GroupId: ""
+      responses:
+        "401":
+          application/json: {"message": "No API key found in request", "status": 401}
 examplesVersion: 1.0.2
 generatedTests: {}
 generatedFiles:

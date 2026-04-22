@@ -745,12 +745,12 @@ func (s *Groups) DeleteGroupsGroupIDOrNameRoles(ctx context.Context, request ope
 				return nil, err
 			}
 
-			var out shared.UnauthorizedError
+			var out shared.GatewayUnauthorizedError
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
 
-			res.UnauthorizedError = &out
+			res.GatewayUnauthorizedError = &out
 		default:
 			rawBody, err := utils.ConsumeRawBody(httpRes)
 			if err != nil {
@@ -905,12 +905,12 @@ func (s *Groups) CreateGroupsGroupIDOrNameRoles(ctx context.Context, request ope
 				return nil, err
 			}
 
-			var out shared.UnauthorizedError
+			var out shared.GatewayUnauthorizedError
 			if err := utils.UnmarshalJsonFromResponseBody(bytes.NewBuffer(rawBody), &out, ""); err != nil {
 				return nil, err
 			}
 
-			res.UnauthorizedError = &out
+			res.GatewayUnauthorizedError = &out
 		default:
 			rawBody, err := utils.ConsumeRawBody(httpRes)
 			if err != nil {

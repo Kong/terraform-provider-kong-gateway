@@ -49,8 +49,8 @@ type CreateGroupsGroupIDOrNameRolesResponse struct {
 	RawResponse *http.Response
 	// Successfully created or updated roles.
 	GroupRole *shared.GroupRole
-	// Unauthorized request
-	UnauthorizedError *shared.UnauthorizedError
+	// Unauthorized
+	GatewayUnauthorizedError *shared.GatewayUnauthorizedError
 }
 
 func (c CreateGroupsGroupIDOrNameRolesResponse) MarshalJSON() ([]byte, error) {
@@ -92,9 +92,9 @@ func (c *CreateGroupsGroupIDOrNameRolesResponse) GetGroupRole() *shared.GroupRol
 	return c.GroupRole
 }
 
-func (c *CreateGroupsGroupIDOrNameRolesResponse) GetUnauthorizedError() *shared.UnauthorizedError {
+func (c *CreateGroupsGroupIDOrNameRolesResponse) GetGatewayUnauthorizedError() *shared.GatewayUnauthorizedError {
 	if c == nil {
 		return nil
 	}
-	return c.UnauthorizedError
+	return c.GatewayUnauthorizedError
 }

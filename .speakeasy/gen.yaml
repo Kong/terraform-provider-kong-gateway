@@ -60,6 +60,7 @@ terraform:
   inferUnionDiscriminators: false
   packageName: kong-gateway
   preApplyUnionDiscriminators: false
+  providerTypeNameOverride: ""
   respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
   unionStrategy: populated-fields

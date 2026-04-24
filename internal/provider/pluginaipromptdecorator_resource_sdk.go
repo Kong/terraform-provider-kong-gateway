@@ -340,9 +340,9 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin(c
 				var content string
 				content = r.Config.Prompts.Append[appendIndex].Content.ValueString()
 
-				role := new(shared.Role)
+				role := new(shared.AiPromptDecoratorPluginConfigRole)
 				if !r.Config.Prompts.Append[appendIndex].Role.IsUnknown() && !r.Config.Prompts.Append[appendIndex].Role.IsNull() {
-					*role = shared.Role(r.Config.Prompts.Append[appendIndex].Role.ValueString())
+					*role = shared.AiPromptDecoratorPluginConfigRole(r.Config.Prompts.Append[appendIndex].Role.ValueString())
 				} else {
 					role = nil
 				}

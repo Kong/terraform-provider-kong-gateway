@@ -7,6 +7,7 @@
 
 * Upgrade to Kong Gateway 3.14
   * Add `plugin_ai_a2a_proxy`, `plugin_ai_custom_guardrail`, `plugin_ai_lakera_guard` and `plugin_metering_and_billing` resources
+* Add support for RBAC resources: `rbac_role`, `rbac_role_entity`, `rbac_role_endpoint`, `rbac_user`, `rbac_user_role`, `group`, `group_role`
 
 ## 1.0.1
 > Released on 2025/11/07

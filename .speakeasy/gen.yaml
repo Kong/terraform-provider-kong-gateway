@@ -13,8 +13,8 @@ generation:
     requestResponseComponentNamesFeb2024: true
     securityFeb2025: false
     sharedErrorComponentsApr2025: false
-    nameOverrideFeb2026: false
     sharedNestedComponentsJan2026: false
+    nameOverrideFeb2026: false
   auth:
     oAuth2ClientCredentialsEnabled: false
     oAuth2PasswordEnabled: false
@@ -22,17 +22,18 @@ generation:
   schemas:
     allOfMergeStrategy: shallowMerge
   requestBodyFieldName: ""
+  versioningStrategy: automatic
+  persistentEdits: {}
   tests:
     generateTests: true
     generateNewTests: false
     skipResponseBodyAssertions: false
-  persistentEdits: {}
-  versioningStrategy: automatic
 terraform:
   version: 1.1.0
   additionalActions: []
   additionalDataSources: []
-  additionalDependencies: {}
+  additionalDependencies:
+    github.com/hashicorp/terraform-plugin-testing: v1.15.0
   additionalEphemeralResources: []
   additionalFunctions: []
   additionalListResources: []
@@ -61,5 +62,4 @@ terraform:
   preApplyUnionDiscriminators: false
   respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
-  unionDeserializationStrategy: populated-fields
   unionStrategy: populated-fields

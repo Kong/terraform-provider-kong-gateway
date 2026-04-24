@@ -9,7 +9,7 @@ import (
 )
 
 type CreateOauth2introspectionPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	Oauth2IntrospectionPlugin shared.Oauth2IntrospectionPlugin `request:"mediaType=application/json"`
 }
@@ -38,6 +38,9 @@ func (c *CreateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() 
 	}
 	return c.Oauth2IntrospectionPlugin
 }
+
+// #region class-body-createoauth2introspectionpluginrequest
+// #endregion class-body-createoauth2introspectionpluginrequest
 
 type CreateOauth2introspectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -97,3 +100,6 @@ func (c *CreateOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() 
 	}
 	return c.GatewayUnauthorizedError
 }
+
+// #region class-body-createoauth2introspectionpluginresponse
+// #endregion class-body-createoauth2introspectionpluginresponse

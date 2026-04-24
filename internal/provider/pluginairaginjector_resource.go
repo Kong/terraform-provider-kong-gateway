@@ -37,6 +37,7 @@ type PluginAiRagInjectorResource struct {
 
 // PluginAiRagInjectorResourceModel describes the resource data model.
 type PluginAiRagInjectorResourceModel struct {
+	Condition     types.String                       `tfsdk:"condition"`
 	Config        *tfTypes.AiRagInjectorPluginConfig `tfsdk:"config"`
 	Consumer      *tfTypes.Set                       `tfsdk:"consumer"`
 	ConsumerGroup *tfTypes.Set                       `tfsdk:"consumer_group"`
@@ -62,9 +63,54 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginAiRagInjector Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
+					"collection_acl_config": schema.MapNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Validators: []validator.Object{
+								speakeasy_objectvalidators.NotNull(),
+							},
+							Attributes: map[string]schema.Attribute{
+								"allow": schema.ListAttribute{
+									Computed:    true,
+									Optional:    true,
+									ElementType: types.StringType,
+									Description: `Consumer identifiers allowed access to this collection`,
+								},
+								"deny": schema.ListAttribute{
+									Computed:    true,
+									Optional:    true,
+									ElementType: types.StringType,
+									Description: `Consumer identifiers denied access to this collection`,
+								},
+							},
+						},
+						Description: `Per-collection ACL overrides`,
+					},
+					"consumer_identifier": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The type of consumer identifier used for ACL checks. must be one of ["consumer_group", "consumer_id", "custom_id", "username"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"consumer_group",
+								"consumer_id",
+								"custom_id",
+								"username",
+							),
+						},
+					},
 					"embeddings": schema.SingleNestedAttribute{
 						Required: true,
 						Attributes: map[string]schema.Attribute{
@@ -106,6 +152,16 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 										Computed:    true,
 										Optional:    true,
 										Description: `Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.`,
+									},
+									"gcp_metadata_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.`,
+									},
+									"gcp_oauth_token_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.`,
 									},
 									"gcp_service_account_json": schema.StringAttribute{
 										Computed:    true,
@@ -206,6 +262,16 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 														Optional:    true,
 														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
 													},
+													"batch_bucket_prefix": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.`,
+													},
+													"batch_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `AWS role arn used for calling batch API. Try to get the value from request if ommited.`,
+													},
 													"embeddings_normalize": schema.BoolAttribute{
 														Computed:    true,
 														Optional:    true,
@@ -215,6 +281,11 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 														Computed:    true,
 														Optional:    true,
 														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
+													},
+													"video_output_s3_uri": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.`,
 													},
 												},
 											},
@@ -265,7 +336,7 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 									},
 									"provider": schema.StringAttribute{
 										Required:    true,
-										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "openai"]`,
+										Description: `AI provider format to use for embeddings API. must be one of ["azure", "bedrock", "gemini", "huggingface", "mistral", "ollama", "openai"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"azure",
@@ -273,6 +344,7 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 												"gemini",
 												"huggingface",
 												"mistral",
+												"ollama",
 												"openai",
 											),
 										},
@@ -285,6 +357,36 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						Description: `The maximum number of chunks to fetch from vectordb`,
+					},
+					"filter_mode": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Defines how the plugin behaves when a filter is invalid. Set to ` + "`" + `compatible` + "`" + ` to ignore invalid filters, or ` + "`" + `strict` + "`" + ` to raise an error. This can be overridden per request. must be one of ["compatible", "strict"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"compatible",
+								"strict",
+							),
+						},
+					},
+					"global_acl_config": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"allow": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `Consumer identifiers allowed access (groups, IDs, usernames, or custom IDs based on consumer_identifier setting)`,
+							},
+							"deny": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `Consumer identifiers denied access (groups, IDs, usernames, or custom IDs based on consumer_identifier setting)`,
+							},
+						},
+						Description: `Global ACL configuration for all RAG operations`,
 					},
 					"inject_as_role": schema.StringAttribute{
 						Computed:    true,
@@ -302,10 +404,23 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 						Computed: true,
 						Optional: true,
 					},
+					"max_filter_clauses": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximum number of filter clauses allowed`,
+						Validators: []validator.Int64{
+							int64validator.Between(1, 1000),
+						},
+					},
 					"stop_on_failure": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `Halt the LLM request process in case of a vectordb or embeddings service failure`,
+					},
+					"stop_on_filter_error": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Default behavior when filter parsing fails (can be overridden per-request)`,
 					},
 					"vectordb": schema.SingleNestedAttribute{
 						Required: true,
@@ -401,6 +516,80 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 								Computed: true,
 								Optional: true,
 								Attributes: map[string]schema.Attribute{
+									"cloud_authentication": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_provider": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"aws",
+														"azure",
+														"gcp",
+													),
+												},
+											},
+											"aws_access_key_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_assume_role_arn": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+											},
+											"aws_cache_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_is_serverless": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_region": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"aws_role_session_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The session name for the temporary credentials when assuming the IAM role.`,
+											},
+											"aws_secret_access_key": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+											},
+											"azure_client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"azure_tenant_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+											},
+											"gcp_service_account_json": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+											},
+										},
+										Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+									},
 									"cluster_max_redirections": schema.Int64Attribute{
 										Computed:    true,
 										Optional:    true,
@@ -583,6 +772,11 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 									),
 								},
 							},
+							"threshold": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `the default similarity threshold for accepting semantic search results (float). Higher threshold means more results are considered similar.`,
+							},
 						},
 					},
 					"vectordb_namespace": schema.StringAttribute{
@@ -737,7 +931,7 @@ func (r *PluginAiRagInjectorResource) Schema(ctx context.Context, req resource.S
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -992,7 +1186,7 @@ func (r *PluginAiRagInjectorResource) ImportState(ctx context.Context, req resou
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -1002,7 +1196,7 @@ func (r *PluginAiRagInjectorResource) ImportState(ctx context.Context, req resou
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

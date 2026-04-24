@@ -11,7 +11,7 @@ import (
 type UpdateAigcpmodelarmorPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiGcpModelArmorPlugin shared.AiGcpModelArmorPlugin `request:"mediaType=application/json"`
 }

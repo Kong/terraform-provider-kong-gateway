@@ -7,15 +7,15 @@ import (
 )
 
 type AiResponseTransformerPluginConfig struct {
-	HTTPProxyHost                    types.String `tfsdk:"http_proxy_host"`
-	HTTPProxyPort                    types.Int64  `tfsdk:"http_proxy_port"`
-	HTTPTimeout                      types.Int64  `tfsdk:"http_timeout"`
-	HTTPSProxyHost                   types.String `tfsdk:"https_proxy_host"`
-	HTTPSProxyPort                   types.Int64  `tfsdk:"https_proxy_port"`
-	HTTPSVerify                      types.Bool   `tfsdk:"https_verify"`
-	Llm                              *Llm         `tfsdk:"llm"`
-	MaxRequestBodySize               types.Int64  `tfsdk:"max_request_body_size"`
-	ParseLlmResponseJSONInstructions types.Bool   `tfsdk:"parse_llm_response_json_instructions"`
-	Prompt                           types.String `tfsdk:"prompt"`
-	TransformationExtractPattern     types.String `tfsdk:"transformation_extract_pattern"`
+	HTTPProxyHost                    types.String        `tfsdk:"http_proxy_host"`
+	HTTPProxyPort                    types.Int64         `tfsdk:"http_proxy_port"`
+	HTTPTimeout                      types.Int64         `tfsdk:"http_timeout"`
+	HTTPSProxyHost                   types.String        `tfsdk:"https_proxy_host"`
+	HTTPSProxyPort                   types.Int64         `tfsdk:"https_proxy_port"`
+	HTTPSVerify                      types.Bool          `tfsdk:"https_verify"`
+	Llm                              *PartialModelConfig `tfsdk:"llm"`
+	MaxRequestBodySize               types.Int64         `tfsdk:"max_request_body_size"`
+	ParseLlmResponseJSONInstructions types.Bool          `tfsdk:"parse_llm_response_json_instructions"`
+	Prompt                           types.String        `tfsdk:"prompt"`
+	TransformationExtractPattern     types.String        `tfsdk:"transformation_extract_pattern"`
 }

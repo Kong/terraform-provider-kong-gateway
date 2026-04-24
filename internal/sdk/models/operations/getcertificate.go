@@ -11,7 +11,7 @@ import (
 type GetCertificateRequest struct {
 	// ID of the Certificate to lookup
 	CertificateID string `pathParam:"style=simple,explode=false,name=CertificateId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

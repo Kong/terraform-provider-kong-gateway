@@ -122,36 +122,144 @@ func (a *AiMcpProxyPluginPartials) GetPath() *string {
 	return a.Path
 }
 
-type Logging struct {
+// ACLAttributeType - The type of attributes that ACL is evaluated with. Should only be configured on listener modes, not conversion-only.
+type ACLAttributeType string
+
+const (
+	ACLAttributeTypeConsumer         ACLAttributeType = "consumer"
+	ACLAttributeTypeOauthAccessToken ACLAttributeType = "oauth_access_token"
+)
+
+func (e ACLAttributeType) ToPointer() *ACLAttributeType {
+	return &e
+}
+func (e *ACLAttributeType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "consumer":
+		fallthrough
+	case "oauth_access_token":
+		*e = ACLAttributeType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ACLAttributeType: %v", v)
+	}
+}
+
+// ConsumerIdentifier - Which subject type entries in ACL lists refer to for per-consumer matching. Should only be configured on listener modes, not conversion-only.
+type ConsumerIdentifier string
+
+const (
+	ConsumerIdentifierConsumerID ConsumerIdentifier = "consumer_id"
+	ConsumerIdentifierCustomID   ConsumerIdentifier = "custom_id"
+	ConsumerIdentifierUsername   ConsumerIdentifier = "username"
+)
+
+func (e ConsumerIdentifier) ToPointer() *ConsumerIdentifier {
+	return &e
+}
+func (e *ConsumerIdentifier) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "consumer_id":
+		fallthrough
+	case "custom_id":
+		fallthrough
+	case "username":
+		*e = ConsumerIdentifier(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConsumerIdentifier: %v", v)
+	}
+}
+
+// DefaultACL - Default ACL entry for the given scope. `deny` has higher precedence than `allow`.
+type DefaultACL struct {
+	// Subjects (e.g. Consumer name, Consumer Groups, or Claim values depending on configuration) explicitly allowed to access this scope.
+	Allow []string `json:"allow,omitempty"`
+	// Subjects (e.g. Consumer name, Consumer Groups, or Claim values depending on configuration) explicitly denied from this scope. `deny` takes precedence over `allow`.
+	Deny []string `json:"deny,omitempty"`
+	// Scope for this default ACL entry (for example: 'tools'). Defaults to 'tools'.
+	Scope *string `json:"scope,omitempty"`
+}
+
+func (d DefaultACL) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DefaultACL) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DefaultACL) GetAllow() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Allow
+}
+
+func (d *DefaultACL) GetDeny() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Deny
+}
+
+func (d *DefaultACL) GetScope() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Scope
+}
+
+type AiMcpProxyPluginLogging struct {
+	// If true, emit audit logs for ACL evaluations.
+	LogAudits *bool `json:"log_audits,omitempty"`
 	// If enabled, will log the request and response body into the Kong log plugin(s) output.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
 	// If enabled, will add mcp metrics into the Kong log plugin(s) output.
 	LogStatistics *bool `json:"log_statistics,omitempty"`
 }
 
-func (l Logging) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(l, "", false)
+func (a AiMcpProxyPluginLogging) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
 }
 
-func (l *Logging) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &l, "", false, nil); err != nil {
+func (a *AiMcpProxyPluginLogging) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (l *Logging) GetLogPayloads() *bool {
-	if l == nil {
+func (a *AiMcpProxyPluginLogging) GetLogAudits() *bool {
+	if a == nil {
 		return nil
 	}
-	return l.LogPayloads
+	return a.LogAudits
 }
 
-func (l *Logging) GetLogStatistics() *bool {
-	if l == nil {
+func (a *AiMcpProxyPluginLogging) GetLogPayloads() *bool {
+	if a == nil {
 		return nil
 	}
-	return l.LogStatistics
+	return a.LogPayloads
+}
+
+func (a *AiMcpProxyPluginLogging) GetLogStatistics() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.LogStatistics
 }
 
 // Mode - The mode of the MCP proxy. Possible values are: 'passthrough-listener', 'conversion-listener', 'conversion-only', 'listener'.
@@ -187,9 +295,580 @@ func (e *Mode) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// AiMcpProxyPluginClient - The configuration for client-side session storage.
+type AiMcpProxyPluginClient struct {
+	// The secrets that are used in session encryption. Required when the strategy is 'client'. The first secret is used for encryption, while all secrets are used for decryption to support key rotation.
+	Secrets []string `json:"secrets,omitempty"`
+}
+
+func (a AiMcpProxyPluginClient) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginClient) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginClient) GetSecrets() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Secrets
+}
+
+// AiMcpProxyPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type AiMcpProxyPluginAuthProvider string
+
+const (
+	AiMcpProxyPluginAuthProviderAws   AiMcpProxyPluginAuthProvider = "aws"
+	AiMcpProxyPluginAuthProviderAzure AiMcpProxyPluginAuthProvider = "azure"
+	AiMcpProxyPluginAuthProviderGcp   AiMcpProxyPluginAuthProvider = "gcp"
+)
+
+func (e AiMcpProxyPluginAuthProvider) ToPointer() *AiMcpProxyPluginAuthProvider {
+	return &e
+}
+func (e *AiMcpProxyPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = AiMcpProxyPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginAuthProvider: %v", v)
+	}
+}
+
+// AiMcpProxyPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type AiMcpProxyPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *AiMcpProxyPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (a AiMcpProxyPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAuthProvider() *AiMcpProxyPluginAuthProvider {
+	if a == nil {
+		return nil
+	}
+	return a.AuthProvider
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsAccessKeyID
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsAssumeRoleArn
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsCacheName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsCacheName
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.AwsIsServerless
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsRegion() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsRegion
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsRoleSessionName
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsSecretAccessKey
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAzureClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureClientID
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureClientSecret
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetAzureTenantID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureTenantID
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpServiceAccountJSON
+}
+
+type AiMcpProxyPluginClusterNodes struct {
+	// A string representing a host name, such as example.com.
+	IP *string `json:"ip,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (a AiMcpProxyPluginClusterNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginClusterNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginClusterNodes) GetIP() *string {
+	if a == nil {
+		return nil
+	}
+	return a.IP
+}
+
+func (a *AiMcpProxyPluginClusterNodes) GetPort() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Port
+}
+
+type AiMcpProxyPluginSentinelNodes struct {
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+}
+
+func (a AiMcpProxyPluginSentinelNodes) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginSentinelNodes) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginSentinelNodes) GetHost() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Host
+}
+
+func (a *AiMcpProxyPluginSentinelNodes) GetPort() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Port
+}
+
+// AiMcpProxyPluginSentinelRole - Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+type AiMcpProxyPluginSentinelRole string
+
+const (
+	AiMcpProxyPluginSentinelRoleAny    AiMcpProxyPluginSentinelRole = "any"
+	AiMcpProxyPluginSentinelRoleMaster AiMcpProxyPluginSentinelRole = "master"
+	AiMcpProxyPluginSentinelRoleSlave  AiMcpProxyPluginSentinelRole = "slave"
+)
+
+func (e AiMcpProxyPluginSentinelRole) ToPointer() *AiMcpProxyPluginSentinelRole {
+	return &e
+}
+func (e *AiMcpProxyPluginSentinelRole) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "any":
+		fallthrough
+	case "master":
+		fallthrough
+	case "slave":
+		*e = AiMcpProxyPluginSentinelRole(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginSentinelRole: %v", v)
+	}
+}
+
+type AiMcpProxyPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *AiMcpProxyPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
+	// Maximum retry attempts for redirection.
+	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
+	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
+	ClusterNodes []AiMcpProxyPluginClusterNodes `json:"cluster_nodes,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ConnectTimeout *int64 `json:"connect_timeout,omitempty"`
+	// If the connection to Redis is proxied (e.g. Envoy), set it `true`. Set the `host` and `port` to point to the proxy address.
+	ConnectionIsProxied *bool `json:"connection_is_proxied,omitempty"`
+	// Database to use for the Redis connection when using the `redis` strategy
+	Database *int64 `json:"database,omitempty"`
+	// A string representing a host name, such as example.com.
+	Host *string `json:"host,omitempty"`
+	// Limits the total number of opened connections for a pool. If the connection pool is full, connection queues above the limit go into the backlog queue. If the backlog queue is full, subsequent connect operations fail and return `nil`. Queued operations (subject to set timeouts) resume once the number of connections in the pool is less than `keepalive_pool_size`. If latency is high or throughput is low, try increasing this value. Empirically, this value is larger than `keepalive_pool_size`.
+	KeepaliveBacklog *int64 `json:"keepalive_backlog,omitempty"`
+	// The size limit for every cosocket connection pool associated with every remote server, per worker process. If neither `keepalive_pool_size` nor `keepalive_backlog` is specified, no pool is created. If `keepalive_pool_size` isn't specified but `keepalive_backlog` is specified, then the pool uses the default value. Try to increase (e.g. 512) this value if latency is high or throughput is low.
+	KeepalivePoolSize *int64 `json:"keepalive_pool_size,omitempty"`
+	// Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+	Password *string `json:"password,omitempty"`
+	// An integer representing a port number between 0 and 65535, inclusive.
+	Port *int64 `json:"port,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	ReadTimeout *int64 `json:"read_timeout,omitempty"`
+	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+	SendTimeout *int64 `json:"send_timeout,omitempty"`
+	// Sentinel master to use for Redis connections. Defining this value implies using Redis Sentinel.
+	SentinelMaster *string `json:"sentinel_master,omitempty"`
+	// Sentinel node addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Sentinel. The minimum length of the array is 1 element.
+	SentinelNodes []AiMcpProxyPluginSentinelNodes `json:"sentinel_nodes,omitempty"`
+	// Sentinel password to authenticate with a Redis Sentinel instance. If undefined, no AUTH commands are sent to Redis Sentinels.
+	SentinelPassword *string `json:"sentinel_password,omitempty"`
+	// Sentinel role to use for Redis connections when the `redis` strategy is defined. Defining this value implies using Redis Sentinel.
+	SentinelRole *AiMcpProxyPluginSentinelRole `json:"sentinel_role,omitempty"`
+	// Sentinel username to authenticate with a Redis Sentinel instance. If undefined, ACL authentication won't be performed. This requires Redis v6.2.0+.
+	SentinelUsername *string `json:"sentinel_username,omitempty"`
+	// A string representing an SNI (server name indication) value for TLS.
+	ServerName *string `json:"server_name,omitempty"`
+	// If set to true, uses SSL to connect to Redis.
+	Ssl *bool `json:"ssl,omitempty"`
+	// If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+	Username *string `json:"username,omitempty"`
+}
+
+func (a AiMcpProxyPluginRedis) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginRedis) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginRedis) GetCloudAuthentication() *AiMcpProxyPluginCloudAuthentication {
+	if a == nil {
+		return nil
+	}
+	return a.CloudAuthentication
+}
+
+func (a *AiMcpProxyPluginRedis) GetClusterMaxRedirections() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.ClusterMaxRedirections
+}
+
+func (a *AiMcpProxyPluginRedis) GetClusterNodes() []AiMcpProxyPluginClusterNodes {
+	if a == nil {
+		return nil
+	}
+	return a.ClusterNodes
+}
+
+func (a *AiMcpProxyPluginRedis) GetConnectTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.ConnectTimeout
+}
+
+func (a *AiMcpProxyPluginRedis) GetConnectionIsProxied() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.ConnectionIsProxied
+}
+
+func (a *AiMcpProxyPluginRedis) GetDatabase() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Database
+}
+
+func (a *AiMcpProxyPluginRedis) GetHost() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Host
+}
+
+func (a *AiMcpProxyPluginRedis) GetKeepaliveBacklog() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.KeepaliveBacklog
+}
+
+func (a *AiMcpProxyPluginRedis) GetKeepalivePoolSize() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.KeepalivePoolSize
+}
+
+func (a *AiMcpProxyPluginRedis) GetPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Password
+}
+
+func (a *AiMcpProxyPluginRedis) GetPort() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Port
+}
+
+func (a *AiMcpProxyPluginRedis) GetReadTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.ReadTimeout
+}
+
+func (a *AiMcpProxyPluginRedis) GetSendTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.SendTimeout
+}
+
+func (a *AiMcpProxyPluginRedis) GetSentinelMaster() *string {
+	if a == nil {
+		return nil
+	}
+	return a.SentinelMaster
+}
+
+func (a *AiMcpProxyPluginRedis) GetSentinelNodes() []AiMcpProxyPluginSentinelNodes {
+	if a == nil {
+		return nil
+	}
+	return a.SentinelNodes
+}
+
+func (a *AiMcpProxyPluginRedis) GetSentinelPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.SentinelPassword
+}
+
+func (a *AiMcpProxyPluginRedis) GetSentinelRole() *AiMcpProxyPluginSentinelRole {
+	if a == nil {
+		return nil
+	}
+	return a.SentinelRole
+}
+
+func (a *AiMcpProxyPluginRedis) GetSentinelUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.SentinelUsername
+}
+
+func (a *AiMcpProxyPluginRedis) GetServerName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ServerName
+}
+
+func (a *AiMcpProxyPluginRedis) GetSsl() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.Ssl
+}
+
+func (a *AiMcpProxyPluginRedis) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
+}
+
+func (a *AiMcpProxyPluginRedis) GetUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Username
+}
+
+// AiMcpProxyPluginStrategy - The strategy for the session. If the value is 'client', the session is encrypted into MCP session id assigned to the client. If the value is not 'client', the session is stored in the configured database.
+type AiMcpProxyPluginStrategy string
+
+const (
+	AiMcpProxyPluginStrategyClient AiMcpProxyPluginStrategy = "client"
+	AiMcpProxyPluginStrategyRedis  AiMcpProxyPluginStrategy = "redis"
+)
+
+func (e AiMcpProxyPluginStrategy) ToPointer() *AiMcpProxyPluginStrategy {
+	return &e
+}
+func (e *AiMcpProxyPluginStrategy) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client":
+		fallthrough
+	case "redis":
+		*e = AiMcpProxyPluginStrategy(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginStrategy: %v", v)
+	}
+}
+
+// AiMcpProxyPluginSession - Enable managed session when Kong responds as MCP server in listener or conversion-listener modes. This doesn't affect the passthrough-listener mode as the state in that mode is maintained by the upstream MCP servers.
+type AiMcpProxyPluginSession struct {
+	// The configuration for client-side session storage.
+	Client *AiMcpProxyPluginClient `json:"client,omitempty"`
+	// If enabled, Kong will maintain managed sessions with the MCP server.
+	Managed *bool                  `json:"managed,omitempty"`
+	Redis   *AiMcpProxyPluginRedis `json:"redis,omitempty"`
+	// The time-to-live (TTL) for each session in seconds.
+	SessionTTL *float64 `json:"session_ttl,omitempty"`
+	// The strategy for the session. If the value is 'client', the session is encrypted into MCP session id assigned to the client. If the value is not 'client', the session is stored in the configured database.
+	Strategy *AiMcpProxyPluginStrategy `json:"strategy,omitempty"`
+}
+
+func (a AiMcpProxyPluginSession) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginSession) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginSession) GetClient() *AiMcpProxyPluginClient {
+	if a == nil {
+		return nil
+	}
+	return a.Client
+}
+
+func (a *AiMcpProxyPluginSession) GetManaged() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.Managed
+}
+
+func (a *AiMcpProxyPluginSession) GetRedis() *AiMcpProxyPluginRedis {
+	if a == nil {
+		return nil
+	}
+	return a.Redis
+}
+
+func (a *AiMcpProxyPluginSession) GetSessionTTL() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.SessionTTL
+}
+
+func (a *AiMcpProxyPluginSession) GetStrategy() *AiMcpProxyPluginStrategy {
+	if a == nil {
+		return nil
+	}
+	return a.Strategy
+}
+
 type Server struct {
 	// Whether to forward the client request headers to the upstream server when calling the tools.
 	ForwardClientHeaders *bool `json:"forward_client_headers,omitempty"`
+	// Enable managed session when Kong responds as MCP server in listener or conversion-listener modes. This doesn't affect the passthrough-listener mode as the state in that mode is maintained by the upstream MCP servers.
+	Session *AiMcpProxyPluginSession `json:"session,omitempty"`
 	// The tag of the MCP server. This is used to filter the exported MCP tools. The field should contain exactly one tag.
 	Tag *string `json:"tag,omitempty"`
 	// The timeout for calling the tools in milliseconds.
@@ -214,6 +893,13 @@ func (s *Server) GetForwardClientHeaders() *bool {
 	return s.ForwardClientHeaders
 }
 
+func (s *Server) GetSession() *AiMcpProxyPluginSession {
+	if s == nil {
+		return nil
+	}
+	return s.Session
+}
+
 func (s *Server) GetTag() *string {
 	if s == nil {
 		return nil
@@ -226,6 +912,39 @@ func (s *Server) GetTimeout() *float64 {
 		return nil
 	}
 	return s.Timeout
+}
+
+// AiMcpProxyPluginACL - Optional per-primitive ACL. `deny` has higher precedence than `allow`.
+type AiMcpProxyPluginACL struct {
+	// Subjects (e.g. Consumer name, Consumer Groups, or Claim values depending on configuration) explicitly allowed to use this primitive.
+	Allow []string `json:"allow,omitempty"`
+	// Subjects (e.g. Consumer name, Consumer Groups, or Claim values depending on configuration) explicitly denied from using this primitive. `deny` takes precedence over `allow`.
+	Deny []string `json:"deny,omitempty"`
+}
+
+func (a AiMcpProxyPluginACL) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginACL) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginACL) GetAllow() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Allow
+}
+
+func (a *AiMcpProxyPluginACL) GetDeny() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Deny
 }
 
 type Annotations struct {
@@ -287,7 +1006,7 @@ func (a *Annotations) GetTitle() *string {
 	return a.Title
 }
 
-// AiMcpProxyPluginMethod - The method of the exported API. By default, Kong will extract the method from API configuration. If the configured method is not exactly matched, this field is required.
+// AiMcpProxyPluginMethod - The method of the exported API, which must be one of the route's method. By default, Kong will extract the method from API configuration. If the configured method is not exactly matched, this field is required.
 type AiMcpProxyPluginMethod string
 
 const (
@@ -323,7 +1042,7 @@ func (e *AiMcpProxyPluginMethod) UnmarshalJSON(data []byte) error {
 	}
 }
 
-// Scheme - The scheme of the exported API. By default, Kong will extract the scheme from API configuration. If the configured scheme is not expected, this field can be used to override it.
+// Scheme - The scheme of the exported API, which must be one of the route's scheme. By default, Kong will extract the scheme from API configuration. If the configured scheme is not expected, this field can be used to override it.
 type Scheme string
 
 const (
@@ -351,24 +1070,30 @@ func (e *Scheme) UnmarshalJSON(data []byte) error {
 }
 
 type Tools struct {
-	Annotations *Annotations `json:"annotations,omitempty"`
+	// Optional per-primitive ACL. `deny` has higher precedence than `allow`.
+	ACL         *AiMcpProxyPluginACL `json:"acl,omitempty"`
+	Annotations *Annotations         `json:"annotations,omitempty"`
 	// The description of the MCP tool. This is used to provide information about the tool's functionality and usage.
 	Description string `json:"description"`
 	// The headers of the exported API. By default, Kong will extract the headers from API configuration. If the configured headers are not exactly matched, this field is required.
-	Headers map[string]any `json:"headers,omitempty"`
-	// The host of the exported API. By default, Kong will extract the host from API configuration. If the configured host is wildcard, this field is required.
+	Headers map[string][]string `json:"headers,omitempty"`
+	// The host of the exported API, which must match the route's hosts. It should be the route's host. By default, Kong will extract the host from API configuration. If the configured host is wildcard, this field is required.
 	Host *string `json:"host,omitempty"`
-	// The method of the exported API. By default, Kong will extract the method from API configuration. If the configured method is not exactly matched, this field is required.
+	// The method of the exported API, which must be one of the route's method. By default, Kong will extract the method from API configuration. If the configured method is not exactly matched, this field is required.
 	Method *AiMcpProxyPluginMethod `json:"method,omitempty"`
-	// The API parameters specification defined in OpenAPI. For example, '[{"name": "city", "in": "query", "description": "Name of the city to get the weather for", "required": true, "schema": {"type": "string"}}]'.See https://swagger.io/docs/specification/v3_0/describing-parameters/ for more details.
-	Parameters *string `json:"parameters,omitempty"`
-	// The path of the exported API. By default, Kong will extract the path from API configuration. If the configured path is not exactly matched, this field is required. Paths not starting with '/' are treated as relative paths.
+	// Tool identifier. In passthrough-listener mode, used to match remote MCP Server tools for ACL enforcement. In other modes, it is also used as the tool name (overrides tools.annotations.title if present).
+	Name *string `json:"name,omitempty"`
+	// The API parameters specification defined in OpenAPI JSON format. For example, '[{"name": "city", "in": "query", "description": "Name of the city to get the weather for", "required": true, "schema": {"type": "string"}}]'.See https://swagger.io/docs/specification/v3_0/describing-parameters/ for more details.
+	Parameters []any `json:"parameters,omitempty"`
+	// The path of the exported API, which must match the route's paths. Path not starting with '/' are treated as relative path and the route path will be added as the prefix. If the upstream path is different from the route one, to match the route's path, use relative path and strip_path to strip the added prefix. Relative path is unsupported when the route path is regex. By default, Kong will extract the path from API configuration.
 	Path *string `json:"path,omitempty"`
 	// The query arguments of the exported API. If the generated query arguments are not exactly matched, this field is required.
-	Query map[string]any `json:"query,omitempty"`
-	// The API requestBody specification defined in OpenAPI. For example, '{"content":{"application/x-www-form-urlencoded":{"schema":{"type":"object","properties":{"color":{"type":"array","items":{"type":"string"}}}}}}'.See https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/ for more details.
-	RequestBody *string `json:"request_body,omitempty"`
-	// The scheme of the exported API. By default, Kong will extract the scheme from API configuration. If the configured scheme is not expected, this field can be used to override it.
+	Query map[string][]string `json:"query,omitempty"`
+	// The API requestBody specification defined in OpenAPI JSON format. For example, '{"content":{"application/x-www-form-urlencoded":{"schema":{"type":"object","properties":{"color":{"type":"array","items":{"type":"string"}}}}}}'.See https://swagger.io/docs/specification/v3_0/describing-request-body/describing-request-body/ for more details. Note that `$ref` is not supported so we need to inline the schema.
+	RequestBody any `json:"request_body,omitempty"`
+	// The API responses specification defined in OpenAPI JSON format. This specification will be used to validate the upstream response and map it back to the structuredOutput. For example, '{"200":{"content":{"application/json":{"schema":{"type":"object","properties":{"result":{"type":"string"}}}}}}}'.See https://swagger.io/docs/specification/v3_0/describing-responses/ for more details.Only one non-error (status code < 400) response is supported. Note that `$ref` is not supported.
+	Responses any `json:"responses,omitempty"`
+	// The scheme of the exported API, which must be one of the route's scheme. By default, Kong will extract the scheme from API configuration. If the configured scheme is not expected, this field can be used to override it.
 	Scheme *Scheme `json:"scheme,omitempty"`
 }
 
@@ -381,6 +1106,13 @@ func (t *Tools) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (t *Tools) GetACL() *AiMcpProxyPluginACL {
+	if t == nil {
+		return nil
+	}
+	return t.ACL
 }
 
 func (t *Tools) GetAnnotations() *Annotations {
@@ -397,7 +1129,7 @@ func (t *Tools) GetDescription() string {
 	return t.Description
 }
 
-func (t *Tools) GetHeaders() map[string]any {
+func (t *Tools) GetHeaders() map[string][]string {
 	if t == nil {
 		return nil
 	}
@@ -418,7 +1150,14 @@ func (t *Tools) GetMethod() *AiMcpProxyPluginMethod {
 	return t.Method
 }
 
-func (t *Tools) GetParameters() *string {
+func (t *Tools) GetName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.Name
+}
+
+func (t *Tools) GetParameters() []any {
 	if t == nil {
 		return nil
 	}
@@ -432,18 +1171,25 @@ func (t *Tools) GetPath() *string {
 	return t.Path
 }
 
-func (t *Tools) GetQuery() map[string]any {
+func (t *Tools) GetQuery() map[string][]string {
 	if t == nil {
 		return nil
 	}
 	return t.Query
 }
 
-func (t *Tools) GetRequestBody() *string {
+func (t *Tools) GetRequestBody() any {
 	if t == nil {
 		return nil
 	}
 	return t.RequestBody
+}
+
+func (t *Tools) GetResponses() any {
+	if t == nil {
+		return nil
+	}
+	return t.Responses
 }
 
 func (t *Tools) GetScheme() *Scheme {
@@ -454,8 +1200,18 @@ func (t *Tools) GetScheme() *Scheme {
 }
 
 type AiMcpProxyPluginConfig struct {
-	Logging *Logging `json:"logging,omitempty"`
-	// max allowed body size allowed to be handled as MCP request.
+	// The claim in the OAuth2 access token to use as the subject for ACL evaluation when 'acl_attribute_type' is set to 'oauth_access_token'. Nested claim can be fetched by using a jq filter starts with dot, e.g., ".user.email": https://jqlang.org/manual/#object-identifier-index.
+	AccessTokenClaimField *string `json:"access_token_claim_field,omitempty"`
+	// The type of attributes that ACL is evaluated with. Should only be configured on listener modes, not conversion-only.
+	ACLAttributeType *ACLAttributeType `json:"acl_attribute_type,omitempty"`
+	// Which subject type entries in ACL lists refer to for per-consumer matching. Should only be configured on listener modes, not conversion-only.
+	ConsumerIdentifier *ConsumerIdentifier `json:"consumer_identifier,omitempty"`
+	// Optional list of default ACL rules keyed by scope (for example: tools).
+	DefaultACL []DefaultACL `json:"default_acl,omitempty"`
+	// If enabled (true), allows Consumer Group names to be used in default and per-primitive ACL. Should only be configured on listener modes, not conversion-only.
+	IncludeConsumerGroups *bool                    `json:"include_consumer_groups,omitempty"`
+	Logging               *AiMcpProxyPluginLogging `json:"logging,omitempty"`
+	// max allowed body size allowed to be handled as MCP request. 0 means unlimited, but the size of this body will still be limited by Nginx's client_max_body_size.
 	MaxRequestBodySize *int64 `json:"max_request_body_size,omitempty"`
 	// The mode of the MCP proxy. Possible values are: 'passthrough-listener', 'conversion-listener', 'conversion-only', 'listener'.
 	Mode   Mode    `json:"mode"`
@@ -474,7 +1230,42 @@ func (a *AiMcpProxyPluginConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (a *AiMcpProxyPluginConfig) GetLogging() *Logging {
+func (a *AiMcpProxyPluginConfig) GetAccessTokenClaimField() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AccessTokenClaimField
+}
+
+func (a *AiMcpProxyPluginConfig) GetACLAttributeType() *ACLAttributeType {
+	if a == nil {
+		return nil
+	}
+	return a.ACLAttributeType
+}
+
+func (a *AiMcpProxyPluginConfig) GetConsumerIdentifier() *ConsumerIdentifier {
+	if a == nil {
+		return nil
+	}
+	return a.ConsumerIdentifier
+}
+
+func (a *AiMcpProxyPluginConfig) GetDefaultACL() []DefaultACL {
+	if a == nil {
+		return nil
+	}
+	return a.DefaultACL
+}
+
+func (a *AiMcpProxyPluginConfig) GetIncludeConsumerGroups() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.IncludeConsumerGroups
+}
+
+func (a *AiMcpProxyPluginConfig) GetLogging() *AiMcpProxyPluginLogging {
 	if a == nil {
 		return nil
 	}
@@ -589,6 +1380,8 @@ func (a *AiMcpProxyPluginService) GetID() *string {
 
 // AiMcpProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiMcpProxyPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -596,9 +1389,10 @@ type AiMcpProxyPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                   `json:"instance_name,omitempty"`
-	name         string                    `const:"ai-mcp-proxy" json:"name"`
-	Ordering     *AiMcpProxyPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                    `const:"ai-mcp-proxy" json:"name"`
+	Ordering *AiMcpProxyPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiMcpProxyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -623,6 +1417,13 @@ func (a *AiMcpProxyPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiMcpProxyPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiMcpProxyPlugin) GetCreatedAt() *int64 {

@@ -14,6 +14,7 @@ PluginSolaceConsume Resource
 
 ```terraform
 resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
+  condition = "...my_condition..."
   config = {
     flow = {
       ack_mode = "AUTO"
@@ -28,7 +29,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
       ]
       max_unacked_messages = 1
       properties = {
-        key = jsonencode("value")
+        key = "value"
       }
       selector     = "...my_selector..."
       wait_timeout = 2606
@@ -42,6 +43,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
       authentication = {
         access_token        = "...my_access_token..."
         access_token_header = "...my_access_token_header..."
+        basic_auth_header   = "...my_basic_auth_header..."
         id_token            = "...my_id_token..."
         id_token_header     = "...my_id_token_header..."
         password            = "...my_password..."
@@ -56,7 +58,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
       generate_sequence_number = false
       host                     = "...my_host..."
       properties = {
-        key = jsonencode("value")
+        key = "value"
       }
       ssl_validate_certificate = true
       vpn_name                 = "...my_vpn_name..."
@@ -103,7 +105,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
     "..."
   ]
   updated_at = 3
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -116,6 +118,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
 - `id` (String) A string representing a UUID (universally unique identifier).
@@ -127,7 +130,7 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -196,9 +199,10 @@ Optional:
 Optional:
 
 - `access_token` (String) The OAuth2 access token used with `OAUTH2` authentication scheme when connecting to an event broker.
-- `access_token_header` (String)
+- `access_token_header` (String) Specifies the header that contains access token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `access_token` field.
+- `basic_auth_header` (String) Specifies the header that contains Basic Authentication credentials for the `BASIC` authentication scheme when connecting to an event broker. This header takes precedence over the `username` and `password` fields.
 - `id_token` (String) The OpenID Connect ID token used with `OAUTH2` authentication scheme when connecting to an event broker.
-- `id_token_header` (String)
+- `id_token_header` (String) Specifies the header that contains id token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `id_token` field.
 - `password` (String) The password used with `BASIC` authentication scheme when connecting to an event broker.
 - `scheme` (String) The client authentication scheme used when connection to an event broker. must be one of ["BASIC", "NONE", "OAUTH2"]
 - `username` (String) The username used with `BASIC` authentication scheme when connecting to an event broker.
@@ -284,8 +288,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_solace_consume.my_kong-gateway_plugin_solace_consume
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -293,5 +297,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_solace_consume.my_kong-gateway_plugin_solace_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_solace_consume.my_kong-gateway_plugin_solace_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

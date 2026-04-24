@@ -11,7 +11,7 @@ import (
 type UpsertSniRequest struct {
 	// ID or name of the SNI to lookup
 	SNIIDOrName string `pathParam:"style=simple,explode=false,name=SNIIdOrName"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the SNI
 	Sni shared.Sni `request:"mediaType=application/json"`

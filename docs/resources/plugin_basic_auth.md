@@ -14,8 +14,37 @@ PluginBasicAuth Resource
 
 ```terraform
 resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
+  condition = "...my_condition..."
   config = {
-    anonymous        = "...my_anonymous..."
+    anonymous = "...my_anonymous..."
+    brute_force_protection = {
+      redis = {
+        cloud_authentication = {
+          auth_provider            = "azure"
+          aws_access_key_id        = "...my_aws_access_key_id..."
+          aws_assume_role_arn      = "...my_aws_assume_role_arn..."
+          aws_cache_name           = "...my_aws_cache_name..."
+          aws_is_serverless        = true
+          aws_region               = "...my_aws_region..."
+          aws_role_session_name    = "...my_aws_role_session_name..."
+          aws_secret_access_key    = "...my_aws_secret_access_key..."
+          azure_client_id          = "...my_azure_client_id..."
+          azure_client_secret      = "...my_azure_client_secret..."
+          azure_tenant_id          = "...my_azure_tenant_id..."
+          gcp_service_account_json = "...my_gcp_service_account_json..."
+        }
+        database    = 4
+        host        = "...my_host..."
+        password    = "...my_password..."
+        port        = 1516
+        server_name = "...my_server_name..."
+        ssl         = true
+        ssl_verify  = false
+        timeout     = 1566038007
+        username    = "...my_username..."
+      }
+      strategy = "memory"
+    }
     hide_credentials = true
     realm            = "...my_realm..."
   }
@@ -55,7 +84,7 @@ resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -64,6 +93,7 @@ resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -76,7 +106,7 @@ resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -84,8 +114,54 @@ resource "kong-gateway_plugin_basic_auth" "my_pluginbasicauth" {
 Optional:
 
 - `anonymous` (String) An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
+- `brute_force_protection` (Attributes) (see [below for nested schema](#nestedatt--config--brute_force_protection))
 - `hide_credentials` (Boolean) An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
 - `realm` (String) When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
+
+<a id="nestedatt--config--brute_force_protection"></a>
+### Nested Schema for `config.brute_force_protection`
+
+Optional:
+
+- `redis` (Attributes) Redis configuration (see [below for nested schema](#nestedatt--config--brute_force_protection--redis))
+- `strategy` (String) The brute force protection strategy to use for retrieving and incrementing the limits. Available values are: `cluster`, `redis`, `memory`, and `off`. must be one of ["cluster", "memory", "off", "redis"]
+
+<a id="nestedatt--config--brute_force_protection--redis"></a>
+### Nested Schema for `config.brute_force_protection.redis`
+
+Optional:
+
+- `cloud_authentication` (Attributes) Cloud auth related configs for connecting to a Cloud Provider's Redis instance. (see [below for nested schema](#nestedatt--config--brute_force_protection--redis--cloud_authentication))
+- `database` (Number) Database to use for the Redis connection when using the `redis` strategy
+- `host` (String) A string representing a host name, such as example.com.
+- `password` (String) Password to use for Redis connections. If undefined, no AUTH commands are sent to Redis.
+- `port` (Number) An integer representing a port number between 0 and 65535, inclusive.
+- `server_name` (String) A string representing an SNI (server name indication) value for TLS.
+- `ssl` (Boolean) If set to true, uses SSL to connect to Redis.
+- `ssl_verify` (Boolean) If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+- `timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
+- `username` (String) Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
+
+<a id="nestedatt--config--brute_force_protection--redis--cloud_authentication"></a>
+### Nested Schema for `config.brute_force_protection.redis.cloud_authentication`
+
+Optional:
+
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+- `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+- `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+- `aws_is_serverless` (Boolean) This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+- `aws_region` (String) The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+- `aws_role_session_name` (String) The session name for the temporary credentials when assuming the IAM role.
+- `aws_secret_access_key` (String) AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+- `azure_client_id` (String) Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+- `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+
+
+
 
 
 <a id="nestedatt--ordering"></a>
@@ -148,8 +224,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_basic_auth.my_kong-gateway_plugin_basic_auth
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -157,5 +233,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_basic_auth.my_kong-gateway_plugin_basic_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_basic_auth.my_kong-gateway_plugin_basic_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

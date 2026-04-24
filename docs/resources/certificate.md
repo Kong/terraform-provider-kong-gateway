@@ -27,7 +27,7 @@ resource "kong-gateway_certificate" "my_certificate" {
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -48,7 +48,7 @@ resource "kong-gateway_certificate" "my_certificate" {
 - `snis` (List of String)
 - `tags` (List of String) An optional set of strings associated with the Certificate for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 ## Import
 
@@ -60,8 +60,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_certificate.my_kong-gateway_certificate
   id = jsonencode({
-    id = "ddf3cdaa-3329-4961-822a-ce6dbd38eff7"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "ddf3cdaa-3329-4961-822a-ce6dbd38eff7"
+    workspace = "team-payments"
   })
 }
 ```
@@ -69,5 +69,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_certificate.my_kong-gateway_certificate '{"id": "ddf3cdaa-3329-4961-822a-ce6dbd38eff7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_certificate.my_kong-gateway_certificate '{"id": "ddf3cdaa-3329-4961-822a-ce6dbd38eff7", "workspace": "team-payments"}'
 ```

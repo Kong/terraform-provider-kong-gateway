@@ -9,7 +9,7 @@ import (
 )
 
 type CreateRouteRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Route for creation
 	RouteJSON shared.RouteJSON `request:"mediaType=application/json"`

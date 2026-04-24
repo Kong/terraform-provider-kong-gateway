@@ -9,7 +9,7 @@ import (
 )
 
 type CreateOauth2PluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace    string              `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	Oauth2Plugin shared.Oauth2Plugin `request:"mediaType=application/json"`
 }
@@ -38,6 +38,9 @@ func (c *CreateOauth2PluginRequest) GetOauth2Plugin() shared.Oauth2Plugin {
 	}
 	return c.Oauth2Plugin
 }
+
+// #region class-body-createoauth2pluginrequest
+// #endregion class-body-createoauth2pluginrequest
 
 type CreateOauth2PluginResponse struct {
 	// HTTP response content type for this operation
@@ -97,3 +100,6 @@ func (c *CreateOauth2PluginResponse) GetGatewayUnauthorizedError() *shared.Gatew
 	}
 	return c.GatewayUnauthorizedError
 }
+
+// #region class-body-createoauth2pluginresponse
+// #endregion class-body-createoauth2pluginresponse

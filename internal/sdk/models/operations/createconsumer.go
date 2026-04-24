@@ -9,7 +9,7 @@ import (
 )
 
 type CreateConsumerRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the new Consumer for creation
 	Consumer shared.Consumer `request:"mediaType=application/json"`

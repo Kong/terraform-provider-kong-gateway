@@ -234,10 +234,14 @@ type MtlsAuthPluginConfig struct {
 	HTTPSProxyPort *int64 `json:"https_proxy_port,omitempty"`
 	// Controls client certificate revocation check behavior. If set to `SKIP`, no revocation check is performed. If set to `IGNORE_CA_ERROR`, the plugin respects the revocation status when either OCSP or CRL URL is set, and doesn't fail on network issues. If set to `STRICT`, the plugin only treats the certificate as valid when it's able to verify the revocation status.
 	RevocationCheckMode *MtlsAuthPluginRevocationCheckMode `json:"revocation_check_mode,omitempty"`
+	// Specifies a list of Subject Alternative Name (SAN) DirectoryName attributes to use for consumer lookup. Applicable only when `skip_consumer_lookup` is false. Supported formats: OID, Long Name, or Short Name. Examples: `commonName` (Long Name), `CN` (Short Name), `2.5.4.3` (OID). If left empty (default), all attributes present in the SAN DirectoryName extension are used. The matcher is case sensitive.
+	SanDirnameMatcher []string `json:"san_dirname_matcher,omitempty"`
 	// Sends the distinguished names (DN) of the configured CA list in the TLS handshake message.
 	SendCaDn *bool `json:"send_ca_dn,omitempty"`
 	// Skip consumer lookup once certificate is trusted against the configured CA list.
 	SkipConsumerLookup *bool `json:"skip_consumer_lookup,omitempty"`
+	// This option enables verification of the certificate presented by the server of the OCSP responder's URL and by the server of the CRL Distribution Point.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
 }
 
 func (m MtlsAuthPluginConfig) MarshalJSON() ([]byte, error) {
@@ -349,6 +353,13 @@ func (m *MtlsAuthPluginConfig) GetRevocationCheckMode() *MtlsAuthPluginRevocatio
 	return m.RevocationCheckMode
 }
 
+func (m *MtlsAuthPluginConfig) GetSanDirnameMatcher() []string {
+	if m == nil {
+		return nil
+	}
+	return m.SanDirnameMatcher
+}
+
 func (m *MtlsAuthPluginConfig) GetSendCaDn() *bool {
 	if m == nil {
 		return nil
@@ -363,6 +374,13 @@ func (m *MtlsAuthPluginConfig) GetSkipConsumerLookup() *bool {
 	return m.SkipConsumerLookup
 }
 
+func (m *MtlsAuthPluginConfig) GetSslVerify() *bool {
+	if m == nil {
+		return nil
+	}
+	return m.SslVerify
+}
+
 type MtlsAuthPluginProtocols string
 
 const (
@@ -370,6 +388,8 @@ const (
 	MtlsAuthPluginProtocolsGrpcs MtlsAuthPluginProtocols = "grpcs"
 	MtlsAuthPluginProtocolsHTTP  MtlsAuthPluginProtocols = "http"
 	MtlsAuthPluginProtocolsHTTPS MtlsAuthPluginProtocols = "https"
+	MtlsAuthPluginProtocolsWs    MtlsAuthPluginProtocols = "ws"
+	MtlsAuthPluginProtocolsWss   MtlsAuthPluginProtocols = "wss"
 )
 
 func (e MtlsAuthPluginProtocols) ToPointer() *MtlsAuthPluginProtocols {
@@ -388,6 +408,10 @@ func (e *MtlsAuthPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
+		fallthrough
+	case "ws":
+		fallthrough
+	case "wss":
 		*e = MtlsAuthPluginProtocols(v)
 		return nil
 	default:
@@ -443,6 +467,8 @@ func (m *MtlsAuthPluginService) GetID() *string {
 
 // MtlsAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type MtlsAuthPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -450,9 +476,10 @@ type MtlsAuthPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"mtls-auth" json:"name"`
-	Ordering     *MtlsAuthPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                  `const:"mtls-auth" json:"name"`
+	Ordering *MtlsAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []MtlsAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -460,7 +487,7 @@ type MtlsAuthPlugin struct {
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64               `json:"updated_at,omitempty"`
 	Config    MtlsAuthPluginConfig `json:"config"`
-	// A set of strings representing HTTP protocols.
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []MtlsAuthPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *MtlsAuthPluginRoute `json:"route,omitempty"`
@@ -477,6 +504,13 @@ func (m *MtlsAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (m *MtlsAuthPlugin) GetCondition() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Condition
 }
 
 func (m *MtlsAuthPlugin) GetCreatedAt() *int64 {

@@ -9,7 +9,7 @@ import (
 )
 
 type CreateExittransformerPluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace             string                       `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	ExitTransformerPlugin shared.ExitTransformerPlugin `request:"mediaType=application/json"`
 }

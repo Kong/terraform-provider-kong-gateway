@@ -29,10 +29,11 @@ generation:
     generateNewTests: false
     skipResponseBodyAssertions: false
 terraform:
-  version: 1.0.2
+  version: 1.1.0
   additionalActions: []
   additionalDataSources: []
-  additionalDependencies: {}
+  additionalDependencies:
+    github.com/hashicorp/terraform-plugin-testing: v1.15.0
   additionalEphemeralResources: []
   additionalFunctions: []
   additionalListResources: []
@@ -54,9 +55,12 @@ terraform:
   enableTypeDeduplication: true
   environmentVariables: []
   excludeEmptyObjectSchemas: false
+  forwardCompatibleEnumsByDefault: false
   includeEmptyObjects: false
   inferUnionDiscriminators: false
   packageName: kong-gateway
+  preApplyUnionDiscriminators: false
+  providerTypeNameOverride: ""
   respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
   unionStrategy: populated-fields

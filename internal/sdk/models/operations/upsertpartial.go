@@ -11,7 +11,7 @@ import (
 type UpsertPartialRequest struct {
 	// ID of the Partial to lookup
 	PartialID string `pathParam:"style=simple,explode=false,name=PartialId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Partial
 	Partial shared.Partial `request:"mediaType=application/json"`
@@ -49,12 +49,24 @@ func (u *UpsertPartialRequest) GetPartial() shared.Partial {
 	return u.Partial
 }
 
+func (u *UpsertPartialRequest) GetPartialEmbeddings() *shared.PartialEmbeddings {
+	return u.GetPartial().PartialEmbeddings
+}
+
+func (u *UpsertPartialRequest) GetPartialModel() *shared.PartialModel {
+	return u.GetPartial().PartialModel
+}
+
 func (u *UpsertPartialRequest) GetPartialRedisCe() *shared.PartialRedisCe {
 	return u.GetPartial().PartialRedisCe
 }
 
 func (u *UpsertPartialRequest) GetPartialRedisEe() *shared.PartialRedisEe {
 	return u.GetPartial().PartialRedisEe
+}
+
+func (u *UpsertPartialRequest) GetPartialVectordb() *shared.PartialVectordb {
+	return u.GetPartial().PartialVectordb
 }
 
 type UpsertPartialResponse struct {
@@ -109,6 +121,20 @@ func (u *UpsertPartialResponse) GetPartial() *shared.Partial {
 	return u.Partial
 }
 
+func (u *UpsertPartialResponse) GetPartialEmbeddings() *shared.PartialEmbeddings {
+	if v := u.GetPartial(); v != nil {
+		return v.PartialEmbeddings
+	}
+	return nil
+}
+
+func (u *UpsertPartialResponse) GetPartialModel() *shared.PartialModel {
+	if v := u.GetPartial(); v != nil {
+		return v.PartialModel
+	}
+	return nil
+}
+
 func (u *UpsertPartialResponse) GetPartialRedisCe() *shared.PartialRedisCe {
 	if v := u.GetPartial(); v != nil {
 		return v.PartialRedisCe
@@ -119,6 +145,13 @@ func (u *UpsertPartialResponse) GetPartialRedisCe() *shared.PartialRedisCe {
 func (u *UpsertPartialResponse) GetPartialRedisEe() *shared.PartialRedisEe {
 	if v := u.GetPartial(); v != nil {
 		return v.PartialRedisEe
+	}
+	return nil
+}
+
+func (u *UpsertPartialResponse) GetPartialVectordb() *shared.PartialVectordb {
+	if v := u.GetPartial(); v != nil {
+		return v.PartialVectordb
 	}
 	return nil
 }

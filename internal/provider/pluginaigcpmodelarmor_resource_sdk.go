@@ -15,8 +15,11 @@ func (r *PluginAiGcpModelArmorResourceModel) RefreshFromSharedAiGcpModelArmorPlu
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.AiGcpModelArmorPluginConfig{}
 		r.Config.EnableMultiLanguageDetection = types.BoolPointerValue(resp.Config.EnableMultiLanguageDetection)
+		r.Config.GcpMetadataURL = types.StringPointerValue(resp.Config.GcpMetadataURL)
+		r.Config.GcpOauthTokenURL = types.StringPointerValue(resp.Config.GcpOauthTokenURL)
 		r.Config.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.GcpServiceAccountJSON)
 		r.Config.GcpUseServiceAccount = types.BoolPointerValue(resp.Config.GcpUseServiceAccount)
 		if resp.Config.GuardingMode != nil {
@@ -25,6 +28,7 @@ func (r *PluginAiGcpModelArmorResourceModel) RefreshFromSharedAiGcpModelArmorPlu
 			r.Config.GuardingMode = types.StringNull()
 		}
 		r.Config.LocationID = types.StringValue(resp.Config.LocationID)
+		r.Config.LogBlockedContent = types.BoolPointerValue(resp.Config.LogBlockedContent)
 		r.Config.ProjectID = types.StringValue(resp.Config.ProjectID)
 		r.Config.RequestFailureMessage = types.StringPointerValue(resp.Config.RequestFailureMessage)
 		r.Config.ResponseBufferSize = types.Float64PointerValue(resp.Config.ResponseBufferSize)
@@ -202,6 +206,12 @@ func (r *PluginAiGcpModelArmorResourceModel) ToOperationsUpdateAigcpmodelarmorPl
 func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx context.Context) (*shared.AiGcpModelArmorPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -298,6 +308,18 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 	} else {
 		enableMultiLanguageDetection = nil
 	}
+	gcpMetadataURL := new(string)
+	if !r.Config.GcpMetadataURL.IsUnknown() && !r.Config.GcpMetadataURL.IsNull() {
+		*gcpMetadataURL = r.Config.GcpMetadataURL.ValueString()
+	} else {
+		gcpMetadataURL = nil
+	}
+	gcpOauthTokenURL := new(string)
+	if !r.Config.GcpOauthTokenURL.IsUnknown() && !r.Config.GcpOauthTokenURL.IsNull() {
+		*gcpOauthTokenURL = r.Config.GcpOauthTokenURL.ValueString()
+	} else {
+		gcpOauthTokenURL = nil
+	}
 	gcpServiceAccountJSON := new(string)
 	if !r.Config.GcpServiceAccountJSON.IsUnknown() && !r.Config.GcpServiceAccountJSON.IsNull() {
 		*gcpServiceAccountJSON = r.Config.GcpServiceAccountJSON.ValueString()
@@ -319,6 +341,12 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 	var locationID string
 	locationID = r.Config.LocationID.ValueString()
 
+	logBlockedContent := new(bool)
+	if !r.Config.LogBlockedContent.IsUnknown() && !r.Config.LogBlockedContent.IsNull() {
+		*logBlockedContent = r.Config.LogBlockedContent.ValueBool()
+	} else {
+		logBlockedContent = nil
+	}
 	var projectID string
 	projectID = r.Config.ProjectID.ValueString()
 
@@ -375,10 +403,13 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 	}
 	config := shared.AiGcpModelArmorPluginConfig{
 		EnableMultiLanguageDetection: enableMultiLanguageDetection,
+		GcpMetadataURL:               gcpMetadataURL,
+		GcpOauthTokenURL:             gcpOauthTokenURL,
 		GcpServiceAccountJSON:        gcpServiceAccountJSON,
 		GcpUseServiceAccount:         gcpUseServiceAccount,
 		GuardingMode:                 guardingMode,
 		LocationID:                   locationID,
+		LogBlockedContent:            logBlockedContent,
 		ProjectID:                    projectID,
 		RequestFailureMessage:        requestFailureMessage,
 		ResponseBufferSize:           responseBufferSize,
@@ -443,6 +474,7 @@ func (r *PluginAiGcpModelArmorResourceModel) ToSharedAiGcpModelArmorPlugin(ctx c
 		}
 	}
 	out := shared.AiGcpModelArmorPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

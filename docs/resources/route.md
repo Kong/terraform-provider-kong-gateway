@@ -63,7 +63,7 @@ resource "kong-gateway_route" "my_route" {
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -93,7 +93,7 @@ resource "kong-gateway_route" "my_route" {
 - `strip_path` (Boolean) When matching a Route via one of the `paths`, strip the matching prefix from the upstream request URL.
 - `tags` (List of String) An optional set of strings associated with the Route for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--destinations"></a>
 ### Nested Schema for `destinations`
@@ -130,8 +130,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_route.my_kong-gateway_route
   id = jsonencode({
-    id = "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7"
+    workspace = "team-payments"
   })
 }
 ```
@@ -139,5 +139,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_route.my_kong-gateway_route '{"id": "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_route.my_kong-gateway_route '{"id": "a4326a41-aa12-44e3-93e4-6b6e58bfb9d7", "workspace": "team-payments"}'
 ```

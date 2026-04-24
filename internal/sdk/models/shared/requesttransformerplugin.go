@@ -528,6 +528,8 @@ func (r *RequestTransformerPluginService) GetID() *string {
 
 // RequestTransformerPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestTransformerPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -535,9 +537,10 @@ type RequestTransformerPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                           `json:"instance_name,omitempty"`
-	name         string                            `const:"request-transformer" json:"name"`
-	Ordering     *RequestTransformerPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                            `const:"request-transformer" json:"name"`
+	Ordering *RequestTransformerPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RequestTransformerPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -566,6 +569,13 @@ func (r *RequestTransformerPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RequestTransformerPlugin) GetCondition() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Condition
 }
 
 func (r *RequestTransformerPlugin) GetCreatedAt() *int64 {

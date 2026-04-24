@@ -11,7 +11,7 @@ import (
 type CreateBasicAuthWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new Basic-auth credential for creation
 	BasicAuthWithoutParents shared.BasicAuthWithoutParents `request:"mediaType=application/json"`

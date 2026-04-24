@@ -30,6 +30,9 @@ func (o *Oauth2PluginAfter) GetAccess() []string {
 	return o.Access
 }
 
+// #region class-body-oauth2pluginafter
+// #endregion class-body-oauth2pluginafter
+
 type Oauth2PluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -51,6 +54,9 @@ func (o *Oauth2PluginBefore) GetAccess() []string {
 	}
 	return o.Access
 }
+
+// #region class-body-oauth2pluginbefore
+// #endregion class-body-oauth2pluginbefore
 
 type Oauth2PluginOrdering struct {
 	After  *Oauth2PluginAfter  `json:"after,omitempty"`
@@ -81,6 +87,9 @@ func (o *Oauth2PluginOrdering) GetBefore() *Oauth2PluginBefore {
 	}
 	return o.Before
 }
+
+// #region class-body-oauth2pluginordering
+// #endregion class-body-oauth2pluginordering
 
 type Oauth2PluginPartials struct {
 	// A string representing a UUID (universally unique identifier).
@@ -121,6 +130,9 @@ func (o *Oauth2PluginPartials) GetPath() *string {
 	}
 	return o.Path
 }
+
+// #region class-body-oauth2pluginpartials
+// #endregion class-body-oauth2pluginpartials
 
 // Pkce - Specifies a mode of how the Proof Key for Code Exchange (PKCE) should be handled by the plugin.
 type Pkce string
@@ -327,6 +339,9 @@ func (o *Oauth2PluginConfig) GetTokenExpiration() *float64 {
 	return o.TokenExpiration
 }
 
+// #region class-body-oauth2pluginconfig
+// #endregion class-body-oauth2pluginconfig
+
 type Oauth2PluginProtocols string
 
 const (
@@ -388,6 +403,9 @@ func (o *Oauth2PluginRoute) GetID() *string {
 	return o.ID
 }
 
+// #region class-body-oauth2pluginroute
+// #endregion class-body-oauth2pluginroute
+
 // Oauth2PluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type Oauth2PluginService struct {
 	ID *string `json:"id,omitempty"`
@@ -411,8 +429,13 @@ func (o *Oauth2PluginService) GetID() *string {
 	return o.ID
 }
 
+// #region class-body-oauth2pluginservice
+// #endregion class-body-oauth2pluginservice
+
 // Oauth2Plugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type Oauth2Plugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -420,9 +443,10 @@ type Oauth2Plugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string               `json:"instance_name,omitempty"`
-	name         string                `const:"oauth2" json:"name"`
-	Ordering     *Oauth2PluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                `const:"oauth2" json:"name"`
+	Ordering *Oauth2PluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []Oauth2PluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -447,6 +471,13 @@ func (o *Oauth2Plugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *Oauth2Plugin) GetCondition() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Condition
 }
 
 func (o *Oauth2Plugin) GetCreatedAt() *int64 {
@@ -536,3 +567,6 @@ func (o *Oauth2Plugin) GetService() *Oauth2PluginService {
 	}
 	return o.Service
 }
+
+// #region class-body-oauth2plugin
+// #endregion class-body-oauth2plugin

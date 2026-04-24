@@ -11,7 +11,7 @@ import (
 type GetAimcpoauth2PluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
@@ -39,6 +39,9 @@ func (g *GetAimcpoauth2PluginRequest) GetWorkspace() string {
 	}
 	return g.Workspace
 }
+
+// #region class-body-getaimcpoauth2pluginrequest
+// #endregion class-body-getaimcpoauth2pluginrequest
 
 type GetAimcpoauth2PluginResponse struct {
 	// HTTP response content type for this operation
@@ -98,3 +101,6 @@ func (g *GetAimcpoauth2PluginResponse) GetGatewayUnauthorizedError() *shared.Gat
 	}
 	return g.GatewayUnauthorizedError
 }
+
+// #region class-body-getaimcpoauth2pluginresponse
+// #endregion class-body-getaimcpoauth2pluginresponse

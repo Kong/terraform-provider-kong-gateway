@@ -14,6 +14,7 @@ PluginAiAzureContentSafety Resource
 
 ```terraform
 resource "kong-gateway_plugin_ai_azure_content_safety" "my_pluginaiazurecontentsafety" {
+  condition = "...my_condition..."
   config = {
     azure_api_version          = "...my_azure_api_version..."
     azure_client_id            = "...my_azure_client_id..."
@@ -33,9 +34,11 @@ resource "kong-gateway_plugin_ai_azure_content_safety" "my_pluginaiazurecontents
     content_safety_url    = "...my_content_safety_url..."
     guarding_mode         = "INPUT"
     halt_on_blocklist_hit = false
+    log_blocked_content   = true
     output_type           = "EightSeverityLevels"
     response_buffer_size  = 8
     reveal_failure_reason = true
+    ssl_verify            = true
     stop_on_error         = false
     text_source           = "concatenate_all_content"
   }
@@ -75,7 +78,7 @@ resource "kong-gateway_plugin_ai_azure_content_safety" "my_pluginaiazurecontents
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -88,6 +91,7 @@ resource "kong-gateway_plugin_ai_azure_content_safety" "my_pluginaiazurecontents
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
 - `id` (String) A string representing a UUID (universally unique identifier).
@@ -99,7 +103,7 @@ resource "kong-gateway_plugin_ai_azure_content_safety" "my_pluginaiazurecontents
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -120,9 +124,11 @@ Optional:
 - `content_safety_key` (String) If `azure_use_managed_identity` is true, set the API key to call Content Safety.
 - `guarding_mode` (String) The guard mode to use for the request. must be one of ["BOTH", "INPUT", "OUTPUT"]
 - `halt_on_blocklist_hit` (Boolean) Tells Azure to reject the request if any blocklist filter is hit.
+- `log_blocked_content` (Boolean) Whether to log prompts and responses that are blocked by the guardrail.
 - `output_type` (String) See https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter#content-filtering-categories. must be one of ["EightSeverityLevels", "FourSeverityLevels"]
 - `response_buffer_size` (Number) The amount of bytes receiving from upstream to be buffered before sending to the guardrails service. This only applies to the response content guard.
 - `reveal_failure_reason` (Boolean) Set true to tell the caller why their request was rejected, if so.
+- `ssl_verify` (Boolean) Whether to verify the certificate presented by the Azure Content Safety service when using HTTPS.
 - `stop_on_error` (Boolean) Stop processing if an error occurs
 - `text_source` (String) Select where to pick the 'text' for the Azure Content Services request. must be one of ["concatenate_all_content", "concatenate_user_content"]
 
@@ -196,8 +202,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_ai_azure_content_safety.my_kong-gateway_plugin_ai_azure_content_safety
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -205,5 +211,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_ai_azure_content_safety.my_kong-gateway_plugin_ai_azure_content_safety '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_ai_azure_content_safety.my_kong-gateway_plugin_ai_azure_content_safety '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

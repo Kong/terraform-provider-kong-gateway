@@ -28,6 +28,14 @@ func TestSmoke(t *testing.T) {
 			name:    "3.12",
 			runWhen: ptr("3.12"),
 		},
+		{
+			name:    "3.13",
+			runWhen: ptr("3.13"),
+		},
+		{
+			name:    "3.14",
+			runWhen: ptr("3.14"),
+		},
 	}
 
 	for _, tc := range testCases {

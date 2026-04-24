@@ -15,11 +15,13 @@ func (r *PluginJSONThreatProtectionResourceModel) RefreshFromSharedJSONThreatPro
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
 			r.Config = &tfTypes.JSONThreatProtectionPluginConfig{}
 			r.Config.AllowDuplicateObjectEntryName = types.BoolPointerValue(resp.Config.AllowDuplicateObjectEntryName)
+			r.Config.AllowNonJSONRequests = types.BoolPointerValue(resp.Config.AllowNonJSONRequests)
 			if resp.Config.EnforcementMode != nil {
 				r.Config.EnforcementMode = types.StringValue(string(*resp.Config.EnforcementMode))
 			} else {
@@ -185,6 +187,12 @@ func (r *PluginJSONThreatProtectionResourceModel) ToOperationsUpdateJsonthreatpr
 func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPlugin(ctx context.Context) (*shared.JSONThreatProtectionPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -283,6 +291,12 @@ func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPl
 		} else {
 			allowDuplicateObjectEntryName = nil
 		}
+		allowNonJSONRequests := new(bool)
+		if !r.Config.AllowNonJSONRequests.IsUnknown() && !r.Config.AllowNonJSONRequests.IsNull() {
+			*allowNonJSONRequests = r.Config.AllowNonJSONRequests.ValueBool()
+		} else {
+			allowNonJSONRequests = nil
+		}
 		enforcementMode := new(shared.JSONThreatProtectionPluginEnforcementMode)
 		if !r.Config.EnforcementMode.IsUnknown() && !r.Config.EnforcementMode.IsNull() {
 			*enforcementMode = shared.JSONThreatProtectionPluginEnforcementMode(r.Config.EnforcementMode.ValueString())
@@ -339,6 +353,7 @@ func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPl
 		}
 		config = &shared.JSONThreatProtectionPluginConfig{
 			AllowDuplicateObjectEntryName: allowDuplicateObjectEntryName,
+			AllowNonJSONRequests:          allowNonJSONRequests,
 			EnforcementMode:               enforcementMode,
 			ErrorMessage:                  errorMessage,
 			ErrorStatusCode:               errorStatusCode,
@@ -379,6 +394,7 @@ func (r *PluginJSONThreatProtectionResourceModel) ToSharedJSONThreatProtectionPl
 		}
 	}
 	out := shared.JSONThreatProtectionPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

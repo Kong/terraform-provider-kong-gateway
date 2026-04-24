@@ -126,6 +126,7 @@ func (a *AiPromptDecoratorPluginPartials) GetPath() *string {
 type LlmFormat string
 
 const (
+	LlmFormatAnthropic   LlmFormat = "anthropic"
 	LlmFormatBedrock     LlmFormat = "bedrock"
 	LlmFormatCohere      LlmFormat = "cohere"
 	LlmFormatGemini      LlmFormat = "gemini"
@@ -142,6 +143,8 @@ func (e *LlmFormat) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "anthropic":
+		fallthrough
 	case "bedrock":
 		fallthrough
 	case "cohere":
@@ -158,18 +161,18 @@ func (e *LlmFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type Role string
+type AiPromptDecoratorPluginConfigRole string
 
 const (
-	RoleAssistant Role = "assistant"
-	RoleSystem    Role = "system"
-	RoleUser      Role = "user"
+	AiPromptDecoratorPluginConfigRoleAssistant AiPromptDecoratorPluginConfigRole = "assistant"
+	AiPromptDecoratorPluginConfigRoleSystem    AiPromptDecoratorPluginConfigRole = "system"
+	AiPromptDecoratorPluginConfigRoleUser      AiPromptDecoratorPluginConfigRole = "user"
 )
 
-func (e Role) ToPointer() *Role {
+func (e AiPromptDecoratorPluginConfigRole) ToPointer() *AiPromptDecoratorPluginConfigRole {
 	return &e
 }
-func (e *Role) UnmarshalJSON(data []byte) error {
+func (e *AiPromptDecoratorPluginConfigRole) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -180,16 +183,16 @@ func (e *Role) UnmarshalJSON(data []byte) error {
 	case "system":
 		fallthrough
 	case "user":
-		*e = Role(v)
+		*e = AiPromptDecoratorPluginConfigRole(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for Role: %v", v)
+		return fmt.Errorf("invalid value for AiPromptDecoratorPluginConfigRole: %v", v)
 	}
 }
 
 type AiPromptDecoratorPluginAppend struct {
-	Content string `json:"content"`
-	Role    *Role  `json:"role,omitempty"`
+	Content string                             `json:"content"`
+	Role    *AiPromptDecoratorPluginConfigRole `json:"role,omitempty"`
 }
 
 func (a AiPromptDecoratorPluginAppend) MarshalJSON() ([]byte, error) {
@@ -210,7 +213,7 @@ func (a *AiPromptDecoratorPluginAppend) GetContent() string {
 	return a.Content
 }
 
-func (a *AiPromptDecoratorPluginAppend) GetRole() *Role {
+func (a *AiPromptDecoratorPluginAppend) GetRole() *AiPromptDecoratorPluginConfigRole {
 	if a == nil {
 		return nil
 	}
@@ -474,6 +477,8 @@ func (a *AiPromptDecoratorPluginService) GetID() *string {
 
 // AiPromptDecoratorPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiPromptDecoratorPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -481,9 +486,10 @@ type AiPromptDecoratorPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                          `json:"instance_name,omitempty"`
-	name         string                           `const:"ai-prompt-decorator" json:"name"`
-	Ordering     *AiPromptDecoratorPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                           `const:"ai-prompt-decorator" json:"name"`
+	Ordering *AiPromptDecoratorPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiPromptDecoratorPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -512,6 +518,13 @@ func (a *AiPromptDecoratorPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiPromptDecoratorPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiPromptDecoratorPlugin) GetCreatedAt() *int64 {

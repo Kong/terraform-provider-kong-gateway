@@ -36,6 +36,7 @@ type PluginAiAwsGuardrailsResource struct {
 
 // PluginAiAwsGuardrailsResourceModel describes the resource data model.
 type PluginAiAwsGuardrailsResourceModel struct {
+	Condition     types.String                         `tfsdk:"condition"`
 	Config        *tfTypes.AiAwsGuardrailsPluginConfig `tfsdk:"config"`
 	Consumer      *tfTypes.Set                         `tfsdk:"consumer"`
 	ConsumerGroup *tfTypes.Set                         `tfsdk:"consumer_group"`
@@ -61,9 +62,22 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginAiAwsGuardrails Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
+					"allow_masking": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Allow to masking the request/response instead of blocking it. Streaming will be disabled if this is enabled.`,
+					},
 					"aws_access_key_id": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -107,16 +121,26 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 					},
 					"guardrails_id": schema.StringAttribute{
 						Required:    true,
-						Description: `The guardrail identifier used in the request to apply the guardrail`,
+						Description: `The guardrail identifier used in the request to apply the guardrail.`,
 					},
 					"guardrails_version": schema.StringAttribute{
 						Required:    true,
-						Description: `The guardrail version used in the request to apply the guardrail`,
+						Description: `The guardrail version used in the request to apply the guardrail. Note that the value of this field must match the pattern ` + "`" + `(([1-9][0-9]{0,7})|(DRAFT))` + "`" + ` according to the AWS documentation https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ApplyGuardrail.html#API_runtime_ApplyGuardrail_RequestSyntax.`,
+					},
+					"log_blocked_content": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Whether to log prompts and responses that are blocked by the guardrail.`,
 					},
 					"response_buffer_size": schema.Float64Attribute{
 						Computed:    true,
 						Optional:    true,
 						Description: `The amount of bytes receiving from upstream to be buffered before sending to the guardrails service. This only applies to the response content guard.`,
+					},
+					"ssl_verify": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Verify TLS certificate when connecting to the bedrock service.`,
 					},
 					"stop_on_error": schema.BoolAttribute{
 						Computed:    true,
@@ -286,7 +310,7 @@ func (r *PluginAiAwsGuardrailsResource) Schema(ctx context.Context, req resource
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -541,7 +565,7 @@ func (r *PluginAiAwsGuardrailsResource) ImportState(ctx context.Context, req res
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -551,7 +575,7 @@ func (r *PluginAiAwsGuardrailsResource) ImportState(ctx context.Context, req res
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

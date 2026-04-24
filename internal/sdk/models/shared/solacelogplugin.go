@@ -224,9 +224,9 @@ type Message struct {
 	Priority *int64 `json:"priority,omitempty"`
 	// Allows the application to set the sender identifier.
 	SenderID *string `json:"sender_id,omitempty"`
-	// Enable or disable the tracing. This is primarily used for distributed tracing and log message correlation, especially in debugging or tracking log message flows across multiple systems.
+	// Enable or disable the tracing propagation. This is primarily used for distributed tracing and message correlation, especially in debugging or tracking message flows across multiple systems.
 	Tracing *bool `json:"tracing,omitempty"`
-	// Indicates whether the log message should be included in distributed tracing (i.e., if it should be "sampled" for the tracing).
+	// Forcibly turn on the tracing on all the messages for distributed tracing (tracing needs to be enabled as well).
 	TracingSampled *bool `json:"tracing_sampled,omitempty"`
 	// Sets the time to live (TTL) in milliseconds for the log message. Setting the time to live to zero disables the TTL for the log message.
 	TTL *int64 `json:"ttl,omitempty"`
@@ -346,10 +346,14 @@ func (e *SolaceLogPluginScheme) UnmarshalJSON(data []byte) error {
 // SolaceLogPluginAuthentication - Session authentication related configuration.
 type SolaceLogPluginAuthentication struct {
 	// The OAuth2 access token used with `OAUTH2` authentication scheme when connecting to an event broker.
-	AccessToken       *string `json:"access_token,omitempty"`
+	AccessToken *string `json:"access_token,omitempty"`
+	// Specifies the header that contains access token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `access_token` field.
 	AccessTokenHeader *string `json:"access_token_header,omitempty"`
+	// Specifies the header that contains Basic Authentication credentials for the `BASIC` authentication scheme when connecting to an event broker. This header takes precedence over the `username` and `password` fields.
+	BasicAuthHeader *string `json:"basic_auth_header,omitempty"`
 	// The OpenID Connect ID token used with `OAUTH2` authentication scheme when connecting to an event broker.
-	IDToken       *string `json:"id_token,omitempty"`
+	IDToken *string `json:"id_token,omitempty"`
+	// Specifies the header that contains id token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `id_token` field.
 	IDTokenHeader *string `json:"id_token_header,omitempty"`
 	// The password used with `BASIC` authentication scheme when connecting to an event broker.
 	Password *string `json:"password,omitempty"`
@@ -382,6 +386,13 @@ func (s *SolaceLogPluginAuthentication) GetAccessTokenHeader() *string {
 		return nil
 	}
 	return s.AccessTokenHeader
+}
+
+func (s *SolaceLogPluginAuthentication) GetBasicAuthHeader() *string {
+	if s == nil {
+		return nil
+	}
+	return s.BasicAuthHeader
 }
 
 func (s *SolaceLogPluginAuthentication) GetIDToken() *string {
@@ -438,7 +449,7 @@ type SolaceLogPluginSession struct {
 	// The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry).
 	Host string `json:"host"`
 	// Additional Solace session properties (each setting needs to have `SESSION_` prefix).
-	Properties map[string]any `json:"properties,omitempty"`
+	Properties map[string]string `json:"properties,omitempty"`
 	// Indicates whether the API should validate server certificates with the trusted certificates.
 	SslValidateCertificate *bool `json:"ssl_validate_certificate,omitempty"`
 	// The name of the Message VPN to attempt to join when connecting to an event broker.
@@ -512,7 +523,7 @@ func (s *SolaceLogPluginSession) GetHost() string {
 	return s.Host
 }
 
-func (s *SolaceLogPluginSession) GetProperties() map[string]any {
+func (s *SolaceLogPluginSession) GetProperties() map[string]string {
 	if s == nil {
 		return nil
 	}
@@ -651,6 +662,8 @@ func (s *SolaceLogPluginService) GetID() *string {
 
 // SolaceLogPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SolaceLogPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -658,9 +671,10 @@ type SolaceLogPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                  `json:"instance_name,omitempty"`
-	name         string                   `const:"solace-log" json:"name"`
-	Ordering     *SolaceLogPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                   `const:"solace-log" json:"name"`
+	Ordering *SolaceLogPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []SolaceLogPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -685,6 +699,13 @@ func (s *SolaceLogPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SolaceLogPlugin) GetCondition() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Condition
 }
 
 func (s *SolaceLogPlugin) GetCreatedAt() *int64 {

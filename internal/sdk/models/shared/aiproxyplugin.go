@@ -164,6 +164,10 @@ type Auth struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
 	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
 	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
 	// Use service account auth for GCP-based providers and models.
@@ -240,6 +244,20 @@ func (a *Auth) GetAzureUseManagedIdentity() *bool {
 	return a.AzureUseManagedIdentity
 }
 
+func (a *Auth) GetGcpMetadataURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpMetadataURL
+}
+
+func (a *Auth) GetGcpOauthTokenURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpOauthTokenURL
+}
+
 func (a *Auth) GetGcpServiceAccountJSON() *string {
 	if a == nil {
 		return nil
@@ -298,6 +316,7 @@ const (
 	AiProxyPluginGenaiCategoryImageGeneration    AiProxyPluginGenaiCategory = "image/generation"
 	AiProxyPluginGenaiCategoryTextEmbeddings     AiProxyPluginGenaiCategory = "text/embeddings"
 	AiProxyPluginGenaiCategoryTextGeneration     AiProxyPluginGenaiCategory = "text/generation"
+	AiProxyPluginGenaiCategoryVideoGeneration    AiProxyPluginGenaiCategory = "video/generation"
 )
 
 func (e AiProxyPluginGenaiCategory) ToPointer() *AiProxyPluginGenaiCategory {
@@ -318,6 +337,8 @@ func (e *AiProxyPluginGenaiCategory) UnmarshalJSON(data []byte) error {
 	case "text/embeddings":
 		fallthrough
 	case "text/generation":
+		fallthrough
+	case "video/generation":
 		*e = AiProxyPluginGenaiCategory(v)
 		return nil
 	default:
@@ -329,6 +350,7 @@ func (e *AiProxyPluginGenaiCategory) UnmarshalJSON(data []byte) error {
 type AiProxyPluginLlmFormat string
 
 const (
+	AiProxyPluginLlmFormatAnthropic   AiProxyPluginLlmFormat = "anthropic"
 	AiProxyPluginLlmFormatBedrock     AiProxyPluginLlmFormat = "bedrock"
 	AiProxyPluginLlmFormatCohere      AiProxyPluginLlmFormat = "cohere"
 	AiProxyPluginLlmFormatGemini      AiProxyPluginLlmFormat = "gemini"
@@ -345,6 +367,8 @@ func (e *AiProxyPluginLlmFormat) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "anthropic":
+		fallthrough
 	case "bedrock":
 		fallthrough
 	case "cohere":
@@ -362,7 +386,7 @@ func (e *AiProxyPluginLlmFormat) UnmarshalJSON(data []byte) error {
 }
 
 type AiProxyPluginLogging struct {
-	// If enabled, will log the request and response body into the Kong log plugin(s) output.
+	// If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.
 	LogPayloads *bool `json:"log_payloads,omitempty"`
 	// If enabled and supported by the driver, will add model usage and token metrics into the Kong log plugin(s) output.
 	LogStatistics *bool `json:"log_statistics,omitempty"`
@@ -402,10 +426,16 @@ type Bedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
 	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
 }
 
 func (b Bedrock) MarshalJSON() ([]byte, error) {
@@ -447,6 +477,20 @@ func (b *Bedrock) GetAwsStsEndpointURL() *string {
 	return b.AwsStsEndpointURL
 }
 
+func (b *Bedrock) GetBatchBucketPrefix() *string {
+	if b == nil {
+		return nil
+	}
+	return b.BatchBucketPrefix
+}
+
+func (b *Bedrock) GetBatchRoleArn() *string {
+	if b == nil {
+		return nil
+	}
+	return b.BatchRoleArn
+}
+
 func (b *Bedrock) GetEmbeddingsNormalize() *bool {
 	if b == nil {
 		return nil
@@ -459,6 +503,13 @@ func (b *Bedrock) GetPerformanceConfigLatency() *string {
 		return nil
 	}
 	return b.PerformanceConfigLatency
+}
+
+func (b *Bedrock) GetVideoOutputS3URI() *string {
+	if b == nil {
+		return nil
+	}
+	return b.VideoOutputS3URI
 }
 
 // EmbeddingInputType - The purpose of the input text to calculate embedding vectors.
@@ -527,6 +578,54 @@ func (c *Cohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return c.WaitForModel
+}
+
+type Dashscope struct {
+	// Two Dashscope endpoints are available, and the international endpoint will be used when this is set to `true`.
+	// It is recommended to set this to `true` when using international version of dashscope.
+	//
+	International *bool `json:"international,omitempty"`
+}
+
+func (d Dashscope) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *Dashscope) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Dashscope) GetInternational() *bool {
+	if d == nil {
+		return nil
+	}
+	return d.International
+}
+
+type Databricks struct {
+	// Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.
+	WorkspaceInstanceID *string `json:"workspace_instance_id,omitempty"`
+}
+
+func (d Databricks) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *Databricks) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Databricks) GetWorkspaceInstanceID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.WorkspaceInstanceID
 }
 
 type Gemini struct {
@@ -677,9 +776,11 @@ type OptionsObj struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string  `json:"azure_instance,omitempty"`
-	Bedrock       *Bedrock `json:"bedrock,omitempty"`
-	Cohere        *Cohere  `json:"cohere,omitempty"`
+	AzureInstance *string     `json:"azure_instance,omitempty"`
+	Bedrock       *Bedrock    `json:"bedrock,omitempty"`
+	Cohere        *Cohere     `json:"cohere,omitempty"`
+	Dashscope     *Dashscope  `json:"dashscope,omitempty"`
+	Databricks    *Databricks `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64       `json:"embeddings_dimensions,omitempty"`
 	Gemini               *Gemini      `json:"gemini,omitempty"`
@@ -757,6 +858,20 @@ func (o *OptionsObj) GetCohere() *Cohere {
 		return nil
 	}
 	return o.Cohere
+}
+
+func (o *OptionsObj) GetDashscope() *Dashscope {
+	if o == nil {
+		return nil
+	}
+	return o.Dashscope
+}
+
+func (o *OptionsObj) GetDatabricks() *Databricks {
+	if o == nil {
+		return nil
+	}
+	return o.Databricks
 }
 
 func (o *OptionsObj) GetEmbeddingsDimensions() *int64 {
@@ -857,12 +972,19 @@ const (
 	ProviderAnthropic   Provider = "anthropic"
 	ProviderAzure       Provider = "azure"
 	ProviderBedrock     Provider = "bedrock"
+	ProviderCerebras    Provider = "cerebras"
 	ProviderCohere      Provider = "cohere"
+	ProviderDashscope   Provider = "dashscope"
+	ProviderDatabricks  Provider = "databricks"
+	ProviderDeepseek    Provider = "deepseek"
 	ProviderGemini      Provider = "gemini"
 	ProviderHuggingface Provider = "huggingface"
 	ProviderLlama2      Provider = "llama2"
 	ProviderMistral     Provider = "mistral"
+	ProviderOllama      Provider = "ollama"
 	ProviderOpenai      Provider = "openai"
+	ProviderVllm        Provider = "vllm"
+	ProviderXai         Provider = "xai"
 )
 
 func (e Provider) ToPointer() *Provider {
@@ -880,7 +1002,15 @@ func (e *Provider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "bedrock":
 		fallthrough
+	case "cerebras":
+		fallthrough
 	case "cohere":
+		fallthrough
+	case "dashscope":
+		fallthrough
+	case "databricks":
+		fallthrough
+	case "deepseek":
 		fallthrough
 	case "gemini":
 		fallthrough
@@ -890,7 +1020,13 @@ func (e *Provider) UnmarshalJSON(data []byte) error {
 		fallthrough
 	case "mistral":
 		fallthrough
+	case "ollama":
+		fallthrough
 	case "openai":
+		fallthrough
+	case "vllm":
+		fallthrough
+	case "xai":
 		*e = Provider(v)
 		return nil
 	default:
@@ -899,6 +1035,8 @@ func (e *Provider) UnmarshalJSON(data []byte) error {
 }
 
 type Model struct {
+	// The model name parameter from the request that this model should map to.
+	ModelAlias *string `json:"model_alias,omitempty"`
 	// Model name to execute.
 	Name *string `json:"name,omitempty"`
 	// Key/value settings for the model
@@ -916,6 +1054,13 @@ func (m *Model) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (m *Model) GetModelAlias() *string {
+	if m == nil {
+		return nil
+	}
+	return m.ModelAlias
 }
 
 func (m *Model) GetName() *string {
@@ -987,6 +1132,7 @@ const (
 	RouteTypeLlmV1Responses             RouteType = "llm/v1/responses"
 	RouteTypePreserve                   RouteType = "preserve"
 	RouteTypeRealtimeV1Realtime         RouteType = "realtime/v1/realtime"
+	RouteTypeVideoV1VideosGenerations   RouteType = "video/v1/videos/generations"
 )
 
 func (e RouteType) ToPointer() *RouteType {
@@ -1025,6 +1171,8 @@ func (e *RouteType) UnmarshalJSON(data []byte) error {
 	case "preserve":
 		fallthrough
 	case "realtime/v1/realtime":
+		fallthrough
+	case "video/v1/videos/generations":
 		*e = RouteType(v)
 		return nil
 	default:
@@ -1256,6 +1404,8 @@ func (a *AiProxyPluginService) GetID() *string {
 
 // AiProxyPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiProxyPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1263,9 +1413,10 @@ type AiProxyPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                `json:"instance_name,omitempty"`
-	name         string                 `const:"ai-proxy" json:"name"`
-	Ordering     *AiProxyPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                 `const:"ai-proxy" json:"name"`
+	Ordering *AiProxyPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiProxyPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -1294,6 +1445,13 @@ func (a *AiProxyPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiProxyPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiProxyPlugin) GetCreatedAt() *int64 {

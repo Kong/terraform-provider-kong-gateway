@@ -15,6 +15,7 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(ctx context.Co
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.TCPLogPluginConfig{}
 		if len(resp.Config.CustomFieldsByLua) > 0 {
 			r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
@@ -25,6 +26,7 @@ func (r *PluginTCPLogResourceModel) RefreshFromSharedTCPLogPlugin(ctx context.Co
 		r.Config.Host = types.StringValue(resp.Config.Host)
 		r.Config.Keepalive = types.Float64PointerValue(resp.Config.Keepalive)
 		r.Config.Port = types.Int64Value(resp.Config.Port)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
 		r.Config.TLS = types.BoolPointerValue(resp.Config.TLS)
 		r.Config.TLSSni = types.StringPointerValue(resp.Config.TLSSni)
@@ -185,6 +187,12 @@ func (r *PluginTCPLogResourceModel) ToOperationsUpdateTcplogPluginRequest(ctx co
 func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin(ctx context.Context) (*shared.TCPLogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -294,6 +302,12 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin(ctx context.Context) (*
 	var port int64
 	port = r.Config.Port.ValueInt64()
 
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
+	}
 	timeout := new(float64)
 	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
 		*timeout = r.Config.Timeout.ValueFloat64()
@@ -317,6 +331,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin(ctx context.Context) (*
 		Host:              host,
 		Keepalive:         keepalive,
 		Port:              port,
+		SslVerify:         sslVerify,
 		Timeout:           timeout,
 		TLS:               tls,
 		TLSSni:            tlsSni,
@@ -362,6 +377,7 @@ func (r *PluginTCPLogResourceModel) ToSharedTCPLogPlugin(ctx context.Context) (*
 		}
 	}
 	out := shared.TCPLogPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

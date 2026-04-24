@@ -37,6 +37,7 @@ type PluginMtlsAuthResource struct {
 
 // PluginMtlsAuthResourceModel describes the resource data model.
 type PluginMtlsAuthResourceModel struct {
+	Condition    types.String                  `tfsdk:"condition"`
 	Config       *tfTypes.MtlsAuthPluginConfig `tfsdk:"config"`
 	CreatedAt    types.Int64                   `tfsdk:"created_at"`
 	Enabled      types.Bool                    `tfsdk:"enabled"`
@@ -60,6 +61,14 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginMtlsAuth Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -150,6 +159,12 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 							),
 						},
 					},
+					"san_dirname_matcher": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specifies a list of Subject Alternative Name (SAN) DirectoryName attributes to use for consumer lookup. Applicable only when ` + "`" + `skip_consumer_lookup` + "`" + ` is false. Supported formats: OID, Long Name, or Short Name. Examples: ` + "`" + `commonName` + "`" + ` (Long Name), ` + "`" + `CN` + "`" + ` (Short Name), ` + "`" + `2.5.4.3` + "`" + ` (OID). If left empty (default), all attributes present in the SAN DirectoryName extension are used. The matcher is case sensitive.`,
+					},
 					"send_ca_dn": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -159,6 +174,11 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 						Computed:    true,
 						Optional:    true,
 						Description: `Skip consumer lookup once certificate is trusted against the configured CA list.`,
+					},
+					"ssl_verify": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `This option enables verification of the certificate presented by the server of the OCSP responder's URL and by the server of the CRL Distribution Point.`,
 					},
 				},
 			},
@@ -246,7 +266,7 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A set of strings representing HTTP protocols.`,
+				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -285,7 +305,7 @@ func (r *PluginMtlsAuthResource) Schema(ctx context.Context, req resource.Schema
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -540,7 +560,7 @@ func (r *PluginMtlsAuthResource) ImportState(ctx context.Context, req resource.I
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -550,7 +570,7 @@ func (r *PluginMtlsAuthResource) ImportState(ctx context.Context, req resource.I
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

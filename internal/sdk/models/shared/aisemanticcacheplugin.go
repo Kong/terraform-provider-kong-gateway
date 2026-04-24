@@ -164,6 +164,10 @@ type AiSemanticCachePluginAuth struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.
 	AzureUseManagedIdentity *bool `json:"azure_use_managed_identity,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
 	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
 	// Use service account auth for GCP-based providers and models.
@@ -238,6 +242,20 @@ func (a *AiSemanticCachePluginAuth) GetAzureUseManagedIdentity() *bool {
 		return nil
 	}
 	return a.AzureUseManagedIdentity
+}
+
+func (a *AiSemanticCachePluginAuth) GetGcpMetadataURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpMetadataURL
+}
+
+func (a *AiSemanticCachePluginAuth) GetGcpOauthTokenURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpOauthTokenURL
 }
 
 func (a *AiSemanticCachePluginAuth) GetGcpServiceAccountJSON() *string {
@@ -339,10 +357,16 @@ type AiSemanticCachePluginBedrock struct {
 	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
 	// If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
+	// S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.
+	BatchBucketPrefix *string `json:"batch_bucket_prefix,omitempty"`
+	// AWS role arn used for calling batch API. Try to get the value from request if ommited.
+	BatchRoleArn *string `json:"batch_role_arn,omitempty"`
 	// If using AWS providers (Bedrock), set to true to normalize the embeddings.
 	EmbeddingsNormalize *bool `json:"embeddings_normalize,omitempty"`
 	// Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.
 	PerformanceConfigLatency *string `json:"performance_config_latency,omitempty"`
+	// S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
+	VideoOutputS3URI *string `json:"video_output_s3_uri,omitempty"`
 }
 
 func (a AiSemanticCachePluginBedrock) MarshalJSON() ([]byte, error) {
@@ -384,6 +408,20 @@ func (a *AiSemanticCachePluginBedrock) GetAwsStsEndpointURL() *string {
 	return a.AwsStsEndpointURL
 }
 
+func (a *AiSemanticCachePluginBedrock) GetBatchBucketPrefix() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchBucketPrefix
+}
+
+func (a *AiSemanticCachePluginBedrock) GetBatchRoleArn() *string {
+	if a == nil {
+		return nil
+	}
+	return a.BatchRoleArn
+}
+
 func (a *AiSemanticCachePluginBedrock) GetEmbeddingsNormalize() *bool {
 	if a == nil {
 		return nil
@@ -396,6 +434,13 @@ func (a *AiSemanticCachePluginBedrock) GetPerformanceConfigLatency() *string {
 		return nil
 	}
 	return a.PerformanceConfigLatency
+}
+
+func (a *AiSemanticCachePluginBedrock) GetVideoOutputS3URI() *string {
+	if a == nil {
+		return nil
+	}
+	return a.VideoOutputS3URI
 }
 
 type AiSemanticCachePluginGemini struct {
@@ -536,6 +581,7 @@ const (
 	AiSemanticCachePluginProviderGemini      AiSemanticCachePluginProvider = "gemini"
 	AiSemanticCachePluginProviderHuggingface AiSemanticCachePluginProvider = "huggingface"
 	AiSemanticCachePluginProviderMistral     AiSemanticCachePluginProvider = "mistral"
+	AiSemanticCachePluginProviderOllama      AiSemanticCachePluginProvider = "ollama"
 	AiSemanticCachePluginProviderOpenai      AiSemanticCachePluginProvider = "openai"
 )
 
@@ -557,6 +603,8 @@ func (e *AiSemanticCachePluginProvider) UnmarshalJSON(data []byte) error {
 	case "huggingface":
 		fallthrough
 	case "mistral":
+		fallthrough
+	case "ollama":
 		fallthrough
 	case "openai":
 		*e = AiSemanticCachePluginProvider(v)
@@ -641,6 +689,7 @@ func (a *AiSemanticCachePluginEmbeddings) GetModel() AiSemanticCachePluginModel 
 type AiSemanticCachePluginLlmFormat string
 
 const (
+	AiSemanticCachePluginLlmFormatAnthropic   AiSemanticCachePluginLlmFormat = "anthropic"
 	AiSemanticCachePluginLlmFormatBedrock     AiSemanticCachePluginLlmFormat = "bedrock"
 	AiSemanticCachePluginLlmFormatCohere      AiSemanticCachePluginLlmFormat = "cohere"
 	AiSemanticCachePluginLlmFormatGemini      AiSemanticCachePluginLlmFormat = "gemini"
@@ -657,6 +706,8 @@ func (e *AiSemanticCachePluginLlmFormat) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "anthropic":
+		fallthrough
 	case "bedrock":
 		fallthrough
 	case "cohere":
@@ -852,6 +903,159 @@ func (a *AiSemanticCachePluginPgvector) GetUser() *string {
 	return a.User
 }
 
+// AiSemanticCachePluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type AiSemanticCachePluginAuthProvider string
+
+const (
+	AiSemanticCachePluginAuthProviderAws   AiSemanticCachePluginAuthProvider = "aws"
+	AiSemanticCachePluginAuthProviderAzure AiSemanticCachePluginAuthProvider = "azure"
+	AiSemanticCachePluginAuthProviderGcp   AiSemanticCachePluginAuthProvider = "gcp"
+)
+
+func (e AiSemanticCachePluginAuthProvider) ToPointer() *AiSemanticCachePluginAuthProvider {
+	return &e
+}
+func (e *AiSemanticCachePluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = AiSemanticCachePluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiSemanticCachePluginAuthProvider: %v", v)
+	}
+}
+
+// AiSemanticCachePluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type AiSemanticCachePluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *AiSemanticCachePluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (a AiSemanticCachePluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAuthProvider() *AiSemanticCachePluginAuthProvider {
+	if a == nil {
+		return nil
+	}
+	return a.AuthProvider
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsAccessKeyID
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsAssumeRoleArn
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsCacheName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsCacheName
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.AwsIsServerless
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsRegion() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsRegion
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsRoleSessionName
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AwsSecretAccessKey
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAzureClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureClientID
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAzureClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureClientSecret
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetAzureTenantID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.AzureTenantID
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpServiceAccountJSON
+}
+
 type AiSemanticCachePluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -947,6 +1151,8 @@ func (e *AiSemanticCachePluginSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type AiSemanticCachePluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *AiSemanticCachePluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -1000,6 +1206,13 @@ func (a *AiSemanticCachePluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiSemanticCachePluginRedis) GetCloudAuthentication() *AiSemanticCachePluginCloudAuthentication {
+	if a == nil {
+		return nil
+	}
+	return a.CloudAuthentication
 }
 
 func (a *AiSemanticCachePluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1185,8 +1398,8 @@ type AiSemanticCachePluginVectordb struct {
 	Redis          *AiSemanticCachePluginRedis         `json:"redis,omitempty"`
 	// which vector database driver to use
 	Strategy AiSemanticCachePluginStrategy `json:"strategy"`
-	// the default similarity threshold for accepting semantic search results (float)
-	Threshold float64 `json:"threshold"`
+	// the default similarity threshold for accepting semantic search results (float). Higher threshold means more results are considered similar.
+	Threshold *float64 `json:"threshold,omitempty"`
 }
 
 func (a AiSemanticCachePluginVectordb) MarshalJSON() ([]byte, error) {
@@ -1194,7 +1407,7 @@ func (a AiSemanticCachePluginVectordb) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiSemanticCachePluginVectordb) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"dimensions", "distance_metric", "strategy", "threshold"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"dimensions", "distance_metric", "strategy"}); err != nil {
 		return err
 	}
 	return nil
@@ -1235,9 +1448,9 @@ func (a *AiSemanticCachePluginVectordb) GetStrategy() AiSemanticCachePluginStrat
 	return a.Strategy
 }
 
-func (a *AiSemanticCachePluginVectordb) GetThreshold() float64 {
+func (a *AiSemanticCachePluginVectordb) GetThreshold() *float64 {
 	if a == nil {
-		return 0.0
+		return nil
 	}
 	return a.Threshold
 }
@@ -1479,6 +1692,8 @@ func (a *AiSemanticCachePluginService) GetID() *string {
 
 // AiSemanticCachePlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiSemanticCachePlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1486,9 +1701,10 @@ type AiSemanticCachePlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                        `json:"instance_name,omitempty"`
-	name         string                         `const:"ai-semantic-cache" json:"name"`
-	Ordering     *AiSemanticCachePluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                         `const:"ai-semantic-cache" json:"name"`
+	Ordering *AiSemanticCachePluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiSemanticCachePluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -1517,6 +1733,13 @@ func (a *AiSemanticCachePlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiSemanticCachePlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiSemanticCachePlugin) GetCreatedAt() *int64 {

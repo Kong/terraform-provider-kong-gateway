@@ -145,6 +145,159 @@ func (r *RequestCalloutPluginMemory) GetDictionaryName() *string {
 	return r.DictionaryName
 }
 
+// RequestCalloutPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type RequestCalloutPluginAuthProvider string
+
+const (
+	RequestCalloutPluginAuthProviderAws   RequestCalloutPluginAuthProvider = "aws"
+	RequestCalloutPluginAuthProviderAzure RequestCalloutPluginAuthProvider = "azure"
+	RequestCalloutPluginAuthProviderGcp   RequestCalloutPluginAuthProvider = "gcp"
+)
+
+func (e RequestCalloutPluginAuthProvider) ToPointer() *RequestCalloutPluginAuthProvider {
+	return &e
+}
+func (e *RequestCalloutPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = RequestCalloutPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RequestCalloutPluginAuthProvider: %v", v)
+	}
+}
+
+// RequestCalloutPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type RequestCalloutPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *RequestCalloutPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (r RequestCalloutPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAuthProvider() *RequestCalloutPluginAuthProvider {
+	if r == nil {
+		return nil
+	}
+	return r.AuthProvider
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAccessKeyID
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsAssumeRoleArn
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsCacheName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsCacheName
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.AwsIsServerless
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsRegion() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRegion
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsRoleSessionName
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AwsSecretAccessKey
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAzureClientID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientID
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureClientSecret
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetAzureTenantID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.AzureTenantID
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if r == nil {
+		return nil
+	}
+	return r.GcpServiceAccountJSON
+}
+
 type RequestCalloutPluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -240,6 +393,8 @@ func (e *RequestCalloutPluginSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type RequestCalloutPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *RequestCalloutPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -293,6 +448,13 @@ func (r *RequestCalloutPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RequestCalloutPluginRedis) GetCloudAuthentication() *RequestCalloutPluginCloudAuthentication {
+	if r == nil {
+		return nil
+	}
+	return r.CloudAuthentication
 }
 
 func (r *RequestCalloutPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -548,7 +710,7 @@ func (r *RequestCalloutPluginCache) GetBypass() *bool {
 // RequestCalloutPluginConfigBody - Callout request body customizations.
 type RequestCalloutPluginConfigBody struct {
 	// The custom body fields to be added to the callout HTTP request. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `true`, decodes the request's body and make it available for customizations. Only JSON content type is supported.
 	Decode *bool `json:"decode,omitempty"`
 	// If `true`, forwards the incoming request's body to the callout request.
@@ -566,7 +728,7 @@ func (r *RequestCalloutPluginConfigBody) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *RequestCalloutPluginConfigBody) GetCustom() map[string]any {
+func (r *RequestCalloutPluginConfigBody) GetCustom() map[string]string {
 	if r == nil {
 		return nil
 	}
@@ -678,7 +840,7 @@ func (e *Error) GetRetries() *int64 {
 // RequestCalloutPluginConfigHeaders - Callout request header customizations.
 type RequestCalloutPluginConfigHeaders struct {
 	// The custom headers to be added in the callout HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `true`, forwards the incoming request's headers to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
@@ -694,7 +856,7 @@ func (r *RequestCalloutPluginConfigHeaders) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *RequestCalloutPluginConfigHeaders) GetCustom() map[string]any {
+func (r *RequestCalloutPluginConfigHeaders) GetCustom() map[string]string {
 	if r == nil {
 		return nil
 	}
@@ -807,7 +969,7 @@ type HTTPOpts struct {
 	Proxy *Proxy `json:"proxy,omitempty"`
 	// The SNI used in the callout request. Defaults to host if omitted.
 	SslServerName *string `json:"ssl_server_name,omitempty"`
-	// If set to `true`, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
+	// If set to `true`, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your callout API. You may also need to configure `lua_ssl_verify_depth` accordingly.
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Socket timeouts in milliseconds. All or none must be set.
 	Timeouts *Timeouts `json:"timeouts,omitempty"`
@@ -855,7 +1017,7 @@ func (h *HTTPOpts) GetTimeouts() *Timeouts {
 // RequestCalloutPluginQuery - Callout request query param customizations.
 type RequestCalloutPluginQuery struct {
 	// The custom query params to be added in the callout HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `true`, forwards the incoming request's query params to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
@@ -871,7 +1033,7 @@ func (r *RequestCalloutPluginQuery) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *RequestCalloutPluginQuery) GetCustom() map[string]any {
+func (r *RequestCalloutPluginQuery) GetCustom() map[string]string {
 	if r == nil {
 		return nil
 	}
@@ -885,8 +1047,8 @@ func (r *RequestCalloutPluginQuery) GetForward() *bool {
 	return r.Forward
 }
 
-// Request - The customizations for the callout request.
-type Request struct {
+// RequestCalloutPluginRequest - The customizations for the callout request.
+type RequestCalloutPluginRequest struct {
 	// Callout request body customizations.
 	Body *RequestCalloutPluginConfigBody `json:"body,omitempty"`
 	// Lua code that executes before the callout request is made. **Warning** can impact system behavior. Standard Lua sandboxing restrictions apply.
@@ -905,67 +1067,67 @@ type Request struct {
 	URL string `json:"url"`
 }
 
-func (r Request) MarshalJSON() ([]byte, error) {
+func (r RequestCalloutPluginRequest) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(r, "", false)
 }
 
-func (r *Request) UnmarshalJSON(data []byte) error {
+func (r *RequestCalloutPluginRequest) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &r, "", false, []string{"url"}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *Request) GetBody() *RequestCalloutPluginConfigBody {
+func (r *RequestCalloutPluginRequest) GetBody() *RequestCalloutPluginConfigBody {
 	if r == nil {
 		return nil
 	}
 	return r.Body
 }
 
-func (r *Request) GetByLua() *string {
+func (r *RequestCalloutPluginRequest) GetByLua() *string {
 	if r == nil {
 		return nil
 	}
 	return r.ByLua
 }
 
-func (r *Request) GetError() *Error {
+func (r *RequestCalloutPluginRequest) GetError() *Error {
 	if r == nil {
 		return nil
 	}
 	return r.Error
 }
 
-func (r *Request) GetHeaders() *RequestCalloutPluginConfigHeaders {
+func (r *RequestCalloutPluginRequest) GetHeaders() *RequestCalloutPluginConfigHeaders {
 	if r == nil {
 		return nil
 	}
 	return r.Headers
 }
 
-func (r *Request) GetHTTPOpts() *HTTPOpts {
+func (r *RequestCalloutPluginRequest) GetHTTPOpts() *HTTPOpts {
 	if r == nil {
 		return nil
 	}
 	return r.HTTPOpts
 }
 
-func (r *Request) GetMethod() *string {
+func (r *RequestCalloutPluginRequest) GetMethod() *string {
 	if r == nil {
 		return nil
 	}
 	return r.Method
 }
 
-func (r *Request) GetQuery() *RequestCalloutPluginQuery {
+func (r *RequestCalloutPluginRequest) GetQuery() *RequestCalloutPluginQuery {
 	if r == nil {
 		return nil
 	}
 	return r.Query
 }
 
-func (r *Request) GetURL() string {
+func (r *RequestCalloutPluginRequest) GetURL() string {
 	if r == nil {
 		return ""
 	}
@@ -1028,8 +1190,8 @@ func (r *RequestCalloutPluginHeaders) GetStore() *bool {
 	return r.Store
 }
 
-// Response - Configurations of callout response handling.
-type Response struct {
+// RequestCalloutPluginResponse - Configurations of callout response handling.
+type RequestCalloutPluginResponse struct {
 	Body *RequestCalloutPluginBody `json:"body,omitempty"`
 	// Lua code that executes after the callout response is received, before caching takes place. Can produce side effects. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
@@ -1037,32 +1199,32 @@ type Response struct {
 	Headers *RequestCalloutPluginHeaders `json:"headers,omitempty"`
 }
 
-func (r Response) MarshalJSON() ([]byte, error) {
+func (r RequestCalloutPluginResponse) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(r, "", false)
 }
 
-func (r *Response) UnmarshalJSON(data []byte) error {
+func (r *RequestCalloutPluginResponse) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *Response) GetBody() *RequestCalloutPluginBody {
+func (r *RequestCalloutPluginResponse) GetBody() *RequestCalloutPluginBody {
 	if r == nil {
 		return nil
 	}
 	return r.Body
 }
 
-func (r *Response) GetByLua() *string {
+func (r *RequestCalloutPluginResponse) GetByLua() *string {
 	if r == nil {
 		return nil
 	}
 	return r.ByLua
 }
 
-func (r *Response) GetHeaders() *RequestCalloutPluginHeaders {
+func (r *RequestCalloutPluginResponse) GetHeaders() *RequestCalloutPluginHeaders {
 	if r == nil {
 		return nil
 	}
@@ -1077,9 +1239,9 @@ type Callouts struct {
 	// A string identifier for a callout. A callout object is referenceable via its name in the `kong.ctx.shared.callouts.<name>`
 	Name string `json:"name"`
 	// The customizations for the callout request.
-	Request Request `json:"request"`
+	Request RequestCalloutPluginRequest `json:"request"`
 	// Configurations of callout response handling.
-	Response *Response `json:"response,omitempty"`
+	Response *RequestCalloutPluginResponse `json:"response,omitempty"`
 }
 
 func (c Callouts) MarshalJSON() ([]byte, error) {
@@ -1114,14 +1276,14 @@ func (c *Callouts) GetName() string {
 	return c.Name
 }
 
-func (c *Callouts) GetRequest() Request {
+func (c *Callouts) GetRequest() RequestCalloutPluginRequest {
 	if c == nil {
-		return Request{}
+		return RequestCalloutPluginRequest{}
 	}
 	return c.Request
 }
 
-func (c *Callouts) GetResponse() *Response {
+func (c *Callouts) GetResponse() *RequestCalloutPluginResponse {
 	if c == nil {
 		return nil
 	}
@@ -1131,7 +1293,7 @@ func (c *Callouts) GetResponse() *Response {
 // Body - Callout request body customizations.
 type Body struct {
 	// The custom body fields to be added in the upstream request body. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `true`, decodes the request's body to make it available for upstream by_lua customizations. Only JSON content type is supported.
 	Decode *bool `json:"decode,omitempty"`
 	// If `false`, skips forwarding the incoming request's body to the upstream request.
@@ -1149,7 +1311,7 @@ func (b *Body) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (b *Body) GetCustom() map[string]any {
+func (b *Body) GetCustom() map[string]string {
 	if b == nil {
 		return nil
 	}
@@ -1173,7 +1335,7 @@ func (b *Body) GetForward() *bool {
 // Headers - Callout request header customizations.
 type Headers struct {
 	// The custom headers to be added in the upstream HTTP request. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `false`, does not forward request headers to upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
@@ -1189,7 +1351,7 @@ func (h *Headers) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (h *Headers) GetCustom() map[string]any {
+func (h *Headers) GetCustom() map[string]string {
 	if h == nil {
 		return nil
 	}
@@ -1206,7 +1368,7 @@ func (h *Headers) GetForward() *bool {
 // Query - Upstream request query param customizations.
 type Query struct {
 	// The custom query params to be added in the upstream HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
-	Custom map[string]any `json:"custom,omitempty"`
+	Custom map[string]string `json:"custom,omitempty"`
 	// If `false`, does not forward request query params to upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
@@ -1222,7 +1384,7 @@ func (q *Query) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (q *Query) GetCustom() map[string]any {
+func (q *Query) GetCustom() map[string]string {
 	if q == nil {
 		return nil
 	}
@@ -1454,6 +1616,8 @@ func (r *RequestCalloutPluginService) GetID() *string {
 
 // RequestCalloutPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type RequestCalloutPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1461,9 +1625,10 @@ type RequestCalloutPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                       `json:"instance_name,omitempty"`
-	name         string                        `const:"request-callout" json:"name"`
-	Ordering     *RequestCalloutPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                        `const:"request-callout" json:"name"`
+	Ordering *RequestCalloutPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []RequestCalloutPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -1492,6 +1657,13 @@ func (r *RequestCalloutPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *RequestCalloutPlugin) GetCondition() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Condition
 }
 
 func (r *RequestCalloutPlugin) GetCreatedAt() *int64 {

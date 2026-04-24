@@ -15,6 +15,7 @@ func (r *PluginAiPromptDecoratorResourceModel) RefreshFromSharedAiPromptDecorato
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -222,6 +223,12 @@ func (r *PluginAiPromptDecoratorResourceModel) ToOperationsUpdateAipromptdecorat
 func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin(ctx context.Context) (*shared.AiPromptDecoratorPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -333,9 +340,9 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin(c
 				var content string
 				content = r.Config.Prompts.Append[appendIndex].Content.ValueString()
 
-				role := new(shared.Role)
+				role := new(shared.AiPromptDecoratorPluginConfigRole)
 				if !r.Config.Prompts.Append[appendIndex].Role.IsUnknown() && !r.Config.Prompts.Append[appendIndex].Role.IsNull() {
-					*role = shared.Role(r.Config.Prompts.Append[appendIndex].Role.ValueString())
+					*role = shared.AiPromptDecoratorPluginConfigRole(r.Config.Prompts.Append[appendIndex].Role.ValueString())
 				} else {
 					role = nil
 				}
@@ -424,6 +431,7 @@ func (r *PluginAiPromptDecoratorResourceModel) ToSharedAiPromptDecoratorPlugin(c
 		}
 	}
 	out := shared.AiPromptDecoratorPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

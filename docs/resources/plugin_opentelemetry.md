@@ -14,7 +14,14 @@ PluginOpentelemetry Resource
 
 ```terraform
 resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
+  condition = "...my_condition..."
   config = {
+    access_logs = {
+      custom_attributes_by_lua = {
+        key = "value"
+      }
+      endpoint = "...my_endpoint..."
+    }
     batch_flush_delay = 10
     batch_span_count  = 3
     connect_timeout   = 989336304
@@ -24,6 +31,16 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
     }
     http_response_header_for_traceid = "...my_http_response_header_for_traceid..."
     logs_endpoint                    = "...my_logs_endpoint..."
+    metrics = {
+      enable_ai_metrics              = false
+      enable_bandwidth_metrics       = false
+      enable_consumer_attribute      = true
+      enable_latency_metrics         = true
+      enable_request_metrics         = false
+      enable_upstream_health_metrics = true
+      endpoint                       = "...my_endpoint..."
+      push_interval                  = 6.43
+    }
     propagation = {
       clear = [
         "..."
@@ -48,7 +65,7 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
     }
     read_timeout = 225003718
     resource_attributes = {
-      key = jsonencode("value")
+      key = "value"
     }
     sampling_rate     = 0.04
     sampling_strategy = "parent_drop_probability_fallback"
@@ -82,7 +99,7 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
     }
   ]
   protocols = [
-    "grpcs"
+    "tcp"
   ]
   route = {
     id = "...my_id..."
@@ -94,7 +111,7 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
     "..."
   ]
   updated_at = 0
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -103,6 +120,7 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
@@ -111,25 +129,27 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
 - `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
 - `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
-- `protocols` (Set of String) A set of strings representing HTTP protocols.
+- `protocols` (Set of String) A set of strings representing protocols.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
 Optional:
 
+- `access_logs` (Attributes) (see [below for nested schema](#nestedatt--config--access_logs))
 - `batch_flush_delay` (Number) The delay, in seconds, between two consecutive batches.
 - `batch_span_count` (Number) The number of spans to be sent in a single batch.
 - `connect_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `header_type` (String) must be one of ["aws", "b3", "b3-single", "datadog", "gcp", "ignore", "instana", "jaeger", "ot", "preserve", "w3c"]
 - `headers` (Map of String) The custom headers to be added in the HTTP request sent to the OTLP server. This setting is useful for adding the authentication headers (token) for the APM backend.
 - `http_response_header_for_traceid` (String)
-- `logs_endpoint` (String) A string representing a URL, such as https://example.com/path/to/resource?q=search.
+- `logs_endpoint` (String) An HTTP URL endpoint where internal logs are exported.
+- `metrics` (Attributes) (see [below for nested schema](#nestedatt--config--metrics))
 - `propagation` (Attributes) (see [below for nested schema](#nestedatt--config--propagation))
 - `queue` (Attributes) (see [below for nested schema](#nestedatt--config--queue))
 - `read_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
@@ -138,6 +158,30 @@ Optional:
 - `sampling_strategy` (String) The sampling strategy to use for OTLP `traces`. Set `parent_drop_probability_fallback` if you want parent-based sampling when the parent span contains a `false` sampled flag, and fallback to probability-based sampling otherwise. Set `parent_probability_fallback` if you want parent-based sampling when the parent span contains a valid sampled flag (`true` or `false`), and fallback to probability-based sampling otherwise. must be one of ["parent_drop_probability_fallback", "parent_probability_fallback"]
 - `send_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
 - `traces_endpoint` (String) A string representing a URL, such as https://example.com/path/to/resource?q=search.
+
+<a id="nestedatt--config--access_logs"></a>
+### Nested Schema for `config.access_logs`
+
+Optional:
+
+- `custom_attributes_by_lua` (Map of String) A key-value map that dynamically modifies access log fields using Lua code.
+- `endpoint` (String) An HTTP URL endpoint where access logs (e.g. request/response, route/service, latency, etc.) are exported.
+
+
+<a id="nestedatt--config--metrics"></a>
+### Nested Schema for `config.metrics`
+
+Optional:
+
+- `enable_ai_metrics` (Boolean) A boolean value that determines if AI metrics should be collected. If enabled, `gen_ai.*`, `mcp.*`, `kong.gen_ai.*`, `kong.gen_ai.a2a.*` and `kong.mcp.*` metrics will be exported. To enable latency metrics for AI metrics, `enable_latency_metrics` must also be set to `true`. To enable `error.type` attribute for AI metrics, `enable_request_metrics` must also be set to `true`.
+- `enable_bandwidth_metrics` (Boolean) A boolean value that determines if bandwidth metrics should be collected. If enabled, `http.server.request.size` and `http.server.response.size` metrics will be exported.
+- `enable_consumer_attribute` (Boolean) A boolean value that determines if `http.server.request.count`, `http.server.request.size` and `http.server.response.size` metrics should fill in the consumer attribute when available.
+- `enable_latency_metrics` (Boolean) A boolean value that determines if latency metrics should be collected. If enabled, `kong.latency.total`, `kong.latency.internal` and `kong.latency.upstream` metrics will be exported.
+- `enable_request_metrics` (Boolean) A boolean value that determines if request count metrics should be collected. If enabled, `http.server.request.count` metrics will be exported.
+- `enable_upstream_health_metrics` (Boolean) A boolean value that determines if upstream health metrics should be collected. If enabled, `kong.upstream.target.status` metrics will be exported.
+- `endpoint` (String) An HTTP URL endpoint where metrics are exported.
+- `push_interval` (Number) The interval in seconds at which metrics are pushed to the OTLP server. This setting is only applicable when `endpoint` is set.
+
 
 <a id="nestedatt--config--propagation"></a>
 ### Nested Schema for `config.propagation`
@@ -234,8 +278,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_opentelemetry.my_kong-gateway_plugin_opentelemetry
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -243,5 +287,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_opentelemetry.my_kong-gateway_plugin_opentelemetry '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_opentelemetry.my_kong-gateway_plugin_opentelemetry '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

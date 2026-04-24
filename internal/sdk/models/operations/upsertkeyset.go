@@ -11,7 +11,7 @@ import (
 type UpsertKeySetRequest struct {
 	// ID or name of the KeySet to lookup
 	KeySetIDOrName string `pathParam:"style=simple,explode=false,name=KeySetIdOrName"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the KeySet
 	KeySet *shared.KeySet `request:"mediaType=application/json"`

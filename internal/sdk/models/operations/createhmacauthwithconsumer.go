@@ -11,7 +11,7 @@ import (
 type CreateHmacAuthWithConsumerRequest struct {
 	// Consumer ID for nested entities
 	ConsumerID string `pathParam:"style=simple,explode=false,name=ConsumerIdForNestedEntities"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of new HMAC-auth credential for creation
 	HMACAuthWithoutParents shared.HMACAuthWithoutParents `request:"mediaType=application/json"`

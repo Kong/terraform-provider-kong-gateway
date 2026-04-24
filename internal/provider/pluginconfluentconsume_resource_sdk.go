@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.ConfluentConsumePluginConfig{}
 		if resp.Config.AutoOffsetReset != nil {
 			r.Config.AutoOffsetReset = types.StringValue(string(*resp.Config.AutoOffsetReset))
@@ -45,6 +44,7 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 		r.Config.ConfluentCloudAPISecret = types.StringPointerValue(resp.Config.ConfluentCloudAPISecret)
 		r.Config.DlqTopic = types.StringPointerValue(resp.Config.DlqTopic)
 		r.Config.EnableDlq = types.BoolPointerValue(resp.Config.EnableDlq)
+		r.Config.EnforceLatestOffsetReset = types.BoolPointerValue(resp.Config.EnforceLatestOffsetReset)
 		r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
 		r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
 		r.Config.MessageByLuaFunctions = make([]types.String, 0, len(resp.Config.MessageByLuaFunctions))
@@ -107,17 +107,15 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 							for key, value := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-								result, _ := json.Marshal(value)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = jsontypes.NewNormalizedValue(string(result))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key] = types.StringValue(value)
 							}
 						}
 						if len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+							r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]types.String, len(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 							for key1, value1 := range resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-								result1, _ := json.Marshal(value1)
-								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = jsontypes.NewNormalizedValue(string(result1))
+								r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key1] = types.StringValue(value1)
 							}
 						}
 						r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -151,6 +149,12 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 				r.Config.SchemaRegistry.Confluent.TTL = types.Float64PointerValue(resp.Config.SchemaRegistry.Confluent.TTL)
 				r.Config.SchemaRegistry.Confluent.URL = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.URL)
 			}
+		}
+		if resp.Config.Security == nil {
+			r.Config.Security = nil
+		} else {
+			r.Config.Security = &tfTypes.ConfluentPluginSecurity{}
+			r.Config.Security.SslVerify = types.BoolPointerValue(resp.Config.Security.SslVerify)
 		}
 		r.Config.Timeout = types.Int64PointerValue(resp.Config.Timeout)
 		r.Config.Topics = []tfTypes.Topics{}
@@ -205,17 +209,15 @@ func (r *PluginConfluentConsumeResourceModel) RefreshFromSharedConfluentConsumeP
 							}
 							topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint)
 							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders) > 0 {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders = make(map[string]types.String, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders))
 								for key2, value2 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-									result2, _ := json.Marshal(value2)
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = jsontypes.NewNormalizedValue(string(result2))
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[key2] = types.StringValue(value2)
 								}
 							}
 							if len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs) > 0 {
-								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]jsontypes.Normalized, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
+								topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs = make(map[string]types.String, len(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs))
 								for key3, value3 := range topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-									result3, _ := json.Marshal(value3)
-									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = jsontypes.NewNormalizedValue(string(result3))
+									topics.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[key3] = types.StringValue(value3)
 								}
 							}
 							topics.SchemaRegistry.Confluent.Authentication.Oauth2.Username = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.Oauth2.Username)
@@ -410,6 +412,12 @@ func (r *PluginConfluentConsumeResourceModel) ToOperationsUpdateConfluentconsume
 func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx context.Context) (*shared.ConfluentConsumePlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -561,6 +569,12 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 	} else {
 		enableDlq = nil
 	}
+	enforceLatestOffsetReset := new(bool)
+	if !r.Config.EnforceLatestOffsetReset.IsUnknown() && !r.Config.EnforceLatestOffsetReset.IsNull() {
+		*enforceLatestOffsetReset = r.Config.EnforceLatestOffsetReset.ValueBool()
+	} else {
+		enforceLatestOffsetReset = nil
+	}
 	keepalive := new(int64)
 	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
 		*keepalive = r.Config.Keepalive.ValueInt64()
@@ -651,16 +665,18 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 					var tokenEndpoint string
 					tokenEndpoint = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
-					tokenHeaders := make(map[string]interface{})
+					tokenHeaders := make(map[string]string)
 					for tokenHeadersKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-						var tokenHeadersInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()), &tokenHeadersInst)
+						var tokenHeadersInst string
+						tokenHeadersInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey].ValueString()
+
 						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
 					}
-					tokenPostArgs := make(map[string]interface{})
+					tokenPostArgs := make(map[string]string)
 					for tokenPostArgsKey := range r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-						var tokenPostArgsInst interface{}
-						_ = json.Unmarshal([]byte(r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()), &tokenPostArgsInst)
+						var tokenPostArgsInst string
+						tokenPostArgsInst = r.Config.SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey].ValueString()
+
 						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
 					}
 					username1 := new(string)
@@ -800,6 +816,18 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 			Confluent: confluent,
 		}
 	}
+	var security *shared.ConfluentConsumePluginSecurity
+	if r.Config.Security != nil {
+		sslVerify2 := new(bool)
+		if !r.Config.Security.SslVerify.IsUnknown() && !r.Config.Security.SslVerify.IsNull() {
+			*sslVerify2 = r.Config.Security.SslVerify.ValueBool()
+		} else {
+			sslVerify2 = nil
+		}
+		security = &shared.ConfluentConsumePluginSecurity{
+			SslVerify: sslVerify2,
+		}
+	}
 	timeout1 := new(int64)
 	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
 		*timeout1 = r.Config.Timeout.ValueInt64()
@@ -873,16 +901,18 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 						var tokenEndpoint1 string
 						tokenEndpoint1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenEndpoint.ValueString()
 
-						tokenHeaders1 := make(map[string]interface{})
+						tokenHeaders1 := make(map[string]string)
 						for tokenHeadersKey1 := range r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders {
-							var tokenHeadersInst1 interface{}
-							_ = json.Unmarshal([]byte(r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey1].ValueString()), &tokenHeadersInst1)
+							var tokenHeadersInst1 string
+							tokenHeadersInst1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenHeaders[tokenHeadersKey1].ValueString()
+
 							tokenHeaders1[tokenHeadersKey1] = tokenHeadersInst1
 						}
-						tokenPostArgs1 := make(map[string]interface{})
+						tokenPostArgs1 := make(map[string]string)
 						for tokenPostArgsKey1 := range r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs {
-							var tokenPostArgsInst1 interface{}
-							_ = json.Unmarshal([]byte(r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey1].ValueString()), &tokenPostArgsInst1)
+							var tokenPostArgsInst1 string
+							tokenPostArgsInst1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2.TokenPostArgs[tokenPostArgsKey1].ValueString()
+
 							tokenPostArgs1[tokenPostArgsKey1] = tokenPostArgsInst1
 						}
 						username3 := new(string)
@@ -960,11 +990,11 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 						} else {
 							noProxy1 = nil
 						}
-						sslVerify2 := new(bool)
+						sslVerify3 := new(bool)
 						if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.IsNull() {
-							*sslVerify2 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
+							*sslVerify3 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.SslVerify.ValueBool()
 						} else {
-							sslVerify2 = nil
+							sslVerify3 = nil
 						}
 						timeout2 := new(int64)
 						if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Oauth2Client.Timeout.IsNull() {
@@ -982,7 +1012,7 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 							HTTPSProxyAuthorization: httpsProxyAuthorization1,
 							KeepAlive:               keepAlive1,
 							NoProxy:                 noProxy1,
-							SslVerify:               sslVerify2,
+							SslVerify:               sslVerify3,
 							Timeout:                 timeout2,
 						}
 					}
@@ -993,11 +1023,11 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 						Oauth2Client: oauth2Client1,
 					}
 				}
-				sslVerify3 := new(bool)
+				sslVerify4 := new(bool)
 				if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.IsNull() {
-					*sslVerify3 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.ValueBool()
+					*sslVerify4 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.SslVerify.ValueBool()
 				} else {
-					sslVerify3 = nil
+					sslVerify4 = nil
 				}
 				ttl1 := new(float64)
 				if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.TTL.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.TTL.IsNull() {
@@ -1013,7 +1043,7 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 				}
 				confluent1 = &shared.ConfluentConsumePluginConfigConfluent{
 					Authentication: authentication1,
-					SslVerify:      sslVerify3,
+					SslVerify:      sslVerify4,
 					TTL:            ttl1,
 					URL:            url1,
 				}
@@ -1028,24 +1058,26 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 		})
 	}
 	config := shared.ConfluentConsumePluginConfig{
-		AutoOffsetReset:         autoOffsetReset,
-		BootstrapServers:        bootstrapServers,
-		ClusterAPIKey:           clusterAPIKey,
-		ClusterAPISecret:        clusterAPISecret,
-		ClusterName:             clusterName,
-		CommitStrategy:          commitStrategy,
-		ConfluentCloudAPIKey:    confluentCloudAPIKey,
-		ConfluentCloudAPISecret: confluentCloudAPISecret,
-		DlqTopic:                dlqTopic,
-		EnableDlq:               enableDlq,
-		Keepalive:               keepalive,
-		KeepaliveEnabled:        keepaliveEnabled,
-		MessageByLuaFunctions:   messageByLuaFunctions,
-		MessageDeserializer:     messageDeserializer,
-		Mode:                    mode,
-		SchemaRegistry:          schemaRegistry,
-		Timeout:                 timeout1,
-		Topics:                  topics,
+		AutoOffsetReset:          autoOffsetReset,
+		BootstrapServers:         bootstrapServers,
+		ClusterAPIKey:            clusterAPIKey,
+		ClusterAPISecret:         clusterAPISecret,
+		ClusterName:              clusterName,
+		CommitStrategy:           commitStrategy,
+		ConfluentCloudAPIKey:     confluentCloudAPIKey,
+		ConfluentCloudAPISecret:  confluentCloudAPISecret,
+		DlqTopic:                 dlqTopic,
+		EnableDlq:                enableDlq,
+		EnforceLatestOffsetReset: enforceLatestOffsetReset,
+		Keepalive:                keepalive,
+		KeepaliveEnabled:         keepaliveEnabled,
+		MessageByLuaFunctions:    messageByLuaFunctions,
+		MessageDeserializer:      messageDeserializer,
+		Mode:                     mode,
+		SchemaRegistry:           schemaRegistry,
+		Security:                 security,
+		Timeout:                  timeout1,
+		Topics:                   topics,
 	}
 	var consumer *shared.ConfluentConsumePluginConsumer
 	if r.Consumer != nil {
@@ -1088,6 +1120,7 @@ func (r *PluginConfluentConsumeResourceModel) ToSharedConfluentConsumePlugin(ctx
 		}
 	}
 	out := shared.ConfluentConsumePlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

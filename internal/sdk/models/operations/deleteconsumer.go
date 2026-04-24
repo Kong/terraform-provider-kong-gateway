@@ -11,7 +11,7 @@ import (
 type DeleteConsumerRequest struct {
 	// ID or username of the Consumer to lookup
 	ConsumerIDOrUsername string `pathParam:"style=simple,explode=false,name=ConsumerIdOrUsername"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 

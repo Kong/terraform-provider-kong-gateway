@@ -11,7 +11,7 @@ import (
 type UpdateSessionPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace     string               `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	SessionPlugin shared.SessionPlugin `request:"mediaType=application/json"`
 }

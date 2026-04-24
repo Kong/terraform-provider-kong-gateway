@@ -7,26 +7,26 @@ import (
 )
 
 type WorkspaceConfig struct {
-	Meta                          map[string]any `json:"meta,omitempty"`
-	Portal                        *bool          `json:"portal,omitempty"`
-	PortalAccessRequestEmail      *bool          `json:"portal_access_request_email,omitempty"`
-	PortalApplicationRequestEmail *bool          `json:"portal_application_request_email,omitempty"`
-	PortalApplicationStatusEmail  *bool          `json:"portal_application_status_email,omitempty"`
-	PortalApprovedEmail           *bool          `json:"portal_approved_email,omitempty"`
-	PortalAuth                    *string        `json:"portal_auth,omitempty"`
-	PortalAuthConf                *string        `json:"portal_auth_conf,omitempty"`
-	PortalAutoApprove             *bool          `json:"portal_auto_approve,omitempty"`
-	PortalCorsOrigins             []string       `json:"portal_cors_origins,omitempty"`
-	PortalDeveloperMetaFields     *string        `json:"portal_developer_meta_fields,omitempty"`
-	PortalEmailsFrom              *string        `json:"portal_emails_from,omitempty"`
-	PortalEmailsReplyTo           *string        `json:"portal_emails_reply_to,omitempty"`
-	PortalInviteEmail             *bool          `json:"portal_invite_email,omitempty"`
-	PortalIsLegacy                *bool          `json:"portal_is_legacy,omitempty"`
-	PortalResetEmail              *bool          `json:"portal_reset_email,omitempty"`
-	PortalResetSuccessEmail       *bool          `json:"portal_reset_success_email,omitempty"`
-	PortalSessionConf             *string        `json:"portal_session_conf,omitempty"`
-	PortalSMTPAdminEmails         []string       `json:"portal_smtp_admin_emails,omitempty"`
-	PortalTokenExp                *int64         `json:"portal_token_exp,omitempty"`
+	Meta                          map[string]string `json:"meta,omitempty"`
+	Portal                        *bool             `json:"portal,omitempty"`
+	PortalAccessRequestEmail      *bool             `json:"portal_access_request_email,omitempty"`
+	PortalApplicationRequestEmail *bool             `json:"portal_application_request_email,omitempty"`
+	PortalApplicationStatusEmail  *bool             `json:"portal_application_status_email,omitempty"`
+	PortalApprovedEmail           *bool             `json:"portal_approved_email,omitempty"`
+	PortalAuth                    *string           `json:"portal_auth,omitempty"`
+	PortalAuthConf                *string           `json:"portal_auth_conf,omitempty"`
+	PortalAutoApprove             *bool             `json:"portal_auto_approve,omitempty"`
+	PortalCorsOrigins             []string          `json:"portal_cors_origins,omitempty"`
+	PortalDeveloperMetaFields     *string           `json:"portal_developer_meta_fields,omitempty"`
+	PortalEmailsFrom              *string           `json:"portal_emails_from,omitempty"`
+	PortalEmailsReplyTo           *string           `json:"portal_emails_reply_to,omitempty"`
+	PortalInviteEmail             *bool             `json:"portal_invite_email,omitempty"`
+	PortalIsLegacy                *bool             `json:"portal_is_legacy,omitempty"`
+	PortalResetEmail              *bool             `json:"portal_reset_email,omitempty"`
+	PortalResetSuccessEmail       *bool             `json:"portal_reset_success_email,omitempty"`
+	PortalSessionConf             *string           `json:"portal_session_conf,omitempty"`
+	PortalSMTPAdminEmails         []string          `json:"portal_smtp_admin_emails,omitempty"`
+	PortalTokenExp                *int64            `json:"portal_token_exp,omitempty"`
 }
 
 func (w WorkspaceConfig) MarshalJSON() ([]byte, error) {
@@ -40,7 +40,7 @@ func (w *WorkspaceConfig) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (w *WorkspaceConfig) GetMeta() map[string]any {
+func (w *WorkspaceConfig) GetMeta() map[string]string {
 	if w == nil {
 		return nil
 	}

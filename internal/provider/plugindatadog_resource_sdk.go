@@ -15,6 +15,7 @@ func (r *PluginDatadogResourceModel) RefreshFromSharedDatadogPlugin(ctx context.
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -22,10 +23,10 @@ func (r *PluginDatadogResourceModel) RefreshFromSharedDatadogPlugin(ctx context.
 			r.Config.ConsumerTag = types.StringPointerValue(resp.Config.ConsumerTag)
 			r.Config.FlushTimeout = types.Float64PointerValue(resp.Config.FlushTimeout)
 			r.Config.Host = types.StringPointerValue(resp.Config.Host)
-			r.Config.Metrics = []tfTypes.Metrics{}
+			r.Config.Metrics = []tfTypes.DatadogPluginMetrics{}
 
 			for _, metricsItem := range resp.Config.Metrics {
-				var metrics tfTypes.Metrics
+				var metrics tfTypes.DatadogPluginMetrics
 
 				if metricsItem.ConsumerIdentifier != nil {
 					metrics.ConsumerIdentifier = types.StringValue(string(*metricsItem.ConsumerIdentifier))
@@ -63,6 +64,7 @@ func (r *PluginDatadogResourceModel) RefreshFromSharedDatadogPlugin(ctx context.
 			}
 			r.Config.QueueSize = types.Int64PointerValue(resp.Config.QueueSize)
 			r.Config.RetryCount = types.Int64PointerValue(resp.Config.RetryCount)
+			r.Config.RouteNameTag = types.StringPointerValue(resp.Config.RouteNameTag)
 			r.Config.ServiceNameTag = types.StringPointerValue(resp.Config.ServiceNameTag)
 			r.Config.StatusTag = types.StringPointerValue(resp.Config.StatusTag)
 		}
@@ -223,6 +225,12 @@ func (r *PluginDatadogResourceModel) ToOperationsUpdateDatadogPluginRequest(ctx 
 func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) (*shared.DatadogPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -333,11 +341,11 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 		} else {
 			host = nil
 		}
-		metrics := make([]shared.Metrics, 0, len(r.Config.Metrics))
+		metrics := make([]shared.DatadogPluginMetrics, 0, len(r.Config.Metrics))
 		for metricsIndex := range r.Config.Metrics {
-			consumerIdentifier := new(shared.ConsumerIdentifier)
+			consumerIdentifier := new(shared.DatadogPluginConsumerIdentifier)
 			if !r.Config.Metrics[metricsIndex].ConsumerIdentifier.IsUnknown() && !r.Config.Metrics[metricsIndex].ConsumerIdentifier.IsNull() {
-				*consumerIdentifier = shared.ConsumerIdentifier(r.Config.Metrics[metricsIndex].ConsumerIdentifier.ValueString())
+				*consumerIdentifier = shared.DatadogPluginConsumerIdentifier(r.Config.Metrics[metricsIndex].ConsumerIdentifier.ValueString())
 			} else {
 				consumerIdentifier = nil
 			}
@@ -353,7 +361,7 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 			for tagsIndex1 := range r.Config.Metrics[metricsIndex].Tags {
 				tags1 = append(tags1, r.Config.Metrics[metricsIndex].Tags[tagsIndex1].ValueString())
 			}
-			metrics = append(metrics, shared.Metrics{
+			metrics = append(metrics, shared.DatadogPluginMetrics{
 				ConsumerIdentifier: consumerIdentifier,
 				Name:               name1,
 				SampleRate:         sampleRate,
@@ -446,6 +454,12 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 		} else {
 			retryCount = nil
 		}
+		routeNameTag := new(string)
+		if !r.Config.RouteNameTag.IsUnknown() && !r.Config.RouteNameTag.IsNull() {
+			*routeNameTag = r.Config.RouteNameTag.ValueString()
+		} else {
+			routeNameTag = nil
+		}
 		serviceNameTag := new(string)
 		if !r.Config.ServiceNameTag.IsUnknown() && !r.Config.ServiceNameTag.IsNull() {
 			*serviceNameTag = r.Config.ServiceNameTag.ValueString()
@@ -468,6 +482,7 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 			Queue:          queue,
 			QueueSize:      queueSize,
 			RetryCount:     retryCount,
+			RouteNameTag:   routeNameTag,
 			ServiceNameTag: serviceNameTag,
 			StatusTag:      statusTag,
 		}
@@ -513,6 +528,7 @@ func (r *PluginDatadogResourceModel) ToSharedDatadogPlugin(ctx context.Context) 
 		}
 	}
 	out := shared.DatadogPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -38,6 +39,7 @@ type PluginAiRequestTransformerResource struct {
 
 // PluginAiRequestTransformerResourceModel describes the resource data model.
 type PluginAiRequestTransformerResourceModel struct {
+	Condition     types.String                              `tfsdk:"condition"`
 	Config        *tfTypes.AiRequestTransformerPluginConfig `tfsdk:"config"`
 	ConsumerGroup *tfTypes.Set                              `tfsdk:"consumer_group"`
 	CreatedAt     types.Int64                               `tfsdk:"created_at"`
@@ -62,6 +64,14 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginAiRequestTransformer Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -143,6 +153,16 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 										Optional:    true,
 										Description: `Set true to use the Azure Cloud Managed Identity (or user-assigned identity) to authenticate with Azure-provider models.`,
 									},
+									"gcp_metadata_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.`,
+									},
+									"gcp_oauth_token_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.`,
+									},
 									"gcp_service_account_json": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
@@ -186,6 +206,11 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 									},
 								},
 							},
+							"description": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The semantic description of the target, required if using semantic load balancing. Specially, setting this to 'CATCHALL' will indicate such target to be used when no other targets match the semantic threshold. Only used by ai-proxy-advanced.`,
+							},
 							"logging": schema.SingleNestedAttribute{
 								Computed: true,
 								Optional: true,
@@ -193,7 +218,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 									"log_payloads": schema.BoolAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `If enabled, will log the request and response body into the Kong log plugin(s) output.`,
+										Description: `If enabled, will log the request and response body into the Kong log plugin(s) output.Furthermore if Opentelemetry instrumentation is enabled the traces will contain this data as well.`,
 									},
 									"log_statistics": schema.BoolAttribute{
 										Computed:    true,
@@ -202,9 +227,20 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 									},
 								},
 							},
+							"metadata": schema.StringAttribute{
+								CustomType:  jsontypes.NormalizedType{},
+								Computed:    true,
+								Optional:    true,
+								Description: `For internal use only. Parsed as JSON.`,
+							},
 							"model": schema.SingleNestedAttribute{
 								Required: true,
 								Attributes: map[string]schema.Attribute{
+									"model_alias": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The model name parameter from the request that this model should map to.`,
+									},
 									"name": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
@@ -258,6 +294,16 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 														Optional:    true,
 														Description: `If using AWS providers (Bedrock), override the STS endpoint URL when assuming a different role.`,
 													},
+													"batch_bucket_prefix": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI prefix (s3://bucket/prefix/) where Bedrock will get input files from and store results to for native batch API.`,
+													},
+													"batch_role_arn": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `AWS role arn used for calling batch API. Try to get the value from request if ommited.`,
+													},
 													"embeddings_normalize": schema.BoolAttribute{
 														Computed:    true,
 														Optional:    true,
@@ -267,6 +313,11 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 														Computed:    true,
 														Optional:    true,
 														Description: `Force the client's performance configuration 'latency' for all requests. Leave empty to let the consumer select the performance configuration.`,
+													},
+													"video_output_s3_uri": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.`,
 													},
 												},
 											},
@@ -292,6 +343,29 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 														Computed:    true,
 														Optional:    true,
 														Description: `Wait for the model if it is not ready`,
+													},
+												},
+											},
+											"dashscope": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"international": schema.BoolAttribute{
+														Computed: true,
+														Optional: true,
+														MarkdownDescription: `Two Dashscope endpoints are available, and the international endpoint will be used when this is set to ` + "`" + `true` + "`" + `.` + "\n" +
+															`It is recommended to set this to ` + "`" + `true` + "`" + ` when using international version of dashscope.`,
+													},
+												},
+											},
+											"databricks": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"workspace_instance_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Workspace Instance ID ('dbc-xxx-yyy') for Databricks model serving.`,
 													},
 												},
 											},
@@ -419,18 +493,25 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 									},
 									"provider": schema.StringAttribute{
 										Required:    true,
-										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cohere", "gemini", "huggingface", "llama2", "mistral", "openai"]`,
+										Description: `AI provider request format - Kong translates requests to and from the specified backend compatible formats. must be one of ["anthropic", "azure", "bedrock", "cerebras", "cohere", "dashscope", "databricks", "deepseek", "gemini", "huggingface", "llama2", "mistral", "ollama", "openai", "vllm", "xai"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"anthropic",
 												"azure",
 												"bedrock",
+												"cerebras",
 												"cohere",
+												"dashscope",
+												"databricks",
+												"deepseek",
 												"gemini",
 												"huggingface",
 												"llama2",
 												"mistral",
+												"ollama",
 												"openai",
+												"vllm",
+												"xai",
 											),
 										},
 									},
@@ -438,7 +519,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 							},
 							"route_type": schema.StringAttribute{
 								Required:    true,
-								Description: `The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime"]`,
+								Description: `The model's operation implementation, for this provider. must be one of ["audio/v1/audio/speech", "audio/v1/audio/transcriptions", "audio/v1/audio/translations", "image/v1/images/edits", "image/v1/images/generations", "llm/v1/assistants", "llm/v1/batches", "llm/v1/chat", "llm/v1/completions", "llm/v1/embeddings", "llm/v1/files", "llm/v1/responses", "preserve", "realtime/v1/realtime", "video/v1/videos/generations"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
 										"audio/v1/audio/speech",
@@ -455,7 +536,16 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 										"llm/v1/responses",
 										"preserve",
 										"realtime/v1/realtime",
+										"video/v1/videos/generations",
 									),
+								},
+							},
+							"weight": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The weight this target gets within the upstream loadbalancer (1-65535). Only used by ai-proxy-advanced.`,
+								Validators: []validator.Int64{
+									int64validator.Between(1, 65535),
 								},
 							},
 						},
@@ -610,7 +700,7 @@ func (r *PluginAiRequestTransformerResource) Schema(ctx context.Context, req res
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -865,7 +955,7 @@ func (r *PluginAiRequestTransformerResource) ImportState(ctx context.Context, re
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -875,7 +965,7 @@ func (r *PluginAiRequestTransformerResource) ImportState(ctx context.Context, re
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

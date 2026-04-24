@@ -14,7 +14,7 @@ KeyAuth Resource
 
 ```terraform
 resource "kong-gateway_key_auth" "my_keyauth" {
-  consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
+  consumer_id = ""
   created_at  = 1
   id          = "...my_id..."
   key         = "...my_key..."
@@ -22,7 +22,7 @@ resource "kong-gateway_key_auth" "my_keyauth" {
     "..."
   ]
   ttl       = 6
-  workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace = "team-payments"
 }
 ```
 
@@ -40,7 +40,7 @@ resource "kong-gateway_key_auth" "my_keyauth" {
 - `key` (String) Requires replacement if changed.
 - `tags` (List of String) A set of strings representing tags. Requires replacement if changed.
 - `ttl` (Number) key-auth ttl in seconds. Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `workspace` (String) The name of the workspace. Default: "default"; Requires replacement if changed.
 
 ## Import
 
@@ -52,9 +52,9 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_key_auth.my_kong-gateway_key_auth
   id = jsonencode({
-    consumer_id = "f28acbfa-c866-4587-b688-0208ac24df21"
-    id = ""
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    consumer_id = ""
+    id          = ""
+    workspace   = "team-payments"
   })
 }
 ```
@@ -62,5 +62,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_key_auth.my_kong-gateway_key_auth '{"consumer_id": "f28acbfa-c866-4587-b688-0208ac24df21", "id": "", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_key_auth.my_kong-gateway_key_auth '{"consumer_id": "", "id": "", "workspace": "team-payments"}'
 ```

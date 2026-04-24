@@ -155,6 +155,159 @@ func (e *NameidFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// SamlPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type SamlPluginAuthProvider string
+
+const (
+	SamlPluginAuthProviderAws   SamlPluginAuthProvider = "aws"
+	SamlPluginAuthProviderAzure SamlPluginAuthProvider = "azure"
+	SamlPluginAuthProviderGcp   SamlPluginAuthProvider = "gcp"
+)
+
+func (e SamlPluginAuthProvider) ToPointer() *SamlPluginAuthProvider {
+	return &e
+}
+func (e *SamlPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = SamlPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for SamlPluginAuthProvider: %v", v)
+	}
+}
+
+// SamlPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type SamlPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *SamlPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (s SamlPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SamlPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SamlPluginCloudAuthentication) GetAuthProvider() *SamlPluginAuthProvider {
+	if s == nil {
+		return nil
+	}
+	return s.AuthProvider
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsAccessKeyID
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsAssumeRoleArn
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsCacheName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsCacheName
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if s == nil {
+		return nil
+	}
+	return s.AwsIsServerless
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsRegion() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsRegion
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsRoleSessionName
+}
+
+func (s *SamlPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AwsSecretAccessKey
+}
+
+func (s *SamlPluginCloudAuthentication) GetAzureClientID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AzureClientID
+}
+
+func (s *SamlPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AzureClientSecret
+}
+
+func (s *SamlPluginCloudAuthentication) GetAzureTenantID() *string {
+	if s == nil {
+		return nil
+	}
+	return s.AzureTenantID
+}
+
+func (s *SamlPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if s == nil {
+		return nil
+	}
+	return s.GcpServiceAccountJSON
+}
+
 type SamlPluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -250,6 +403,8 @@ func (e *SamlPluginSentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type SamlPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *SamlPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -307,6 +462,13 @@ func (s *SamlPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SamlPluginRedis) GetCloudAuthentication() *SamlPluginCloudAuthentication {
+	if s == nil {
+		return nil
+	}
+	return s.CloudAuthentication
 }
 
 func (s *SamlPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -1192,6 +1354,8 @@ func (s *SamlPluginService) GetID() *string {
 
 // SamlPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SamlPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1199,9 +1363,10 @@ type SamlPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string             `json:"instance_name,omitempty"`
-	name         string              `const:"saml" json:"name"`
-	Ordering     *SamlPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string              `const:"saml" json:"name"`
+	Ordering *SamlPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []SamlPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -1226,6 +1391,13 @@ func (s *SamlPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SamlPlugin) GetCondition() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Condition
 }
 
 func (s *SamlPlugin) GetCreatedAt() *int64 {

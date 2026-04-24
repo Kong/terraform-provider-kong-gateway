@@ -11,7 +11,7 @@ import (
 type UpdateAimcpoauth2PluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace         string                   `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiMcpOauth2Plugin shared.AiMcpOauth2Plugin `request:"mediaType=application/json"`
 }
@@ -47,6 +47,9 @@ func (u *UpdateAimcpoauth2PluginRequest) GetAiMcpOauth2Plugin() shared.AiMcpOaut
 	}
 	return u.AiMcpOauth2Plugin
 }
+
+// #region class-body-updateaimcpoauth2pluginrequest
+// #endregion class-body-updateaimcpoauth2pluginrequest
 
 type UpdateAimcpoauth2PluginResponse struct {
 	// HTTP response content type for this operation
@@ -106,3 +109,6 @@ func (u *UpdateAimcpoauth2PluginResponse) GetGatewayUnauthorizedError() *shared.
 	}
 	return u.GatewayUnauthorizedError
 }
+
+// #region class-body-updateaimcpoauth2pluginresponse
+// #endregion class-body-updateaimcpoauth2pluginresponse

@@ -11,7 +11,7 @@ import (
 type DeleteOauth2introspectionPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 }
 
@@ -39,6 +39,9 @@ func (d *DeleteOauth2introspectionPluginRequest) GetWorkspace() string {
 	}
 	return d.Workspace
 }
+
+// #region class-body-deleteoauth2introspectionpluginrequest
+// #endregion class-body-deleteoauth2introspectionpluginrequest
 
 type DeleteOauth2introspectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -89,3 +92,6 @@ func (d *DeleteOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() 
 	}
 	return d.GatewayUnauthorizedError
 }
+
+// #region class-body-deleteoauth2introspectionpluginresponse
+// #endregion class-body-deleteoauth2introspectionpluginresponse

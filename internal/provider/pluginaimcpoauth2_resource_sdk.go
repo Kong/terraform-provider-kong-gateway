@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,79 +15,157 @@ func (r *PluginAiMcpOauth2ResourceModel) RefreshFromSharedAiMcpOauth2Plugin(ctx 
 	var diags diag.Diagnostics
 
 	if resp != nil {
-		if resp.Config == nil {
-			r.Config = nil
+		r.Condition = types.StringPointerValue(resp.Condition)
+		r.Config = &tfTypes.AiMcpOauth2PluginConfig{}
+		if len(resp.Config.Args) > 0 {
+			r.Config.Args = make(map[string]types.String, len(resp.Config.Args))
+			for key, value := range resp.Config.Args {
+				r.Config.Args[key] = types.StringValue(value)
+			}
+		}
+		r.Config.AuthorizationServers = make([]types.String, 0, len(resp.Config.AuthorizationServers))
+		for _, v := range resp.Config.AuthorizationServers {
+			r.Config.AuthorizationServers = append(r.Config.AuthorizationServers, types.StringValue(v))
+		}
+		r.Config.CacheIntrospection = types.BoolPointerValue(resp.Config.CacheIntrospection)
+		r.Config.ClaimToHeader = []tfTypes.ClaimToHeader{}
+
+		for _, claimToHeaderItem := range resp.Config.ClaimToHeader {
+			var claimToHeader tfTypes.ClaimToHeader
+
+			claimToHeader.Claim = types.StringValue(claimToHeaderItem.Claim)
+			claimToHeader.Header = types.StringValue(claimToHeaderItem.Header)
+
+			r.Config.ClaimToHeader = append(r.Config.ClaimToHeader, claimToHeader)
+		}
+		if resp.Config.ClientAlg != nil {
+			r.Config.ClientAlg = types.StringValue(string(*resp.Config.ClientAlg))
 		} else {
-			r.Config = &tfTypes.AiMcpOauth2PluginConfig{}
-			if len(resp.Config.Args) > 0 {
-				r.Config.Args = make(map[string]jsontypes.Normalized, len(resp.Config.Args))
-				for key, value := range resp.Config.Args {
-					result, _ := json.Marshal(value)
-					r.Config.Args[key] = jsontypes.NewNormalizedValue(string(result))
+			r.Config.ClientAlg = types.StringNull()
+		}
+		if resp.Config.ClientAuth != nil {
+			r.Config.ClientAuth = types.StringValue(string(*resp.Config.ClientAuth))
+		} else {
+			r.Config.ClientAuth = types.StringNull()
+		}
+		r.Config.ClientID = types.StringPointerValue(resp.Config.ClientID)
+		r.Config.ClientJwk = types.StringPointerValue(resp.Config.ClientJwk)
+		r.Config.ClientSecret = types.StringPointerValue(resp.Config.ClientSecret)
+		r.Config.ConsumerBy = make([]types.String, 0, len(resp.Config.ConsumerBy))
+		for _, v := range resp.Config.ConsumerBy {
+			r.Config.ConsumerBy = append(r.Config.ConsumerBy, types.StringValue(string(v)))
+		}
+		r.Config.ConsumerClaim = make([]types.String, 0, len(resp.Config.ConsumerClaim))
+		for _, v := range resp.Config.ConsumerClaim {
+			r.Config.ConsumerClaim = append(r.Config.ConsumerClaim, types.StringValue(v))
+		}
+		r.Config.ConsumerGroupsClaim = make([]types.String, 0, len(resp.Config.ConsumerGroupsClaim))
+		for _, v := range resp.Config.ConsumerGroupsClaim {
+			r.Config.ConsumerGroupsClaim = append(r.Config.ConsumerGroupsClaim, types.StringValue(v))
+		}
+		r.Config.ConsumerGroupsOptional = types.BoolPointerValue(resp.Config.ConsumerGroupsOptional)
+		r.Config.ConsumerOptional = types.BoolPointerValue(resp.Config.ConsumerOptional)
+		r.Config.CredentialClaim = make([]types.String, 0, len(resp.Config.CredentialClaim))
+		for _, v := range resp.Config.CredentialClaim {
+			r.Config.CredentialClaim = append(r.Config.CredentialClaim, types.StringValue(v))
+		}
+		if len(resp.Config.Headers) > 0 {
+			r.Config.Headers = make(map[string]types.String, len(resp.Config.Headers))
+			for key1, value1 := range resp.Config.Headers {
+				r.Config.Headers[key1] = types.StringValue(value1)
+			}
+		}
+		r.Config.HTTPProxy = types.StringPointerValue(resp.Config.HTTPProxy)
+		r.Config.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.HTTPProxyAuthorization)
+		r.Config.HTTPVersion = types.Float64PointerValue(resp.Config.HTTPVersion)
+		r.Config.HTTPSProxy = types.StringPointerValue(resp.Config.HTTPSProxy)
+		r.Config.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.HTTPSProxyAuthorization)
+		r.Config.InsecureRelaxedAudienceValidation = types.BoolPointerValue(resp.Config.InsecureRelaxedAudienceValidation)
+		r.Config.IntrospectionEndpoint = types.StringPointerValue(resp.Config.IntrospectionEndpoint)
+		if resp.Config.IntrospectionFormat != nil {
+			r.Config.IntrospectionFormat = types.StringValue(string(*resp.Config.IntrospectionFormat))
+		} else {
+			r.Config.IntrospectionFormat = types.StringNull()
+		}
+		r.Config.JwksCacheTTL = types.Int64PointerValue(resp.Config.JwksCacheTTL)
+		r.Config.JwksEndpoint = types.StringPointerValue(resp.Config.JwksEndpoint)
+		r.Config.JwtClaimsLeeway = types.Int64PointerValue(resp.Config.JwtClaimsLeeway)
+		r.Config.Keepalive = types.BoolPointerValue(resp.Config.Keepalive)
+		r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
+		r.Config.MetadataCacheTTL = types.Int64PointerValue(resp.Config.MetadataCacheTTL)
+		r.Config.MetadataDiscoveryEndpoint = types.StringPointerValue(resp.Config.MetadataDiscoveryEndpoint)
+		r.Config.MetadataDiscoveryRetry = types.Int64PointerValue(resp.Config.MetadataDiscoveryRetry)
+		r.Config.MetadataEndpoint = types.StringPointerValue(resp.Config.MetadataEndpoint)
+		r.Config.MtlsIntrospectionEndpoint = types.StringPointerValue(resp.Config.MtlsIntrospectionEndpoint)
+		r.Config.NoProxy = types.StringPointerValue(resp.Config.NoProxy)
+		r.Config.PassthroughCredentials = types.BoolPointerValue(resp.Config.PassthroughCredentials)
+		r.Config.Resource = types.StringValue(resp.Config.Resource)
+		r.Config.ScopesSupported = make([]types.String, 0, len(resp.Config.ScopesSupported))
+		for _, v := range resp.Config.ScopesSupported {
+			r.Config.ScopesSupported = append(r.Config.ScopesSupported, types.StringValue(v))
+		}
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
+		r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
+		r.Config.TLSClientAuthCert = types.StringPointerValue(resp.Config.TLSClientAuthCert)
+		r.Config.TLSClientAuthKey = types.StringPointerValue(resp.Config.TLSClientAuthKey)
+		r.Config.TLSClientAuthSslVerify = types.BoolPointerValue(resp.Config.TLSClientAuthSslVerify)
+		if resp.Config.TokenExchange == nil {
+			r.Config.TokenExchange = nil
+		} else {
+			r.Config.TokenExchange = &tfTypes.TokenExchange{}
+			if resp.Config.TokenExchange.Cache == nil {
+				r.Config.TokenExchange.Cache = nil
+			} else {
+				r.Config.TokenExchange.Cache = &tfTypes.AiMcpOauth2PluginCache{}
+				r.Config.TokenExchange.Cache.Enabled = types.BoolPointerValue(resp.Config.TokenExchange.Cache.Enabled)
+				r.Config.TokenExchange.Cache.TTL = types.Int64PointerValue(resp.Config.TokenExchange.Cache.TTL)
+			}
+			if resp.Config.TokenExchange.ClientAuth != nil {
+				r.Config.TokenExchange.ClientAuth = types.StringValue(string(*resp.Config.TokenExchange.ClientAuth))
+			} else {
+				r.Config.TokenExchange.ClientAuth = types.StringNull()
+			}
+			r.Config.TokenExchange.ClientID = types.StringPointerValue(resp.Config.TokenExchange.ClientID)
+			r.Config.TokenExchange.ClientSecret = types.StringPointerValue(resp.Config.TokenExchange.ClientSecret)
+			r.Config.TokenExchange.Enabled = types.BoolPointerValue(resp.Config.TokenExchange.Enabled)
+			if resp.Config.TokenExchange.Request == nil {
+				r.Config.TokenExchange.Request = nil
+			} else {
+				r.Config.TokenExchange.Request = &tfTypes.AiMcpOauth2PluginRequest{}
+				r.Config.TokenExchange.Request.ActorToken = types.StringPointerValue(resp.Config.TokenExchange.Request.ActorToken)
+				r.Config.TokenExchange.Request.ActorTokenHeader = types.StringPointerValue(resp.Config.TokenExchange.Request.ActorTokenHeader)
+				if resp.Config.TokenExchange.Request.ActorTokenSource != nil {
+					r.Config.TokenExchange.Request.ActorTokenSource = types.StringValue(string(*resp.Config.TokenExchange.Request.ActorTokenSource))
+				} else {
+					r.Config.TokenExchange.Request.ActorTokenSource = types.StringNull()
 				}
-			}
-			r.Config.AuthorizationServers = make([]types.String, 0, len(resp.Config.AuthorizationServers))
-			for _, v := range resp.Config.AuthorizationServers {
-				r.Config.AuthorizationServers = append(r.Config.AuthorizationServers, types.StringValue(v))
-			}
-			r.Config.CacheIntrospection = types.BoolPointerValue(resp.Config.CacheIntrospection)
-			r.Config.ClaimToHeader = []tfTypes.ClaimToHeader{}
-
-			for _, claimToHeaderItem := range resp.Config.ClaimToHeader {
-				var claimToHeader tfTypes.ClaimToHeader
-
-				claimToHeader.Claim = types.StringValue(claimToHeaderItem.Claim)
-				claimToHeader.Header = types.StringValue(claimToHeaderItem.Header)
-
-				r.Config.ClaimToHeader = append(r.Config.ClaimToHeader, claimToHeader)
-			}
-			if resp.Config.ClientAlg != nil {
-				r.Config.ClientAlg = types.StringValue(string(*resp.Config.ClientAlg))
-			} else {
-				r.Config.ClientAlg = types.StringNull()
-			}
-			if resp.Config.ClientAuth != nil {
-				r.Config.ClientAuth = types.StringValue(string(*resp.Config.ClientAuth))
-			} else {
-				r.Config.ClientAuth = types.StringNull()
-			}
-			r.Config.ClientID = types.StringValue(resp.Config.ClientID)
-			r.Config.ClientJwk = types.StringPointerValue(resp.Config.ClientJwk)
-			r.Config.ClientSecret = types.StringPointerValue(resp.Config.ClientSecret)
-			if len(resp.Config.Headers) > 0 {
-				r.Config.Headers = make(map[string]jsontypes.Normalized, len(resp.Config.Headers))
-				for key1, value1 := range resp.Config.Headers {
-					result1, _ := json.Marshal(value1)
-					r.Config.Headers[key1] = jsontypes.NewNormalizedValue(string(result1))
+				r.Config.TokenExchange.Request.ActorTokenType = types.StringPointerValue(resp.Config.TokenExchange.Request.ActorTokenType)
+				r.Config.TokenExchange.Request.Audience = make([]types.String, 0, len(resp.Config.TokenExchange.Request.Audience))
+				for _, v := range resp.Config.TokenExchange.Request.Audience {
+					r.Config.TokenExchange.Request.Audience = append(r.Config.TokenExchange.Request.Audience, types.StringValue(v))
 				}
+				r.Config.TokenExchange.Request.RequestedTokenType = types.StringPointerValue(resp.Config.TokenExchange.Request.RequestedTokenType)
+				r.Config.TokenExchange.Request.Resource = types.StringPointerValue(resp.Config.TokenExchange.Request.Resource)
+				r.Config.TokenExchange.Request.Scopes = make([]types.String, 0, len(resp.Config.TokenExchange.Request.Scopes))
+				for _, v := range resp.Config.TokenExchange.Request.Scopes {
+					r.Config.TokenExchange.Request.Scopes = append(r.Config.TokenExchange.Request.Scopes, types.StringValue(v))
+				}
+				r.Config.TokenExchange.Request.SubjectTokenType = types.StringPointerValue(resp.Config.TokenExchange.Request.SubjectTokenType)
 			}
-			r.Config.HTTPProxy = types.StringPointerValue(resp.Config.HTTPProxy)
-			r.Config.HTTPProxyAuthorization = types.StringPointerValue(resp.Config.HTTPProxyAuthorization)
-			r.Config.HTTPVersion = types.Float64PointerValue(resp.Config.HTTPVersion)
-			r.Config.HTTPSProxy = types.StringPointerValue(resp.Config.HTTPSProxy)
-			r.Config.HTTPSProxyAuthorization = types.StringPointerValue(resp.Config.HTTPSProxyAuthorization)
-			r.Config.InsecureRelaxedAudienceValidation = types.BoolPointerValue(resp.Config.InsecureRelaxedAudienceValidation)
-			r.Config.IntrospectionEndpoint = types.StringValue(resp.Config.IntrospectionEndpoint)
-			if resp.Config.IntrospectionFormat != nil {
-				r.Config.IntrospectionFormat = types.StringValue(string(*resp.Config.IntrospectionFormat))
-			} else {
-				r.Config.IntrospectionFormat = types.StringNull()
+			r.Config.TokenExchange.TokenEndpoint = types.StringValue(resp.Config.TokenExchange.TokenEndpoint)
+		}
+		r.Config.UpstreamHeaders = []tfTypes.UpstreamHeaders{}
+
+		for _, upstreamHeadersItem := range resp.Config.UpstreamHeaders {
+			var upstreamHeaders tfTypes.UpstreamHeaders
+
+			upstreamHeaders.Header = types.StringValue(upstreamHeadersItem.Header)
+			upstreamHeaders.Path = make([]types.String, 0, len(upstreamHeadersItem.Path))
+			for _, v := range upstreamHeadersItem.Path {
+				upstreamHeaders.Path = append(upstreamHeaders.Path, types.StringValue(v))
 			}
-			r.Config.Keepalive = types.BoolPointerValue(resp.Config.Keepalive)
-			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
-			r.Config.MetadataEndpoint = types.StringPointerValue(resp.Config.MetadataEndpoint)
-			r.Config.MtlsIntrospectionEndpoint = types.StringPointerValue(resp.Config.MtlsIntrospectionEndpoint)
-			r.Config.NoProxy = types.StringPointerValue(resp.Config.NoProxy)
-			r.Config.Resource = types.StringValue(resp.Config.Resource)
-			r.Config.ScopesSupported = make([]types.String, 0, len(resp.Config.ScopesSupported))
-			for _, v := range resp.Config.ScopesSupported {
-				r.Config.ScopesSupported = append(r.Config.ScopesSupported, types.StringValue(v))
-			}
-			r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
-			r.Config.Timeout = types.Float64PointerValue(resp.Config.Timeout)
-			r.Config.TLSClientAuthCert = types.StringPointerValue(resp.Config.TLSClientAuthCert)
-			r.Config.TLSClientAuthKey = types.StringPointerValue(resp.Config.TLSClientAuthKey)
-			r.Config.TLSClientAuthSslVerify = types.BoolPointerValue(resp.Config.TLSClientAuthSslVerify)
+
+			r.Config.UpstreamHeaders = append(r.Config.UpstreamHeaders, upstreamHeaders)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
@@ -242,6 +318,12 @@ func (r *PluginAiMcpOauth2ResourceModel) ToOperationsUpdateAimcpoauth2PluginRequ
 func (r *PluginAiMcpOauth2ResourceModel) ToSharedAiMcpOauth2Plugin(ctx context.Context) (*shared.AiMcpOauth2Plugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -332,214 +414,440 @@ func (r *PluginAiMcpOauth2ResourceModel) ToSharedAiMcpOauth2Plugin(ctx context.C
 	} else {
 		updatedAt = nil
 	}
-	var config *shared.AiMcpOauth2PluginConfig
-	if r.Config != nil {
-		args := make(map[string]interface{})
-		for argsKey := range r.Config.Args {
-			var argsInst interface{}
-			_ = json.Unmarshal([]byte(r.Config.Args[argsKey].ValueString()), &argsInst)
-			args[argsKey] = argsInst
-		}
-		authorizationServers := make([]string, 0, len(r.Config.AuthorizationServers))
-		for authorizationServersIndex := range r.Config.AuthorizationServers {
-			authorizationServers = append(authorizationServers, r.Config.AuthorizationServers[authorizationServersIndex].ValueString())
-		}
-		cacheIntrospection := new(bool)
-		if !r.Config.CacheIntrospection.IsUnknown() && !r.Config.CacheIntrospection.IsNull() {
-			*cacheIntrospection = r.Config.CacheIntrospection.ValueBool()
-		} else {
-			cacheIntrospection = nil
-		}
-		claimToHeader := make([]shared.ClaimToHeader, 0, len(r.Config.ClaimToHeader))
-		for claimToHeaderIndex := range r.Config.ClaimToHeader {
-			var claim string
-			claim = r.Config.ClaimToHeader[claimToHeaderIndex].Claim.ValueString()
+	args := make(map[string]string)
+	for argsKey := range r.Config.Args {
+		var argsInst string
+		argsInst = r.Config.Args[argsKey].ValueString()
 
-			var header string
-			header = r.Config.ClaimToHeader[claimToHeaderIndex].Header.ValueString()
+		args[argsKey] = argsInst
+	}
+	authorizationServers := make([]string, 0, len(r.Config.AuthorizationServers))
+	for authorizationServersIndex := range r.Config.AuthorizationServers {
+		authorizationServers = append(authorizationServers, r.Config.AuthorizationServers[authorizationServersIndex].ValueString())
+	}
+	cacheIntrospection := new(bool)
+	if !r.Config.CacheIntrospection.IsUnknown() && !r.Config.CacheIntrospection.IsNull() {
+		*cacheIntrospection = r.Config.CacheIntrospection.ValueBool()
+	} else {
+		cacheIntrospection = nil
+	}
+	claimToHeader := make([]shared.ClaimToHeader, 0, len(r.Config.ClaimToHeader))
+	for claimToHeaderIndex := range r.Config.ClaimToHeader {
+		var claim string
+		claim = r.Config.ClaimToHeader[claimToHeaderIndex].Claim.ValueString()
 
-			claimToHeader = append(claimToHeader, shared.ClaimToHeader{
-				Claim:  claim,
-				Header: header,
-			})
-		}
-		clientAlg := new(shared.ClientAlg)
-		if !r.Config.ClientAlg.IsUnknown() && !r.Config.ClientAlg.IsNull() {
-			*clientAlg = shared.ClientAlg(r.Config.ClientAlg.ValueString())
-		} else {
-			clientAlg = nil
-		}
-		clientAuth := new(shared.ClientAuth)
-		if !r.Config.ClientAuth.IsUnknown() && !r.Config.ClientAuth.IsNull() {
-			*clientAuth = shared.ClientAuth(r.Config.ClientAuth.ValueString())
-		} else {
-			clientAuth = nil
-		}
-		var clientID string
-		clientID = r.Config.ClientID.ValueString()
+		var header string
+		header = r.Config.ClaimToHeader[claimToHeaderIndex].Header.ValueString()
 
-		clientJwk := new(string)
-		if !r.Config.ClientJwk.IsUnknown() && !r.Config.ClientJwk.IsNull() {
-			*clientJwk = r.Config.ClientJwk.ValueString()
-		} else {
-			clientJwk = nil
-		}
-		clientSecret := new(string)
-		if !r.Config.ClientSecret.IsUnknown() && !r.Config.ClientSecret.IsNull() {
-			*clientSecret = r.Config.ClientSecret.ValueString()
-		} else {
-			clientSecret = nil
-		}
-		headers := make(map[string]interface{})
-		for headersKey := range r.Config.Headers {
-			var headersInst interface{}
-			_ = json.Unmarshal([]byte(r.Config.Headers[headersKey].ValueString()), &headersInst)
-			headers[headersKey] = headersInst
-		}
-		httpProxy := new(string)
-		if !r.Config.HTTPProxy.IsUnknown() && !r.Config.HTTPProxy.IsNull() {
-			*httpProxy = r.Config.HTTPProxy.ValueString()
-		} else {
-			httpProxy = nil
-		}
-		httpProxyAuthorization := new(string)
-		if !r.Config.HTTPProxyAuthorization.IsUnknown() && !r.Config.HTTPProxyAuthorization.IsNull() {
-			*httpProxyAuthorization = r.Config.HTTPProxyAuthorization.ValueString()
-		} else {
-			httpProxyAuthorization = nil
-		}
-		httpVersion := new(float64)
-		if !r.Config.HTTPVersion.IsUnknown() && !r.Config.HTTPVersion.IsNull() {
-			*httpVersion = r.Config.HTTPVersion.ValueFloat64()
-		} else {
-			httpVersion = nil
-		}
-		httpsProxy := new(string)
-		if !r.Config.HTTPSProxy.IsUnknown() && !r.Config.HTTPSProxy.IsNull() {
-			*httpsProxy = r.Config.HTTPSProxy.ValueString()
-		} else {
-			httpsProxy = nil
-		}
-		httpsProxyAuthorization := new(string)
-		if !r.Config.HTTPSProxyAuthorization.IsUnknown() && !r.Config.HTTPSProxyAuthorization.IsNull() {
-			*httpsProxyAuthorization = r.Config.HTTPSProxyAuthorization.ValueString()
-		} else {
-			httpsProxyAuthorization = nil
-		}
-		insecureRelaxedAudienceValidation := new(bool)
-		if !r.Config.InsecureRelaxedAudienceValidation.IsUnknown() && !r.Config.InsecureRelaxedAudienceValidation.IsNull() {
-			*insecureRelaxedAudienceValidation = r.Config.InsecureRelaxedAudienceValidation.ValueBool()
-		} else {
-			insecureRelaxedAudienceValidation = nil
-		}
-		var introspectionEndpoint string
-		introspectionEndpoint = r.Config.IntrospectionEndpoint.ValueString()
+		claimToHeader = append(claimToHeader, shared.ClaimToHeader{
+			Claim:  claim,
+			Header: header,
+		})
+	}
+	clientAlg := new(shared.ClientAlg)
+	if !r.Config.ClientAlg.IsUnknown() && !r.Config.ClientAlg.IsNull() {
+		*clientAlg = shared.ClientAlg(r.Config.ClientAlg.ValueString())
+	} else {
+		clientAlg = nil
+	}
+	clientAuth := new(shared.ClientAuth)
+	if !r.Config.ClientAuth.IsUnknown() && !r.Config.ClientAuth.IsNull() {
+		*clientAuth = shared.ClientAuth(r.Config.ClientAuth.ValueString())
+	} else {
+		clientAuth = nil
+	}
+	clientID := new(string)
+	if !r.Config.ClientID.IsUnknown() && !r.Config.ClientID.IsNull() {
+		*clientID = r.Config.ClientID.ValueString()
+	} else {
+		clientID = nil
+	}
+	clientJwk := new(string)
+	if !r.Config.ClientJwk.IsUnknown() && !r.Config.ClientJwk.IsNull() {
+		*clientJwk = r.Config.ClientJwk.ValueString()
+	} else {
+		clientJwk = nil
+	}
+	clientSecret := new(string)
+	if !r.Config.ClientSecret.IsUnknown() && !r.Config.ClientSecret.IsNull() {
+		*clientSecret = r.Config.ClientSecret.ValueString()
+	} else {
+		clientSecret = nil
+	}
+	consumerBy := make([]shared.ConsumerBy, 0, len(r.Config.ConsumerBy))
+	for _, consumerByItem := range r.Config.ConsumerBy {
+		consumerBy = append(consumerBy, shared.ConsumerBy(consumerByItem.ValueString()))
+	}
+	consumerClaim := make([]string, 0, len(r.Config.ConsumerClaim))
+	for consumerClaimIndex := range r.Config.ConsumerClaim {
+		consumerClaim = append(consumerClaim, r.Config.ConsumerClaim[consumerClaimIndex].ValueString())
+	}
+	consumerGroupsClaim := make([]string, 0, len(r.Config.ConsumerGroupsClaim))
+	for consumerGroupsClaimIndex := range r.Config.ConsumerGroupsClaim {
+		consumerGroupsClaim = append(consumerGroupsClaim, r.Config.ConsumerGroupsClaim[consumerGroupsClaimIndex].ValueString())
+	}
+	consumerGroupsOptional := new(bool)
+	if !r.Config.ConsumerGroupsOptional.IsUnknown() && !r.Config.ConsumerGroupsOptional.IsNull() {
+		*consumerGroupsOptional = r.Config.ConsumerGroupsOptional.ValueBool()
+	} else {
+		consumerGroupsOptional = nil
+	}
+	consumerOptional := new(bool)
+	if !r.Config.ConsumerOptional.IsUnknown() && !r.Config.ConsumerOptional.IsNull() {
+		*consumerOptional = r.Config.ConsumerOptional.ValueBool()
+	} else {
+		consumerOptional = nil
+	}
+	credentialClaim := make([]string, 0, len(r.Config.CredentialClaim))
+	for credentialClaimIndex := range r.Config.CredentialClaim {
+		credentialClaim = append(credentialClaim, r.Config.CredentialClaim[credentialClaimIndex].ValueString())
+	}
+	headers := make(map[string]string)
+	for headersKey := range r.Config.Headers {
+		var headersInst string
+		headersInst = r.Config.Headers[headersKey].ValueString()
 
-		introspectionFormat := new(shared.IntrospectionFormat)
-		if !r.Config.IntrospectionFormat.IsUnknown() && !r.Config.IntrospectionFormat.IsNull() {
-			*introspectionFormat = shared.IntrospectionFormat(r.Config.IntrospectionFormat.ValueString())
-		} else {
-			introspectionFormat = nil
-		}
-		keepalive := new(bool)
-		if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
-			*keepalive = r.Config.Keepalive.ValueBool()
-		} else {
-			keepalive = nil
-		}
-		maxRequestBodySize := new(int64)
-		if !r.Config.MaxRequestBodySize.IsUnknown() && !r.Config.MaxRequestBodySize.IsNull() {
-			*maxRequestBodySize = r.Config.MaxRequestBodySize.ValueInt64()
-		} else {
-			maxRequestBodySize = nil
-		}
-		metadataEndpoint := new(string)
-		if !r.Config.MetadataEndpoint.IsUnknown() && !r.Config.MetadataEndpoint.IsNull() {
-			*metadataEndpoint = r.Config.MetadataEndpoint.ValueString()
-		} else {
-			metadataEndpoint = nil
-		}
-		mtlsIntrospectionEndpoint := new(string)
-		if !r.Config.MtlsIntrospectionEndpoint.IsUnknown() && !r.Config.MtlsIntrospectionEndpoint.IsNull() {
-			*mtlsIntrospectionEndpoint = r.Config.MtlsIntrospectionEndpoint.ValueString()
-		} else {
-			mtlsIntrospectionEndpoint = nil
-		}
-		noProxy := new(string)
-		if !r.Config.NoProxy.IsUnknown() && !r.Config.NoProxy.IsNull() {
-			*noProxy = r.Config.NoProxy.ValueString()
-		} else {
-			noProxy = nil
-		}
-		var resource string
-		resource = r.Config.Resource.ValueString()
+		headers[headersKey] = headersInst
+	}
+	httpProxy := new(string)
+	if !r.Config.HTTPProxy.IsUnknown() && !r.Config.HTTPProxy.IsNull() {
+		*httpProxy = r.Config.HTTPProxy.ValueString()
+	} else {
+		httpProxy = nil
+	}
+	httpProxyAuthorization := new(string)
+	if !r.Config.HTTPProxyAuthorization.IsUnknown() && !r.Config.HTTPProxyAuthorization.IsNull() {
+		*httpProxyAuthorization = r.Config.HTTPProxyAuthorization.ValueString()
+	} else {
+		httpProxyAuthorization = nil
+	}
+	httpVersion := new(float64)
+	if !r.Config.HTTPVersion.IsUnknown() && !r.Config.HTTPVersion.IsNull() {
+		*httpVersion = r.Config.HTTPVersion.ValueFloat64()
+	} else {
+		httpVersion = nil
+	}
+	httpsProxy := new(string)
+	if !r.Config.HTTPSProxy.IsUnknown() && !r.Config.HTTPSProxy.IsNull() {
+		*httpsProxy = r.Config.HTTPSProxy.ValueString()
+	} else {
+		httpsProxy = nil
+	}
+	httpsProxyAuthorization := new(string)
+	if !r.Config.HTTPSProxyAuthorization.IsUnknown() && !r.Config.HTTPSProxyAuthorization.IsNull() {
+		*httpsProxyAuthorization = r.Config.HTTPSProxyAuthorization.ValueString()
+	} else {
+		httpsProxyAuthorization = nil
+	}
+	insecureRelaxedAudienceValidation := new(bool)
+	if !r.Config.InsecureRelaxedAudienceValidation.IsUnknown() && !r.Config.InsecureRelaxedAudienceValidation.IsNull() {
+		*insecureRelaxedAudienceValidation = r.Config.InsecureRelaxedAudienceValidation.ValueBool()
+	} else {
+		insecureRelaxedAudienceValidation = nil
+	}
+	introspectionEndpoint := new(string)
+	if !r.Config.IntrospectionEndpoint.IsUnknown() && !r.Config.IntrospectionEndpoint.IsNull() {
+		*introspectionEndpoint = r.Config.IntrospectionEndpoint.ValueString()
+	} else {
+		introspectionEndpoint = nil
+	}
+	introspectionFormat := new(shared.IntrospectionFormat)
+	if !r.Config.IntrospectionFormat.IsUnknown() && !r.Config.IntrospectionFormat.IsNull() {
+		*introspectionFormat = shared.IntrospectionFormat(r.Config.IntrospectionFormat.ValueString())
+	} else {
+		introspectionFormat = nil
+	}
+	jwksCacheTTL := new(int64)
+	if !r.Config.JwksCacheTTL.IsUnknown() && !r.Config.JwksCacheTTL.IsNull() {
+		*jwksCacheTTL = r.Config.JwksCacheTTL.ValueInt64()
+	} else {
+		jwksCacheTTL = nil
+	}
+	jwksEndpoint := new(string)
+	if !r.Config.JwksEndpoint.IsUnknown() && !r.Config.JwksEndpoint.IsNull() {
+		*jwksEndpoint = r.Config.JwksEndpoint.ValueString()
+	} else {
+		jwksEndpoint = nil
+	}
+	jwtClaimsLeeway := new(int64)
+	if !r.Config.JwtClaimsLeeway.IsUnknown() && !r.Config.JwtClaimsLeeway.IsNull() {
+		*jwtClaimsLeeway = r.Config.JwtClaimsLeeway.ValueInt64()
+	} else {
+		jwtClaimsLeeway = nil
+	}
+	keepalive := new(bool)
+	if !r.Config.Keepalive.IsUnknown() && !r.Config.Keepalive.IsNull() {
+		*keepalive = r.Config.Keepalive.ValueBool()
+	} else {
+		keepalive = nil
+	}
+	maxRequestBodySize := new(int64)
+	if !r.Config.MaxRequestBodySize.IsUnknown() && !r.Config.MaxRequestBodySize.IsNull() {
+		*maxRequestBodySize = r.Config.MaxRequestBodySize.ValueInt64()
+	} else {
+		maxRequestBodySize = nil
+	}
+	metadataCacheTTL := new(int64)
+	if !r.Config.MetadataCacheTTL.IsUnknown() && !r.Config.MetadataCacheTTL.IsNull() {
+		*metadataCacheTTL = r.Config.MetadataCacheTTL.ValueInt64()
+	} else {
+		metadataCacheTTL = nil
+	}
+	metadataDiscoveryEndpoint := new(string)
+	if !r.Config.MetadataDiscoveryEndpoint.IsUnknown() && !r.Config.MetadataDiscoveryEndpoint.IsNull() {
+		*metadataDiscoveryEndpoint = r.Config.MetadataDiscoveryEndpoint.ValueString()
+	} else {
+		metadataDiscoveryEndpoint = nil
+	}
+	metadataDiscoveryRetry := new(int64)
+	if !r.Config.MetadataDiscoveryRetry.IsUnknown() && !r.Config.MetadataDiscoveryRetry.IsNull() {
+		*metadataDiscoveryRetry = r.Config.MetadataDiscoveryRetry.ValueInt64()
+	} else {
+		metadataDiscoveryRetry = nil
+	}
+	metadataEndpoint := new(string)
+	if !r.Config.MetadataEndpoint.IsUnknown() && !r.Config.MetadataEndpoint.IsNull() {
+		*metadataEndpoint = r.Config.MetadataEndpoint.ValueString()
+	} else {
+		metadataEndpoint = nil
+	}
+	mtlsIntrospectionEndpoint := new(string)
+	if !r.Config.MtlsIntrospectionEndpoint.IsUnknown() && !r.Config.MtlsIntrospectionEndpoint.IsNull() {
+		*mtlsIntrospectionEndpoint = r.Config.MtlsIntrospectionEndpoint.ValueString()
+	} else {
+		mtlsIntrospectionEndpoint = nil
+	}
+	noProxy := new(string)
+	if !r.Config.NoProxy.IsUnknown() && !r.Config.NoProxy.IsNull() {
+		*noProxy = r.Config.NoProxy.ValueString()
+	} else {
+		noProxy = nil
+	}
+	passthroughCredentials := new(bool)
+	if !r.Config.PassthroughCredentials.IsUnknown() && !r.Config.PassthroughCredentials.IsNull() {
+		*passthroughCredentials = r.Config.PassthroughCredentials.ValueBool()
+	} else {
+		passthroughCredentials = nil
+	}
+	var resource string
+	resource = r.Config.Resource.ValueString()
 
-		scopesSupported := make([]string, 0, len(r.Config.ScopesSupported))
-		for scopesSupportedIndex := range r.Config.ScopesSupported {
-			scopesSupported = append(scopesSupported, r.Config.ScopesSupported[scopesSupportedIndex].ValueString())
+	scopesSupported := make([]string, 0, len(r.Config.ScopesSupported))
+	for scopesSupportedIndex := range r.Config.ScopesSupported {
+		scopesSupported = append(scopesSupported, r.Config.ScopesSupported[scopesSupportedIndex].ValueString())
+	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
+	}
+	timeout := new(float64)
+	if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
+		*timeout = r.Config.Timeout.ValueFloat64()
+	} else {
+		timeout = nil
+	}
+	tlsClientAuthCert := new(string)
+	if !r.Config.TLSClientAuthCert.IsUnknown() && !r.Config.TLSClientAuthCert.IsNull() {
+		*tlsClientAuthCert = r.Config.TLSClientAuthCert.ValueString()
+	} else {
+		tlsClientAuthCert = nil
+	}
+	tlsClientAuthKey := new(string)
+	if !r.Config.TLSClientAuthKey.IsUnknown() && !r.Config.TLSClientAuthKey.IsNull() {
+		*tlsClientAuthKey = r.Config.TLSClientAuthKey.ValueString()
+	} else {
+		tlsClientAuthKey = nil
+	}
+	tlsClientAuthSslVerify := new(bool)
+	if !r.Config.TLSClientAuthSslVerify.IsUnknown() && !r.Config.TLSClientAuthSslVerify.IsNull() {
+		*tlsClientAuthSslVerify = r.Config.TLSClientAuthSslVerify.ValueBool()
+	} else {
+		tlsClientAuthSslVerify = nil
+	}
+	var tokenExchange *shared.TokenExchange
+	if r.Config.TokenExchange != nil {
+		var cache *shared.AiMcpOauth2PluginCache
+		if r.Config.TokenExchange.Cache != nil {
+			enabled1 := new(bool)
+			if !r.Config.TokenExchange.Cache.Enabled.IsUnknown() && !r.Config.TokenExchange.Cache.Enabled.IsNull() {
+				*enabled1 = r.Config.TokenExchange.Cache.Enabled.ValueBool()
+			} else {
+				enabled1 = nil
+			}
+			ttl := new(int64)
+			if !r.Config.TokenExchange.Cache.TTL.IsUnknown() && !r.Config.TokenExchange.Cache.TTL.IsNull() {
+				*ttl = r.Config.TokenExchange.Cache.TTL.ValueInt64()
+			} else {
+				ttl = nil
+			}
+			cache = &shared.AiMcpOauth2PluginCache{
+				Enabled: enabled1,
+				TTL:     ttl,
+			}
 		}
-		sslVerify := new(bool)
-		if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
-			*sslVerify = r.Config.SslVerify.ValueBool()
+		clientAuth1 := new(shared.AiMcpOauth2PluginClientAuth)
+		if !r.Config.TokenExchange.ClientAuth.IsUnknown() && !r.Config.TokenExchange.ClientAuth.IsNull() {
+			*clientAuth1 = shared.AiMcpOauth2PluginClientAuth(r.Config.TokenExchange.ClientAuth.ValueString())
 		} else {
-			sslVerify = nil
+			clientAuth1 = nil
 		}
-		timeout := new(float64)
-		if !r.Config.Timeout.IsUnknown() && !r.Config.Timeout.IsNull() {
-			*timeout = r.Config.Timeout.ValueFloat64()
+		clientId1 := new(string)
+		if !r.Config.TokenExchange.ClientID.IsUnknown() && !r.Config.TokenExchange.ClientID.IsNull() {
+			*clientId1 = r.Config.TokenExchange.ClientID.ValueString()
 		} else {
-			timeout = nil
+			clientId1 = nil
 		}
-		tlsClientAuthCert := new(string)
-		if !r.Config.TLSClientAuthCert.IsUnknown() && !r.Config.TLSClientAuthCert.IsNull() {
-			*tlsClientAuthCert = r.Config.TLSClientAuthCert.ValueString()
+		clientSecret1 := new(string)
+		if !r.Config.TokenExchange.ClientSecret.IsUnknown() && !r.Config.TokenExchange.ClientSecret.IsNull() {
+			*clientSecret1 = r.Config.TokenExchange.ClientSecret.ValueString()
 		} else {
-			tlsClientAuthCert = nil
+			clientSecret1 = nil
 		}
-		tlsClientAuthKey := new(string)
-		if !r.Config.TLSClientAuthKey.IsUnknown() && !r.Config.TLSClientAuthKey.IsNull() {
-			*tlsClientAuthKey = r.Config.TLSClientAuthKey.ValueString()
+		enabled2 := new(bool)
+		if !r.Config.TokenExchange.Enabled.IsUnknown() && !r.Config.TokenExchange.Enabled.IsNull() {
+			*enabled2 = r.Config.TokenExchange.Enabled.ValueBool()
 		} else {
-			tlsClientAuthKey = nil
+			enabled2 = nil
 		}
-		tlsClientAuthSslVerify := new(bool)
-		if !r.Config.TLSClientAuthSslVerify.IsUnknown() && !r.Config.TLSClientAuthSslVerify.IsNull() {
-			*tlsClientAuthSslVerify = r.Config.TLSClientAuthSslVerify.ValueBool()
-		} else {
-			tlsClientAuthSslVerify = nil
+		var request *shared.AiMcpOauth2PluginRequest
+		if r.Config.TokenExchange.Request != nil {
+			actorToken := new(string)
+			if !r.Config.TokenExchange.Request.ActorToken.IsUnknown() && !r.Config.TokenExchange.Request.ActorToken.IsNull() {
+				*actorToken = r.Config.TokenExchange.Request.ActorToken.ValueString()
+			} else {
+				actorToken = nil
+			}
+			actorTokenHeader := new(string)
+			if !r.Config.TokenExchange.Request.ActorTokenHeader.IsUnknown() && !r.Config.TokenExchange.Request.ActorTokenHeader.IsNull() {
+				*actorTokenHeader = r.Config.TokenExchange.Request.ActorTokenHeader.ValueString()
+			} else {
+				actorTokenHeader = nil
+			}
+			actorTokenSource := new(shared.ActorTokenSource)
+			if !r.Config.TokenExchange.Request.ActorTokenSource.IsUnknown() && !r.Config.TokenExchange.Request.ActorTokenSource.IsNull() {
+				*actorTokenSource = shared.ActorTokenSource(r.Config.TokenExchange.Request.ActorTokenSource.ValueString())
+			} else {
+				actorTokenSource = nil
+			}
+			actorTokenType := new(string)
+			if !r.Config.TokenExchange.Request.ActorTokenType.IsUnknown() && !r.Config.TokenExchange.Request.ActorTokenType.IsNull() {
+				*actorTokenType = r.Config.TokenExchange.Request.ActorTokenType.ValueString()
+			} else {
+				actorTokenType = nil
+			}
+			audience := make([]string, 0, len(r.Config.TokenExchange.Request.Audience))
+			for audienceIndex := range r.Config.TokenExchange.Request.Audience {
+				audience = append(audience, r.Config.TokenExchange.Request.Audience[audienceIndex].ValueString())
+			}
+			requestedTokenType := new(string)
+			if !r.Config.TokenExchange.Request.RequestedTokenType.IsUnknown() && !r.Config.TokenExchange.Request.RequestedTokenType.IsNull() {
+				*requestedTokenType = r.Config.TokenExchange.Request.RequestedTokenType.ValueString()
+			} else {
+				requestedTokenType = nil
+			}
+			resource1 := new(string)
+			if !r.Config.TokenExchange.Request.Resource.IsUnknown() && !r.Config.TokenExchange.Request.Resource.IsNull() {
+				*resource1 = r.Config.TokenExchange.Request.Resource.ValueString()
+			} else {
+				resource1 = nil
+			}
+			scopes := make([]string, 0, len(r.Config.TokenExchange.Request.Scopes))
+			for scopesIndex := range r.Config.TokenExchange.Request.Scopes {
+				scopes = append(scopes, r.Config.TokenExchange.Request.Scopes[scopesIndex].ValueString())
+			}
+			subjectTokenType := new(string)
+			if !r.Config.TokenExchange.Request.SubjectTokenType.IsUnknown() && !r.Config.TokenExchange.Request.SubjectTokenType.IsNull() {
+				*subjectTokenType = r.Config.TokenExchange.Request.SubjectTokenType.ValueString()
+			} else {
+				subjectTokenType = nil
+			}
+			request = &shared.AiMcpOauth2PluginRequest{
+				ActorToken:         actorToken,
+				ActorTokenHeader:   actorTokenHeader,
+				ActorTokenSource:   actorTokenSource,
+				ActorTokenType:     actorTokenType,
+				Audience:           audience,
+				RequestedTokenType: requestedTokenType,
+				Resource:           resource1,
+				Scopes:             scopes,
+				SubjectTokenType:   subjectTokenType,
+			}
 		}
-		config = &shared.AiMcpOauth2PluginConfig{
-			Args:                              args,
-			AuthorizationServers:              authorizationServers,
-			CacheIntrospection:                cacheIntrospection,
-			ClaimToHeader:                     claimToHeader,
-			ClientAlg:                         clientAlg,
-			ClientAuth:                        clientAuth,
-			ClientID:                          clientID,
-			ClientJwk:                         clientJwk,
-			ClientSecret:                      clientSecret,
-			Headers:                           headers,
-			HTTPProxy:                         httpProxy,
-			HTTPProxyAuthorization:            httpProxyAuthorization,
-			HTTPVersion:                       httpVersion,
-			HTTPSProxy:                        httpsProxy,
-			HTTPSProxyAuthorization:           httpsProxyAuthorization,
-			InsecureRelaxedAudienceValidation: insecureRelaxedAudienceValidation,
-			IntrospectionEndpoint:             introspectionEndpoint,
-			IntrospectionFormat:               introspectionFormat,
-			Keepalive:                         keepalive,
-			MaxRequestBodySize:                maxRequestBodySize,
-			MetadataEndpoint:                  metadataEndpoint,
-			MtlsIntrospectionEndpoint:         mtlsIntrospectionEndpoint,
-			NoProxy:                           noProxy,
-			Resource:                          resource,
-			ScopesSupported:                   scopesSupported,
-			SslVerify:                         sslVerify,
-			Timeout:                           timeout,
-			TLSClientAuthCert:                 tlsClientAuthCert,
-			TLSClientAuthKey:                  tlsClientAuthKey,
-			TLSClientAuthSslVerify:            tlsClientAuthSslVerify,
+		var tokenEndpoint string
+		tokenEndpoint = r.Config.TokenExchange.TokenEndpoint.ValueString()
+
+		tokenExchange = &shared.TokenExchange{
+			Cache:         cache,
+			ClientAuth:    clientAuth1,
+			ClientID:      clientId1,
+			ClientSecret:  clientSecret1,
+			Enabled:       enabled2,
+			Request:       request,
+			TokenEndpoint: tokenEndpoint,
 		}
+	}
+	upstreamHeaders := make([]shared.UpstreamHeaders, 0, len(r.Config.UpstreamHeaders))
+	for upstreamHeadersIndex := range r.Config.UpstreamHeaders {
+		var header1 string
+		header1 = r.Config.UpstreamHeaders[upstreamHeadersIndex].Header.ValueString()
+
+		path1 := make([]string, 0, len(r.Config.UpstreamHeaders[upstreamHeadersIndex].Path))
+		for pathIndex := range r.Config.UpstreamHeaders[upstreamHeadersIndex].Path {
+			path1 = append(path1, r.Config.UpstreamHeaders[upstreamHeadersIndex].Path[pathIndex].ValueString())
+		}
+		upstreamHeaders = append(upstreamHeaders, shared.UpstreamHeaders{
+			Header: header1,
+			Path:   path1,
+		})
+	}
+	config := shared.AiMcpOauth2PluginConfig{
+		Args:                              args,
+		AuthorizationServers:              authorizationServers,
+		CacheIntrospection:                cacheIntrospection,
+		ClaimToHeader:                     claimToHeader,
+		ClientAlg:                         clientAlg,
+		ClientAuth:                        clientAuth,
+		ClientID:                          clientID,
+		ClientJwk:                         clientJwk,
+		ClientSecret:                      clientSecret,
+		ConsumerBy:                        consumerBy,
+		ConsumerClaim:                     consumerClaim,
+		ConsumerGroupsClaim:               consumerGroupsClaim,
+		ConsumerGroupsOptional:            consumerGroupsOptional,
+		ConsumerOptional:                  consumerOptional,
+		CredentialClaim:                   credentialClaim,
+		Headers:                           headers,
+		HTTPProxy:                         httpProxy,
+		HTTPProxyAuthorization:            httpProxyAuthorization,
+		HTTPVersion:                       httpVersion,
+		HTTPSProxy:                        httpsProxy,
+		HTTPSProxyAuthorization:           httpsProxyAuthorization,
+		InsecureRelaxedAudienceValidation: insecureRelaxedAudienceValidation,
+		IntrospectionEndpoint:             introspectionEndpoint,
+		IntrospectionFormat:               introspectionFormat,
+		JwksCacheTTL:                      jwksCacheTTL,
+		JwksEndpoint:                      jwksEndpoint,
+		JwtClaimsLeeway:                   jwtClaimsLeeway,
+		Keepalive:                         keepalive,
+		MaxRequestBodySize:                maxRequestBodySize,
+		MetadataCacheTTL:                  metadataCacheTTL,
+		MetadataDiscoveryEndpoint:         metadataDiscoveryEndpoint,
+		MetadataDiscoveryRetry:            metadataDiscoveryRetry,
+		MetadataEndpoint:                  metadataEndpoint,
+		MtlsIntrospectionEndpoint:         mtlsIntrospectionEndpoint,
+		NoProxy:                           noProxy,
+		PassthroughCredentials:            passthroughCredentials,
+		Resource:                          resource,
+		ScopesSupported:                   scopesSupported,
+		SslVerify:                         sslVerify,
+		Timeout:                           timeout,
+		TLSClientAuthCert:                 tlsClientAuthCert,
+		TLSClientAuthKey:                  tlsClientAuthKey,
+		TLSClientAuthSslVerify:            tlsClientAuthSslVerify,
+		TokenExchange:                     tokenExchange,
+		UpstreamHeaders:                   upstreamHeaders,
 	}
 	protocols := make([]shared.AiMcpOauth2PluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -570,6 +878,7 @@ func (r *PluginAiMcpOauth2ResourceModel) ToSharedAiMcpOauth2Plugin(ctx context.C
 		}
 	}
 	out := shared.AiMcpOauth2Plugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

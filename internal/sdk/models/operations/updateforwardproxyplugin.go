@@ -11,7 +11,7 @@ import (
 type UpdateForwardproxyPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace          string                    `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	ForwardProxyPlugin shared.ForwardProxyPlugin `request:"mediaType=application/json"`
 }

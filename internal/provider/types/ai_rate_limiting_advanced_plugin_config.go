@@ -7,6 +7,8 @@ import (
 )
 
 type AiRateLimitingAdvancedPluginConfig struct {
+	CustomCostCountFunction    types.String          `tfsdk:"custom_cost_count_function"`
+	DecreaseByFractionsInRedis types.Bool            `tfsdk:"decrease_by_fractions_in_redis"`
 	DictionaryName             types.String          `tfsdk:"dictionary_name"`
 	DisablePenalty             types.Bool            `tfsdk:"disable_penalty"`
 	ErrorCode                  types.Float64         `tfsdk:"error_code"`
@@ -19,6 +21,7 @@ type AiRateLimitingAdvancedPluginConfig struct {
 	LlmProviders               []LlmProviders        `tfsdk:"llm_providers"`
 	Namespace                  types.String          `tfsdk:"namespace"`
 	Path                       types.String          `tfsdk:"path"`
+	Policies                   []Policies            `tfsdk:"policies"`
 	Redis                      *PartialRedisEeConfig `tfsdk:"redis"`
 	RequestPromptCountFunction types.String          `tfsdk:"request_prompt_count_function"`
 	RetryAfterJitterMax        types.Float64         `tfsdk:"retry_after_jitter_max"`

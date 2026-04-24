@@ -11,7 +11,7 @@ import (
 type UpsertRouteRequest struct {
 	// ID or name of the Route to lookup
 	RouteIDOrName string `pathParam:"style=simple,explode=false,name=RouteIdOrName"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	// Description of the Route
 	RouteJSON shared.RouteJSON `request:"mediaType=application/json"`

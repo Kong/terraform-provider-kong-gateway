@@ -15,6 +15,7 @@ func (r *PluginRouteByHeaderResourceModel) RefreshFromSharedRouteByHeaderPlugin(
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		if resp.Config == nil {
 			r.Config = nil
 		} else {
@@ -192,6 +193,12 @@ func (r *PluginRouteByHeaderResourceModel) ToOperationsUpdateRoutebyheaderPlugin
 func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx context.Context) (*shared.RouteByHeaderPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -286,18 +293,18 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 	if r.Config != nil {
 		rules := make([]shared.RouteByHeaderPluginRules, 0, len(r.Config.Rules))
 		for rulesIndex := range r.Config.Rules {
-			condition := make(map[string]string)
+			condition1 := make(map[string]string)
 			for conditionKey := range r.Config.Rules[rulesIndex].Condition {
 				var conditionInst string
 				conditionInst = r.Config.Rules[rulesIndex].Condition[conditionKey].ValueString()
 
-				condition[conditionKey] = conditionInst
+				condition1[conditionKey] = conditionInst
 			}
 			var upstreamName string
 			upstreamName = r.Config.Rules[rulesIndex].UpstreamName.ValueString()
 
 			rules = append(rules, shared.RouteByHeaderPluginRules{
-				Condition:    condition,
+				Condition:    condition1,
 				UpstreamName: upstreamName,
 			})
 		}
@@ -346,6 +353,7 @@ func (r *PluginRouteByHeaderResourceModel) ToSharedRouteByHeaderPlugin(ctx conte
 		}
 	}
 	out := shared.RouteByHeaderPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

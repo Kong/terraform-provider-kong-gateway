@@ -208,11 +208,90 @@ func (s *SolaceUpstreamPluginDestinations) GetType() *SolaceUpstreamPluginType {
 	return s.Type
 }
 
+// SolaceUpstreamPluginHeaders - Header settings for user properties (mapping, inclusion and exclusion).
+type SolaceUpstreamPluginHeaders struct {
+	// Headers that must not be forwarded into user properties. This is used to exclude sensitive headers such as authorization from being forwarded as user properties, or to avoid duplication when a header is mapped to a user property but you don't want the original header to be included as well.
+	ExcludeHeaders []string `json:"exclude_headers,omitempty"`
+	// Headers to include as user properties even without explicit mapping.
+	IncludeHeaders []string `json:"include_headers,omitempty"`
+	// Header-to-user_property mapping (key = HTTP header name, value = target user property name).
+	Mappings map[string]string `json:"mappings,omitempty"`
+}
+
+func (s SolaceUpstreamPluginHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *SolaceUpstreamPluginHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SolaceUpstreamPluginHeaders) GetExcludeHeaders() []string {
+	if s == nil {
+		return nil
+	}
+	return s.ExcludeHeaders
+}
+
+func (s *SolaceUpstreamPluginHeaders) GetIncludeHeaders() []string {
+	if s == nil {
+		return nil
+	}
+	return s.IncludeHeaders
+}
+
+func (s *SolaceUpstreamPluginHeaders) GetMappings() map[string]string {
+	if s == nil {
+		return nil
+	}
+	return s.Mappings
+}
+
+// UserProperties - User defined properties to be included in the message. Separate static properties from header mappings.
+type UserProperties struct {
+	// Header settings for user properties (mapping, inclusion and exclusion).
+	Headers *SolaceUpstreamPluginHeaders `json:"headers,omitempty"`
+	// Predefined user properties to set on every message (key = property name, value = property value).
+	PredefinedProperties map[string]string `json:"predefined_properties,omitempty"`
+}
+
+func (u UserProperties) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UserProperties) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UserProperties) GetHeaders() *SolaceUpstreamPluginHeaders {
+	if u == nil {
+		return nil
+	}
+	return u.Headers
+}
+
+func (u *UserProperties) GetPredefinedProperties() map[string]string {
+	if u == nil {
+		return nil
+	}
+	return u.PredefinedProperties
+}
+
 // SolaceUpstreamPluginMessage - The message related configuration.
 type SolaceUpstreamPluginMessage struct {
 	// When using a non-DIRECT guaranteed delivery mode, this property sets the message acknowledgement timeout in milliseconds (waiting time).
 	AckTimeout *int64 `json:"ack_timeout,omitempty"`
-	// When not using `forward_method`, `forward_uri`, `forward_headers` or `forward_body`, this sets the message content.
+	// Sets the HTTP Content-Encoding applied to the Solace message payload (for example, gzip). If unset, the request Content-Encoding header is used when available.
+	ContentEncoding *string `json:"content_encoding,omitempty"`
+	// Sets the HTTP Content-Type applied to the Solace message payload. If unset, the request Content-Type header is used when available.
+	ContentType *string `json:"content_type,omitempty"`
+	// When not using `forward_method`, `forward_uri`, `forward_headers`, `forward_body` or `forward_body_raw_only`, this sets the message content.
 	DefaultContent *string `json:"default_content,omitempty"`
 	// Sets the message delivery mode.
 	DeliveryMode *SolaceUpstreamPluginDeliveryMode `json:"delivery_mode,omitempty"`
@@ -222,6 +301,8 @@ type SolaceUpstreamPluginMessage struct {
 	DmqEligible *bool `json:"dmq_eligible,omitempty"`
 	// Include the request body and the body arguments in the message.
 	ForwardBody *bool `json:"forward_body,omitempty"`
+	// Forward only the raw request body without wrapping it in a JSON payload or adding extra fields.
+	ForwardBodyRawOnly *bool `json:"forward_body_raw_only,omitempty"`
 	// Include the request headers in the message.
 	ForwardHeaders *bool `json:"forward_headers,omitempty"`
 	// Include the request method in the message.
@@ -234,12 +315,14 @@ type SolaceUpstreamPluginMessage struct {
 	Priority *int64 `json:"priority,omitempty"`
 	// Allows the application to set the content of the sender identifier.
 	SenderID *string `json:"sender_id,omitempty"`
-	// Enable or disable the tracing. This is primarily used for distributed tracing and message correlation, especially in debugging or tracking message flows across multiple systems.
+	// Enable or disable the tracing propagation. This is primarily used for distributed tracing and message correlation, especially in debugging or tracking message flows across multiple systems.
 	Tracing *bool `json:"tracing,omitempty"`
-	// Indicates whether the message should be included in distributed tracing (i.e., if it should be "sampled" for the tracing)
+	// Forcibly turn on the tracing on all the messages for distributed tracing (tracing needs to be enabled as well).
 	TracingSampled *bool `json:"tracing_sampled,omitempty"`
 	// Sets the time to live (TTL) in milliseconds for the message. Setting the time to live to zero disables the TTL for the message.
 	TTL *int64 `json:"ttl,omitempty"`
+	// User defined properties to be included in the message. Separate static properties from header mappings.
+	UserProperties *UserProperties `json:"user_properties,omitempty"`
 }
 
 func (s SolaceUpstreamPluginMessage) MarshalJSON() ([]byte, error) {
@@ -258,6 +341,20 @@ func (s *SolaceUpstreamPluginMessage) GetAckTimeout() *int64 {
 		return nil
 	}
 	return s.AckTimeout
+}
+
+func (s *SolaceUpstreamPluginMessage) GetContentEncoding() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ContentEncoding
+}
+
+func (s *SolaceUpstreamPluginMessage) GetContentType() *string {
+	if s == nil {
+		return nil
+	}
+	return s.ContentType
 }
 
 func (s *SolaceUpstreamPluginMessage) GetDefaultContent() *string {
@@ -293,6 +390,13 @@ func (s *SolaceUpstreamPluginMessage) GetForwardBody() *bool {
 		return nil
 	}
 	return s.ForwardBody
+}
+
+func (s *SolaceUpstreamPluginMessage) GetForwardBodyRawOnly() *bool {
+	if s == nil {
+		return nil
+	}
+	return s.ForwardBodyRawOnly
 }
 
 func (s *SolaceUpstreamPluginMessage) GetForwardHeaders() *bool {
@@ -358,6 +462,13 @@ func (s *SolaceUpstreamPluginMessage) GetTTL() *int64 {
 	return s.TTL
 }
 
+func (s *SolaceUpstreamPluginMessage) GetUserProperties() *UserProperties {
+	if s == nil {
+		return nil
+	}
+	return s.UserProperties
+}
+
 // SolaceUpstreamPluginScheme - The client authentication scheme used when connection to an event broker.
 type SolaceUpstreamPluginScheme string
 
@@ -391,10 +502,14 @@ func (e *SolaceUpstreamPluginScheme) UnmarshalJSON(data []byte) error {
 // SolaceUpstreamPluginAuthentication - Session authentication related configuration.
 type SolaceUpstreamPluginAuthentication struct {
 	// The OAuth2 access token used with `OAUTH2` authentication scheme when connecting to an event broker.
-	AccessToken       *string `json:"access_token,omitempty"`
+	AccessToken *string `json:"access_token,omitempty"`
+	// Specifies the header that contains access token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `access_token` field.
 	AccessTokenHeader *string `json:"access_token_header,omitempty"`
+	// Specifies the header that contains Basic Authentication credentials for the `BASIC` authentication scheme when connecting to an event broker. This header takes precedence over the `username` and `password` fields.
+	BasicAuthHeader *string `json:"basic_auth_header,omitempty"`
 	// The OpenID Connect ID token used with `OAUTH2` authentication scheme when connecting to an event broker.
-	IDToken       *string `json:"id_token,omitempty"`
+	IDToken *string `json:"id_token,omitempty"`
+	// Specifies the header that contains id token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `id_token` field.
 	IDTokenHeader *string `json:"id_token_header,omitempty"`
 	// The password used with `BASIC` authentication scheme when connecting to an event broker.
 	Password *string `json:"password,omitempty"`
@@ -427,6 +542,13 @@ func (s *SolaceUpstreamPluginAuthentication) GetAccessTokenHeader() *string {
 		return nil
 	}
 	return s.AccessTokenHeader
+}
+
+func (s *SolaceUpstreamPluginAuthentication) GetBasicAuthHeader() *string {
+	if s == nil {
+		return nil
+	}
+	return s.BasicAuthHeader
 }
 
 func (s *SolaceUpstreamPluginAuthentication) GetIDToken() *string {
@@ -483,7 +605,7 @@ type SolaceUpstreamPluginSession struct {
 	// The IPv4 or IPv6 address or host name to connect to (see: https://docs.solace.com/API-Developer-Online-Ref-Documentation/c/index.html#host-entry).
 	Host string `json:"host"`
 	// Additional Solace session properties (each setting needs to have `SESSION_` prefix).
-	Properties map[string]any `json:"properties,omitempty"`
+	Properties map[string]string `json:"properties,omitempty"`
 	// Indicates whether the API should validate server certificates with the trusted certificates.
 	SslValidateCertificate *bool `json:"ssl_validate_certificate,omitempty"`
 	// The name of the Message VPN to attempt to join when connecting to an event broker.
@@ -557,7 +679,7 @@ func (s *SolaceUpstreamPluginSession) GetHost() string {
 	return s.Host
 }
 
-func (s *SolaceUpstreamPluginSession) GetProperties() map[string]any {
+func (s *SolaceUpstreamPluginSession) GetProperties() map[string]string {
 	if s == nil {
 		return nil
 	}
@@ -690,6 +812,8 @@ func (s *SolaceUpstreamPluginService) GetID() *string {
 
 // SolaceUpstreamPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type SolaceUpstreamPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -697,9 +821,10 @@ type SolaceUpstreamPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                       `json:"instance_name,omitempty"`
-	name         string                        `const:"solace-upstream" json:"name"`
-	Ordering     *SolaceUpstreamPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                        `const:"solace-upstream" json:"name"`
+	Ordering *SolaceUpstreamPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []SolaceUpstreamPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -724,6 +849,13 @@ func (s *SolaceUpstreamPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SolaceUpstreamPlugin) GetCondition() *string {
+	if s == nil {
+		return nil
+	}
+	return s.Condition
 }
 
 func (s *SolaceUpstreamPlugin) GetCreatedAt() *int64 {

@@ -14,9 +14,10 @@ PluginHmacAuth Resource
 
 ```terraform
 resource "kong-gateway_plugin_hmac_auth" "my_pluginhmacauth" {
+  condition = "...my_condition..."
   config = {
     algorithms = [
-      "hmac-sha256"
+      "hmac-sha224"
     ]
     anonymous  = "...my_anonymous..."
     clock_skew = 8.73
@@ -63,7 +64,7 @@ resource "kong-gateway_plugin_hmac_auth" "my_pluginhmacauth" {
     "..."
   ]
   updated_at = 9
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -72,6 +73,7 @@ resource "kong-gateway_plugin_hmac_auth" "my_pluginhmacauth" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -84,14 +86,14 @@ resource "kong-gateway_plugin_hmac_auth" "my_pluginhmacauth" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
 Optional:
 
-- `algorithms` (List of String) A list of HMAC digest algorithms that the user wants to support. Allowed values are `hmac-sha1`, `hmac-sha256`, `hmac-sha384`, and `hmac-sha512`
+- `algorithms` (List of String) A list of HMAC digest algorithms that the user wants to support. Allowed values are `hmac-sha224`, `hmac-sha256`, `hmac-sha384`, `hmac-sha512`, and `hmac-sha1` (disabled by default, and not available in FIPS mode)
 - `anonymous` (String) An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails.
 - `clock_skew` (Number) Clock skew in seconds to prevent replay attacks.
 - `enforce_headers` (List of String) A list of headers that the client should at least use for HTTP signature creation.
@@ -160,8 +162,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_hmac_auth.my_kong-gateway_plugin_hmac_auth
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -169,5 +171,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_hmac_auth.my_kong-gateway_plugin_hmac_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_hmac_auth.my_kong-gateway_plugin_hmac_auth '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

@@ -30,6 +30,9 @@ func (o *Oauth2IntrospectionPluginAfter) GetAccess() []string {
 	return o.Access
 }
 
+// #region class-body-oauth2introspectionpluginafter
+// #endregion class-body-oauth2introspectionpluginafter
+
 type Oauth2IntrospectionPluginBefore struct {
 	Access []string `json:"access,omitempty"`
 }
@@ -51,6 +54,9 @@ func (o *Oauth2IntrospectionPluginBefore) GetAccess() []string {
 	}
 	return o.Access
 }
+
+// #region class-body-oauth2introspectionpluginbefore
+// #endregion class-body-oauth2introspectionpluginbefore
 
 type Oauth2IntrospectionPluginOrdering struct {
 	After  *Oauth2IntrospectionPluginAfter  `json:"after,omitempty"`
@@ -81,6 +87,9 @@ func (o *Oauth2IntrospectionPluginOrdering) GetBefore() *Oauth2IntrospectionPlug
 	}
 	return o.Before
 }
+
+// #region class-body-oauth2introspectionpluginordering
+// #endregion class-body-oauth2introspectionpluginordering
 
 type Oauth2IntrospectionPluginPartials struct {
 	// A string representing a UUID (universally unique identifier).
@@ -122,6 +131,9 @@ func (o *Oauth2IntrospectionPluginPartials) GetPath() *string {
 	return o.Path
 }
 
+// #region class-body-oauth2introspectionpluginpartials
+// #endregion class-body-oauth2introspectionpluginpartials
+
 // Oauth2IntrospectionPluginConsumerBy - A string indicating whether to associate OAuth2 `username` or `client_id` with the consumer's username. OAuth2 `username` is mapped to a consumer's `username` field, while an OAuth2 `client_id` maps to a consumer's `custom_id`.
 type Oauth2IntrospectionPluginConsumerBy string
 
@@ -159,7 +171,7 @@ type Oauth2IntrospectionPluginConfig struct {
 	// A list of custom claims to be forwarded from the introspection response to the upstream request. Claims are forwarded in headers with prefix `X-Credential-{claim-name}`.
 	CustomClaimsForward []string `json:"custom_claims_forward,omitempty"`
 	// A list of custom headers to be added in the introspection request.
-	CustomIntrospectionHeaders map[string]any `json:"custom_introspection_headers,omitempty"`
+	CustomIntrospectionHeaders map[string]string `json:"custom_introspection_headers,omitempty"`
 	// An optional boolean value telling the plugin to hide the credential to the upstream API server. It will be removed by Kong before proxying the request.
 	HideCredentials *bool `json:"hide_credentials,omitempty"`
 	// A boolean indicating whether to forward information about the current downstream request to the introspect endpoint. If true, headers `X-Request-Path` and `X-Request-Http-Method` will be inserted into the introspect request.
@@ -217,7 +229,7 @@ func (o *Oauth2IntrospectionPluginConfig) GetCustomClaimsForward() []string {
 	return o.CustomClaimsForward
 }
 
-func (o *Oauth2IntrospectionPluginConfig) GetCustomIntrospectionHeaders() map[string]any {
+func (o *Oauth2IntrospectionPluginConfig) GetCustomIntrospectionHeaders() map[string]string {
 	if o == nil {
 		return nil
 	}
@@ -280,6 +292,9 @@ func (o *Oauth2IntrospectionPluginConfig) GetTTL() *float64 {
 	return o.TTL
 }
 
+// #region class-body-oauth2introspectionpluginconfig
+// #endregion class-body-oauth2introspectionpluginconfig
+
 type Oauth2IntrospectionPluginProtocols string
 
 const (
@@ -335,6 +350,9 @@ func (o *Oauth2IntrospectionPluginRoute) GetID() *string {
 	return o.ID
 }
 
+// #region class-body-oauth2introspectionpluginroute
+// #endregion class-body-oauth2introspectionpluginroute
+
 // Oauth2IntrospectionPluginService - If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched.
 type Oauth2IntrospectionPluginService struct {
 	ID *string `json:"id,omitempty"`
@@ -358,8 +376,13 @@ func (o *Oauth2IntrospectionPluginService) GetID() *string {
 	return o.ID
 }
 
+// #region class-body-oauth2introspectionpluginservice
+// #endregion class-body-oauth2introspectionpluginservice
+
 // Oauth2IntrospectionPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type Oauth2IntrospectionPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -367,9 +390,10 @@ type Oauth2IntrospectionPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                            `json:"instance_name,omitempty"`
-	name         string                             `const:"oauth2-introspection" json:"name"`
-	Ordering     *Oauth2IntrospectionPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                             `const:"oauth2-introspection" json:"name"`
+	Ordering *Oauth2IntrospectionPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []Oauth2IntrospectionPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -394,6 +418,13 @@ func (o *Oauth2IntrospectionPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *Oauth2IntrospectionPlugin) GetCondition() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Condition
 }
 
 func (o *Oauth2IntrospectionPlugin) GetCreatedAt() *int64 {
@@ -483,3 +514,6 @@ func (o *Oauth2IntrospectionPlugin) GetService() *Oauth2IntrospectionPluginServi
 	}
 	return o.Service
 }
+
+// #region class-body-oauth2introspectionplugin
+// #endregion class-body-oauth2introspectionplugin

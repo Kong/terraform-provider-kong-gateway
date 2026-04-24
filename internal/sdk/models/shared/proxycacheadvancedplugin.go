@@ -145,6 +145,159 @@ func (p *ProxyCacheAdvancedPluginMemory) GetDictionaryName() *string {
 	return p.DictionaryName
 }
 
+// ProxyCacheAdvancedPluginAuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type ProxyCacheAdvancedPluginAuthProvider string
+
+const (
+	ProxyCacheAdvancedPluginAuthProviderAws   ProxyCacheAdvancedPluginAuthProvider = "aws"
+	ProxyCacheAdvancedPluginAuthProviderAzure ProxyCacheAdvancedPluginAuthProvider = "azure"
+	ProxyCacheAdvancedPluginAuthProviderGcp   ProxyCacheAdvancedPluginAuthProvider = "gcp"
+)
+
+func (e ProxyCacheAdvancedPluginAuthProvider) ToPointer() *ProxyCacheAdvancedPluginAuthProvider {
+	return &e
+}
+func (e *ProxyCacheAdvancedPluginAuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = ProxyCacheAdvancedPluginAuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ProxyCacheAdvancedPluginAuthProvider: %v", v)
+	}
+}
+
+// ProxyCacheAdvancedPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type ProxyCacheAdvancedPluginCloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *ProxyCacheAdvancedPluginAuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (p ProxyCacheAdvancedPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAuthProvider() *ProxyCacheAdvancedPluginAuthProvider {
+	if p == nil {
+		return nil
+	}
+	return p.AuthProvider
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsAccessKeyID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAccessKeyID
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsAssumeRoleArn
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsCacheName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsCacheName
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsIsServerless() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.AwsIsServerless
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsRegion() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRegion
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsRoleSessionName() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsRoleSessionName
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAwsSecretAccessKey() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AwsSecretAccessKey
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAzureClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientID
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAzureClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureClientSecret
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetAzureTenantID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.AzureTenantID
+}
+
+func (p *ProxyCacheAdvancedPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if p == nil {
+		return nil
+	}
+	return p.GcpServiceAccountJSON
+}
+
 type ProxyCacheAdvancedPluginClusterNodes struct {
 	// A string representing a host name, such as example.com.
 	IP *string `json:"ip,omitempty"`
@@ -240,6 +393,8 @@ func (e *ProxyCacheAdvancedPluginSentinelRole) UnmarshalJSON(data []byte) error 
 }
 
 type ProxyCacheAdvancedPluginRedis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *ProxyCacheAdvancedPluginCloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -293,6 +448,13 @@ func (p *ProxyCacheAdvancedPluginRedis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (p *ProxyCacheAdvancedPluginRedis) GetCloudAuthentication() *ProxyCacheAdvancedPluginCloudAuthentication {
+	if p == nil {
+		return nil
+	}
+	return p.CloudAuthentication
 }
 
 func (p *ProxyCacheAdvancedPluginRedis) GetClusterMaxRedirections() *int64 {
@@ -807,6 +969,8 @@ func (p *ProxyCacheAdvancedPluginService) GetID() *string {
 
 // ProxyCacheAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type ProxyCacheAdvancedPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -814,9 +978,10 @@ type ProxyCacheAdvancedPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                           `json:"instance_name,omitempty"`
-	name         string                            `const:"proxy-cache-advanced" json:"name"`
-	Ordering     *ProxyCacheAdvancedPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                            `const:"proxy-cache-advanced" json:"name"`
+	Ordering *ProxyCacheAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []ProxyCacheAdvancedPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -845,6 +1010,13 @@ func (p *ProxyCacheAdvancedPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (p *ProxyCacheAdvancedPlugin) GetCondition() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Condition
 }
 
 func (p *ProxyCacheAdvancedPlugin) GetCreatedAt() *int64 {

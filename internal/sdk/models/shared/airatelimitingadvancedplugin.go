@@ -168,6 +168,7 @@ func (e *Identifier) UnmarshalJSON(data []byte) error {
 type AiRateLimitingAdvancedPluginLlmFormat string
 
 const (
+	AiRateLimitingAdvancedPluginLlmFormatAnthropic   AiRateLimitingAdvancedPluginLlmFormat = "anthropic"
 	AiRateLimitingAdvancedPluginLlmFormatBedrock     AiRateLimitingAdvancedPluginLlmFormat = "bedrock"
 	AiRateLimitingAdvancedPluginLlmFormatCohere      AiRateLimitingAdvancedPluginLlmFormat = "cohere"
 	AiRateLimitingAdvancedPluginLlmFormatGemini      AiRateLimitingAdvancedPluginLlmFormat = "gemini"
@@ -184,6 +185,8 @@ func (e *AiRateLimitingAdvancedPluginLlmFormat) UnmarshalJSON(data []byte) error
 		return err
 	}
 	switch v {
+	case "anthropic":
+		fallthrough
 	case "bedrock":
 		fallthrough
 	case "cohere":
@@ -208,6 +211,7 @@ const (
 	NameAzure         Name = "azure"
 	NameBedrock       Name = "bedrock"
 	NameCohere        Name = "cohere"
+	NameCustomCost    Name = "customCost"
 	NameGemini        Name = "gemini"
 	NameHuggingface   Name = "huggingface"
 	NameLlama2        Name = "llama2"
@@ -232,6 +236,8 @@ func (e *Name) UnmarshalJSON(data []byte) error {
 	case "bedrock":
 		fallthrough
 	case "cohere":
+		fallthrough
+	case "customCost":
 		fallthrough
 	case "gemini":
 		fallthrough
@@ -290,6 +296,402 @@ func (l *LlmProviders) GetWindowSize() []float64 {
 		return []float64{}
 	}
 	return l.WindowSize
+}
+
+// AiRateLimitingAdvancedPluginTokensCountStrategy - What to count for this limit. Supported strategies: total_tokens, prompt_tokens, completion_tokens, cost.
+type AiRateLimitingAdvancedPluginTokensCountStrategy string
+
+const (
+	AiRateLimitingAdvancedPluginTokensCountStrategyCompletionTokens AiRateLimitingAdvancedPluginTokensCountStrategy = "completion_tokens"
+	AiRateLimitingAdvancedPluginTokensCountStrategyCost             AiRateLimitingAdvancedPluginTokensCountStrategy = "cost"
+	AiRateLimitingAdvancedPluginTokensCountStrategyPromptTokens     AiRateLimitingAdvancedPluginTokensCountStrategy = "prompt_tokens"
+	AiRateLimitingAdvancedPluginTokensCountStrategyTotalTokens      AiRateLimitingAdvancedPluginTokensCountStrategy = "total_tokens"
+)
+
+func (e AiRateLimitingAdvancedPluginTokensCountStrategy) ToPointer() *AiRateLimitingAdvancedPluginTokensCountStrategy {
+	return &e
+}
+func (e *AiRateLimitingAdvancedPluginTokensCountStrategy) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "completion_tokens":
+		fallthrough
+	case "cost":
+		fallthrough
+	case "prompt_tokens":
+		fallthrough
+	case "total_tokens":
+		*e = AiRateLimitingAdvancedPluginTokensCountStrategy(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRateLimitingAdvancedPluginTokensCountStrategy: %v", v)
+	}
+}
+
+type AiRateLimitingAdvancedPluginLimits struct {
+	// The rate limit threshold for this window.
+	Limit float64 `json:"limit"`
+	// What to count for this limit. Supported strategies: total_tokens, prompt_tokens, completion_tokens, cost.
+	TokensCountStrategy *AiRateLimitingAdvancedPluginTokensCountStrategy `json:"tokens_count_strategy,omitempty"`
+	// The window size in seconds.
+	WindowSize int64 `json:"window_size"`
+}
+
+func (a AiRateLimitingAdvancedPluginLimits) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRateLimitingAdvancedPluginLimits) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"limit", "window_size"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiRateLimitingAdvancedPluginLimits) GetLimit() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.Limit
+}
+
+func (a *AiRateLimitingAdvancedPluginLimits) GetTokensCountStrategy() *AiRateLimitingAdvancedPluginTokensCountStrategy {
+	if a == nil {
+		return nil
+	}
+	return a.TokensCountStrategy
+}
+
+func (a *AiRateLimitingAdvancedPluginLimits) GetWindowSize() int64 {
+	if a == nil {
+		return 0
+	}
+	return a.WindowSize
+}
+
+// AiRateLimitingAdvancedPluginType - The attribute to match against.
+type AiRateLimitingAdvancedPluginType string
+
+const (
+	AiRateLimitingAdvancedPluginTypeConsumer      AiRateLimitingAdvancedPluginType = "consumer"
+	AiRateLimitingAdvancedPluginTypeConsumerGroup AiRateLimitingAdvancedPluginType = "consumer_group"
+	AiRateLimitingAdvancedPluginTypeHeader        AiRateLimitingAdvancedPluginType = "header"
+	AiRateLimitingAdvancedPluginTypeIP            AiRateLimitingAdvancedPluginType = "ip"
+	AiRateLimitingAdvancedPluginTypeModel         AiRateLimitingAdvancedPluginType = "model"
+	AiRateLimitingAdvancedPluginTypePath          AiRateLimitingAdvancedPluginType = "path"
+	AiRateLimitingAdvancedPluginTypeProvider      AiRateLimitingAdvancedPluginType = "provider"
+)
+
+func (e AiRateLimitingAdvancedPluginType) ToPointer() *AiRateLimitingAdvancedPluginType {
+	return &e
+}
+func (e *AiRateLimitingAdvancedPluginType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "consumer":
+		fallthrough
+	case "consumer_group":
+		fallthrough
+	case "header":
+		fallthrough
+	case "ip":
+		fallthrough
+	case "model":
+		fallthrough
+	case "path":
+		fallthrough
+	case "provider":
+		*e = AiRateLimitingAdvancedPluginType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRateLimitingAdvancedPluginType: %v", v)
+	}
+}
+
+type Match struct {
+	// Sub-key for consumer (id|username|custom_id), consumer_group (id|name), or header (header name).
+	Key *string `json:"key,omitempty"`
+	// If true, the matched value contributes to the composite rate limit counter key.
+	PartitionBy *bool `json:"partition_by,omitempty"`
+	// The attribute to match against.
+	Type AiRateLimitingAdvancedPluginType `json:"type"`
+	// Values to match. If omitted, matches any value of this type.
+	Values []string `json:"values,omitempty"`
+}
+
+func (m Match) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(m, "", false)
+}
+
+func (m *Match) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &m, "", false, []string{"type"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Match) GetKey() *string {
+	if m == nil {
+		return nil
+	}
+	return m.Key
+}
+
+func (m *Match) GetPartitionBy() *bool {
+	if m == nil {
+		return nil
+	}
+	return m.PartitionBy
+}
+
+func (m *Match) GetType() AiRateLimitingAdvancedPluginType {
+	if m == nil {
+		return AiRateLimitingAdvancedPluginType("")
+	}
+	return m.Type
+}
+
+func (m *Match) GetValues() []string {
+	if m == nil {
+		return nil
+	}
+	return m.Values
+}
+
+// AiRateLimitingAdvancedPluginWindowType - The time window type for this policy.
+type AiRateLimitingAdvancedPluginWindowType string
+
+const (
+	AiRateLimitingAdvancedPluginWindowTypeFixed   AiRateLimitingAdvancedPluginWindowType = "fixed"
+	AiRateLimitingAdvancedPluginWindowTypeSliding AiRateLimitingAdvancedPluginWindowType = "sliding"
+)
+
+func (e AiRateLimitingAdvancedPluginWindowType) ToPointer() *AiRateLimitingAdvancedPluginWindowType {
+	return &e
+}
+func (e *AiRateLimitingAdvancedPluginWindowType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "fixed":
+		fallthrough
+	case "sliding":
+		*e = AiRateLimitingAdvancedPluginWindowType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRateLimitingAdvancedPluginWindowType: %v", v)
+	}
+}
+
+type Policies struct {
+	// UUID reference to a reusable ai_rate_limiting_policies DAO entity. Mutually exclusive with inline limits.
+	ID *string `json:"id,omitempty"`
+	// Rate limits to enforce when this policy matches.
+	Limits []AiRateLimitingAdvancedPluginLimits `json:"limits,omitempty"`
+	// Array of match conditions (AND logic). If omitted, this policy acts as a fallback for unmatched requests.
+	Match []Match `json:"match,omitempty"`
+	// The time window type for this policy.
+	WindowType *AiRateLimitingAdvancedPluginWindowType `json:"window_type,omitempty"`
+}
+
+func (p Policies) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Policies) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Policies) GetID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ID
+}
+
+func (p *Policies) GetLimits() []AiRateLimitingAdvancedPluginLimits {
+	if p == nil {
+		return nil
+	}
+	return p.Limits
+}
+
+func (p *Policies) GetMatch() []Match {
+	if p == nil {
+		return nil
+	}
+	return p.Match
+}
+
+func (p *Policies) GetWindowType() *AiRateLimitingAdvancedPluginWindowType {
+	if p == nil {
+		return nil
+	}
+	return p.WindowType
+}
+
+// AuthProvider - Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+type AuthProvider string
+
+const (
+	AuthProviderAws   AuthProvider = "aws"
+	AuthProviderAzure AuthProvider = "azure"
+	AuthProviderGcp   AuthProvider = "gcp"
+)
+
+func (e AuthProvider) ToPointer() *AuthProvider {
+	return &e
+}
+func (e *AuthProvider) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "aws":
+		fallthrough
+	case "azure":
+		fallthrough
+	case "gcp":
+		*e = AuthProvider(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AuthProvider: %v", v)
+	}
+}
+
+// CloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+type CloudAuthentication struct {
+	// Auth providers to be used to authenticate to a Cloud Provider's Redis instance.
+	AuthProvider *AuthProvider `json:"auth_provider,omitempty"`
+	// AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
+	// The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+	AwsAssumeRoleArn *string `json:"aws_assume_role_arn,omitempty"`
+	// The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+	AwsCacheName *string `json:"aws_cache_name,omitempty"`
+	// This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+	AwsIsServerless *bool `json:"aws_is_serverless,omitempty"`
+	// The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+	AwsRegion *string `json:"aws_region,omitempty"`
+	// The session name for the temporary credentials when assuming the IAM role.
+	AwsRoleSessionName *string `json:"aws_role_session_name,omitempty"`
+	// AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+	AwsSecretAccessKey *string `json:"aws_secret_access_key,omitempty"`
+	// Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientID *string `json:"azure_client_id,omitempty"`
+	// Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+	AzureClientSecret *string `json:"azure_client_secret,omitempty"`
+	// Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
+	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+}
+
+func (c CloudAuthentication) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CloudAuthentication) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CloudAuthentication) GetAuthProvider() *AuthProvider {
+	if c == nil {
+		return nil
+	}
+	return c.AuthProvider
+}
+
+func (c *CloudAuthentication) GetAwsAccessKeyID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsAccessKeyID
+}
+
+func (c *CloudAuthentication) GetAwsAssumeRoleArn() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsAssumeRoleArn
+}
+
+func (c *CloudAuthentication) GetAwsCacheName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsCacheName
+}
+
+func (c *CloudAuthentication) GetAwsIsServerless() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.AwsIsServerless
+}
+
+func (c *CloudAuthentication) GetAwsRegion() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsRegion
+}
+
+func (c *CloudAuthentication) GetAwsRoleSessionName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsRoleSessionName
+}
+
+func (c *CloudAuthentication) GetAwsSecretAccessKey() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AwsSecretAccessKey
+}
+
+func (c *CloudAuthentication) GetAzureClientID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AzureClientID
+}
+
+func (c *CloudAuthentication) GetAzureClientSecret() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AzureClientSecret
+}
+
+func (c *CloudAuthentication) GetAzureTenantID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AzureTenantID
+}
+
+func (c *CloudAuthentication) GetGcpServiceAccountJSON() *string {
+	if c == nil {
+		return nil
+	}
+	return c.GcpServiceAccountJSON
 }
 
 type ClusterNodes struct {
@@ -387,6 +789,8 @@ func (e *SentinelRole) UnmarshalJSON(data []byte) error {
 }
 
 type Redis struct {
+	// Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
+	CloudAuthentication *CloudAuthentication `json:"cloud_authentication,omitempty"`
 	// Maximum retry attempts for redirection.
 	ClusterMaxRedirections *int64 `json:"cluster_max_redirections,omitempty"`
 	// Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element.
@@ -440,6 +844,13 @@ func (r *Redis) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (r *Redis) GetCloudAuthentication() *CloudAuthentication {
+	if r == nil {
+		return nil
+	}
+	return r.CloudAuthentication
 }
 
 func (r *Redis) GetClusterMaxRedirections() *int64 {
@@ -589,7 +1000,7 @@ func (r *Redis) GetUsername() *string {
 	return r.Username
 }
 
-// Strategy - The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local` and `cluster`.
+// Strategy - The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local`, `redis` and `cluster`.
 type Strategy string
 
 const (
@@ -680,7 +1091,11 @@ func (e *WindowType) UnmarshalJSON(data []byte) error {
 }
 
 type AiRateLimitingAdvancedPluginConfig struct {
-	// The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is `config.strategy` is `cluster` or `redis` and `config.sync_rate` isn't `-1`), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle.
+	// If defined, it uses custom function to generate cost for the inference request
+	CustomCostCountFunction *string `json:"custom_cost_count_function,omitempty"`
+	// By default, Kong decreates the AI rate limiting counters by whole number in Redis. This setting allows to decrease the counters by float number.
+	DecreaseByFractionsInRedis *bool `json:"decrease_by_fractions_in_redis,omitempty"`
+	// The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is `config.strategy` is `cluster` or `redis` and `config.sync_rate` isn't `-1`), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle. The dictionary must be defined in the nginx configuration using `lua_shared_dict` directive (e.g., `lua_shared_dict kong_rate_limiting_counters 12m`).
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 	// If set to `true`, this doesn't count denied requests (status = `429`). If set to `false`, all requests, including denied ones, are counted. This parameter only affects the `sliding` window_type and the request prompt provider.
 	DisablePenalty *bool `json:"disable_penalty,omitempty"`
@@ -698,18 +1113,20 @@ type AiRateLimitingAdvancedPluginConfig struct {
 	Identifier *Identifier `json:"identifier,omitempty"`
 	// LLM input and output format and schema to use
 	LlmFormat *AiRateLimitingAdvancedPluginLlmFormat `json:"llm_format,omitempty"`
-	// The provider config. Takes an array of `name`, `limit` and `window size` values.
-	LlmProviders []LlmProviders `json:"llm_providers"`
+	// The provider config. Takes an array of `name`, `limit` and `window size` values. Mutually exclusive with `policies`.
+	LlmProviders []LlmProviders `json:"llm_providers,omitempty"`
 	// The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. NOTE: For the plugin instances sharing the same namespace, all the configurations that are required for synchronizing counters, e.g. `strategy`, `redis`, `sync_rate`, `dictionary_name`, need to be the same.
 	Namespace *string `json:"namespace,omitempty"`
 	// A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).
-	Path  *string `json:"path,omitempty"`
-	Redis *Redis  `json:"redis,omitempty"`
+	Path *string `json:"path,omitempty"`
+	// Policy-based rate limiting. Each policy defines match conditions and limits. Mutually exclusive with `llm_providers`.
+	Policies []Policies `json:"policies,omitempty"`
+	Redis    *Redis     `json:"redis,omitempty"`
 	// If defined, it use custom function to count requests for the request prompt provider
 	RequestPromptCountFunction *string `json:"request_prompt_count_function,omitempty"`
 	// The upper bound of a jitter (random delay) in seconds to be added to the `Retry-After` header of denied requests (status = `429`) in order to prevent all the clients from coming back at the same time. The lower bound of the jitter is `0`; in this case, the `Retry-After` header is equal to the `RateLimit-Reset` header.
 	RetryAfterJitterMax *float64 `json:"retry_after_jitter_max,omitempty"`
-	// The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local` and `cluster`.
+	// The rate-limiting strategy to use for retrieving and incrementing the limits. Available values are: `local`, `redis` and `cluster`.
 	Strategy *Strategy `json:"strategy,omitempty"`
 	// How often to sync counter data to the central data store. A value of 0 results in synchronous behavior; a value of -1 ignores sync behavior entirely and only stores counters in node memory. A value greater than 0 will sync the counters in the specified number of seconds. The minimum allowed interval is 0.02 seconds (20ms).
 	SyncRate *float64 `json:"sync_rate,omitempty"`
@@ -724,10 +1141,24 @@ func (a AiRateLimitingAdvancedPluginConfig) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiRateLimitingAdvancedPluginConfig) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"llm_providers"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AiRateLimitingAdvancedPluginConfig) GetCustomCostCountFunction() *string {
+	if a == nil {
+		return nil
+	}
+	return a.CustomCostCountFunction
+}
+
+func (a *AiRateLimitingAdvancedPluginConfig) GetDecreaseByFractionsInRedis() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.DecreaseByFractionsInRedis
 }
 
 func (a *AiRateLimitingAdvancedPluginConfig) GetDictionaryName() *string {
@@ -795,7 +1226,7 @@ func (a *AiRateLimitingAdvancedPluginConfig) GetLlmFormat() *AiRateLimitingAdvan
 
 func (a *AiRateLimitingAdvancedPluginConfig) GetLlmProviders() []LlmProviders {
 	if a == nil {
-		return []LlmProviders{}
+		return nil
 	}
 	return a.LlmProviders
 }
@@ -812,6 +1243,13 @@ func (a *AiRateLimitingAdvancedPluginConfig) GetPath() *string {
 		return nil
 	}
 	return a.Path
+}
+
+func (a *AiRateLimitingAdvancedPluginConfig) GetPolicies() []Policies {
+	if a == nil {
+		return nil
+	}
+	return a.Policies
 }
 
 func (a *AiRateLimitingAdvancedPluginConfig) GetRedis() *Redis {
@@ -989,6 +1427,8 @@ func (a *AiRateLimitingAdvancedPluginService) GetID() *string {
 
 // AiRateLimitingAdvancedPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiRateLimitingAdvancedPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -996,16 +1436,17 @@ type AiRateLimitingAdvancedPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                               `json:"instance_name,omitempty"`
-	name         string                                `const:"ai-rate-limiting-advanced" json:"name"`
-	Ordering     *AiRateLimitingAdvancedPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                                `const:"ai-rate-limiting-advanced" json:"name"`
+	Ordering *AiRateLimitingAdvancedPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiRateLimitingAdvancedPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
 	Tags []string `json:"tags,omitempty"`
 	// Unix epoch when the resource was last updated.
-	UpdatedAt *int64                             `json:"updated_at,omitempty"`
-	Config    AiRateLimitingAdvancedPluginConfig `json:"config"`
+	UpdatedAt *int64                              `json:"updated_at,omitempty"`
+	Config    *AiRateLimitingAdvancedPluginConfig `json:"config,omitempty"`
 	// If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer.
 	Consumer *AiRateLimitingAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
@@ -1023,10 +1464,17 @@ func (a AiRateLimitingAdvancedPlugin) MarshalJSON() ([]byte, error) {
 }
 
 func (a *AiRateLimitingAdvancedPlugin) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name", "config"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"name"}); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (a *AiRateLimitingAdvancedPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiRateLimitingAdvancedPlugin) GetCreatedAt() *int64 {
@@ -1089,9 +1537,9 @@ func (a *AiRateLimitingAdvancedPlugin) GetUpdatedAt() *int64 {
 	return a.UpdatedAt
 }
 
-func (a *AiRateLimitingAdvancedPlugin) GetConfig() AiRateLimitingAdvancedPluginConfig {
+func (a *AiRateLimitingAdvancedPlugin) GetConfig() *AiRateLimitingAdvancedPluginConfig {
 	if a == nil {
-		return AiRateLimitingAdvancedPluginConfig{}
+		return nil
 	}
 	return a.Config
 }

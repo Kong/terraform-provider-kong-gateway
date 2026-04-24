@@ -7,11 +7,17 @@ import (
 )
 
 type AiRagInjectorPluginConfig struct {
-	Embeddings        *Embeddings                  `tfsdk:"embeddings"`
-	FetchChunksCount  types.Float64                `tfsdk:"fetch_chunks_count"`
-	InjectAsRole      types.String                 `tfsdk:"inject_as_role"`
-	InjectTemplate    types.String                 `tfsdk:"inject_template"`
-	StopOnFailure     types.Bool                   `tfsdk:"stop_on_failure"`
-	Vectordb          *AiRagInjectorPluginVectordb `tfsdk:"vectordb"`
-	VectordbNamespace types.String                 `tfsdk:"vectordb_namespace"`
+	CollectionACLConfig map[string]AiMcpProxyPluginACL `tfsdk:"collection_acl_config"`
+	ConsumerIdentifier  types.String                   `tfsdk:"consumer_identifier"`
+	Embeddings          *PartialEmbeddingsConfig       `tfsdk:"embeddings"`
+	FetchChunksCount    types.Float64                  `tfsdk:"fetch_chunks_count"`
+	FilterMode          types.String                   `tfsdk:"filter_mode"`
+	GlobalACLConfig     *AiMcpProxyPluginACL           `tfsdk:"global_acl_config"`
+	InjectAsRole        types.String                   `tfsdk:"inject_as_role"`
+	InjectTemplate      types.String                   `tfsdk:"inject_template"`
+	MaxFilterClauses    types.Int64                    `tfsdk:"max_filter_clauses"`
+	StopOnFailure       types.Bool                     `tfsdk:"stop_on_failure"`
+	StopOnFilterError   types.Bool                     `tfsdk:"stop_on_filter_error"`
+	Vectordb            *PartialVectordbConfig         `tfsdk:"vectordb"`
+	VectordbNamespace   types.String                   `tfsdk:"vectordb_namespace"`
 }

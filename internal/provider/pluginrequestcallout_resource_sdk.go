@@ -4,8 +4,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
@@ -17,6 +15,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.RequestCalloutPluginConfig{}
 		if resp.Config.Cache == nil {
 			r.Config.Cache = nil
@@ -33,6 +32,27 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 				r.Config.Cache.Redis = nil
 			} else {
 				r.Config.Cache.Redis = &tfTypes.PartialRedisEeConfig{}
+				if resp.Config.Cache.Redis.CloudAuthentication == nil {
+					r.Config.Cache.Redis.CloudAuthentication = nil
+				} else {
+					r.Config.Cache.Redis.CloudAuthentication = &tfTypes.PartialRedisCeCloudAuthentication{}
+					if resp.Config.Cache.Redis.CloudAuthentication.AuthProvider != nil {
+						r.Config.Cache.Redis.CloudAuthentication.AuthProvider = types.StringValue(string(*resp.Config.Cache.Redis.CloudAuthentication.AuthProvider))
+					} else {
+						r.Config.Cache.Redis.CloudAuthentication.AuthProvider = types.StringNull()
+					}
+					r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID)
+					r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn)
+					r.Config.Cache.Redis.CloudAuthentication.AwsCacheName = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsCacheName)
+					r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless = types.BoolPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsIsServerless)
+					r.Config.Cache.Redis.CloudAuthentication.AwsRegion = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsRegion)
+					r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName)
+					r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey)
+					r.Config.Cache.Redis.CloudAuthentication.AzureClientID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureClientID)
+					r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureClientSecret)
+					r.Config.Cache.Redis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.AzureTenantID)
+					r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON)
+				}
 				r.Config.Cache.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Cache.Redis.ClusterMaxRedirections)
 				r.Config.Cache.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
 
@@ -99,16 +119,15 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 				callouts.DependsOn = append(callouts.DependsOn, types.StringValue(v))
 			}
 			callouts.Name = types.StringValue(calloutsItem.Name)
-			callouts.Request = &tfTypes.Request{}
+			callouts.Request = &tfTypes.RequestCalloutPluginRequest{}
 			if calloutsItem.Request.Body == nil {
 				callouts.Request.Body = nil
 			} else {
 				callouts.Request.Body = &tfTypes.RequestCalloutPluginConfigBody{}
 				if len(calloutsItem.Request.Body.Custom) > 0 {
-					callouts.Request.Body.Custom = make(map[string]jsontypes.Normalized, len(calloutsItem.Request.Body.Custom))
+					callouts.Request.Body.Custom = make(map[string]types.String, len(calloutsItem.Request.Body.Custom))
 					for key, value := range calloutsItem.Request.Body.Custom {
-						result, _ := json.Marshal(value)
-						callouts.Request.Body.Custom[key] = jsontypes.NewNormalizedValue(string(result))
+						callouts.Request.Body.Custom[key] = types.StringValue(value)
 					}
 				}
 				callouts.Request.Body.Decode = types.BoolPointerValue(calloutsItem.Request.Body.Decode)
@@ -137,10 +156,9 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			} else {
 				callouts.Request.Headers = &tfTypes.RequestCalloutPluginConfigHeaders{}
 				if len(calloutsItem.Request.Headers.Custom) > 0 {
-					callouts.Request.Headers.Custom = make(map[string]jsontypes.Normalized, len(calloutsItem.Request.Headers.Custom))
+					callouts.Request.Headers.Custom = make(map[string]types.String, len(calloutsItem.Request.Headers.Custom))
 					for key1, value1 := range calloutsItem.Request.Headers.Custom {
-						result1, _ := json.Marshal(value1)
-						callouts.Request.Headers.Custom[key1] = jsontypes.NewNormalizedValue(string(result1))
+						callouts.Request.Headers.Custom[key1] = types.StringValue(value1)
 					}
 				}
 				callouts.Request.Headers.Forward = types.BoolPointerValue(calloutsItem.Request.Headers.Forward)
@@ -175,10 +193,9 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			} else {
 				callouts.Request.Query = &tfTypes.RequestCalloutPluginConfigHeaders{}
 				if len(calloutsItem.Request.Query.Custom) > 0 {
-					callouts.Request.Query.Custom = make(map[string]jsontypes.Normalized, len(calloutsItem.Request.Query.Custom))
+					callouts.Request.Query.Custom = make(map[string]types.String, len(calloutsItem.Request.Query.Custom))
 					for key2, value2 := range calloutsItem.Request.Query.Custom {
-						result2, _ := json.Marshal(value2)
-						callouts.Request.Query.Custom[key2] = jsontypes.NewNormalizedValue(string(result2))
+						callouts.Request.Query.Custom[key2] = types.StringValue(value2)
 					}
 				}
 				callouts.Request.Query.Forward = types.BoolPointerValue(calloutsItem.Request.Query.Forward)
@@ -187,7 +204,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			if calloutsItem.Response == nil {
 				callouts.Response = nil
 			} else {
-				callouts.Response = &tfTypes.Response{}
+				callouts.Response = &tfTypes.RequestCalloutPluginResponse{}
 				if calloutsItem.Response.Body == nil {
 					callouts.Response.Body = nil
 				} else {
@@ -215,10 +232,9 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			} else {
 				r.Config.Upstream.Body = &tfTypes.RequestCalloutPluginConfigBody{}
 				if len(resp.Config.Upstream.Body.Custom) > 0 {
-					r.Config.Upstream.Body.Custom = make(map[string]jsontypes.Normalized, len(resp.Config.Upstream.Body.Custom))
+					r.Config.Upstream.Body.Custom = make(map[string]types.String, len(resp.Config.Upstream.Body.Custom))
 					for key3, value3 := range resp.Config.Upstream.Body.Custom {
-						result3, _ := json.Marshal(value3)
-						r.Config.Upstream.Body.Custom[key3] = jsontypes.NewNormalizedValue(string(result3))
+						r.Config.Upstream.Body.Custom[key3] = types.StringValue(value3)
 					}
 				}
 				r.Config.Upstream.Body.Decode = types.BoolPointerValue(resp.Config.Upstream.Body.Decode)
@@ -230,10 +246,9 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			} else {
 				r.Config.Upstream.Headers = &tfTypes.RequestCalloutPluginConfigHeaders{}
 				if len(resp.Config.Upstream.Headers.Custom) > 0 {
-					r.Config.Upstream.Headers.Custom = make(map[string]jsontypes.Normalized, len(resp.Config.Upstream.Headers.Custom))
+					r.Config.Upstream.Headers.Custom = make(map[string]types.String, len(resp.Config.Upstream.Headers.Custom))
 					for key4, value4 := range resp.Config.Upstream.Headers.Custom {
-						result4, _ := json.Marshal(value4)
-						r.Config.Upstream.Headers.Custom[key4] = jsontypes.NewNormalizedValue(string(result4))
+						r.Config.Upstream.Headers.Custom[key4] = types.StringValue(value4)
 					}
 				}
 				r.Config.Upstream.Headers.Forward = types.BoolPointerValue(resp.Config.Upstream.Headers.Forward)
@@ -243,10 +258,9 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			} else {
 				r.Config.Upstream.Query = &tfTypes.RequestCalloutPluginConfigHeaders{}
 				if len(resp.Config.Upstream.Query.Custom) > 0 {
-					r.Config.Upstream.Query.Custom = make(map[string]jsontypes.Normalized, len(resp.Config.Upstream.Query.Custom))
+					r.Config.Upstream.Query.Custom = make(map[string]types.String, len(resp.Config.Upstream.Query.Custom))
 					for key5, value5 := range resp.Config.Upstream.Query.Custom {
-						result5, _ := json.Marshal(value5)
-						r.Config.Upstream.Query.Custom[key5] = jsontypes.NewNormalizedValue(string(result5))
+						r.Config.Upstream.Query.Custom[key5] = types.StringValue(value5)
 					}
 				}
 				r.Config.Upstream.Query.Forward = types.BoolPointerValue(resp.Config.Upstream.Query.Forward)
@@ -415,6 +429,12 @@ func (r *PluginRequestCalloutResourceModel) ToOperationsUpdateRequestcalloutPlug
 func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx context.Context) (*shared.RequestCalloutPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -527,6 +547,95 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 		var redis *shared.RequestCalloutPluginRedis
 		if r.Config.Cache.Redis != nil {
+			var cloudAuthentication *shared.RequestCalloutPluginCloudAuthentication
+			if r.Config.Cache.Redis.CloudAuthentication != nil {
+				authProvider := new(shared.RequestCalloutPluginAuthProvider)
+				if !r.Config.Cache.Redis.CloudAuthentication.AuthProvider.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AuthProvider.IsNull() {
+					*authProvider = shared.RequestCalloutPluginAuthProvider(r.Config.Cache.Redis.CloudAuthentication.AuthProvider.ValueString())
+				} else {
+					authProvider = nil
+				}
+				awsAccessKeyID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.IsNull() {
+					*awsAccessKeyID = r.Config.Cache.Redis.CloudAuthentication.AwsAccessKeyID.ValueString()
+				} else {
+					awsAccessKeyID = nil
+				}
+				awsAssumeRoleArn := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.IsNull() {
+					*awsAssumeRoleArn = r.Config.Cache.Redis.CloudAuthentication.AwsAssumeRoleArn.ValueString()
+				} else {
+					awsAssumeRoleArn = nil
+				}
+				awsCacheName := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.IsNull() {
+					*awsCacheName = r.Config.Cache.Redis.CloudAuthentication.AwsCacheName.ValueString()
+				} else {
+					awsCacheName = nil
+				}
+				awsIsServerless := new(bool)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.IsNull() {
+					*awsIsServerless = r.Config.Cache.Redis.CloudAuthentication.AwsIsServerless.ValueBool()
+				} else {
+					awsIsServerless = nil
+				}
+				awsRegion := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsRegion.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsRegion.IsNull() {
+					*awsRegion = r.Config.Cache.Redis.CloudAuthentication.AwsRegion.ValueString()
+				} else {
+					awsRegion = nil
+				}
+				awsRoleSessionName := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.IsNull() {
+					*awsRoleSessionName = r.Config.Cache.Redis.CloudAuthentication.AwsRoleSessionName.ValueString()
+				} else {
+					awsRoleSessionName = nil
+				}
+				awsSecretAccessKey := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.IsNull() {
+					*awsSecretAccessKey = r.Config.Cache.Redis.CloudAuthentication.AwsSecretAccessKey.ValueString()
+				} else {
+					awsSecretAccessKey = nil
+				}
+				azureClientID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureClientID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureClientID.IsNull() {
+					*azureClientID = r.Config.Cache.Redis.CloudAuthentication.AzureClientID.ValueString()
+				} else {
+					azureClientID = nil
+				}
+				azureClientSecret := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.IsNull() {
+					*azureClientSecret = r.Config.Cache.Redis.CloudAuthentication.AzureClientSecret.ValueString()
+				} else {
+					azureClientSecret = nil
+				}
+				azureTenantID := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.IsNull() {
+					*azureTenantID = r.Config.Cache.Redis.CloudAuthentication.AzureTenantID.ValueString()
+				} else {
+					azureTenantID = nil
+				}
+				gcpServiceAccountJSON := new(string)
+				if !r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.IsUnknown() && !r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.IsNull() {
+					*gcpServiceAccountJSON = r.Config.Cache.Redis.CloudAuthentication.GcpServiceAccountJSON.ValueString()
+				} else {
+					gcpServiceAccountJSON = nil
+				}
+				cloudAuthentication = &shared.RequestCalloutPluginCloudAuthentication{
+					AuthProvider:          authProvider,
+					AwsAccessKeyID:        awsAccessKeyID,
+					AwsAssumeRoleArn:      awsAssumeRoleArn,
+					AwsCacheName:          awsCacheName,
+					AwsIsServerless:       awsIsServerless,
+					AwsRegion:             awsRegion,
+					AwsRoleSessionName:    awsRoleSessionName,
+					AwsSecretAccessKey:    awsSecretAccessKey,
+					AzureClientID:         azureClientID,
+					AzureClientSecret:     azureClientSecret,
+					AzureTenantID:         azureTenantID,
+					GcpServiceAccountJSON: gcpServiceAccountJSON,
+				}
+			}
 			clusterMaxRedirections := new(int64)
 			if !r.Config.Cache.Redis.ClusterMaxRedirections.IsUnknown() && !r.Config.Cache.Redis.ClusterMaxRedirections.IsNull() {
 				*clusterMaxRedirections = r.Config.Cache.Redis.ClusterMaxRedirections.ValueInt64()
@@ -680,6 +789,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 				username = nil
 			}
 			redis = &shared.RequestCalloutPluginRedis{
+				CloudAuthentication:    cloudAuthentication,
 				ClusterMaxRedirections: clusterMaxRedirections,
 				ClusterNodes:           clusterNodes,
 				ConnectTimeout:         connectTimeout,
@@ -739,10 +849,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 
 		var body *shared.RequestCalloutPluginConfigBody
 		if r.Config.Callouts[calloutsIndex].Request.Body != nil {
-			custom := make(map[string]interface{})
+			custom := make(map[string]string)
 			for customKey := range r.Config.Callouts[calloutsIndex].Request.Body.Custom {
-				var customInst interface{}
-				_ = json.Unmarshal([]byte(r.Config.Callouts[calloutsIndex].Request.Body.Custom[customKey].ValueString()), &customInst)
+				var customInst string
+				customInst = r.Config.Callouts[calloutsIndex].Request.Body.Custom[customKey].ValueString()
+
 				custom[customKey] = customInst
 			}
 			decode := new(bool)
@@ -809,10 +920,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 		var headers *shared.RequestCalloutPluginConfigHeaders
 		if r.Config.Callouts[calloutsIndex].Request.Headers != nil {
-			custom1 := make(map[string]interface{})
+			custom1 := make(map[string]string)
 			for customKey1 := range r.Config.Callouts[calloutsIndex].Request.Headers.Custom {
-				var customInst1 interface{}
-				_ = json.Unmarshal([]byte(r.Config.Callouts[calloutsIndex].Request.Headers.Custom[customKey1].ValueString()), &customInst1)
+				var customInst1 string
+				customInst1 = r.Config.Callouts[calloutsIndex].Request.Headers.Custom[customKey1].ValueString()
+
 				custom1[customKey1] = customInst1
 			}
 			forward1 := new(bool)
@@ -914,10 +1026,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 		var query *shared.RequestCalloutPluginQuery
 		if r.Config.Callouts[calloutsIndex].Request.Query != nil {
-			custom2 := make(map[string]interface{})
+			custom2 := make(map[string]string)
 			for customKey2 := range r.Config.Callouts[calloutsIndex].Request.Query.Custom {
-				var customInst2 interface{}
-				_ = json.Unmarshal([]byte(r.Config.Callouts[calloutsIndex].Request.Query.Custom[customKey2].ValueString()), &customInst2)
+				var customInst2 string
+				customInst2 = r.Config.Callouts[calloutsIndex].Request.Query.Custom[customKey2].ValueString()
+
 				custom2[customKey2] = customInst2
 			}
 			forward2 := new(bool)
@@ -934,7 +1047,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		var url string
 		url = r.Config.Callouts[calloutsIndex].Request.URL.ValueString()
 
-		request := shared.Request{
+		request := shared.RequestCalloutPluginRequest{
 			Body:     body,
 			ByLua:    byLua,
 			Error:    error,
@@ -944,7 +1057,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 			Query:    query,
 			URL:      url,
 		}
-		var response *shared.Response
+		var response *shared.RequestCalloutPluginResponse
 		if r.Config.Callouts[calloutsIndex].Response != nil {
 			var body1 *shared.RequestCalloutPluginBody
 			if r.Config.Callouts[calloutsIndex].Response.Body != nil {
@@ -983,7 +1096,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 					Store: store1,
 				}
 			}
-			response = &shared.Response{
+			response = &shared.RequestCalloutPluginResponse{
 				Body:    body1,
 				ByLua:   byLua1,
 				Headers: headers1,
@@ -1001,10 +1114,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 	if r.Config.Upstream != nil {
 		var body2 *shared.Body
 		if r.Config.Upstream.Body != nil {
-			custom3 := make(map[string]interface{})
+			custom3 := make(map[string]string)
 			for customKey3 := range r.Config.Upstream.Body.Custom {
-				var customInst3 interface{}
-				_ = json.Unmarshal([]byte(r.Config.Upstream.Body.Custom[customKey3].ValueString()), &customInst3)
+				var customInst3 string
+				customInst3 = r.Config.Upstream.Body.Custom[customKey3].ValueString()
+
 				custom3[customKey3] = customInst3
 			}
 			decode2 := new(bool)
@@ -1033,10 +1147,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 		var headers2 *shared.Headers
 		if r.Config.Upstream.Headers != nil {
-			custom4 := make(map[string]interface{})
+			custom4 := make(map[string]string)
 			for customKey4 := range r.Config.Upstream.Headers.Custom {
-				var customInst4 interface{}
-				_ = json.Unmarshal([]byte(r.Config.Upstream.Headers.Custom[customKey4].ValueString()), &customInst4)
+				var customInst4 string
+				customInst4 = r.Config.Upstream.Headers.Custom[customKey4].ValueString()
+
 				custom4[customKey4] = customInst4
 			}
 			forward4 := new(bool)
@@ -1052,10 +1167,11 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 		var query1 *shared.Query
 		if r.Config.Upstream.Query != nil {
-			custom5 := make(map[string]interface{})
+			custom5 := make(map[string]string)
 			for customKey5 := range r.Config.Upstream.Query.Custom {
-				var customInst5 interface{}
-				_ = json.Unmarshal([]byte(r.Config.Upstream.Query.Custom[customKey5].ValueString()), &customInst5)
+				var customInst5 string
+				customInst5 = r.Config.Upstream.Query.Custom[customKey5].ValueString()
+
 				custom5[customKey5] = customInst5
 			}
 			forward5 := new(bool)
@@ -1134,6 +1250,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		}
 	}
 	out := shared.RequestCalloutPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

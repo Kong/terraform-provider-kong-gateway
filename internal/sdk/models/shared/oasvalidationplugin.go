@@ -129,6 +129,8 @@ type OasValidationPluginConfig struct {
 	APISpec string `json:"api_spec"`
 	// Indicates whether the api_spec is URI-Encoded.
 	APISpecEncoded *bool `json:"api_spec_encoded,omitempty"`
+	// If set to true, collects all validation errors instead of stopping at the first error. Note: Enabling this option with OpenAPI 3.0 will affect performance.
+	CollectAllErrors *bool `json:"collect_all_errors,omitempty"`
 	// The base path to be used for path match evaluation. This value is ignored if `include_base_path` is set to `false`.
 	CustomBasePath *string `json:"custom_base_path,omitempty"`
 	// If set to true, checks if HTTP header parameters in the request exist in the API specification.
@@ -185,6 +187,13 @@ func (o *OasValidationPluginConfig) GetAPISpecEncoded() *bool {
 		return nil
 	}
 	return o.APISpecEncoded
+}
+
+func (o *OasValidationPluginConfig) GetCollectAllErrors() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.CollectAllErrors
 }
 
 func (o *OasValidationPluginConfig) GetCustomBasePath() *string {
@@ -374,6 +383,8 @@ func (o *OasValidationPluginService) GetID() *string {
 
 // OasValidationPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type OasValidationPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -381,9 +392,10 @@ type OasValidationPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                      `json:"instance_name,omitempty"`
-	name         string                       `const:"oas-validation" json:"name"`
-	Ordering     *OasValidationPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                       `const:"oas-validation" json:"name"`
+	Ordering *OasValidationPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []OasValidationPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -410,6 +422,13 @@ func (o *OasValidationPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (o *OasValidationPlugin) GetCondition() *string {
+	if o == nil {
+		return nil
+	}
+	return o.Condition
 }
 
 func (o *OasValidationPlugin) GetCreatedAt() *int64 {

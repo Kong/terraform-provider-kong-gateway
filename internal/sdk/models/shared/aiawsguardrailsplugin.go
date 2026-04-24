@@ -180,6 +180,8 @@ func (e *TextSource) UnmarshalJSON(data []byte) error {
 }
 
 type AiAwsGuardrailsPluginConfig struct {
+	// Allow to masking the request/response instead of blocking it. Streaming will be disabled if this is enabled.
+	AllowMasking *bool `json:"allow_masking,omitempty"`
 	// The AWS access key ID to use for authentication
 	AwsAccessKeyID *string `json:"aws_access_key_id,omitempty"`
 	// The target AWS IAM role ARN used to access the guardrails service
@@ -194,12 +196,16 @@ type AiAwsGuardrailsPluginConfig struct {
 	AwsStsEndpointURL *string `json:"aws_sts_endpoint_url,omitempty"`
 	// The guardrail mode to use for the request
 	GuardingMode *GuardingMode `json:"guarding_mode,omitempty"`
-	// The guardrail identifier used in the request to apply the guardrail
+	// The guardrail identifier used in the request to apply the guardrail.
 	GuardrailsID string `json:"guardrails_id"`
-	// The guardrail version used in the request to apply the guardrail
+	// The guardrail version used in the request to apply the guardrail. Note that the value of this field must match the pattern `(([1-9][0-9]{0,7})|(DRAFT))` according to the AWS documentation https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_ApplyGuardrail.html#API_runtime_ApplyGuardrail_RequestSyntax.
 	GuardrailsVersion string `json:"guardrails_version"`
+	// Whether to log prompts and responses that are blocked by the guardrail.
+	LogBlockedContent *bool `json:"log_blocked_content,omitempty"`
 	// The amount of bytes receiving from upstream to be buffered before sending to the guardrails service. This only applies to the response content guard.
 	ResponseBufferSize *float64 `json:"response_buffer_size,omitempty"`
+	// Verify TLS certificate when connecting to the bedrock service.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Stop processing if an error occurs
 	StopOnError *bool `json:"stop_on_error,omitempty"`
 	// Select where to pick the 'text' for the Content Guard Services request.
@@ -217,6 +223,13 @@ func (a *AiAwsGuardrailsPluginConfig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiAwsGuardrailsPluginConfig) GetAllowMasking() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.AllowMasking
 }
 
 func (a *AiAwsGuardrailsPluginConfig) GetAwsAccessKeyID() *string {
@@ -282,11 +295,25 @@ func (a *AiAwsGuardrailsPluginConfig) GetGuardrailsVersion() string {
 	return a.GuardrailsVersion
 }
 
+func (a *AiAwsGuardrailsPluginConfig) GetLogBlockedContent() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.LogBlockedContent
+}
+
 func (a *AiAwsGuardrailsPluginConfig) GetResponseBufferSize() *float64 {
 	if a == nil {
 		return nil
 	}
 	return a.ResponseBufferSize
+}
+
+func (a *AiAwsGuardrailsPluginConfig) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
 }
 
 func (a *AiAwsGuardrailsPluginConfig) GetStopOnError() *bool {
@@ -436,6 +463,8 @@ func (a *AiAwsGuardrailsPluginService) GetID() *string {
 
 // AiAwsGuardrailsPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiAwsGuardrailsPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -443,9 +472,10 @@ type AiAwsGuardrailsPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                        `json:"instance_name,omitempty"`
-	name         string                         `const:"ai-aws-guardrails" json:"name"`
-	Ordering     *AiAwsGuardrailsPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                         `const:"ai-aws-guardrails" json:"name"`
+	Ordering *AiAwsGuardrailsPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiAwsGuardrailsPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -474,6 +504,13 @@ func (a *AiAwsGuardrailsPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiAwsGuardrailsPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiAwsGuardrailsPlugin) GetCreatedAt() *int64 {

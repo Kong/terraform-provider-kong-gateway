@@ -14,6 +14,7 @@ PluginKafkaConsume Resource
 
 ```terraform
 resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
+  condition = "...my_condition..."
   config = {
     authentication = {
       mechanism = "SCRAM-SHA-256"
@@ -29,10 +30,11 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
         port = 90
       }
     ]
-    cluster_name    = "...my_cluster_name..."
-    commit_strategy = "auto"
-    dlq_topic       = "...my_dlq_topic..."
-    enable_dlq      = false
+    cluster_name                = "...my_cluster_name..."
+    commit_strategy             = "auto"
+    dlq_topic                   = "...my_dlq_topic..."
+    enable_dlq                  = false
+    enforce_latest_offset_reset = false
     message_by_lua_functions = [
       "..."
     ]
@@ -59,10 +61,10 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
             ]
             token_endpoint = "...my_token_endpoint..."
             token_headers = {
-              key = jsonencode("value")
+              key = "value"
             }
             token_post_args = {
-              key = jsonencode("value")
+              key = "value"
             }
             username = "...my_username..."
           }
@@ -88,6 +90,7 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
     security = {
       certificate_id = "...my_certificate_id..."
       ssl            = false
+      ssl_verify     = true
     }
     topics = [
       {
@@ -113,10 +116,10 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
                 ]
                 token_endpoint = "...my_token_endpoint..."
                 token_headers = {
-                  key = jsonencode("value")
+                  key = "value"
                 }
                 token_post_args = {
-                  key = jsonencode("value")
+                  key = "value"
                 }
                 username = "...my_username..."
               }
@@ -178,7 +181,7 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
     "..."
   ]
   updated_at = 2
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -191,6 +194,7 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -202,7 +206,7 @@ resource "kong-gateway_plugin_kafka_consume" "my_pluginkafkaconsume" {
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -220,6 +224,7 @@ Optional:
 - `commit_strategy` (String) The strategy to use for committing offsets. must be one of ["auto", "off"]
 - `dlq_topic` (String) The topic to use for the Dead Letter Queue.
 - `enable_dlq` (Boolean) Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the `message_by_lua_functions`, it will be forwarded to `dlq_topic` that can be processed later.
+- `enforce_latest_offset_reset` (Boolean) When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.
 - `message_by_lua_functions` (List of String) The Lua functions that manipulates the message being sent to the client.
 - `message_deserializer` (String) The deserializer to use for the consumed messages. must be one of ["json", "noop"]
 - `mode` (String) The mode of operation for the plugin. must be one of ["http-get", "server-sent-events", "websocket"]
@@ -411,6 +416,7 @@ Optional:
 
 - `certificate_id` (String) UUID of certificate entity for mTLS authentication.
 - `ssl` (Boolean) Enables TLS.
+- `ssl_verify` (Boolean) When using TLS, this option enables verification of the certificate presented by the server.
 
 
 
@@ -474,8 +480,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_kafka_consume.my_kong-gateway_plugin_kafka_consume
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -483,5 +489,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_kafka_consume.my_kong-gateway_plugin_kafka_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_kafka_consume.my_kong-gateway_plugin_kafka_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

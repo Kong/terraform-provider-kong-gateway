@@ -14,6 +14,7 @@ PluginConfluentConsume Resource
 
 ```terraform
 resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
+  condition = "...my_condition..."
   config = {
     auto_offset_reset = "latest"
     bootstrap_servers = [
@@ -22,16 +23,17 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
         port = 6067
       }
     ]
-    cluster_api_key            = "...my_cluster_api_key..."
-    cluster_api_secret         = "...my_cluster_api_secret..."
-    cluster_name               = "...my_cluster_name..."
-    commit_strategy            = "auto"
-    confluent_cloud_api_key    = "...my_confluent_cloud_api_key..."
-    confluent_cloud_api_secret = "...my_confluent_cloud_api_secret..."
-    dlq_topic                  = "...my_dlq_topic..."
-    enable_dlq                 = true
-    keepalive                  = 6
-    keepalive_enabled          = true
+    cluster_api_key             = "...my_cluster_api_key..."
+    cluster_api_secret          = "...my_cluster_api_secret..."
+    cluster_name                = "...my_cluster_name..."
+    commit_strategy             = "auto"
+    confluent_cloud_api_key     = "...my_confluent_cloud_api_key..."
+    confluent_cloud_api_secret  = "...my_confluent_cloud_api_secret..."
+    dlq_topic                   = "...my_dlq_topic..."
+    enable_dlq                  = true
+    enforce_latest_offset_reset = false
+    keepalive                   = 6
+    keepalive_enabled           = true
     message_by_lua_functions = [
       "..."
     ]
@@ -58,10 +60,10 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
             ]
             token_endpoint = "...my_token_endpoint..."
             token_headers = {
-              key = jsonencode("value")
+              key = "value"
             }
             token_post_args = {
-              key = jsonencode("value")
+              key = "value"
             }
             username = "...my_username..."
           }
@@ -83,6 +85,9 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
         ttl        = 2802.66
         url        = "...my_url..."
       }
+    }
+    security = {
+      ssl_verify = true
     }
     timeout = 9
     topics = [
@@ -109,10 +114,10 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
                 ]
                 token_endpoint = "...my_token_endpoint..."
                 token_headers = {
-                  key = jsonencode("value")
+                  key = "value"
                 }
                 token_post_args = {
-                  key = jsonencode("value")
+                  key = "value"
                 }
                 username = "...my_username..."
               }
@@ -177,7 +182,7 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
     "..."
   ]
   updated_at = 5
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -190,6 +195,7 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `consumer` (Attributes) If set, the plugin will activate only for requests where the specified has been authenticated. (Note that some plugins can not be restricted to consumers this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer. (see [below for nested schema](#nestedatt--consumer))
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
@@ -202,7 +208,7 @@ resource "kong-gateway_plugin_confluent_consume" "my_pluginconfluentconsume" {
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -223,12 +229,14 @@ Optional:
 - `confluent_cloud_api_secret` (String) The corresponding secret for the Confluent Cloud API key.
 - `dlq_topic` (String) The topic to use for the Dead Letter Queue.
 - `enable_dlq` (Boolean) Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the `message_by_lua_functions`, it will be forwarded to `dlq_topic` that can be processed later.
+- `enforce_latest_offset_reset` (Boolean) When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.
 - `keepalive` (Number) Keepalive timeout in milliseconds.
 - `keepalive_enabled` (Boolean)
 - `message_by_lua_functions` (List of String) The Lua functions that manipulates the message being sent to the client.
 - `message_deserializer` (String) The deserializer to use for the consumed messages. must be one of ["json", "noop"]
 - `mode` (String) The mode of operation for the plugin. must be one of ["http-get", "server-sent-events", "websocket"]
 - `schema_registry` (Attributes) The plugin-global schema registry configuration. (see [below for nested schema](#nestedatt--config--schema_registry))
+- `security` (Attributes) (see [below for nested schema](#nestedatt--config--security))
 - `timeout` (Number) Socket timeout in milliseconds.
 
 <a id="nestedatt--config--topics"></a>
@@ -397,6 +405,14 @@ Optional:
 
 
 
+<a id="nestedatt--config--security"></a>
+### Nested Schema for `config.security`
+
+Optional:
+
+- `ssl_verify` (Boolean) Enables verification of the certificate presented by the server.
+
+
 
 <a id="nestedatt--consumer"></a>
 ### Nested Schema for `consumer`
@@ -466,8 +482,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_confluent_consume.my_kong-gateway_plugin_confluent_consume
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -475,5 +491,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_confluent_consume.my_kong-gateway_plugin_confluent_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_confluent_consume.my_kong-gateway_plugin_confluent_consume '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

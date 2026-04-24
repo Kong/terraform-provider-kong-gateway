@@ -15,6 +15,7 @@ func (r *PluginHeaderCertAuthResourceModel) RefreshFromSharedHeaderCertAuthPlugi
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.HeaderCertAuthPluginConfig{}
 		r.Config.AllowPartialChain = types.BoolPointerValue(resp.Config.AllowPartialChain)
 		r.Config.Anonymous = types.StringPointerValue(resp.Config.Anonymous)
@@ -48,6 +49,7 @@ func (r *PluginHeaderCertAuthResourceModel) RefreshFromSharedHeaderCertAuthPlugi
 		}
 		r.Config.SecureSource = types.BoolPointerValue(resp.Config.SecureSource)
 		r.Config.SkipConsumerLookup = types.BoolPointerValue(resp.Config.SkipConsumerLookup)
+		r.Config.SslVerify = types.BoolPointerValue(resp.Config.SslVerify)
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
 		r.Enabled = types.BoolPointerValue(resp.Enabled)
 		r.ID = types.StringPointerValue(resp.ID)
@@ -199,6 +201,12 @@ func (r *PluginHeaderCertAuthResourceModel) ToOperationsUpdateHeadercertauthPlug
 func (r *PluginHeaderCertAuthResourceModel) ToSharedHeaderCertAuthPlugin(ctx context.Context) (*shared.HeaderCertAuthPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -327,9 +335,9 @@ func (r *PluginHeaderCertAuthResourceModel) ToSharedHeaderCertAuthPlugin(ctx con
 	var certificateHeaderName string
 	certificateHeaderName = r.Config.CertificateHeaderName.ValueString()
 
-	consumerBy := make([]shared.ConsumerBy, 0, len(r.Config.ConsumerBy))
+	consumerBy := make([]shared.HeaderCertAuthPluginConsumerBy, 0, len(r.Config.ConsumerBy))
 	for _, consumerByItem := range r.Config.ConsumerBy {
-		consumerBy = append(consumerBy, shared.ConsumerBy(consumerByItem.ValueString()))
+		consumerBy = append(consumerBy, shared.HeaderCertAuthPluginConsumerBy(consumerByItem.ValueString()))
 	}
 	defaultConsumer := new(string)
 	if !r.Config.DefaultConsumer.IsUnknown() && !r.Config.DefaultConsumer.IsNull() {
@@ -385,6 +393,12 @@ func (r *PluginHeaderCertAuthResourceModel) ToSharedHeaderCertAuthPlugin(ctx con
 	} else {
 		skipConsumerLookup = nil
 	}
+	sslVerify := new(bool)
+	if !r.Config.SslVerify.IsUnknown() && !r.Config.SslVerify.IsNull() {
+		*sslVerify = r.Config.SslVerify.ValueBool()
+	} else {
+		sslVerify = nil
+	}
 	config := shared.HeaderCertAuthPluginConfig{
 		AllowPartialChain:       allowPartialChain,
 		Anonymous:               anonymous,
@@ -404,6 +418,7 @@ func (r *PluginHeaderCertAuthResourceModel) ToSharedHeaderCertAuthPlugin(ctx con
 		RevocationCheckMode:     revocationCheckMode,
 		SecureSource:            secureSource,
 		SkipConsumerLookup:      skipConsumerLookup,
+		SslVerify:               sslVerify,
 	}
 	protocols := make([]shared.HeaderCertAuthPluginProtocols, 0, len(r.Protocols))
 	for _, protocolsItem := range r.Protocols {
@@ -434,6 +449,7 @@ func (r *PluginHeaderCertAuthResourceModel) ToSharedHeaderCertAuthPlugin(ctx con
 		}
 	}
 	out := shared.HeaderCertAuthPlugin{
+		Condition:    condition,
 		CreatedAt:    createdAt,
 		Enabled:      enabled,
 		ID:           id,

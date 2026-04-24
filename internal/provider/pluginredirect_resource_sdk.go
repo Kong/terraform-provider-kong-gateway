@@ -15,6 +15,7 @@ func (r *PluginRedirectResourceModel) RefreshFromSharedRedirectPlugin(ctx contex
 	var diags diag.Diagnostics
 
 	if resp != nil {
+		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.RedirectPluginConfig{}
 		r.Config.KeepIncomingPath = types.BoolPointerValue(resp.Config.KeepIncomingPath)
 		r.Config.Location = types.StringValue(resp.Config.Location)
@@ -182,6 +183,12 @@ func (r *PluginRedirectResourceModel) ToOperationsUpdateRedirectPluginRequest(ct
 func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context) (*shared.RedirectPlugin, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	condition := new(string)
+	if !r.Condition.IsUnknown() && !r.Condition.IsNull() {
+		*condition = r.Condition.ValueString()
+	} else {
+		condition = nil
+	}
 	createdAt := new(int64)
 	if !r.CreatedAt.IsUnknown() && !r.CreatedAt.IsNull() {
 		*createdAt = r.CreatedAt.ValueInt64()
@@ -345,6 +352,7 @@ func (r *PluginRedirectResourceModel) ToSharedRedirectPlugin(ctx context.Context
 		}
 	}
 	out := shared.RedirectPlugin{
+		Condition:     condition,
 		CreatedAt:     createdAt,
 		Enabled:       enabled,
 		ID:            id,

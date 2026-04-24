@@ -7,17 +7,17 @@ import (
 )
 
 type AiLlmAsJudgePluginConfig struct {
-	HTTPProxyHost          types.String  `tfsdk:"http_proxy_host"`
-	HTTPProxyPort          types.Int64   `tfsdk:"http_proxy_port"`
-	HTTPTimeout            types.Int64   `tfsdk:"http_timeout"`
-	HTTPSProxyHost         types.String  `tfsdk:"https_proxy_host"`
-	HTTPSProxyPort         types.Int64   `tfsdk:"https_proxy_port"`
-	HTTPSVerify            types.Bool    `tfsdk:"https_verify"`
-	IgnoreAssistantPrompts types.Bool    `tfsdk:"ignore_assistant_prompts"`
-	IgnoreSystemPrompts    types.Bool    `tfsdk:"ignore_system_prompts"`
-	IgnoreToolPrompts      types.Bool    `tfsdk:"ignore_tool_prompts"`
-	Llm                    *Llm          `tfsdk:"llm"`
-	MessageCountback       types.Float64 `tfsdk:"message_countback"`
-	Prompt                 types.String  `tfsdk:"prompt"`
-	SamplingRate           types.Float64 `tfsdk:"sampling_rate"`
+	HTTPProxyHost          types.String        `tfsdk:"http_proxy_host"`
+	HTTPProxyPort          types.Int64         `tfsdk:"http_proxy_port"`
+	HTTPTimeout            types.Int64         `tfsdk:"http_timeout"`
+	HTTPSProxyHost         types.String        `tfsdk:"https_proxy_host"`
+	HTTPSProxyPort         types.Int64         `tfsdk:"https_proxy_port"`
+	HTTPSVerify            types.Bool          `tfsdk:"https_verify"`
+	IgnoreAssistantPrompts types.Bool          `tfsdk:"ignore_assistant_prompts"`
+	IgnoreSystemPrompts    types.Bool          `tfsdk:"ignore_system_prompts"`
+	IgnoreToolPrompts      types.Bool          `tfsdk:"ignore_tool_prompts"`
+	Llm                    *PartialModelConfig `tfsdk:"llm"`
+	MessageCountback       types.Float64       `tfsdk:"message_countback"`
+	Prompt                 types.String        `tfsdk:"prompt"`
+	SamplingRate           types.Float64       `tfsdk:"sampling_rate"`
 }

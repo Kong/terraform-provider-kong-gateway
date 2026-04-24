@@ -11,7 +11,7 @@ import (
 type UpdateOauth2introspectionPluginRequest struct {
 	// ID of the Plugin to lookup
 	PluginID string `pathParam:"style=simple,explode=false,name=PluginId"`
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace                 string                           `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	Oauth2IntrospectionPlugin shared.Oauth2IntrospectionPlugin `request:"mediaType=application/json"`
 }
@@ -47,6 +47,9 @@ func (u *UpdateOauth2introspectionPluginRequest) GetOauth2IntrospectionPlugin() 
 	}
 	return u.Oauth2IntrospectionPlugin
 }
+
+// #region class-body-updateoauth2introspectionpluginrequest
+// #endregion class-body-updateoauth2introspectionpluginrequest
 
 type UpdateOauth2introspectionPluginResponse struct {
 	// HTTP response content type for this operation
@@ -106,3 +109,6 @@ func (u *UpdateOauth2introspectionPluginResponse) GetGatewayUnauthorizedError() 
 	}
 	return u.GatewayUnauthorizedError
 }
+
+// #region class-body-updateoauth2introspectionpluginresponse
+// #endregion class-body-updateoauth2introspectionpluginresponse

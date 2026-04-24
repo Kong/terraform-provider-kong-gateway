@@ -27,7 +27,7 @@ resource "kong-gateway_target" "my_target" {
   }
   upstream_id = "5a078780-5d4c-4aae-984a-bdc6f52113d8"
   weight      = 57664
-  workspace   = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace   = "team-payments"
 }
 ```
 
@@ -48,7 +48,7 @@ resource "kong-gateway_target" "my_target" {
 - `updated_at` (Number) Unix epoch when the resource was last updated. Requires replacement if changed.
 - `upstream` (Attributes) The unique identifier or the name of the upstream for which to update the target. Requires replacement if changed. (see [below for nested schema](#nestedatt--upstream))
 - `weight` (Number) The weight this target gets within the upstream loadbalancer (`0`-`65535`). If the hostname resolves to an SRV record, the `weight` value will be overridden by the value from the DNS record. Requires replacement if changed.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"; Requires replacement if changed.
+- `workspace` (String) The name of the workspace. Default: "default"; Requires replacement if changed.
 
 <a id="nestedatt--upstream"></a>
 ### Nested Schema for `upstream`

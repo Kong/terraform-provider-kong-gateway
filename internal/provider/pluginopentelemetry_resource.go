@@ -7,10 +7,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -21,7 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
-	"github.com/kong/terraform-provider-kong-gateway/internal/validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
 )
 
@@ -41,6 +38,7 @@ type PluginOpentelemetryResource struct {
 
 // PluginOpentelemetryResourceModel describes the resource data model.
 type PluginOpentelemetryResourceModel struct {
+	Condition    types.String                       `tfsdk:"condition"`
 	Config       *tfTypes.OpentelemetryPluginConfig `tfsdk:"config"`
 	Consumer     *tfTypes.Set                       `tfsdk:"consumer"`
 	CreatedAt    types.Int64                        `tfsdk:"created_at"`
@@ -65,10 +63,35 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginOpentelemetry Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Computed: true,
 				Optional: true,
 				Attributes: map[string]schema.Attribute{
+					"access_logs": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"custom_attributes_by_lua": schema.MapAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `A key-value map that dynamically modifies access log fields using Lua code.`,
+							},
+							"endpoint": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `An HTTP URL endpoint where access logs (e.g. request/response, route/service, latency, etc.) are exported.`,
+							},
+						},
+					},
 					"batch_flush_delay": schema.Int64Attribute{
 						Computed:    true,
 						Optional:    true,
@@ -120,7 +143,53 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 					"logs_endpoint": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `A string representing a URL, such as https://example.com/path/to/resource?q=search.`,
+						Description: `An HTTP URL endpoint where internal logs are exported.`,
+					},
+					"metrics": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"enable_ai_metrics": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if AI metrics should be collected. If enabled, ` + "`" + `gen_ai.*` + "`" + `, ` + "`" + `mcp.*` + "`" + `, ` + "`" + `kong.gen_ai.*` + "`" + `, ` + "`" + `kong.gen_ai.a2a.*` + "`" + ` and ` + "`" + `kong.mcp.*` + "`" + ` metrics will be exported. To enable latency metrics for AI metrics, ` + "`" + `enable_latency_metrics` + "`" + ` must also be set to ` + "`" + `true` + "`" + `. To enable ` + "`" + `error.type` + "`" + ` attribute for AI metrics, ` + "`" + `enable_request_metrics` + "`" + ` must also be set to ` + "`" + `true` + "`" + `.`,
+							},
+							"enable_bandwidth_metrics": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if bandwidth metrics should be collected. If enabled, ` + "`" + `http.server.request.size` + "`" + ` and ` + "`" + `http.server.response.size` + "`" + ` metrics will be exported.`,
+							},
+							"enable_consumer_attribute": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if ` + "`" + `http.server.request.count` + "`" + `, ` + "`" + `http.server.request.size` + "`" + ` and ` + "`" + `http.server.response.size` + "`" + ` metrics should fill in the consumer attribute when available.`,
+							},
+							"enable_latency_metrics": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if latency metrics should be collected. If enabled, ` + "`" + `kong.latency.total` + "`" + `, ` + "`" + `kong.latency.internal` + "`" + ` and ` + "`" + `kong.latency.upstream` + "`" + ` metrics will be exported.`,
+							},
+							"enable_request_metrics": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if request count metrics should be collected. If enabled, ` + "`" + `http.server.request.count` + "`" + ` metrics will be exported.`,
+							},
+							"enable_upstream_health_metrics": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if upstream health metrics should be collected. If enabled, ` + "`" + `kong.upstream.target.status` + "`" + ` metrics will be exported.`,
+							},
+							"endpoint": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `An HTTP URL endpoint where metrics are exported.`,
+							},
+							"push_interval": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The interval in seconds at which metrics are pushed to the OTLP server. This setting is only applicable when ` + "`" + `endpoint` + "`" + ` is set.`,
+							},
+						},
 					},
 					"propagation": schema.SingleNestedAttribute{
 						Computed: true,
@@ -239,10 +308,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 					"resource_attributes": schema.MapAttribute{
 						Computed:    true,
 						Optional:    true,
-						ElementType: jsontypes.NormalizedType{},
-						Validators: []validator.Map{
-							mapvalidator.ValueStringsAre(validators.IsValidJSON()),
-						},
+						ElementType: types.StringType,
 					},
 					"sampling_rate": schema.Float64Attribute{
 						Computed:    true,
@@ -373,7 +439,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A set of strings representing HTTP protocols.`,
+				Description: `A set of strings representing protocols.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -412,7 +478,7 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -667,7 +733,7 @@ func (r *PluginOpentelemetryResource) ImportState(ctx context.Context, req resou
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -677,7 +743,7 @@ func (r *PluginOpentelemetryResource) ImportState(ctx context.Context, req resou
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

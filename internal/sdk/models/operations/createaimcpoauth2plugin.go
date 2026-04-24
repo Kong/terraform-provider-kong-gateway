@@ -9,7 +9,7 @@ import (
 )
 
 type CreateAimcpoauth2PluginRequest struct {
-	// The name or UUID of the workspace
+	// The name of the workspace
 	Workspace         string                   `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
 	AiMcpOauth2Plugin shared.AiMcpOauth2Plugin `request:"mediaType=application/json"`
 }
@@ -38,6 +38,9 @@ func (c *CreateAimcpoauth2PluginRequest) GetAiMcpOauth2Plugin() shared.AiMcpOaut
 	}
 	return c.AiMcpOauth2Plugin
 }
+
+// #region class-body-createaimcpoauth2pluginrequest
+// #endregion class-body-createaimcpoauth2pluginrequest
 
 type CreateAimcpoauth2PluginResponse struct {
 	// HTTP response content type for this operation
@@ -97,3 +100,6 @@ func (c *CreateAimcpoauth2PluginResponse) GetGatewayUnauthorizedError() *shared.
 	}
 	return c.GatewayUnauthorizedError
 }
+
+// #region class-body-createaimcpoauth2pluginresponse
+// #endregion class-body-createaimcpoauth2pluginresponse

@@ -14,6 +14,7 @@ PluginOpenidConnect Resource
 
 ```terraform
 resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
+  condition = "...my_condition..."
   config = {
     anonymous = "...my_anonymous..."
     audience = [
@@ -116,6 +117,20 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
       "..."
     ]
     cluster_cache_redis = {
+      cloud_authentication = {
+        auth_provider            = "aws"
+        aws_access_key_id        = "...my_aws_access_key_id..."
+        aws_assume_role_arn      = "...my_aws_assume_role_arn..."
+        aws_cache_name           = "...my_aws_cache_name..."
+        aws_is_serverless        = false
+        aws_region               = "...my_aws_region..."
+        aws_role_session_name    = "...my_aws_role_session_name..."
+        aws_secret_access_key    = "...my_aws_secret_access_key..."
+        azure_client_id          = "...my_azure_client_id..."
+        azure_client_secret      = "...my_azure_client_secret..."
+        azure_tenant_id          = "...my_azure_tenant_id..."
+        gcp_service_account_json = "...my_gcp_service_account_json..."
+      }
       cluster_max_redirections = 1
       cluster_nodes = [
         {
@@ -152,8 +167,10 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     consumer_by = [
       "custom_id"
     ]
-    consumer_claim = [
-      "..."
+    consumer_claims = [
+      [
+        # ...
+      ]
     ]
     consumer_groups_claim = [
       "..."
@@ -178,6 +195,14 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ]
     downstream_access_token_header     = "...my_downstream_access_token_header..."
     downstream_access_token_jwk_header = "...my_downstream_access_token_jwk_header..."
+    downstream_headers = [
+      {
+        header = "...my_header..."
+        path = [
+          "..."
+        ]
+      }
+    ]
     downstream_headers_claims = [
       "..."
     ]
@@ -256,6 +281,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     issuers_allowed = [
       "..."
     ]
+    jwks_endpoint      = "...my_jwks_endpoint..."
     jwt_session_claim  = "...my_jwt_session_claim..."
     jwt_session_cookie = "...my_jwt_session_cookie..."
     keepalive          = false
@@ -301,6 +327,20 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
       "..."
     ]
     redis = {
+      cloud_authentication = {
+        auth_provider            = "gcp"
+        aws_access_key_id        = "...my_aws_access_key_id..."
+        aws_assume_role_arn      = "...my_aws_assume_role_arn..."
+        aws_cache_name           = "...my_aws_cache_name..."
+        aws_is_serverless        = true
+        aws_region               = "...my_aws_region..."
+        aws_role_session_name    = "...my_aws_role_session_name..."
+        aws_secret_access_key    = "...my_aws_secret_access_key..."
+        azure_client_id          = "...my_azure_client_id..."
+        azure_client_secret      = "...my_azure_client_secret..."
+        azure_tenant_id          = "...my_azure_tenant_id..."
+        gcp_service_account_json = "...my_gcp_service_account_json..."
+      }
       cluster_max_redirections = 6
       cluster_nodes = [
         {
@@ -389,6 +429,8 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     session_memcached_port            = 4879
     session_memcached_prefix          = "...my_session_memcached_prefix..."
     session_memcached_socket          = "...my_session_memcached_socket..."
+    session_memcached_ssl             = true
+    session_memcached_ssl_verify      = true
     session_remember                  = false
     session_remember_absolute_timeout = 6.53
     session_remember_cookie_name      = "...my_session_remember_cookie_name..."
@@ -410,7 +452,42 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     token_cache_key_include_scope = true
     token_endpoint                = "...my_token_endpoint..."
     token_endpoint_auth_method    = "private_key_jwt"
-    token_exchange_endpoint       = "...my_token_exchange_endpoint..."
+    token_exchange = {
+      cache = {
+        enabled = false
+        ttl     = 6
+      }
+      request = {
+        audience = [
+          "..."
+        ]
+        empty_audience = false
+        empty_scopes   = false
+        scopes = [
+          "..."
+        ]
+      }
+      subject_token_issuers = [
+        {
+          conditions = {
+            has_audience = [
+              "..."
+            ]
+            has_scopes = [
+              "..."
+            ]
+            missing_audience = [
+              "..."
+            ]
+            missing_scopes = [
+              "..."
+            ]
+          }
+          issuer = "...my_issuer..."
+        }
+      ]
+    }
+    token_exchange_endpoint = "...my_token_exchange_endpoint..."
     token_headers_client = [
       "..."
     ]
@@ -446,6 +523,14 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ]
     upstream_access_token_header     = "...my_upstream_access_token_header..."
     upstream_access_token_jwk_header = "...my_upstream_access_token_jwk_header..."
+    upstream_headers = [
+      {
+        header = "...my_header..."
+        path = [
+          "..."
+        ]
+      }
+    ]
     upstream_headers_claims = [
       "..."
     ]
@@ -510,7 +595,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     }
   ]
   protocols = [
-    "grpcs"
+    "http"
   ]
   route = {
     id = "...my_id..."
@@ -522,7 +607,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     "..."
   ]
   updated_at = 7
-  workspace  = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+  workspace  = "team-payments"
 }
 ```
 
@@ -535,18 +620,19 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
 
 ### Optional
 
+- `condition` (String) An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
 - `created_at` (Number) Unix epoch when the resource was created.
 - `enabled` (Boolean) Whether the plugin is applied.
 - `id` (String) A string representing a UUID (universally unique identifier).
 - `instance_name` (String) A unique string representing a UTF-8 encoded name.
 - `ordering` (Attributes) (see [below for nested schema](#nestedatt--ordering))
 - `partials` (Attributes List) A list of partials to be used by the plugin. (see [below for nested schema](#nestedatt--partials))
-- `protocols` (Set of String) A set of strings representing HTTP protocols.
+- `protocols` (Set of String) A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 - `route` (Attributes) If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used. (see [below for nested schema](#nestedatt--route))
 - `service` (Attributes) If set, the plugin will only activate when receiving requests via one of the routes belonging to the specified Service. Leave unset for the plugin to activate regardless of the Service being matched. (see [below for nested schema](#nestedatt--service))
 - `tags` (List of String) An optional set of strings associated with the Plugin for grouping and filtering.
 - `updated_at` (Number) Unix epoch when the resource was last updated.
-- `workspace` (String) The name or UUID of the workspace. Default: "default"
+- `workspace` (String) The name of the workspace. Default: "default"
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -578,7 +664,7 @@ Optional:
 - `bearer_token_param_type` (List of String) Where to look for the bearer token: - `header`: search the `Authorization`, `access-token`, and `x-access-token` HTTP headers - `query`: search the URL's query string - `body`: search the HTTP request body - `cookie`: search the HTTP request cookies specified with `config.bearer_token_cookie_name`.
 - `by_username_ignore_case` (Boolean) If `consumer_by` is set to `username`, specify whether `username` can match consumers case-insensitively.
 - `cache_introspection` (Boolean) Cache the introspection endpoint requests.
-- `cache_token_exchange` (Boolean) Cache the token exchange endpoint requests.
+- `cache_token_exchange` (Boolean) Cache the legacy token exchange endpoint requests.
 - `cache_tokens` (Boolean) Cache the token endpoint requests.
 - `cache_tokens_salt` (String) Salt used for generating the cache key that is used for caching the token endpoint requests.
 - `cache_ttl` (Number) The default cache ttl in seconds that is used in case the cached object does not specify the expiry.
@@ -598,7 +684,7 @@ Optional:
 - `cluster_cache_redis` (Attributes) (see [below for nested schema](#nestedatt--config--cluster_cache_redis))
 - `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]
 - `consumer_by` (List of String) Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
-- `consumer_claim` (List of String) The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
+- `consumer_claims` (List of List of String) The claims used for consumer mapping. Each entry represents a claim path inside the token payload. The paths are evaluated in order, and the first matching claim is used.
 - `consumer_groups_claim` (List of String) The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
 - `consumer_groups_optional` (Boolean) Do not terminate the request if consumer groups mapping fails.
 - `consumer_optional` (Boolean) Do not terminate the request if consumer mapping fails.
@@ -610,7 +696,8 @@ Optional:
 - `domains` (List of String) The allowed values for the `hd` claim.
 - `downstream_access_token_header` (String) The downstream access token header.
 - `downstream_access_token_jwk_header` (String) The downstream access token JWK header.
-- `downstream_headers_claims` (List of String) The downstream header claims. If multiple values are set, it means the claim is inside a nested object of the token payload.
+- `downstream_headers` (Attributes List) The downstream claim to header mappings. (see [below for nested schema](#nestedatt--config--downstream_headers))
+- `downstream_headers_claims` (List of String) The downstream header claims. Only top level claims are supported.
 - `downstream_headers_names` (List of String) The downstream header names for the claim values.
 - `downstream_id_token_header` (String) The downstream id token header.
 - `downstream_id_token_jwk_header` (String) The downstream id token JWK header.
@@ -655,6 +742,7 @@ Optional:
 - `introspection_post_args_values` (List of String) Extra post argument values passed to the introspection endpoint.
 - `introspection_token_param_name` (String) Designate token's parameter name for introspection.
 - `issuers_allowed` (List of String) The issuers allowed to be present in the tokens (`iss` claim).
+- `jwks_endpoint` (String) Overrides the `jwks_uri` returned by discovery. Use when the IdP exposes a non-standard JWKS endpoint.
 - `jwt_session_claim` (String) The claim to match against the JWT session cookie.
 - `jwt_session_cookie` (String) The name of the JWT session cookie.
 - `keepalive` (Boolean) Use keepalive with the HTTP client.
@@ -726,6 +814,8 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `session_memcached_port` (Number) The memcached port.
 - `session_memcached_prefix` (String) The memcached session key prefix.
 - `session_memcached_socket` (String) The memcached unix socket path.
+- `session_memcached_ssl` (Boolean) If set to true, uses SSL to connect to memcached
+- `session_memcached_ssl_verify` (Boolean) If set to true, verifies the validity of the memcached server SSL certificate
 - `session_remember` (Boolean) Enables or disables persistent sessions.
 - `session_remember_absolute_timeout` (Number) Limits how long the persistent session can be renewed in seconds, until re-authentication is required. 0 disables the checks.
 - `session_remember_cookie_name` (String) Persistent session cookie name. Use with the `remember` configuration parameter.
@@ -743,7 +833,8 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `token_cache_key_include_scope` (Boolean) Include the scope in the token cache key, so token with different scopes are considered diffrent tokens.
 - `token_endpoint` (String) The token endpoint. If set it overrides the value in `token_endpoint` returned by the discovery endpoint.
 - `token_endpoint_auth_method` (String) The token endpoint authentication method: `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, or `none`: do not authenticate. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none", "private_key_jwt", "self_signed_tls_client_auth", "tls_client_auth"]
-- `token_exchange_endpoint` (String) The token exchange endpoint.
+- `token_exchange` (Attributes) Details on how to accept tokens from other identity providers. (see [below for nested schema](#nestedatt--config--token_exchange))
+- `token_exchange_endpoint` (String) Endpoint used to perform the legacy token exchange.
 - `token_headers_client` (List of String) Extra headers passed from the client to the token endpoint.
 - `token_headers_grants` (List of String) Enable the sending of the token endpoint response headers only with certain grants: - `password`: with OAuth password grant - `client_credentials`: with OAuth client credentials grant - `authorization_code`: with authorization code flow - `refresh_token` with refresh token grant.
 - `token_headers_names` (List of String) Extra header names passed to the token endpoint.
@@ -759,6 +850,7 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `unexpected_redirect_uri` (List of String) Where to redirect the client when unexpected errors happen with the requests.
 - `upstream_access_token_header` (String) The upstream access token header.
 - `upstream_access_token_jwk_header` (String) The upstream access token JWK header.
+- `upstream_headers` (Attributes List) The upstream claim to header mappings. (see [below for nested schema](#nestedatt--config--upstream_headers))
 - `upstream_headers_claims` (List of String) The upstream header claims. Only top level claims are supported.
 - `upstream_headers_names` (List of String) The upstream header names for the claim values.
 - `upstream_id_token_header` (String) The upstream id token header.
@@ -820,6 +912,7 @@ Optional:
 
 Optional:
 
+- `cloud_authentication` (Attributes) Cloud auth related configs for connecting to a Cloud Provider's Redis instance. (see [below for nested schema](#nestedatt--config--cluster_cache_redis--cloud_authentication))
 - `cluster_max_redirections` (Number) Maximum retry attempts for redirection.
 - `cluster_nodes` (Attributes List) Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element. (see [below for nested schema](#nestedatt--config--cluster_cache_redis--cluster_nodes))
 - `connect_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
@@ -842,6 +935,25 @@ Optional:
 - `ssl_verify` (Boolean) If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
 - `username` (String) Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 
+<a id="nestedatt--config--cluster_cache_redis--cloud_authentication"></a>
+### Nested Schema for `config.cluster_cache_redis.cloud_authentication`
+
+Optional:
+
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+- `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+- `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+- `aws_is_serverless` (Boolean) This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+- `aws_region` (String) The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+- `aws_role_session_name` (String) The session name for the temporary credentials when assuming the IAM role.
+- `aws_secret_access_key` (String) AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+- `azure_client_id` (String) Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+- `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+
+
 <a id="nestedatt--config--cluster_cache_redis--cluster_nodes"></a>
 ### Nested Schema for `config.cluster_cache_redis.cluster_nodes`
 
@@ -861,11 +973,21 @@ Optional:
 
 
 
+<a id="nestedatt--config--downstream_headers"></a>
+### Nested Schema for `config.downstream_headers`
+
+Optional:
+
+- `header` (String) The name of the header. Not Null
+- `path` (List of String) The path of the header value. Not Null
+
+
 <a id="nestedatt--config--redis"></a>
 ### Nested Schema for `config.redis`
 
 Optional:
 
+- `cloud_authentication` (Attributes) Cloud auth related configs for connecting to a Cloud Provider's Redis instance. (see [below for nested schema](#nestedatt--config--redis--cloud_authentication))
 - `cluster_max_redirections` (Number) Maximum retry attempts for redirection.
 - `cluster_nodes` (Attributes List) Cluster addresses to use for Redis connections when the `redis` strategy is defined. Defining this field implies using a Redis Cluster. The minimum length of the array is 1 element. (see [below for nested schema](#nestedatt--config--redis--cluster_nodes))
 - `connect_timeout` (Number) An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
@@ -890,6 +1012,25 @@ Optional:
 - `ssl_verify` (Boolean) If set to true, verifies the validity of the server SSL certificate. If setting this parameter, also configure `lua_ssl_trusted_certificate` in `kong.conf` to specify the CA (or server) certificate used by your Redis server. You may also need to configure `lua_ssl_verify_depth` accordingly.
 - `username` (String) Username to use for Redis connections. If undefined, ACL authentication won't be performed. This requires Redis v6.0.0+. To be compatible with Redis v5.x.y, you can set it to `default`.
 
+<a id="nestedatt--config--redis--cloud_authentication"></a>
+### Nested Schema for `config.redis.cloud_authentication`
+
+Optional:
+
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
+- `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
+- `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
+- `aws_is_serverless` (Boolean) This flag specifies whether the cluster is serverless when auth_provider is set to `aws`.
+- `aws_region` (String) The region of the AWS ElastiCache cluster when `auth_provider` is set to `aws`.
+- `aws_role_session_name` (String) The session name for the temporary credentials when assuming the IAM role.
+- `aws_secret_access_key` (String) AWS Secret Access Key to be used for authentication when `auth_provider` is set to `aws`.
+- `azure_client_id` (String) Azure Client ID to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
+- `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
+- `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+
+
 <a id="nestedatt--config--redis--cluster_nodes"></a>
 ### Nested Schema for `config.redis.cluster_nodes`
 
@@ -907,6 +1048,65 @@ Optional:
 - `host` (String) A string representing a host name, such as example.com.
 - `port` (Number) An integer representing a port number between 0 and 65535, inclusive.
 
+
+
+<a id="nestedatt--config--token_exchange"></a>
+### Nested Schema for `config.token_exchange`
+
+Optional:
+
+- `cache` (Attributes) Cache support for token exchange (see [below for nested schema](#nestedatt--config--token_exchange--cache))
+- `request` (Attributes) Parameters used in the token exchange request. (see [below for nested schema](#nestedatt--config--token_exchange--request))
+- `subject_token_issuers` (Attributes List) Trusted token issuers from which the upstream may accept tokens to be exchanged. If a JWT bearer matches all the conditions of a subject token issuer item, the token will be exchanged. Not Null (see [below for nested schema](#nestedatt--config--token_exchange--subject_token_issuers))
+
+<a id="nestedatt--config--token_exchange--cache"></a>
+### Nested Schema for `config.token_exchange.cache`
+
+Optional:
+
+- `enabled` (Boolean) Whether to enable caching.
+- `ttl` (Number) Cache ttl in seconds used when caching exchanged tokens, use it to override `conf.cache_ttl`. Token expiry will be used if shorter than this value.
+
+
+<a id="nestedatt--config--token_exchange--request"></a>
+### Nested Schema for `config.token_exchange.request`
+
+Optional:
+
+- `audience` (List of String) Audiences used in the token exchange request. Values defined here override those defined in `config.audience`.
+- `empty_audience` (Boolean) Use empty audiences. Use this field to override audiences defined in `config.audience`.
+- `empty_scopes` (Boolean) Use empty scopes. Use this field to override scopes defined in `config.scopes`.
+- `scopes` (List of String) Scopes used in the token exchange request. Values defined here override those defined in `config.scopes`.
+
+
+<a id="nestedatt--config--token_exchange--subject_token_issuers"></a>
+### Nested Schema for `config.token_exchange.subject_token_issuers`
+
+Optional:
+
+- `conditions` (Attributes) A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined. (see [below for nested schema](#nestedatt--config--token_exchange--subject_token_issuers--conditions))
+- `issuer` (String) Tokens of whose iss claim matches this value will be exchanged. Not Null
+
+<a id="nestedatt--config--token_exchange--subject_token_issuers--conditions"></a>
+### Nested Schema for `config.token_exchange.subject_token_issuers.conditions`
+
+Optional:
+
+- `has_audience` (List of String)
+- `has_scopes` (List of String)
+- `missing_audience` (List of String)
+- `missing_scopes` (List of String)
+
+
+
+
+<a id="nestedatt--config--upstream_headers"></a>
+### Nested Schema for `config.upstream_headers`
+
+Optional:
+
+- `header` (String) The name of the header. Not Null
+- `path` (List of String) The path of the header value. Not Null
 
 
 
@@ -970,8 +1170,8 @@ In Terraform v1.5.0 and later, the [`import` block](https://developer.hashicorp.
 import {
   to = kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect
   id = jsonencode({
-    id = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
-    workspace = "747d1e5-8246-4f65-a939-b392f1ee17f8"
+    id        = "3473c251-5b6c-4f45-b1ff-7ede735a366d"
+    workspace = "team-payments"
   })
 }
 ```
@@ -979,5 +1179,5 @@ import {
 The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
-terraform import kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}'
+terraform import kong-gateway_plugin_openid_connect.my_kong-gateway_plugin_openid_connect '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}'
 ```

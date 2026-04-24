@@ -18,7 +18,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_listvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/listvalidators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -37,6 +39,7 @@ type PluginOpenidConnectResource struct {
 
 // PluginOpenidConnectResourceModel describes the resource data model.
 type PluginOpenidConnectResourceModel struct {
+	Condition    types.String                       `tfsdk:"condition"`
 	Config       *tfTypes.OpenidConnectPluginConfig `tfsdk:"config"`
 	CreatedAt    types.Int64                        `tfsdk:"created_at"`
 	Enabled      types.Bool                         `tfsdk:"enabled"`
@@ -60,6 +63,14 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "PluginOpenidConnect Resource",
 		Attributes: map[string]schema.Attribute{
+			"condition": schema.StringAttribute{
+				Computed:    true,
+				Optional:    true,
+				Description: `An expression used for conditional control over plugin execution. If the expression evaluates to ` + "`" + `true` + "`" + ` during the request flow, the plugin is executed; otherwise, it is skipped.`,
+				Validators: []validator.String{
+					stringvalidator.UTF8LengthAtMost(1024),
+				},
+			},
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -188,7 +199,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"cache_token_exchange": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Cache the token exchange endpoint requests.`,
+						Description: `Cache the legacy token exchange endpoint requests.`,
 					},
 					"cache_tokens": schema.BoolAttribute{
 						Computed:    true,
@@ -389,6 +400,80 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"cloud_authentication": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"auth_provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"aws",
+												"azure",
+												"gcp",
+											),
+										},
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_assume_role_arn": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+									},
+									"aws_cache_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_is_serverless": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_region": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_role_session_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The session name for the temporary credentials when assuming the IAM role.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+								},
+								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+							},
 							"cluster_max_redirections": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
@@ -578,11 +663,13 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						ElementType: types.StringType,
 						Description: `Consumer fields used for mapping: - ` + "`" + `id` + "`" + `: try to find the matching Consumer by ` + "`" + `id` + "`" + ` - ` + "`" + `username` + "`" + `: try to find the matching Consumer by ` + "`" + `username` + "`" + ` - ` + "`" + `custom_id` + "`" + `: try to find the matching Consumer by ` + "`" + `custom_id` + "`" + `.`,
 					},
-					"consumer_claim": schema.ListAttribute{
-						Computed:    true,
-						Optional:    true,
-						ElementType: types.StringType,
-						Description: `The claim used for consumer mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.`,
+					"consumer_claims": schema.ListAttribute{
+						Computed: true,
+						Optional: true,
+						ElementType: types.ListType{
+							ElemType: types.StringType,
+						},
+						Description: `The claims used for consumer mapping. Each entry represents a claim path inside the token payload. The paths are evaluated in order, and the first matching claim is used.`,
 					},
 					"consumer_groups_claim": schema.ListAttribute{
 						Computed:    true,
@@ -645,11 +732,40 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `The downstream access token JWK header.`,
 					},
+					"downstream_headers": schema.ListNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Validators: []validator.Object{
+								speakeasy_objectvalidators.NotNull(),
+							},
+							Attributes: map[string]schema.Attribute{
+								"header": schema.StringAttribute{
+									Computed:    true,
+									Optional:    true,
+									Description: `The name of the header. Not Null`,
+									Validators: []validator.String{
+										speakeasy_stringvalidators.NotNull(),
+									},
+								},
+								"path": schema.ListAttribute{
+									Computed:    true,
+									Optional:    true,
+									ElementType: types.StringType,
+									Description: `The path of the header value. Not Null`,
+									Validators: []validator.List{
+										speakeasy_listvalidators.NotNull(),
+									},
+								},
+							},
+						},
+						Description: `The downstream claim to header mappings.`,
+					},
 					"downstream_headers_claims": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `The downstream header claims. If multiple values are set, it means the claim is inside a nested object of the token payload.`,
+						Description: `The downstream header claims. Only top level claims are supported.`,
 					},
 					"downstream_headers_names": schema.ListAttribute{
 						Computed:    true,
@@ -908,6 +1024,11 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						ElementType: types.StringType,
 						Description: `The issuers allowed to be present in the tokens (` + "`" + `iss` + "`" + ` claim).`,
 					},
+					"jwks_endpoint": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Overrides the ` + "`" + `jwks_uri` + "`" + ` returned by discovery. Use when the IdP exposes a non-standard JWKS endpoint.`,
+					},
 					"jwt_session_claim": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -1109,6 +1230,80 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"cloud_authentication": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"auth_provider": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Validators: []validator.String{
+											stringvalidator.OneOf(
+												"aws",
+												"azure",
+												"gcp",
+											),
+										},
+									},
+									"aws_access_key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Access Key ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_assume_role_arn": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.`,
+									},
+									"aws_cache_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The name of the AWS Elasticache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_is_serverless": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `This flag specifies whether the cluster is serverless when auth_provider is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_region": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The region of the AWS ElastiCache cluster when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"aws_role_session_name": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The session name for the temporary credentials when assuming the IAM role.`,
+									},
+									"aws_secret_access_key": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `AWS Secret Access Key to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `aws` + "`" + `.`,
+									},
+									"azure_client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Client Secret to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"azure_tenant_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Azure Tenant ID to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `azure` + "`" + `.`,
+									},
+									"gcp_service_account_json": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+								},
+								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
+							},
 							"cluster_max_redirections": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
@@ -1522,6 +1717,16 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `The memcached unix socket path.`,
 					},
+					"session_memcached_ssl": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `If set to true, uses SSL to connect to memcached`,
+					},
+					"session_memcached_ssl_verify": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `If set to true, verifies the validity of the memcached server SSL certificate`,
+					},
 					"session_remember": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -1628,10 +1833,113 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 							),
 						},
 					},
+					"token_exchange": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"cache": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"enabled": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Whether to enable caching.`,
+									},
+									"ttl": schema.Int64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Cache ttl in seconds used when caching exchanged tokens, use it to override ` + "`" + `conf.cache_ttl` + "`" + `. Token expiry will be used if shorter than this value.`,
+									},
+								},
+								Description: `Cache support for token exchange`,
+							},
+							"request": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"audience": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Audiences used in the token exchange request. Values defined here override those defined in ` + "`" + `config.audience` + "`" + `.`,
+									},
+									"empty_audience": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use empty audiences. Use this field to override audiences defined in ` + "`" + `config.audience` + "`" + `.`,
+									},
+									"empty_scopes": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use empty scopes. Use this field to override scopes defined in ` + "`" + `config.scopes` + "`" + `.`,
+									},
+									"scopes": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Scopes used in the token exchange request. Values defined here override those defined in ` + "`" + `config.scopes` + "`" + `.`,
+									},
+								},
+								Description: `Parameters used in the token exchange request.`,
+							},
+							"subject_token_issuers": schema.ListNestedAttribute{
+								Computed: true,
+								Optional: true,
+								NestedObject: schema.NestedAttributeObject{
+									Validators: []validator.Object{
+										speakeasy_objectvalidators.NotNull(),
+									},
+									Attributes: map[string]schema.Attribute{
+										"conditions": schema.SingleNestedAttribute{
+											Computed: true,
+											Optional: true,
+											Attributes: map[string]schema.Attribute{
+												"has_audience": schema.ListAttribute{
+													Computed:    true,
+													Optional:    true,
+													ElementType: types.StringType,
+												},
+												"has_scopes": schema.ListAttribute{
+													Computed:    true,
+													Optional:    true,
+													ElementType: types.StringType,
+												},
+												"missing_audience": schema.ListAttribute{
+													Computed:    true,
+													Optional:    true,
+													ElementType: types.StringType,
+												},
+												"missing_scopes": schema.ListAttribute{
+													Computed:    true,
+													Optional:    true,
+													ElementType: types.StringType,
+												},
+											},
+											Description: `A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined.`,
+										},
+										"issuer": schema.StringAttribute{
+											Computed:    true,
+											Optional:    true,
+											Description: `Tokens of whose iss claim matches this value will be exchanged. Not Null`,
+											Validators: []validator.String{
+												speakeasy_stringvalidators.NotNull(),
+											},
+										},
+									},
+								},
+								Description: `Trusted token issuers from which the upstream may accept tokens to be exchanged. If a JWT bearer matches all the conditions of a subject token issuer item, the token will be exchanged. Not Null`,
+								Validators: []validator.List{
+									speakeasy_listvalidators.NotNull(),
+								},
+							},
+						},
+						Description: `Details on how to accept tokens from other identity providers.`,
+					},
 					"token_exchange_endpoint": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The token exchange endpoint.`,
+						Description: `Endpoint used to perform the legacy token exchange.`,
 					},
 					"token_headers_client": schema.ListAttribute{
 						Computed:    true,
@@ -1717,6 +2025,35 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						Description: `The upstream access token JWK header.`,
+					},
+					"upstream_headers": schema.ListNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Validators: []validator.Object{
+								speakeasy_objectvalidators.NotNull(),
+							},
+							Attributes: map[string]schema.Attribute{
+								"header": schema.StringAttribute{
+									Computed:    true,
+									Optional:    true,
+									Description: `The name of the header. Not Null`,
+									Validators: []validator.String{
+										speakeasy_stringvalidators.NotNull(),
+									},
+								},
+								"path": schema.ListAttribute{
+									Computed:    true,
+									Optional:    true,
+									ElementType: types.StringType,
+									Description: `The path of the header value. Not Null`,
+									Validators: []validator.List{
+										speakeasy_listvalidators.NotNull(),
+									},
+								},
+							},
+						},
+						Description: `The upstream claim to header mappings.`,
 					},
 					"upstream_headers_claims": schema.ListAttribute{
 						Computed:    true,
@@ -1933,7 +2270,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A set of strings representing HTTP protocols.`,
+				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,
@@ -1972,7 +2309,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 				Computed:    true,
 				Optional:    true,
 				Default:     stringdefault.StaticString(`default`),
-				Description: `The name or UUID of the workspace. Default: "default"`,
+				Description: `The name of the workspace. Default: "default"`,
 			},
 		},
 	}
@@ -2227,7 +2564,7 @@ func (r *PluginOpenidConnectResource) ImportState(ctx context.Context, req resou
 	}
 
 	if err := dec.Decode(&data); err != nil {
-		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "747d1e5-8246-4f65-a939-b392f1ee17f8"}': `+err.Error())
+		resp.Diagnostics.AddError("Invalid ID", `The import ID is not valid. It is expected to be a JSON object string with the format: '{"id": "3473c251-5b6c-4f45-b1ff-7ede735a366d", "workspace": "team-payments"}': `+err.Error())
 		return
 	}
 
@@ -2237,7 +2574,7 @@ func (r *PluginOpenidConnectResource) ImportState(ctx context.Context, req resou
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
 	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"747d1e5-8246-4f65-a939-b392f1ee17f8"'`)
+		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)

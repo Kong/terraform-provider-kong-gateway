@@ -185,6 +185,10 @@ func (e *AiGcpModelArmorPluginTextSource) UnmarshalJSON(data []byte) error {
 type AiGcpModelArmorPluginConfig struct {
 	// Enables multi-language detection mode. Must be used with 'source_language'.
 	EnableMultiLanguageDetection *bool `json:"enable_multi_language_detection,omitempty"`
+	// Custom metadata URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google metadata endpoint.
+	GcpMetadataURL *string `json:"gcp_metadata_url,omitempty"`
+	// Custom OAuth token URL for GCP authentication. Useful for restricted network environments or custom GCP endpoints. If null, Kong will use the default Google OAuth token endpoint.
+	GcpOauthTokenURL *string `json:"gcp_oauth_token_url,omitempty"`
 	// Set this field to the full JSON of the GCP service account to authenticate, if required. If null (and gcp_use_service_account is true), Kong will attempt to read from environment variable `GCP_SERVICE_ACCOUNT` or from the instance/container metadata service.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
 	// Use service account auth for GCP-based providers and models.
@@ -193,6 +197,8 @@ type AiGcpModelArmorPluginConfig struct {
 	GuardingMode *AiGcpModelArmorPluginGuardingMode `json:"guarding_mode,omitempty"`
 	// GCP Location ID for the GCP Model Armor subscription.
 	LocationID string `json:"location_id"`
+	// Whether to log prompts and responses that are blocked by the guardrail.
+	LogBlockedContent *bool `json:"log_blocked_content,omitempty"`
 	// GCP Project ID for the GCP Model Armor subscription.
 	ProjectID string `json:"project_id"`
 	// The message to return when a failure occurs on the request phase.
@@ -233,6 +239,20 @@ func (a *AiGcpModelArmorPluginConfig) GetEnableMultiLanguageDetection() *bool {
 	return a.EnableMultiLanguageDetection
 }
 
+func (a *AiGcpModelArmorPluginConfig) GetGcpMetadataURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpMetadataURL
+}
+
+func (a *AiGcpModelArmorPluginConfig) GetGcpOauthTokenURL() *string {
+	if a == nil {
+		return nil
+	}
+	return a.GcpOauthTokenURL
+}
+
 func (a *AiGcpModelArmorPluginConfig) GetGcpServiceAccountJSON() *string {
 	if a == nil {
 		return nil
@@ -259,6 +279,13 @@ func (a *AiGcpModelArmorPluginConfig) GetLocationID() string {
 		return ""
 	}
 	return a.LocationID
+}
+
+func (a *AiGcpModelArmorPluginConfig) GetLogBlockedContent() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.LogBlockedContent
 }
 
 func (a *AiGcpModelArmorPluginConfig) GetProjectID() string {
@@ -457,6 +484,8 @@ func (a *AiGcpModelArmorPluginService) GetID() *string {
 
 // AiGcpModelArmorPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type AiGcpModelArmorPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -464,9 +493,10 @@ type AiGcpModelArmorPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                        `json:"instance_name,omitempty"`
-	name         string                         `const:"ai-gcp-model-armor" json:"name"`
-	Ordering     *AiGcpModelArmorPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                         `const:"ai-gcp-model-armor" json:"name"`
+	Ordering *AiGcpModelArmorPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []AiGcpModelArmorPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -495,6 +525,13 @@ func (a *AiGcpModelArmorPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (a *AiGcpModelArmorPlugin) GetCondition() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Condition
 }
 
 func (a *AiGcpModelArmorPlugin) GetCreatedAt() *int64 {

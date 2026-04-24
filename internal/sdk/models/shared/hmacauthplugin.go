@@ -126,6 +126,7 @@ type Algorithms string
 
 const (
 	AlgorithmsHmacSha1   Algorithms = "hmac-sha1"
+	AlgorithmsHmacSha224 Algorithms = "hmac-sha224"
 	AlgorithmsHmacSha256 Algorithms = "hmac-sha256"
 	AlgorithmsHmacSha384 Algorithms = "hmac-sha384"
 	AlgorithmsHmacSha512 Algorithms = "hmac-sha512"
@@ -142,6 +143,8 @@ func (e *Algorithms) UnmarshalJSON(data []byte) error {
 	switch v {
 	case "hmac-sha1":
 		fallthrough
+	case "hmac-sha224":
+		fallthrough
 	case "hmac-sha256":
 		fallthrough
 	case "hmac-sha384":
@@ -155,7 +158,7 @@ func (e *Algorithms) UnmarshalJSON(data []byte) error {
 }
 
 type HmacAuthPluginConfig struct {
-	// A list of HMAC digest algorithms that the user wants to support. Allowed values are `hmac-sha1`, `hmac-sha256`, `hmac-sha384`, and `hmac-sha512`
+	// A list of HMAC digest algorithms that the user wants to support. Allowed values are `hmac-sha224`, `hmac-sha256`, `hmac-sha384`, `hmac-sha512`, and `hmac-sha1` (disabled by default, and not available in FIPS mode)
 	Algorithms []Algorithms `json:"algorithms,omitempty"`
 	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails.
 	Anonymous *string `json:"anonymous,omitempty"`
@@ -317,6 +320,8 @@ func (h *HmacAuthPluginService) GetID() *string {
 
 // HmacAuthPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type HmacAuthPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -324,9 +329,10 @@ type HmacAuthPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                 `json:"instance_name,omitempty"`
-	name         string                  `const:"hmac-auth" json:"name"`
-	Ordering     *HmacAuthPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                  `const:"hmac-auth" json:"name"`
+	Ordering *HmacAuthPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []HmacAuthPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -351,6 +357,13 @@ func (h *HmacAuthPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (h *HmacAuthPlugin) GetCondition() *string {
+	if h == nil {
+		return nil
+	}
+	return h.Condition
 }
 
 func (h *HmacAuthPlugin) GetCreatedAt() *int64 {

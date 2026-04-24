@@ -400,9 +400,9 @@ type KafkaUpstreamPluginOauth2 struct {
 	// The token endpoint URI.
 	TokenEndpoint string `json:"token_endpoint"`
 	// Extra headers to be passed in the token endpoint request.
-	TokenHeaders map[string]any `json:"token_headers,omitempty"`
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
 	// Extra post arguments to be passed in the token endpoint request.
-	TokenPostArgs map[string]any `json:"token_post_args,omitempty"`
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
 	// The username to use if `config.oauth.grant_type` is set to `password`.
 	Username *string `json:"username,omitempty"`
 }
@@ -467,14 +467,14 @@ func (k *KafkaUpstreamPluginOauth2) GetTokenEndpoint() string {
 	return k.TokenEndpoint
 }
 
-func (k *KafkaUpstreamPluginOauth2) GetTokenHeaders() map[string]any {
+func (k *KafkaUpstreamPluginOauth2) GetTokenHeaders() map[string]string {
 	if k == nil {
 		return nil
 	}
 	return k.TokenHeaders
 }
 
-func (k *KafkaUpstreamPluginOauth2) GetTokenPostArgs() map[string]any {
+func (k *KafkaUpstreamPluginOauth2) GetTokenPostArgs() map[string]string {
 	if k == nil {
 		return nil
 	}
@@ -487,6 +487,9 @@ func (k *KafkaUpstreamPluginOauth2) GetUsername() *string {
 	}
 	return k.Username
 }
+
+// #region class-body-kafkaupstreampluginoauth2
+// #endregion class-body-kafkaupstreampluginoauth2
 
 // KafkaUpstreamPluginAuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
 type KafkaUpstreamPluginAuthMethod string
@@ -660,6 +663,9 @@ func (k *KafkaUpstreamPluginOauth2Client) GetTimeout() *int64 {
 	}
 	return k.Timeout
 }
+
+// #region class-body-kafkaupstreampluginoauth2client
+// #endregion class-body-kafkaupstreampluginoauth2client
 
 type KafkaUpstreamPluginConfigAuthentication struct {
 	Basic *KafkaUpstreamPluginBasic `json:"basic,omitempty"`
@@ -865,6 +871,8 @@ type KafkaUpstreamPluginSecurity struct {
 	CertificateID *string `json:"certificate_id,omitempty"`
 	// Enables TLS.
 	Ssl *bool `json:"ssl,omitempty"`
+	// When using TLS, this option enables verification of the certificate presented by the server.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
 }
 
 func (k KafkaUpstreamPluginSecurity) MarshalJSON() ([]byte, error) {
@@ -890,6 +898,13 @@ func (k *KafkaUpstreamPluginSecurity) GetSsl() *bool {
 		return nil
 	}
 	return k.Ssl
+}
+
+func (k *KafkaUpstreamPluginSecurity) GetSslVerify() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.SslVerify
 }
 
 type KafkaUpstreamPluginConfig struct {
@@ -1240,6 +1255,8 @@ func (k *KafkaUpstreamPluginService) GetID() *string {
 
 // KafkaUpstreamPlugin - A Plugin entity represents a plugin configuration that will be executed during the HTTP request/response lifecycle. It is how you can add functionalities to Services that run behind Kong, like Authentication or Rate Limiting for example. You can find more information about how to install and what values each plugin takes by visiting the [Kong Hub](https://docs.konghq.com/hub/). When adding a Plugin Configuration to a Service, every request made by a client to that Service will run said Plugin. If a Plugin needs to be tuned to different values for some specific Consumers, you can do so by creating a separate plugin instance that specifies both the Service and the Consumer, through the `service` and `consumer` fields.
 type KafkaUpstreamPlugin struct {
+	// An expression used for conditional control over plugin execution. If the expression evaluates to `true` during the request flow, the plugin is executed; otherwise, it is skipped.
+	Condition *string `json:"condition,omitempty"`
 	// Unix epoch when the resource was created.
 	CreatedAt *int64 `json:"created_at,omitempty"`
 	// Whether the plugin is applied.
@@ -1247,9 +1264,10 @@ type KafkaUpstreamPlugin struct {
 	// A string representing a UUID (universally unique identifier).
 	ID *string `json:"id,omitempty"`
 	// A unique string representing a UTF-8 encoded name.
-	InstanceName *string                      `json:"instance_name,omitempty"`
-	name         string                       `const:"kafka-upstream" json:"name"`
-	Ordering     *KafkaUpstreamPluginOrdering `json:"ordering,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	//lint:ignore U1000 accessed via reflection for JSON marshaling
+	name     string                       `const:"kafka-upstream" json:"name"`
+	Ordering *KafkaUpstreamPluginOrdering `json:"ordering,omitempty"`
 	// A list of partials to be used by the plugin.
 	Partials []KafkaUpstreamPluginPartials `json:"partials,omitempty"`
 	// An optional set of strings associated with the Plugin for grouping and filtering.
@@ -1276,6 +1294,13 @@ func (k *KafkaUpstreamPlugin) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (k *KafkaUpstreamPlugin) GetCondition() *string {
+	if k == nil {
+		return nil
+	}
+	return k.Condition
 }
 
 func (k *KafkaUpstreamPlugin) GetCreatedAt() *int64 {

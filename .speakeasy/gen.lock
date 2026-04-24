@@ -3,19 +3,19 @@ id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
   docChecksum: cf11d53e177770b731299d68bfc3ea7c
   docVersion: 3.14.0
-  speakeasyVersion: 1.761.3
-  generationVersion: 2.879.11
+  speakeasyVersion: 1.761.9
+  generationVersion: 2.881.4
   releaseVersion: 1.1.0
-  configChecksum: 7e25bbb3411c7462f7b3d22c2d66dda7
+  configChecksum: c090f812f51275522b56f8ba9fd0ca61
 persistentEdits:
-  generation_id: 4dbb8278-5a21-4502-a315-2a6bb3d3b1ab
-  pristine_commit_hash: b3a0df42b166b2afc6cc916a98fa652e28656e67
-  pristine_tree_hash: e4ecd00b5396630706d9dc60a6d8bc81d1c90952
+  generation_id: 1f7327db-0ce1-4b72-b200-8b43a46262e8
+  pristine_commit_hash: 529adc1221849630d7b9e84ef5fc98fac5580fd6
+  pristine_tree_hash: 1842c8537689d0894753d9eaf146d6309b9d500a
 features:
   terraform:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.3.2
-    core: 3.47.2
+    core: 3.47.4
     globalSecurity: 2.82.3
     globalServerURLs: 2.83.2
     inputOutputModels: 2.83.0
@@ -1708,8 +1708,8 @@ trackedFiles:
     pristine_git_object: 28c7e1cffe60ba2f3c8cb783dce79fc928934496
   go.mod:
     id: c47645c391ad
-    last_write_checksum: sha1:91492b7c5949d299e9199951a790ba58a61ce942
-    pristine_git_object: 83824490c43999f7f481cec0ede6201ebe5b3829
+    last_write_checksum: sha1:afb0e5bd6934577c61b3cbf19875d3420a9a1c1f
+    pristine_git_object: ea04611f9ae805bb98bb49d075797e2ee68c30b3
   internal/planmodifiers/boolplanmodifier/suppress_diff.go:
     id: 3cf85b98963e
     last_write_checksum: sha1:263e1cf5d14ed18c531ecfd6cfee477db3f58032
@@ -4408,8 +4408,8 @@ trackedFiles:
     pristine_git_object: 402553581b4b2f6e6f1195534cb873908698b074
   internal/sdk/konggateway.go:
     id: "00e542406092"
-    last_write_checksum: sha1:e1b2ac232fc5cb09557e9bdcd2040174654de74e
-    pristine_git_object: 60484230005a444e6ac280f6a5a30d3cee77cdbf
+    last_write_checksum: sha1:f2b06aceb4872455b3271f847a65c87b19c277cd
+    pristine_git_object: 62ad8e0cf1fb834c6b16bacb582b2a0d87a5f4c8
   internal/sdk/models/errors/sdkerror.go:
     id: 19b5a8d3586b
     last_write_checksum: sha1:5d65fce5049df7c5113e11c9ccb1e4c46b91901c

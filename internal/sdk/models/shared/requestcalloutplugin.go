@@ -837,33 +837,33 @@ func (e *Error) GetRetries() *int64 {
 	return e.Retries
 }
 
-// RequestCalloutPluginConfigHeaders - Callout request header customizations.
-type RequestCalloutPluginConfigHeaders struct {
+// RequestCalloutPluginConfigCalloutsHeaders - Callout request header customizations.
+type RequestCalloutPluginConfigCalloutsHeaders struct {
 	// The custom headers to be added in the callout HTTP request. Values can contain Lua expressions in the form `$(some_lua_expression)`. The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]string `json:"custom,omitempty"`
 	// If `true`, forwards the incoming request's headers to the callout request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (r RequestCalloutPluginConfigHeaders) MarshalJSON() ([]byte, error) {
+func (r RequestCalloutPluginConfigCalloutsHeaders) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(r, "", false)
 }
 
-func (r *RequestCalloutPluginConfigHeaders) UnmarshalJSON(data []byte) error {
+func (r *RequestCalloutPluginConfigCalloutsHeaders) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *RequestCalloutPluginConfigHeaders) GetCustom() map[string]string {
+func (r *RequestCalloutPluginConfigCalloutsHeaders) GetCustom() map[string]string {
 	if r == nil {
 		return nil
 	}
 	return r.Custom
 }
 
-func (r *RequestCalloutPluginConfigHeaders) GetForward() *bool {
+func (r *RequestCalloutPluginConfigCalloutsHeaders) GetForward() *bool {
 	if r == nil {
 		return nil
 	}
@@ -1056,7 +1056,7 @@ type RequestCalloutPluginRequest struct {
 	// The error handling policy the plugin will apply to TCP and HTTP errors.
 	Error *Error `json:"error,omitempty"`
 	// Callout request header customizations.
-	Headers *RequestCalloutPluginConfigHeaders `json:"headers,omitempty"`
+	Headers *RequestCalloutPluginConfigCalloutsHeaders `json:"headers,omitempty"`
 	// HTTP connection parameters.
 	HTTPOpts *HTTPOpts `json:"http_opts,omitempty"`
 	// The HTTP method that will be requested.
@@ -1099,7 +1099,7 @@ func (r *RequestCalloutPluginRequest) GetError() *Error {
 	return r.Error
 }
 
-func (r *RequestCalloutPluginRequest) GetHeaders() *RequestCalloutPluginConfigHeaders {
+func (r *RequestCalloutPluginRequest) GetHeaders() *RequestCalloutPluginConfigCalloutsHeaders {
 	if r == nil {
 		return nil
 	}
@@ -1166,24 +1166,24 @@ func (r *RequestCalloutPluginBody) GetStore() *bool {
 	return r.Store
 }
 
-// RequestCalloutPluginHeaders - Callout response header customizations.
-type RequestCalloutPluginHeaders struct {
+// RequestCalloutPluginConfigHeaders - Callout response header customizations.
+type RequestCalloutPluginConfigHeaders struct {
 	// If `false`, skips storing the callout response headers into kong.ctx.shared.callouts.<name>.response.headers.
 	Store *bool `json:"store,omitempty"`
 }
 
-func (r RequestCalloutPluginHeaders) MarshalJSON() ([]byte, error) {
+func (r RequestCalloutPluginConfigHeaders) MarshalJSON() ([]byte, error) {
 	return utils.MarshalJSON(r, "", false)
 }
 
-func (r *RequestCalloutPluginHeaders) UnmarshalJSON(data []byte) error {
+func (r *RequestCalloutPluginConfigHeaders) UnmarshalJSON(data []byte) error {
 	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *RequestCalloutPluginHeaders) GetStore() *bool {
+func (r *RequestCalloutPluginConfigHeaders) GetStore() *bool {
 	if r == nil {
 		return nil
 	}
@@ -1196,7 +1196,7 @@ type RequestCalloutPluginResponse struct {
 	// Lua code that executes after the callout response is received, before caching takes place. Can produce side effects. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
 	// Callout response header customizations.
-	Headers *RequestCalloutPluginHeaders `json:"headers,omitempty"`
+	Headers *RequestCalloutPluginConfigHeaders `json:"headers,omitempty"`
 }
 
 func (r RequestCalloutPluginResponse) MarshalJSON() ([]byte, error) {
@@ -1224,7 +1224,7 @@ func (r *RequestCalloutPluginResponse) GetByLua() *string {
 	return r.ByLua
 }
 
-func (r *RequestCalloutPluginResponse) GetHeaders() *RequestCalloutPluginHeaders {
+func (r *RequestCalloutPluginResponse) GetHeaders() *RequestCalloutPluginConfigHeaders {
 	if r == nil {
 		return nil
 	}
@@ -1332,37 +1332,37 @@ func (b *Body) GetForward() *bool {
 	return b.Forward
 }
 
-// Headers - Callout request header customizations.
-type Headers struct {
+// RequestCalloutPluginHeaders - Callout request header customizations.
+type RequestCalloutPluginHeaders struct {
 	// The custom headers to be added in the upstream HTTP request. Values can contain Lua expressions in the form $(some_lua_expression). The syntax is based on `request-transformer-advanced` templates.
 	Custom map[string]string `json:"custom,omitempty"`
 	// If `false`, does not forward request headers to upstream request.
 	Forward *bool `json:"forward,omitempty"`
 }
 
-func (h Headers) MarshalJSON() ([]byte, error) {
-	return utils.MarshalJSON(h, "", false)
+func (r RequestCalloutPluginHeaders) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
 }
 
-func (h *Headers) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &h, "", false, nil); err != nil {
+func (r *RequestCalloutPluginHeaders) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (h *Headers) GetCustom() map[string]string {
-	if h == nil {
+func (r *RequestCalloutPluginHeaders) GetCustom() map[string]string {
+	if r == nil {
 		return nil
 	}
-	return h.Custom
+	return r.Custom
 }
 
-func (h *Headers) GetForward() *bool {
-	if h == nil {
+func (r *RequestCalloutPluginHeaders) GetForward() *bool {
+	if r == nil {
 		return nil
 	}
-	return h.Forward
+	return r.Forward
 }
 
 // Query - Upstream request query param customizations.
@@ -1405,7 +1405,7 @@ type RequestCalloutPluginUpstream struct {
 	// Lua code that executes before the upstream request is made. Can produce side effects. Standard Lua sandboxing restrictions apply.
 	ByLua *string `json:"by_lua,omitempty"`
 	// Callout request header customizations.
-	Headers *Headers `json:"headers,omitempty"`
+	Headers *RequestCalloutPluginHeaders `json:"headers,omitempty"`
 	// Upstream request query param customizations.
 	Query *Query `json:"query,omitempty"`
 }
@@ -1435,7 +1435,7 @@ func (r *RequestCalloutPluginUpstream) GetByLua() *string {
 	return r.ByLua
 }
 
-func (r *RequestCalloutPluginUpstream) GetHeaders() *Headers {
+func (r *RequestCalloutPluginUpstream) GetHeaders() *RequestCalloutPluginHeaders {
 	if r == nil {
 		return nil
 	}

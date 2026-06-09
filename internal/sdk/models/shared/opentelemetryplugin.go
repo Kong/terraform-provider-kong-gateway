@@ -122,6 +122,7 @@ func (o *OpentelemetryPluginPartials) GetPath() *string {
 	return o.Path
 }
 
+// AccessLogs - Configuration for exporting access logs to an OTLP/HTTP endpoint. If `endpoint` is set, Kong will export access logs (e.g. request/response, route/service, latency, etc.) to the specified endpoint.
 type AccessLogs struct {
 	// A key-value map that dynamically modifies access log fields using Lua code.
 	CustomAttributesByLua map[string]string `json:"custom_attributes_by_lua,omitempty"`
@@ -207,6 +208,7 @@ func (e *HeaderType) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// OpentelemetryPluginMetrics - Configuration for exporting metrics to an OTLP/HTTP endpoint. If `endpoint` is set, Kong will export metrics to the specified endpoint at the interval defined by `push_interval`.
 type OpentelemetryPluginMetrics struct {
 	// A boolean value that determines if AI metrics should be collected. If enabled, `gen_ai.*`, `mcp.*`, `kong.gen_ai.*`, `kong.gen_ai.a2a.*` and `kong.mcp.*` metrics will be exported. To enable latency metrics for AI metrics, `enable_latency_metrics` must also be set to `true`. To enable `error.type` attribute for AI metrics, `enable_request_metrics` must also be set to `true`.
 	EnableAiMetrics *bool `json:"enable_ai_metrics,omitempty"`
@@ -626,6 +628,7 @@ func (e *SamplingStrategy) UnmarshalJSON(data []byte) error {
 }
 
 type OpentelemetryPluginConfig struct {
+	// Configuration for exporting access logs to an OTLP/HTTP endpoint. If `endpoint` is set, Kong will export access logs (e.g. request/response, route/service, latency, etc.) to the specified endpoint.
 	AccessLogs *AccessLogs `json:"access_logs,omitempty"`
 	// The delay, in seconds, between two consecutive batches.
 	BatchFlushDelay *int64 `json:"batch_flush_delay,omitempty"`
@@ -638,12 +641,14 @@ type OpentelemetryPluginConfig struct {
 	Headers                      map[string]string `json:"headers,omitempty"`
 	HTTPResponseHeaderForTraceid *string           `json:"http_response_header_for_traceid,omitempty"`
 	// An HTTP URL endpoint where internal logs are exported.
-	LogsEndpoint *string                     `json:"logs_endpoint,omitempty"`
-	Metrics      *OpentelemetryPluginMetrics `json:"metrics,omitempty"`
-	Propagation  *Propagation                `json:"propagation,omitempty"`
-	Queue        *OpentelemetryPluginQueue   `json:"queue,omitempty"`
+	LogsEndpoint *string `json:"logs_endpoint,omitempty"`
+	// Configuration for exporting metrics to an OTLP/HTTP endpoint. If `endpoint` is set, Kong will export metrics to the specified endpoint at the interval defined by `push_interval`.
+	Metrics     *OpentelemetryPluginMetrics `json:"metrics,omitempty"`
+	Propagation *Propagation                `json:"propagation,omitempty"`
+	Queue       *OpentelemetryPluginQueue   `json:"queue,omitempty"`
 	// An integer representing a timeout in milliseconds. Must be between 0 and 2^31-2.
-	ReadTimeout        *int64            `json:"read_timeout,omitempty"`
+	ReadTimeout *int64 `json:"read_timeout,omitempty"`
+	// A key-value map of resource attributes to be sent with the telemetry data. The keys and values can be either static or dynamic using Kong variables (e.g. `${kong.service.name}`) for the values. For dynamic values, Lua string template syntax is used and the values will be rendered at runtime.
 	ResourceAttributes map[string]string `json:"resource_attributes,omitempty"`
 	// Tracing sampling rate for configuring the probability-based sampler. When set, this value supersedes the global `tracing_sampling_rate` setting from kong.conf.
 	SamplingRate *float64 `json:"sampling_rate,omitempty"`

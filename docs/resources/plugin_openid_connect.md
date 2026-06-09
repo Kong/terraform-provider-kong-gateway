@@ -50,6 +50,7 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ]
     authorization_rolling_timeout = 4.31
     bearer_token_cookie_name      = "...my_bearer_token_cookie_name..."
+    bearer_token_header_name      = "...my_bearer_token_header_name..."
     bearer_token_param_type = [
       "cookie"
     ]
@@ -115,6 +116,9 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     ]
     client_secret = [
       "..."
+    ]
+    cluster_cache_items = [
+      "tokens"
     ]
     cluster_cache_redis = {
       cloud_authentication = {
@@ -317,10 +321,38 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
     password_param_type = [
       "query"
     ]
-    preserve_query_args                               = true
-    proof_of_possession_auth_methods_validation       = false
-    proof_of_possession_dpop                          = "strict"
-    proof_of_possession_mtls                          = "strict"
+    preserve_query_args = true
+    principals = {
+      directory             = "...my_directory..."
+      enabled               = false
+      error_on_miss         = true
+      match_consumer        = false
+      match_consumer_groups = true
+      principal_by          = "...my_principal_by..."
+      principal_claim = [
+        "..."
+      ]
+    }
+    proof_of_possession_auth_methods_validation = false
+    proof_of_possession_dpop                    = "strict"
+    proof_of_possession_mtls                    = "strict"
+    proof_of_possession_mtls_from_header = {
+      allow_partial_chain = true
+      ca_certificates = [
+        "..."
+      ]
+      cert_cache_ttl            = 7.94
+      certificate_header_format = "url_encoded"
+      certificate_header_name   = "...my_certificate_header_name..."
+      http_proxy_host           = "...my_http_proxy_host..."
+      http_proxy_port           = 63903
+      http_timeout              = 5.56
+      https_proxy_host          = "...my_https_proxy_host..."
+      https_proxy_port          = 20420
+      revocation_check_mode     = "STRICT"
+      secure_source             = true
+      ssl_verify                = true
+    }
     pushed_authorization_request_endpoint             = "...my_pushed_authorization_request_endpoint..."
     pushed_authorization_request_endpoint_auth_method = "client_secret_jwt"
     redirect_uri = [
@@ -483,7 +515,9 @@ resource "kong-gateway_plugin_openid_connect" "my_pluginopenidconnect" {
               "..."
             ]
           }
-          issuer = "...my_issuer..."
+          issuer           = "...my_issuer..."
+          jwks_uri         = "...my_jwks_uri..."
+          verify_signature = true
         }
       ]
     }
@@ -661,6 +695,7 @@ Optional:
 - `authorization_query_args_values` (List of String) Extra query argument values passed to the authorization endpoint.
 - `authorization_rolling_timeout` (Number) Specifies how long the session used for the authorization code flow can be used in seconds until it needs to be renewed. 0 disables the checks and rolling.
 - `bearer_token_cookie_name` (String) The name of the cookie in which the bearer token is passed.
+- `bearer_token_header_name` (String) The name of the HTTP header from which the bearer token is retrieved. When configured, only this header is checked for the bearer token.
 - `bearer_token_param_type` (List of String) Where to look for the bearer token: - `header`: search the `Authorization`, `access-token`, and `x-access-token` HTTP headers - `query`: search the URL's query string - `body`: search the HTTP request body - `cookie`: search the HTTP request cookies specified with `config.bearer_token_cookie_name`.
 - `by_username_ignore_case` (Boolean) If `consumer_by` is set to `username`, specify whether `username` can match consumers case-insensitively.
 - `cache_introspection` (Boolean) Cache the introspection endpoint requests.
@@ -681,8 +716,9 @@ Optional:
 - `client_id` (List of String) The client id(s) that the plugin uses when it calls authenticated endpoints on the identity provider.
 - `client_jwk` (Attributes List) The JWK used for the private_key_jwt authentication. (see [below for nested schema](#nestedatt--config--client_jwk))
 - `client_secret` (List of String) The client secret.
+- `cluster_cache_items` (List of String) Specifies which items are stored in the cluster cache backend configured via `cluster_cache_strategy`. Allowed values are `"introspection"` and `"tokens"`. When `"tokens"` is included, access and refresh token material is AES-encrypted before being written to the cache; enable only when your Redis deployment meets your compliance requirements. Defaults to `["introspection"]`. An empty set disables all cluster caching regardless of `cluster_cache_strategy`.
 - `cluster_cache_redis` (Attributes) (see [below for nested schema](#nestedatt--config--cluster_cache_redis))
-- `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]
+- `cluster_cache_strategy` (String) The strategy to use for the cluster cache. If set, the plugin will share introspection cache with nodes configured with the same strategy backend. must be one of ["off", "redis"]
 - `consumer_by` (List of String) Consumer fields used for mapping: - `id`: try to find the matching Consumer by `id` - `username`: try to find the matching Consumer by `username` - `custom_id`: try to find the matching Consumer by `custom_id`.
 - `consumer_claims` (List of List of String) The claims used for consumer mapping. Each entry represents a claim path inside the token payload. The paths are evaluated in order, and the first matching claim is used.
 - `consumer_groups_claim` (List of String) The claim used for consumer groups mapping. If multiple values are set, it means the claim is inside a nested object of the token payload.
@@ -769,9 +805,11 @@ For more granular token revocation, you can also adjust the `logout_revoke_acces
 - `no_proxy` (String) Do not use proxy with these hosts.
 - `password_param_type` (List of String) Where to look for the username and password: - `header`: search the HTTP headers - `query`: search the URL's query string - `body`: search the HTTP request body.
 - `preserve_query_args` (Boolean) With this parameter, you can preserve request query arguments even when doing authorization code flow.
+- `principals` (Attributes) Configuration for Kong Identity principal hydration after token verification. (see [below for nested schema](#nestedatt--config--principals))
 - `proof_of_possession_auth_methods_validation` (Boolean) If set to true, only the auth_methods that are compatible with Proof of Possession (PoP) can be configured when PoP is enabled. If set to false, all auth_methods will be configurable and PoP checks will be silently skipped for those auth_methods that are not compatible with PoP.
 - `proof_of_possession_dpop` (String) Enable Demonstrating Proof-of-Possession (DPoP). If set to strict, all request are verified despite the presence of the DPoP key claim (cnf.jkt). If set to optional, only tokens bound with DPoP's key are verified with the proof. must be one of ["off", "optional", "strict"]
 - `proof_of_possession_mtls` (String) Enable mtls proof of possession. If set to strict, all tokens (from supported auth_methods: bearer, introspection, and session granted with bearer or introspection) are verified, if set to optional, only tokens that contain the certificate hash claim are verified. If the verification fails, the request will be rejected with 401. must be one of ["off", "optional", "strict"]
+- `proof_of_possession_mtls_from_header` (Attributes) Configuration for reading the client certificate from an HTTP header injected by a WAF or L7 proxy that terminates TLS. When configured, the plugin reads and validates the certificate from the specified header for mTLS Proof-of-Possession (PoP) verification instead of (or in addition to) the TLS layer certificate. (see [below for nested schema](#nestedatt--config--proof_of_possession_mtls_from_header))
 - `pushed_authorization_request_endpoint` (String) The pushed authorization endpoint. If set it overrides the value in `pushed_authorization_request_endpoint` returned by the discovery endpoint.
 - `pushed_authorization_request_endpoint_auth_method` (String) The pushed authorization request endpoint authentication method: `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, or `none`: do not authenticate. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none", "private_key_jwt", "self_signed_tls_client_auth", "tls_client_auth"]
 - `redirect_uri` (List of String) The redirect URI passed to the authorization and token endpoints.
@@ -982,6 +1020,40 @@ Optional:
 - `path` (List of String) The path of the header value. Not Null
 
 
+<a id="nestedatt--config--principals"></a>
+### Nested Schema for `config.principals`
+
+Optional:
+
+- `directory` (String) The Kong Identity directory instance to look up against.
+- `enabled` (Boolean) When true, query Kong Identity to map a Principal after token verification.
+- `error_on_miss` (Boolean) When true (default), return 401 if fail to match a Principal in Kong Identity after token verification. When false, the request continues without authenticated_principal set.
+- `match_consumer` (Boolean) If a Consumer is attached to the matched Principal in Kong Identity, load it and set it in the request context, overriding consumer_by.
+- `match_consumer_groups` (Boolean) If Consumer Groups are attached to the matched Principal in Kong Identity, load them, overriding consumer_groups_claim.
+- `principal_by` (String) Custom identity name for a type=custom Kong Identity lookup. When absent and principal_claim is set, an OIDC lookup is performed using principal_claim as the claim name instead of 'sub'.
+- `principal_claim` (List of String) Token claim to use for the Kong Identity lookup. If multiple values are set, it means the claim is inside a nested object of the token payload. When principal_by is also set, performs a custom identity lookup (type=custom). When set alone, performs an OIDC lookup using this claim name instead of the default 'sub'.
+
+
+<a id="nestedatt--config--proof_of_possession_mtls_from_header"></a>
+### Nested Schema for `config.proof_of_possession_mtls_from_header`
+
+Optional:
+
+- `allow_partial_chain` (Boolean) Allow certificate verification with only an intermediate certificate. When enabled, a full chain to the root CA is not required.
+- `ca_certificates` (List of String) List of CA Certificate UUIDs to use when validating the client certificate chain. At least one is required. Not Null
+- `cert_cache_ttl` (Number) Time in milliseconds to cache the revocation check result for a given certificate.
+- `certificate_header_format` (String) Encoding format of the certificate in the header. Supported formats: `url_encoded`, `base64_encoded`. must be one of ["base64_encoded", "url_encoded"]
+- `certificate_header_name` (String) Name of the HTTP header that contains the injected client certificate. Not Null
+- `http_proxy_host` (String) A string representing a host name, such as example.com.
+- `http_proxy_port` (Number) An integer representing a port number between 0 and 65535, inclusive.
+- `http_timeout` (Number) HTTP timeout in milliseconds when communicating with the OCSP server or downloading CRL.
+- `https_proxy_host` (String) A string representing a host name, such as example.com.
+- `https_proxy_port` (Number) An integer representing a port number between 0 and 65535, inclusive.
+- `revocation_check_mode` (String) Controls client certificate revocation check behavior. `SKIP` disables revocation checking. `IGNORE_CA_ERROR` respects revocation status when reachable but ignores network errors. `STRICT` requires a successful revocation check. must be one of ["IGNORE_CA_ERROR", "SKIP", "STRICT"]
+- `secure_source` (Boolean) When set to `true`, only requests from trusted IP addresses (configured in `trusted_ips` in kong.conf) are allowed to use the certificate header. This prevents direct header injection from untrusted clients.
+- `ssl_verify` (Boolean) Verify the TLS certificate of the OCSP responder or CRL distribution point server.
+
+
 <a id="nestedatt--config--redis"></a>
 ### Nested Schema for `config.redis`
 
@@ -1074,8 +1146,8 @@ Optional:
 Optional:
 
 - `audience` (List of String) Audiences used in the token exchange request. Values defined here override those defined in `config.audience`.
-- `empty_audience` (Boolean) Use empty audiences. Use this field to override audiences defined in `config.audience`.
-- `empty_scopes` (Boolean) Use empty scopes. Use this field to override scopes defined in `config.scopes`.
+- `empty_audience` (Boolean) Use empty audiences. Use this field to remove audiences defined in `config.audience`.
+- `empty_scopes` (Boolean) Use empty scopes. Use this field to remove scopes defined in `config.scopes`.
 - `scopes` (List of String) Scopes used in the token exchange request. Values defined here override those defined in `config.scopes`.
 
 
@@ -1084,8 +1156,10 @@ Optional:
 
 Optional:
 
-- `conditions` (Attributes) A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined. (see [below for nested schema](#nestedatt--config--token_exchange--subject_token_issuers--conditions))
+- `conditions` (Attributes) A token will only be exchanged when it matches all these criteria. To exchange tokens issued by a different issuer, `conditions` must not be defined. In contrast, to exchange tokens issued by the target issuer itself, `conditions` must be defined. (see [below for nested schema](#nestedatt--config--token_exchange--subject_token_issuers--conditions))
 - `issuer` (String) Tokens of whose iss claim matches this value will be exchanged. Not Null
+- `jwks_uri` (String) An explicit JWKS endpoint for this issuer. This field should be left empty when this issuer is the same as the target issuer. It is only used when `verify_signature` is `true`. When set, Kong fetches the signing keys from this URI directly instead of using OIDC Discovery.
+- `verify_signature` (Boolean) When true, Kong cryptographically verifies the signature of the incoming subject token before exchanging it. This field should be left empty or set to `false` when this issuer is the same as the target issuer. Defaults to `false` for backward compatibility.
 
 <a id="nestedatt--config--token_exchange--subject_token_issuers--conditions"></a>
 ### Nested Schema for `config.token_exchange.subject_token_issuers.conditions`

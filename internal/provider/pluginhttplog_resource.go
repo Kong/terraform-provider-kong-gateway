@@ -74,6 +74,17 @@ func (r *PluginHTTPLogResource) Schema(ctx context.Context, req resource.SchemaR
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
+					"client_certificate": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"id": schema.StringAttribute{
+								Computed: true,
+								Optional: true,
+							},
+						},
+						Description: `Certificate to use as the mTLS client certificate when connecting to the configured HTTPS endpoint.`,
+					},
 					"content_type": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,

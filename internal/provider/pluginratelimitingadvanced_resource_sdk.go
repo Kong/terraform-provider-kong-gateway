@@ -25,6 +25,11 @@ func (r *PluginRateLimitingAdvancedResourceModel) RefreshFromSharedRateLimitingA
 		for _, v := range resp.Config.ConsumerGroups {
 			r.Config.ConsumerGroups = append(r.Config.ConsumerGroups, types.StringValue(v))
 		}
+		if resp.Config.CounterKey != nil {
+			r.Config.CounterKey = types.StringValue(string(*resp.Config.CounterKey))
+		} else {
+			r.Config.CounterKey = types.StringNull()
+		}
 		r.Config.DictionaryName = types.StringPointerValue(resp.Config.DictionaryName)
 		r.Config.DisablePenalty = types.BoolPointerValue(resp.Config.DisablePenalty)
 		r.Config.EnforceConsumerGroups = types.BoolPointerValue(resp.Config.EnforceConsumerGroups)
@@ -409,6 +414,12 @@ func (r *PluginRateLimitingAdvancedResourceModel) ToSharedRateLimitingAdvancedPl
 	consumerGroups := make([]string, 0, len(r.Config.ConsumerGroups))
 	for consumerGroupsIndex := range r.Config.ConsumerGroups {
 		consumerGroups = append(consumerGroups, r.Config.ConsumerGroups[consumerGroupsIndex].ValueString())
+	}
+	counterKey := new(shared.CounterKey)
+	if !r.Config.CounterKey.IsUnknown() && !r.Config.CounterKey.IsNull() {
+		*counterKey = shared.CounterKey(r.Config.CounterKey.ValueString())
+	} else {
+		counterKey = nil
 	}
 	dictionaryName := new(string)
 	if !r.Config.DictionaryName.IsUnknown() && !r.Config.DictionaryName.IsNull() {
@@ -819,6 +830,7 @@ func (r *PluginRateLimitingAdvancedResourceModel) ToSharedRateLimitingAdvancedPl
 	config := shared.RateLimitingAdvancedPluginConfig{
 		CompoundIdentifier:    compoundIdentifier,
 		ConsumerGroups:        consumerGroups,
+		CounterKey:            counterKey,
 		DictionaryName:        dictionaryName,
 		DisablePenalty:        disablePenalty,
 		EnforceConsumerGroups: enforceConsumerGroups,

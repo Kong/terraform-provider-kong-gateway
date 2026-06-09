@@ -17,7 +17,19 @@ resource "kong-gateway_plugin_kafka_log" "my_pluginkafkalog" {
   condition = "...my_condition..."
   config = {
     authentication = {
-      mechanism = "SCRAM-SHA-256"
+      mechanism = "PLAIN"
+      oauthbearer = {
+        client_id     = "...my_client_id..."
+        client_secret = "...my_client_secret..."
+        extensions = {
+          key = "value"
+        }
+        scopes = [
+          "..."
+        ]
+        token_endpoint_tls_verify = true
+        token_endpoint_url        = "...my_token_endpoint_url..."
+      }
       password  = "...my_password..."
       strategy  = "sasl"
       tokenauth = true
@@ -209,11 +221,25 @@ Optional:
 
 Optional:
 
-- `mechanism` (String) The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256` or `SCRAM-SHA-512`. must be one of ["PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]
+- `mechanism` (String) The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`, or `OAUTHBEARER`. must be one of ["OAUTHBEARER", "PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]
+- `oauthbearer` (Attributes) Options for SASL OAUTHBEARER authentication. Required when `mechanism` is `OAUTHBEARER`. (see [below for nested schema](#nestedatt--config--authentication--oauthbearer))
 - `password` (String) Password for SASL authentication.
 - `strategy` (String) The authentication strategy for the plugin, the only option for the value is `sasl`. must be "sasl"
 - `tokenauth` (Boolean) Enable this to indicate `DelegationToken` authentication
 - `user` (String) Username for SASL authentication.
+
+<a id="nestedatt--config--authentication--oauthbearer"></a>
+### Nested Schema for `config.authentication.oauthbearer`
+
+Optional:
+
+- `client_id` (String) The OAuth2 client ID.
+- `client_secret` (String) The OAuth2 client secret.
+- `extensions` (Map of String) Key-value pairs sent as extensions in the OAUTHBEARER SASL handshake (e.g. logicalCluster, identityPoolId).
+- `scopes` (List of String) List of OAuth2 scopes to request.
+- `token_endpoint_tls_verify` (Boolean) Whether to verify the TLS certificate of the token endpoint.
+- `token_endpoint_url` (String) The URL of the OAuth2 token endpoint.
+
 
 
 <a id="nestedatt--config--bootstrap_servers"></a>

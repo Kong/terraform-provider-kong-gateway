@@ -109,7 +109,7 @@ func (r *PluginServiceProtectionResource) Schema(ctx context.Context, req resour
 					"namespace": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. NOTE: For the plugin instances sharing the same namespace, all the configurations that are required for synchronizing counters, e.g. ` + "`" + `strategy` + "`" + `, ` + "`" + `redis` + "`" + `, ` + "`" + `sync_rate` + "`" + `, ` + "`" + `dictionary_name` + "`" + `, need to be the same.`,
+						Description: `The rate limiting library namespace to use for this plugin instance. Counter data and sync configuration is isolated in each namespace. Counters are scoped per Service, so plugin instances configured on different Services maintain independent counters even when using the same namespace. NOTE: For plugin instances sharing the same namespace, all configurations that are required for synchronizing counters, e.g. ` + "`" + `strategy` + "`" + `, ` + "`" + `redis` + "`" + `, ` + "`" + `sync_rate` + "`" + `, ` + "`" + `dictionary_name` + "`" + `, need to be the same.`,
 					},
 					"redis": schema.SingleNestedAttribute{
 						Computed: true,

@@ -67,6 +67,14 @@ func (r *PluginBasicAuthResourceModel) RefreshFromSharedBasicAuthPlugin(ctx cont
 				}
 			}
 			r.Config.HideCredentials = types.BoolPointerValue(resp.Config.HideCredentials)
+			if resp.Config.Principals == nil {
+				r.Config.Principals = nil
+			} else {
+				r.Config.Principals = &tfTypes.Principals{}
+				r.Config.Principals.Directory = types.StringPointerValue(resp.Config.Principals.Directory)
+				r.Config.Principals.Enabled = types.BoolPointerValue(resp.Config.Principals.Enabled)
+				r.Config.Principals.ErrorOnMiss = types.BoolPointerValue(resp.Config.Principals.ErrorOnMiss)
+			}
 			r.Config.Realm = types.StringPointerValue(resp.Config.Realm)
 		}
 		r.CreatedAt = types.Int64PointerValue(resp.CreatedAt)
@@ -501,6 +509,32 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 		} else {
 			hideCredentials = nil
 		}
+		var principals *shared.Principals
+		if r.Config.Principals != nil {
+			directory := new(string)
+			if !r.Config.Principals.Directory.IsUnknown() && !r.Config.Principals.Directory.IsNull() {
+				*directory = r.Config.Principals.Directory.ValueString()
+			} else {
+				directory = nil
+			}
+			enabled1 := new(bool)
+			if !r.Config.Principals.Enabled.IsUnknown() && !r.Config.Principals.Enabled.IsNull() {
+				*enabled1 = r.Config.Principals.Enabled.ValueBool()
+			} else {
+				enabled1 = nil
+			}
+			errorOnMiss := new(bool)
+			if !r.Config.Principals.ErrorOnMiss.IsUnknown() && !r.Config.Principals.ErrorOnMiss.IsNull() {
+				*errorOnMiss = r.Config.Principals.ErrorOnMiss.ValueBool()
+			} else {
+				errorOnMiss = nil
+			}
+			principals = &shared.Principals{
+				Directory:   directory,
+				Enabled:     enabled1,
+				ErrorOnMiss: errorOnMiss,
+			}
+		}
 		realm := new(string)
 		if !r.Config.Realm.IsUnknown() && !r.Config.Realm.IsNull() {
 			*realm = r.Config.Realm.ValueString()
@@ -511,6 +545,7 @@ func (r *PluginBasicAuthResourceModel) ToSharedBasicAuthPlugin(ctx context.Conte
 			Anonymous:            anonymous,
 			BruteForceProtection: bruteForceProtection,
 			HideCredentials:      hideCredentials,
+			Principals:           principals,
 			Realm:                realm,
 		}
 	}

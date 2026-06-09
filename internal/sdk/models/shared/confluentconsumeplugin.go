@@ -208,6 +208,92 @@ func (e *CommitStrategy) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// ConfluentConsumePluginConfigMode - The strategy to determine the consumer group ID. `random`: a hash `com.konghq.kafka.<md5>` over the plugin ID (plus consumer identifier/IP and node ID for SSE/WebSocket). `kong_consumer`: uses the authenticated consumer's `username`, `custom_id`, then `id`, directly; falls back to `random` if no consumer is authenticated. `manual`: uses `consumer_group_id` directly. For SSE/WebSocket, `manual` and `kong_consumer` group IDs get a `.<node_id>` suffix.
+type ConfluentConsumePluginConfigMode string
+
+const (
+	ConfluentConsumePluginConfigModeKongConsumer ConfluentConsumePluginConfigMode = "kong_consumer"
+	ConfluentConsumePluginConfigModeManual       ConfluentConsumePluginConfigMode = "manual"
+	ConfluentConsumePluginConfigModeRandom       ConfluentConsumePluginConfigMode = "random"
+)
+
+func (e ConfluentConsumePluginConfigMode) ToPointer() *ConfluentConsumePluginConfigMode {
+	return &e
+}
+func (e *ConfluentConsumePluginConfigMode) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "kong_consumer":
+		fallthrough
+	case "manual":
+		fallthrough
+	case "random":
+		*e = ConfluentConsumePluginConfigMode(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentConsumePluginConfigMode: %v", v)
+	}
+}
+
+// ConfluentConsumePluginConsumerGroup - Configuration for the Kafka consumer group ID.
+type ConfluentConsumePluginConsumerGroup struct {
+	// The fixed consumer group ID to use when mode is set to `manual`. For SSE and WebSocket modes, a `.<node_id>` suffix is automatically appended.
+	ConsumerGroupID *string `json:"consumer_group_id,omitempty"`
+	// The strategy to determine the consumer group ID. `random`: a hash `com.konghq.kafka.<md5>` over the plugin ID (plus consumer identifier/IP and node ID for SSE/WebSocket). `kong_consumer`: uses the authenticated consumer's `username`, `custom_id`, then `id`, directly; falls back to `random` if no consumer is authenticated. `manual`: uses `consumer_group_id` directly. For SSE/WebSocket, `manual` and `kong_consumer` group IDs get a `.<node_id>` suffix.
+	Mode *ConfluentConsumePluginConfigMode `json:"mode,omitempty"`
+}
+
+func (c ConfluentConsumePluginConsumerGroup) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginConsumerGroup) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ConfluentConsumePluginConsumerGroup) GetConsumerGroupID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ConsumerGroupID
+}
+
+func (c *ConfluentConsumePluginConsumerGroup) GetMode() *ConfluentConsumePluginConfigMode {
+	if c == nil {
+		return nil
+	}
+	return c.Mode
+}
+
+type ConfluentConsumePluginErrorHandling struct {
+	// When enabled, the Kafka client error message is returned to the HTTP client. Useful for debugging but may expose internal details, so should be disabled in production.
+	ReturnErrorMessage *bool `json:"return_error_message,omitempty"`
+}
+
+func (c ConfluentConsumePluginErrorHandling) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginErrorHandling) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ConfluentConsumePluginErrorHandling) GetReturnErrorMessage() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.ReturnErrorMessage
+}
+
 // MessageDeserializer - The deserializer to use for the consumed messages.
 type MessageDeserializer string
 
@@ -265,6 +351,75 @@ func (e *ConfluentConsumePluginMode) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// ConfluentConsumePluginOauthbearer - Options for SASL OAUTHBEARER authentication. When set, takes precedence over `cluster_api_key`/`cluster_api_secret`.
+type ConfluentConsumePluginOauthbearer struct {
+	// The OAuth2 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// The OAuth2 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Key-value pairs sent as extensions in the OAUTHBEARER SASL handshake (e.g. logicalCluster, identityPoolId).
+	Extensions map[string]string `json:"extensions,omitempty"`
+	// List of OAuth2 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	TokenEndpointTLSVerify *bool `json:"token_endpoint_tls_verify,omitempty"`
+	// The URL of the OAuth2 token endpoint.
+	TokenEndpointURL *string `json:"token_endpoint_url,omitempty"`
+}
+
+func (c ConfluentConsumePluginOauthbearer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ConfluentConsumePluginOauthbearer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetClientID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ClientID
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetClientSecret() *string {
+	if c == nil {
+		return nil
+	}
+	return c.ClientSecret
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetExtensions() map[string]string {
+	if c == nil {
+		return nil
+	}
+	return c.Extensions
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetScopes() []string {
+	if c == nil {
+		return nil
+	}
+	return c.Scopes
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetTokenEndpointTLSVerify() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.TokenEndpointTLSVerify
+}
+
+func (c *ConfluentConsumePluginOauthbearer) GetTokenEndpointURL() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TokenEndpointURL
+}
+
 type ConfluentConsumePluginBasic struct {
 	Password string `json:"password"`
 	Username string `json:"username"`
@@ -295,19 +450,19 @@ func (c *ConfluentConsumePluginBasic) GetUsername() string {
 	return c.Username
 }
 
-// ConfluentConsumePluginConfigMode - Authentication mode to use with the schema registry.
-type ConfluentConsumePluginConfigMode string
+// ConfluentConsumePluginConfigSchemaRegistryMode - Authentication mode to use with the schema registry.
+type ConfluentConsumePluginConfigSchemaRegistryMode string
 
 const (
-	ConfluentConsumePluginConfigModeBasic  ConfluentConsumePluginConfigMode = "basic"
-	ConfluentConsumePluginConfigModeNone   ConfluentConsumePluginConfigMode = "none"
-	ConfluentConsumePluginConfigModeOauth2 ConfluentConsumePluginConfigMode = "oauth2"
+	ConfluentConsumePluginConfigSchemaRegistryModeBasic  ConfluentConsumePluginConfigSchemaRegistryMode = "basic"
+	ConfluentConsumePluginConfigSchemaRegistryModeNone   ConfluentConsumePluginConfigSchemaRegistryMode = "none"
+	ConfluentConsumePluginConfigSchemaRegistryModeOauth2 ConfluentConsumePluginConfigSchemaRegistryMode = "oauth2"
 )
 
-func (e ConfluentConsumePluginConfigMode) ToPointer() *ConfluentConsumePluginConfigMode {
+func (e ConfluentConsumePluginConfigSchemaRegistryMode) ToPointer() *ConfluentConsumePluginConfigSchemaRegistryMode {
 	return &e
 }
-func (e *ConfluentConsumePluginConfigMode) UnmarshalJSON(data []byte) error {
+func (e *ConfluentConsumePluginConfigSchemaRegistryMode) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -318,10 +473,10 @@ func (e *ConfluentConsumePluginConfigMode) UnmarshalJSON(data []byte) error {
 	case "none":
 		fallthrough
 	case "oauth2":
-		*e = ConfluentConsumePluginConfigMode(v)
+		*e = ConfluentConsumePluginConfigSchemaRegistryMode(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for ConfluentConsumePluginConfigMode: %v", v)
+		return fmt.Errorf("invalid value for ConfluentConsumePluginConfigSchemaRegistryMode: %v", v)
 	}
 }
 
@@ -638,9 +793,9 @@ func (c *ConfluentConsumePluginOauth2Client) GetTimeout() *int64 {
 type ConfluentConsumePluginAuthentication struct {
 	Basic *ConfluentConsumePluginBasic `json:"basic,omitempty"`
 	// Authentication mode to use with the schema registry.
-	Mode         *ConfluentConsumePluginConfigMode   `json:"mode,omitempty"`
-	Oauth2       *ConfluentConsumePluginOauth2       `json:"oauth2,omitempty"`
-	Oauth2Client *ConfluentConsumePluginOauth2Client `json:"oauth2_client,omitempty"`
+	Mode         *ConfluentConsumePluginConfigSchemaRegistryMode `json:"mode,omitempty"`
+	Oauth2       *ConfluentConsumePluginOauth2                   `json:"oauth2,omitempty"`
+	Oauth2Client *ConfluentConsumePluginOauth2Client             `json:"oauth2_client,omitempty"`
 }
 
 func (c ConfluentConsumePluginAuthentication) MarshalJSON() ([]byte, error) {
@@ -661,7 +816,7 @@ func (c *ConfluentConsumePluginAuthentication) GetBasic() *ConfluentConsumePlugi
 	return c.Basic
 }
 
-func (c *ConfluentConsumePluginAuthentication) GetMode() *ConfluentConsumePluginConfigMode {
+func (c *ConfluentConsumePluginAuthentication) GetMode() *ConfluentConsumePluginConfigSchemaRegistryMode {
 	if c == nil {
 		return nil
 	}
@@ -1303,9 +1458,9 @@ type ConfluentConsumePluginConfig struct {
 	// Set of bootstrap brokers in a `{host: host, port: port}` list format.
 	BootstrapServers []ConfluentConsumePluginBootstrapServers `json:"bootstrap_servers,omitempty"`
 	// Username/Apikey for SASL authentication.
-	ClusterAPIKey string `json:"cluster_api_key"`
+	ClusterAPIKey *string `json:"cluster_api_key,omitempty"`
 	// Password/ApiSecret for SASL authentication.
-	ClusterAPISecret string `json:"cluster_api_secret"`
+	ClusterAPISecret *string `json:"cluster_api_secret,omitempty"`
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
 	ClusterName *string `json:"cluster_name,omitempty"`
 	// The strategy to use for committing offsets.
@@ -1314,12 +1469,15 @@ type ConfluentConsumePluginConfig struct {
 	ConfluentCloudAPIKey *string `json:"confluent_cloud_api_key,omitempty"`
 	// The corresponding secret for the Confluent Cloud API key.
 	ConfluentCloudAPISecret *string `json:"confluent_cloud_api_secret,omitempty"`
+	// Configuration for the Kafka consumer group ID.
+	ConsumerGroup *ConfluentConsumePluginConsumerGroup `json:"consumer_group,omitempty"`
 	// The topic to use for the Dead Letter Queue.
 	DlqTopic *string `json:"dlq_topic,omitempty"`
 	// Enables Dead Letter Queue. When enabled, if the message doesn't conform to the schema (from Schema Registry) or there's an error in the `message_by_lua_functions`, it will be forwarded to `dlq_topic` that can be processed later.
 	EnableDlq *bool `json:"enable_dlq,omitempty"`
 	// When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.
-	EnforceLatestOffsetReset *bool `json:"enforce_latest_offset_reset,omitempty"`
+	EnforceLatestOffsetReset *bool                                `json:"enforce_latest_offset_reset,omitempty"`
+	ErrorHandling            *ConfluentConsumePluginErrorHandling `json:"error_handling,omitempty"`
 	// Keepalive timeout in milliseconds.
 	Keepalive        *int64 `json:"keepalive,omitempty"`
 	KeepaliveEnabled *bool  `json:"keepalive_enabled,omitempty"`
@@ -1329,6 +1487,8 @@ type ConfluentConsumePluginConfig struct {
 	MessageDeserializer *MessageDeserializer `json:"message_deserializer,omitempty"`
 	// The mode of operation for the plugin.
 	Mode *ConfluentConsumePluginMode `json:"mode,omitempty"`
+	// Options for SASL OAUTHBEARER authentication. When set, takes precedence over `cluster_api_key`/`cluster_api_secret`.
+	Oauthbearer *ConfluentConsumePluginOauthbearer `json:"oauthbearer,omitempty"`
 	// The plugin-global schema registry configuration.
 	SchemaRegistry *ConfluentConsumePluginSchemaRegistry `json:"schema_registry,omitempty"`
 	Security       *ConfluentConsumePluginSecurity       `json:"security,omitempty"`
@@ -1343,7 +1503,7 @@ func (c ConfluentConsumePluginConfig) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ConfluentConsumePluginConfig) UnmarshalJSON(data []byte) error {
-	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"cluster_api_key", "cluster_api_secret", "topics"}); err != nil {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"topics"}); err != nil {
 		return err
 	}
 	return nil
@@ -1363,16 +1523,16 @@ func (c *ConfluentConsumePluginConfig) GetBootstrapServers() []ConfluentConsumeP
 	return c.BootstrapServers
 }
 
-func (c *ConfluentConsumePluginConfig) GetClusterAPIKey() string {
+func (c *ConfluentConsumePluginConfig) GetClusterAPIKey() *string {
 	if c == nil {
-		return ""
+		return nil
 	}
 	return c.ClusterAPIKey
 }
 
-func (c *ConfluentConsumePluginConfig) GetClusterAPISecret() string {
+func (c *ConfluentConsumePluginConfig) GetClusterAPISecret() *string {
 	if c == nil {
-		return ""
+		return nil
 	}
 	return c.ClusterAPISecret
 }
@@ -1405,6 +1565,13 @@ func (c *ConfluentConsumePluginConfig) GetConfluentCloudAPISecret() *string {
 	return c.ConfluentCloudAPISecret
 }
 
+func (c *ConfluentConsumePluginConfig) GetConsumerGroup() *ConfluentConsumePluginConsumerGroup {
+	if c == nil {
+		return nil
+	}
+	return c.ConsumerGroup
+}
+
 func (c *ConfluentConsumePluginConfig) GetDlqTopic() *string {
 	if c == nil {
 		return nil
@@ -1424,6 +1591,13 @@ func (c *ConfluentConsumePluginConfig) GetEnforceLatestOffsetReset() *bool {
 		return nil
 	}
 	return c.EnforceLatestOffsetReset
+}
+
+func (c *ConfluentConsumePluginConfig) GetErrorHandling() *ConfluentConsumePluginErrorHandling {
+	if c == nil {
+		return nil
+	}
+	return c.ErrorHandling
 }
 
 func (c *ConfluentConsumePluginConfig) GetKeepalive() *int64 {
@@ -1459,6 +1633,13 @@ func (c *ConfluentConsumePluginConfig) GetMode() *ConfluentConsumePluginMode {
 		return nil
 	}
 	return c.Mode
+}
+
+func (c *ConfluentConsumePluginConfig) GetOauthbearer() *ConfluentConsumePluginOauthbearer {
+	if c == nil {
+		return nil
+	}
+	return c.Oauthbearer
 }
 
 func (c *ConfluentConsumePluginConfig) GetSchemaRegistry() *ConfluentConsumePluginSchemaRegistry {

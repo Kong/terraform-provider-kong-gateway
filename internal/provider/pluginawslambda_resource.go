@@ -219,6 +219,11 @@ func (r *PluginAwsLambdaResource) Schema(ctx context.Context, req resource.Schem
 							int64validator.Between(0, 65535),
 						},
 					},
+					"preserve_lambda_api_error_code": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `When enabled, the HTTP status code returned by the AWS Lambda API is forwarded to the client instead of mapping all errors to HTTP 500. Applies to 4xx and 5xx responses from the Lambda API.`,
+					},
 					"proxy_url": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,

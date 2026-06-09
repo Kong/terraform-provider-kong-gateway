@@ -135,6 +135,27 @@ func (r *PluginKeyAuthResource) Schema(ctx context.Context, req resource.SchemaR
 						ElementType: types.StringType,
 						Description: `Describes an array of parameter names where the plugin will look for a key. The key names may only contain [a-z], [A-Z], [0-9], [_] underscore, and [-] hyphen.`,
 					},
+					"principals": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"directory": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The Kong Identity directory instance to authenticate against.`,
+							},
+							"enabled": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true, authenticate against Kong Identity instead of local credentials.`,
+							},
+							"error_on_miss": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true (default), return 401 if no matching principal is found in Kong Identity. When false, allow the request to continue unauthenticated instead.`,
+							},
+						},
+					},
 					"realm": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,

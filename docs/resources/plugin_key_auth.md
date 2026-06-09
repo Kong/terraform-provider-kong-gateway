@@ -31,6 +31,11 @@ resource "kong-gateway_plugin_key_auth" "my_pluginkeyauth" {
     key_names = [
       "..."
     ]
+    principals = {
+      directory     = "...my_directory..."
+      enabled       = true
+      error_on_miss = false
+    }
     realm            = "...my_realm..."
     run_on_preflight = false
   }
@@ -106,6 +111,7 @@ Optional:
 - `key_in_header` (Boolean) If enabled (default), the plugin reads the request header and tries to find the key in it.
 - `key_in_query` (Boolean) If enabled (default), the plugin reads the query parameter in the request and tries to find the key in it.
 - `key_names` (List of String) Describes an array of parameter names where the plugin will look for a key. The key names may only contain [a-z], [A-Z], [0-9], [_] underscore, and [-] hyphen.
+- `principals` (Attributes) (see [below for nested schema](#nestedatt--config--principals))
 - `realm` (String) When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
 - `run_on_preflight` (Boolean) A boolean value that indicates whether the plugin should run (and try to authenticate) on `OPTIONS` preflight requests. If set to `false`, then `OPTIONS` requests are always allowed.
 
@@ -117,6 +123,16 @@ Optional:
 - `id` (String) A string representing a UUID (universally unique identifier).
 - `region` (String)
 - `scope` (String) must be one of ["cp", "realm"]
+
+
+<a id="nestedatt--config--principals"></a>
+### Nested Schema for `config.principals`
+
+Optional:
+
+- `directory` (String) The Kong Identity directory instance to authenticate against.
+- `enabled` (Boolean) When true, authenticate against Kong Identity instead of local credentials.
+- `error_on_miss` (Boolean) When true (default), return 401 if no matching principal is found in Kong Identity. When false, allow the request to continue unauthenticated instead.
 
 
 

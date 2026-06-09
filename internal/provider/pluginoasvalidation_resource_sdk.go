@@ -24,9 +24,11 @@ func (r *PluginOasValidationResourceModel) RefreshFromSharedOasValidationPlugin(
 		r.Config.CustomBasePath = types.StringPointerValue(resp.Config.CustomBasePath)
 		r.Config.HeaderParameterCheck = types.BoolPointerValue(resp.Config.HeaderParameterCheck)
 		r.Config.IncludeBasePath = types.BoolPointerValue(resp.Config.IncludeBasePath)
+		r.Config.MaxStructuredErrors = types.Int64PointerValue(resp.Config.MaxStructuredErrors)
 		r.Config.NotifyOnlyRequestValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyRequestValidationFailure)
 		r.Config.NotifyOnlyResponseBodyValidationFailure = types.BoolPointerValue(resp.Config.NotifyOnlyResponseBodyValidationFailure)
 		r.Config.QueryParameterCheck = types.BoolPointerValue(resp.Config.QueryParameterCheck)
+		r.Config.StructuredErrors = types.BoolPointerValue(resp.Config.StructuredErrors)
 		r.Config.ValidateRequestBody = types.BoolPointerValue(resp.Config.ValidateRequestBody)
 		r.Config.ValidateRequestHeaderParams = types.BoolPointerValue(resp.Config.ValidateRequestHeaderParams)
 		r.Config.ValidateRequestQueryParams = types.BoolPointerValue(resp.Config.ValidateRequestQueryParams)
@@ -325,6 +327,12 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 	} else {
 		includeBasePath = nil
 	}
+	maxStructuredErrors := new(int64)
+	if !r.Config.MaxStructuredErrors.IsUnknown() && !r.Config.MaxStructuredErrors.IsNull() {
+		*maxStructuredErrors = r.Config.MaxStructuredErrors.ValueInt64()
+	} else {
+		maxStructuredErrors = nil
+	}
 	notifyOnlyRequestValidationFailure := new(bool)
 	if !r.Config.NotifyOnlyRequestValidationFailure.IsUnknown() && !r.Config.NotifyOnlyRequestValidationFailure.IsNull() {
 		*notifyOnlyRequestValidationFailure = r.Config.NotifyOnlyRequestValidationFailure.ValueBool()
@@ -342,6 +350,12 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 		*queryParameterCheck = r.Config.QueryParameterCheck.ValueBool()
 	} else {
 		queryParameterCheck = nil
+	}
+	structuredErrors := new(bool)
+	if !r.Config.StructuredErrors.IsUnknown() && !r.Config.StructuredErrors.IsNull() {
+		*structuredErrors = r.Config.StructuredErrors.ValueBool()
+	} else {
+		structuredErrors = nil
 	}
 	validateRequestBody := new(bool)
 	if !r.Config.ValidateRequestBody.IsUnknown() && !r.Config.ValidateRequestBody.IsNull() {
@@ -387,9 +401,11 @@ func (r *PluginOasValidationResourceModel) ToSharedOasValidationPlugin(ctx conte
 		CustomBasePath:                          customBasePath,
 		HeaderParameterCheck:                    headerParameterCheck,
 		IncludeBasePath:                         includeBasePath,
+		MaxStructuredErrors:                     maxStructuredErrors,
 		NotifyOnlyRequestValidationFailure:      notifyOnlyRequestValidationFailure,
 		NotifyOnlyResponseBodyValidationFailure: notifyOnlyResponseBodyValidationFailure,
 		QueryParameterCheck:                     queryParameterCheck,
+		StructuredErrors:                        structuredErrors,
 		ValidateRequestBody:                     validateRequestBody,
 		ValidateRequestHeaderParams:             validateRequestHeaderParams,
 		ValidateRequestQueryParams:              validateRequestQueryParams,

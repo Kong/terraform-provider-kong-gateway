@@ -122,10 +122,11 @@ func (k *KafkaLogPluginPartials) GetPath() *string {
 	return k.Path
 }
 
-// KafkaLogPluginMechanism - The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256` or `SCRAM-SHA-512`.
+// KafkaLogPluginMechanism - The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`, or `OAUTHBEARER`.
 type KafkaLogPluginMechanism string
 
 const (
+	KafkaLogPluginMechanismOauthbearer KafkaLogPluginMechanism = "OAUTHBEARER"
 	KafkaLogPluginMechanismPlain       KafkaLogPluginMechanism = "PLAIN"
 	KafkaLogPluginMechanismScramSha256 KafkaLogPluginMechanism = "SCRAM-SHA-256"
 	KafkaLogPluginMechanismScramSha512 KafkaLogPluginMechanism = "SCRAM-SHA-512"
@@ -140,6 +141,8 @@ func (e *KafkaLogPluginMechanism) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v {
+	case "OAUTHBEARER":
+		fallthrough
 	case "PLAIN":
 		fallthrough
 	case "SCRAM-SHA-256":
@@ -150,6 +153,75 @@ func (e *KafkaLogPluginMechanism) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("invalid value for KafkaLogPluginMechanism: %v", v)
 	}
+}
+
+// KafkaLogPluginOauthbearer - Options for SASL OAUTHBEARER authentication. Required when `mechanism` is `OAUTHBEARER`.
+type KafkaLogPluginOauthbearer struct {
+	// The OAuth2 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// The OAuth2 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Key-value pairs sent as extensions in the OAUTHBEARER SASL handshake (e.g. logicalCluster, identityPoolId).
+	Extensions map[string]string `json:"extensions,omitempty"`
+	// List of OAuth2 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	TokenEndpointTLSVerify *bool `json:"token_endpoint_tls_verify,omitempty"`
+	// The URL of the OAuth2 token endpoint.
+	TokenEndpointURL *string `json:"token_endpoint_url,omitempty"`
+}
+
+func (k KafkaLogPluginOauthbearer) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(k, "", false)
+}
+
+func (k *KafkaLogPluginOauthbearer) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &k, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k *KafkaLogPluginOauthbearer) GetClientID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ClientID
+}
+
+func (k *KafkaLogPluginOauthbearer) GetClientSecret() *string {
+	if k == nil {
+		return nil
+	}
+	return k.ClientSecret
+}
+
+func (k *KafkaLogPluginOauthbearer) GetExtensions() map[string]string {
+	if k == nil {
+		return nil
+	}
+	return k.Extensions
+}
+
+func (k *KafkaLogPluginOauthbearer) GetScopes() []string {
+	if k == nil {
+		return nil
+	}
+	return k.Scopes
+}
+
+func (k *KafkaLogPluginOauthbearer) GetTokenEndpointTLSVerify() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.TokenEndpointTLSVerify
+}
+
+func (k *KafkaLogPluginOauthbearer) GetTokenEndpointURL() *string {
+	if k == nil {
+		return nil
+	}
+	return k.TokenEndpointURL
 }
 
 // KafkaLogPluginStrategy - The authentication strategy for the plugin, the only option for the value is `sasl`.
@@ -177,8 +249,10 @@ func (e *KafkaLogPluginStrategy) UnmarshalJSON(data []byte) error {
 }
 
 type KafkaLogPluginAuthentication struct {
-	// The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256` or `SCRAM-SHA-512`.
+	// The SASL authentication mechanism.  Supported options: `PLAIN`, `SCRAM-SHA-256`, `SCRAM-SHA-512`, or `OAUTHBEARER`.
 	Mechanism *KafkaLogPluginMechanism `json:"mechanism,omitempty"`
+	// Options for SASL OAUTHBEARER authentication. Required when `mechanism` is `OAUTHBEARER`.
+	Oauthbearer *KafkaLogPluginOauthbearer `json:"oauthbearer,omitempty"`
 	// Password for SASL authentication.
 	Password *string `json:"password,omitempty"`
 	// The authentication strategy for the plugin, the only option for the value is `sasl`.
@@ -205,6 +279,13 @@ func (k *KafkaLogPluginAuthentication) GetMechanism() *KafkaLogPluginMechanism {
 		return nil
 	}
 	return k.Mechanism
+}
+
+func (k *KafkaLogPluginAuthentication) GetOauthbearer() *KafkaLogPluginOauthbearer {
+	if k == nil {
+		return nil
+	}
+	return k.Oauthbearer
 }
 
 func (k *KafkaLogPluginAuthentication) GetPassword() *string {

@@ -180,6 +180,14 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `The name of the cookie in which the bearer token is passed.`,
 					},
+					"bearer_token_header_name": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The name of the HTTP header from which the bearer token is retrieved. When configured, only this header is checked for the bearer token.`,
+						Validators: []validator.String{
+							stringvalidator.UTF8LengthAtLeast(1),
+						},
+					},
 					"bearer_token_param_type": schema.ListAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -395,6 +403,12 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						ElementType: types.StringType,
 						Description: `The client secret.`,
+					},
+					"cluster_cache_items": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Specifies which items are stored in the cluster cache backend configured via ` + "`" + `cluster_cache_strategy` + "`" + `. Allowed values are ` + "`" + `"introspection"` + "`" + ` and ` + "`" + `"tokens"` + "`" + `. When ` + "`" + `"tokens"` + "`" + ` is included, access and refresh token material is AES-encrypted before being written to the cache; enable only when your Redis deployment meets your compliance requirements. Defaults to ` + "`" + `["introspection"]` + "`" + `. An empty set disables all cluster caching regardless of ` + "`" + `cluster_cache_strategy` + "`" + `.`,
 					},
 					"cluster_cache_redis": schema.SingleNestedAttribute{
 						Computed: true,
@@ -649,7 +663,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"cluster_cache_strategy": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The strategy to use for the cluster cache. If set, the plugin will share cache with nodes configured with the same strategy backend. Currentlly only introspection cache is shared. must be one of ["off", "redis"]`,
+						Description: `The strategy to use for the cluster cache. If set, the plugin will share introspection cache with nodes configured with the same strategy backend. must be one of ["off", "redis"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"off",
@@ -1170,6 +1184,52 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `With this parameter, you can preserve request query arguments even when doing authorization code flow.`,
 					},
+					"principals": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"directory": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The Kong Identity directory instance to look up against.`,
+							},
+							"enabled": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true, query Kong Identity to map a Principal after token verification.`,
+							},
+							"error_on_miss": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true (default), return 401 if fail to match a Principal in Kong Identity after token verification. When false, the request continues without authenticated_principal set.`,
+							},
+							"match_consumer": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `If a Consumer is attached to the matched Principal in Kong Identity, load it and set it in the request context, overriding consumer_by.`,
+							},
+							"match_consumer_groups": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `If Consumer Groups are attached to the matched Principal in Kong Identity, load them, overriding consumer_groups_claim.`,
+							},
+							"principal_by": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Custom identity name for a type=custom Kong Identity lookup. When absent and principal_claim is set, an OIDC lookup is performed using principal_claim as the claim name instead of 'sub'.`,
+								Validators: []validator.String{
+									stringvalidator.UTF8LengthAtLeast(1),
+								},
+							},
+							"principal_claim": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `Token claim to use for the Kong Identity lookup. If multiple values are set, it means the claim is inside a nested object of the token payload. When principal_by is also set, performs a custom identity lookup (type=custom). When set alone, performs an OIDC lookup using this claim name instead of the default 'sub'.`,
+							},
+						},
+						Description: `Configuration for Kong Identity principal hydration after token verification.`,
+					},
 					"proof_of_possession_auth_methods_validation": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -1198,6 +1258,104 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 								"strict",
 							),
 						},
+					},
+					"proof_of_possession_mtls_from_header": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"allow_partial_chain": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Allow certificate verification with only an intermediate certificate. When enabled, a full chain to the root CA is not required.`,
+							},
+							"ca_certificates": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `List of CA Certificate UUIDs to use when validating the client certificate chain. At least one is required. Not Null`,
+								Validators: []validator.List{
+									speakeasy_listvalidators.NotNull(),
+								},
+							},
+							"cert_cache_ttl": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Time in milliseconds to cache the revocation check result for a given certificate.`,
+							},
+							"certificate_header_format": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Encoding format of the certificate in the header. Supported formats: ` + "`" + `url_encoded` + "`" + `, ` + "`" + `base64_encoded` + "`" + `. must be one of ["base64_encoded", "url_encoded"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"base64_encoded",
+										"url_encoded",
+									),
+								},
+							},
+							"certificate_header_name": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Name of the HTTP header that contains the injected client certificate. Not Null`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+								},
+							},
+							"http_proxy_host": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A string representing a host name, such as example.com.`,
+							},
+							"http_proxy_port": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 65535),
+								},
+							},
+							"http_timeout": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `HTTP timeout in milliseconds when communicating with the OCSP server or downloading CRL.`,
+							},
+							"https_proxy_host": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A string representing a host name, such as example.com.`,
+							},
+							"https_proxy_port": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `An integer representing a port number between 0 and 65535, inclusive.`,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 65535),
+								},
+							},
+							"revocation_check_mode": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Controls client certificate revocation check behavior. ` + "`" + `SKIP` + "`" + ` disables revocation checking. ` + "`" + `IGNORE_CA_ERROR` + "`" + ` respects revocation status when reachable but ignores network errors. ` + "`" + `STRICT` + "`" + ` requires a successful revocation check. must be one of ["IGNORE_CA_ERROR", "SKIP", "STRICT"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"IGNORE_CA_ERROR",
+										"SKIP",
+										"STRICT",
+									),
+								},
+							},
+							"secure_source": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When set to ` + "`" + `true` + "`" + `, only requests from trusted IP addresses (configured in ` + "`" + `trusted_ips` + "`" + ` in kong.conf) are allowed to use the certificate header. This prevents direct header injection from untrusted clients.`,
+							},
+							"ssl_verify": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Verify the TLS certificate of the OCSP responder or CRL distribution point server.`,
+							},
+						},
+						Description: `Configuration for reading the client certificate from an HTTP header injected by a WAF or L7 proxy that terminates TLS. When configured, the plugin reads and validates the certificate from the specified header for mTLS Proof-of-Possession (PoP) verification instead of (or in addition to) the TLS layer certificate.`,
 					},
 					"pushed_authorization_request_endpoint": schema.StringAttribute{
 						Computed:    true,
@@ -1867,12 +2025,12 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 									"empty_audience": schema.BoolAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Use empty audiences. Use this field to override audiences defined in ` + "`" + `config.audience` + "`" + `.`,
+										Description: `Use empty audiences. Use this field to remove audiences defined in ` + "`" + `config.audience` + "`" + `.`,
 									},
 									"empty_scopes": schema.BoolAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Use empty scopes. Use this field to override scopes defined in ` + "`" + `config.scopes` + "`" + `.`,
+										Description: `Use empty scopes. Use this field to remove scopes defined in ` + "`" + `config.scopes` + "`" + `.`,
 									},
 									"scopes": schema.ListAttribute{
 										Computed:    true,
@@ -1916,7 +2074,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 													ElementType: types.StringType,
 												},
 											},
-											Description: `A tokens will only be exchange when it matches all these criteria. To exchanging tokens issued from a different issuer, conditions must not be defined; On the contrary, to exchange tokens issued from the target issuer itself, conditions must be defined.`,
+											Description: `A token will only be exchanged when it matches all these criteria. To exchange tokens issued by a different issuer, ` + "`" + `conditions` + "`" + ` must not be defined. In contrast, to exchange tokens issued by the target issuer itself, ` + "`" + `conditions` + "`" + ` must be defined.`,
 										},
 										"issuer": schema.StringAttribute{
 											Computed:    true,
@@ -1925,6 +2083,16 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 											Validators: []validator.String{
 												speakeasy_stringvalidators.NotNull(),
 											},
+										},
+										"jwks_uri": schema.StringAttribute{
+											Computed:    true,
+											Optional:    true,
+											Description: `An explicit JWKS endpoint for this issuer. This field should be left empty when this issuer is the same as the target issuer. It is only used when ` + "`" + `verify_signature` + "`" + ` is ` + "`" + `true` + "`" + `. When set, Kong fetches the signing keys from this URI directly instead of using OIDC Discovery.`,
+										},
+										"verify_signature": schema.BoolAttribute{
+											Computed:    true,
+											Optional:    true,
+											Description: `When true, Kong cryptographically verifies the signature of the incoming subject token before exchanging it. This field should be left empty or set to ` + "`" + `false` + "`" + ` when this issuer is the same as the target issuer. Defaults to ` + "`" + `false` + "`" + ` for backward compatibility.`,
 										},
 									},
 								},

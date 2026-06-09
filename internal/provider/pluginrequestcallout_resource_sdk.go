@@ -154,7 +154,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			if calloutsItem.Request.Headers == nil {
 				callouts.Request.Headers = nil
 			} else {
-				callouts.Request.Headers = &tfTypes.RequestCalloutPluginConfigHeaders{}
+				callouts.Request.Headers = &tfTypes.RequestCalloutPluginConfigCalloutsHeaders{}
 				if len(calloutsItem.Request.Headers.Custom) > 0 {
 					callouts.Request.Headers.Custom = make(map[string]types.String, len(calloutsItem.Request.Headers.Custom))
 					for key1, value1 := range calloutsItem.Request.Headers.Custom {
@@ -191,7 +191,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			if calloutsItem.Request.Query == nil {
 				callouts.Request.Query = nil
 			} else {
-				callouts.Request.Query = &tfTypes.RequestCalloutPluginConfigHeaders{}
+				callouts.Request.Query = &tfTypes.RequestCalloutPluginConfigCalloutsHeaders{}
 				if len(calloutsItem.Request.Query.Custom) > 0 {
 					callouts.Request.Query.Custom = make(map[string]types.String, len(calloutsItem.Request.Query.Custom))
 					for key2, value2 := range calloutsItem.Request.Query.Custom {
@@ -216,7 +216,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 				if calloutsItem.Response.Headers == nil {
 					callouts.Response.Headers = nil
 				} else {
-					callouts.Response.Headers = &tfTypes.RequestCalloutPluginHeaders{}
+					callouts.Response.Headers = &tfTypes.RequestCalloutPluginConfigHeaders{}
 					callouts.Response.Headers.Store = types.BoolPointerValue(calloutsItem.Response.Headers.Store)
 				}
 			}
@@ -244,7 +244,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			if resp.Config.Upstream.Headers == nil {
 				r.Config.Upstream.Headers = nil
 			} else {
-				r.Config.Upstream.Headers = &tfTypes.RequestCalloutPluginConfigHeaders{}
+				r.Config.Upstream.Headers = &tfTypes.RequestCalloutPluginConfigCalloutsHeaders{}
 				if len(resp.Config.Upstream.Headers.Custom) > 0 {
 					r.Config.Upstream.Headers.Custom = make(map[string]types.String, len(resp.Config.Upstream.Headers.Custom))
 					for key4, value4 := range resp.Config.Upstream.Headers.Custom {
@@ -256,7 +256,7 @@ func (r *PluginRequestCalloutResourceModel) RefreshFromSharedRequestCalloutPlugi
 			if resp.Config.Upstream.Query == nil {
 				r.Config.Upstream.Query = nil
 			} else {
-				r.Config.Upstream.Query = &tfTypes.RequestCalloutPluginConfigHeaders{}
+				r.Config.Upstream.Query = &tfTypes.RequestCalloutPluginConfigCalloutsHeaders{}
 				if len(resp.Config.Upstream.Query.Custom) > 0 {
 					r.Config.Upstream.Query.Custom = make(map[string]types.String, len(resp.Config.Upstream.Query.Custom))
 					for key5, value5 := range resp.Config.Upstream.Query.Custom {
@@ -918,7 +918,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 				Retries:           retries,
 			}
 		}
-		var headers *shared.RequestCalloutPluginConfigHeaders
+		var headers *shared.RequestCalloutPluginConfigCalloutsHeaders
 		if r.Config.Callouts[calloutsIndex].Request.Headers != nil {
 			custom1 := make(map[string]string)
 			for customKey1 := range r.Config.Callouts[calloutsIndex].Request.Headers.Custom {
@@ -933,7 +933,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 			} else {
 				forward1 = nil
 			}
-			headers = &shared.RequestCalloutPluginConfigHeaders{
+			headers = &shared.RequestCalloutPluginConfigCalloutsHeaders{
 				Custom:  custom1,
 				Forward: forward1,
 			}
@@ -1084,7 +1084,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 			} else {
 				byLua1 = nil
 			}
-			var headers1 *shared.RequestCalloutPluginHeaders
+			var headers1 *shared.RequestCalloutPluginConfigHeaders
 			if r.Config.Callouts[calloutsIndex].Response.Headers != nil {
 				store1 := new(bool)
 				if !r.Config.Callouts[calloutsIndex].Response.Headers.Store.IsUnknown() && !r.Config.Callouts[calloutsIndex].Response.Headers.Store.IsNull() {
@@ -1092,7 +1092,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 				} else {
 					store1 = nil
 				}
-				headers1 = &shared.RequestCalloutPluginHeaders{
+				headers1 = &shared.RequestCalloutPluginConfigHeaders{
 					Store: store1,
 				}
 			}
@@ -1145,7 +1145,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 		} else {
 			byLua2 = nil
 		}
-		var headers2 *shared.Headers
+		var headers2 *shared.RequestCalloutPluginHeaders
 		if r.Config.Upstream.Headers != nil {
 			custom4 := make(map[string]string)
 			for customKey4 := range r.Config.Upstream.Headers.Custom {
@@ -1160,7 +1160,7 @@ func (r *PluginRequestCalloutResourceModel) ToSharedRequestCalloutPlugin(ctx con
 			} else {
 				forward4 = nil
 			}
-			headers2 = &shared.Headers{
+			headers2 = &shared.RequestCalloutPluginHeaders{
 				Custom:  custom4,
 				Forward: forward4,
 			}

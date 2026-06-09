@@ -21,6 +21,7 @@ jobs:
         terraform-version:
           - "1.11.*"
         kong-gateway-version:
+          - "3.15"
           - "3.14"
           - "3.13"
           - "3.12"
@@ -46,6 +47,7 @@ jobs:
       - name: Setup Kong Gateway
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
+          KONG_CUSTOM_PLUGIN_STREAMING_ENABLED: "on"
         run: |
           curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }} -e KONG_LICENSE_DATA
       - run: make acceptance

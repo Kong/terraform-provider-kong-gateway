@@ -1,5 +1,5 @@
 resource "kong-gateway_custom_plugin_streaming" "my_streaming_plugin" {
-  name = "my-custom-streaming"
+  name = "set-header"
 
   handler = <<-EOT
     return {
@@ -38,6 +38,8 @@ resource "kong-gateway_custom_plugin" "seth1" {
     name = "x-custom-header"
     value = "my-custom-value"
   }
+
+  depends_on = [ kong-gateway_custom_plugin_streaming.my_streaming_plugin ]
 }
 
 
@@ -47,9 +49,10 @@ resource "kong-gateway_cloned_plugin" "my_cloned_plugin" {
 }
 
 resource "kong-gateway_custom_plugin" "my_custom_acl" {
-  group       = "demo"
   name = "custom-acl"
   config = {
     allow = ["mygroup"]
   }
+
+  depends_on = [ kong-gateway_cloned_plugin.my_cloned_plugin ]
 }

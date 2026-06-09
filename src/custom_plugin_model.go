@@ -76,7 +76,7 @@ func (r *CustomPluginResourceModel) ToSharedPluginInput() (shared.Plugin, error)
 	}
 
 	if r.Route != nil {
-		pluginInput.Route = &shared.Route{
+		pluginInput.Route = &shared.PluginRoute{
 			ID: r.Route.ID,
 		}
 	}

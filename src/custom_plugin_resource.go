@@ -375,7 +375,7 @@ func pointerToId[T any](obj *T) *ForeignKeyWithId {
 		x.ID = v.ID
 	case *shared.PluginConsumerGroup:
 		x.ID = v.ID
-	case *shared.Route:
+	case *shared.PluginRoute:
 		x.ID = v.ID
 	case *shared.PluginService:
 		x.ID = v.ID

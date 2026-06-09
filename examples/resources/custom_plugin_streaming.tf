@@ -1,5 +1,5 @@
 resource "kong-gateway_custom_plugin_streaming" "my_streaming_plugin" {
-  name = "my-streaming-plugin"
+  name = "set-header"
 
   handler = <<-EOT
     return {

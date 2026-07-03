@@ -1,6 +1,6 @@
 module github.com/kong/terraform-provider-kong-gateway
 
-go 1.25.8
+go 1.25.10
 
 require (
 	github.com/hashicorp/go-uuid v1.0.3

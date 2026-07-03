@@ -49,7 +49,7 @@ jobs:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
           KONG_CUSTOM_PLUGIN_STREAMING_ENABLED: "on"
         run: |
-          curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }} -e KONG_LICENSE_DATA
+          curl -Ls https://get.konghq.com/quickstart | bash -s -- -t ${{ matrix.kong-gateway-version }} -e KONG_LICENSE_DATA -e KONG_CUSTOM_PLUGIN_STREAMING_ENABLED
       - run: make acceptance
         env:
           KONG_VERSION: ${{ matrix.kong-gateway-version }}

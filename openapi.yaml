@@ -13,7 +13,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Kong Enterprise Admin API
-  version: 3.16.0
+  version: 3.15.0
 servers:
   - description: Default Admin API URL
     url: '{protocol}://{hostname}:{port}{path}'
@@ -12365,7 +12365,6 @@ paths:
         - CA Certificates
   /cloned-plugins:
     post:
-      x-internal: true
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: ClonedPlugin#create
@@ -12392,7 +12391,6 @@ paths:
         - Cloned Plugins
   /cloned-plugins/{ClonedPluginIdOrName}:
     delete:
-      x-internal: true
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: ClonedPlugin#delete
@@ -12409,7 +12407,6 @@ paths:
       tags:
         - Cloned Plugins
     get:
-      x-internal: true
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: ClonedPlugin#read
@@ -12432,7 +12429,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/ClonedPluginIdOrName'
     put:
-      x-internal: true
       x-speakeasy-entity-operation:
         terraform-datasource: null
         terraform-resource: ClonedPlugin#update

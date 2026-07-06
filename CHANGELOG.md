@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.2.0
-> Released on 2026/06/??
+> Released on 2026/07/06
 
 ### Features
 * Upgrade to Kong Gateway 3.15

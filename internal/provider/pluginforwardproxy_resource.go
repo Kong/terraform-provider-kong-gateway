@@ -86,6 +86,12 @@ func (r *PluginForwardProxyResource) Schema(ctx context.Context, req resource.Sc
 						MarkdownDescription: `The username to authenticate with, if the forward proxy is protected` + "\n" +
 							`by basic authentication.`,
 					},
+					"ca_certificates": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `Array of CA Certificate object UUIDs used to build the trust store for verifying the upstream server's TLS certificate. When https_verify is enabled and this array is non-empty, those CAs override the global lua_ssl_trusted_certificate for requests proxied by this plugin. When unset or empty, verification falls back to the global lua_ssl_trusted_certificate. When https_verify is disabled, the value is retained in the configuration but ignored at request time.`,
+					},
 					"http_proxy_host": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -115,7 +121,7 @@ func (r *PluginForwardProxyResource) Schema(ctx context.Context, req resource.Sc
 					"https_verify": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Whether the server certificate will be verified according to the CA certificates specified in lua_ssl_trusted_certificate.`,
+						Description: `Whether the server certificate will be verified. When ca_certificates is configured, those certificates are used for verification. Otherwise, verification uses the CA certificates specified in lua_ssl_trusted_certificate.`,
 					},
 					"proxy_scheme": schema.StringAttribute{
 						Computed:    true,

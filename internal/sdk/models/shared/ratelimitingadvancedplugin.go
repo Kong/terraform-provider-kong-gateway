@@ -166,6 +166,36 @@ func (e *CompoundIdentifier) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// CounterKey - The key used to identify the counter for rate limiting. This can be based on consumer attributes such as `consumer.id`, `consumer.username`, or `consumer.custom_id`. Only applicable when `identifier` is set to `consumer`.
+type CounterKey string
+
+const (
+	CounterKeyConsumerCustomID CounterKey = "consumer.custom_id"
+	CounterKeyConsumerID       CounterKey = "consumer.id"
+	CounterKeyConsumerUsername CounterKey = "consumer.username"
+)
+
+func (e CounterKey) ToPointer() *CounterKey {
+	return &e
+}
+func (e *CounterKey) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "consumer.custom_id":
+		fallthrough
+	case "consumer.id":
+		fallthrough
+	case "consumer.username":
+		*e = CounterKey(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for CounterKey: %v", v)
+	}
+}
+
 // RateLimitingAdvancedPluginIdentifier - The type of identifier used to generate the rate limit key. Defines the scope used to increment the rate limiting counters. Note if `identifier` is `consumer-group`, the plugin must be applied on a consumer group entity. Because a consumer may belong to multiple consumer groups, the plugin needs to know explicitly which consumer group to limit the rate.
 type RateLimitingAdvancedPluginIdentifier string
 
@@ -815,6 +845,8 @@ type RateLimitingAdvancedPluginConfig struct {
 	CompoundIdentifier []CompoundIdentifier `json:"compound_identifier,omitempty"`
 	// List of consumer groups allowed to override the rate limiting settings for the given Route or Service. Required if `enforce_consumer_groups` is set to `true`.
 	ConsumerGroups []string `json:"consumer_groups,omitempty"`
+	// The key used to identify the counter for rate limiting. This can be based on consumer attributes such as `consumer.id`, `consumer.username`, or `consumer.custom_id`. Only applicable when `identifier` is set to `consumer`.
+	CounterKey *CounterKey `json:"counter_key,omitempty"`
 	// The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is `config.strategy` is `cluster` or `redis` and `config.sync_rate` isn't `-1`), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 	// If set to `true`, this doesn't count denied requests (status = `429`). If set to `false`, all requests, including denied ones, are counted. This parameter only affects the `sliding` window_type.
@@ -876,6 +908,13 @@ func (r *RateLimitingAdvancedPluginConfig) GetConsumerGroups() []string {
 		return nil
 	}
 	return r.ConsumerGroups
+}
+
+func (r *RateLimitingAdvancedPluginConfig) GetCounterKey() *CounterKey {
+	if r == nil {
+		return nil
+	}
+	return r.CounterKey
 }
 
 func (r *RateLimitingAdvancedPluginConfig) GetDictionaryName() *string {

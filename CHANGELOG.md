@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+> Released on 2026/07/06
+
+### Features
+* Upgrade to Kong Gateway 3.15
+  * Add `kong-gateway_custom_plugin_streaming` and `kong-gateway_cloned_plugin` resources
+
 ## 1.1.0
 > Released on 2026/04/24
 

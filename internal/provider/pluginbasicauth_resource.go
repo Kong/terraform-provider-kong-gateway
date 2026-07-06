@@ -76,7 +76,7 @@ func (r *PluginBasicAuthResource) Schema(ctx context.Context, req resource.Schem
 					"anonymous": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure ` + "`" + `4xx` + "`" + `. Please note that this value must refer to the Consumer ` + "`" + `id` + "`" + ` or ` + "`" + `username` + "`" + ` attribute, and **not** its ` + "`" + `custom_id` + "`" + `.`,
+						Description: `An optional string (Consumer UUID or username) value to use as an "anonymous" consumer if authentication fails. If empty (default null), the request will fail with an authentication failure ` + "`" + `4xx` + "`" + `. Please note that this value must refer to the Consumer ` + "`" + `id` + "`" + ` or ` + "`" + `username` + "`" + ` attribute, and **not** its ` + "`" + `custom_id` + "`" + `.`,
 					},
 					"brute_force_protection": schema.SingleNestedAttribute{
 						Computed: true,
@@ -233,6 +233,27 @@ func (r *PluginBasicAuthResource) Schema(ctx context.Context, req resource.Schem
 						Computed:    true,
 						Optional:    true,
 						Description: `An optional boolean value telling the plugin to show or hide the credential from the upstream service. If ` + "`" + `true` + "`" + `, the plugin will strip the credential from the request (i.e. the ` + "`" + `Authorization` + "`" + ` header) before proxying it.`,
+					},
+					"principals": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"directory": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The Kong Identity directory instance to authenticate against.`,
+							},
+							"enabled": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true, authenticate against Kong Identity instead of local credentials.`,
+							},
+							"error_on_miss": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When true (default), return 401 if no matching principal is found in Kong Identity. When false, allow the request to continue unauthenticated instead.`,
+							},
+						},
 					},
 					"realm": schema.StringAttribute{
 						Computed:    true,

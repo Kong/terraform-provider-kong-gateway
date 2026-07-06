@@ -13,6 +13,8 @@ type GetConsumerGroupRequest struct {
 	ConsumerGroupID string `pathParam:"style=simple,explode=false,name=ConsumerGroupId"`
 	// The name of the workspace
 	Workspace string `default:"default" pathParam:"style=simple,explode=false,name=workspace"`
+	// Expand the consumer group to include a list of its consumers.
+	ListConsumers *bool `queryParam:"style=form,explode=true,name=list_consumers"`
 }
 
 func (g GetConsumerGroupRequest) MarshalJSON() ([]byte, error) {
@@ -38,6 +40,13 @@ func (g *GetConsumerGroupRequest) GetWorkspace() string {
 		return ""
 	}
 	return g.Workspace
+}
+
+func (g *GetConsumerGroupRequest) GetListConsumers() *bool {
+	if g == nil {
+		return nil
+	}
+	return g.ListConsumers
 }
 
 type GetConsumerGroupResponse struct {

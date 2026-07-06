@@ -87,6 +87,18 @@ func (r *PluginRateLimitingAdvancedResource) Schema(ctx context.Context, req res
 						ElementType: types.StringType,
 						Description: `List of consumer groups allowed to override the rate limiting settings for the given Route or Service. Required if ` + "`" + `enforce_consumer_groups` + "`" + ` is set to ` + "`" + `true` + "`" + `.`,
 					},
+					"counter_key": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The key used to identify the counter for rate limiting. This can be based on consumer attributes such as ` + "`" + `consumer.id` + "`" + `, ` + "`" + `consumer.username` + "`" + `, or ` + "`" + `consumer.custom_id` + "`" + `. Only applicable when ` + "`" + `identifier` + "`" + ` is set to ` + "`" + `consumer` + "`" + `. must be one of ["consumer.custom_id", "consumer.id", "consumer.username"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"consumer.custom_id",
+								"consumer.id",
+								"consumer.username",
+							),
+						},
+					},
 					"dictionary_name": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,

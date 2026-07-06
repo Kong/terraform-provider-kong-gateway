@@ -183,6 +183,8 @@ type ForwardProxyPluginConfig struct {
 	// The username to authenticate with, if the forward proxy is protected
 	// by basic authentication.
 	AuthUsername *string `json:"auth_username,omitempty"`
+	// Array of CA Certificate object UUIDs used to build the trust store for verifying the upstream server's TLS certificate. When https_verify is enabled and this array is non-empty, those CAs override the global lua_ssl_trusted_certificate for requests proxied by this plugin. When unset or empty, verification falls back to the global lua_ssl_trusted_certificate. When https_verify is disabled, the value is retained in the configuration but ignored at request time.
+	CaCertificates []string `json:"ca_certificates,omitempty"`
 	// A string representing a host name, such as example.com.
 	HTTPProxyHost *string `json:"http_proxy_host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
@@ -191,7 +193,7 @@ type ForwardProxyPluginConfig struct {
 	HTTPSProxyHost *string `json:"https_proxy_host,omitempty"`
 	// An integer representing a port number between 0 and 65535, inclusive.
 	HTTPSProxyPort *int64 `json:"https_proxy_port,omitempty"`
-	// Whether the server certificate will be verified according to the CA certificates specified in lua_ssl_trusted_certificate.
+	// Whether the server certificate will be verified. When ca_certificates is configured, those certificates are used for verification. Otherwise, verification uses the CA certificates specified in lua_ssl_trusted_certificate.
 	HTTPSVerify *bool `json:"https_verify,omitempty"`
 	// The proxy scheme to use when connecting. Only `http` is supported.
 	ProxyScheme *ProxyScheme `json:"proxy_scheme,omitempty"`
@@ -222,6 +224,13 @@ func (f *ForwardProxyPluginConfig) GetAuthUsername() *string {
 		return nil
 	}
 	return f.AuthUsername
+}
+
+func (f *ForwardProxyPluginConfig) GetCaCertificates() []string {
+	if f == nil {
+		return nil
+	}
+	return f.CaCertificates
 }
 
 func (f *ForwardProxyPluginConfig) GetHTTPProxyHost() *string {

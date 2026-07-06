@@ -2,7 +2,7 @@
 
 package sdk
 
-// Generated from OpenAPI doc version 3.14.0 and generator version 2.881.4
+// Generated from OpenAPI doc version 3.15.0 and generator version 2.915.0
 
 import (
 	"context"
@@ -154,6 +154,8 @@ type KongGateway struct {
 	// A CA certificate object represents a trusted certificate authority.
 	// These objects are used by Kong Gateway to verify the validity of a client or server certificate.
 	CACertificates *CACertificates
+	ClonedPlugins  *ClonedPlugins
+	CustomPlugins  *CustomPlugins
 	// Group routes
 	Groups *Groups
 	// The workspace object describes the workspace entity, which has an ID and a name.
@@ -315,9 +317,9 @@ func WithTimeout(timeout time.Duration) SDKOption {
 // New creates a new instance of the SDK with the provided options
 func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
-		SDKVersion: "1.1.0",
+		SDKVersion: "1.2.0",
 		sdkConfiguration: config.SDKConfiguration{
-			UserAgent:  "speakeasy-sdk/terraform 1.1.0 2.881.4 3.14.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			UserAgent:  "speakeasy-sdk/terraform 1.2.0 2.915.0 3.15.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerList: ServerList,
 			ServerVariables: []map[string]string{
 				{
@@ -372,6 +374,8 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk.Targets = newTargets(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Vaults = newVaults(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.CACertificates = newCACertificates(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.ClonedPlugins = newClonedPlugins(sdk, sdk.sdkConfiguration, sdk.hooks)
+	sdk.CustomPlugins = newCustomPlugins(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Groups = newGroups(sdk, sdk.sdkConfiguration, sdk.hooks)
 	sdk.Workspaces = newWorkspaces(sdk, sdk.sdkConfiguration, sdk.hooks)
 

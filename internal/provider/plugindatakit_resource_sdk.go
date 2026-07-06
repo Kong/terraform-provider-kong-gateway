@@ -286,6 +286,7 @@ func (r *PluginDatakitResourceModel) RefreshFromSharedDatakitPlugin(ctx context.
 				}
 				nodes.Property.Input = types.StringPointerValue(nodesItem.Property.Input)
 				nodes.Property.Name = types.StringPointerValue(nodesItem.Property.Name)
+				nodes.Property.NonNil = types.BoolPointerValue(nodesItem.Property.NonNil)
 				nodes.Property.Output = types.StringPointerValue(nodesItem.Property.Output)
 				nodes.Property.Property = types.StringValue(nodesItem.Property.Property)
 				if nodesItem.Property.Type != nil {
@@ -1533,6 +1534,12 @@ func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) 
 			} else {
 				name10 = nil
 			}
+			nonNil := new(bool)
+			if !r.Config.Nodes[nodesItem].Property.NonNil.IsUnknown() && !r.Config.Nodes[nodesItem].Property.NonNil.IsNull() {
+				*nonNil = r.Config.Nodes[nodesItem].Property.NonNil.ValueBool()
+			} else {
+				nonNil = nil
+			}
 			output8 := new(string)
 			if !r.Config.Nodes[nodesItem].Property.Output.IsUnknown() && !r.Config.Nodes[nodesItem].Property.Output.IsNull() {
 				*output8 = r.Config.Nodes[nodesItem].Property.Output.ValueString()
@@ -1552,6 +1559,7 @@ func (r *PluginDatakitResourceModel) ToSharedDatakitPlugin(ctx context.Context) 
 				ContentType: contentType,
 				Input:       input9,
 				Name:        name10,
+				NonNil:      nonNil,
 				Output:      output8,
 				Property:    property1,
 				Type:        typeVar9,

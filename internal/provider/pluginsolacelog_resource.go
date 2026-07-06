@@ -189,6 +189,53 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 										Optional:    true,
 										Description: `Specifies the header that contains Basic Authentication credentials for the ` + "`" + `BASIC` + "`" + ` authentication scheme when connecting to an event broker. This header takes precedence over the ` + "`" + `username` + "`" + ` and ` + "`" + `password` + "`" + ` fields.`,
 									},
+									"client_credentials": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The OAuth2 client ID used with ` + "`" + `CLIENT_CREDENTIALS` + "`" + ` authentication scheme when connecting to an event broker. Not Null`,
+												Validators: []validator.String{
+													speakeasy_stringvalidators.NotNull(),
+												},
+											},
+											"client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The OAuth2 client secret used with ` + "`" + `CLIENT_CREDENTIALS` + "`" + ` authentication scheme when connecting to an event broker. Not Null`,
+												Validators: []validator.String{
+													speakeasy_stringvalidators.NotNull(),
+												},
+											},
+											"eagerly_expire": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Number of seconds before actual expiry when cached access tokens should be considered expired and proactively renewed. This helps prevent edge cases where tokens are rejected by Solace just as they expire, but setting this too high may lead to unnecessary token refreshes.`,
+											},
+											"scopes": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `The OAuth2 scopes to request when retrieving access tokens for the ` + "`" + `CLIENT_CREDENTIALS` + "`" + ` authentication scheme.`,
+											},
+											"ssl_verify": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Controls TLS certificate verification for HTTPS token endpoint requests.`,
+											},
+											"token_endpoint": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The OAuth2 token endpoint URL used to retrieve access tokens for the ` + "`" + `CLIENT_CREDENTIALS` + "`" + ` authentication scheme when connecting to an event broker. Not Null`,
+												Validators: []validator.String{
+													speakeasy_stringvalidators.NotNull(),
+												},
+											},
+										},
+										Description: `Client credentials used to automatically obtain and renew OAuth2 access tokens from an IdP for the ` + "`" + `CLIENT_CREDENTIALS` + "`" + ` authentication scheme. When set, Kong fetches tokens from ` + "`" + `token_endpoint` + "`" + ` using ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + `, caches them until expiry, and retries with a fresh token whenever Solace returns an unauthenticated response.`,
+									},
 									"id_token": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
@@ -210,10 +257,11 @@ func (r *PluginSolaceLogResource) Schema(ctx context.Context, req resource.Schem
 									"scheme": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `The client authentication scheme used when connection to an event broker. must be one of ["BASIC", "NONE", "OAUTH2"]`,
+										Description: `The client authentication scheme used when connection to an event broker. must be one of ["BASIC", "CLIENT_CREDENTIALS", "NONE", "OAUTH2"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"BASIC",
+												"CLIENT_CREDENTIALS",
 												"NONE",
 												"OAUTH2",
 											),

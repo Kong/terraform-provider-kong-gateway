@@ -83,14 +83,54 @@ func (r *PluginKafkaLogResource) Schema(ctx context.Context, req resource.Schema
 							"mechanism": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + `, ` + "`" + `SCRAM-SHA-256` + "`" + ` or ` + "`" + `SCRAM-SHA-512` + "`" + `. must be one of ["PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]`,
+								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + `, ` + "`" + `SCRAM-SHA-256` + "`" + `, ` + "`" + `SCRAM-SHA-512` + "`" + `, or ` + "`" + `OAUTHBEARER` + "`" + `. must be one of ["OAUTHBEARER", "PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
+										"OAUTHBEARER",
 										"PLAIN",
 										"SCRAM-SHA-256",
 										"SCRAM-SHA-512",
 									),
 								},
+							},
+							"oauthbearer": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The OAuth2 client ID.`,
+									},
+									"client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The OAuth2 client secret.`,
+									},
+									"extensions": schema.MapAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Key-value pairs sent as extensions in the OAUTHBEARER SASL handshake (e.g. logicalCluster, identityPoolId).`,
+									},
+									"scopes": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `List of OAuth2 scopes to request.`,
+									},
+									"token_endpoint_tls_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Whether to verify the TLS certificate of the token endpoint.`,
+									},
+									"token_endpoint_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The URL of the OAuth2 token endpoint.`,
+									},
+								},
+								Description: `Options for SASL OAUTHBEARER authentication. Required when ` + "`" + `mechanism` + "`" + ` is ` + "`" + `OAUTHBEARER` + "`" + `.`,
 							},
 							"password": schema.StringAttribute{
 								Computed:    true,

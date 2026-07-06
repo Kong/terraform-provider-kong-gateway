@@ -445,12 +445,54 @@ func (b *BruteForceProtection) GetStrategy() *BasicAuthPluginStrategy {
 	return b.Strategy
 }
 
+type Principals struct {
+	// The Kong Identity directory instance to authenticate against.
+	Directory *string `json:"directory,omitempty"`
+	// When true, authenticate against Kong Identity instead of local credentials.
+	Enabled *bool `json:"enabled,omitempty"`
+	// When true (default), return 401 if no matching principal is found in Kong Identity. When false, allow the request to continue unauthenticated instead.
+	ErrorOnMiss *bool `json:"error_on_miss,omitempty"`
+}
+
+func (p Principals) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *Principals) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Principals) GetDirectory() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Directory
+}
+
+func (p *Principals) GetEnabled() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.Enabled
+}
+
+func (p *Principals) GetErrorOnMiss() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.ErrorOnMiss
+}
+
 type BasicAuthPluginConfig struct {
-	// An optional string (Consumer UUID or username) value to use as an “anonymous” consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
+	// An optional string (Consumer UUID or username) value to use as an "anonymous" consumer if authentication fails. If empty (default null), the request will fail with an authentication failure `4xx`. Please note that this value must refer to the Consumer `id` or `username` attribute, and **not** its `custom_id`.
 	Anonymous            *string               `json:"anonymous,omitempty"`
 	BruteForceProtection *BruteForceProtection `json:"brute_force_protection,omitempty"`
 	// An optional boolean value telling the plugin to show or hide the credential from the upstream service. If `true`, the plugin will strip the credential from the request (i.e. the `Authorization` header) before proxying it.
-	HideCredentials *bool `json:"hide_credentials,omitempty"`
+	HideCredentials *bool       `json:"hide_credentials,omitempty"`
+	Principals      *Principals `json:"principals,omitempty"`
 	// When authentication fails the plugin sends `WWW-Authenticate` header with `realm` attribute value.
 	Realm *string `json:"realm,omitempty"`
 }
@@ -485,6 +527,13 @@ func (b *BasicAuthPluginConfig) GetHideCredentials() *bool {
 		return nil
 	}
 	return b.HideCredentials
+}
+
+func (b *BasicAuthPluginConfig) GetPrincipals() *Principals {
+	if b == nil {
+		return nil
+	}
+	return b.Principals
 }
 
 func (b *BasicAuthPluginConfig) GetRealm() *string {

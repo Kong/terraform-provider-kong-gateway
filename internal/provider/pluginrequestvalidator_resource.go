@@ -81,6 +81,11 @@ func (r *PluginRequestValidatorResource) Schema(ctx context.Context, req resourc
 						ElementType: types.StringType,
 						Description: `List of allowed content types. The value can be configured with the ` + "`" + `charset` + "`" + ` parameter. For example, ` + "`" + `application/json; charset=UTF-8` + "`" + `.`,
 					},
+					"array_length_compat": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `If true, ` + "`" + `minLength` + "`" + `/` + "`" + `maxLength` + "`" + ` also apply to arrays using item count. Compatibility option for legacy schemas that use these keywords instead of ` + "`" + `minItems` + "`" + `/` + "`" + `maxItems` + "`" + `.`,
+					},
 					"body_schema": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,

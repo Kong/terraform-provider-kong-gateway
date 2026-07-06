@@ -1152,6 +1152,11 @@ func (r *PluginDatakitResource) Schema(ctx context.Context, req resource.SchemaR
 												stringvalidator.UTF8LengthBetween(1, 255),
 											},
 										},
+										"non_nil": schema.BoolAttribute{
+											Computed:    true,
+											Optional:    true,
+											Description: `When true, the property value must exist: in SET mode, input must not be nil/null; in GET mode, output must not be nil/null.`,
+										},
 										"output": schema.StringAttribute{
 											Computed:    true,
 											Optional:    true,

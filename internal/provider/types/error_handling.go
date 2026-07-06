@@ -6,6 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type RequestCalloutPluginHeaders struct {
-	Store types.Bool `tfsdk:"store"`
+type ErrorHandling struct {
+	ReturnErrorMessage types.Bool `tfsdk:"return_error_message"`
 }

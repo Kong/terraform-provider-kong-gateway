@@ -82,14 +82,54 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 							"mechanism": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + ` or ` + "`" + `SCRAM-SHA-256` + "`" + `. must be one of ["PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]`,
+								Description: `The SASL authentication mechanism.  Supported options: ` + "`" + `PLAIN` + "`" + `, ` + "`" + `SCRAM-SHA-256` + "`" + `, ` + "`" + `SCRAM-SHA-512` + "`" + `, or ` + "`" + `OAUTHBEARER` + "`" + `. must be one of ["OAUTHBEARER", "PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
+										"OAUTHBEARER",
 										"PLAIN",
 										"SCRAM-SHA-256",
 										"SCRAM-SHA-512",
 									),
 								},
+							},
+							"oauthbearer": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"client_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The OAuth2 client ID.`,
+									},
+									"client_secret": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The OAuth2 client secret.`,
+									},
+									"extensions": schema.MapAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Key-value pairs sent as extensions in the OAUTHBEARER SASL handshake (e.g. logicalCluster, identityPoolId).`,
+									},
+									"scopes": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `List of OAuth2 scopes to request.`,
+									},
+									"token_endpoint_tls_verify": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Whether to verify the TLS certificate of the token endpoint.`,
+									},
+									"token_endpoint_url": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The URL of the OAuth2 token endpoint.`,
+									},
+								},
+								Description: `Options for SASL OAUTHBEARER authentication. Required when ` + "`" + `mechanism` + "`" + ` is ` + "`" + `OAUTHBEARER` + "`" + `.`,
 							},
 							"password": schema.StringAttribute{
 								Computed:    true,
@@ -171,6 +211,30 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 							),
 						},
 					},
+					"consumer_group": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"consumer_group_id": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The fixed consumer group ID to use when mode is set to ` + "`" + `manual` + "`" + `. For SSE and WebSocket modes, a ` + "`" + `.<node_id>` + "`" + ` suffix is automatically appended.`,
+							},
+							"mode": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The strategy to determine the consumer group ID. ` + "`" + `random` + "`" + `: a hash ` + "`" + `com.konghq.kafka.<md5>` + "`" + ` over the plugin ID (plus consumer identifier/IP and node ID for SSE/WebSocket). ` + "`" + `kong_consumer` + "`" + `: uses the authenticated consumer's ` + "`" + `username` + "`" + `, ` + "`" + `custom_id` + "`" + `, then ` + "`" + `id` + "`" + `, directly; falls back to ` + "`" + `random` + "`" + ` if no consumer is authenticated. ` + "`" + `manual` + "`" + `: uses ` + "`" + `consumer_group_id` + "`" + ` directly. For SSE/WebSocket, ` + "`" + `manual` + "`" + ` and ` + "`" + `kong_consumer` + "`" + ` group IDs get a ` + "`" + `.<node_id>` + "`" + ` suffix. must be one of ["kong_consumer", "manual", "random"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"kong_consumer",
+										"manual",
+										"random",
+									),
+								},
+							},
+						},
+						Description: `Configuration for the Kafka consumer group ID.`,
+					},
 					"dlq_topic": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -185,6 +249,17 @@ func (r *PluginKafkaConsumeResource) Schema(ctx context.Context, req resource.Sc
 						Computed:    true,
 						Optional:    true,
 						Description: `When true, 'latest' offset reset behaves correctly (starts from end). When false (default), maintains backwards compatibility where 'latest' acts like 'earliest'.`,
+					},
+					"error_handling": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"return_error_message": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `When enabled, the Kafka client error message is returned to the HTTP client. Useful for debugging but may expose internal details, so should be disabled in production.`,
+							},
+						},
 					},
 					"message_by_lua_functions": schema.ListAttribute{
 						Computed:    true,

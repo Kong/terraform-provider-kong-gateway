@@ -44,11 +44,21 @@ resource "kong-gateway_plugin_solace_consume" "my_pluginsolaceconsume" {
         access_token        = "...my_access_token..."
         access_token_header = "...my_access_token_header..."
         basic_auth_header   = "...my_basic_auth_header..."
-        id_token            = "...my_id_token..."
-        id_token_header     = "...my_id_token_header..."
-        password            = "...my_password..."
-        scheme              = "NONE"
-        username            = "...my_username..."
+        client_credentials = {
+          client_id      = "...my_client_id..."
+          client_secret  = "...my_client_secret..."
+          eagerly_expire = 0
+          scopes = [
+            "..."
+          ]
+          ssl_verify     = false
+          token_endpoint = "...my_token_endpoint..."
+        }
+        id_token        = "...my_id_token..."
+        id_token_header = "...my_id_token_header..."
+        password        = "...my_password..."
+        scheme          = "NONE"
+        username        = "...my_username..."
       }
       calculate_message_expiry = true
       connect_timeout          = 41235
@@ -201,11 +211,25 @@ Optional:
 - `access_token` (String) The OAuth2 access token used with `OAUTH2` authentication scheme when connecting to an event broker.
 - `access_token_header` (String) Specifies the header that contains access token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `access_token` field.
 - `basic_auth_header` (String) Specifies the header that contains Basic Authentication credentials for the `BASIC` authentication scheme when connecting to an event broker. This header takes precedence over the `username` and `password` fields.
+- `client_credentials` (Attributes) Client credentials used to automatically obtain and renew OAuth2 access tokens from an IdP for the `CLIENT_CREDENTIALS` authentication scheme. When set, Kong fetches tokens from `token_endpoint` using `client_id` and `client_secret`, caches them until expiry, and retries with a fresh token whenever Solace returns an unauthenticated response. (see [below for nested schema](#nestedatt--config--session--authentication--client_credentials))
 - `id_token` (String) The OpenID Connect ID token used with `OAUTH2` authentication scheme when connecting to an event broker.
 - `id_token_header` (String) Specifies the header that contains id token for the `OAUTH2` authentication scheme when connecting to an event broker. This header takes precedence over the `id_token` field.
 - `password` (String) The password used with `BASIC` authentication scheme when connecting to an event broker.
-- `scheme` (String) The client authentication scheme used when connection to an event broker. must be one of ["BASIC", "NONE", "OAUTH2"]
+- `scheme` (String) The client authentication scheme used when connection to an event broker. must be one of ["BASIC", "CLIENT_CREDENTIALS", "NONE", "OAUTH2"]
 - `username` (String) The username used with `BASIC` authentication scheme when connecting to an event broker.
+
+<a id="nestedatt--config--session--authentication--client_credentials"></a>
+### Nested Schema for `config.session.authentication.client_credentials`
+
+Optional:
+
+- `client_id` (String) The OAuth2 client ID used with `CLIENT_CREDENTIALS` authentication scheme when connecting to an event broker. Not Null
+- `client_secret` (String) The OAuth2 client secret used with `CLIENT_CREDENTIALS` authentication scheme when connecting to an event broker. Not Null
+- `eagerly_expire` (Number) Number of seconds before actual expiry when cached access tokens should be considered expired and proactively renewed. This helps prevent edge cases where tokens are rejected by Solace just as they expire, but setting this too high may lead to unnecessary token refreshes.
+- `scopes` (List of String) The OAuth2 scopes to request when retrieving access tokens for the `CLIENT_CREDENTIALS` authentication scheme.
+- `ssl_verify` (Boolean) Controls TLS certificate verification for HTTPS token endpoint requests.
+- `token_endpoint` (String) The OAuth2 token endpoint URL used to retrieve access tokens for the `CLIENT_CREDENTIALS` authentication scheme when connecting to an event broker. Not Null
+
 
 
 

@@ -63,6 +63,7 @@ func (r *PluginAwsLambdaResourceModel) RefreshFromSharedAwsLambdaPlugin(ctx cont
 				r.Config.LogType = types.StringNull()
 			}
 			r.Config.Port = types.Int64PointerValue(resp.Config.Port)
+			r.Config.PreserveLambdaAPIErrorCode = types.BoolPointerValue(resp.Config.PreserveLambdaAPIErrorCode)
 			r.Config.ProxyURL = types.StringPointerValue(resp.Config.ProxyURL)
 			r.Config.Qualifier = types.StringPointerValue(resp.Config.Qualifier)
 			r.Config.SkipLargeBodies = types.BoolPointerValue(resp.Config.SkipLargeBodies)
@@ -463,6 +464,12 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 		} else {
 			port = nil
 		}
+		preserveLambdaAPIErrorCode := new(bool)
+		if !r.Config.PreserveLambdaAPIErrorCode.IsUnknown() && !r.Config.PreserveLambdaAPIErrorCode.IsNull() {
+			*preserveLambdaAPIErrorCode = r.Config.PreserveLambdaAPIErrorCode.ValueBool()
+		} else {
+			preserveLambdaAPIErrorCode = nil
+		}
 		proxyURL := new(string)
 		if !r.Config.ProxyURL.IsUnknown() && !r.Config.ProxyURL.IsNull() {
 			*proxyURL = r.Config.ProxyURL.ValueString()
@@ -523,6 +530,7 @@ func (r *PluginAwsLambdaResourceModel) ToSharedAwsLambdaPlugin(ctx context.Conte
 			Keepalive:                          keepalive,
 			LogType:                            logType,
 			Port:                               port,
+			PreserveLambdaAPIErrorCode:         preserveLambdaAPIErrorCode,
 			ProxyURL:                           proxyURL,
 			Qualifier:                          qualifier,
 			SkipLargeBodies:                    skipLargeBodies,

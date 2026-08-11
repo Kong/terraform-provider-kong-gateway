@@ -1,10 +1,10 @@
 # Changelog
 
 ## 1.2.1
-> Released on 2026/08/11
+> Released on 2026/08/12
 
 ### Chores
-* Upgrade speakeasy to 1.793.0
+* Bumping dependencies
 
 ## 1.2.0
 > Released on 2026/07/06

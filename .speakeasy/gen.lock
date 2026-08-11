@@ -3,19 +3,19 @@ id: 8a4eac39-6713-4ddc-9ce6-7a233c1cb864
 management:
   docChecksum: 70ac65006155e32074bd9deae1a2031b
   docVersion: 3.15.0
-  speakeasyVersion: 1.788.0
-  generationVersion: 2.915.0
+  speakeasyVersion: 1.793.0
+  generationVersion: 2.928.0
   releaseVersion: 1.2.0
-  configChecksum: 3e609d73b700c865fd87486a7ad4d5bd
+  configChecksum: f4e9a3e8c5214343a3ff06b0cfbe152d
 persistentEdits:
-  generation_id: 8bc331d4-786d-4170-a3c4-cfcca6380f81
-  pristine_commit_hash: 311a63c86cbbcc1425e7baaf0c6306b9d3073598
-  pristine_tree_hash: d4a828396e96bd3c39d95cce550fa65dc66d90c4
+  generation_id: 679dd4b6-08c5-487d-bed7-62f7287a9608
+  pristine_commit_hash: 8536740c2f5f453d851b44dfd5f3def96fb52f61
+  pristine_tree_hash: 8d1a1a19419453fd0bcac6cb6d34421e09b02f48
 features:
   terraform:
     additionalDependencies: 0.1.0
     constsAndDefaults: 0.3.2
-    core: 3.47.10
+    core: 3.47.11
     globalSecurity: 2.82.3
     globalServerURLs: 2.83.2
     inputOutputModels: 2.83.0
@@ -24,7 +24,7 @@ features:
     sets: 0.1.2
     transformJq: 0.0.1
     typeOverrides: 2.81.1
-    unions: 2.82.15
+    unions: 2.82.16
 trackedFiles:
   .gitattributes:
     id: 24139dae6567
@@ -1732,8 +1732,8 @@ trackedFiles:
     pristine_git_object: 28c7e1cffe60ba2f3c8cb783dce79fc928934496
   go.mod:
     id: c47645c391ad
-    last_write_checksum: sha1:c548c97f8343a734119f048effb6d6fcab7cd82c
-    pristine_git_object: 9e54a949b43797eb098076bf865e07a80bdb0b54
+    last_write_checksum: sha1:97a0a635e10754ed29f86ed1c0db2283b8e02e09
+    pristine_git_object: f1da0293037ac84d331bbf329c9e260f035e6128
   internal/planmodifiers/boolplanmodifier/suppress_diff.go:
     id: 3cf85b98963e
     last_write_checksum: sha1:263e1cf5d14ed18c531ecfd6cfee477db3f58032
@@ -4488,8 +4488,8 @@ trackedFiles:
     pristine_git_object: 402553581b4b2f6e6f1195534cb873908698b074
   internal/sdk/konggateway.go:
     id: "00e542406092"
-    last_write_checksum: sha1:8b7e95410f109a5feea83998f1667b4b37c9a7f5
-    pristine_git_object: b1dc2865c78753e6e50c97178c2253cf1e83fe72
+    last_write_checksum: sha1:8ae8a30952586467b6b177665328aabafaa55e8b
+    pristine_git_object: 0a64dd06b95a00dd4dcb24f7ee95f067db1dcc20
   internal/sdk/models/errors/sdkerror.go:
     id: 19b5a8d3586b
     last_write_checksum: sha1:5d65fce5049df7c5113e11c9ccb1e4c46b91901c

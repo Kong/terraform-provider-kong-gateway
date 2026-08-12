@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+> Released on 2026/08/12
+
+### Chores
+* Bumping dependencies
+
 ## 1.2.0
 > Released on 2026/07/06
 

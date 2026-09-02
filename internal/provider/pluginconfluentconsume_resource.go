@@ -313,6 +313,16 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 													},
 												},
 											},
+											"identity_pool_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The Confluent Cloud OAuth identity pool ID, sent as the ` + "`" + `Confluent-Identity-Pool-Id` + "`" + ` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.`,
+											},
+											"logical_cluster_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The Confluent Cloud Schema Registry cluster ID, sent as the ` + "`" + `target-sr-cluster` + "`" + ` request header. Confluent Cloud requires this when ` + "`" + `mode` + "`" + ` is 'oauth2'.`,
+											},
 											"mode": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
@@ -561,6 +571,16 @@ func (r *PluginConfluentConsumeResource) Schema(ctx context.Context, req resourc
 																	},
 																},
 															},
+														},
+														"identity_pool_id": schema.StringAttribute{
+															Computed:    true,
+															Optional:    true,
+															Description: `The Confluent Cloud OAuth identity pool ID, sent as the ` + "`" + `Confluent-Identity-Pool-Id` + "`" + ` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.`,
+														},
+														"logical_cluster_id": schema.StringAttribute{
+															Computed:    true,
+															Optional:    true,
+															Description: `The Confluent Cloud Schema Registry cluster ID, sent as the ` + "`" + `target-sr-cluster` + "`" + ` request header. Confluent Cloud requires this when ` + "`" + `mode` + "`" + ` is 'oauth2'.`,
 														},
 														"mode": schema.StringAttribute{
 															Computed:    true,

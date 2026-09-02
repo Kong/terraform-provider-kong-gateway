@@ -512,6 +512,36 @@ func (b *Bedrock) GetVideoOutputS3URI() *string {
 	return b.VideoOutputS3URI
 }
 
+type CacheWriteCostList struct {
+	Cost float64 `json:"cost"`
+	TTL  string  `json:"ttl"`
+}
+
+func (c CacheWriteCostList) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *CacheWriteCostList) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"cost", "ttl"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CacheWriteCostList) GetCost() float64 {
+	if c == nil {
+		return 0.0
+	}
+	return c.Cost
+}
+
+func (c *CacheWriteCostList) GetTTL() string {
+	if c == nil {
+		return ""
+	}
+	return c.TTL
+}
+
 // EmbeddingInputType - The purpose of the input text to calculate embedding vectors.
 type EmbeddingInputType string
 
@@ -578,6 +608,44 @@ func (c *Cohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return c.WaitForModel
+}
+
+type ContextWindowFactor struct {
+	Above        string  `json:"above"`
+	InputFactor  float64 `json:"input_factor"`
+	OutputFactor float64 `json:"output_factor"`
+}
+
+func (c ContextWindowFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(c, "", false)
+}
+
+func (c *ContextWindowFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &c, "", false, []string{"above", "input_factor", "output_factor"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *ContextWindowFactor) GetAbove() string {
+	if c == nil {
+		return ""
+	}
+	return c.Above
+}
+
+func (c *ContextWindowFactor) GetInputFactor() float64 {
+	if c == nil {
+		return 0.0
+	}
+	return c.InputFactor
+}
+
+func (c *ContextWindowFactor) GetOutputFactor() float64 {
+	if c == nil {
+		return 0.0
+	}
+	return c.OutputFactor
 }
 
 type Dashscope struct {
@@ -767,6 +835,37 @@ func (e *MistralFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
+type ServiceTierFactor struct {
+	Factor float64 `json:"factor"`
+	// A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+	Tier string `json:"tier"`
+}
+
+func (s ServiceTierFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(s, "", false)
+}
+
+func (s *ServiceTierFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &s, "", false, []string{"factor", "tier"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ServiceTierFactor) GetFactor() float64 {
+	if s == nil {
+		return 0.0
+	}
+	return s.Factor
+}
+
+func (s *ServiceTierFactor) GetTier() string {
+	if s == nil {
+		return ""
+	}
+	return s.Tier
+}
+
 // OptionsObj - Key/value settings for the model
 type OptionsObj struct {
 	// Defines the schema/API version, if using Anthropic provider.
@@ -776,11 +875,19 @@ type OptionsObj struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string     `json:"azure_instance,omitempty"`
-	Bedrock       *Bedrock    `json:"bedrock,omitempty"`
-	Cohere        *Cohere     `json:"cohere,omitempty"`
-	Dashscope     *Dashscope  `json:"dashscope,omitempty"`
-	Databricks    *Databricks `json:"databricks,omitempty"`
+	AzureInstance *string  `json:"azure_instance,omitempty"`
+	Bedrock       *Bedrock `json:"bedrock,omitempty"`
+	// Defines the cost per 1M cache-read (cached) prompt tokens.
+	CacheReadCost *float64 `json:"cache_read_cost,omitempty"`
+	// Defines the cost per 1M cache-write prompt tokens.
+	CacheWriteCost *float64 `json:"cache_write_cost,omitempty"`
+	// Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+	CacheWriteCostList []CacheWriteCostList `json:"cache_write_cost_list,omitempty"`
+	Cohere             *Cohere              `json:"cohere,omitempty"`
+	// Above an input-token threshold, scale input/output pricing with the corresponding factor.
+	ContextWindowFactor []ContextWindowFactor `json:"context_window_factor,omitempty"`
+	Dashscope           *Dashscope            `json:"dashscope,omitempty"`
+	Databricks          *Databricks           `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64       `json:"embeddings_dimensions,omitempty"`
 	Gemini               *Gemini      `json:"gemini,omitempty"`
@@ -795,6 +902,8 @@ type OptionsObj struct {
 	MistralFormat *MistralFormat `json:"mistral_format,omitempty"`
 	// Defines the cost per 1M tokens in the output of the AI.
 	OutputCost *float64 `json:"output_cost,omitempty"`
+	// Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+	ServiceTierFactor []ServiceTierFactor `json:"service_tier_factor,omitempty"`
 	// Defines the matching temperature, if using chat or completion models.
 	Temperature *float64 `json:"temperature,omitempty"`
 	// Defines the top-k most likely tokens, if supported.
@@ -853,11 +962,39 @@ func (o *OptionsObj) GetBedrock() *Bedrock {
 	return o.Bedrock
 }
 
+func (o *OptionsObj) GetCacheReadCost() *float64 {
+	if o == nil {
+		return nil
+	}
+	return o.CacheReadCost
+}
+
+func (o *OptionsObj) GetCacheWriteCost() *float64 {
+	if o == nil {
+		return nil
+	}
+	return o.CacheWriteCost
+}
+
+func (o *OptionsObj) GetCacheWriteCostList() []CacheWriteCostList {
+	if o == nil {
+		return nil
+	}
+	return o.CacheWriteCostList
+}
+
 func (o *OptionsObj) GetCohere() *Cohere {
 	if o == nil {
 		return nil
 	}
 	return o.Cohere
+}
+
+func (o *OptionsObj) GetContextWindowFactor() []ContextWindowFactor {
+	if o == nil {
+		return nil
+	}
+	return o.ContextWindowFactor
 }
 
 func (o *OptionsObj) GetDashscope() *Dashscope {
@@ -928,6 +1065,13 @@ func (o *OptionsObj) GetOutputCost() *float64 {
 		return nil
 	}
 	return o.OutputCost
+}
+
+func (o *OptionsObj) GetServiceTierFactor() []ServiceTierFactor {
+	if o == nil {
+		return nil
+	}
+	return o.ServiceTierFactor
 }
 
 func (o *OptionsObj) GetTemperature() *float64 {

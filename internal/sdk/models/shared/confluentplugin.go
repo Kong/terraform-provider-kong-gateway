@@ -747,6 +747,10 @@ func (o *Oauth2Client) GetTimeout() *int64 {
 
 type ConfluentPluginAuthentication struct {
 	Basic *Basic `json:"basic,omitempty"`
+	// The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.
+	IdentityPoolID *string `json:"identity_pool_id,omitempty"`
+	// The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+	LogicalClusterID *string `json:"logical_cluster_id,omitempty"`
 	// Authentication mode to use with the schema registry.
 	Mode         *ConfluentPluginMode `json:"mode,omitempty"`
 	Oauth2       *Oauth2              `json:"oauth2,omitempty"`
@@ -769,6 +773,20 @@ func (c *ConfluentPluginAuthentication) GetBasic() *Basic {
 		return nil
 	}
 	return c.Basic
+}
+
+func (c *ConfluentPluginAuthentication) GetIdentityPoolID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.IdentityPoolID
+}
+
+func (c *ConfluentPluginAuthentication) GetLogicalClusterID() *string {
+	if c == nil {
+		return nil
+	}
+	return c.LogicalClusterID
 }
 
 func (c *ConfluentPluginAuthentication) GetMode() *ConfluentPluginMode {

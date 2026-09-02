@@ -434,6 +434,36 @@ func (a *AiResponseTransformerPluginBedrock) GetVideoOutputS3URI() *string {
 	return a.VideoOutputS3URI
 }
 
+type AiResponseTransformerPluginCacheWriteCostList struct {
+	Cost float64 `json:"cost"`
+	TTL  string  `json:"ttl"`
+}
+
+func (a AiResponseTransformerPluginCacheWriteCostList) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiResponseTransformerPluginCacheWriteCostList) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"cost", "ttl"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiResponseTransformerPluginCacheWriteCostList) GetCost() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.Cost
+}
+
+func (a *AiResponseTransformerPluginCacheWriteCostList) GetTTL() string {
+	if a == nil {
+		return ""
+	}
+	return a.TTL
+}
+
 // AiResponseTransformerPluginEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
 type AiResponseTransformerPluginEmbeddingInputType string
 
@@ -500,6 +530,44 @@ func (a *AiResponseTransformerPluginCohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return a.WaitForModel
+}
+
+type AiResponseTransformerPluginContextWindowFactor struct {
+	Above        string  `json:"above"`
+	InputFactor  float64 `json:"input_factor"`
+	OutputFactor float64 `json:"output_factor"`
+}
+
+func (a AiResponseTransformerPluginContextWindowFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiResponseTransformerPluginContextWindowFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"above", "input_factor", "output_factor"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiResponseTransformerPluginContextWindowFactor) GetAbove() string {
+	if a == nil {
+		return ""
+	}
+	return a.Above
+}
+
+func (a *AiResponseTransformerPluginContextWindowFactor) GetInputFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.InputFactor
+}
+
+func (a *AiResponseTransformerPluginContextWindowFactor) GetOutputFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.OutputFactor
 }
 
 type AiResponseTransformerPluginDashscope struct {
@@ -689,6 +757,37 @@ func (e *AiResponseTransformerPluginMistralFormat) UnmarshalJSON(data []byte) er
 	}
 }
 
+type AiResponseTransformerPluginServiceTierFactor struct {
+	Factor float64 `json:"factor"`
+	// A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+	Tier string `json:"tier"`
+}
+
+func (a AiResponseTransformerPluginServiceTierFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiResponseTransformerPluginServiceTierFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"factor", "tier"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiResponseTransformerPluginServiceTierFactor) GetFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.Factor
+}
+
+func (a *AiResponseTransformerPluginServiceTierFactor) GetTier() string {
+	if a == nil {
+		return ""
+	}
+	return a.Tier
+}
+
 // AiResponseTransformerPluginOptions - Key/value settings for the model
 type AiResponseTransformerPluginOptions struct {
 	// Defines the schema/API version, if using Anthropic provider.
@@ -698,11 +797,19 @@ type AiResponseTransformerPluginOptions struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string                                `json:"azure_instance,omitempty"`
-	Bedrock       *AiResponseTransformerPluginBedrock    `json:"bedrock,omitempty"`
-	Cohere        *AiResponseTransformerPluginCohere     `json:"cohere,omitempty"`
-	Dashscope     *AiResponseTransformerPluginDashscope  `json:"dashscope,omitempty"`
-	Databricks    *AiResponseTransformerPluginDatabricks `json:"databricks,omitempty"`
+	AzureInstance *string                             `json:"azure_instance,omitempty"`
+	Bedrock       *AiResponseTransformerPluginBedrock `json:"bedrock,omitempty"`
+	// Defines the cost per 1M cache-read (cached) prompt tokens.
+	CacheReadCost *float64 `json:"cache_read_cost,omitempty"`
+	// Defines the cost per 1M cache-write prompt tokens.
+	CacheWriteCost *float64 `json:"cache_write_cost,omitempty"`
+	// Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+	CacheWriteCostList []AiResponseTransformerPluginCacheWriteCostList `json:"cache_write_cost_list,omitempty"`
+	Cohere             *AiResponseTransformerPluginCohere              `json:"cohere,omitempty"`
+	// Above an input-token threshold, scale input/output pricing with the corresponding factor.
+	ContextWindowFactor []AiResponseTransformerPluginContextWindowFactor `json:"context_window_factor,omitempty"`
+	Dashscope           *AiResponseTransformerPluginDashscope            `json:"dashscope,omitempty"`
+	Databricks          *AiResponseTransformerPluginDatabricks           `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64                                  `json:"embeddings_dimensions,omitempty"`
 	Gemini               *AiResponseTransformerPluginGemini      `json:"gemini,omitempty"`
@@ -717,6 +824,8 @@ type AiResponseTransformerPluginOptions struct {
 	MistralFormat *AiResponseTransformerPluginMistralFormat `json:"mistral_format,omitempty"`
 	// Defines the cost per 1M tokens in the output of the AI.
 	OutputCost *float64 `json:"output_cost,omitempty"`
+	// Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+	ServiceTierFactor []AiResponseTransformerPluginServiceTierFactor `json:"service_tier_factor,omitempty"`
 	// Defines the matching temperature, if using chat or completion models.
 	Temperature *float64 `json:"temperature,omitempty"`
 	// Defines the top-k most likely tokens, if supported.
@@ -775,11 +884,39 @@ func (a *AiResponseTransformerPluginOptions) GetBedrock() *AiResponseTransformer
 	return a.Bedrock
 }
 
+func (a *AiResponseTransformerPluginOptions) GetCacheReadCost() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.CacheReadCost
+}
+
+func (a *AiResponseTransformerPluginOptions) GetCacheWriteCost() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.CacheWriteCost
+}
+
+func (a *AiResponseTransformerPluginOptions) GetCacheWriteCostList() []AiResponseTransformerPluginCacheWriteCostList {
+	if a == nil {
+		return nil
+	}
+	return a.CacheWriteCostList
+}
+
 func (a *AiResponseTransformerPluginOptions) GetCohere() *AiResponseTransformerPluginCohere {
 	if a == nil {
 		return nil
 	}
 	return a.Cohere
+}
+
+func (a *AiResponseTransformerPluginOptions) GetContextWindowFactor() []AiResponseTransformerPluginContextWindowFactor {
+	if a == nil {
+		return nil
+	}
+	return a.ContextWindowFactor
 }
 
 func (a *AiResponseTransformerPluginOptions) GetDashscope() *AiResponseTransformerPluginDashscope {
@@ -850,6 +987,13 @@ func (a *AiResponseTransformerPluginOptions) GetOutputCost() *float64 {
 		return nil
 	}
 	return a.OutputCost
+}
+
+func (a *AiResponseTransformerPluginOptions) GetServiceTierFactor() []AiResponseTransformerPluginServiceTierFactor {
+	if a == nil {
+		return nil
+	}
+	return a.ServiceTierFactor
 }
 
 func (a *AiResponseTransformerPluginOptions) GetTemperature() *float64 {

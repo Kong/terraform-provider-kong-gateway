@@ -872,6 +872,10 @@ func (k *KafkaUpstreamPluginOauth2Client) GetTimeout() *int64 {
 
 type KafkaUpstreamPluginConfigAuthentication struct {
 	Basic *KafkaUpstreamPluginBasic `json:"basic,omitempty"`
+	// The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.
+	IdentityPoolID *string `json:"identity_pool_id,omitempty"`
+	// The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+	LogicalClusterID *string `json:"logical_cluster_id,omitempty"`
 	// Authentication mode to use with the schema registry.
 	Mode         *KafkaUpstreamPluginMode         `json:"mode,omitempty"`
 	Oauth2       *KafkaUpstreamPluginOauth2       `json:"oauth2,omitempty"`
@@ -894,6 +898,20 @@ func (k *KafkaUpstreamPluginConfigAuthentication) GetBasic() *KafkaUpstreamPlugi
 		return nil
 	}
 	return k.Basic
+}
+
+func (k *KafkaUpstreamPluginConfigAuthentication) GetIdentityPoolID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.IdentityPoolID
+}
+
+func (k *KafkaUpstreamPluginConfigAuthentication) GetLogicalClusterID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.LogicalClusterID
 }
 
 func (k *KafkaUpstreamPluginConfigAuthentication) GetMode() *KafkaUpstreamPluginMode {

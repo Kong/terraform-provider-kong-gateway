@@ -19,7 +19,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
+	speakeasy_float64validators "github.com/kong/terraform-provider-kong-gateway/internal/validators/float64validators"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -306,6 +308,44 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 											},
 										},
 									},
+									"cache_read_cost": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Defines the cost per 1M cache-read (cached) prompt tokens.`,
+									},
+									"cache_write_cost": schema.Float64Attribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Defines the cost per 1M cache-write prompt tokens.`,
+									},
+									"cache_write_cost_list": schema.ListNestedAttribute{
+										Computed: true,
+										Optional: true,
+										NestedObject: schema.NestedAttributeObject{
+											Validators: []validator.Object{
+												speakeasy_objectvalidators.NotNull(),
+											},
+											Attributes: map[string]schema.Attribute{
+												"cost": schema.Float64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.Float64{
+														speakeasy_float64validators.NotNull(),
+													},
+												},
+												"ttl": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.String{
+														speakeasy_stringvalidators.NotNull(),
+													},
+												},
+											},
+										},
+										Description: `Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.`,
+									},
 									"cohere": schema.SingleNestedAttribute{
 										Computed: true,
 										Optional: true,
@@ -330,6 +370,42 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 												Description: `Wait for the model if it is not ready`,
 											},
 										},
+									},
+									"context_window_factor": schema.ListNestedAttribute{
+										Computed: true,
+										Optional: true,
+										NestedObject: schema.NestedAttributeObject{
+											Validators: []validator.Object{
+												speakeasy_objectvalidators.NotNull(),
+											},
+											Attributes: map[string]schema.Attribute{
+												"above": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.String{
+														speakeasy_stringvalidators.NotNull(),
+													},
+												},
+												"input_factor": schema.Float64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.Float64{
+														speakeasy_float64validators.NotNull(),
+													},
+												},
+												"output_factor": schema.Float64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.Float64{
+														speakeasy_float64validators.NotNull(),
+													},
+												},
+											},
+										},
+										Description: `Above an input-token threshold, scale input/output pricing with the corresponding factor.`,
 									},
 									"dashscope": schema.SingleNestedAttribute{
 										Computed: true,
@@ -438,6 +514,35 @@ func (r *PluginAiProxyResource) Schema(ctx context.Context, req resource.SchemaR
 										Computed:    true,
 										Optional:    true,
 										Description: `Defines the cost per 1M tokens in the output of the AI.`,
+									},
+									"service_tier_factor": schema.ListNestedAttribute{
+										Computed: true,
+										Optional: true,
+										NestedObject: schema.NestedAttributeObject{
+											Validators: []validator.Object{
+												speakeasy_objectvalidators.NotNull(),
+											},
+											Attributes: map[string]schema.Attribute{
+												"factor": schema.Float64Attribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `Not Null`,
+													Validators: []validator.Float64{
+														speakeasy_float64validators.NotNull(),
+													},
+												},
+												"tier": schema.StringAttribute{
+													Computed:    true,
+													Optional:    true,
+													Description: `A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier. Not Null`,
+													Validators: []validator.String{
+														speakeasy_stringvalidators.NotNull(),
+														stringvalidator.UTF8LengthAtLeast(1),
+													},
+												},
+											},
+										},
+										Description: `Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.`,
 									},
 									"temperature": schema.Float64Attribute{
 										Computed:    true,

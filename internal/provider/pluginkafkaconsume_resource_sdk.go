@@ -128,6 +128,8 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 						r.Config.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Password)
 						r.Config.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(resp.Config.SchemaRegistry.Confluent.Authentication.Basic.Username)
 					}
+					r.Config.SchemaRegistry.Confluent.Authentication.IdentityPoolID = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.IdentityPoolID)
+					r.Config.SchemaRegistry.Confluent.Authentication.LogicalClusterID = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.Authentication.LogicalClusterID)
 					if resp.Config.SchemaRegistry.Confluent.Authentication.Mode != nil {
 						r.Config.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.Authentication.Mode))
 					} else {
@@ -231,6 +233,8 @@ func (r *PluginKafkaConsumeResourceModel) RefreshFromSharedKafkaConsumePlugin(ct
 							topics.SchemaRegistry.Confluent.Authentication.Basic.Password = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Password)
 							topics.SchemaRegistry.Confluent.Authentication.Basic.Username = types.StringValue(topicsItem.SchemaRegistry.Confluent.Authentication.Basic.Username)
 						}
+						topics.SchemaRegistry.Confluent.Authentication.IdentityPoolID = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.IdentityPoolID)
+						topics.SchemaRegistry.Confluent.Authentication.LogicalClusterID = types.StringPointerValue(topicsItem.SchemaRegistry.Confluent.Authentication.LogicalClusterID)
 						if topicsItem.SchemaRegistry.Confluent.Authentication.Mode != nil {
 							topics.SchemaRegistry.Confluent.Authentication.Mode = types.StringValue(string(*topicsItem.SchemaRegistry.Confluent.Authentication.Mode))
 						} else {
@@ -753,6 +757,18 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 						Username: username,
 					}
 				}
+				identityPoolID := new(string)
+				if !r.Config.SchemaRegistry.Confluent.Authentication.IdentityPoolID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.IdentityPoolID.IsNull() {
+					*identityPoolID = r.Config.SchemaRegistry.Confluent.Authentication.IdentityPoolID.ValueString()
+				} else {
+					identityPoolID = nil
+				}
+				logicalClusterID := new(string)
+				if !r.Config.SchemaRegistry.Confluent.Authentication.LogicalClusterID.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.LogicalClusterID.IsNull() {
+					*logicalClusterID = r.Config.SchemaRegistry.Confluent.Authentication.LogicalClusterID.ValueString()
+				} else {
+					logicalClusterID = nil
+				}
 				mode2 := new(shared.KafkaConsumePluginConfigSchemaRegistryMode)
 				if !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !r.Config.SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
 					*mode2 = shared.KafkaConsumePluginConfigSchemaRegistryMode(r.Config.SchemaRegistry.Confluent.Authentication.Mode.ValueString())
@@ -912,10 +928,12 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 					}
 				}
 				authentication1 = &shared.KafkaConsumePluginAuthentication{
-					Basic:        basic,
-					Mode:         mode2,
-					Oauth2:       oauth2,
-					Oauth2Client: oauth2Client,
+					Basic:            basic,
+					IdentityPoolID:   identityPoolID,
+					LogicalClusterID: logicalClusterID,
+					Mode:             mode2,
+					Oauth2:           oauth2,
+					Oauth2Client:     oauth2Client,
 				}
 			}
 			sslVerify1 := new(bool)
@@ -996,6 +1014,18 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 							Password: password3,
 							Username: username2,
 						}
+					}
+					identityPoolId1 := new(string)
+					if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.IdentityPoolID.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.IdentityPoolID.IsNull() {
+						*identityPoolId1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.IdentityPoolID.ValueString()
+					} else {
+						identityPoolId1 = nil
+					}
+					logicalClusterId1 := new(string)
+					if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.LogicalClusterID.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.LogicalClusterID.IsNull() {
+						*logicalClusterId1 = r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.LogicalClusterID.ValueString()
+					} else {
+						logicalClusterId1 = nil
 					}
 					mode3 := new(shared.KafkaConsumePluginConfigTopicsMode)
 					if !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Mode.IsUnknown() && !r.Config.Topics[topicsIndex].SchemaRegistry.Confluent.Authentication.Mode.IsNull() {
@@ -1156,10 +1186,12 @@ func (r *PluginKafkaConsumeResourceModel) ToSharedKafkaConsumePlugin(ctx context
 						}
 					}
 					authentication2 = &shared.KafkaConsumePluginConfigAuthentication{
-						Basic:        basic1,
-						Mode:         mode3,
-						Oauth2:       oauth21,
-						Oauth2Client: oauth2Client1,
+						Basic:            basic1,
+						IdentityPoolID:   identityPoolId1,
+						LogicalClusterID: logicalClusterId1,
+						Mode:             mode3,
+						Oauth2:           oauth21,
+						Oauth2Client:     oauth2Client1,
 					}
 				}
 				sslVerify4 := new(bool)

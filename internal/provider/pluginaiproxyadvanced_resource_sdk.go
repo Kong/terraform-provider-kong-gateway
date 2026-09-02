@@ -262,6 +262,18 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 					targets.Model.Options.Bedrock.PerformanceConfigLatency = types.StringPointerValue(targetsItem.Model.Options.Bedrock.PerformanceConfigLatency)
 					targets.Model.Options.Bedrock.VideoOutputS3URI = types.StringPointerValue(targetsItem.Model.Options.Bedrock.VideoOutputS3URI)
 				}
+				targets.Model.Options.CacheReadCost = types.Float64PointerValue(targetsItem.Model.Options.CacheReadCost)
+				targets.Model.Options.CacheWriteCost = types.Float64PointerValue(targetsItem.Model.Options.CacheWriteCost)
+				targets.Model.Options.CacheWriteCostList = []tfTypes.PartialModelCacheWriteCostList{}
+
+				for _, cacheWriteCostListItem := range targetsItem.Model.Options.CacheWriteCostList {
+					var cacheWriteCostList tfTypes.PartialModelCacheWriteCostList
+
+					cacheWriteCostList.Cost = types.Float64Value(cacheWriteCostListItem.Cost)
+					cacheWriteCostList.TTL = types.StringValue(cacheWriteCostListItem.TTL)
+
+					targets.Model.Options.CacheWriteCostList = append(targets.Model.Options.CacheWriteCostList, cacheWriteCostList)
+				}
 				if targetsItem.Model.Options.Cohere == nil {
 					targets.Model.Options.Cohere = nil
 				} else {
@@ -272,6 +284,17 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 						targets.Model.Options.Cohere.EmbeddingInputType = types.StringNull()
 					}
 					targets.Model.Options.Cohere.WaitForModel = types.BoolPointerValue(targetsItem.Model.Options.Cohere.WaitForModel)
+				}
+				targets.Model.Options.ContextWindowFactor = []tfTypes.PartialModelContextWindowFactor{}
+
+				for _, contextWindowFactorItem := range targetsItem.Model.Options.ContextWindowFactor {
+					var contextWindowFactor tfTypes.PartialModelContextWindowFactor
+
+					contextWindowFactor.Above = types.StringValue(contextWindowFactorItem.Above)
+					contextWindowFactor.InputFactor = types.Float64Value(contextWindowFactorItem.InputFactor)
+					contextWindowFactor.OutputFactor = types.Float64Value(contextWindowFactorItem.OutputFactor)
+
+					targets.Model.Options.ContextWindowFactor = append(targets.Model.Options.ContextWindowFactor, contextWindowFactor)
 				}
 				if targetsItem.Model.Options.Dashscope == nil {
 					targets.Model.Options.Dashscope = nil
@@ -315,6 +338,16 @@ func (r *PluginAiProxyAdvancedResourceModel) RefreshFromSharedAiProxyAdvancedPlu
 					targets.Model.Options.MistralFormat = types.StringNull()
 				}
 				targets.Model.Options.OutputCost = types.Float64PointerValue(targetsItem.Model.Options.OutputCost)
+				targets.Model.Options.ServiceTierFactor = []tfTypes.PartialModelServiceTierFactor{}
+
+				for _, serviceTierFactorItem := range targetsItem.Model.Options.ServiceTierFactor {
+					var serviceTierFactor tfTypes.PartialModelServiceTierFactor
+
+					serviceTierFactor.Factor = types.Float64Value(serviceTierFactorItem.Factor)
+					serviceTierFactor.Tier = types.StringValue(serviceTierFactorItem.Tier)
+
+					targets.Model.Options.ServiceTierFactor = append(targets.Model.Options.ServiceTierFactor, serviceTierFactor)
+				}
 				targets.Model.Options.Temperature = types.Float64PointerValue(targetsItem.Model.Options.Temperature)
 				targets.Model.Options.TopK = types.Int64PointerValue(targetsItem.Model.Options.TopK)
 				targets.Model.Options.TopP = types.Float64PointerValue(targetsItem.Model.Options.TopP)
@@ -1401,6 +1434,31 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx c
 					VideoOutputS3URI:         videoOutputS3Uri1,
 				}
 			}
+			cacheReadCost := new(float64)
+			if !r.Config.Targets[targetsIndex].Model.Options.CacheReadCost.IsUnknown() && !r.Config.Targets[targetsIndex].Model.Options.CacheReadCost.IsNull() {
+				*cacheReadCost = r.Config.Targets[targetsIndex].Model.Options.CacheReadCost.ValueFloat64()
+			} else {
+				cacheReadCost = nil
+			}
+			cacheWriteCost := new(float64)
+			if !r.Config.Targets[targetsIndex].Model.Options.CacheWriteCost.IsUnknown() && !r.Config.Targets[targetsIndex].Model.Options.CacheWriteCost.IsNull() {
+				*cacheWriteCost = r.Config.Targets[targetsIndex].Model.Options.CacheWriteCost.ValueFloat64()
+			} else {
+				cacheWriteCost = nil
+			}
+			cacheWriteCostList := make([]shared.AiProxyAdvancedPluginCacheWriteCostList, 0, len(r.Config.Targets[targetsIndex].Model.Options.CacheWriteCostList))
+			for cacheWriteCostListIndex := range r.Config.Targets[targetsIndex].Model.Options.CacheWriteCostList {
+				var cost float64
+				cost = r.Config.Targets[targetsIndex].Model.Options.CacheWriteCostList[cacheWriteCostListIndex].Cost.ValueFloat64()
+
+				var ttl string
+				ttl = r.Config.Targets[targetsIndex].Model.Options.CacheWriteCostList[cacheWriteCostListIndex].TTL.ValueString()
+
+				cacheWriteCostList = append(cacheWriteCostList, shared.AiProxyAdvancedPluginCacheWriteCostList{
+					Cost: cost,
+					TTL:  ttl,
+				})
+			}
 			var cohere *shared.AiProxyAdvancedPluginCohere
 			if r.Config.Targets[targetsIndex].Model.Options.Cohere != nil {
 				embeddingInputType := new(shared.AiProxyAdvancedPluginEmbeddingInputType)
@@ -1419,6 +1477,23 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx c
 					EmbeddingInputType: embeddingInputType,
 					WaitForModel:       waitForModel1,
 				}
+			}
+			contextWindowFactor := make([]shared.AiProxyAdvancedPluginContextWindowFactor, 0, len(r.Config.Targets[targetsIndex].Model.Options.ContextWindowFactor))
+			for contextWindowFactorIndex := range r.Config.Targets[targetsIndex].Model.Options.ContextWindowFactor {
+				var above string
+				above = r.Config.Targets[targetsIndex].Model.Options.ContextWindowFactor[contextWindowFactorIndex].Above.ValueString()
+
+				var inputFactor float64
+				inputFactor = r.Config.Targets[targetsIndex].Model.Options.ContextWindowFactor[contextWindowFactorIndex].InputFactor.ValueFloat64()
+
+				var outputFactor float64
+				outputFactor = r.Config.Targets[targetsIndex].Model.Options.ContextWindowFactor[contextWindowFactorIndex].OutputFactor.ValueFloat64()
+
+				contextWindowFactor = append(contextWindowFactor, shared.AiProxyAdvancedPluginContextWindowFactor{
+					Above:        above,
+					InputFactor:  inputFactor,
+					OutputFactor: outputFactor,
+				})
 			}
 			var dashscope *shared.AiProxyAdvancedPluginDashscope
 			if r.Config.Targets[targetsIndex].Model.Options.Dashscope != nil {
@@ -1532,6 +1607,19 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx c
 			} else {
 				outputCost = nil
 			}
+			serviceTierFactor := make([]shared.AiProxyAdvancedPluginServiceTierFactor, 0, len(r.Config.Targets[targetsIndex].Model.Options.ServiceTierFactor))
+			for serviceTierFactorIndex := range r.Config.Targets[targetsIndex].Model.Options.ServiceTierFactor {
+				var factor float64
+				factor = r.Config.Targets[targetsIndex].Model.Options.ServiceTierFactor[serviceTierFactorIndex].Factor.ValueFloat64()
+
+				var tier string
+				tier = r.Config.Targets[targetsIndex].Model.Options.ServiceTierFactor[serviceTierFactorIndex].Tier.ValueString()
+
+				serviceTierFactor = append(serviceTierFactor, shared.AiProxyAdvancedPluginServiceTierFactor{
+					Factor: factor,
+					Tier:   tier,
+				})
+			}
 			temperature := new(float64)
 			if !r.Config.Targets[targetsIndex].Model.Options.Temperature.IsUnknown() && !r.Config.Targets[targetsIndex].Model.Options.Temperature.IsNull() {
 				*temperature = r.Config.Targets[targetsIndex].Model.Options.Temperature.ValueFloat64()
@@ -1568,7 +1656,11 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx c
 				AzureDeploymentID:    azureDeploymentID,
 				AzureInstance:        azureInstance,
 				Bedrock:              bedrock1,
+				CacheReadCost:        cacheReadCost,
+				CacheWriteCost:       cacheWriteCost,
+				CacheWriteCostList:   cacheWriteCostList,
 				Cohere:               cohere,
+				ContextWindowFactor:  contextWindowFactor,
 				Dashscope:            dashscope,
 				Databricks:           databricks,
 				EmbeddingsDimensions: embeddingsDimensions,
@@ -1579,6 +1671,7 @@ func (r *PluginAiProxyAdvancedResourceModel) ToSharedAiProxyAdvancedPlugin(ctx c
 				MaxTokens:            maxTokens,
 				MistralFormat:        mistralFormat,
 				OutputCost:           outputCost,
+				ServiceTierFactor:    serviceTierFactor,
 				Temperature:          temperature,
 				TopK:                 topK,
 				TopP:                 topP,

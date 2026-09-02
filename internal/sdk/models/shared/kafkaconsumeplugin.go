@@ -917,6 +917,10 @@ func (k *KafkaConsumePluginOauth2Client) GetTimeout() *int64 {
 
 type KafkaConsumePluginAuthentication struct {
 	Basic *KafkaConsumePluginBasic `json:"basic,omitempty"`
+	// The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.
+	IdentityPoolID *string `json:"identity_pool_id,omitempty"`
+	// The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+	LogicalClusterID *string `json:"logical_cluster_id,omitempty"`
 	// Authentication mode to use with the schema registry.
 	Mode         *KafkaConsumePluginConfigSchemaRegistryMode `json:"mode,omitempty"`
 	Oauth2       *KafkaConsumePluginOauth2                   `json:"oauth2,omitempty"`
@@ -939,6 +943,20 @@ func (k *KafkaConsumePluginAuthentication) GetBasic() *KafkaConsumePluginBasic {
 		return nil
 	}
 	return k.Basic
+}
+
+func (k *KafkaConsumePluginAuthentication) GetIdentityPoolID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.IdentityPoolID
+}
+
+func (k *KafkaConsumePluginAuthentication) GetLogicalClusterID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.LogicalClusterID
 }
 
 func (k *KafkaConsumePluginAuthentication) GetMode() *KafkaConsumePluginConfigSchemaRegistryMode {
@@ -1447,6 +1465,10 @@ func (k *KafkaConsumePluginConfigOauth2Client) GetTimeout() *int64 {
 
 type KafkaConsumePluginConfigAuthentication struct {
 	Basic *KafkaConsumePluginConfigBasic `json:"basic,omitempty"`
+	// The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims.
+	IdentityPoolID *string `json:"identity_pool_id,omitempty"`
+	// The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+	LogicalClusterID *string `json:"logical_cluster_id,omitempty"`
 	// Authentication mode to use with the schema registry.
 	Mode         *KafkaConsumePluginConfigTopicsMode   `json:"mode,omitempty"`
 	Oauth2       *KafkaConsumePluginConfigOauth2       `json:"oauth2,omitempty"`
@@ -1469,6 +1491,20 @@ func (k *KafkaConsumePluginConfigAuthentication) GetBasic() *KafkaConsumePluginC
 		return nil
 	}
 	return k.Basic
+}
+
+func (k *KafkaConsumePluginConfigAuthentication) GetIdentityPoolID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.IdentityPoolID
+}
+
+func (k *KafkaConsumePluginConfigAuthentication) GetLogicalClusterID() *string {
+	if k == nil {
+		return nil
+	}
+	return k.LogicalClusterID
 }
 
 func (k *KafkaConsumePluginConfigAuthentication) GetMode() *KafkaConsumePluginConfigTopicsMode {

@@ -13999,6 +13999,7 @@ components:
               enum:
                 - concatenate_all_content
                 - concatenate_user_content
+                - last_message
             timeout:
               description: Connection timeout with the bedrock service
               type: number
@@ -14157,6 +14158,7 @@ components:
               enum:
                 - concatenate_all_content
                 - concatenate_user_content
+                - last_message
           required:
             - content_safety_url
         name:
@@ -14839,6 +14841,25 @@ components:
                             video_output_s3_uri:
                               description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                               type: string
+                        cache_read_cost:
+                          description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                          type: number
+                        cache_write_cost:
+                          description: Defines the cost per 1M cache-write prompt tokens.
+                          type: number
+                        cache_write_cost_list:
+                          description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                          type: array
+                          items:
+                            properties:
+                              cost:
+                                type: number
+                              ttl:
+                                type: string
+                            required:
+                              - cost
+                              - ttl
+                            type: object
                         cohere:
                           type: object
                           properties:
@@ -14855,6 +14876,22 @@ components:
                             wait_for_model:
                               description: Wait for the model if it is not ready
                               type: boolean
+                        context_window_factor:
+                          description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                          type: array
+                          items:
+                            properties:
+                              above:
+                                type: string
+                              input_factor:
+                                type: number
+                              output_factor:
+                                type: number
+                            required:
+                              - above
+                              - input_factor
+                              - output_factor
+                            type: object
                         dashscope:
                           type: object
                           properties:
@@ -14919,6 +14956,21 @@ components:
                         output_cost:
                           description: Defines the cost per 1M tokens in the output of the AI.
                           type: number
+                        service_tier_factor:
+                          description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                          type: array
+                          items:
+                            properties:
+                              factor:
+                                type: number
+                              tier:
+                                description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                                type: string
+                                minLength: 1
+                            required:
+                              - factor
+                              - tier
+                            type: object
                         temperature:
                           description: Defines the matching temperature, if using chat or completion models.
                           type: number
@@ -16865,6 +16917,25 @@ components:
                               video_output_s3_uri:
                                 description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                                 type: string
+                          cache_read_cost:
+                            description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                            type: number
+                          cache_write_cost:
+                            description: Defines the cost per 1M cache-write prompt tokens.
+                            type: number
+                          cache_write_cost_list:
+                            description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                            type: array
+                            items:
+                              properties:
+                                cost:
+                                  type: number
+                                ttl:
+                                  type: string
+                              required:
+                                - cost
+                                - ttl
+                              type: object
                           cohere:
                             type: object
                             properties:
@@ -16881,6 +16952,22 @@ components:
                               wait_for_model:
                                 description: Wait for the model if it is not ready
                                 type: boolean
+                          context_window_factor:
+                            description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                            type: array
+                            items:
+                              properties:
+                                above:
+                                  type: string
+                                input_factor:
+                                  type: number
+                                output_factor:
+                                  type: number
+                              required:
+                                - above
+                                - input_factor
+                                - output_factor
+                              type: object
                           dashscope:
                             type: object
                             properties:
@@ -16945,6 +17032,21 @@ components:
                           output_cost:
                             description: Defines the cost per 1M tokens in the output of the AI.
                             type: number
+                          service_tier_factor:
+                            description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                            type: array
+                            items:
+                              properties:
+                                factor:
+                                  type: number
+                                tier:
+                                  description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                                  type: string
+                                  minLength: 1
+                              required:
+                                - factor
+                                - tier
+                              type: object
                           temperature:
                             description: Defines the matching temperature, if using chat or completion models.
                             type: number
@@ -17534,6 +17636,25 @@ components:
                         video_output_s3_uri:
                           description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                           type: string
+                    cache_read_cost:
+                      description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                      type: number
+                    cache_write_cost:
+                      description: Defines the cost per 1M cache-write prompt tokens.
+                      type: number
+                    cache_write_cost_list:
+                      description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                      type: array
+                      items:
+                        properties:
+                          cost:
+                            type: number
+                          ttl:
+                            type: string
+                        required:
+                          - cost
+                          - ttl
+                        type: object
                     cohere:
                       type: object
                       properties:
@@ -17550,6 +17671,22 @@ components:
                         wait_for_model:
                           description: Wait for the model if it is not ready
                           type: boolean
+                    context_window_factor:
+                      description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                      type: array
+                      items:
+                        properties:
+                          above:
+                            type: string
+                          input_factor:
+                            type: number
+                          output_factor:
+                            type: number
+                        required:
+                          - above
+                          - input_factor
+                          - output_factor
+                        type: object
                     dashscope:
                       type: object
                       properties:
@@ -17614,6 +17751,21 @@ components:
                     output_cost:
                       description: Defines the cost per 1M tokens in the output of the AI.
                       type: number
+                    service_tier_factor:
+                      description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                      type: array
+                      items:
+                        properties:
+                          factor:
+                            type: number
+                          tier:
+                            description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                            type: string
+                            minLength: 1
+                        required:
+                          - factor
+                          - tier
+                        type: object
                     temperature:
                       description: Defines the matching temperature, if using chat or completion models.
                       type: number
@@ -18987,6 +19139,25 @@ components:
                             video_output_s3_uri:
                               description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                               type: string
+                        cache_read_cost:
+                          description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                          type: number
+                        cache_write_cost:
+                          description: Defines the cost per 1M cache-write prompt tokens.
+                          type: number
+                        cache_write_cost_list:
+                          description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                          type: array
+                          items:
+                            properties:
+                              cost:
+                                type: number
+                              ttl:
+                                type: string
+                            required:
+                              - cost
+                              - ttl
+                            type: object
                         cohere:
                           type: object
                           properties:
@@ -19003,6 +19174,22 @@ components:
                             wait_for_model:
                               description: Wait for the model if it is not ready
                               type: boolean
+                        context_window_factor:
+                          description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                          type: array
+                          items:
+                            properties:
+                              above:
+                                type: string
+                              input_factor:
+                                type: number
+                              output_factor:
+                                type: number
+                            required:
+                              - above
+                              - input_factor
+                              - output_factor
+                            type: object
                         dashscope:
                           type: object
                           properties:
@@ -19067,6 +19254,21 @@ components:
                         output_cost:
                           description: Defines the cost per 1M tokens in the output of the AI.
                           type: number
+                        service_tier_factor:
+                          description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                          type: array
+                          items:
+                            properties:
+                              factor:
+                                type: number
+                              tier:
+                                description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                                type: string
+                                minLength: 1
+                            required:
+                              - factor
+                              - tier
+                            type: object
                         temperature:
                           description: Defines the matching temperature, if using chat or completion models.
                           type: number
@@ -19385,6 +19587,25 @@ components:
                             video_output_s3_uri:
                               description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                               type: string
+                        cache_read_cost:
+                          description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                          type: number
+                        cache_write_cost:
+                          description: Defines the cost per 1M cache-write prompt tokens.
+                          type: number
+                        cache_write_cost_list:
+                          description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                          type: array
+                          items:
+                            properties:
+                              cost:
+                                type: number
+                              ttl:
+                                type: string
+                            required:
+                              - cost
+                              - ttl
+                            type: object
                         cohere:
                           type: object
                           properties:
@@ -19401,6 +19622,22 @@ components:
                             wait_for_model:
                               description: Wait for the model if it is not ready
                               type: boolean
+                        context_window_factor:
+                          description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                          type: array
+                          items:
+                            properties:
+                              above:
+                                type: string
+                              input_factor:
+                                type: number
+                              output_factor:
+                                type: number
+                            required:
+                              - above
+                              - input_factor
+                              - output_factor
+                            type: object
                         dashscope:
                           type: object
                           properties:
@@ -19465,6 +19702,21 @@ components:
                         output_cost:
                           description: Defines the cost per 1M tokens in the output of the AI.
                           type: number
+                        service_tier_factor:
+                          description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                          type: array
+                          items:
+                            properties:
+                              factor:
+                                type: number
+                              tier:
+                                description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                                type: string
+                                minLength: 1
+                            required:
+                              - factor
+                              - tier
+                            type: object
                         temperature:
                           description: Defines the matching temperature, if using chat or completion models.
                           type: number
@@ -22569,6 +22821,12 @@ components:
                           required:
                             - password
                             - username
+                        identity_pool_id:
+                          description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                          type: string
+                        logical_cluster_id:
+                          description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                          type: string
                         mode:
                           description: Authentication mode to use with the schema registry.
                           type: string
@@ -22743,6 +23001,12 @@ components:
                                 required:
                                   - password
                                   - username
+                              identity_pool_id:
+                                description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                                type: string
+                              logical_cluster_id:
+                                description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                                type: string
                               mode:
                                 description: Authentication mode to use with the schema registry.
                                 type: string
@@ -23152,6 +23416,12 @@ components:
                           required:
                             - password
                             - username
+                        identity_pool_id:
+                          description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                          type: string
+                        logical_cluster_id:
+                          description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                          type: string
                         mode:
                           description: Authentication mode to use with the schema registry.
                           type: string
@@ -28181,6 +28451,12 @@ components:
                           required:
                             - password
                             - username
+                        identity_pool_id:
+                          description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                          type: string
+                        logical_cluster_id:
+                          description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                          type: string
                         mode:
                           description: Authentication mode to use with the schema registry.
                           type: string
@@ -28357,6 +28633,12 @@ components:
                                 required:
                                   - password
                                   - username
+                              identity_pool_id:
+                                description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                                type: string
+                              logical_cluster_id:
+                                description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                                type: string
                               mode:
                                 description: Authentication mode to use with the schema registry.
                                 type: string
@@ -28702,6 +28984,12 @@ components:
                           required:
                             - password
                             - username
+                        identity_pool_id:
+                          description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                          type: string
+                        logical_cluster_id:
+                          description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                          type: string
                         mode:
                           description: Authentication mode to use with the schema registry.
                           type: string
@@ -29154,6 +29442,12 @@ components:
                           required:
                             - password
                             - username
+                        identity_pool_id:
+                          description: "The Confluent Cloud OAuth identity pool ID, sent as the `Confluent-Identity-Pool-Id` request header. Optional: if omitted, Confluent Cloud automatically maps an identity pool based on the token's claims."
+                          type: string
+                        logical_cluster_id:
+                          description: The Confluent Cloud Schema Registry cluster ID, sent as the `target-sr-cluster` request header. Confluent Cloud requires this when `mode` is 'oauth2'.
+                          type: string
                         mode:
                           description: Authentication mode to use with the schema registry.
                           type: string
@@ -29593,6 +29887,7 @@ components:
                     type: string
                   scope:
                     type: string
+                    default: cp
                     enum:
                       - cp
                       - realm
@@ -31812,7 +32107,7 @@ components:
                 - header
                 - query
             ignore_signature:
-              description: 'Skip the token signature verification on certain grants: - `password`: OAuth password grant - `client_credentials`: OAuth client credentials grant - `authorization_code`: authorization code flow - `refresh_token`: OAuth refresh token grant - `session`: session cookie authentication - `introspection`: OAuth introspection - `userinfo`: OpenID Connect user info endpoint authentication.'
+              description: 'Skip the token signature verification on certain grants. This is insecure and logs a warning; use it only for providers that publish no verification key. Grants: - `password`: OAuth password grant - `client_credentials`: OAuth client credentials grant - `authorization_code`: authorization code flow - `refresh_token`: OAuth refresh token grant - `session`: session cookie authentication - `introspection`: OAuth introspection - `userinfo`: OpenID Connect user info endpoint authentication.'
               type: array
               items:
                 enum:
@@ -33682,6 +33977,25 @@ components:
                         video_output_s3_uri:
                           description: S3 URI (s3://bucket/prefix) where Bedrock will store generated video files. Required for video generation.
                           type: string
+                    cache_read_cost:
+                      description: Defines the cost per 1M cache-read (cached) prompt tokens.
+                      type: number
+                    cache_write_cost:
+                      description: Defines the cost per 1M cache-write prompt tokens.
+                      type: number
+                    cache_write_cost_list:
+                      description: Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+                      type: array
+                      items:
+                        properties:
+                          cost:
+                            type: number
+                          ttl:
+                            type: string
+                        required:
+                          - cost
+                          - ttl
+                        type: object
                     cohere:
                       type: object
                       properties:
@@ -33698,6 +34012,22 @@ components:
                         wait_for_model:
                           description: Wait for the model if it is not ready
                           type: boolean
+                    context_window_factor:
+                      description: Above an input-token threshold, scale input/output pricing with the corresponding factor.
+                      type: array
+                      items:
+                        properties:
+                          above:
+                            type: string
+                          input_factor:
+                            type: number
+                          output_factor:
+                            type: number
+                        required:
+                          - above
+                          - input_factor
+                          - output_factor
+                        type: object
                     dashscope:
                       type: object
                       properties:
@@ -33762,6 +34092,21 @@ components:
                     output_cost:
                       description: Defines the cost per 1M tokens in the output of the AI.
                       type: number
+                    service_tier_factor:
+                      description: Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+                      type: array
+                      items:
+                        properties:
+                          factor:
+                            type: number
+                          tier:
+                            description: A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+                            type: string
+                            minLength: 1
+                        required:
+                          - factor
+                          - tier
+                        type: object
                     temperature:
                       description: Defines the matching temperature, if using chat or completion models.
                       type: number
@@ -39189,7 +39534,7 @@ components:
               type: boolean
               default: false
             validate_assertion_signature:
-              description: Enable signature validation for SAML responses.
+              description: Controls SAML response signature validation. When enabled (the default), the `saml:Assertion` signature is validated and a valid `idp_certificate` is required. When disabled, the signature is still validated as long as an `idp_certificate` is configured, but the `samlp:Response` signature is checked instead of the assertion. Disabling it without an `idp_certificate` skips signature validation entirely, which is insecure (unsigned responses are accepted) and logs a warning.
               type: boolean
               default: true
           required:
@@ -41952,7 +42297,7 @@ components:
                     successes:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                 http_path:
                   description: A string representing a URL path, such as /path/to/resource. Must start with a forward slash (/) and must not contain empty segments (i.e., two consecutive forward slashes).
@@ -41998,7 +42343,7 @@ components:
                     http_failures:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                     http_statuses:
                       type: array
@@ -42023,12 +42368,12 @@ components:
                     tcp_failures:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                     timeouts:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
             passive:
               type: object
@@ -42119,7 +42464,7 @@ components:
                     successes:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                 type:
                   type: string
@@ -42144,7 +42489,7 @@ components:
                     http_failures:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                     http_statuses:
                       type: array
@@ -42159,12 +42504,12 @@ components:
                     tcp_failures:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
                     timeouts:
                       type: integer
                       default: 0
-                      maximum: 255
+                      maximum: 254
                       minimum: 0
             threshold:
               type: number

@@ -158,6 +158,7 @@ type TextSource string
 const (
 	TextSourceConcatenateAllContent  TextSource = "concatenate_all_content"
 	TextSourceConcatenateUserContent TextSource = "concatenate_user_content"
+	TextSourceLastMessage            TextSource = "last_message"
 )
 
 func (e TextSource) ToPointer() *TextSource {
@@ -172,6 +173,8 @@ func (e *TextSource) UnmarshalJSON(data []byte) error {
 	case "concatenate_all_content":
 		fallthrough
 	case "concatenate_user_content":
+		fallthrough
+	case "last_message":
 		*e = TextSource(v)
 		return nil
 	default:

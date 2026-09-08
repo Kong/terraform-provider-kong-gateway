@@ -42,7 +42,7 @@ resource "kong-gateway_upstream" "my_upstream" {
           627
         ]
         interval  = 9499.17
-        successes = 151
+        successes = 150
       }
       http_path                = "...my_http_path..."
       https_sni                = "...my_https_sni..."
@@ -55,7 +55,7 @@ resource "kong-gateway_upstream" "my_upstream" {
           407
         ]
         interval     = 50984.59
-        tcp_failures = 244
+        tcp_failures = 243
         timeouts     = 100
       }
     }
@@ -64,16 +64,16 @@ resource "kong-gateway_upstream" "my_upstream" {
         http_statuses = [
           604
         ]
-        successes = 228
+        successes = 227
       }
       type = "http"
       unhealthy = {
-        http_failures = 71
+        http_failures = 70
         http_statuses = [
           125
         ]
         tcp_failures = 137
-        timeouts     = 104
+        timeouts     = 103
       }
     }
     threshold = 21.38

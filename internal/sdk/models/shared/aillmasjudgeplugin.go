@@ -434,6 +434,36 @@ func (a *AiLlmAsJudgePluginBedrock) GetVideoOutputS3URI() *string {
 	return a.VideoOutputS3URI
 }
 
+type AiLlmAsJudgePluginCacheWriteCostList struct {
+	Cost float64 `json:"cost"`
+	TTL  string  `json:"ttl"`
+}
+
+func (a AiLlmAsJudgePluginCacheWriteCostList) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginCacheWriteCostList) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"cost", "ttl"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiLlmAsJudgePluginCacheWriteCostList) GetCost() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.Cost
+}
+
+func (a *AiLlmAsJudgePluginCacheWriteCostList) GetTTL() string {
+	if a == nil {
+		return ""
+	}
+	return a.TTL
+}
+
 // AiLlmAsJudgePluginEmbeddingInputType - The purpose of the input text to calculate embedding vectors.
 type AiLlmAsJudgePluginEmbeddingInputType string
 
@@ -500,6 +530,44 @@ func (a *AiLlmAsJudgePluginCohere) GetWaitForModel() *bool {
 		return nil
 	}
 	return a.WaitForModel
+}
+
+type AiLlmAsJudgePluginContextWindowFactor struct {
+	Above        string  `json:"above"`
+	InputFactor  float64 `json:"input_factor"`
+	OutputFactor float64 `json:"output_factor"`
+}
+
+func (a AiLlmAsJudgePluginContextWindowFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginContextWindowFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"above", "input_factor", "output_factor"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiLlmAsJudgePluginContextWindowFactor) GetAbove() string {
+	if a == nil {
+		return ""
+	}
+	return a.Above
+}
+
+func (a *AiLlmAsJudgePluginContextWindowFactor) GetInputFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.InputFactor
+}
+
+func (a *AiLlmAsJudgePluginContextWindowFactor) GetOutputFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.OutputFactor
 }
 
 type AiLlmAsJudgePluginDashscope struct {
@@ -689,6 +757,37 @@ func (e *AiLlmAsJudgePluginMistralFormat) UnmarshalJSON(data []byte) error {
 	}
 }
 
+type AiLlmAsJudgePluginServiceTierFactor struct {
+	Factor float64 `json:"factor"`
+	// A word matched case-insensitively as a substring of the vendor's reported service tier (e.g. 'priority', 'flex', or 'throughput' for Gemini/Vertex's PROVISIONED_THROUGHPUT). If several entries match, the longest (most specific) wins; array order doesn't matter. Configure 'priority' will also match 'fast' (whole word) as OpenAI returns either 'priority' or 'fast' for priority service tier.
+	Tier string `json:"tier"`
+}
+
+func (a AiLlmAsJudgePluginServiceTierFactor) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiLlmAsJudgePluginServiceTierFactor) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, []string{"factor", "tier"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiLlmAsJudgePluginServiceTierFactor) GetFactor() float64 {
+	if a == nil {
+		return 0.0
+	}
+	return a.Factor
+}
+
+func (a *AiLlmAsJudgePluginServiceTierFactor) GetTier() string {
+	if a == nil {
+		return ""
+	}
+	return a.Tier
+}
+
 // AiLlmAsJudgePluginOptions - Key/value settings for the model
 type AiLlmAsJudgePluginOptions struct {
 	// Defines the schema/API version, if using Anthropic provider.
@@ -698,11 +797,19 @@ type AiLlmAsJudgePluginOptions struct {
 	// Deployment ID for Azure OpenAI instances.
 	AzureDeploymentID *string `json:"azure_deployment_id,omitempty"`
 	// Instance name for Azure OpenAI hosted models.
-	AzureInstance *string                       `json:"azure_instance,omitempty"`
-	Bedrock       *AiLlmAsJudgePluginBedrock    `json:"bedrock,omitempty"`
-	Cohere        *AiLlmAsJudgePluginCohere     `json:"cohere,omitempty"`
-	Dashscope     *AiLlmAsJudgePluginDashscope  `json:"dashscope,omitempty"`
-	Databricks    *AiLlmAsJudgePluginDatabricks `json:"databricks,omitempty"`
+	AzureInstance *string                    `json:"azure_instance,omitempty"`
+	Bedrock       *AiLlmAsJudgePluginBedrock `json:"bedrock,omitempty"`
+	// Defines the cost per 1M cache-read (cached) prompt tokens.
+	CacheReadCost *float64 `json:"cache_read_cost,omitempty"`
+	// Defines the cost per 1M cache-write prompt tokens.
+	CacheWriteCost *float64 `json:"cache_write_cost,omitempty"`
+	// Per-cache-TTL cache-write pricing; overrides cache_write_cost per TTL. Configure this if the upstream provider charges differently for different cache TTLs, as Anthropic does for 5m and 1h TTLs.
+	CacheWriteCostList []AiLlmAsJudgePluginCacheWriteCostList `json:"cache_write_cost_list,omitempty"`
+	Cohere             *AiLlmAsJudgePluginCohere              `json:"cohere,omitempty"`
+	// Above an input-token threshold, scale input/output pricing with the corresponding factor.
+	ContextWindowFactor []AiLlmAsJudgePluginContextWindowFactor `json:"context_window_factor,omitempty"`
+	Dashscope           *AiLlmAsJudgePluginDashscope            `json:"dashscope,omitempty"`
+	Databricks          *AiLlmAsJudgePluginDatabricks           `json:"databricks,omitempty"`
 	// If using embeddings models, set the number of dimensions to generate.
 	EmbeddingsDimensions *int64                         `json:"embeddings_dimensions,omitempty"`
 	Gemini               *AiLlmAsJudgePluginGemini      `json:"gemini,omitempty"`
@@ -717,6 +824,8 @@ type AiLlmAsJudgePluginOptions struct {
 	MistralFormat *AiLlmAsJudgePluginMistralFormat `json:"mistral_format,omitempty"`
 	// Defines the cost per 1M tokens in the output of the AI.
 	OutputCost *float64 `json:"output_cost,omitempty"`
+	// Multiplier applied to the whole request for a service tier. No need to configure a standard/default tier, as the default factor is 1.0 if none of the tier is matched.
+	ServiceTierFactor []AiLlmAsJudgePluginServiceTierFactor `json:"service_tier_factor,omitempty"`
 	// Defines the matching temperature, if using chat or completion models.
 	Temperature *float64 `json:"temperature,omitempty"`
 	// Defines the top-k most likely tokens, if supported.
@@ -775,11 +884,39 @@ func (a *AiLlmAsJudgePluginOptions) GetBedrock() *AiLlmAsJudgePluginBedrock {
 	return a.Bedrock
 }
 
+func (a *AiLlmAsJudgePluginOptions) GetCacheReadCost() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.CacheReadCost
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetCacheWriteCost() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.CacheWriteCost
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetCacheWriteCostList() []AiLlmAsJudgePluginCacheWriteCostList {
+	if a == nil {
+		return nil
+	}
+	return a.CacheWriteCostList
+}
+
 func (a *AiLlmAsJudgePluginOptions) GetCohere() *AiLlmAsJudgePluginCohere {
 	if a == nil {
 		return nil
 	}
 	return a.Cohere
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetContextWindowFactor() []AiLlmAsJudgePluginContextWindowFactor {
+	if a == nil {
+		return nil
+	}
+	return a.ContextWindowFactor
 }
 
 func (a *AiLlmAsJudgePluginOptions) GetDashscope() *AiLlmAsJudgePluginDashscope {
@@ -850,6 +987,13 @@ func (a *AiLlmAsJudgePluginOptions) GetOutputCost() *float64 {
 		return nil
 	}
 	return a.OutputCost
+}
+
+func (a *AiLlmAsJudgePluginOptions) GetServiceTierFactor() []AiLlmAsJudgePluginServiceTierFactor {
+	if a == nil {
+		return nil
+	}
+	return a.ServiceTierFactor
 }
 
 func (a *AiLlmAsJudgePluginOptions) GetTemperature() *float64 {

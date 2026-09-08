@@ -230,7 +230,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 								},
@@ -278,7 +278,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 									"http_statuses": schema.ListAttribute{
@@ -297,14 +297,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 								},
@@ -328,7 +328,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 								},
@@ -355,7 +355,7 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 									"http_statuses": schema.ListAttribute{
@@ -367,14 +367,14 @@ func (r *UpstreamResource) Schema(ctx context.Context, req resource.SchemaReques
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 									"timeouts": schema.Int64Attribute{
 										Computed: true,
 										Optional: true,
 										Validators: []validator.Int64{
-											int64validator.Between(0, 255),
+											int64validator.Between(0, 254),
 										},
 									},
 								},

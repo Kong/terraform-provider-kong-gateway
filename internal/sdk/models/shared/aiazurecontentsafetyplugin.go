@@ -215,6 +215,7 @@ type AiAzureContentSafetyPluginTextSource string
 const (
 	AiAzureContentSafetyPluginTextSourceConcatenateAllContent  AiAzureContentSafetyPluginTextSource = "concatenate_all_content"
 	AiAzureContentSafetyPluginTextSourceConcatenateUserContent AiAzureContentSafetyPluginTextSource = "concatenate_user_content"
+	AiAzureContentSafetyPluginTextSourceLastMessage            AiAzureContentSafetyPluginTextSource = "last_message"
 )
 
 func (e AiAzureContentSafetyPluginTextSource) ToPointer() *AiAzureContentSafetyPluginTextSource {
@@ -229,6 +230,8 @@ func (e *AiAzureContentSafetyPluginTextSource) UnmarshalJSON(data []byte) error 
 	case "concatenate_all_content":
 		fallthrough
 	case "concatenate_user_content":
+		fallthrough
+	case "last_message":
 		*e = AiAzureContentSafetyPluginTextSource(v)
 		return nil
 	default:

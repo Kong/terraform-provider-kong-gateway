@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+> Released on 2026/09/07
+
+### Features
+* Upgrade to Kong Gateway v3.15.0.5 which includes support for cost-accounting fields (`cache_read_cost`, `cache_write_cost`, `cache_write_cost_list`, `context_window_factor`, `service_tier_factor`) in `kong-gateway_plugin_ai_proxy_advanced`, `kkong-gateway_plugin_ai_response_transformer` and `kong-gateway_plugin_ai_llm_as_judge` resources.
+
 ## 1.2.1
 > Released on 2026/08/12
 

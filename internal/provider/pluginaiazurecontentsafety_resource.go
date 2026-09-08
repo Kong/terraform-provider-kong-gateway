@@ -200,11 +200,12 @@ func (r *PluginAiAzureContentSafetyResource) Schema(ctx context.Context, req res
 					"text_source": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Select where to pick the 'text' for the Azure Content Services request. must be one of ["concatenate_all_content", "concatenate_user_content"]`,
+						Description: `Select where to pick the 'text' for the Azure Content Services request. must be one of ["concatenate_all_content", "concatenate_user_content", "last_message"]`,
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"concatenate_all_content",
 								"concatenate_user_content",
+								"last_message",
 							),
 						},
 					},

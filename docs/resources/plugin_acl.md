@@ -19,8 +19,14 @@ resource "kong-gateway_plugin_acl" "my_pluginacl" {
     allow = [
       "..."
     ]
+    allow_when = [
+      "..."
+    ]
     always_use_authenticated_groups = true
     deny = [
+      "..."
+    ]
+    deny_when = [
       "..."
     ]
     hide_groups_header      = true
@@ -91,11 +97,13 @@ resource "kong-gateway_plugin_acl" "my_pluginacl" {
 
 Optional:
 
-- `allow` (List of String) Arbitrary group names that are allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
-- `always_use_authenticated_groups` (Boolean) If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous.
-- `deny` (List of String) Arbitrary group names that are not allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
-- `hide_groups_header` (Boolean) If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service.
-- `include_consumer_groups` (Boolean) If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields
+- `allow` (List of String) Arbitrary group names that are allowed to consume the service or route. Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+- `allow_when` (List of String) Allow the request if it matches any of these CEL boolean expressions evaluated against the request context (consumer, principal, HTTP attributes, consumer groups, etc.). Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+- `always_use_authenticated_groups` (Boolean) If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous. This option is ignored when `allow_when` or `deny_when` is effective.
+- `deny` (List of String) Arbitrary group names that are not allowed to consume the service or route. Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+- `deny_when` (List of String) Deny the request if it matches any of these CEL boolean expressions evaluated against the request context (consumer, principal, HTTP attributes, consumer groups, etc.). Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+- `hide_groups_header` (Boolean) If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service. This header is not set when allow_when or deny_when is used.
+- `include_consumer_groups` (Boolean) If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields. This option is ignored when `allow_when` or `deny_when` is used.
 
 
 <a id="nestedatt--ordering"></a>

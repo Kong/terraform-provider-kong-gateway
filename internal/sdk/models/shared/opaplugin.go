@@ -150,10 +150,11 @@ func (e *OpaProtocol) UnmarshalJSON(data []byte) error {
 }
 
 type OpaPluginConfig struct {
+	// If set to true, the raw request body is included as input to OPA. Not supported for WebSocket protocols (ws/wss).
 	IncludeBodyInOpaInput *bool `json:"include_body_in_opa_input,omitempty"`
 	// If set to true, the Kong Gateway Consumer object in use for the current request (if any) is included as input to OPA.
 	IncludeConsumerInOpaInput *bool `json:"include_consumer_in_opa_input,omitempty"`
-	// If set to true and the `Content-Type` header of the current request is `application/json`, the request body will be JSON decoded and the decoded struct is included as input to OPA.
+	// If set to true and the `Content-Type` header of the current request is `application/json`, the request body will be JSON decoded and the decoded struct is included as input to OPA. Not supported for WebSocket protocols (ws/wss).
 	IncludeParsedJSONBodyInOpaInput *bool `json:"include_parsed_json_body_in_opa_input,omitempty"`
 	// If set to true, the Kong Gateway Route object in use for the current request is included as input to OPA.
 	IncludeRouteInOpaInput *bool `json:"include_route_in_opa_input,omitempty"`
@@ -268,6 +269,8 @@ const (
 	OpaPluginProtocolsGrpcs OpaPluginProtocols = "grpcs"
 	OpaPluginProtocolsHTTP  OpaPluginProtocols = "http"
 	OpaPluginProtocolsHTTPS OpaPluginProtocols = "https"
+	OpaPluginProtocolsWs    OpaPluginProtocols = "ws"
+	OpaPluginProtocolsWss   OpaPluginProtocols = "wss"
 )
 
 func (e OpaPluginProtocols) ToPointer() *OpaPluginProtocols {
@@ -286,6 +289,10 @@ func (e *OpaPluginProtocols) UnmarshalJSON(data []byte) error {
 	case "http":
 		fallthrough
 	case "https":
+		fallthrough
+	case "ws":
+		fallthrough
+	case "wss":
 		*e = OpaPluginProtocols(v)
 		return nil
 	default:
@@ -361,7 +368,7 @@ type OpaPlugin struct {
 	// Unix epoch when the resource was last updated.
 	UpdatedAt *int64          `json:"updated_at,omitempty"`
 	Config    OpaPluginConfig `json:"config"`
-	// A set of strings representing HTTP protocols.
+	// A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.
 	Protocols []OpaPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
 	Route *OpaPluginRoute `json:"route,omitempty"`

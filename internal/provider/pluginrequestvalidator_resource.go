@@ -96,6 +96,17 @@ func (r *PluginRequestValidatorResource) Schema(ctx context.Context, req resourc
 						Optional:    true,
 						Description: `Determines whether to enable parameters validation of request content-type.`,
 					},
+					"enforcement_mode": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Determines the action to take when a request fails validation. When set to ` + "`" + `block` + "`" + `, the request is rejected with an HTTP 400 response. When set to ` + "`" + `log_only` + "`" + `, the request is allowed to proceed and a warning is logged. must be one of ["block", "log_only"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"block",
+								"log_only",
+							),
+						},
+					},
 					"parameter_schema": schema.ListNestedAttribute{
 						Computed: true,
 						Optional: true,

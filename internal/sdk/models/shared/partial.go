@@ -2072,6 +2072,7 @@ const (
 	PartialVectordbAuthProviderAws   PartialVectordbAuthProvider = "aws"
 	PartialVectordbAuthProviderAzure PartialVectordbAuthProvider = "azure"
 	PartialVectordbAuthProviderGcp   PartialVectordbAuthProvider = "gcp"
+	PartialVectordbAuthProviderOauth PartialVectordbAuthProvider = "oauth"
 )
 
 func (e PartialVectordbAuthProvider) ToPointer() *PartialVectordbAuthProvider {
@@ -2088,11 +2089,247 @@ func (e *PartialVectordbAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = PartialVectordbAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for PartialVectordbAuthProvider: %v", v)
 	}
+}
+
+// PartialVectordbAuthMethod - Client authentication method used against the token endpoint.
+type PartialVectordbAuthMethod string
+
+const (
+	PartialVectordbAuthMethodClientSecretBasic PartialVectordbAuthMethod = "client_secret_basic"
+	PartialVectordbAuthMethodClientSecretJwt   PartialVectordbAuthMethod = "client_secret_jwt"
+	PartialVectordbAuthMethodClientSecretPost  PartialVectordbAuthMethod = "client_secret_post"
+)
+
+func (e PartialVectordbAuthMethod) ToPointer() *PartialVectordbAuthMethod {
+	return &e
+}
+func (e *PartialVectordbAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = PartialVectordbAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbAuthMethod: %v", v)
+	}
+}
+
+// PartialVectordbClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type PartialVectordbClientSecretJwtAlg string
+
+const (
+	PartialVectordbClientSecretJwtAlgHs256 PartialVectordbClientSecretJwtAlg = "HS256"
+	PartialVectordbClientSecretJwtAlgHs512 PartialVectordbClientSecretJwtAlg = "HS512"
+)
+
+func (e PartialVectordbClientSecretJwtAlg) ToPointer() *PartialVectordbClientSecretJwtAlg {
+	return &e
+}
+func (e *PartialVectordbClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = PartialVectordbClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbClientSecretJwtAlg: %v", v)
+	}
+}
+
+// PartialVectordbGrantType - OAuth 2.0 grant type used to request access tokens.
+type PartialVectordbGrantType string
+
+const (
+	PartialVectordbGrantTypeClientCredentials PartialVectordbGrantType = "client_credentials"
+	PartialVectordbGrantTypePassword          PartialVectordbGrantType = "password"
+)
+
+func (e PartialVectordbGrantType) ToPointer() *PartialVectordbGrantType {
+	return &e
+}
+func (e *PartialVectordbGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = PartialVectordbGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialVectordbGrantType: %v", v)
+	}
+}
+
+// PartialVectordbOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type PartialVectordbOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *PartialVectordbAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *PartialVectordbClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *PartialVectordbGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialVectordbOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialVectordbOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialVectordbOauth) GetAuthMethod() *PartialVectordbAuthMethod {
+	if p == nil {
+		return nil
+	}
+	return p.AuthMethod
+}
+
+func (p *PartialVectordbOauth) GetClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientID
+}
+
+func (p *PartialVectordbOauth) GetClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecret
+}
+
+func (p *PartialVectordbOauth) GetClientSecretJwtAlg() *PartialVectordbClientSecretJwtAlg {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecretJwtAlg
+}
+
+func (p *PartialVectordbOauth) GetGrantType() *PartialVectordbGrantType {
+	if p == nil {
+		return nil
+	}
+	return p.GrantType
+}
+
+func (p *PartialVectordbOauth) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialVectordbOauth) GetRedisUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsername
+}
+
+func (p *PartialVectordbOauth) GetRedisUsernameClaim() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsernameClaim
+}
+
+func (p *PartialVectordbOauth) GetScopes() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Scopes
+}
+
+func (p *PartialVectordbOauth) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialVectordbOauth) GetTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Timeout
+}
+
+func (p *PartialVectordbOauth) GetTokenEndpoint() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenEndpoint
+}
+
+func (p *PartialVectordbOauth) GetTokenHeaders() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenHeaders
+}
+
+func (p *PartialVectordbOauth) GetTokenPostArgs() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenPostArgs
+}
+
+func (p *PartialVectordbOauth) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
 }
 
 // PartialVectordbCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -2121,6 +2358,8 @@ type PartialVectordbCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *PartialVectordbOauth `json:"oauth,omitempty"`
 }
 
 func (p PartialVectordbCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -2216,6 +2455,13 @@ func (p *PartialVectordbCloudAuthentication) GetGcpServiceAccountJSON() *string 
 		return nil
 	}
 	return p.GcpServiceAccountJSON
+}
+
+func (p *PartialVectordbCloudAuthentication) GetOauth() *PartialVectordbOauth {
+	if p == nil {
+		return nil
+	}
+	return p.Oauth
 }
 
 type PartialVectordbClusterNodes struct {
@@ -2697,6 +2943,7 @@ const (
 	PartialRedisEeAuthProviderAws   PartialRedisEeAuthProvider = "aws"
 	PartialRedisEeAuthProviderAzure PartialRedisEeAuthProvider = "azure"
 	PartialRedisEeAuthProviderGcp   PartialRedisEeAuthProvider = "gcp"
+	PartialRedisEeAuthProviderOauth PartialRedisEeAuthProvider = "oauth"
 )
 
 func (e PartialRedisEeAuthProvider) ToPointer() *PartialRedisEeAuthProvider {
@@ -2713,11 +2960,247 @@ func (e *PartialRedisEeAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = PartialRedisEeAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for PartialRedisEeAuthProvider: %v", v)
 	}
+}
+
+// PartialRedisEeAuthMethod - Client authentication method used against the token endpoint.
+type PartialRedisEeAuthMethod string
+
+const (
+	PartialRedisEeAuthMethodClientSecretBasic PartialRedisEeAuthMethod = "client_secret_basic"
+	PartialRedisEeAuthMethodClientSecretJwt   PartialRedisEeAuthMethod = "client_secret_jwt"
+	PartialRedisEeAuthMethodClientSecretPost  PartialRedisEeAuthMethod = "client_secret_post"
+)
+
+func (e PartialRedisEeAuthMethod) ToPointer() *PartialRedisEeAuthMethod {
+	return &e
+}
+func (e *PartialRedisEeAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = PartialRedisEeAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisEeAuthMethod: %v", v)
+	}
+}
+
+// PartialRedisEeClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type PartialRedisEeClientSecretJwtAlg string
+
+const (
+	PartialRedisEeClientSecretJwtAlgHs256 PartialRedisEeClientSecretJwtAlg = "HS256"
+	PartialRedisEeClientSecretJwtAlgHs512 PartialRedisEeClientSecretJwtAlg = "HS512"
+)
+
+func (e PartialRedisEeClientSecretJwtAlg) ToPointer() *PartialRedisEeClientSecretJwtAlg {
+	return &e
+}
+func (e *PartialRedisEeClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = PartialRedisEeClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisEeClientSecretJwtAlg: %v", v)
+	}
+}
+
+// PartialRedisEeGrantType - OAuth 2.0 grant type used to request access tokens.
+type PartialRedisEeGrantType string
+
+const (
+	PartialRedisEeGrantTypeClientCredentials PartialRedisEeGrantType = "client_credentials"
+	PartialRedisEeGrantTypePassword          PartialRedisEeGrantType = "password"
+)
+
+func (e PartialRedisEeGrantType) ToPointer() *PartialRedisEeGrantType {
+	return &e
+}
+func (e *PartialRedisEeGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = PartialRedisEeGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisEeGrantType: %v", v)
+	}
+}
+
+// PartialRedisEeOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type PartialRedisEeOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *PartialRedisEeAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *PartialRedisEeClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *PartialRedisEeGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialRedisEeOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisEeOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisEeOauth) GetAuthMethod() *PartialRedisEeAuthMethod {
+	if p == nil {
+		return nil
+	}
+	return p.AuthMethod
+}
+
+func (p *PartialRedisEeOauth) GetClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientID
+}
+
+func (p *PartialRedisEeOauth) GetClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecret
+}
+
+func (p *PartialRedisEeOauth) GetClientSecretJwtAlg() *PartialRedisEeClientSecretJwtAlg {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecretJwtAlg
+}
+
+func (p *PartialRedisEeOauth) GetGrantType() *PartialRedisEeGrantType {
+	if p == nil {
+		return nil
+	}
+	return p.GrantType
+}
+
+func (p *PartialRedisEeOauth) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialRedisEeOauth) GetRedisUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsername
+}
+
+func (p *PartialRedisEeOauth) GetRedisUsernameClaim() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsernameClaim
+}
+
+func (p *PartialRedisEeOauth) GetScopes() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Scopes
+}
+
+func (p *PartialRedisEeOauth) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialRedisEeOauth) GetTimeout() *int64 {
+	if p == nil {
+		return nil
+	}
+	return p.Timeout
+}
+
+func (p *PartialRedisEeOauth) GetTokenEndpoint() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenEndpoint
+}
+
+func (p *PartialRedisEeOauth) GetTokenHeaders() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenHeaders
+}
+
+func (p *PartialRedisEeOauth) GetTokenPostArgs() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenPostArgs
+}
+
+func (p *PartialRedisEeOauth) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
 }
 
 // PartialRedisEeCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -2746,6 +3229,8 @@ type PartialRedisEeCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *PartialRedisEeOauth `json:"oauth,omitempty"`
 }
 
 func (p PartialRedisEeCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -2841,6 +3326,13 @@ func (p *PartialRedisEeCloudAuthentication) GetGcpServiceAccountJSON() *string {
 		return nil
 	}
 	return p.GcpServiceAccountJSON
+}
+
+func (p *PartialRedisEeCloudAuthentication) GetOauth() *PartialRedisEeOauth {
+	if p == nil {
+		return nil
+	}
+	return p.Oauth
 }
 
 type PartialRedisEeClusterNodes struct {
@@ -3229,6 +3721,7 @@ const (
 	PartialRedisCeAuthProviderAws   PartialRedisCeAuthProvider = "aws"
 	PartialRedisCeAuthProviderAzure PartialRedisCeAuthProvider = "azure"
 	PartialRedisCeAuthProviderGcp   PartialRedisCeAuthProvider = "gcp"
+	PartialRedisCeAuthProviderOauth PartialRedisCeAuthProvider = "oauth"
 )
 
 func (e PartialRedisCeAuthProvider) ToPointer() *PartialRedisCeAuthProvider {
@@ -3245,11 +3738,247 @@ func (e *PartialRedisCeAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = PartialRedisCeAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for PartialRedisCeAuthProvider: %v", v)
 	}
+}
+
+// PartialRedisCeAuthMethod - Client authentication method used against the token endpoint.
+type PartialRedisCeAuthMethod string
+
+const (
+	PartialRedisCeAuthMethodClientSecretBasic PartialRedisCeAuthMethod = "client_secret_basic"
+	PartialRedisCeAuthMethodClientSecretJwt   PartialRedisCeAuthMethod = "client_secret_jwt"
+	PartialRedisCeAuthMethodClientSecretPost  PartialRedisCeAuthMethod = "client_secret_post"
+)
+
+func (e PartialRedisCeAuthMethod) ToPointer() *PartialRedisCeAuthMethod {
+	return &e
+}
+func (e *PartialRedisCeAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = PartialRedisCeAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisCeAuthMethod: %v", v)
+	}
+}
+
+// PartialRedisCeClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type PartialRedisCeClientSecretJwtAlg string
+
+const (
+	PartialRedisCeClientSecretJwtAlgHs256 PartialRedisCeClientSecretJwtAlg = "HS256"
+	PartialRedisCeClientSecretJwtAlgHs512 PartialRedisCeClientSecretJwtAlg = "HS512"
+)
+
+func (e PartialRedisCeClientSecretJwtAlg) ToPointer() *PartialRedisCeClientSecretJwtAlg {
+	return &e
+}
+func (e *PartialRedisCeClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = PartialRedisCeClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisCeClientSecretJwtAlg: %v", v)
+	}
+}
+
+// PartialRedisCeGrantType - OAuth 2.0 grant type used to request access tokens.
+type PartialRedisCeGrantType string
+
+const (
+	PartialRedisCeGrantTypeClientCredentials PartialRedisCeGrantType = "client_credentials"
+	PartialRedisCeGrantTypePassword          PartialRedisCeGrantType = "password"
+)
+
+func (e PartialRedisCeGrantType) ToPointer() *PartialRedisCeGrantType {
+	return &e
+}
+func (e *PartialRedisCeGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = PartialRedisCeGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PartialRedisCeGrantType: %v", v)
+	}
+}
+
+// PartialRedisCeOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type PartialRedisCeOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *PartialRedisCeAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *PartialRedisCeClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *PartialRedisCeGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *float64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (p PartialRedisCeOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PartialRedisCeOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PartialRedisCeOauth) GetAuthMethod() *PartialRedisCeAuthMethod {
+	if p == nil {
+		return nil
+	}
+	return p.AuthMethod
+}
+
+func (p *PartialRedisCeOauth) GetClientID() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientID
+}
+
+func (p *PartialRedisCeOauth) GetClientSecret() *string {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecret
+}
+
+func (p *PartialRedisCeOauth) GetClientSecretJwtAlg() *PartialRedisCeClientSecretJwtAlg {
+	if p == nil {
+		return nil
+	}
+	return p.ClientSecretJwtAlg
+}
+
+func (p *PartialRedisCeOauth) GetGrantType() *PartialRedisCeGrantType {
+	if p == nil {
+		return nil
+	}
+	return p.GrantType
+}
+
+func (p *PartialRedisCeOauth) GetPassword() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Password
+}
+
+func (p *PartialRedisCeOauth) GetRedisUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsername
+}
+
+func (p *PartialRedisCeOauth) GetRedisUsernameClaim() *string {
+	if p == nil {
+		return nil
+	}
+	return p.RedisUsernameClaim
+}
+
+func (p *PartialRedisCeOauth) GetScopes() []string {
+	if p == nil {
+		return nil
+	}
+	return p.Scopes
+}
+
+func (p *PartialRedisCeOauth) GetSslVerify() *bool {
+	if p == nil {
+		return nil
+	}
+	return p.SslVerify
+}
+
+func (p *PartialRedisCeOauth) GetTimeout() *float64 {
+	if p == nil {
+		return nil
+	}
+	return p.Timeout
+}
+
+func (p *PartialRedisCeOauth) GetTokenEndpoint() *string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenEndpoint
+}
+
+func (p *PartialRedisCeOauth) GetTokenHeaders() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenHeaders
+}
+
+func (p *PartialRedisCeOauth) GetTokenPostArgs() map[string]string {
+	if p == nil {
+		return nil
+	}
+	return p.TokenPostArgs
+}
+
+func (p *PartialRedisCeOauth) GetUsername() *string {
+	if p == nil {
+		return nil
+	}
+	return p.Username
 }
 
 // PartialRedisCeCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -3278,6 +4007,8 @@ type PartialRedisCeCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *PartialRedisCeOauth `json:"oauth,omitempty"`
 }
 
 func (p PartialRedisCeCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -3373,6 +4104,13 @@ func (p *PartialRedisCeCloudAuthentication) GetGcpServiceAccountJSON() *string {
 		return nil
 	}
 	return p.GcpServiceAccountJSON
+}
+
+func (p *PartialRedisCeCloudAuthentication) GetOauth() *PartialRedisCeOauth {
+	if p == nil {
+		return nil
+	}
+	return p.Oauth
 }
 
 type PartialRedisCeConfig struct {

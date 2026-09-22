@@ -36,7 +36,9 @@ resource "kong-gateway_plugin_statsd" "my_pluginstatsd" {
     port   = 4402
     prefix = "...my_prefix..."
     queue = {
+      breaker_cooldown     = 367249.14
       concurrency_limit    = 1
+      failure_threshold    = 620011
       initial_retry_delay  = 183991.51
       max_batch_size       = 606114
       max_bytes            = 8
@@ -157,7 +159,9 @@ Optional:
 
 Optional:
 
+- `breaker_cooldown` (Number) Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
 - `concurrency_limit` (Number) The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]
+- `failure_threshold` (Number) Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
 - `initial_retry_delay` (Number) Time in seconds before the initial retry is made for a failing batch.
 - `max_batch_size` (Number) Maximum number of entries that can be processed at a time.
 - `max_bytes` (Number) Maximum number of bytes that can be waiting on a queue, requires string content.

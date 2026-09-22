@@ -170,6 +170,11 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 								Optional:    true,
 								Description: `A boolean value that determines if latency metrics should be collected. If enabled, ` + "`" + `kong.latency.total` + "`" + `, ` + "`" + `kong.latency.internal` + "`" + ` and ` + "`" + `kong.latency.upstream` + "`" + ` metrics will be exported.`,
 							},
+							"enable_principal_attribute": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `A boolean value that determines if ` + "`" + `http.server.request.count` + "`" + `, ` + "`" + `http.server.request.size` + "`" + ` and ` + "`" + `http.server.response.size` + "`" + ` metrics should fill in the principal attributes when an authenticated principal is available.`,
+							},
 							"enable_request_metrics": schema.BoolAttribute{
 								Computed:    true,
 								Optional:    true,
@@ -239,12 +244,28 @@ func (r *PluginOpentelemetryResource) Schema(ctx context.Context, req resource.S
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"breaker_cooldown": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.`,
+								Validators: []validator.Float64{
+									float64validator.Between(0, 1000000),
+								},
+							},
 							"concurrency_limit": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]`,
 								Validators: []validator.Int64{
 									int64validator.OneOf(-1, 1),
+								},
+							},
+							"failure_threshold": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.`,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 1000000),
 								},
 							},
 							"initial_retry_delay": schema.Float64Attribute{

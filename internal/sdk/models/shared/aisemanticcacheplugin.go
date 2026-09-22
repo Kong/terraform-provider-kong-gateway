@@ -910,6 +910,7 @@ const (
 	AiSemanticCachePluginAuthProviderAws   AiSemanticCachePluginAuthProvider = "aws"
 	AiSemanticCachePluginAuthProviderAzure AiSemanticCachePluginAuthProvider = "azure"
 	AiSemanticCachePluginAuthProviderGcp   AiSemanticCachePluginAuthProvider = "gcp"
+	AiSemanticCachePluginAuthProviderOauth AiSemanticCachePluginAuthProvider = "oauth"
 )
 
 func (e AiSemanticCachePluginAuthProvider) ToPointer() *AiSemanticCachePluginAuthProvider {
@@ -926,11 +927,247 @@ func (e *AiSemanticCachePluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = AiSemanticCachePluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for AiSemanticCachePluginAuthProvider: %v", v)
 	}
+}
+
+// AiSemanticCachePluginAuthMethod - Client authentication method used against the token endpoint.
+type AiSemanticCachePluginAuthMethod string
+
+const (
+	AiSemanticCachePluginAuthMethodClientSecretBasic AiSemanticCachePluginAuthMethod = "client_secret_basic"
+	AiSemanticCachePluginAuthMethodClientSecretJwt   AiSemanticCachePluginAuthMethod = "client_secret_jwt"
+	AiSemanticCachePluginAuthMethodClientSecretPost  AiSemanticCachePluginAuthMethod = "client_secret_post"
+)
+
+func (e AiSemanticCachePluginAuthMethod) ToPointer() *AiSemanticCachePluginAuthMethod {
+	return &e
+}
+func (e *AiSemanticCachePluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = AiSemanticCachePluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiSemanticCachePluginAuthMethod: %v", v)
+	}
+}
+
+// AiSemanticCachePluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type AiSemanticCachePluginClientSecretJwtAlg string
+
+const (
+	AiSemanticCachePluginClientSecretJwtAlgHs256 AiSemanticCachePluginClientSecretJwtAlg = "HS256"
+	AiSemanticCachePluginClientSecretJwtAlgHs512 AiSemanticCachePluginClientSecretJwtAlg = "HS512"
+)
+
+func (e AiSemanticCachePluginClientSecretJwtAlg) ToPointer() *AiSemanticCachePluginClientSecretJwtAlg {
+	return &e
+}
+func (e *AiSemanticCachePluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = AiSemanticCachePluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiSemanticCachePluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// AiSemanticCachePluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type AiSemanticCachePluginGrantType string
+
+const (
+	AiSemanticCachePluginGrantTypeClientCredentials AiSemanticCachePluginGrantType = "client_credentials"
+	AiSemanticCachePluginGrantTypePassword          AiSemanticCachePluginGrantType = "password"
+)
+
+func (e AiSemanticCachePluginGrantType) ToPointer() *AiSemanticCachePluginGrantType {
+	return &e
+}
+func (e *AiSemanticCachePluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = AiSemanticCachePluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiSemanticCachePluginGrantType: %v", v)
+	}
+}
+
+// AiSemanticCachePluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type AiSemanticCachePluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *AiSemanticCachePluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *AiSemanticCachePluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *AiSemanticCachePluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (a AiSemanticCachePluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiSemanticCachePluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiSemanticCachePluginOauth) GetAuthMethod() *AiSemanticCachePluginAuthMethod {
+	if a == nil {
+		return nil
+	}
+	return a.AuthMethod
+}
+
+func (a *AiSemanticCachePluginOauth) GetClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientID
+}
+
+func (a *AiSemanticCachePluginOauth) GetClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecret
+}
+
+func (a *AiSemanticCachePluginOauth) GetClientSecretJwtAlg() *AiSemanticCachePluginClientSecretJwtAlg {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecretJwtAlg
+}
+
+func (a *AiSemanticCachePluginOauth) GetGrantType() *AiSemanticCachePluginGrantType {
+	if a == nil {
+		return nil
+	}
+	return a.GrantType
+}
+
+func (a *AiSemanticCachePluginOauth) GetPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Password
+}
+
+func (a *AiSemanticCachePluginOauth) GetRedisUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsername
+}
+
+func (a *AiSemanticCachePluginOauth) GetRedisUsernameClaim() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsernameClaim
+}
+
+func (a *AiSemanticCachePluginOauth) GetScopes() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Scopes
+}
+
+func (a *AiSemanticCachePluginOauth) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
+}
+
+func (a *AiSemanticCachePluginOauth) GetTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Timeout
+}
+
+func (a *AiSemanticCachePluginOauth) GetTokenEndpoint() *string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenEndpoint
+}
+
+func (a *AiSemanticCachePluginOauth) GetTokenHeaders() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenHeaders
+}
+
+func (a *AiSemanticCachePluginOauth) GetTokenPostArgs() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenPostArgs
+}
+
+func (a *AiSemanticCachePluginOauth) GetUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Username
 }
 
 // AiSemanticCachePluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -959,6 +1196,8 @@ type AiSemanticCachePluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *AiSemanticCachePluginOauth `json:"oauth,omitempty"`
 }
 
 func (a AiSemanticCachePluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -1054,6 +1293,13 @@ func (a *AiSemanticCachePluginCloudAuthentication) GetGcpServiceAccountJSON() *s
 		return nil
 	}
 	return a.GcpServiceAccountJSON
+}
+
+func (a *AiSemanticCachePluginCloudAuthentication) GetOauth() *AiSemanticCachePluginOauth {
+	if a == nil {
+		return nil
+	}
+	return a.Oauth
 }
 
 type AiSemanticCachePluginClusterNodes struct {

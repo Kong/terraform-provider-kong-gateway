@@ -36,6 +36,7 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
       enable_bandwidth_metrics       = false
       enable_consumer_attribute      = true
       enable_latency_metrics         = true
+      enable_principal_attribute     = true
       enable_request_metrics         = false
       enable_upstream_health_metrics = true
       endpoint                       = "...my_endpoint..."
@@ -54,7 +55,9 @@ resource "kong-gateway_plugin_opentelemetry" "my_pluginopentelemetry" {
       ]
     }
     queue = {
+      breaker_cooldown     = 442630.74
       concurrency_limit    = 4
+      failure_threshold    = 138917
       initial_retry_delay  = 792422.25
       max_batch_size       = 170741
       max_bytes            = 4
@@ -177,6 +180,7 @@ Optional:
 - `enable_bandwidth_metrics` (Boolean) A boolean value that determines if bandwidth metrics should be collected. If enabled, `http.server.request.size` and `http.server.response.size` metrics will be exported.
 - `enable_consumer_attribute` (Boolean) A boolean value that determines if `http.server.request.count`, `http.server.request.size` and `http.server.response.size` metrics should fill in the consumer attribute when available.
 - `enable_latency_metrics` (Boolean) A boolean value that determines if latency metrics should be collected. If enabled, `kong.latency.total`, `kong.latency.internal` and `kong.latency.upstream` metrics will be exported.
+- `enable_principal_attribute` (Boolean) A boolean value that determines if `http.server.request.count`, `http.server.request.size` and `http.server.response.size` metrics should fill in the principal attributes when an authenticated principal is available.
 - `enable_request_metrics` (Boolean) A boolean value that determines if request count metrics should be collected. If enabled, `http.server.request.count` metrics will be exported.
 - `enable_upstream_health_metrics` (Boolean) A boolean value that determines if upstream health metrics should be collected. If enabled, `kong.upstream.target.status` metrics will be exported.
 - `endpoint` (String) An HTTP URL endpoint where metrics are exported.
@@ -199,7 +203,9 @@ Optional:
 
 Optional:
 
+- `breaker_cooldown` (Number) Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
 - `concurrency_limit` (Number) The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]
+- `failure_threshold` (Number) Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
 - `initial_retry_delay` (Number) Time in seconds before the initial retry is made for a failing batch.
 - `max_batch_size` (Number) Maximum number of entries that can be processed at a time.
 - `max_bytes` (Number) Maximum number of bytes that can be waiting on a queue, requires string content.

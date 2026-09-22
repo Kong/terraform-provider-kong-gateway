@@ -19,6 +19,7 @@ import (
 	tfTypes "github.com/kong/terraform-provider-kong-gateway/internal/provider/types"
 	"github.com/kong/terraform-provider-kong-gateway/internal/sdk"
 	speakeasy_objectvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/objectvalidators"
+	speakeasy_stringvalidators "github.com/kong/terraform-provider-kong-gateway/internal/validators/stringvalidators"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -150,12 +151,13 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 											"auth_provider": schema.StringAttribute{
 												Computed:    true,
 												Optional:    true,
-												Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+												Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]`,
 												Validators: []validator.String{
 													stringvalidator.OneOf(
 														"aws",
 														"azure",
 														"gcp",
+														"oauth",
 													),
 												},
 											},
@@ -213,6 +215,113 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 												Computed:    true,
 												Optional:    true,
 												Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+											},
+											"oauth": schema.SingleNestedAttribute{
+												Computed: true,
+												Optional: true,
+												Attributes: map[string]schema.Attribute{
+													"auth_method": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_secret_basic",
+																"client_secret_jwt",
+																"client_secret_post",
+															),
+														},
+													},
+													"client_id": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `OAuth 2.0 client ID.`,
+													},
+													"client_secret": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `OAuth 2.0 client secret.`,
+													},
+													"client_secret_jwt_alg": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Signing algorithm used for ` + "`" + `client_secret_jwt` + "`" + ` client authentication. must be one of ["HS256", "HS512"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"HS256",
+																"HS512",
+															),
+														},
+													},
+													"grant_type": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]`,
+														Validators: []validator.String{
+															stringvalidator.OneOf(
+																"client_credentials",
+																"password",
+															),
+														},
+													},
+													"password": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Resource owner password, used with the ` + "`" + `password` + "`" + ` grant type.`,
+													},
+													"redis_username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Static Redis ACL username sent with ` + "`" + `AUTH <username> <token>` + "`" + `.`,
+													},
+													"redis_username_claim": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `JWT claim in the access token used to derive the Redis ACL username (for example, ` + "`" + `oid` + "`" + ` for Microsoft Entra ID).`,
+													},
+													"scopes": schema.ListAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `OAuth 2.0 scopes to request.`,
+													},
+													"ssl_verify": schema.BoolAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Whether to verify the TLS certificate of the token endpoint.`,
+													},
+													"timeout": schema.Int64Attribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Timeout, in milliseconds, for requests to the token endpoint.`,
+														Validators: []validator.Int64{
+															int64validator.Between(0, 2147483646),
+														},
+													},
+													"token_endpoint": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `OAuth 2.0 token endpoint URL used to request access tokens.`,
+													},
+													"token_headers": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `Additional HTTP headers to send with the token request.`,
+													},
+													"token_post_args": schema.MapAttribute{
+														Computed:    true,
+														Optional:    true,
+														ElementType: types.StringType,
+														Description: `Additional POST body arguments to send with the token request.`,
+													},
+													"username": schema.StringAttribute{
+														Computed:    true,
+														Optional:    true,
+														Description: `Resource owner username, used with the ` + "`" + `password` + "`" + ` grant type.`,
+													},
+												},
+												Description: `OAuth 2.0 client configuration used to authenticate to Redis when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `oauth` + "`" + `.`,
 											},
 										},
 										Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
@@ -409,13 +518,14 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 							"auth_method": schema.StringAttribute{
 								Computed:    true,
 								Optional:    true,
-								Description: `The authentication method used in client requests to the IdP. Supported values are: ` + "`" + `client_secret_basic` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` in the ` + "`" + `Authorization: Basic` + "`" + ` header, ` + "`" + `client_secret_post` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as part of the request body, or ` + "`" + `client_secret_jwt` + "`" + ` to send a JWT signed with the ` + "`" + `client_secret` + "`" + ` using the client assertion as part of the body. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none"]`,
+								Description: `The authentication method used in client requests to the IdP. Supported values are: ` + "`" + `client_secret_basic` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` in the ` + "`" + `Authorization: Basic` + "`" + ` header, ` + "`" + `client_secret_post` + "`" + ` to send ` + "`" + `client_id` + "`" + ` and ` + "`" + `client_secret` + "`" + ` as part of the request body, ` + "`" + `client_secret_jwt` + "`" + ` to send a JWT signed with the ` + "`" + `client_secret` + "`" + ` using the client assertion as part of the body, ` + "`" + `private_key_jwt` + "`" + ` to send a JWT signed with a private key, or ` + "`" + `none` + "`" + ` to send no client authentication. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post", "none", "private_key_jwt"]`,
 								Validators: []validator.String{
 									stringvalidator.OneOf(
 										"client_secret_basic",
 										"client_secret_jwt",
 										"client_secret_post",
 										"none",
+										"private_key_jwt",
 									),
 								},
 							},
@@ -464,6 +574,60 @@ func (r *PluginUpstreamOauthResource) Schema(ctx context.Context, req resource.S
 								Computed:    true,
 								Optional:    true,
 								Description: `A comma-separated list of hosts that should not be proxied.`,
+							},
+							"private_key_jwt_alg": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The algorithm to use when signing the JWT client assertion for ` + "`" + `private_key_jwt` + "`" + ` authentication. This field is ignored when ` + "`" + `auth_method` + "`" + ` is not ` + "`" + `private_key_jwt` + "`" + `. must be one of ["ES256", "ES256K", "ES384", "ES512", "ESB256", "ESB320", "ESB384", "ESB512", "ESP256", "ESP384", "ESP512", "Ed25519", "Ed448", "EdDSA", "PS256", "PS384", "PS512", "RS256", "RS384", "RS512"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"ES256",
+										"ES256K",
+										"ES384",
+										"ES512",
+										"ESB256",
+										"ESB320",
+										"ESB384",
+										"ESB512",
+										"ESP256",
+										"ESP384",
+										"ESP512",
+										"Ed25519",
+										"Ed448",
+										"EdDSA",
+										"PS256",
+										"PS384",
+										"PS512",
+										"RS256",
+										"RS384",
+										"RS512",
+									),
+								},
+							},
+							"private_key_jwt_include_kid": schema.BoolAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Whether to include the configured Key ID as the ` + "`" + `kid` + "`" + ` header in the JWT client assertion for ` + "`" + `private_key_jwt` + "`" + ` authentication. This field is ignored when ` + "`" + `auth_method` + "`" + ` is not ` + "`" + `private_key_jwt` + "`" + `.`,
+							},
+							"private_key_jwt_key": schema.SingleNestedAttribute{
+								Computed: true,
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"key_id": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The Key ID. This maps to the ` + "`" + `kid` + "`" + ` field of the Kong Keys entity and is used as the JWT header ` + "`" + `kid` + "`" + `. Not Null`,
+										Validators: []validator.String{
+											speakeasy_stringvalidators.NotNull(),
+										},
+									},
+									"key_set": schema.StringAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `The optional name of the Kong Key Set used to scope the key lookup.`,
+									},
+								},
+								Description: `The Kong Keys entity reference used to sign the JWT client assertion for ` + "`" + `private_key_jwt` + "`" + ` authentication. This field is ignored when ` + "`" + `auth_method` + "`" + ` is not ` + "`" + `private_key_jwt` + "`" + `.`,
 							},
 							"ssl_verify": schema.BoolAttribute{
 								Computed:    true,

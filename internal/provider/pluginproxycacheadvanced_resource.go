@@ -79,6 +79,11 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 						Optional:    true,
 						Description: `Unhandled errors while trying to retrieve a cache entry (such as redis down) are resolved with ` + "`" + `Bypass` + "`" + `, with the request going upstream.`,
 					},
+					"cache_by_principal": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `When enabled, use the authenticated Principal's UUID to compose the cache key.`,
+					},
 					"cache_control": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -122,12 +127,13 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 									"auth_provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"aws",
 												"azure",
 												"gcp",
+												"oauth",
 											),
 										},
 									},
@@ -185,6 +191,113 @@ func (r *PluginProxyCacheAdvancedResource) Schema(ctx context.Context, req resou
 										Computed:    true,
 										Optional:    true,
 										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+									"oauth": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_method": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_secret_basic",
+														"client_secret_jwt",
+														"client_secret_post",
+													),
+												},
+											},
+											"client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client ID.`,
+											},
+											"client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client secret.`,
+											},
+											"client_secret_jwt_alg": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Signing algorithm used for ` + "`" + `client_secret_jwt` + "`" + ` client authentication. must be one of ["HS256", "HS512"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"HS256",
+														"HS512",
+													),
+												},
+											},
+											"grant_type": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_credentials",
+														"password",
+													),
+												},
+											},
+											"password": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner password, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+											"redis_username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Static Redis ACL username sent with ` + "`" + `AUTH <username> <token>` + "`" + `.`,
+											},
+											"redis_username_claim": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `JWT claim in the access token used to derive the Redis ACL username (for example, ` + "`" + `oid` + "`" + ` for Microsoft Entra ID).`,
+											},
+											"scopes": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `OAuth 2.0 scopes to request.`,
+											},
+											"ssl_verify": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Whether to verify the TLS certificate of the token endpoint.`,
+											},
+											"timeout": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Timeout, in milliseconds, for requests to the token endpoint.`,
+												Validators: []validator.Int64{
+													int64validator.Between(0, 2147483646),
+												},
+											},
+											"token_endpoint": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 token endpoint URL used to request access tokens.`,
+											},
+											"token_headers": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional HTTP headers to send with the token request.`,
+											},
+											"token_post_args": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional POST body arguments to send with the token request.`,
+											},
+											"username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner username, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+										},
+										Description: `OAuth 2.0 client configuration used to authenticate to Redis when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `oauth` + "`" + `.`,
 									},
 								},
 								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,

@@ -129,6 +129,7 @@ const (
 	BasicAuthPluginAuthProviderAws   BasicAuthPluginAuthProvider = "aws"
 	BasicAuthPluginAuthProviderAzure BasicAuthPluginAuthProvider = "azure"
 	BasicAuthPluginAuthProviderGcp   BasicAuthPluginAuthProvider = "gcp"
+	BasicAuthPluginAuthProviderOauth BasicAuthPluginAuthProvider = "oauth"
 )
 
 func (e BasicAuthPluginAuthProvider) ToPointer() *BasicAuthPluginAuthProvider {
@@ -145,11 +146,247 @@ func (e *BasicAuthPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = BasicAuthPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for BasicAuthPluginAuthProvider: %v", v)
 	}
+}
+
+// BasicAuthPluginAuthMethod - Client authentication method used against the token endpoint.
+type BasicAuthPluginAuthMethod string
+
+const (
+	BasicAuthPluginAuthMethodClientSecretBasic BasicAuthPluginAuthMethod = "client_secret_basic"
+	BasicAuthPluginAuthMethodClientSecretJwt   BasicAuthPluginAuthMethod = "client_secret_jwt"
+	BasicAuthPluginAuthMethodClientSecretPost  BasicAuthPluginAuthMethod = "client_secret_post"
+)
+
+func (e BasicAuthPluginAuthMethod) ToPointer() *BasicAuthPluginAuthMethod {
+	return &e
+}
+func (e *BasicAuthPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = BasicAuthPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for BasicAuthPluginAuthMethod: %v", v)
+	}
+}
+
+// BasicAuthPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type BasicAuthPluginClientSecretJwtAlg string
+
+const (
+	BasicAuthPluginClientSecretJwtAlgHs256 BasicAuthPluginClientSecretJwtAlg = "HS256"
+	BasicAuthPluginClientSecretJwtAlgHs512 BasicAuthPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e BasicAuthPluginClientSecretJwtAlg) ToPointer() *BasicAuthPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *BasicAuthPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = BasicAuthPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for BasicAuthPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// BasicAuthPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type BasicAuthPluginGrantType string
+
+const (
+	BasicAuthPluginGrantTypeClientCredentials BasicAuthPluginGrantType = "client_credentials"
+	BasicAuthPluginGrantTypePassword          BasicAuthPluginGrantType = "password"
+)
+
+func (e BasicAuthPluginGrantType) ToPointer() *BasicAuthPluginGrantType {
+	return &e
+}
+func (e *BasicAuthPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = BasicAuthPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for BasicAuthPluginGrantType: %v", v)
+	}
+}
+
+// BasicAuthPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type BasicAuthPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *BasicAuthPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *BasicAuthPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *BasicAuthPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *float64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (b BasicAuthPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(b, "", false)
+}
+
+func (b *BasicAuthPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &b, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (b *BasicAuthPluginOauth) GetAuthMethod() *BasicAuthPluginAuthMethod {
+	if b == nil {
+		return nil
+	}
+	return b.AuthMethod
+}
+
+func (b *BasicAuthPluginOauth) GetClientID() *string {
+	if b == nil {
+		return nil
+	}
+	return b.ClientID
+}
+
+func (b *BasicAuthPluginOauth) GetClientSecret() *string {
+	if b == nil {
+		return nil
+	}
+	return b.ClientSecret
+}
+
+func (b *BasicAuthPluginOauth) GetClientSecretJwtAlg() *BasicAuthPluginClientSecretJwtAlg {
+	if b == nil {
+		return nil
+	}
+	return b.ClientSecretJwtAlg
+}
+
+func (b *BasicAuthPluginOauth) GetGrantType() *BasicAuthPluginGrantType {
+	if b == nil {
+		return nil
+	}
+	return b.GrantType
+}
+
+func (b *BasicAuthPluginOauth) GetPassword() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Password
+}
+
+func (b *BasicAuthPluginOauth) GetRedisUsername() *string {
+	if b == nil {
+		return nil
+	}
+	return b.RedisUsername
+}
+
+func (b *BasicAuthPluginOauth) GetRedisUsernameClaim() *string {
+	if b == nil {
+		return nil
+	}
+	return b.RedisUsernameClaim
+}
+
+func (b *BasicAuthPluginOauth) GetScopes() []string {
+	if b == nil {
+		return nil
+	}
+	return b.Scopes
+}
+
+func (b *BasicAuthPluginOauth) GetSslVerify() *bool {
+	if b == nil {
+		return nil
+	}
+	return b.SslVerify
+}
+
+func (b *BasicAuthPluginOauth) GetTimeout() *float64 {
+	if b == nil {
+		return nil
+	}
+	return b.Timeout
+}
+
+func (b *BasicAuthPluginOauth) GetTokenEndpoint() *string {
+	if b == nil {
+		return nil
+	}
+	return b.TokenEndpoint
+}
+
+func (b *BasicAuthPluginOauth) GetTokenHeaders() map[string]string {
+	if b == nil {
+		return nil
+	}
+	return b.TokenHeaders
+}
+
+func (b *BasicAuthPluginOauth) GetTokenPostArgs() map[string]string {
+	if b == nil {
+		return nil
+	}
+	return b.TokenPostArgs
+}
+
+func (b *BasicAuthPluginOauth) GetUsername() *string {
+	if b == nil {
+		return nil
+	}
+	return b.Username
 }
 
 // BasicAuthPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -178,6 +415,8 @@ type BasicAuthPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *BasicAuthPluginOauth `json:"oauth,omitempty"`
 }
 
 func (b BasicAuthPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -273,6 +512,13 @@ func (b *BasicAuthPluginCloudAuthentication) GetGcpServiceAccountJSON() *string 
 		return nil
 	}
 	return b.GcpServiceAccountJSON
+}
+
+func (b *BasicAuthPluginCloudAuthentication) GetOauth() *BasicAuthPluginOauth {
+	if b == nil {
+		return nil
+	}
+	return b.Oauth
 }
 
 // BasicAuthPluginRedis - Redis configuration

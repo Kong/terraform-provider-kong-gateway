@@ -2463,6 +2463,7 @@ const (
 	DatakitPluginAuthProviderAws   DatakitPluginAuthProvider = "aws"
 	DatakitPluginAuthProviderAzure DatakitPluginAuthProvider = "azure"
 	DatakitPluginAuthProviderGcp   DatakitPluginAuthProvider = "gcp"
+	DatakitPluginAuthProviderOauth DatakitPluginAuthProvider = "oauth"
 )
 
 func (e DatakitPluginAuthProvider) ToPointer() *DatakitPluginAuthProvider {
@@ -2479,11 +2480,247 @@ func (e *DatakitPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = DatakitPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for DatakitPluginAuthProvider: %v", v)
 	}
+}
+
+// DatakitPluginAuthMethod - Client authentication method used against the token endpoint.
+type DatakitPluginAuthMethod string
+
+const (
+	DatakitPluginAuthMethodClientSecretBasic DatakitPluginAuthMethod = "client_secret_basic"
+	DatakitPluginAuthMethodClientSecretJwt   DatakitPluginAuthMethod = "client_secret_jwt"
+	DatakitPluginAuthMethodClientSecretPost  DatakitPluginAuthMethod = "client_secret_post"
+)
+
+func (e DatakitPluginAuthMethod) ToPointer() *DatakitPluginAuthMethod {
+	return &e
+}
+func (e *DatakitPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = DatakitPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginAuthMethod: %v", v)
+	}
+}
+
+// DatakitPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type DatakitPluginClientSecretJwtAlg string
+
+const (
+	DatakitPluginClientSecretJwtAlgHs256 DatakitPluginClientSecretJwtAlg = "HS256"
+	DatakitPluginClientSecretJwtAlgHs512 DatakitPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e DatakitPluginClientSecretJwtAlg) ToPointer() *DatakitPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *DatakitPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = DatakitPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// DatakitPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type DatakitPluginGrantType string
+
+const (
+	DatakitPluginGrantTypeClientCredentials DatakitPluginGrantType = "client_credentials"
+	DatakitPluginGrantTypePassword          DatakitPluginGrantType = "password"
+)
+
+func (e DatakitPluginGrantType) ToPointer() *DatakitPluginGrantType {
+	return &e
+}
+func (e *DatakitPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = DatakitPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for DatakitPluginGrantType: %v", v)
+	}
+}
+
+// DatakitPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type DatakitPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *DatakitPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *DatakitPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *DatakitPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (d DatakitPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(d, "", false)
+}
+
+func (d *DatakitPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &d, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DatakitPluginOauth) GetAuthMethod() *DatakitPluginAuthMethod {
+	if d == nil {
+		return nil
+	}
+	return d.AuthMethod
+}
+
+func (d *DatakitPluginOauth) GetClientID() *string {
+	if d == nil {
+		return nil
+	}
+	return d.ClientID
+}
+
+func (d *DatakitPluginOauth) GetClientSecret() *string {
+	if d == nil {
+		return nil
+	}
+	return d.ClientSecret
+}
+
+func (d *DatakitPluginOauth) GetClientSecretJwtAlg() *DatakitPluginClientSecretJwtAlg {
+	if d == nil {
+		return nil
+	}
+	return d.ClientSecretJwtAlg
+}
+
+func (d *DatakitPluginOauth) GetGrantType() *DatakitPluginGrantType {
+	if d == nil {
+		return nil
+	}
+	return d.GrantType
+}
+
+func (d *DatakitPluginOauth) GetPassword() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Password
+}
+
+func (d *DatakitPluginOauth) GetRedisUsername() *string {
+	if d == nil {
+		return nil
+	}
+	return d.RedisUsername
+}
+
+func (d *DatakitPluginOauth) GetRedisUsernameClaim() *string {
+	if d == nil {
+		return nil
+	}
+	return d.RedisUsernameClaim
+}
+
+func (d *DatakitPluginOauth) GetScopes() []string {
+	if d == nil {
+		return nil
+	}
+	return d.Scopes
+}
+
+func (d *DatakitPluginOauth) GetSslVerify() *bool {
+	if d == nil {
+		return nil
+	}
+	return d.SslVerify
+}
+
+func (d *DatakitPluginOauth) GetTimeout() *int64 {
+	if d == nil {
+		return nil
+	}
+	return d.Timeout
+}
+
+func (d *DatakitPluginOauth) GetTokenEndpoint() *string {
+	if d == nil {
+		return nil
+	}
+	return d.TokenEndpoint
+}
+
+func (d *DatakitPluginOauth) GetTokenHeaders() map[string]string {
+	if d == nil {
+		return nil
+	}
+	return d.TokenHeaders
+}
+
+func (d *DatakitPluginOauth) GetTokenPostArgs() map[string]string {
+	if d == nil {
+		return nil
+	}
+	return d.TokenPostArgs
+}
+
+func (d *DatakitPluginOauth) GetUsername() *string {
+	if d == nil {
+		return nil
+	}
+	return d.Username
 }
 
 // DatakitPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -2512,6 +2749,8 @@ type DatakitPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *DatakitPluginOauth `json:"oauth,omitempty"`
 }
 
 func (d DatakitPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -2607,6 +2846,13 @@ func (d *DatakitPluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
 		return nil
 	}
 	return d.GcpServiceAccountJSON
+}
+
+func (d *DatakitPluginCloudAuthentication) GetOauth() *DatakitPluginOauth {
+	if d == nil {
+		return nil
+	}
+	return d.Oauth
 }
 
 type DatakitPluginClusterNodes struct {
@@ -3012,9 +3258,11 @@ func (r *Resources) GetVault() map[string]string {
 }
 
 type DatakitPluginConfig struct {
-	Debug     *bool      `json:"debug,omitempty"`
-	Nodes     []Nodes    `json:"nodes"`
-	Resources *Resources `json:"resources,omitempty"`
+	// Array of CA Certificate object UUIDs used to build the trust store for verifying the TLS certificate of servers contacted by `call` nodes. Applies only when a node's `ssl_verify` is enabled (the default). When set, the referenced CA certificates replace (they do not augment) the global `lua_ssl_trusted_certificate` trust set for those requests; when unset or empty, the global trust set is used.
+	CaCertificates []string   `json:"ca_certificates,omitempty"`
+	Debug          *bool      `json:"debug,omitempty"`
+	Nodes          []Nodes    `json:"nodes"`
+	Resources      *Resources `json:"resources,omitempty"`
 }
 
 func (d DatakitPluginConfig) MarshalJSON() ([]byte, error) {
@@ -3026,6 +3274,13 @@ func (d *DatakitPluginConfig) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (d *DatakitPluginConfig) GetCaCertificates() []string {
+	if d == nil {
+		return nil
+	}
+	return d.CaCertificates
 }
 
 func (d *DatakitPluginConfig) GetDebug() *bool {

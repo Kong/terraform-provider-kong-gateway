@@ -186,6 +186,7 @@ const (
 	GraphqlRateLimitingAdvancedPluginAuthProviderAws   GraphqlRateLimitingAdvancedPluginAuthProvider = "aws"
 	GraphqlRateLimitingAdvancedPluginAuthProviderAzure GraphqlRateLimitingAdvancedPluginAuthProvider = "azure"
 	GraphqlRateLimitingAdvancedPluginAuthProviderGcp   GraphqlRateLimitingAdvancedPluginAuthProvider = "gcp"
+	GraphqlRateLimitingAdvancedPluginAuthProviderOauth GraphqlRateLimitingAdvancedPluginAuthProvider = "oauth"
 )
 
 func (e GraphqlRateLimitingAdvancedPluginAuthProvider) ToPointer() *GraphqlRateLimitingAdvancedPluginAuthProvider {
@@ -202,11 +203,247 @@ func (e *GraphqlRateLimitingAdvancedPluginAuthProvider) UnmarshalJSON(data []byt
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = GraphqlRateLimitingAdvancedPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginAuthProvider: %v", v)
 	}
+}
+
+// GraphqlRateLimitingAdvancedPluginAuthMethod - Client authentication method used against the token endpoint.
+type GraphqlRateLimitingAdvancedPluginAuthMethod string
+
+const (
+	GraphqlRateLimitingAdvancedPluginAuthMethodClientSecretBasic GraphqlRateLimitingAdvancedPluginAuthMethod = "client_secret_basic"
+	GraphqlRateLimitingAdvancedPluginAuthMethodClientSecretJwt   GraphqlRateLimitingAdvancedPluginAuthMethod = "client_secret_jwt"
+	GraphqlRateLimitingAdvancedPluginAuthMethodClientSecretPost  GraphqlRateLimitingAdvancedPluginAuthMethod = "client_secret_post"
+)
+
+func (e GraphqlRateLimitingAdvancedPluginAuthMethod) ToPointer() *GraphqlRateLimitingAdvancedPluginAuthMethod {
+	return &e
+}
+func (e *GraphqlRateLimitingAdvancedPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = GraphqlRateLimitingAdvancedPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginAuthMethod: %v", v)
+	}
+}
+
+// GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg string
+
+const (
+	GraphqlRateLimitingAdvancedPluginClientSecretJwtAlgHs256 GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg = "HS256"
+	GraphqlRateLimitingAdvancedPluginClientSecretJwtAlgHs512 GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg) ToPointer() *GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// GraphqlRateLimitingAdvancedPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type GraphqlRateLimitingAdvancedPluginGrantType string
+
+const (
+	GraphqlRateLimitingAdvancedPluginGrantTypeClientCredentials GraphqlRateLimitingAdvancedPluginGrantType = "client_credentials"
+	GraphqlRateLimitingAdvancedPluginGrantTypePassword          GraphqlRateLimitingAdvancedPluginGrantType = "password"
+)
+
+func (e GraphqlRateLimitingAdvancedPluginGrantType) ToPointer() *GraphqlRateLimitingAdvancedPluginGrantType {
+	return &e
+}
+func (e *GraphqlRateLimitingAdvancedPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = GraphqlRateLimitingAdvancedPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for GraphqlRateLimitingAdvancedPluginGrantType: %v", v)
+	}
+}
+
+// GraphqlRateLimitingAdvancedPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type GraphqlRateLimitingAdvancedPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *GraphqlRateLimitingAdvancedPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *GraphqlRateLimitingAdvancedPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (g GraphqlRateLimitingAdvancedPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(g, "", false)
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &g, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetAuthMethod() *GraphqlRateLimitingAdvancedPluginAuthMethod {
+	if g == nil {
+		return nil
+	}
+	return g.AuthMethod
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetClientID() *string {
+	if g == nil {
+		return nil
+	}
+	return g.ClientID
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetClientSecret() *string {
+	if g == nil {
+		return nil
+	}
+	return g.ClientSecret
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetClientSecretJwtAlg() *GraphqlRateLimitingAdvancedPluginClientSecretJwtAlg {
+	if g == nil {
+		return nil
+	}
+	return g.ClientSecretJwtAlg
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetGrantType() *GraphqlRateLimitingAdvancedPluginGrantType {
+	if g == nil {
+		return nil
+	}
+	return g.GrantType
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetPassword() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Password
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetRedisUsername() *string {
+	if g == nil {
+		return nil
+	}
+	return g.RedisUsername
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetRedisUsernameClaim() *string {
+	if g == nil {
+		return nil
+	}
+	return g.RedisUsernameClaim
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetScopes() []string {
+	if g == nil {
+		return nil
+	}
+	return g.Scopes
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetSslVerify() *bool {
+	if g == nil {
+		return nil
+	}
+	return g.SslVerify
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetTimeout() *int64 {
+	if g == nil {
+		return nil
+	}
+	return g.Timeout
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetTokenEndpoint() *string {
+	if g == nil {
+		return nil
+	}
+	return g.TokenEndpoint
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetTokenHeaders() map[string]string {
+	if g == nil {
+		return nil
+	}
+	return g.TokenHeaders
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetTokenPostArgs() map[string]string {
+	if g == nil {
+		return nil
+	}
+	return g.TokenPostArgs
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginOauth) GetUsername() *string {
+	if g == nil {
+		return nil
+	}
+	return g.Username
 }
 
 // GraphqlRateLimitingAdvancedPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -235,6 +472,8 @@ type GraphqlRateLimitingAdvancedPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *GraphqlRateLimitingAdvancedPluginOauth `json:"oauth,omitempty"`
 }
 
 func (g GraphqlRateLimitingAdvancedPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -330,6 +569,13 @@ func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetGcpServiceAcco
 		return nil
 	}
 	return g.GcpServiceAccountJSON
+}
+
+func (g *GraphqlRateLimitingAdvancedPluginCloudAuthentication) GetOauth() *GraphqlRateLimitingAdvancedPluginOauth {
+	if g == nil {
+		return nil
+	}
+	return g.Oauth
 }
 
 type GraphqlRateLimitingAdvancedPluginClusterNodes struct {

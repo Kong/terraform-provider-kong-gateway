@@ -16,8 +16,9 @@ PluginProxyCache Resource
 resource "kong-gateway_plugin_proxy_cache" "my_pluginproxycache" {
   condition = "...my_condition..."
   config = {
-    cache_control = true
-    cache_ttl     = 2
+    cache_by_principal = false
+    cache_control      = true
+    cache_ttl          = 2
     content_type = [
       "..."
     ]
@@ -125,6 +126,7 @@ Required:
 
 Optional:
 
+- `cache_by_principal` (Boolean) When enabled, use the authenticated Principal's UUID to compose the cache key.
 - `cache_control` (Boolean) When enabled, respect the Cache-Control behaviors defined in RFC7234.
 - `cache_ttl` (Number) TTL, in seconds, of cache entities.
 - `content_type` (List of String) Upstream response content types considered cacheable. The plugin performs an **exact match** against each specified value.

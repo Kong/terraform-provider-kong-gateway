@@ -73,8 +73,9 @@ func (r *PluginOpaResource) Schema(ctx context.Context, req resource.SchemaReque
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"include_body_in_opa_input": schema.BoolAttribute{
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `If set to true, the raw request body is included as input to OPA. Not supported for WebSocket protocols (ws/wss).`,
 					},
 					"include_consumer_in_opa_input": schema.BoolAttribute{
 						Computed:    true,
@@ -84,7 +85,7 @@ func (r *PluginOpaResource) Schema(ctx context.Context, req resource.SchemaReque
 					"include_parsed_json_body_in_opa_input": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `If set to true and the ` + "`" + `Content-Type` + "`" + ` header of the current request is ` + "`" + `application/json` + "`" + `, the request body will be JSON decoded and the decoded struct is included as input to OPA.`,
+						Description: `If set to true and the ` + "`" + `Content-Type` + "`" + ` header of the current request is ` + "`" + `application/json` + "`" + `, the request body will be JSON decoded and the decoded struct is included as input to OPA. Not supported for WebSocket protocols (ws/wss).`,
 					},
 					"include_route_in_opa_input": schema.BoolAttribute{
 						Computed:    true,
@@ -220,7 +221,7 @@ func (r *PluginOpaResource) Schema(ctx context.Context, req resource.SchemaReque
 				Computed:    true,
 				Optional:    true,
 				ElementType: types.StringType,
-				Description: `A set of strings representing HTTP protocols.`,
+				Description: `A list of the request protocols that will trigger this plugin. The default value, as well as the possible values allowed on this field, may change depending on the plugin type. For example, plugins that only work in stream mode will only support tcp and tls.`,
 			},
 			"route": schema.SingleNestedAttribute{
 				Computed: true,

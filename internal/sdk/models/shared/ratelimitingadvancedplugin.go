@@ -131,6 +131,7 @@ const (
 	CompoundIdentifierHeader        CompoundIdentifier = "header"
 	CompoundIdentifierIP            CompoundIdentifier = "ip"
 	CompoundIdentifierPath          CompoundIdentifier = "path"
+	CompoundIdentifierPrincipal     CompoundIdentifier = "principal"
 	CompoundIdentifierRoute         CompoundIdentifier = "route"
 	CompoundIdentifierService       CompoundIdentifier = "service"
 )
@@ -155,6 +156,8 @@ func (e *CompoundIdentifier) UnmarshalJSON(data []byte) error {
 	case "ip":
 		fallthrough
 	case "path":
+		fallthrough
+	case "principal":
 		fallthrough
 	case "route":
 		fallthrough
@@ -206,6 +209,7 @@ const (
 	RateLimitingAdvancedPluginIdentifierHeader        RateLimitingAdvancedPluginIdentifier = "header"
 	RateLimitingAdvancedPluginIdentifierIP            RateLimitingAdvancedPluginIdentifier = "ip"
 	RateLimitingAdvancedPluginIdentifierPath          RateLimitingAdvancedPluginIdentifier = "path"
+	RateLimitingAdvancedPluginIdentifierPrincipal     RateLimitingAdvancedPluginIdentifier = "principal"
 	RateLimitingAdvancedPluginIdentifierRoute         RateLimitingAdvancedPluginIdentifier = "route"
 	RateLimitingAdvancedPluginIdentifierService       RateLimitingAdvancedPluginIdentifier = "service"
 )
@@ -231,6 +235,8 @@ func (e *RateLimitingAdvancedPluginIdentifier) UnmarshalJSON(data []byte) error 
 		fallthrough
 	case "path":
 		fallthrough
+	case "principal":
+		fallthrough
 	case "route":
 		fallthrough
 	case "service":
@@ -248,6 +254,7 @@ const (
 	RateLimitingAdvancedPluginAuthProviderAws   RateLimitingAdvancedPluginAuthProvider = "aws"
 	RateLimitingAdvancedPluginAuthProviderAzure RateLimitingAdvancedPluginAuthProvider = "azure"
 	RateLimitingAdvancedPluginAuthProviderGcp   RateLimitingAdvancedPluginAuthProvider = "gcp"
+	RateLimitingAdvancedPluginAuthProviderOauth RateLimitingAdvancedPluginAuthProvider = "oauth"
 )
 
 func (e RateLimitingAdvancedPluginAuthProvider) ToPointer() *RateLimitingAdvancedPluginAuthProvider {
@@ -264,11 +271,247 @@ func (e *RateLimitingAdvancedPluginAuthProvider) UnmarshalJSON(data []byte) erro
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = RateLimitingAdvancedPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginAuthProvider: %v", v)
 	}
+}
+
+// RateLimitingAdvancedPluginAuthMethod - Client authentication method used against the token endpoint.
+type RateLimitingAdvancedPluginAuthMethod string
+
+const (
+	RateLimitingAdvancedPluginAuthMethodClientSecretBasic RateLimitingAdvancedPluginAuthMethod = "client_secret_basic"
+	RateLimitingAdvancedPluginAuthMethodClientSecretJwt   RateLimitingAdvancedPluginAuthMethod = "client_secret_jwt"
+	RateLimitingAdvancedPluginAuthMethodClientSecretPost  RateLimitingAdvancedPluginAuthMethod = "client_secret_post"
+)
+
+func (e RateLimitingAdvancedPluginAuthMethod) ToPointer() *RateLimitingAdvancedPluginAuthMethod {
+	return &e
+}
+func (e *RateLimitingAdvancedPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = RateLimitingAdvancedPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginAuthMethod: %v", v)
+	}
+}
+
+// RateLimitingAdvancedPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type RateLimitingAdvancedPluginClientSecretJwtAlg string
+
+const (
+	RateLimitingAdvancedPluginClientSecretJwtAlgHs256 RateLimitingAdvancedPluginClientSecretJwtAlg = "HS256"
+	RateLimitingAdvancedPluginClientSecretJwtAlgHs512 RateLimitingAdvancedPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e RateLimitingAdvancedPluginClientSecretJwtAlg) ToPointer() *RateLimitingAdvancedPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *RateLimitingAdvancedPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = RateLimitingAdvancedPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// RateLimitingAdvancedPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type RateLimitingAdvancedPluginGrantType string
+
+const (
+	RateLimitingAdvancedPluginGrantTypeClientCredentials RateLimitingAdvancedPluginGrantType = "client_credentials"
+	RateLimitingAdvancedPluginGrantTypePassword          RateLimitingAdvancedPluginGrantType = "password"
+)
+
+func (e RateLimitingAdvancedPluginGrantType) ToPointer() *RateLimitingAdvancedPluginGrantType {
+	return &e
+}
+func (e *RateLimitingAdvancedPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = RateLimitingAdvancedPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RateLimitingAdvancedPluginGrantType: %v", v)
+	}
+}
+
+// RateLimitingAdvancedPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type RateLimitingAdvancedPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *RateLimitingAdvancedPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *RateLimitingAdvancedPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *RateLimitingAdvancedPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetAuthMethod() *RateLimitingAdvancedPluginAuthMethod {
+	if r == nil {
+		return nil
+	}
+	return r.AuthMethod
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetClientID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ClientID
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetClientSecret() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ClientSecret
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetClientSecretJwtAlg() *RateLimitingAdvancedPluginClientSecretJwtAlg {
+	if r == nil {
+		return nil
+	}
+	return r.ClientSecretJwtAlg
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetGrantType() *RateLimitingAdvancedPluginGrantType {
+	if r == nil {
+		return nil
+	}
+	return r.GrantType
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetPassword() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Password
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetRedisUsername() *string {
+	if r == nil {
+		return nil
+	}
+	return r.RedisUsername
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetRedisUsernameClaim() *string {
+	if r == nil {
+		return nil
+	}
+	return r.RedisUsernameClaim
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetScopes() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Scopes
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetSslVerify() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.SslVerify
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetTimeout() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.Timeout
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetTokenEndpoint() *string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenEndpoint
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetTokenHeaders() map[string]string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenHeaders
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetTokenPostArgs() map[string]string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenPostArgs
+}
+
+func (r *RateLimitingAdvancedPluginOauth) GetUsername() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Username
 }
 
 // RateLimitingAdvancedPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -297,6 +540,8 @@ type RateLimitingAdvancedPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *RateLimitingAdvancedPluginOauth `json:"oauth,omitempty"`
 }
 
 func (r RateLimitingAdvancedPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -392,6 +637,13 @@ func (r *RateLimitingAdvancedPluginCloudAuthentication) GetGcpServiceAccountJSON
 		return nil
 	}
 	return r.GcpServiceAccountJSON
+}
+
+func (r *RateLimitingAdvancedPluginCloudAuthentication) GetOauth() *RateLimitingAdvancedPluginOauth {
+	if r == nil {
+		return nil
+	}
+	return r.Oauth
 }
 
 type RateLimitingAdvancedPluginClusterNodes struct {
@@ -847,6 +1099,8 @@ type RateLimitingAdvancedPluginConfig struct {
 	ConsumerGroups []string `json:"consumer_groups,omitempty"`
 	// The key used to identify the counter for rate limiting. This can be based on consumer attributes such as `consumer.id`, `consumer.username`, or `consumer.custom_id`. Only applicable when `identifier` is set to `consumer`.
 	CounterKey *CounterKey `json:"counter_key,omitempty"`
+	// Overrides the computed rate-limiting key with a literal value for this request, regardless of `identifier` or `compound_identifier`.
+	CustomKey *string `json:"custom_key,omitempty"`
 	// The shared dictionary where counters are stored. When the plugin is configured to synchronize counter data externally (that is `config.strategy` is `cluster` or `redis` and `config.sync_rate` isn't `-1`), this dictionary serves as a buffer to populate counters in the data store on each synchronization cycle.
 	DictionaryName *string `json:"dictionary_name,omitempty"`
 	// If set to `true`, this doesn't count denied requests (status = `429`). If set to `false`, all requests, including denied ones, are counted. This parameter only affects the `sliding` window_type.
@@ -915,6 +1169,13 @@ func (r *RateLimitingAdvancedPluginConfig) GetCounterKey() *CounterKey {
 		return nil
 	}
 	return r.CounterKey
+}
+
+func (r *RateLimitingAdvancedPluginConfig) GetCustomKey() *string {
+	if r == nil {
+		return nil
+	}
+	return r.CustomKey
 }
 
 func (r *RateLimitingAdvancedPluginConfig) GetDictionaryName() *string {
@@ -1096,6 +1357,36 @@ func (r *RateLimitingAdvancedPluginConsumerGroup) GetID() *string {
 	return r.ID
 }
 
+type RateLimitingAdvancedPluginExpressions struct {
+	CustomKey *string  `json:"custom_key,omitempty"`
+	Limit     []string `json:"limit,omitempty"`
+}
+
+func (r RateLimitingAdvancedPluginExpressions) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RateLimitingAdvancedPluginExpressions) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RateLimitingAdvancedPluginExpressions) GetCustomKey() *string {
+	if r == nil {
+		return nil
+	}
+	return r.CustomKey
+}
+
+func (r *RateLimitingAdvancedPluginExpressions) GetLimit() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Limit
+}
+
 type RateLimitingAdvancedPluginProtocols string
 
 const (
@@ -1200,6 +1491,7 @@ type RateLimitingAdvancedPlugin struct {
 	Consumer *RateLimitingAdvancedPluginConsumer `json:"consumer,omitempty"`
 	// If set, the plugin will activate only for requests where the specified consumer group has been authenticated. (Note that some plugins can not be restricted to consumers groups this way.). Leave unset for the plugin to activate regardless of the authenticated Consumer Groups
 	ConsumerGroup *RateLimitingAdvancedPluginConsumerGroup `json:"consumer_group,omitempty"`
+	Expressions   *RateLimitingAdvancedPluginExpressions   `json:"expressions,omitempty"`
 	// A set of strings representing HTTP protocols.
 	Protocols []RateLimitingAdvancedPluginProtocols `json:"protocols,omitempty"`
 	// If set, the plugin will only activate when receiving requests via the specified route. Leave unset for the plugin to activate regardless of the route being used.
@@ -1305,6 +1597,13 @@ func (r *RateLimitingAdvancedPlugin) GetConsumerGroup() *RateLimitingAdvancedPlu
 		return nil
 	}
 	return r.ConsumerGroup
+}
+
+func (r *RateLimitingAdvancedPlugin) GetExpressions() *RateLimitingAdvancedPluginExpressions {
+	if r == nil {
+		return nil
+	}
+	return r.Expressions
 }
 
 func (r *RateLimitingAdvancedPlugin) GetProtocols() []RateLimitingAdvancedPluginProtocols {

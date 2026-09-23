@@ -95,7 +95,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `The audiences (` + "`" + `audience_claim` + "`" + ` claim) required to be present in the access token (or introspection results) for successful authorization. This config parameter works in both **AND** / **OR** cases.`,
+						Description: `The audiences (` + "`" + `audience_claim` + "`" + ` claim) required for successful authorization. The plugin checks these values against the access token (or introspection results). Each array element is an alternative (**OR**). To require several values together, put them in one element separated by spaces (**AND**). For example, ` + "`" + `["a b", "c"]` + "`" + ` authorizes a token that has both audiences ` + "`" + `a` + "`" + ` and ` + "`" + `b` + "`" + `, or a token that has audience ` + "`" + `c` + "`" + `.`,
 					},
 					"auth_methods": schema.ListAttribute{
 						Computed:    true,
@@ -421,12 +421,13 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 									"auth_provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"aws",
 												"azure",
 												"gcp",
+												"oauth",
 											),
 										},
 									},
@@ -484,6 +485,113 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 										Computed:    true,
 										Optional:    true,
 										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+									"oauth": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_method": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_secret_basic",
+														"client_secret_jwt",
+														"client_secret_post",
+													),
+												},
+											},
+											"client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client ID.`,
+											},
+											"client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client secret.`,
+											},
+											"client_secret_jwt_alg": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Signing algorithm used for ` + "`" + `client_secret_jwt` + "`" + ` client authentication. must be one of ["HS256", "HS512"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"HS256",
+														"HS512",
+													),
+												},
+											},
+											"grant_type": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_credentials",
+														"password",
+													),
+												},
+											},
+											"password": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner password, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+											"redis_username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Static Redis ACL username sent with ` + "`" + `AUTH <username> <token>` + "`" + `.`,
+											},
+											"redis_username_claim": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `JWT claim in the access token used to derive the Redis ACL username (for example, ` + "`" + `oid` + "`" + ` for Microsoft Entra ID).`,
+											},
+											"scopes": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `OAuth 2.0 scopes to request.`,
+											},
+											"ssl_verify": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Whether to verify the TLS certificate of the token endpoint.`,
+											},
+											"timeout": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Timeout, in milliseconds, for requests to the token endpoint.`,
+												Validators: []validator.Int64{
+													int64validator.Between(0, 2147483646),
+												},
+											},
+											"token_endpoint": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 token endpoint URL used to request access tokens.`,
+											},
+											"token_headers": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional HTTP headers to send with the token request.`,
+											},
+											"token_post_args": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional POST body arguments to send with the token request.`,
+											},
+											"username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner username, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+										},
+										Description: `OAuth 2.0 client configuration used to authenticate to Redis when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `oauth` + "`" + `.`,
 									},
 								},
 								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
@@ -884,12 +992,12 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `The groups (` + "`" + `groups_claim` + "`" + ` claim) required to be present in the access token (or introspection results) for successful authorization. This config parameter works in both **AND** / **OR** cases.`,
+						Description: `The groups (` + "`" + `groups_claim` + "`" + ` claim) required for successful authorization. The plugin checks these values against the access token (or introspection results). Each array element is an alternative (**OR**). To require several values together, put them in one element separated by spaces (**AND**). For example, ` + "`" + `["a b", "c"]` + "`" + ` authorizes a token that has both groups ` + "`" + `a` + "`" + ` and ` + "`" + `b` + "`" + `, or a token that has group ` + "`" + `c` + "`" + `.`,
 					},
 					"hide_credentials": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Remove the credentials used for authentication from the request. If multiple credentials are sent with the same request, the plugin will remove those that were used for successful authentication.`,
+						Description: `Remove the credentials used for authentication from the downstream request. If multiple credentials are sent with the same request, the plugin will remove those that were used for successful authentication. This setting does not control how the plugin sends the access token to the upstream service. To control that, use ` + "`" + `upstream_access_token_header` + "`" + `.`,
 					},
 					"http_proxy": schema.StringAttribute{
 						Computed:    true,
@@ -1357,6 +1465,41 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						},
 						Description: `Configuration for reading the client certificate from an HTTP header injected by a WAF or L7 proxy that terminates TLS. When configured, the plugin reads and validates the certificate from the specified header for mTLS Proof-of-Possession (PoP) verification instead of (or in addition to) the TLS layer certificate.`,
 					},
+					"protected_resource_metadata": schema.SingleNestedAttribute{
+						Computed: true,
+						Optional: true,
+						Attributes: map[string]schema.Attribute{
+							"authorization_servers": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `List of authorization server issuer URIs to advertise in the RFC 9728 metadata document. Not Null`,
+								Validators: []validator.List{
+									speakeasy_listvalidators.NotNull(),
+								},
+							},
+							"metadata_endpoint": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Override the well-known metadata endpoint path. Defaults to the path component of resource with /.well-known/oauth-protected-resource appended.`,
+							},
+							"resource": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The URI of the protected resource. Used as the resource field in the RFC 9728 metadata document and to derive the well-known endpoint path. Not Null`,
+								Validators: []validator.String{
+									speakeasy_stringvalidators.NotNull(),
+								},
+							},
+							"scopes_supported": schema.ListAttribute{
+								Computed:    true,
+								Optional:    true,
+								ElementType: types.StringType,
+								Description: `Scopes supported by this protected resource. Included in the RFC 9728 metadata document and in the scope attribute of WWW-Authenticate challenge headers on 401 responses.`,
+							},
+						},
+						Description: `When configured, the plugin advertises this API as an OAuth 2.0 protected resource per RFC 9728. It serves a discovery document at the well-known URI and includes resource_metadata in WWW-Authenticate challenge headers.`,
+					},
 					"pushed_authorization_request_endpoint": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -1395,12 +1538,13 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 									"auth_provider": schema.StringAttribute{
 										Computed:    true,
 										Optional:    true,
-										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]`,
+										Description: `Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]`,
 										Validators: []validator.String{
 											stringvalidator.OneOf(
 												"aws",
 												"azure",
 												"gcp",
+												"oauth",
 											),
 										},
 									},
@@ -1458,6 +1602,113 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 										Computed:    true,
 										Optional:    true,
 										Description: `GCP Service Account JSON to be used for authentication when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `gcp` + "`" + `.`,
+									},
+									"oauth": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"auth_method": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_secret_basic",
+														"client_secret_jwt",
+														"client_secret_post",
+													),
+												},
+											},
+											"client_id": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client ID.`,
+											},
+											"client_secret": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 client secret.`,
+											},
+											"client_secret_jwt_alg": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Signing algorithm used for ` + "`" + `client_secret_jwt` + "`" + ` client authentication. must be one of ["HS256", "HS512"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"HS256",
+														"HS512",
+													),
+												},
+											},
+											"grant_type": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"client_credentials",
+														"password",
+													),
+												},
+											},
+											"password": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner password, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+											"redis_username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Static Redis ACL username sent with ` + "`" + `AUTH <username> <token>` + "`" + `.`,
+											},
+											"redis_username_claim": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `JWT claim in the access token used to derive the Redis ACL username (for example, ` + "`" + `oid` + "`" + ` for Microsoft Entra ID).`,
+											},
+											"scopes": schema.ListAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `OAuth 2.0 scopes to request.`,
+											},
+											"ssl_verify": schema.BoolAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Whether to verify the TLS certificate of the token endpoint.`,
+											},
+											"timeout": schema.Int64Attribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Timeout, in milliseconds, for requests to the token endpoint.`,
+												Validators: []validator.Int64{
+													int64validator.Between(0, 2147483646),
+												},
+											},
+											"token_endpoint": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `OAuth 2.0 token endpoint URL used to request access tokens.`,
+											},
+											"token_headers": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional HTTP headers to send with the token request.`,
+											},
+											"token_post_args": schema.MapAttribute{
+												Computed:    true,
+												Optional:    true,
+												ElementType: types.StringType,
+												Description: `Additional POST body arguments to send with the token request.`,
+											},
+											"username": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Resource owner username, used with the ` + "`" + `password` + "`" + ` grant type.`,
+											},
+										},
+										Description: `OAuth 2.0 client configuration used to authenticate to Redis when ` + "`" + `auth_provider` + "`" + ` is set to ` + "`" + `oauth` + "`" + `.`,
 									},
 								},
 								Description: `Cloud auth related configs for connecting to a Cloud Provider's Redis instance.`,
@@ -1748,7 +1999,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `The roles (` + "`" + `roles_claim` + "`" + ` claim) required to be present in the access token (or introspection results) for successful authorization. This config parameter works in both **AND** / **OR** cases.`,
+						Description: `The roles (` + "`" + `roles_claim` + "`" + ` claim) required for successful authorization. The plugin checks these values against the access token (or introspection results). Each array element is an alternative (**OR**). To require several values together, put them in one element separated by spaces (**AND**). For example, ` + "`" + `["a b", "c"]` + "`" + ` authorizes a token that has both roles ` + "`" + `a` + "`" + ` and ` + "`" + `b` + "`" + `, or a token that has role ` + "`" + `c` + "`" + `.`,
 					},
 					"run_on_preflight": schema.BoolAttribute{
 						Computed:    true,
@@ -1771,7 +2022,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 						Computed:    true,
 						Optional:    true,
 						ElementType: types.StringType,
-						Description: `The scopes (` + "`" + `scopes_claim` + "`" + ` claim) required to be present in the access token (or introspection results) for successful authorization. This config parameter works in both **AND** / **OR** cases.`,
+						Description: `The scopes (` + "`" + `scopes_claim` + "`" + ` claim) required for successful authorization. The plugin checks these values against the access token (or introspection results). Each array element is an alternative (**OR**). To require several values together, put them in one element separated by spaces (**AND**). For example, ` + "`" + `["a b", "c"]` + "`" + ` authorizes a token that has both scopes ` + "`" + `a` + "`" + ` and ` + "`" + `b` + "`" + `, or a token that has scope ` + "`" + `c` + "`" + `.`,
 					},
 					"search_user_info": schema.BoolAttribute{
 						Computed:    true,
@@ -2012,10 +2263,77 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 								},
 								Description: `Cache support for token exchange`,
 							},
+							"grant_type": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `The token exchange grant. ` + "`" + `token_exchange` + "`" + ` (default) uses the OAuth 2.0 Token Exchange grant (RFC 8693). ` + "`" + `jwt_bearer` + "`" + ` uses the JWT Bearer authorization-grant flow (RFC 7523); see ` + "`" + `token_exchange.provider` + "`" + ` for provider-specific defaults in this mode. must be one of ["jwt_bearer", "token_exchange"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"jwt_bearer",
+										"token_exchange",
+									),
+								},
+							},
+							"map_identities_from": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Which token's claims to use for consumer, consumer group, and principal mapping. Only takes effect when token exchange is configured. ` + "`" + `exchanged_tokens` + "`" + ` (default) uses the token(s) returned by the exchange or tokens derived from it, as today. ` + "`" + `subject_token` + "`" + ` uses the original, pre-exchange bearer token's claims instead. must be one of ["exchanged_tokens", "subject_token"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"exchanged_tokens",
+										"subject_token",
+									),
+								},
+							},
+							"provider": schema.StringAttribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Identity provider used with ` + "`" + `grant_type = jwt_bearer` + "`" + `; not allowed with ` + "`" + `grant_type = token_exchange` + "`" + `. ` + "`" + `standard` + "`" + ` (default) adds no provider-specific parameter. ` + "`" + `microsoft` + "`" + ` adds the required ` + "`" + `requested_token_use=on_behalf_of` + "`" + `, which is fixed and cannot be overridden via ` + "`" + `post_args_names/values` + "`" + `. must be one of ["microsoft", "standard"]`,
+								Validators: []validator.String{
+									stringvalidator.OneOf(
+										"microsoft",
+										"standard",
+									),
+								},
+							},
 							"request": schema.SingleNestedAttribute{
 								Computed: true,
 								Optional: true,
 								Attributes: map[string]schema.Attribute{
+									"actor_token": schema.SingleNestedAttribute{
+										Computed: true,
+										Optional: true,
+										Attributes: map[string]schema.Attribute{
+											"header_name": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Header name containing the actor token. Required when ` + "`" + `source` + "`" + ` is ` + "`" + `header` + "`" + `.`,
+											},
+											"source": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Where to obtain the actor token. ` + "`" + `header` + "`" + ` reads it from a request header. ` + "`" + `config` + "`" + ` uses a fixed value. ` + "`" + `none` + "`" + ` disables actor token support. must be one of ["config", "header", "none"]`,
+												Validators: []validator.String{
+													stringvalidator.OneOf(
+														"config",
+														"header",
+														"none",
+													),
+												},
+											},
+											"static_token": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `Static actor token value. Required when ` + "`" + `source` + "`" + ` is ` + "`" + `config` + "`" + `.`,
+											},
+											"type": schema.StringAttribute{
+												Computed:    true,
+												Optional:    true,
+												Description: `The RFC 8693 token type identifier of the actor token (the ` + "`" + `actor_token_type` + "`" + ` request parameter).`,
+											},
+										},
+										Description: `How to obtain the actor token to include in the token exchange request. Represents the identity of the party acting on behalf of the subject.`,
+									},
 									"audience": schema.ListAttribute{
 										Computed:    true,
 										Optional:    true,
@@ -2027,10 +2345,44 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 										Optional:    true,
 										Description: `Use empty audiences. Use this field to remove audiences defined in ` + "`" + `config.audience` + "`" + `.`,
 									},
+									"empty_headers": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use no extra headers on the token exchange request. Use this field to remove extra headers defined in ` + "`" + `config.token_headers_names` + "`" + `.`,
+									},
+									"empty_post_args": schema.BoolAttribute{
+										Computed:    true,
+										Optional:    true,
+										Description: `Use no extra POST arguments on the token exchange request. Use this field to remove extra POST arguments defined in ` + "`" + `config.token_post_args_names` + "`" + `.`,
+									},
 									"empty_scopes": schema.BoolAttribute{
 										Computed:    true,
 										Optional:    true,
 										Description: `Use empty scopes. Use this field to remove scopes defined in ` + "`" + `config.scopes` + "`" + `.`,
+									},
+									"headers_names": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Extra header names sent only on the token exchange request. Overrides ` + "`" + `config.token_headers_names` + "`" + ` for this request.`,
+									},
+									"headers_values": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Values paired by index with ` + "`" + `headers_names` + "`" + `.`,
+									},
+									"post_args_names": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Extra POST argument names sent only on the token exchange request. Overrides ` + "`" + `config.token_post_args_names` + "`" + ` for this request. Use this, not the top-level field, for parameters that must not be attached to the plugin's other token endpoint calls, for example ` + "`" + `requested_token_use` + "`" + ` for Entra ID's On-Behalf-Of flow.`,
+									},
+									"post_args_values": schema.ListAttribute{
+										Computed:    true,
+										Optional:    true,
+										ElementType: types.StringType,
+										Description: `Values paired by index with ` + "`" + `post_args_names` + "`" + `.`,
 									},
 									"scopes": schema.ListAttribute{
 										Computed:    true,
@@ -2057,24 +2409,28 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 													Computed:    true,
 													Optional:    true,
 													ElementType: types.StringType,
+													Description: `Audience values that must all be present in the token, matched against ` + "`" + `audience_claim` + "`" + `.`,
 												},
 												"has_scopes": schema.ListAttribute{
 													Computed:    true,
 													Optional:    true,
 													ElementType: types.StringType,
+													Description: `Scope values that must all be present in the token, matched against ` + "`" + `scopes_claim` + "`" + `.`,
 												},
 												"missing_audience": schema.ListAttribute{
 													Computed:    true,
 													Optional:    true,
 													ElementType: types.StringType,
+													Description: `Audience values that must all be absent from the token, matched against ` + "`" + `audience_claim` + "`" + `.`,
 												},
 												"missing_scopes": schema.ListAttribute{
 													Computed:    true,
 													Optional:    true,
 													ElementType: types.StringType,
+													Description: `Scope values that must all be absent from the token, matched against ` + "`" + `scopes_claim` + "`" + `.`,
 												},
 											},
-											Description: `A token will only be exchanged when it matches all these criteria. To exchange tokens issued by a different issuer, ` + "`" + `conditions` + "`" + ` must not be defined. In contrast, to exchange tokens issued by the target issuer itself, ` + "`" + `conditions` + "`" + ` must be defined.`,
+											Description: `A token will only be exchanged when it matches all these criteria. To exchange tokens issued by a different issuer, ` + "`" + `conditions` + "`" + ` must not be defined -- every token from that issuer is exchanged unconditionally, since a foreign-issued token that isn't exchanged can never pass normal verification against the target issuer anyway. In contrast, to exchange tokens issued by the target issuer itself, ` + "`" + `conditions` + "`" + ` must be defined.`,
 										},
 										"issuer": schema.StringAttribute{
 											Computed:    true,
@@ -2092,7 +2448,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 										"verify_signature": schema.BoolAttribute{
 											Computed:    true,
 											Optional:    true,
-											Description: `When true, Kong cryptographically verifies the signature of the incoming subject token before exchanging it. This field should be left empty or set to ` + "`" + `false` + "`" + ` when this issuer is the same as the target issuer. Defaults to ` + "`" + `false` + "`" + ` for backward compatibility.`,
+											Description: `When true, Kong cryptographically verifies the signature of the incoming subject token before exchanging it. Defaults to ` + "`" + `false` + "`" + ` for backward compatibility, which skips this local check; the token exchange request to the issuer still validates the subject token itself, so this is defense in depth, not the only safeguard. This field should be left empty or set to ` + "`" + `false` + "`" + ` when this issuer is the same as the target issuer.`,
 										},
 									},
 								},
@@ -2187,7 +2543,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"upstream_access_token_header": schema.StringAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `The upstream access token header.`,
+						Description: `The upstream access token header. The access token is sent to the upstream service using this header regardless of the ` + "`" + `hide_credentials` + "`" + ` setting. Set this field to ` + "`" + `null` + "`" + ` to prevent sending the access token to the upstream.`,
 					},
 					"upstream_access_token_jwk_header": schema.StringAttribute{
 						Computed:    true,
@@ -2350,7 +2706,7 @@ func (r *PluginOpenidConnectResource) Schema(ctx context.Context, req resource.S
 					"verify_signature": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
-						Description: `Verify signature of tokens.`,
+						Description: `Verify the cryptographic signature of tokens. Disabling this skips verification for every token source, including tokens presented directly by clients (bearer); this is insecure for that path. To trust only tokens fetched from the identity provider for specific grants, use ` + "`" + `ignore_signature` + "`" + ` instead, which never affects bearer tokens.`,
 					},
 				},
 			},

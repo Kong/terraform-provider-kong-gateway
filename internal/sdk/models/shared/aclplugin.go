@@ -123,15 +123,19 @@ func (a *ACLPluginPartials) GetPath() *string {
 }
 
 type Config struct {
-	// Arbitrary group names that are allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
+	// Arbitrary group names that are allowed to consume the service or route. Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
 	Allow []string `json:"allow,omitempty"`
-	// If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous.
+	// Allow the request if it matches any of these CEL boolean expressions evaluated against the request context (consumer, principal, HTTP attributes, consumer groups, etc.). Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+	AllowWhen []string `json:"allow_when,omitempty"`
+	// If enabled (`true`), the authenticated groups will always be used even when an authenticated consumer already exists. If the authenticated groups don't exist, it will fallback to use the groups associated with the consumer. By default the authenticated groups will only be used when there is no consumer or the consumer is anonymous. This option is ignored when `allow_when` or `deny_when` is effective.
 	AlwaysUseAuthenticatedGroups *bool `json:"always_use_authenticated_groups,omitempty"`
-	// Arbitrary group names that are not allowed to consume the service or route. One of `config.allow` or `config.deny` must be specified.
+	// Arbitrary group names that are not allowed to consume the service or route. Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
 	Deny []string `json:"deny,omitempty"`
-	// If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service.
+	// Deny the request if it matches any of these CEL boolean expressions evaluated against the request context (consumer, principal, HTTP attributes, consumer groups, etc.). Exactly one of `config.allow`, `config.deny`, `config.allow_when`, or `config.deny_when` must be specified.
+	DenyWhen []string `json:"deny_when,omitempty"`
+	// If enabled (`true`), prevents the `X-Consumer-Groups` header from being sent in the request to the upstream service. This header is not set when allow_when or deny_when is used.
 	HideGroupsHeader *bool `json:"hide_groups_header,omitempty"`
-	// If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields
+	// If enabled (`true`), allows the consumer-groups to be used in the `allow|deny` fields. This option is ignored when `allow_when` or `deny_when` is used.
 	IncludeConsumerGroups *bool `json:"include_consumer_groups,omitempty"`
 }
 
@@ -153,6 +157,13 @@ func (c *Config) GetAllow() []string {
 	return c.Allow
 }
 
+func (c *Config) GetAllowWhen() []string {
+	if c == nil {
+		return nil
+	}
+	return c.AllowWhen
+}
+
 func (c *Config) GetAlwaysUseAuthenticatedGroups() *bool {
 	if c == nil {
 		return nil
@@ -165,6 +176,13 @@ func (c *Config) GetDeny() []string {
 		return nil
 	}
 	return c.Deny
+}
+
+func (c *Config) GetDenyWhen() []string {
+	if c == nil {
+		return nil
+	}
+	return c.DenyWhen
 }
 
 func (c *Config) GetHideGroupsHeader() *bool {

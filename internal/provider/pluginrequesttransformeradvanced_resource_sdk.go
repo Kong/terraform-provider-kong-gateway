@@ -73,6 +73,7 @@ func (r *PluginRequestTransformerAdvancedResourceModel) RefreshFromSharedRequest
 			}
 			r.Config.DotsInKeys = types.BoolPointerValue(resp.Config.DotsInKeys)
 			r.Config.HTTPMethod = types.StringPointerValue(resp.Config.HTTPMethod)
+			r.Config.MaxRequestBodySize = types.Int64PointerValue(resp.Config.MaxRequestBodySize)
 			if resp.Config.Remove == nil {
 				r.Config.Remove = nil
 			} else {
@@ -463,6 +464,12 @@ func (r *PluginRequestTransformerAdvancedResourceModel) ToSharedRequestTransform
 		} else {
 			httpMethod = nil
 		}
+		maxRequestBodySize := new(int64)
+		if !r.Config.MaxRequestBodySize.IsUnknown() && !r.Config.MaxRequestBodySize.IsNull() {
+			*maxRequestBodySize = r.Config.MaxRequestBodySize.ValueInt64()
+		} else {
+			maxRequestBodySize = nil
+		}
 		var remove *shared.RequestTransformerAdvancedPluginRemove
 		if r.Config.Remove != nil {
 			body3 := make([]string, 0, len(r.Config.Remove.Body))
@@ -536,14 +543,15 @@ func (r *PluginRequestTransformerAdvancedResourceModel) ToSharedRequestTransform
 			}
 		}
 		config = &shared.RequestTransformerAdvancedPluginConfig{
-			Add:        add,
-			Allow:      allow,
-			Append:     append1,
-			DotsInKeys: dotsInKeys,
-			HTTPMethod: httpMethod,
-			Remove:     remove,
-			Rename:     rename,
-			Replace:    replace,
+			Add:                add,
+			Allow:              allow,
+			Append:             append1,
+			DotsInKeys:         dotsInKeys,
+			HTTPMethod:         httpMethod,
+			MaxRequestBodySize: maxRequestBodySize,
+			Remove:             remove,
+			Rename:             rename,
+			Replace:            replace,
 		}
 	}
 	var consumer *shared.RequestTransformerAdvancedPluginConsumer

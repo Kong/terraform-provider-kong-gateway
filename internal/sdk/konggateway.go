@@ -2,7 +2,7 @@
 
 package sdk
 
-// Generated from OpenAPI doc version 3.15.0 and generator version 2.934.1
+// Generated from OpenAPI doc version 3.16.0 and generator version 2.934.1
 
 import (
 	"context"
@@ -319,7 +319,7 @@ func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
 		SDKVersion: "1.3.0",
 		sdkConfiguration: config.SDKConfiguration{
-			UserAgent:  "speakeasy-sdk/terraform 1.3.0 2.934.1 3.15.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			UserAgent:  "speakeasy-sdk/terraform 1.3.0 2.934.1 3.16.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
 			ServerList: ServerList,
 			ServerVariables: []map[string]string{
 				{

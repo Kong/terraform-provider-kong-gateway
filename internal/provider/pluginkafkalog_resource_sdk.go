@@ -65,6 +65,11 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 			r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
 		}
 		r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
+		if resp.Config.CompressionType != nil {
+			r.Config.CompressionType = types.StringValue(string(*resp.Config.CompressionType))
+		} else {
+			r.Config.CompressionType = types.StringNull()
+		}
 		if len(resp.Config.CustomFieldsByLua) > 0 {
 			r.Config.CustomFieldsByLua = make(map[string]types.String, len(resp.Config.CustomFieldsByLua))
 			for key1, value1 := range resp.Config.CustomFieldsByLua {
@@ -74,6 +79,7 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 		r.Config.Keepalive = types.Int64PointerValue(resp.Config.Keepalive)
 		r.Config.KeepaliveEnabled = types.BoolPointerValue(resp.Config.KeepaliveEnabled)
 		r.Config.KeyQueryArg = types.StringPointerValue(resp.Config.KeyQueryArg)
+		r.Config.NewKafkaAsyncProducer = types.BoolPointerValue(resp.Config.NewKafkaAsyncProducer)
 		r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 		r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 		r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
@@ -177,6 +183,11 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 					r.Config.SchemaRegistry.Confluent.KeySchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.KeySchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SubjectName)
 				}
@@ -187,6 +198,11 @@ func (r *PluginKafkaLogResourceModel) RefreshFromSharedKafkaLogPlugin(ctx contex
 					r.Config.SchemaRegistry.Confluent.ValueSchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.ValueSchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName)
 				}
@@ -561,6 +577,12 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 	} else {
 		clusterName = nil
 	}
+	compressionType := new(shared.KafkaLogPluginCompressionType)
+	if !r.Config.CompressionType.IsUnknown() && !r.Config.CompressionType.IsNull() {
+		*compressionType = shared.KafkaLogPluginCompressionType(r.Config.CompressionType.ValueString())
+	} else {
+		compressionType = nil
+	}
 	customFieldsByLua := make(map[string]string)
 	for customFieldsByLuaKey := range r.Config.CustomFieldsByLua {
 		var customFieldsByLuaInst string
@@ -585,6 +607,12 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 		*keyQueryArg = r.Config.KeyQueryArg.ValueString()
 	} else {
 		keyQueryArg = nil
+	}
+	newKafkaAsyncProducer := new(bool)
+	if !r.Config.NewKafkaAsyncProducer.IsUnknown() && !r.Config.NewKafkaAsyncProducer.IsNull() {
+		*newKafkaAsyncProducer = r.Config.NewKafkaAsyncProducer.ValueBool()
+	} else {
+		newKafkaAsyncProducer = nil
 	}
 	producerAsync := new(bool)
 	if !r.Config.ProducerAsync.IsUnknown() && !r.Config.ProducerAsync.IsNull() {
@@ -840,6 +868,12 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 			}
 			var keySchema *shared.KafkaLogPluginKeySchema
 			if r.Config.SchemaRegistry.Confluent.KeySchema != nil {
+				payloadEncoding := new(shared.KafkaLogPluginPayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsNull() {
+					*payloadEncoding = shared.KafkaLogPluginPayloadEncoding(r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding = nil
+				}
 				schemaVersion := new(string)
 				if !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsNull() {
 					*schemaVersion = r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.ValueString()
@@ -853,8 +887,9 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 					subjectName = nil
 				}
 				keySchema = &shared.KafkaLogPluginKeySchema{
-					SchemaVersion: schemaVersion,
-					SubjectName:   subjectName,
+					PayloadEncoding: payloadEncoding,
+					SchemaVersion:   schemaVersion,
+					SubjectName:     subjectName,
 				}
 			}
 			sslVerify1 := new(bool)
@@ -877,6 +912,12 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 			}
 			var valueSchema *shared.KafkaLogPluginValueSchema
 			if r.Config.SchemaRegistry.Confluent.ValueSchema != nil {
+				payloadEncoding1 := new(shared.KafkaLogPluginConfigPayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsNull() {
+					*payloadEncoding1 = shared.KafkaLogPluginConfigPayloadEncoding(r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding1 = nil
+				}
 				schemaVersion1 := new(string)
 				if !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsNull() {
 					*schemaVersion1 = r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.ValueString()
@@ -890,8 +931,9 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 					subjectName1 = nil
 				}
 				valueSchema = &shared.KafkaLogPluginValueSchema{
-					SchemaVersion: schemaVersion1,
-					SubjectName:   subjectName1,
+					PayloadEncoding: payloadEncoding1,
+					SchemaVersion:   schemaVersion1,
+					SubjectName:     subjectName1,
 				}
 			}
 			confluent = &shared.KafkaLogPluginConfluent{
@@ -943,14 +985,16 @@ func (r *PluginKafkaLogResourceModel) ToSharedKafkaLogPlugin(ctx context.Context
 	topic = r.Config.Topic.ValueString()
 
 	config := shared.KafkaLogPluginConfig{
-		Authentication:    authentication,
-		BootstrapServers:  bootstrapServers,
-		ClusterName:       clusterName,
-		CustomFieldsByLua: customFieldsByLua,
-		Keepalive:         keepalive,
-		KeepaliveEnabled:  keepaliveEnabled,
-		KeyQueryArg:       keyQueryArg,
-		ProducerAsync:     producerAsync,
+		Authentication:        authentication,
+		BootstrapServers:      bootstrapServers,
+		ClusterName:           clusterName,
+		CompressionType:       compressionType,
+		CustomFieldsByLua:     customFieldsByLua,
+		Keepalive:             keepalive,
+		KeepaliveEnabled:      keepaliveEnabled,
+		KeyQueryArg:           keyQueryArg,
+		NewKafkaAsyncProducer: newKafkaAsyncProducer,
+		ProducerAsync:         producerAsync,
 		ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
 		ProducerAsyncFlushTimeout:                    producerAsyncFlushTimeout,
 		ProducerRequestAcks:                          producerRequestAcks,

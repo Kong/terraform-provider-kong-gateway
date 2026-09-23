@@ -139,6 +139,7 @@ type OpenidConnectPluginConfig struct {
 	ProofOfPossessionDpop                        types.String                      `tfsdk:"proof_of_possession_dpop"`
 	ProofOfPossessionMtls                        types.String                      `tfsdk:"proof_of_possession_mtls"`
 	ProofOfPossessionMtlsFromHeader              *ProofOfPossessionMtlsFromHeader  `tfsdk:"proof_of_possession_mtls_from_header"`
+	ProtectedResourceMetadata                    *ProtectedResourceMetadata        `tfsdk:"protected_resource_metadata"`
 	PushedAuthorizationRequestEndpoint           types.String                      `tfsdk:"pushed_authorization_request_endpoint"`
 	PushedAuthorizationRequestEndpointAuthMethod types.String                      `tfsdk:"pushed_authorization_request_endpoint_auth_method"`
 	RedirectURI                                  []types.String                    `tfsdk:"redirect_uri"`

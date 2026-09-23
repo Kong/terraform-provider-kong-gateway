@@ -152,6 +152,7 @@ const (
 	RequestCalloutPluginAuthProviderAws   RequestCalloutPluginAuthProvider = "aws"
 	RequestCalloutPluginAuthProviderAzure RequestCalloutPluginAuthProvider = "azure"
 	RequestCalloutPluginAuthProviderGcp   RequestCalloutPluginAuthProvider = "gcp"
+	RequestCalloutPluginAuthProviderOauth RequestCalloutPluginAuthProvider = "oauth"
 )
 
 func (e RequestCalloutPluginAuthProvider) ToPointer() *RequestCalloutPluginAuthProvider {
@@ -168,11 +169,247 @@ func (e *RequestCalloutPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = RequestCalloutPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for RequestCalloutPluginAuthProvider: %v", v)
 	}
+}
+
+// RequestCalloutPluginAuthMethod - Client authentication method used against the token endpoint.
+type RequestCalloutPluginAuthMethod string
+
+const (
+	RequestCalloutPluginAuthMethodClientSecretBasic RequestCalloutPluginAuthMethod = "client_secret_basic"
+	RequestCalloutPluginAuthMethodClientSecretJwt   RequestCalloutPluginAuthMethod = "client_secret_jwt"
+	RequestCalloutPluginAuthMethodClientSecretPost  RequestCalloutPluginAuthMethod = "client_secret_post"
+)
+
+func (e RequestCalloutPluginAuthMethod) ToPointer() *RequestCalloutPluginAuthMethod {
+	return &e
+}
+func (e *RequestCalloutPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = RequestCalloutPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RequestCalloutPluginAuthMethod: %v", v)
+	}
+}
+
+// RequestCalloutPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type RequestCalloutPluginClientSecretJwtAlg string
+
+const (
+	RequestCalloutPluginClientSecretJwtAlgHs256 RequestCalloutPluginClientSecretJwtAlg = "HS256"
+	RequestCalloutPluginClientSecretJwtAlgHs512 RequestCalloutPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e RequestCalloutPluginClientSecretJwtAlg) ToPointer() *RequestCalloutPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *RequestCalloutPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = RequestCalloutPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RequestCalloutPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// RequestCalloutPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type RequestCalloutPluginGrantType string
+
+const (
+	RequestCalloutPluginGrantTypeClientCredentials RequestCalloutPluginGrantType = "client_credentials"
+	RequestCalloutPluginGrantTypePassword          RequestCalloutPluginGrantType = "password"
+)
+
+func (e RequestCalloutPluginGrantType) ToPointer() *RequestCalloutPluginGrantType {
+	return &e
+}
+func (e *RequestCalloutPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = RequestCalloutPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for RequestCalloutPluginGrantType: %v", v)
+	}
+}
+
+// RequestCalloutPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type RequestCalloutPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *RequestCalloutPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *RequestCalloutPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *RequestCalloutPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (r RequestCalloutPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(r, "", false)
+}
+
+func (r *RequestCalloutPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &r, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RequestCalloutPluginOauth) GetAuthMethod() *RequestCalloutPluginAuthMethod {
+	if r == nil {
+		return nil
+	}
+	return r.AuthMethod
+}
+
+func (r *RequestCalloutPluginOauth) GetClientID() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ClientID
+}
+
+func (r *RequestCalloutPluginOauth) GetClientSecret() *string {
+	if r == nil {
+		return nil
+	}
+	return r.ClientSecret
+}
+
+func (r *RequestCalloutPluginOauth) GetClientSecretJwtAlg() *RequestCalloutPluginClientSecretJwtAlg {
+	if r == nil {
+		return nil
+	}
+	return r.ClientSecretJwtAlg
+}
+
+func (r *RequestCalloutPluginOauth) GetGrantType() *RequestCalloutPluginGrantType {
+	if r == nil {
+		return nil
+	}
+	return r.GrantType
+}
+
+func (r *RequestCalloutPluginOauth) GetPassword() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Password
+}
+
+func (r *RequestCalloutPluginOauth) GetRedisUsername() *string {
+	if r == nil {
+		return nil
+	}
+	return r.RedisUsername
+}
+
+func (r *RequestCalloutPluginOauth) GetRedisUsernameClaim() *string {
+	if r == nil {
+		return nil
+	}
+	return r.RedisUsernameClaim
+}
+
+func (r *RequestCalloutPluginOauth) GetScopes() []string {
+	if r == nil {
+		return nil
+	}
+	return r.Scopes
+}
+
+func (r *RequestCalloutPluginOauth) GetSslVerify() *bool {
+	if r == nil {
+		return nil
+	}
+	return r.SslVerify
+}
+
+func (r *RequestCalloutPluginOauth) GetTimeout() *int64 {
+	if r == nil {
+		return nil
+	}
+	return r.Timeout
+}
+
+func (r *RequestCalloutPluginOauth) GetTokenEndpoint() *string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenEndpoint
+}
+
+func (r *RequestCalloutPluginOauth) GetTokenHeaders() map[string]string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenHeaders
+}
+
+func (r *RequestCalloutPluginOauth) GetTokenPostArgs() map[string]string {
+	if r == nil {
+		return nil
+	}
+	return r.TokenPostArgs
+}
+
+func (r *RequestCalloutPluginOauth) GetUsername() *string {
+	if r == nil {
+		return nil
+	}
+	return r.Username
 }
 
 // RequestCalloutPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -201,6 +438,8 @@ type RequestCalloutPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *RequestCalloutPluginOauth `json:"oauth,omitempty"`
 }
 
 func (r RequestCalloutPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -296,6 +535,13 @@ func (r *RequestCalloutPluginCloudAuthentication) GetGcpServiceAccountJSON() *st
 		return nil
 	}
 	return r.GcpServiceAccountJSON
+}
+
+func (r *RequestCalloutPluginCloudAuthentication) GetOauth() *RequestCalloutPluginOauth {
+	if r == nil {
+		return nil
+	}
+	return r.Oauth
 }
 
 type RequestCalloutPluginClusterNodes struct {

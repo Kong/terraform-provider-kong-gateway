@@ -84,7 +84,7 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 					if resp.Config.Server.Session.Redis.CloudAuthentication == nil {
 						r.Config.Server.Session.Redis.CloudAuthentication = nil
 					} else {
-						r.Config.Server.Session.Redis.CloudAuthentication = &tfTypes.PartialRedisCeCloudAuthentication{}
+						r.Config.Server.Session.Redis.CloudAuthentication = &tfTypes.PartialRedisEeCloudAuthentication{}
 						if resp.Config.Server.Session.Redis.CloudAuthentication.AuthProvider != nil {
 							r.Config.Server.Session.Redis.CloudAuthentication.AuthProvider = types.StringValue(string(*resp.Config.Server.Session.Redis.CloudAuthentication.AuthProvider))
 						} else {
@@ -101,6 +101,51 @@ func (r *PluginAiMcpProxyResourceModel) RefreshFromSharedAiMcpProxyPlugin(ctx co
 						r.Config.Server.Session.Redis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.AzureClientSecret)
 						r.Config.Server.Session.Redis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.AzureTenantID)
 						r.Config.Server.Session.Redis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.GcpServiceAccountJSON)
+						if resp.Config.Server.Session.Redis.CloudAuthentication.Oauth == nil {
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth = nil
+						} else {
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth = &tfTypes.PartialRedisEeOauth{}
+							if resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod != nil {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod = types.StringValue(string(*resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod))
+							} else {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod = types.StringNull()
+							}
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientID = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientID)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecret = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecret)
+							if resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg != nil {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg = types.StringValue(string(*resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg))
+							} else {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg = types.StringNull()
+							}
+							if resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType != nil {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType = types.StringValue(string(*resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType))
+							} else {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType = types.StringNull()
+							}
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Password = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.Password)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsername = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsername)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsernameClaim = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsernameClaim)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes = make([]types.String, 0, len(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes))
+							for _, v := range resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes = append(r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes, types.StringValue(v))
+							}
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.SslVerify = types.BoolPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.SslVerify)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Timeout = types.Int64PointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.Timeout)
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenEndpoint = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenEndpoint)
+							if len(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders) > 0 {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders = make(map[string]types.String, len(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders))
+								for key, value := range resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders {
+									r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders[key] = types.StringValue(value)
+								}
+							}
+							if len(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs) > 0 {
+								r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs = make(map[string]types.String, len(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs))
+								for key1, value1 := range resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs {
+									r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs[key1] = types.StringValue(value1)
+								}
+							}
+							r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Username = types.StringPointerValue(resp.Config.Server.Session.Redis.CloudAuthentication.Oauth.Username)
+						}
 					}
 					r.Config.Server.Session.Redis.ClusterMaxRedirections = types.Int64PointerValue(resp.Config.Server.Session.Redis.ClusterMaxRedirections)
 					r.Config.Server.Session.Redis.ClusterNodes = []tfTypes.PartialRedisEeClusterNodes{}
@@ -678,6 +723,116 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 					} else {
 						gcpServiceAccountJSON = nil
 					}
+					var oauth *shared.AiMcpProxyPluginOauth
+					if r.Config.Server.Session.Redis.CloudAuthentication.Oauth != nil {
+						authMethod := new(shared.AiMcpProxyPluginAuthMethod)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod.IsNull() {
+							*authMethod = shared.AiMcpProxyPluginAuthMethod(r.Config.Server.Session.Redis.CloudAuthentication.Oauth.AuthMethod.ValueString())
+						} else {
+							authMethod = nil
+						}
+						clientID := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientID.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientID.IsNull() {
+							*clientID = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientID.ValueString()
+						} else {
+							clientID = nil
+						}
+						clientSecret := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecret.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecret.IsNull() {
+							*clientSecret = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecret.ValueString()
+						} else {
+							clientSecret = nil
+						}
+						clientSecretJwtAlg := new(shared.AiMcpProxyPluginClientSecretJwtAlg)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.IsNull() {
+							*clientSecretJwtAlg = shared.AiMcpProxyPluginClientSecretJwtAlg(r.Config.Server.Session.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.ValueString())
+						} else {
+							clientSecretJwtAlg = nil
+						}
+						grantType := new(shared.AiMcpProxyPluginGrantType)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType.IsNull() {
+							*grantType = shared.AiMcpProxyPluginGrantType(r.Config.Server.Session.Redis.CloudAuthentication.Oauth.GrantType.ValueString())
+						} else {
+							grantType = nil
+						}
+						password := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Password.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Password.IsNull() {
+							*password = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Password.ValueString()
+						} else {
+							password = nil
+						}
+						redisUsername := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsername.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsername.IsNull() {
+							*redisUsername = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsername.ValueString()
+						} else {
+							redisUsername = nil
+						}
+						redisUsernameClaim := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.IsNull() {
+							*redisUsernameClaim = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.ValueString()
+						} else {
+							redisUsernameClaim = nil
+						}
+						scopes := make([]string, 0, len(r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes))
+						for scopesIndex := range r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes {
+							scopes = append(scopes, r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Scopes[scopesIndex].ValueString())
+						}
+						sslVerify := new(bool)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.SslVerify.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.SslVerify.IsNull() {
+							*sslVerify = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.SslVerify.ValueBool()
+						} else {
+							sslVerify = nil
+						}
+						timeout := new(int64)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Timeout.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Timeout.IsNull() {
+							*timeout = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Timeout.ValueInt64()
+						} else {
+							timeout = nil
+						}
+						tokenEndpoint := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenEndpoint.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenEndpoint.IsNull() {
+							*tokenEndpoint = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenEndpoint.ValueString()
+						} else {
+							tokenEndpoint = nil
+						}
+						tokenHeaders := make(map[string]string)
+						for tokenHeadersKey := range r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders {
+							var tokenHeadersInst string
+							tokenHeadersInst = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenHeaders[tokenHeadersKey].ValueString()
+
+							tokenHeaders[tokenHeadersKey] = tokenHeadersInst
+						}
+						tokenPostArgs := make(map[string]string)
+						for tokenPostArgsKey := range r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs {
+							var tokenPostArgsInst string
+							tokenPostArgsInst = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.TokenPostArgs[tokenPostArgsKey].ValueString()
+
+							tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
+						}
+						username := new(string)
+						if !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Username.IsUnknown() && !r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Username.IsNull() {
+							*username = r.Config.Server.Session.Redis.CloudAuthentication.Oauth.Username.ValueString()
+						} else {
+							username = nil
+						}
+						oauth = &shared.AiMcpProxyPluginOauth{
+							AuthMethod:         authMethod,
+							ClientID:           clientID,
+							ClientSecret:       clientSecret,
+							ClientSecretJwtAlg: clientSecretJwtAlg,
+							GrantType:          grantType,
+							Password:           password,
+							RedisUsername:      redisUsername,
+							RedisUsernameClaim: redisUsernameClaim,
+							Scopes:             scopes,
+							SslVerify:          sslVerify,
+							Timeout:            timeout,
+							TokenEndpoint:      tokenEndpoint,
+							TokenHeaders:       tokenHeaders,
+							TokenPostArgs:      tokenPostArgs,
+							Username:           username,
+						}
+					}
 					cloudAuthentication = &shared.AiMcpProxyPluginCloudAuthentication{
 						AuthProvider:          authProvider,
 						AwsAccessKeyID:        awsAccessKeyID,
@@ -691,6 +846,7 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 						AzureClientSecret:     azureClientSecret,
 						AzureTenantID:         azureTenantID,
 						GcpServiceAccountJSON: gcpServiceAccountJSON,
+						Oauth:                 oauth,
 					}
 				}
 				clusterMaxRedirections := new(int64)
@@ -754,11 +910,11 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 				} else {
 					keepalivePoolSize = nil
 				}
-				password := new(string)
+				password1 := new(string)
 				if !r.Config.Server.Session.Redis.Password.IsUnknown() && !r.Config.Server.Session.Redis.Password.IsNull() {
-					*password = r.Config.Server.Session.Redis.Password.ValueString()
+					*password1 = r.Config.Server.Session.Redis.Password.ValueString()
 				} else {
-					password = nil
+					password1 = nil
 				}
 				port1 := new(int64)
 				if !r.Config.Server.Session.Redis.Port.IsUnknown() && !r.Config.Server.Session.Redis.Port.IsNull() {
@@ -833,17 +989,17 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 				} else {
 					ssl = nil
 				}
-				sslVerify := new(bool)
+				sslVerify1 := new(bool)
 				if !r.Config.Server.Session.Redis.SslVerify.IsUnknown() && !r.Config.Server.Session.Redis.SslVerify.IsNull() {
-					*sslVerify = r.Config.Server.Session.Redis.SslVerify.ValueBool()
+					*sslVerify1 = r.Config.Server.Session.Redis.SslVerify.ValueBool()
 				} else {
-					sslVerify = nil
+					sslVerify1 = nil
 				}
-				username := new(string)
+				username1 := new(string)
 				if !r.Config.Server.Session.Redis.Username.IsUnknown() && !r.Config.Server.Session.Redis.Username.IsNull() {
-					*username = r.Config.Server.Session.Redis.Username.ValueString()
+					*username1 = r.Config.Server.Session.Redis.Username.ValueString()
 				} else {
-					username = nil
+					username1 = nil
 				}
 				redis = &shared.AiMcpProxyPluginRedis{
 					CloudAuthentication:    cloudAuthentication,
@@ -855,7 +1011,7 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 					Host:                   host,
 					KeepaliveBacklog:       keepaliveBacklog,
 					KeepalivePoolSize:      keepalivePoolSize,
-					Password:               password,
+					Password:               password1,
 					Port:                   port1,
 					ReadTimeout:            readTimeout,
 					SendTimeout:            sendTimeout,
@@ -866,8 +1022,8 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 					SentinelUsername:       sentinelUsername,
 					ServerName:             serverName,
 					Ssl:                    ssl,
-					SslVerify:              sslVerify,
-					Username:               username,
+					SslVerify:              sslVerify1,
+					Username:               username1,
 				}
 			}
 			sessionTTL := new(float64)
@@ -896,17 +1052,17 @@ func (r *PluginAiMcpProxyResourceModel) ToSharedAiMcpProxyPlugin(ctx context.Con
 		} else {
 			tag = nil
 		}
-		timeout := new(float64)
+		timeout1 := new(float64)
 		if !r.Config.Server.Timeout.IsUnknown() && !r.Config.Server.Timeout.IsNull() {
-			*timeout = r.Config.Server.Timeout.ValueFloat64()
+			*timeout1 = r.Config.Server.Timeout.ValueFloat64()
 		} else {
-			timeout = nil
+			timeout1 = nil
 		}
 		server = &shared.Server{
 			ForwardClientHeaders: forwardClientHeaders,
 			Session:              session,
 			Tag:                  tag,
-			Timeout:              timeout,
+			Timeout:              timeout1,
 		}
 	}
 	tools := make([]shared.Tools, 0, len(r.Config.Tools))

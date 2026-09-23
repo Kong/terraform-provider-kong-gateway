@@ -432,8 +432,12 @@ func (e *StatsdAdvancedPluginConcurrencyLimit) UnmarshalJSON(data []byte) error 
 }
 
 type StatsdAdvancedPluginQueue struct {
+	// Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
+	BreakerCooldown *float64 `json:"breaker_cooldown,omitempty"`
 	// The number of of queue delivery timers. -1 indicates unlimited.
 	ConcurrencyLimit *StatsdAdvancedPluginConcurrencyLimit `json:"concurrency_limit,omitempty"`
+	// Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
+	FailureThreshold *int64 `json:"failure_threshold,omitempty"`
 	// Time in seconds before the initial retry is made for a failing batch.
 	InitialRetryDelay *float64 `json:"initial_retry_delay,omitempty"`
 	// Maximum number of entries that can be processed at a time.
@@ -461,11 +465,25 @@ func (s *StatsdAdvancedPluginQueue) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (s *StatsdAdvancedPluginQueue) GetBreakerCooldown() *float64 {
+	if s == nil {
+		return nil
+	}
+	return s.BreakerCooldown
+}
+
 func (s *StatsdAdvancedPluginQueue) GetConcurrencyLimit() *StatsdAdvancedPluginConcurrencyLimit {
 	if s == nil {
 		return nil
 	}
 	return s.ConcurrencyLimit
+}
+
+func (s *StatsdAdvancedPluginQueue) GetFailureThreshold() *int64 {
+	if s == nil {
+		return nil
+	}
+	return s.FailureThreshold
 }
 
 func (s *StatsdAdvancedPluginQueue) GetInitialRetryDelay() *float64 {

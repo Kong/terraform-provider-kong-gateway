@@ -100,6 +100,51 @@ func (r *PluginAcmeResourceModel) RefreshFromSharedAcmePlugin(ctx context.Contex
 					r.Config.StorageConfig.Redis.CloudAuthentication.AzureClientSecret = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.AzureClientSecret)
 					r.Config.StorageConfig.Redis.CloudAuthentication.AzureTenantID = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.AzureTenantID)
 					r.Config.StorageConfig.Redis.CloudAuthentication.GcpServiceAccountJSON = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.GcpServiceAccountJSON)
+					if resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth == nil {
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth = nil
+					} else {
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth = &tfTypes.PartialRedisCeOauth{}
+						if resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod != nil {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod = types.StringValue(string(*resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod))
+						} else {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod = types.StringNull()
+						}
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientID = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientID)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecret = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecret)
+						if resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg != nil {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg = types.StringValue(string(*resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg))
+						} else {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg = types.StringNull()
+						}
+						if resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType != nil {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType = types.StringValue(string(*resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType))
+						} else {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType = types.StringNull()
+						}
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Password = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Password)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsername = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsername)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsernameClaim = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsernameClaim)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes = make([]types.String, 0, len(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes))
+						for _, v := range resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes = append(r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes, types.StringValue(v))
+						}
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.SslVerify = types.BoolPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.SslVerify)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Timeout = types.Float64PointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Timeout)
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenEndpoint = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenEndpoint)
+						if len(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders) > 0 {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders = make(map[string]types.String, len(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders))
+							for key1, value1 := range resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders {
+								r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders[key1] = types.StringValue(value1)
+							}
+						}
+						if len(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs) > 0 {
+							r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs = make(map[string]types.String, len(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs))
+							for key2, value2 := range resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs {
+								r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs[key2] = types.StringValue(value2)
+							}
+						}
+						r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Username = types.StringPointerValue(resp.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Username)
+					}
 				}
 				r.Config.StorageConfig.Redis.Database = types.Int64PointerValue(resp.Config.StorageConfig.Redis.Database)
 				if resp.Config.StorageConfig.Redis.ExtraOptions == nil {
@@ -602,6 +647,116 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 				} else {
 					gcpServiceAccountJSON = nil
 				}
+				var oauth *shared.AcmePluginOauth
+				if r.Config.StorageConfig.Redis.CloudAuthentication.Oauth != nil {
+					authMethod := new(shared.AcmePluginConfigAuthMethod)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod.IsNull() {
+						*authMethod = shared.AcmePluginConfigAuthMethod(r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.AuthMethod.ValueString())
+					} else {
+						authMethod = nil
+					}
+					clientID := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientID.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientID.IsNull() {
+						*clientID = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientID.ValueString()
+					} else {
+						clientID = nil
+					}
+					clientSecret := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecret.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecret.IsNull() {
+						*clientSecret = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecret.ValueString()
+					} else {
+						clientSecret = nil
+					}
+					clientSecretJwtAlg := new(shared.AcmePluginClientSecretJwtAlg)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.IsNull() {
+						*clientSecretJwtAlg = shared.AcmePluginClientSecretJwtAlg(r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.ClientSecretJwtAlg.ValueString())
+					} else {
+						clientSecretJwtAlg = nil
+					}
+					grantType := new(shared.AcmePluginGrantType)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType.IsNull() {
+						*grantType = shared.AcmePluginGrantType(r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.GrantType.ValueString())
+					} else {
+						grantType = nil
+					}
+					password := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Password.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Password.IsNull() {
+						*password = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Password.ValueString()
+					} else {
+						password = nil
+					}
+					redisUsername := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsername.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsername.IsNull() {
+						*redisUsername = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsername.ValueString()
+					} else {
+						redisUsername = nil
+					}
+					redisUsernameClaim := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.IsNull() {
+						*redisUsernameClaim = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.RedisUsernameClaim.ValueString()
+					} else {
+						redisUsernameClaim = nil
+					}
+					scopes := make([]string, 0, len(r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes))
+					for scopesIndex := range r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes {
+						scopes = append(scopes, r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Scopes[scopesIndex].ValueString())
+					}
+					sslVerify := new(bool)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.SslVerify.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.SslVerify.IsNull() {
+						*sslVerify = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.SslVerify.ValueBool()
+					} else {
+						sslVerify = nil
+					}
+					timeout1 := new(float64)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Timeout.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Timeout.IsNull() {
+						*timeout1 = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Timeout.ValueFloat64()
+					} else {
+						timeout1 = nil
+					}
+					tokenEndpoint := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenEndpoint.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenEndpoint.IsNull() {
+						*tokenEndpoint = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenEndpoint.ValueString()
+					} else {
+						tokenEndpoint = nil
+					}
+					tokenHeaders := make(map[string]string)
+					for tokenHeadersKey := range r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders {
+						var tokenHeadersInst string
+						tokenHeadersInst = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenHeaders[tokenHeadersKey].ValueString()
+
+						tokenHeaders[tokenHeadersKey] = tokenHeadersInst
+					}
+					tokenPostArgs := make(map[string]string)
+					for tokenPostArgsKey := range r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs {
+						var tokenPostArgsInst string
+						tokenPostArgsInst = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.TokenPostArgs[tokenPostArgsKey].ValueString()
+
+						tokenPostArgs[tokenPostArgsKey] = tokenPostArgsInst
+					}
+					username := new(string)
+					if !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Username.IsUnknown() && !r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Username.IsNull() {
+						*username = r.Config.StorageConfig.Redis.CloudAuthentication.Oauth.Username.ValueString()
+					} else {
+						username = nil
+					}
+					oauth = &shared.AcmePluginOauth{
+						AuthMethod:         authMethod,
+						ClientID:           clientID,
+						ClientSecret:       clientSecret,
+						ClientSecretJwtAlg: clientSecretJwtAlg,
+						GrantType:          grantType,
+						Password:           password,
+						RedisUsername:      redisUsername,
+						RedisUsernameClaim: redisUsernameClaim,
+						Scopes:             scopes,
+						SslVerify:          sslVerify,
+						Timeout:            timeout1,
+						TokenEndpoint:      tokenEndpoint,
+						TokenHeaders:       tokenHeaders,
+						TokenPostArgs:      tokenPostArgs,
+						Username:           username,
+					}
+				}
 				cloudAuthentication = &shared.AcmePluginCloudAuthentication{
 					AuthProvider:          authProvider,
 					AwsAccessKeyID:        awsAccessKeyID,
@@ -615,6 +770,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 					AzureClientSecret:     azureClientSecret,
 					AzureTenantID:         azureTenantID,
 					GcpServiceAccountJSON: gcpServiceAccountJSON,
+					Oauth:                 oauth,
 				}
 			}
 			database := new(int64)
@@ -648,11 +804,11 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 			} else {
 				host1 = nil
 			}
-			password := new(string)
+			password1 := new(string)
 			if !r.Config.StorageConfig.Redis.Password.IsUnknown() && !r.Config.StorageConfig.Redis.Password.IsNull() {
-				*password = r.Config.StorageConfig.Redis.Password.ValueString()
+				*password1 = r.Config.StorageConfig.Redis.Password.ValueString()
 			} else {
-				password = nil
+				password1 = nil
 			}
 			port1 := new(int64)
 			if !r.Config.StorageConfig.Redis.Port.IsUnknown() && !r.Config.StorageConfig.Redis.Port.IsNull() {
@@ -672,36 +828,36 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 			} else {
 				ssl = nil
 			}
-			sslVerify := new(bool)
+			sslVerify1 := new(bool)
 			if !r.Config.StorageConfig.Redis.SslVerify.IsUnknown() && !r.Config.StorageConfig.Redis.SslVerify.IsNull() {
-				*sslVerify = r.Config.StorageConfig.Redis.SslVerify.ValueBool()
+				*sslVerify1 = r.Config.StorageConfig.Redis.SslVerify.ValueBool()
 			} else {
-				sslVerify = nil
+				sslVerify1 = nil
 			}
-			timeout1 := new(int64)
+			timeout2 := new(int64)
 			if !r.Config.StorageConfig.Redis.Timeout.IsUnknown() && !r.Config.StorageConfig.Redis.Timeout.IsNull() {
-				*timeout1 = r.Config.StorageConfig.Redis.Timeout.ValueInt64()
+				*timeout2 = r.Config.StorageConfig.Redis.Timeout.ValueInt64()
 			} else {
-				timeout1 = nil
+				timeout2 = nil
 			}
-			username := new(string)
+			username1 := new(string)
 			if !r.Config.StorageConfig.Redis.Username.IsUnknown() && !r.Config.StorageConfig.Redis.Username.IsNull() {
-				*username = r.Config.StorageConfig.Redis.Username.ValueString()
+				*username1 = r.Config.StorageConfig.Redis.Username.ValueString()
 			} else {
-				username = nil
+				username1 = nil
 			}
 			redis = &shared.AcmePluginRedis{
 				CloudAuthentication: cloudAuthentication,
 				Database:            database,
 				ExtraOptions:        extraOptions,
 				Host:                host1,
-				Password:            password,
+				Password:            password1,
 				Port:                port1,
 				ServerName:          serverName,
 				Ssl:                 ssl,
-				SslVerify:           sslVerify,
-				Timeout:             timeout1,
-				Username:            username,
+				SslVerify:           sslVerify1,
+				Timeout:             timeout2,
+				Username:            username1,
 			}
 		}
 		var shm *shared.Shm
@@ -718,11 +874,11 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 		}
 		var vault *shared.AcmePluginVault
 		if r.Config.StorageConfig.Vault != nil {
-			authMethod := new(shared.AcmePluginAuthMethod)
+			authMethod1 := new(shared.AcmePluginAuthMethod)
 			if !r.Config.StorageConfig.Vault.AuthMethod.IsUnknown() && !r.Config.StorageConfig.Vault.AuthMethod.IsNull() {
-				*authMethod = shared.AcmePluginAuthMethod(r.Config.StorageConfig.Vault.AuthMethod.ValueString())
+				*authMethod1 = shared.AcmePluginAuthMethod(r.Config.StorageConfig.Vault.AuthMethod.ValueString())
 			} else {
-				authMethod = nil
+				authMethod1 = nil
 			}
 			authPath := new(string)
 			if !r.Config.StorageConfig.Vault.AuthPath.IsUnknown() && !r.Config.StorageConfig.Vault.AuthPath.IsNull() {
@@ -766,11 +922,11 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 			} else {
 				port2 = nil
 			}
-			timeout2 := new(float64)
+			timeout3 := new(float64)
 			if !r.Config.StorageConfig.Vault.Timeout.IsUnknown() && !r.Config.StorageConfig.Vault.Timeout.IsNull() {
-				*timeout2 = r.Config.StorageConfig.Vault.Timeout.ValueFloat64()
+				*timeout3 = r.Config.StorageConfig.Vault.Timeout.ValueFloat64()
 			} else {
-				timeout2 = nil
+				timeout3 = nil
 			}
 			tlsServerName := new(string)
 			if !r.Config.StorageConfig.Vault.TLSServerName.IsUnknown() && !r.Config.StorageConfig.Vault.TLSServerName.IsNull() {
@@ -791,7 +947,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 				token1 = nil
 			}
 			vault = &shared.AcmePluginVault{
-				AuthMethod:    authMethod,
+				AuthMethod:    authMethod1,
 				AuthPath:      authPath,
 				AuthRole:      authRole,
 				Host:          host2,
@@ -799,7 +955,7 @@ func (r *PluginAcmeResourceModel) ToSharedAcmePlugin(ctx context.Context) (*shar
 				JwtPath:       jwtPath,
 				KvPath:        kvPath1,
 				Port:          port2,
-				Timeout:       timeout2,
+				Timeout:       timeout3,
 				TLSServerName: tlsServerName,
 				TLSVerify:     tlsVerify,
 				Token:         token1,

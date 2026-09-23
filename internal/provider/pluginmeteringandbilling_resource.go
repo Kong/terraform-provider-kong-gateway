@@ -75,6 +75,12 @@ func (r *PluginMeteringAndBillingResource) Schema(ctx context.Context, req resou
 			"config": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
+					"allow_status_codes": schema.ListAttribute{
+						Computed:    true,
+						Optional:    true,
+						ElementType: types.StringType,
+						Description: `List of status code ranges that are allowed to be logged in usage events.`,
+					},
 					"api_token": schema.StringAttribute{
 						Required:    true,
 						Description: `Bearer token for authenticating with the ingest endpoint.`,
@@ -142,12 +148,28 @@ func (r *PluginMeteringAndBillingResource) Schema(ctx context.Context, req resou
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"breaker_cooldown": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.`,
+								Validators: []validator.Float64{
+									float64validator.Between(0, 1000000),
+								},
+							},
 							"concurrency_limit": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]`,
 								Validators: []validator.Int64{
 									int64validator.OneOf(-1, 1),
+								},
+							},
+							"failure_threshold": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.`,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 1000000),
 								},
 							},
 							"initial_retry_delay": schema.Float64Attribute{

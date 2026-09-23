@@ -17,6 +17,10 @@ func (r *PluginMeteringAndBillingResourceModel) RefreshFromSharedMeteringAndBill
 	if resp != nil {
 		r.Condition = types.StringPointerValue(resp.Condition)
 		r.Config = &tfTypes.MeteringAndBillingPluginConfig{}
+		r.Config.AllowStatusCodes = make([]types.String, 0, len(resp.Config.AllowStatusCodes))
+		for _, v := range resp.Config.AllowStatusCodes {
+			r.Config.AllowStatusCodes = append(r.Config.AllowStatusCodes, types.StringValue(v))
+		}
 		r.Config.APIToken = types.StringValue(resp.Config.APIToken)
 		r.Config.Attributes = []tfTypes.Attributes{}
 
@@ -37,11 +41,13 @@ func (r *PluginMeteringAndBillingResourceModel) RefreshFromSharedMeteringAndBill
 			r.Config.Queue = nil
 		} else {
 			r.Config.Queue = &tfTypes.Queue{}
+			r.Config.Queue.BreakerCooldown = types.Float64PointerValue(resp.Config.Queue.BreakerCooldown)
 			if resp.Config.Queue.ConcurrencyLimit != nil {
 				r.Config.Queue.ConcurrencyLimit = types.Int64Value(int64(*resp.Config.Queue.ConcurrencyLimit))
 			} else {
 				r.Config.Queue.ConcurrencyLimit = types.Int64Null()
 			}
+			r.Config.Queue.FailureThreshold = types.Int64PointerValue(resp.Config.Queue.FailureThreshold)
 			r.Config.Queue.InitialRetryDelay = types.Float64PointerValue(resp.Config.Queue.InitialRetryDelay)
 			r.Config.Queue.MaxBatchSize = types.Int64PointerValue(resp.Config.Queue.MaxBatchSize)
 			r.Config.Queue.MaxBytes = types.Int64PointerValue(resp.Config.Queue.MaxBytes)
@@ -54,7 +60,7 @@ func (r *PluginMeteringAndBillingResourceModel) RefreshFromSharedMeteringAndBill
 		if resp.Config.Subject == nil {
 			r.Config.Subject = nil
 		} else {
-			r.Config.Subject = &tfTypes.Subject{}
+			r.Config.Subject = &tfTypes.Customer{}
 			r.Config.Subject.Field = types.StringPointerValue(resp.Config.Subject.Field)
 			if resp.Config.Subject.LookUpValueIn != nil {
 				r.Config.Subject.LookUpValueIn = types.StringValue(string(*resp.Config.Subject.LookUpValueIn))
@@ -316,6 +322,10 @@ func (r *PluginMeteringAndBillingResourceModel) ToSharedMeteringAndBillingPlugin
 	} else {
 		updatedAt = nil
 	}
+	allowStatusCodes := make([]string, 0, len(r.Config.AllowStatusCodes))
+	for allowStatusCodesIndex := range r.Config.AllowStatusCodes {
+		allowStatusCodes = append(allowStatusCodes, r.Config.AllowStatusCodes[allowStatusCodesIndex].ValueString())
+	}
 	var apiToken string
 	apiToken = r.Config.APIToken.ValueString()
 
@@ -357,11 +367,23 @@ func (r *PluginMeteringAndBillingResourceModel) ToSharedMeteringAndBillingPlugin
 	}
 	var queue *shared.MeteringAndBillingPluginQueue
 	if r.Config.Queue != nil {
+		breakerCooldown := new(float64)
+		if !r.Config.Queue.BreakerCooldown.IsUnknown() && !r.Config.Queue.BreakerCooldown.IsNull() {
+			*breakerCooldown = r.Config.Queue.BreakerCooldown.ValueFloat64()
+		} else {
+			breakerCooldown = nil
+		}
 		concurrencyLimit := new(shared.MeteringAndBillingPluginConcurrencyLimit)
 		if !r.Config.Queue.ConcurrencyLimit.IsUnknown() && !r.Config.Queue.ConcurrencyLimit.IsNull() {
 			*concurrencyLimit = shared.MeteringAndBillingPluginConcurrencyLimit(r.Config.Queue.ConcurrencyLimit.ValueInt64())
 		} else {
 			concurrencyLimit = nil
+		}
+		failureThreshold := new(int64)
+		if !r.Config.Queue.FailureThreshold.IsUnknown() && !r.Config.Queue.FailureThreshold.IsNull() {
+			*failureThreshold = r.Config.Queue.FailureThreshold.ValueInt64()
+		} else {
+			failureThreshold = nil
 		}
 		initialRetryDelay := new(float64)
 		if !r.Config.Queue.InitialRetryDelay.IsUnknown() && !r.Config.Queue.InitialRetryDelay.IsNull() {
@@ -406,7 +428,9 @@ func (r *PluginMeteringAndBillingResourceModel) ToSharedMeteringAndBillingPlugin
 			maxRetryTime = nil
 		}
 		queue = &shared.MeteringAndBillingPluginQueue{
+			BreakerCooldown:    breakerCooldown,
 			ConcurrencyLimit:   concurrencyLimit,
+			FailureThreshold:   failureThreshold,
 			InitialRetryDelay:  initialRetryDelay,
 			MaxBatchSize:       maxBatchSize,
 			MaxBytes:           maxBytes,
@@ -430,9 +454,9 @@ func (r *PluginMeteringAndBillingResourceModel) ToSharedMeteringAndBillingPlugin
 		} else {
 			field = nil
 		}
-		lookUpValueIn1 := new(shared.LookUpValueIn)
+		lookUpValueIn1 := new(shared.MeteringAndBillingPluginLookUpValueIn)
 		if !r.Config.Subject.LookUpValueIn.IsUnknown() && !r.Config.Subject.LookUpValueIn.IsNull() {
-			*lookUpValueIn1 = shared.LookUpValueIn(r.Config.Subject.LookUpValueIn.ValueString())
+			*lookUpValueIn1 = shared.MeteringAndBillingPluginLookUpValueIn(r.Config.Subject.LookUpValueIn.ValueString())
 		} else {
 			lookUpValueIn1 = nil
 		}
@@ -448,6 +472,7 @@ func (r *PluginMeteringAndBillingResourceModel) ToSharedMeteringAndBillingPlugin
 		timeout = nil
 	}
 	config := shared.MeteringAndBillingPluginConfig{
+		AllowStatusCodes:  allowStatusCodes,
 		APIToken:          apiToken,
 		Attributes:        attributes,
 		IngestEndpoint:    ingestEndpoint,

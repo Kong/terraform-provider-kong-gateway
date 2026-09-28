@@ -69,6 +69,11 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 			r.Config.BootstrapServers = append(r.Config.BootstrapServers, bootstrapServers)
 		}
 		r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
+		if resp.Config.CompressionType != nil {
+			r.Config.CompressionType = types.StringValue(string(*resp.Config.CompressionType))
+		} else {
+			r.Config.CompressionType = types.StringNull()
+		}
 		if resp.Config.ErrorHandling == nil {
 			r.Config.ErrorHandling = nil
 		} else {
@@ -112,9 +117,14 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 		for _, v := range resp.Config.MessageByLuaFunctions {
 			r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
 		}
+		r.Config.NewKafkaAsyncProducer = types.BoolPointerValue(resp.Config.NewKafkaAsyncProducer)
 		r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 		r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 		r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
+		r.Config.ProducerAsyncHealthFailureThreshold = types.Int64PointerValue(resp.Config.ProducerAsyncHealthFailureThreshold)
+		r.Config.ProducerAsyncHealthGating = types.BoolPointerValue(resp.Config.ProducerAsyncHealthGating)
+		r.Config.ProducerAsyncHealthProbeInterval = types.Int64PointerValue(resp.Config.ProducerAsyncHealthProbeInterval)
+		r.Config.ProducerAsyncHealthRecoveryThreshold = types.Int64PointerValue(resp.Config.ProducerAsyncHealthRecoveryThreshold)
 		if resp.Config.ProducerRequestAcks != nil {
 			r.Config.ProducerRequestAcks = types.Int64Value(int64(*resp.Config.ProducerRequestAcks))
 		} else {
@@ -215,6 +225,11 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 					r.Config.SchemaRegistry.Confluent.KeySchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.KeySchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SubjectName)
 				}
@@ -225,6 +240,11 @@ func (r *PluginKafkaUpstreamResourceModel) RefreshFromSharedKafkaUpstreamPlugin(
 					r.Config.SchemaRegistry.Confluent.ValueSchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.ValueSchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName)
 				}
@@ -604,6 +624,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 	} else {
 		clusterName = nil
 	}
+	compressionType := new(shared.KafkaUpstreamPluginCompressionType)
+	if !r.Config.CompressionType.IsUnknown() && !r.Config.CompressionType.IsNull() {
+		*compressionType = shared.KafkaUpstreamPluginCompressionType(r.Config.CompressionType.ValueString())
+	} else {
+		compressionType = nil
+	}
 	var errorHandling *shared.KafkaUpstreamPluginErrorHandling
 	if r.Config.ErrorHandling != nil {
 		returnErrorMessage := new(bool)
@@ -706,6 +732,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 	for messageByLuaFunctionsIndex := range r.Config.MessageByLuaFunctions {
 		messageByLuaFunctions = append(messageByLuaFunctions, r.Config.MessageByLuaFunctions[messageByLuaFunctionsIndex].ValueString())
 	}
+	newKafkaAsyncProducer := new(bool)
+	if !r.Config.NewKafkaAsyncProducer.IsUnknown() && !r.Config.NewKafkaAsyncProducer.IsNull() {
+		*newKafkaAsyncProducer = r.Config.NewKafkaAsyncProducer.ValueBool()
+	} else {
+		newKafkaAsyncProducer = nil
+	}
 	producerAsync := new(bool)
 	if !r.Config.ProducerAsync.IsUnknown() && !r.Config.ProducerAsync.IsNull() {
 		*producerAsync = r.Config.ProducerAsync.ValueBool()
@@ -723,6 +755,30 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		*producerAsyncFlushTimeout = r.Config.ProducerAsyncFlushTimeout.ValueInt64()
 	} else {
 		producerAsyncFlushTimeout = nil
+	}
+	producerAsyncHealthFailureThreshold := new(int64)
+	if !r.Config.ProducerAsyncHealthFailureThreshold.IsUnknown() && !r.Config.ProducerAsyncHealthFailureThreshold.IsNull() {
+		*producerAsyncHealthFailureThreshold = r.Config.ProducerAsyncHealthFailureThreshold.ValueInt64()
+	} else {
+		producerAsyncHealthFailureThreshold = nil
+	}
+	producerAsyncHealthGating := new(bool)
+	if !r.Config.ProducerAsyncHealthGating.IsUnknown() && !r.Config.ProducerAsyncHealthGating.IsNull() {
+		*producerAsyncHealthGating = r.Config.ProducerAsyncHealthGating.ValueBool()
+	} else {
+		producerAsyncHealthGating = nil
+	}
+	producerAsyncHealthProbeInterval := new(int64)
+	if !r.Config.ProducerAsyncHealthProbeInterval.IsUnknown() && !r.Config.ProducerAsyncHealthProbeInterval.IsNull() {
+		*producerAsyncHealthProbeInterval = r.Config.ProducerAsyncHealthProbeInterval.ValueInt64()
+	} else {
+		producerAsyncHealthProbeInterval = nil
+	}
+	producerAsyncHealthRecoveryThreshold := new(int64)
+	if !r.Config.ProducerAsyncHealthRecoveryThreshold.IsUnknown() && !r.Config.ProducerAsyncHealthRecoveryThreshold.IsNull() {
+		*producerAsyncHealthRecoveryThreshold = r.Config.ProducerAsyncHealthRecoveryThreshold.ValueInt64()
+	} else {
+		producerAsyncHealthRecoveryThreshold = nil
 	}
 	producerRequestAcks := new(shared.KafkaUpstreamPluginProducerRequestAcks)
 	if !r.Config.ProducerRequestAcks.IsUnknown() && !r.Config.ProducerRequestAcks.IsNull() {
@@ -960,6 +1016,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			}
 			var keySchema *shared.KafkaUpstreamPluginKeySchema
 			if r.Config.SchemaRegistry.Confluent.KeySchema != nil {
+				payloadEncoding := new(shared.KafkaUpstreamPluginPayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsNull() {
+					*payloadEncoding = shared.KafkaUpstreamPluginPayloadEncoding(r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding = nil
+				}
 				schemaVersion := new(string)
 				if !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsNull() {
 					*schemaVersion = r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.ValueString()
@@ -973,8 +1035,9 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 					subjectName = nil
 				}
 				keySchema = &shared.KafkaUpstreamPluginKeySchema{
-					SchemaVersion: schemaVersion,
-					SubjectName:   subjectName,
+					PayloadEncoding: payloadEncoding,
+					SchemaVersion:   schemaVersion,
+					SubjectName:     subjectName,
 				}
 			}
 			sslVerify1 := new(bool)
@@ -997,6 +1060,12 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 			}
 			var valueSchema *shared.KafkaUpstreamPluginValueSchema
 			if r.Config.SchemaRegistry.Confluent.ValueSchema != nil {
+				payloadEncoding1 := new(shared.KafkaUpstreamPluginConfigPayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsNull() {
+					*payloadEncoding1 = shared.KafkaUpstreamPluginConfigPayloadEncoding(r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding1 = nil
+				}
 				schemaVersion1 := new(string)
 				if !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsNull() {
 					*schemaVersion1 = r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.ValueString()
@@ -1010,8 +1079,9 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 					subjectName1 = nil
 				}
 				valueSchema = &shared.KafkaUpstreamPluginValueSchema{
-					SchemaVersion: schemaVersion1,
-					SubjectName:   subjectName1,
+					PayloadEncoding: payloadEncoding1,
+					SchemaVersion:   schemaVersion1,
+					SubjectName:     subjectName1,
 				}
 			}
 			confluent = &shared.KafkaUpstreamPluginConfluent{
@@ -1073,6 +1143,7 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		Authentication:        authentication,
 		BootstrapServers:      bootstrapServers,
 		ClusterName:           clusterName,
+		CompressionType:       compressionType,
 		ErrorHandling:         errorHandling,
 		ForwardBody:           forwardBody,
 		ForwardHeaders:        forwardHeaders,
@@ -1083,9 +1154,14 @@ func (r *PluginKafkaUpstreamResourceModel) ToSharedKafkaUpstreamPlugin(ctx conte
 		KeepaliveEnabled:      keepaliveEnabled,
 		KeyQueryArg:           keyQueryArg,
 		MessageByLuaFunctions: messageByLuaFunctions,
+		NewKafkaAsyncProducer: newKafkaAsyncProducer,
 		ProducerAsync:         producerAsync,
 		ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
 		ProducerAsyncFlushTimeout:                    producerAsyncFlushTimeout,
+		ProducerAsyncHealthFailureThreshold:          producerAsyncHealthFailureThreshold,
+		ProducerAsyncHealthGating:                    producerAsyncHealthGating,
+		ProducerAsyncHealthProbeInterval:             producerAsyncHealthProbeInterval,
+		ProducerAsyncHealthRecoveryThreshold:         producerAsyncHealthRecoveryThreshold,
 		ProducerRequestAcks:                          producerRequestAcks,
 		ProducerRequestLimitsBytesPerRequest:         producerRequestLimitsBytesPerRequest,
 		ProducerRequestLimitsMessagesPerRequest:      producerRequestLimitsMessagesPerRequest,

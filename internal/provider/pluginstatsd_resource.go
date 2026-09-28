@@ -218,12 +218,28 @@ func (r *PluginStatsdResource) Schema(ctx context.Context, req resource.SchemaRe
 						Computed: true,
 						Optional: true,
 						Attributes: map[string]schema.Attribute{
+							"breaker_cooldown": schema.Float64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.`,
+								Validators: []validator.Float64{
+									float64validator.Between(0, 1000000),
+								},
+							},
 							"concurrency_limit": schema.Int64Attribute{
 								Computed:    true,
 								Optional:    true,
 								Description: `The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]`,
 								Validators: []validator.Int64{
 									int64validator.OneOf(-1, 1),
+								},
+							},
+							"failure_threshold": schema.Int64Attribute{
+								Computed:    true,
+								Optional:    true,
+								Description: `Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.`,
+								Validators: []validator.Int64{
+									int64validator.Between(0, 1000000),
 								},
 							},
 							"initial_retry_delay": schema.Float64Attribute{
@@ -720,8 +736,8 @@ func (r *PluginStatsdResource) ImportState(ctx context.Context, req resource.Imp
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		ID        string `json:"id"`
-		Workspace string `json:"workspace"`
+		ID        string  `json:"id"`
+		Workspace *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -734,9 +750,9 @@ func (r *PluginStatsdResource) ImportState(ctx context.Context, req resource.Imp
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

@@ -96,6 +96,17 @@ func (r *PluginRequestValidatorResource) Schema(ctx context.Context, req resourc
 						Optional:    true,
 						Description: `Determines whether to enable parameters validation of request content-type.`,
 					},
+					"enforcement_mode": schema.StringAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `Determines the action to take when a request fails validation. When set to ` + "`" + `block` + "`" + `, the request is rejected with an HTTP 400 response. When set to ` + "`" + `log_only` + "`" + `, the request is allowed to proceed and a warning is logged. must be one of ["block", "log_only"]`,
+						Validators: []validator.String{
+							stringvalidator.OneOf(
+								"block",
+								"log_only",
+							),
+						},
+					},
 					"parameter_schema": schema.ListNestedAttribute{
 						Computed: true,
 						Optional: true,
@@ -569,8 +580,8 @@ func (r *PluginRequestValidatorResource) ImportState(ctx context.Context, req re
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		ID        string `json:"id"`
-		Workspace string `json:"workspace"`
+		ID        string  `json:"id"`
+		Workspace *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -583,9 +594,9 @@ func (r *PluginRequestValidatorResource) ImportState(ctx context.Context, req re
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

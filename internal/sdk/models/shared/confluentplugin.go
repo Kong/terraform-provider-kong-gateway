@@ -154,6 +154,39 @@ func (b *BootstrapServers) GetPort() int64 {
 	return b.Port
 }
 
+// CompressionType - The compression codec the producer uses to compress message batches before sending them to the Kafka broker. This applies only to the Kong-to-broker hop and is independent of any HTTP-level `Content-Encoding`. Defaults to `none` (compression disabled); `lz4` is the recommended codec when enabling compression.
+type CompressionType string
+
+const (
+	CompressionTypeGzip   CompressionType = "gzip"
+	CompressionTypeLz4    CompressionType = "lz4"
+	CompressionTypeNone   CompressionType = "none"
+	CompressionTypeSnappy CompressionType = "snappy"
+)
+
+func (e CompressionType) ToPointer() *CompressionType {
+	return &e
+}
+func (e *CompressionType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "gzip":
+		fallthrough
+	case "lz4":
+		fallthrough
+	case "none":
+		fallthrough
+	case "snappy":
+		*e = CompressionType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for CompressionType: %v", v)
+	}
+}
+
 type ErrorHandling struct {
 	// When enabled, the Kafka client error message is returned to the HTTP client. Useful for debugging but may expose internal details, so should be disabled in production.
 	ReturnErrorMessage *bool `json:"return_error_message,omitempty"`
@@ -810,7 +843,36 @@ func (c *ConfluentPluginAuthentication) GetOauth2Client() *Oauth2Client {
 	return c.Oauth2Client
 }
 
+// PayloadEncoding - How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+type PayloadEncoding string
+
+const (
+	PayloadEncodingAvroJSON   PayloadEncoding = "avro_json"
+	PayloadEncodingSimpleJSON PayloadEncoding = "simple_json"
+)
+
+func (e PayloadEncoding) ToPointer() *PayloadEncoding {
+	return &e
+}
+func (e *PayloadEncoding) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "avro_json":
+		fallthrough
+	case "simple_json":
+		*e = PayloadEncoding(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PayloadEncoding: %v", v)
+	}
+}
+
 type KeySchema struct {
+	// How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+	PayloadEncoding *PayloadEncoding `json:"payload_encoding,omitempty"`
 	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
 	SchemaVersion *string `json:"schema_version,omitempty"`
 	// The name of the subject
@@ -828,6 +890,13 @@ func (k *KeySchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (k *KeySchema) GetPayloadEncoding() *PayloadEncoding {
+	if k == nil {
+		return nil
+	}
+	return k.PayloadEncoding
+}
+
 func (k *KeySchema) GetSchemaVersion() *string {
 	if k == nil {
 		return nil
@@ -842,7 +911,36 @@ func (k *KeySchema) GetSubjectName() *string {
 	return k.SubjectName
 }
 
+// ConfluentPluginPayloadEncoding - How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+type ConfluentPluginPayloadEncoding string
+
+const (
+	ConfluentPluginPayloadEncodingAvroJSON   ConfluentPluginPayloadEncoding = "avro_json"
+	ConfluentPluginPayloadEncodingSimpleJSON ConfluentPluginPayloadEncoding = "simple_json"
+)
+
+func (e ConfluentPluginPayloadEncoding) ToPointer() *ConfluentPluginPayloadEncoding {
+	return &e
+}
+func (e *ConfluentPluginPayloadEncoding) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "avro_json":
+		fallthrough
+	case "simple_json":
+		*e = ConfluentPluginPayloadEncoding(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for ConfluentPluginPayloadEncoding: %v", v)
+	}
+}
+
 type ValueSchema struct {
+	// How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+	PayloadEncoding *ConfluentPluginPayloadEncoding `json:"payload_encoding,omitempty"`
 	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
 	SchemaVersion *string `json:"schema_version,omitempty"`
 	// The name of the subject
@@ -858,6 +956,13 @@ func (v *ValueSchema) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (v *ValueSchema) GetPayloadEncoding() *ConfluentPluginPayloadEncoding {
+	if v == nil {
+		return nil
+	}
+	return v.PayloadEncoding
 }
 
 func (v *ValueSchema) GetSchemaVersion() *string {
@@ -996,6 +1101,8 @@ type ConfluentPluginConfig struct {
 	ClusterAPISecret *string `json:"cluster_api_secret,omitempty"`
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
 	ClusterName *string `json:"cluster_name,omitempty"`
+	// The compression codec the producer uses to compress message batches before sending them to the Kafka broker. This applies only to the Kong-to-broker hop and is independent of any HTTP-level `Content-Encoding`. Defaults to `none` (compression disabled); `lz4` is the recommended codec when enabling compression.
+	CompressionType *CompressionType `json:"compression_type,omitempty"`
 	// Apikey for authentication with Confluent Cloud. This allows for management tasks such as creating topics, ACLs, etc.
 	ConfluentCloudAPIKey *string `json:"confluent_cloud_api_key,omitempty"`
 	// The corresponding secret for the Confluent Cloud API key.
@@ -1018,14 +1125,26 @@ type ConfluentPluginConfig struct {
 	KeyQueryArg *string `json:"key_query_arg,omitempty"`
 	// The Lua functions that manipulates the message being sent to the Kafka topic.
 	MessageByLuaFunctions []string `json:"message_by_lua_functions,omitempty"`
+	// Use the improved asynchronous Kafka producer, which batches messages more efficiently under high load. Only affects asynchronous mode. Messages without a key may be reordered across partitions; set a message key if ordering matters.
+	NewKafkaAsyncProducer *bool `json:"new_kafka_async_producer,omitempty"`
 	// Options for SASL OAUTHBEARER authentication. When set, takes precedence over `cluster_api_key`/`cluster_api_secret`.
 	Oauthbearer *Oauthbearer `json:"oauthbearer,omitempty"`
-	// Flag to enable asynchronous mode.
+	// Flag to enable asynchronous mode. Only takes effect when `producer_config_enabled` is true.
 	ProducerAsync *bool `json:"producer_async,omitempty"`
 	// Maximum number of messages that can be buffered in memory in asynchronous mode.
 	ProducerAsyncBufferingLimitsMessagesInMemory *int64 `json:"producer_async_buffering_limits_messages_in_memory,omitempty"`
 	// Maximum time interval in milliseconds between buffer flushes in asynchronous mode.
 	ProducerAsyncFlushTimeout *int64 `json:"producer_async_flush_timeout,omitempty"`
+	// Number of consecutive authentication/authorization or connectivity failures before the producer is marked unhealthy and async requests are gated.
+	ProducerAsyncHealthFailureThreshold *int64 `json:"producer_async_health_failure_threshold,omitempty"`
+	// In asynchronous mode, fail incoming requests fast with HTTP 503 (instead of returning 200 and silently dropping the message) when the producer is sustainedly failing to authenticate with, or reach, the broker. Disabled by default.
+	ProducerAsyncHealthGating *bool `json:"producer_async_health_gating,omitempty"`
+	// Interval in milliseconds between background recovery probes while the producer is unhealthy.
+	ProducerAsyncHealthProbeInterval *int64 `json:"producer_async_health_probe_interval,omitempty"`
+	// Number of consecutive successful recovery probes required before the producer resumes accepting async requests.
+	ProducerAsyncHealthRecoveryThreshold *int64 `json:"producer_async_health_recovery_threshold,omitempty"`
+	// Honor the `producer_*` delivery settings (asynchronous mode, request acks/limits/retries). Historically the Confluent plugin ignored these and always produced synchronously; this flag defaults to false to preserve that behavior. Set to true to opt into the configured producer behavior.
+	ProducerConfigEnabled *bool `json:"producer_config_enabled,omitempty"`
 	// The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
 	ProducerRequestAcks *ProducerRequestAcks `json:"producer_request_acks,omitempty"`
 	// Maximum size of a Produce request in bytes.
@@ -1093,6 +1212,13 @@ func (c *ConfluentPluginConfig) GetClusterName() *string {
 		return nil
 	}
 	return c.ClusterName
+}
+
+func (c *ConfluentPluginConfig) GetCompressionType() *CompressionType {
+	if c == nil {
+		return nil
+	}
+	return c.CompressionType
 }
 
 func (c *ConfluentPluginConfig) GetConfluentCloudAPIKey() *string {
@@ -1179,6 +1305,13 @@ func (c *ConfluentPluginConfig) GetMessageByLuaFunctions() []string {
 	return c.MessageByLuaFunctions
 }
 
+func (c *ConfluentPluginConfig) GetNewKafkaAsyncProducer() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.NewKafkaAsyncProducer
+}
+
 func (c *ConfluentPluginConfig) GetOauthbearer() *Oauthbearer {
 	if c == nil {
 		return nil
@@ -1205,6 +1338,41 @@ func (c *ConfluentPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
 		return nil
 	}
 	return c.ProducerAsyncFlushTimeout
+}
+
+func (c *ConfluentPluginConfig) GetProducerAsyncHealthFailureThreshold() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.ProducerAsyncHealthFailureThreshold
+}
+
+func (c *ConfluentPluginConfig) GetProducerAsyncHealthGating() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.ProducerAsyncHealthGating
+}
+
+func (c *ConfluentPluginConfig) GetProducerAsyncHealthProbeInterval() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.ProducerAsyncHealthProbeInterval
+}
+
+func (c *ConfluentPluginConfig) GetProducerAsyncHealthRecoveryThreshold() *int64 {
+	if c == nil {
+		return nil
+	}
+	return c.ProducerAsyncHealthRecoveryThreshold
+}
+
+func (c *ConfluentPluginConfig) GetProducerConfigEnabled() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.ProducerConfigEnabled
 }
 
 func (c *ConfluentPluginConfig) GetProducerRequestAcks() *ProducerRequestAcks {

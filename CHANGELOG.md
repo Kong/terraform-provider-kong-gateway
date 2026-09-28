@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+> Released on 2026/09/??
+
+### Features
+* Upgrade to Kong Gateway v3.16
+  * Add support new plugin `kong-gateway_plugin_entitlement_enforcement`
+  * Add support for Dynamic plugin configuration to `kong-gateway_plugin_rate_limiting` and `kong-gateway_plugin_rate_limiting_advanced` using which users can now provide expression-based configuration
+
 ## 1.3.0
 > Released on 2026/09/07
 

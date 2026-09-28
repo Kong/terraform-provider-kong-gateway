@@ -55,6 +55,8 @@ terraform:
   enableTypeDeduplication: true
   environmentVariables: []
   excludeEmptyObjectSchemas: false
+  fixFlags:
+    encodePathParams: false
   forwardCompatibleEnumsByDefault: false
   includeEmptyObjects: false
   inferUnionDiscriminators: false
@@ -63,4 +65,5 @@ terraform:
   providerTypeNameOverride: ""
   respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
+  serverVariableProviderAttributes: {}
   unionStrategy: populated-fields

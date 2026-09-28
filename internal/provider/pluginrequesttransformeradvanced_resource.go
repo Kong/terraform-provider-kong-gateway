@@ -147,6 +147,11 @@ func (r *PluginRequestTransformerAdvancedResource) Schema(ctx context.Context, r
 						Optional:    true,
 						Description: `A string representing an HTTP method, such as GET, POST, PUT, or DELETE. The string must contain only uppercase letters.`,
 					},
+					"max_request_body_size": schema.Int64Attribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `The maximum request body size, in bytes, that the plugin reads to apply body transformations. Bodies larger than ` + "`" + `client_body_buffer_size` + "`" + ` are buffered by Nginx to a temporary file. ` + "`" + `-1` + "`" + ` (the default) disables reading such buffered bodies, so their body transformations are skipped to avoid the extra disk I/O. ` + "`" + `0` + "`" + ` means unlimited (still bounded by Nginx's ` + "`" + `client_max_body_size` + "`" + `), and any positive value caps how much of the buffered body is read from the temporary file.`,
+					},
 					"remove": schema.SingleNestedAttribute{
 						Computed: true,
 						Optional: true,
@@ -616,8 +621,8 @@ func (r *PluginRequestTransformerAdvancedResource) ImportState(ctx context.Conte
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		ID        string `json:"id"`
-		Workspace string `json:"workspace"`
+		ID        string  `json:"id"`
+		Workspace *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -630,9 +635,9 @@ func (r *PluginRequestTransformerAdvancedResource) ImportState(ctx context.Conte
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

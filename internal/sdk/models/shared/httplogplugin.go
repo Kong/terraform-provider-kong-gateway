@@ -230,8 +230,12 @@ func (e *HTTPLogPluginConcurrencyLimit) UnmarshalJSON(data []byte) error {
 }
 
 type HTTPLogPluginQueue struct {
+	// Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
+	BreakerCooldown *float64 `json:"breaker_cooldown,omitempty"`
 	// The number of of queue delivery timers. -1 indicates unlimited.
 	ConcurrencyLimit *HTTPLogPluginConcurrencyLimit `json:"concurrency_limit,omitempty"`
+	// Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
+	FailureThreshold *int64 `json:"failure_threshold,omitempty"`
 	// Time in seconds before the initial retry is made for a failing batch.
 	InitialRetryDelay *float64 `json:"initial_retry_delay,omitempty"`
 	// Maximum number of entries that can be processed at a time.
@@ -259,11 +263,25 @@ func (h *HTTPLogPluginQueue) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (h *HTTPLogPluginQueue) GetBreakerCooldown() *float64 {
+	if h == nil {
+		return nil
+	}
+	return h.BreakerCooldown
+}
+
 func (h *HTTPLogPluginQueue) GetConcurrencyLimit() *HTTPLogPluginConcurrencyLimit {
 	if h == nil {
 		return nil
 	}
 	return h.ConcurrencyLimit
+}
+
+func (h *HTTPLogPluginQueue) GetFailureThreshold() *int64 {
+	if h == nil {
+		return nil
+	}
+	return h.FailureThreshold
 }
 
 func (h *HTTPLogPluginQueue) GetInitialRetryDelay() *float64 {

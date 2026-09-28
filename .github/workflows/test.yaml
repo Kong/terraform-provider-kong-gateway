@@ -21,6 +21,7 @@ jobs:
         terraform-version:
           - "1.11.*"
         kong-gateway-version:
+          - "3.16"
           - "3.15"
           - "3.14"
           - "3.13"

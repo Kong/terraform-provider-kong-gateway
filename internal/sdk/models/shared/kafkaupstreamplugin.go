@@ -348,6 +348,39 @@ func (k *KafkaUpstreamPluginBootstrapServers) GetPort() int64 {
 	return k.Port
 }
 
+// KafkaUpstreamPluginCompressionType - The compression codec the producer uses to compress message batches before sending them to the Kafka broker. This applies only to the Kong-to-broker hop and is independent of any HTTP-level `Content-Encoding`. Defaults to `none` (compression disabled); `lz4` is the recommended codec when enabling compression.
+type KafkaUpstreamPluginCompressionType string
+
+const (
+	KafkaUpstreamPluginCompressionTypeGzip   KafkaUpstreamPluginCompressionType = "gzip"
+	KafkaUpstreamPluginCompressionTypeLz4    KafkaUpstreamPluginCompressionType = "lz4"
+	KafkaUpstreamPluginCompressionTypeNone   KafkaUpstreamPluginCompressionType = "none"
+	KafkaUpstreamPluginCompressionTypeSnappy KafkaUpstreamPluginCompressionType = "snappy"
+)
+
+func (e KafkaUpstreamPluginCompressionType) ToPointer() *KafkaUpstreamPluginCompressionType {
+	return &e
+}
+func (e *KafkaUpstreamPluginCompressionType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "gzip":
+		fallthrough
+	case "lz4":
+		fallthrough
+	case "none":
+		fallthrough
+	case "snappy":
+		*e = KafkaUpstreamPluginCompressionType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaUpstreamPluginCompressionType: %v", v)
+	}
+}
+
 type KafkaUpstreamPluginErrorHandling struct {
 	// When enabled, the Kafka client error message is returned to the HTTP client. Useful for debugging but may expose internal details, so should be disabled in production.
 	ReturnErrorMessage *bool `json:"return_error_message,omitempty"`
@@ -935,7 +968,36 @@ func (k *KafkaUpstreamPluginConfigAuthentication) GetOauth2Client() *KafkaUpstre
 	return k.Oauth2Client
 }
 
+// KafkaUpstreamPluginPayloadEncoding - How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+type KafkaUpstreamPluginPayloadEncoding string
+
+const (
+	KafkaUpstreamPluginPayloadEncodingAvroJSON   KafkaUpstreamPluginPayloadEncoding = "avro_json"
+	KafkaUpstreamPluginPayloadEncodingSimpleJSON KafkaUpstreamPluginPayloadEncoding = "simple_json"
+)
+
+func (e KafkaUpstreamPluginPayloadEncoding) ToPointer() *KafkaUpstreamPluginPayloadEncoding {
+	return &e
+}
+func (e *KafkaUpstreamPluginPayloadEncoding) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "avro_json":
+		fallthrough
+	case "simple_json":
+		*e = KafkaUpstreamPluginPayloadEncoding(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaUpstreamPluginPayloadEncoding: %v", v)
+	}
+}
+
 type KafkaUpstreamPluginKeySchema struct {
+	// How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+	PayloadEncoding *KafkaUpstreamPluginPayloadEncoding `json:"payload_encoding,omitempty"`
 	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
 	SchemaVersion *string `json:"schema_version,omitempty"`
 	// The name of the subject
@@ -953,6 +1015,13 @@ func (k *KafkaUpstreamPluginKeySchema) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (k *KafkaUpstreamPluginKeySchema) GetPayloadEncoding() *KafkaUpstreamPluginPayloadEncoding {
+	if k == nil {
+		return nil
+	}
+	return k.PayloadEncoding
+}
+
 func (k *KafkaUpstreamPluginKeySchema) GetSchemaVersion() *string {
 	if k == nil {
 		return nil
@@ -967,7 +1036,36 @@ func (k *KafkaUpstreamPluginKeySchema) GetSubjectName() *string {
 	return k.SubjectName
 }
 
+// KafkaUpstreamPluginConfigPayloadEncoding - How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+type KafkaUpstreamPluginConfigPayloadEncoding string
+
+const (
+	KafkaUpstreamPluginConfigPayloadEncodingAvroJSON   KafkaUpstreamPluginConfigPayloadEncoding = "avro_json"
+	KafkaUpstreamPluginConfigPayloadEncodingSimpleJSON KafkaUpstreamPluginConfigPayloadEncoding = "simple_json"
+)
+
+func (e KafkaUpstreamPluginConfigPayloadEncoding) ToPointer() *KafkaUpstreamPluginConfigPayloadEncoding {
+	return &e
+}
+func (e *KafkaUpstreamPluginConfigPayloadEncoding) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "avro_json":
+		fallthrough
+	case "simple_json":
+		*e = KafkaUpstreamPluginConfigPayloadEncoding(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for KafkaUpstreamPluginConfigPayloadEncoding: %v", v)
+	}
+}
+
 type KafkaUpstreamPluginValueSchema struct {
+	// How the client encodes union/nullable fields in the request body for Avro schemas. 'avro_json' (default) requires Avro-spec JSON with type-tagged unions (e.g. {"int": 1}, {"null": null}). 'simple_json' lets the gateway accept plain JSON and resolve union branches against the schema.
+	PayloadEncoding *KafkaUpstreamPluginConfigPayloadEncoding `json:"payload_encoding,omitempty"`
 	// The schema version to use for serialization/deserialization. Use 'latest' to always fetch the most recent version.
 	SchemaVersion *string `json:"schema_version,omitempty"`
 	// The name of the subject
@@ -983,6 +1081,13 @@ func (k *KafkaUpstreamPluginValueSchema) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (k *KafkaUpstreamPluginValueSchema) GetPayloadEncoding() *KafkaUpstreamPluginConfigPayloadEncoding {
+	if k == nil {
+		return nil
+	}
+	return k.PayloadEncoding
 }
 
 func (k *KafkaUpstreamPluginValueSchema) GetSchemaVersion() *string {
@@ -1135,8 +1240,10 @@ type KafkaUpstreamPluginConfig struct {
 	// Set of bootstrap brokers in a `{host: host, port: port}` list format.
 	BootstrapServers []KafkaUpstreamPluginBootstrapServers `json:"bootstrap_servers,omitempty"`
 	// An identifier for the Kafka cluster. By default, this field generates a random string. You can also set your own custom cluster identifier.  If more than one Kafka plugin is configured without a `cluster_name` (that is, if the default autogenerated value is removed), these plugins will use the same producer, and by extension, the same cluster. Logs will be sent to the leader of the cluster.
-	ClusterName   *string                           `json:"cluster_name,omitempty"`
-	ErrorHandling *KafkaUpstreamPluginErrorHandling `json:"error_handling,omitempty"`
+	ClusterName *string `json:"cluster_name,omitempty"`
+	// The compression codec the producer uses to compress message batches before sending them to the Kafka broker. This applies only to the Kong-to-broker hop and is independent of any HTTP-level `Content-Encoding`. Defaults to `none` (compression disabled); `lz4` is the recommended codec when enabling compression.
+	CompressionType *KafkaUpstreamPluginCompressionType `json:"compression_type,omitempty"`
+	ErrorHandling   *KafkaUpstreamPluginErrorHandling   `json:"error_handling,omitempty"`
 	// Include the request body in the message. At least one of these must be true: `forward_method`, `forward_uri`, `forward_headers`, `forward_body`.
 	ForwardBody *bool `json:"forward_body,omitempty"`
 	// Include the request headers in the message. At least one of these must be true: `forward_method`, `forward_uri`, `forward_headers`, `forward_body`.
@@ -1154,12 +1261,22 @@ type KafkaUpstreamPluginConfig struct {
 	KeyQueryArg *string `json:"key_query_arg,omitempty"`
 	// The Lua functions that manipulates the message being sent to the Kafka topic.
 	MessageByLuaFunctions []string `json:"message_by_lua_functions,omitempty"`
+	// Use the improved asynchronous Kafka producer, which batches messages more efficiently under high load. Only affects asynchronous mode. Messages without a key may be reordered across partitions; set a message key if ordering matters.
+	NewKafkaAsyncProducer *bool `json:"new_kafka_async_producer,omitempty"`
 	// Flag to enable asynchronous mode.
 	ProducerAsync *bool `json:"producer_async,omitempty"`
 	// Maximum number of messages that can be buffered in memory in asynchronous mode.
 	ProducerAsyncBufferingLimitsMessagesInMemory *int64 `json:"producer_async_buffering_limits_messages_in_memory,omitempty"`
 	// Maximum time interval in milliseconds between buffer flushes in asynchronous mode.
 	ProducerAsyncFlushTimeout *int64 `json:"producer_async_flush_timeout,omitempty"`
+	// Number of consecutive authentication/authorization or connectivity failures before the producer is marked unhealthy and async requests are gated.
+	ProducerAsyncHealthFailureThreshold *int64 `json:"producer_async_health_failure_threshold,omitempty"`
+	// In asynchronous mode, fail incoming requests fast with HTTP 503 (instead of returning 200 and silently dropping the message) when the producer is sustainedly failing to authenticate with, or reach, the broker. Disabled by default.
+	ProducerAsyncHealthGating *bool `json:"producer_async_health_gating,omitempty"`
+	// Interval in milliseconds between background recovery probes while the producer is unhealthy.
+	ProducerAsyncHealthProbeInterval *int64 `json:"producer_async_health_probe_interval,omitempty"`
+	// Number of consecutive successful recovery probes required before the producer resumes accepting async requests.
+	ProducerAsyncHealthRecoveryThreshold *int64 `json:"producer_async_health_recovery_threshold,omitempty"`
 	// The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments; 1 for only the leader; and -1 for the full ISR (In-Sync Replica set).
 	ProducerRequestAcks *KafkaUpstreamPluginProducerRequestAcks `json:"producer_request_acks,omitempty"`
 	// Maximum size of a Produce request in bytes.
@@ -1220,6 +1337,13 @@ func (k *KafkaUpstreamPluginConfig) GetClusterName() *string {
 		return nil
 	}
 	return k.ClusterName
+}
+
+func (k *KafkaUpstreamPluginConfig) GetCompressionType() *KafkaUpstreamPluginCompressionType {
+	if k == nil {
+		return nil
+	}
+	return k.CompressionType
 }
 
 func (k *KafkaUpstreamPluginConfig) GetErrorHandling() *KafkaUpstreamPluginErrorHandling {
@@ -1292,6 +1416,13 @@ func (k *KafkaUpstreamPluginConfig) GetMessageByLuaFunctions() []string {
 	return k.MessageByLuaFunctions
 }
 
+func (k *KafkaUpstreamPluginConfig) GetNewKafkaAsyncProducer() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.NewKafkaAsyncProducer
+}
+
 func (k *KafkaUpstreamPluginConfig) GetProducerAsync() *bool {
 	if k == nil {
 		return nil
@@ -1311,6 +1442,34 @@ func (k *KafkaUpstreamPluginConfig) GetProducerAsyncFlushTimeout() *int64 {
 		return nil
 	}
 	return k.ProducerAsyncFlushTimeout
+}
+
+func (k *KafkaUpstreamPluginConfig) GetProducerAsyncHealthFailureThreshold() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.ProducerAsyncHealthFailureThreshold
+}
+
+func (k *KafkaUpstreamPluginConfig) GetProducerAsyncHealthGating() *bool {
+	if k == nil {
+		return nil
+	}
+	return k.ProducerAsyncHealthGating
+}
+
+func (k *KafkaUpstreamPluginConfig) GetProducerAsyncHealthProbeInterval() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.ProducerAsyncHealthProbeInterval
+}
+
+func (k *KafkaUpstreamPluginConfig) GetProducerAsyncHealthRecoveryThreshold() *int64 {
+	if k == nil {
+		return nil
+	}
+	return k.ProducerAsyncHealthRecoveryThreshold
 }
 
 func (k *KafkaUpstreamPluginConfig) GetProducerRequestAcks() *KafkaUpstreamPluginProducerRequestAcks {

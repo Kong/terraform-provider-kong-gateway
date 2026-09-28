@@ -126,6 +126,11 @@ func (r *PluginOasValidationResource) Schema(ctx context.Context, req resource.S
 						Optional:    true,
 						Description: `If set to true, checks if query parameters in the request exist in the API specification.`,
 					},
+					"rfc9457_error_response": schema.BoolAttribute{
+						Computed:    true,
+						Optional:    true,
+						Description: `If set to ` + "`" + `true` + "`" + `, interrupting non-gRPC HTTP validation failures are returned as ` + "`" + `application/problem+json` + "`" + ` using RFC 9457 top-level fields plus Kong extensions ` + "`" + `message` + "`" + `, ` + "`" + `errors` + "`" + `, and optional ` + "`" + `more` + "`" + `. Requires ` + "`" + `structured_errors` + "`" + ` and ` + "`" + `verbose_response` + "`" + ` to both be set to ` + "`" + `true` + "`" + `. When set to ` + "`" + `false` + "`" + `, the legacy response format is preserved.`,
+					},
 					"structured_errors": schema.BoolAttribute{
 						Computed:    true,
 						Optional:    true,
@@ -547,8 +552,8 @@ func (r *PluginOasValidationResource) ImportState(ctx context.Context, req resou
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		ID        string `json:"id"`
-		Workspace string `json:"workspace"`
+		ID        string  `json:"id"`
+		Workspace *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -561,9 +566,9 @@ func (r *PluginOasValidationResource) ImportState(ctx context.Context, req resou
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), data.ID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

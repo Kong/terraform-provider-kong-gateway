@@ -323,6 +323,7 @@ const (
 	AcmePluginAuthProviderAws   AcmePluginAuthProvider = "aws"
 	AcmePluginAuthProviderAzure AcmePluginAuthProvider = "azure"
 	AcmePluginAuthProviderGcp   AcmePluginAuthProvider = "gcp"
+	AcmePluginAuthProviderOauth AcmePluginAuthProvider = "oauth"
 )
 
 func (e AcmePluginAuthProvider) ToPointer() *AcmePluginAuthProvider {
@@ -339,11 +340,247 @@ func (e *AcmePluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = AcmePluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for AcmePluginAuthProvider: %v", v)
 	}
+}
+
+// AcmePluginConfigAuthMethod - Client authentication method used against the token endpoint.
+type AcmePluginConfigAuthMethod string
+
+const (
+	AcmePluginConfigAuthMethodClientSecretBasic AcmePluginConfigAuthMethod = "client_secret_basic"
+	AcmePluginConfigAuthMethodClientSecretJwt   AcmePluginConfigAuthMethod = "client_secret_jwt"
+	AcmePluginConfigAuthMethodClientSecretPost  AcmePluginConfigAuthMethod = "client_secret_post"
+)
+
+func (e AcmePluginConfigAuthMethod) ToPointer() *AcmePluginConfigAuthMethod {
+	return &e
+}
+func (e *AcmePluginConfigAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = AcmePluginConfigAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AcmePluginConfigAuthMethod: %v", v)
+	}
+}
+
+// AcmePluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type AcmePluginClientSecretJwtAlg string
+
+const (
+	AcmePluginClientSecretJwtAlgHs256 AcmePluginClientSecretJwtAlg = "HS256"
+	AcmePluginClientSecretJwtAlgHs512 AcmePluginClientSecretJwtAlg = "HS512"
+)
+
+func (e AcmePluginClientSecretJwtAlg) ToPointer() *AcmePluginClientSecretJwtAlg {
+	return &e
+}
+func (e *AcmePluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = AcmePluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AcmePluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// AcmePluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type AcmePluginGrantType string
+
+const (
+	AcmePluginGrantTypeClientCredentials AcmePluginGrantType = "client_credentials"
+	AcmePluginGrantTypePassword          AcmePluginGrantType = "password"
+)
+
+func (e AcmePluginGrantType) ToPointer() *AcmePluginGrantType {
+	return &e
+}
+func (e *AcmePluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = AcmePluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AcmePluginGrantType: %v", v)
+	}
+}
+
+// AcmePluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type AcmePluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *AcmePluginConfigAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *AcmePluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *AcmePluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *float64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (a AcmePluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AcmePluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AcmePluginOauth) GetAuthMethod() *AcmePluginConfigAuthMethod {
+	if a == nil {
+		return nil
+	}
+	return a.AuthMethod
+}
+
+func (a *AcmePluginOauth) GetClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientID
+}
+
+func (a *AcmePluginOauth) GetClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecret
+}
+
+func (a *AcmePluginOauth) GetClientSecretJwtAlg() *AcmePluginClientSecretJwtAlg {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecretJwtAlg
+}
+
+func (a *AcmePluginOauth) GetGrantType() *AcmePluginGrantType {
+	if a == nil {
+		return nil
+	}
+	return a.GrantType
+}
+
+func (a *AcmePluginOauth) GetPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Password
+}
+
+func (a *AcmePluginOauth) GetRedisUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsername
+}
+
+func (a *AcmePluginOauth) GetRedisUsernameClaim() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsernameClaim
+}
+
+func (a *AcmePluginOauth) GetScopes() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Scopes
+}
+
+func (a *AcmePluginOauth) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
+}
+
+func (a *AcmePluginOauth) GetTimeout() *float64 {
+	if a == nil {
+		return nil
+	}
+	return a.Timeout
+}
+
+func (a *AcmePluginOauth) GetTokenEndpoint() *string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenEndpoint
+}
+
+func (a *AcmePluginOauth) GetTokenHeaders() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenHeaders
+}
+
+func (a *AcmePluginOauth) GetTokenPostArgs() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenPostArgs
+}
+
+func (a *AcmePluginOauth) GetUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Username
 }
 
 // AcmePluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -372,6 +609,8 @@ type AcmePluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *AcmePluginOauth `json:"oauth,omitempty"`
 }
 
 func (a AcmePluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -467,6 +706,13 @@ func (a *AcmePluginCloudAuthentication) GetGcpServiceAccountJSON() *string {
 		return nil
 	}
 	return a.GcpServiceAccountJSON
+}
+
+func (a *AcmePluginCloudAuthentication) GetOauth() *AcmePluginOauth {
+	if a == nil {
+		return nil
+	}
+	return a.Oauth
 }
 
 // ExtraOptions - Custom ACME Redis options

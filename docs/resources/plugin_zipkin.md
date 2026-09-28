@@ -39,7 +39,9 @@ resource "kong-gateway_plugin_zipkin" "my_pluginzipkin" {
       ]
     }
     queue = {
+      breaker_cooldown     = 492016.29
       concurrency_limit    = 1
+      failure_threshold    = 809200
       initial_retry_delay  = 272764.47
       max_batch_size       = 152161
       max_bytes            = 2
@@ -164,7 +166,9 @@ Optional:
 
 Optional:
 
+- `breaker_cooldown` (Number) Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
 - `concurrency_limit` (Number) The number of of queue delivery timers. -1 indicates unlimited. must be one of [-1, 1]
+- `failure_threshold` (Number) Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
 - `initial_retry_delay` (Number) Time in seconds before the initial retry is made for a failing batch.
 - `max_batch_size` (Number) Maximum number of entries that can be processed at a time.
 - `max_bytes` (Number) Maximum number of bytes that can be waiting on a queue, requires string content.

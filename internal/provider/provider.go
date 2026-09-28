@@ -245,6 +245,7 @@ func (p *KongGatewayProvider) Resources(ctx context.Context) []func() resource.R
 		NewPluginDatadogResource,
 		NewPluginDatakitResource,
 		NewPluginDegraphqlResource,
+		NewPluginEntitlementEnforcementResource,
 		NewPluginExitTransformerResource,
 		NewPluginFileLogResource,
 		NewPluginForwardProxyResource,

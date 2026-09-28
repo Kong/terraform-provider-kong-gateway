@@ -7,7 +7,7 @@ import (
 )
 
 type OpenidConnectPluginRedis struct {
-	CloudAuthentication    *PartialRedisCeCloudAuthentication `tfsdk:"cloud_authentication"`
+	CloudAuthentication    *PartialRedisEeCloudAuthentication `tfsdk:"cloud_authentication"`
 	ClusterMaxRedirections types.Int64                        `tfsdk:"cluster_max_redirections"`
 	ClusterNodes           []PartialRedisEeClusterNodes       `tfsdk:"cluster_nodes"`
 	ConnectTimeout         types.Int64                        `tfsdk:"connect_timeout"`

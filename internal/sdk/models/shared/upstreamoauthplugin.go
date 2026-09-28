@@ -220,6 +220,7 @@ const (
 	UpstreamOauthPluginAuthProviderAws   UpstreamOauthPluginAuthProvider = "aws"
 	UpstreamOauthPluginAuthProviderAzure UpstreamOauthPluginAuthProvider = "azure"
 	UpstreamOauthPluginAuthProviderGcp   UpstreamOauthPluginAuthProvider = "gcp"
+	UpstreamOauthPluginAuthProviderOauth UpstreamOauthPluginAuthProvider = "oauth"
 )
 
 func (e UpstreamOauthPluginAuthProvider) ToPointer() *UpstreamOauthPluginAuthProvider {
@@ -236,11 +237,247 @@ func (e *UpstreamOauthPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = UpstreamOauthPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for UpstreamOauthPluginAuthProvider: %v", v)
 	}
+}
+
+// UpstreamOauthPluginAuthMethod - Client authentication method used against the token endpoint.
+type UpstreamOauthPluginAuthMethod string
+
+const (
+	UpstreamOauthPluginAuthMethodClientSecretBasic UpstreamOauthPluginAuthMethod = "client_secret_basic"
+	UpstreamOauthPluginAuthMethodClientSecretJwt   UpstreamOauthPluginAuthMethod = "client_secret_jwt"
+	UpstreamOauthPluginAuthMethodClientSecretPost  UpstreamOauthPluginAuthMethod = "client_secret_post"
+)
+
+func (e UpstreamOauthPluginAuthMethod) ToPointer() *UpstreamOauthPluginAuthMethod {
+	return &e
+}
+func (e *UpstreamOauthPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = UpstreamOauthPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for UpstreamOauthPluginAuthMethod: %v", v)
+	}
+}
+
+// UpstreamOauthPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type UpstreamOauthPluginClientSecretJwtAlg string
+
+const (
+	UpstreamOauthPluginClientSecretJwtAlgHs256 UpstreamOauthPluginClientSecretJwtAlg = "HS256"
+	UpstreamOauthPluginClientSecretJwtAlgHs512 UpstreamOauthPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e UpstreamOauthPluginClientSecretJwtAlg) ToPointer() *UpstreamOauthPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *UpstreamOauthPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = UpstreamOauthPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for UpstreamOauthPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// UpstreamOauthPluginConfigGrantType - OAuth 2.0 grant type used to request access tokens.
+type UpstreamOauthPluginConfigGrantType string
+
+const (
+	UpstreamOauthPluginConfigGrantTypeClientCredentials UpstreamOauthPluginConfigGrantType = "client_credentials"
+	UpstreamOauthPluginConfigGrantTypePassword          UpstreamOauthPluginConfigGrantType = "password"
+)
+
+func (e UpstreamOauthPluginConfigGrantType) ToPointer() *UpstreamOauthPluginConfigGrantType {
+	return &e
+}
+func (e *UpstreamOauthPluginConfigGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = UpstreamOauthPluginConfigGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for UpstreamOauthPluginConfigGrantType: %v", v)
+	}
+}
+
+// UpstreamOauthPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type UpstreamOauthPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *UpstreamOauthPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *UpstreamOauthPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *UpstreamOauthPluginConfigGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (u UpstreamOauthPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(u, "", false)
+}
+
+func (u *UpstreamOauthPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &u, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *UpstreamOauthPluginOauth) GetAuthMethod() *UpstreamOauthPluginAuthMethod {
+	if u == nil {
+		return nil
+	}
+	return u.AuthMethod
+}
+
+func (u *UpstreamOauthPluginOauth) GetClientID() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ClientID
+}
+
+func (u *UpstreamOauthPluginOauth) GetClientSecret() *string {
+	if u == nil {
+		return nil
+	}
+	return u.ClientSecret
+}
+
+func (u *UpstreamOauthPluginOauth) GetClientSecretJwtAlg() *UpstreamOauthPluginClientSecretJwtAlg {
+	if u == nil {
+		return nil
+	}
+	return u.ClientSecretJwtAlg
+}
+
+func (u *UpstreamOauthPluginOauth) GetGrantType() *UpstreamOauthPluginConfigGrantType {
+	if u == nil {
+		return nil
+	}
+	return u.GrantType
+}
+
+func (u *UpstreamOauthPluginOauth) GetPassword() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Password
+}
+
+func (u *UpstreamOauthPluginOauth) GetRedisUsername() *string {
+	if u == nil {
+		return nil
+	}
+	return u.RedisUsername
+}
+
+func (u *UpstreamOauthPluginOauth) GetRedisUsernameClaim() *string {
+	if u == nil {
+		return nil
+	}
+	return u.RedisUsernameClaim
+}
+
+func (u *UpstreamOauthPluginOauth) GetScopes() []string {
+	if u == nil {
+		return nil
+	}
+	return u.Scopes
+}
+
+func (u *UpstreamOauthPluginOauth) GetSslVerify() *bool {
+	if u == nil {
+		return nil
+	}
+	return u.SslVerify
+}
+
+func (u *UpstreamOauthPluginOauth) GetTimeout() *int64 {
+	if u == nil {
+		return nil
+	}
+	return u.Timeout
+}
+
+func (u *UpstreamOauthPluginOauth) GetTokenEndpoint() *string {
+	if u == nil {
+		return nil
+	}
+	return u.TokenEndpoint
+}
+
+func (u *UpstreamOauthPluginOauth) GetTokenHeaders() map[string]string {
+	if u == nil {
+		return nil
+	}
+	return u.TokenHeaders
+}
+
+func (u *UpstreamOauthPluginOauth) GetTokenPostArgs() map[string]string {
+	if u == nil {
+		return nil
+	}
+	return u.TokenPostArgs
+}
+
+func (u *UpstreamOauthPluginOauth) GetUsername() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Username
 }
 
 // UpstreamOauthPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -269,6 +506,8 @@ type UpstreamOauthPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *UpstreamOauthPluginOauth `json:"oauth,omitempty"`
 }
 
 func (u UpstreamOauthPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -364,6 +603,13 @@ func (u *UpstreamOauthPluginCloudAuthentication) GetGcpServiceAccountJSON() *str
 		return nil
 	}
 	return u.GcpServiceAccountJSON
+}
+
+func (u *UpstreamOauthPluginCloudAuthentication) GetOauth() *UpstreamOauthPluginOauth {
+	if u == nil {
+		return nil
+	}
+	return u.Oauth
 }
 
 type UpstreamOauthPluginClusterNodes struct {
@@ -756,7 +1002,7 @@ func (u *UpstreamOauthPluginCache) GetStrategy() *UpstreamOauthPluginStrategy {
 	return u.Strategy
 }
 
-// AuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+// AuthMethod - The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body, `private_key_jwt` to send a JWT signed with a private key, or `none` to send no client authentication.
 type AuthMethod string
 
 const (
@@ -764,6 +1010,7 @@ const (
 	AuthMethodClientSecretJwt   AuthMethod = "client_secret_jwt"
 	AuthMethodClientSecretPost  AuthMethod = "client_secret_post"
 	AuthMethodNone              AuthMethod = "none"
+	AuthMethodPrivateKeyJwt     AuthMethod = "private_key_jwt"
 )
 
 func (e AuthMethod) ToPointer() *AuthMethod {
@@ -782,6 +1029,8 @@ func (e *AuthMethod) UnmarshalJSON(data []byte) error {
 	case "client_secret_post":
 		fallthrough
 	case "none":
+		fallthrough
+	case "private_key_jwt":
 		*e = AuthMethod(v)
 		return nil
 	default:
@@ -816,8 +1065,122 @@ func (e *ClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
 	}
 }
 
+// PrivateKeyJwtAlg - The algorithm to use when signing the JWT client assertion for `private_key_jwt` authentication. This field is ignored when `auth_method` is not `private_key_jwt`.
+type PrivateKeyJwtAlg string
+
+const (
+	PrivateKeyJwtAlgEs256   PrivateKeyJwtAlg = "ES256"
+	PrivateKeyJwtAlgEs256K  PrivateKeyJwtAlg = "ES256K"
+	PrivateKeyJwtAlgEs384   PrivateKeyJwtAlg = "ES384"
+	PrivateKeyJwtAlgEs512   PrivateKeyJwtAlg = "ES512"
+	PrivateKeyJwtAlgEsb256  PrivateKeyJwtAlg = "ESB256"
+	PrivateKeyJwtAlgEsb320  PrivateKeyJwtAlg = "ESB320"
+	PrivateKeyJwtAlgEsb384  PrivateKeyJwtAlg = "ESB384"
+	PrivateKeyJwtAlgEsb512  PrivateKeyJwtAlg = "ESB512"
+	PrivateKeyJwtAlgEsp256  PrivateKeyJwtAlg = "ESP256"
+	PrivateKeyJwtAlgEsp384  PrivateKeyJwtAlg = "ESP384"
+	PrivateKeyJwtAlgEsp512  PrivateKeyJwtAlg = "ESP512"
+	PrivateKeyJwtAlgEd25519 PrivateKeyJwtAlg = "Ed25519"
+	PrivateKeyJwtAlgEd448   PrivateKeyJwtAlg = "Ed448"
+	PrivateKeyJwtAlgEdDsa   PrivateKeyJwtAlg = "EdDSA"
+	PrivateKeyJwtAlgPs256   PrivateKeyJwtAlg = "PS256"
+	PrivateKeyJwtAlgPs384   PrivateKeyJwtAlg = "PS384"
+	PrivateKeyJwtAlgPs512   PrivateKeyJwtAlg = "PS512"
+	PrivateKeyJwtAlgRs256   PrivateKeyJwtAlg = "RS256"
+	PrivateKeyJwtAlgRs384   PrivateKeyJwtAlg = "RS384"
+	PrivateKeyJwtAlgRs512   PrivateKeyJwtAlg = "RS512"
+)
+
+func (e PrivateKeyJwtAlg) ToPointer() *PrivateKeyJwtAlg {
+	return &e
+}
+func (e *PrivateKeyJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "ES256":
+		fallthrough
+	case "ES256K":
+		fallthrough
+	case "ES384":
+		fallthrough
+	case "ES512":
+		fallthrough
+	case "ESB256":
+		fallthrough
+	case "ESB320":
+		fallthrough
+	case "ESB384":
+		fallthrough
+	case "ESB512":
+		fallthrough
+	case "ESP256":
+		fallthrough
+	case "ESP384":
+		fallthrough
+	case "ESP512":
+		fallthrough
+	case "Ed25519":
+		fallthrough
+	case "Ed448":
+		fallthrough
+	case "EdDSA":
+		fallthrough
+	case "PS256":
+		fallthrough
+	case "PS384":
+		fallthrough
+	case "PS512":
+		fallthrough
+	case "RS256":
+		fallthrough
+	case "RS384":
+		fallthrough
+	case "RS512":
+		*e = PrivateKeyJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for PrivateKeyJwtAlg: %v", v)
+	}
+}
+
+// PrivateKeyJwtKey - The Kong Keys entity reference used to sign the JWT client assertion for `private_key_jwt` authentication. This field is ignored when `auth_method` is not `private_key_jwt`.
+type PrivateKeyJwtKey struct {
+	// The Key ID. This maps to the `kid` field of the Kong Keys entity and is used as the JWT header `kid`.
+	KeyID string `json:"key_id"`
+	// The optional name of the Kong Key Set used to scope the key lookup.
+	KeySet *string `json:"key_set,omitempty"`
+}
+
+func (p PrivateKeyJwtKey) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(p, "", false)
+}
+
+func (p *PrivateKeyJwtKey) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &p, "", false, []string{"key_id"}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PrivateKeyJwtKey) GetKeyID() string {
+	if p == nil {
+		return ""
+	}
+	return p.KeyID
+}
+
+func (p *PrivateKeyJwtKey) GetKeySet() *string {
+	if p == nil {
+		return nil
+	}
+	return p.KeySet
+}
+
 type Client struct {
-	// The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, or `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body.
+	// The authentication method used in client requests to the IdP. Supported values are: `client_secret_basic` to send `client_id` and `client_secret` in the `Authorization: Basic` header, `client_secret_post` to send `client_id` and `client_secret` as part of the request body, `client_secret_jwt` to send a JWT signed with the `client_secret` using the client assertion as part of the body, `private_key_jwt` to send a JWT signed with a private key, or `none` to send no client authentication.
 	AuthMethod *AuthMethod `json:"auth_method,omitempty"`
 	// The algorithm to use with JWT when using `client_secret_jwt` authentication.
 	ClientSecretJwtAlg *ClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
@@ -835,6 +1198,12 @@ type Client struct {
 	KeepAlive *bool `json:"keep_alive,omitempty"`
 	// A comma-separated list of hosts that should not be proxied.
 	NoProxy *string `json:"no_proxy,omitempty"`
+	// The algorithm to use when signing the JWT client assertion for `private_key_jwt` authentication. This field is ignored when `auth_method` is not `private_key_jwt`.
+	PrivateKeyJwtAlg *PrivateKeyJwtAlg `json:"private_key_jwt_alg,omitempty"`
+	// Whether to include the configured Key ID as the `kid` header in the JWT client assertion for `private_key_jwt` authentication. This field is ignored when `auth_method` is not `private_key_jwt`.
+	PrivateKeyJwtIncludeKid *bool `json:"private_key_jwt_include_kid,omitempty"`
+	// The Kong Keys entity reference used to sign the JWT client assertion for `private_key_jwt` authentication. This field is ignored when `auth_method` is not `private_key_jwt`.
+	PrivateKeyJwtKey *PrivateKeyJwtKey `json:"private_key_jwt_key,omitempty"`
 	// Whether to verify the certificate presented by the IdP when using HTTPS.
 	SslVerify *bool `json:"ssl_verify,omitempty"`
 	// Network I/O timeout for requests to the IdP in milliseconds.
@@ -915,6 +1284,27 @@ func (c *Client) GetNoProxy() *string {
 	return c.NoProxy
 }
 
+func (c *Client) GetPrivateKeyJwtAlg() *PrivateKeyJwtAlg {
+	if c == nil {
+		return nil
+	}
+	return c.PrivateKeyJwtAlg
+}
+
+func (c *Client) GetPrivateKeyJwtIncludeKid() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.PrivateKeyJwtIncludeKid
+}
+
+func (c *Client) GetPrivateKeyJwtKey() *PrivateKeyJwtKey {
+	if c == nil {
+		return nil
+	}
+	return c.PrivateKeyJwtKey
+}
+
 func (c *Client) GetSslVerify() *bool {
 	if c == nil {
 		return nil
@@ -929,18 +1319,18 @@ func (c *Client) GetTimeout() *int64 {
 	return c.Timeout
 }
 
-// GrantType - The OAuth grant type to be used.
-type GrantType string
+// UpstreamOauthPluginGrantType - The OAuth grant type to be used.
+type UpstreamOauthPluginGrantType string
 
 const (
-	GrantTypeClientCredentials GrantType = "client_credentials"
-	GrantTypePassword          GrantType = "password"
+	UpstreamOauthPluginGrantTypeClientCredentials UpstreamOauthPluginGrantType = "client_credentials"
+	UpstreamOauthPluginGrantTypePassword          UpstreamOauthPluginGrantType = "password"
 )
 
-func (e GrantType) ToPointer() *GrantType {
+func (e UpstreamOauthPluginGrantType) ToPointer() *UpstreamOauthPluginGrantType {
 	return &e
 }
-func (e *GrantType) UnmarshalJSON(data []byte) error {
+func (e *UpstreamOauthPluginGrantType) UnmarshalJSON(data []byte) error {
 	var v string
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
@@ -949,10 +1339,10 @@ func (e *GrantType) UnmarshalJSON(data []byte) error {
 	case "client_credentials":
 		fallthrough
 	case "password":
-		*e = GrantType(v)
+		*e = UpstreamOauthPluginGrantType(v)
 		return nil
 	default:
-		return fmt.Errorf("invalid value for GrantType: %v", v)
+		return fmt.Errorf("invalid value for UpstreamOauthPluginGrantType: %v", v)
 	}
 }
 
@@ -964,7 +1354,7 @@ type Oauth struct {
 	// The client secret for the application registration in the IdP.
 	ClientSecret *string `json:"client_secret,omitempty"`
 	// The OAuth grant type to be used.
-	GrantType *GrantType `json:"grant_type,omitempty"`
+	GrantType *UpstreamOauthPluginGrantType `json:"grant_type,omitempty"`
 	// The password to use if `config.oauth.grant_type` is set to `password`.
 	Password *string `json:"password,omitempty"`
 	// List of scopes to request from the IdP when obtaining a new token.
@@ -1011,7 +1401,7 @@ func (o *Oauth) GetClientSecret() *string {
 	return o.ClientSecret
 }
 
-func (o *Oauth) GetGrantType() *GrantType {
+func (o *Oauth) GetGrantType() *UpstreamOauthPluginGrantType {
 	if o == nil {
 		return nil
 	}

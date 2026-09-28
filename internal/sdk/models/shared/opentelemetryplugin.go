@@ -218,6 +218,8 @@ type OpentelemetryPluginMetrics struct {
 	EnableConsumerAttribute *bool `json:"enable_consumer_attribute,omitempty"`
 	// A boolean value that determines if latency metrics should be collected. If enabled, `kong.latency.total`, `kong.latency.internal` and `kong.latency.upstream` metrics will be exported.
 	EnableLatencyMetrics *bool `json:"enable_latency_metrics,omitempty"`
+	// A boolean value that determines if `http.server.request.count`, `http.server.request.size` and `http.server.response.size` metrics should fill in the principal attributes when an authenticated principal is available.
+	EnablePrincipalAttribute *bool `json:"enable_principal_attribute,omitempty"`
 	// A boolean value that determines if request count metrics should be collected. If enabled, `http.server.request.count` metrics will be exported.
 	EnableRequestMetrics *bool `json:"enable_request_metrics,omitempty"`
 	// A boolean value that determines if upstream health metrics should be collected. If enabled, `kong.upstream.target.status` metrics will be exported.
@@ -265,6 +267,13 @@ func (o *OpentelemetryPluginMetrics) GetEnableLatencyMetrics() *bool {
 		return nil
 	}
 	return o.EnableLatencyMetrics
+}
+
+func (o *OpentelemetryPluginMetrics) GetEnablePrincipalAttribute() *bool {
+	if o == nil {
+		return nil
+	}
+	return o.EnablePrincipalAttribute
 }
 
 func (o *OpentelemetryPluginMetrics) GetEnableRequestMetrics() *bool {
@@ -515,8 +524,12 @@ func (e *OpentelemetryPluginConcurrencyLimit) UnmarshalJSON(data []byte) error {
 }
 
 type OpentelemetryPluginQueue struct {
+	// Time in seconds the circuit breaker stays open (fast-shedding entries) before it allows a single batch through to probe whether the destination has recovered.
+	BreakerCooldown *float64 `json:"breaker_cooldown,omitempty"`
 	// The number of of queue delivery timers. -1 indicates unlimited.
 	ConcurrencyLimit *OpentelemetryPluginConcurrencyLimit `json:"concurrency_limit,omitempty"`
+	// Number of consecutive failed batches after which the queue opens its circuit breaker and drops entries instead of retrying. 0 disables the circuit breaker.
+	FailureThreshold *int64 `json:"failure_threshold,omitempty"`
 	// Time in seconds before the initial retry is made for a failing batch.
 	InitialRetryDelay *float64 `json:"initial_retry_delay,omitempty"`
 	// Maximum number of entries that can be processed at a time.
@@ -544,11 +557,25 @@ func (o *OpentelemetryPluginQueue) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (o *OpentelemetryPluginQueue) GetBreakerCooldown() *float64 {
+	if o == nil {
+		return nil
+	}
+	return o.BreakerCooldown
+}
+
 func (o *OpentelemetryPluginQueue) GetConcurrencyLimit() *OpentelemetryPluginConcurrencyLimit {
 	if o == nil {
 		return nil
 	}
 	return o.ConcurrencyLimit
+}
+
+func (o *OpentelemetryPluginQueue) GetFailureThreshold() *int64 {
+	if o == nil {
+		return nil
+	}
+	return o.FailureThreshold
 }
 
 func (o *OpentelemetryPluginQueue) GetInitialRetryDelay() *float64 {

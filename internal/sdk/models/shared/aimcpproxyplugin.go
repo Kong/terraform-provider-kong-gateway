@@ -326,6 +326,7 @@ const (
 	AiMcpProxyPluginAuthProviderAws   AiMcpProxyPluginAuthProvider = "aws"
 	AiMcpProxyPluginAuthProviderAzure AiMcpProxyPluginAuthProvider = "azure"
 	AiMcpProxyPluginAuthProviderGcp   AiMcpProxyPluginAuthProvider = "gcp"
+	AiMcpProxyPluginAuthProviderOauth AiMcpProxyPluginAuthProvider = "oauth"
 )
 
 func (e AiMcpProxyPluginAuthProvider) ToPointer() *AiMcpProxyPluginAuthProvider {
@@ -342,11 +343,247 @@ func (e *AiMcpProxyPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = AiMcpProxyPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for AiMcpProxyPluginAuthProvider: %v", v)
 	}
+}
+
+// AiMcpProxyPluginAuthMethod - Client authentication method used against the token endpoint.
+type AiMcpProxyPluginAuthMethod string
+
+const (
+	AiMcpProxyPluginAuthMethodClientSecretBasic AiMcpProxyPluginAuthMethod = "client_secret_basic"
+	AiMcpProxyPluginAuthMethodClientSecretJwt   AiMcpProxyPluginAuthMethod = "client_secret_jwt"
+	AiMcpProxyPluginAuthMethodClientSecretPost  AiMcpProxyPluginAuthMethod = "client_secret_post"
+)
+
+func (e AiMcpProxyPluginAuthMethod) ToPointer() *AiMcpProxyPluginAuthMethod {
+	return &e
+}
+func (e *AiMcpProxyPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = AiMcpProxyPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginAuthMethod: %v", v)
+	}
+}
+
+// AiMcpProxyPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type AiMcpProxyPluginClientSecretJwtAlg string
+
+const (
+	AiMcpProxyPluginClientSecretJwtAlgHs256 AiMcpProxyPluginClientSecretJwtAlg = "HS256"
+	AiMcpProxyPluginClientSecretJwtAlgHs512 AiMcpProxyPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e AiMcpProxyPluginClientSecretJwtAlg) ToPointer() *AiMcpProxyPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *AiMcpProxyPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = AiMcpProxyPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// AiMcpProxyPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type AiMcpProxyPluginGrantType string
+
+const (
+	AiMcpProxyPluginGrantTypeClientCredentials AiMcpProxyPluginGrantType = "client_credentials"
+	AiMcpProxyPluginGrantTypePassword          AiMcpProxyPluginGrantType = "password"
+)
+
+func (e AiMcpProxyPluginGrantType) ToPointer() *AiMcpProxyPluginGrantType {
+	return &e
+}
+func (e *AiMcpProxyPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = AiMcpProxyPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiMcpProxyPluginGrantType: %v", v)
+	}
+}
+
+// AiMcpProxyPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type AiMcpProxyPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *AiMcpProxyPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *AiMcpProxyPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *AiMcpProxyPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (a AiMcpProxyPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiMcpProxyPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiMcpProxyPluginOauth) GetAuthMethod() *AiMcpProxyPluginAuthMethod {
+	if a == nil {
+		return nil
+	}
+	return a.AuthMethod
+}
+
+func (a *AiMcpProxyPluginOauth) GetClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientID
+}
+
+func (a *AiMcpProxyPluginOauth) GetClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecret
+}
+
+func (a *AiMcpProxyPluginOauth) GetClientSecretJwtAlg() *AiMcpProxyPluginClientSecretJwtAlg {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecretJwtAlg
+}
+
+func (a *AiMcpProxyPluginOauth) GetGrantType() *AiMcpProxyPluginGrantType {
+	if a == nil {
+		return nil
+	}
+	return a.GrantType
+}
+
+func (a *AiMcpProxyPluginOauth) GetPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Password
+}
+
+func (a *AiMcpProxyPluginOauth) GetRedisUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsername
+}
+
+func (a *AiMcpProxyPluginOauth) GetRedisUsernameClaim() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsernameClaim
+}
+
+func (a *AiMcpProxyPluginOauth) GetScopes() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Scopes
+}
+
+func (a *AiMcpProxyPluginOauth) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
+}
+
+func (a *AiMcpProxyPluginOauth) GetTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Timeout
+}
+
+func (a *AiMcpProxyPluginOauth) GetTokenEndpoint() *string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenEndpoint
+}
+
+func (a *AiMcpProxyPluginOauth) GetTokenHeaders() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenHeaders
+}
+
+func (a *AiMcpProxyPluginOauth) GetTokenPostArgs() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenPostArgs
+}
+
+func (a *AiMcpProxyPluginOauth) GetUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Username
 }
 
 // AiMcpProxyPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -375,6 +612,8 @@ type AiMcpProxyPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *AiMcpProxyPluginOauth `json:"oauth,omitempty"`
 }
 
 func (a AiMcpProxyPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -470,6 +709,13 @@ func (a *AiMcpProxyPluginCloudAuthentication) GetGcpServiceAccountJSON() *string
 		return nil
 	}
 	return a.GcpServiceAccountJSON
+}
+
+func (a *AiMcpProxyPluginCloudAuthentication) GetOauth() *AiMcpProxyPluginOauth {
+	if a == nil {
+		return nil
+	}
+	return a.Oauth
 }
 
 type AiMcpProxyPluginClusterNodes struct {

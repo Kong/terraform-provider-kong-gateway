@@ -29,7 +29,7 @@ generation:
     generateNewTests: false
     skipResponseBodyAssertions: false
 terraform:
-  version: 1.3.0
+  version: 1.4.0
   additionalActions: []
   additionalDataSources: []
   additionalDependencies:
@@ -55,6 +55,8 @@ terraform:
   enableTypeDeduplication: true
   environmentVariables: []
   excludeEmptyObjectSchemas: false
+  fixFlags:
+    encodePathParams: false
   forwardCompatibleEnumsByDefault: false
   includeEmptyObjects: false
   inferUnionDiscriminators: false
@@ -63,4 +65,5 @@ terraform:
   providerTypeNameOverride: ""
   respectRequiredFields: true
   respectTitlesForPrimitiveUnionMembers: false
+  serverVariableProviderAttributes: {}
   unionStrategy: populated-fields

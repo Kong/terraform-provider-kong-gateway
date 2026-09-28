@@ -34,6 +34,11 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx cont
 		r.Config.ClusterAPIKey = types.StringPointerValue(resp.Config.ClusterAPIKey)
 		r.Config.ClusterAPISecret = types.StringPointerValue(resp.Config.ClusterAPISecret)
 		r.Config.ClusterName = types.StringPointerValue(resp.Config.ClusterName)
+		if resp.Config.CompressionType != nil {
+			r.Config.CompressionType = types.StringValue(string(*resp.Config.CompressionType))
+		} else {
+			r.Config.CompressionType = types.StringNull()
+		}
 		r.Config.ConfluentCloudAPIKey = types.StringPointerValue(resp.Config.ConfluentCloudAPIKey)
 		r.Config.ConfluentCloudAPISecret = types.StringPointerValue(resp.Config.ConfluentCloudAPISecret)
 		if resp.Config.ErrorHandling == nil {
@@ -79,6 +84,7 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx cont
 		for _, v := range resp.Config.MessageByLuaFunctions {
 			r.Config.MessageByLuaFunctions = append(r.Config.MessageByLuaFunctions, types.StringValue(v))
 		}
+		r.Config.NewKafkaAsyncProducer = types.BoolPointerValue(resp.Config.NewKafkaAsyncProducer)
 		if resp.Config.Oauthbearer == nil {
 			r.Config.Oauthbearer = nil
 		} else {
@@ -101,6 +107,11 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx cont
 		r.Config.ProducerAsync = types.BoolPointerValue(resp.Config.ProducerAsync)
 		r.Config.ProducerAsyncBufferingLimitsMessagesInMemory = types.Int64PointerValue(resp.Config.ProducerAsyncBufferingLimitsMessagesInMemory)
 		r.Config.ProducerAsyncFlushTimeout = types.Int64PointerValue(resp.Config.ProducerAsyncFlushTimeout)
+		r.Config.ProducerAsyncHealthFailureThreshold = types.Int64PointerValue(resp.Config.ProducerAsyncHealthFailureThreshold)
+		r.Config.ProducerAsyncHealthGating = types.BoolPointerValue(resp.Config.ProducerAsyncHealthGating)
+		r.Config.ProducerAsyncHealthProbeInterval = types.Int64PointerValue(resp.Config.ProducerAsyncHealthProbeInterval)
+		r.Config.ProducerAsyncHealthRecoveryThreshold = types.Int64PointerValue(resp.Config.ProducerAsyncHealthRecoveryThreshold)
+		r.Config.ProducerConfigEnabled = types.BoolPointerValue(resp.Config.ProducerConfigEnabled)
 		if resp.Config.ProducerRequestAcks != nil {
 			r.Config.ProducerRequestAcks = types.Int64Value(int64(*resp.Config.ProducerRequestAcks))
 		} else {
@@ -201,6 +212,11 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx cont
 					r.Config.SchemaRegistry.Confluent.KeySchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.KeySchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.KeySchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.KeySchema.SubjectName)
 				}
@@ -211,6 +227,11 @@ func (r *PluginConfluentResourceModel) RefreshFromSharedConfluentPlugin(ctx cont
 					r.Config.SchemaRegistry.Confluent.ValueSchema = nil
 				} else {
 					r.Config.SchemaRegistry.Confluent.ValueSchema = &tfTypes.KeySchema{}
+					if resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding != nil {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringValue(string(*resp.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding))
+					} else {
+						r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding = types.StringNull()
+					}
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion)
 					r.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName = types.StringPointerValue(resp.Config.SchemaRegistry.Confluent.ValueSchema.SubjectName)
 				}
@@ -513,6 +534,12 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 	} else {
 		clusterName = nil
 	}
+	compressionType := new(shared.CompressionType)
+	if !r.Config.CompressionType.IsUnknown() && !r.Config.CompressionType.IsNull() {
+		*compressionType = shared.CompressionType(r.Config.CompressionType.ValueString())
+	} else {
+		compressionType = nil
+	}
 	confluentCloudAPIKey := new(string)
 	if !r.Config.ConfluentCloudAPIKey.IsUnknown() && !r.Config.ConfluentCloudAPIKey.IsNull() {
 		*confluentCloudAPIKey = r.Config.ConfluentCloudAPIKey.ValueString()
@@ -627,6 +654,12 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 	for messageByLuaFunctionsIndex := range r.Config.MessageByLuaFunctions {
 		messageByLuaFunctions = append(messageByLuaFunctions, r.Config.MessageByLuaFunctions[messageByLuaFunctionsIndex].ValueString())
 	}
+	newKafkaAsyncProducer := new(bool)
+	if !r.Config.NewKafkaAsyncProducer.IsUnknown() && !r.Config.NewKafkaAsyncProducer.IsNull() {
+		*newKafkaAsyncProducer = r.Config.NewKafkaAsyncProducer.ValueBool()
+	} else {
+		newKafkaAsyncProducer = nil
+	}
 	var oauthbearer *shared.Oauthbearer
 	if r.Config.Oauthbearer != nil {
 		clientID := new(string)
@@ -690,6 +723,36 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 		*producerAsyncFlushTimeout = r.Config.ProducerAsyncFlushTimeout.ValueInt64()
 	} else {
 		producerAsyncFlushTimeout = nil
+	}
+	producerAsyncHealthFailureThreshold := new(int64)
+	if !r.Config.ProducerAsyncHealthFailureThreshold.IsUnknown() && !r.Config.ProducerAsyncHealthFailureThreshold.IsNull() {
+		*producerAsyncHealthFailureThreshold = r.Config.ProducerAsyncHealthFailureThreshold.ValueInt64()
+	} else {
+		producerAsyncHealthFailureThreshold = nil
+	}
+	producerAsyncHealthGating := new(bool)
+	if !r.Config.ProducerAsyncHealthGating.IsUnknown() && !r.Config.ProducerAsyncHealthGating.IsNull() {
+		*producerAsyncHealthGating = r.Config.ProducerAsyncHealthGating.ValueBool()
+	} else {
+		producerAsyncHealthGating = nil
+	}
+	producerAsyncHealthProbeInterval := new(int64)
+	if !r.Config.ProducerAsyncHealthProbeInterval.IsUnknown() && !r.Config.ProducerAsyncHealthProbeInterval.IsNull() {
+		*producerAsyncHealthProbeInterval = r.Config.ProducerAsyncHealthProbeInterval.ValueInt64()
+	} else {
+		producerAsyncHealthProbeInterval = nil
+	}
+	producerAsyncHealthRecoveryThreshold := new(int64)
+	if !r.Config.ProducerAsyncHealthRecoveryThreshold.IsUnknown() && !r.Config.ProducerAsyncHealthRecoveryThreshold.IsNull() {
+		*producerAsyncHealthRecoveryThreshold = r.Config.ProducerAsyncHealthRecoveryThreshold.ValueInt64()
+	} else {
+		producerAsyncHealthRecoveryThreshold = nil
+	}
+	producerConfigEnabled := new(bool)
+	if !r.Config.ProducerConfigEnabled.IsUnknown() && !r.Config.ProducerConfigEnabled.IsNull() {
+		*producerConfigEnabled = r.Config.ProducerConfigEnabled.ValueBool()
+	} else {
+		producerConfigEnabled = nil
 	}
 	producerRequestAcks := new(shared.ProducerRequestAcks)
 	if !r.Config.ProducerRequestAcks.IsUnknown() && !r.Config.ProducerRequestAcks.IsNull() {
@@ -927,6 +990,12 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 			}
 			var keySchema *shared.KeySchema
 			if r.Config.SchemaRegistry.Confluent.KeySchema != nil {
+				payloadEncoding := new(shared.PayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.IsNull() {
+					*payloadEncoding = shared.PayloadEncoding(r.Config.SchemaRegistry.Confluent.KeySchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding = nil
+				}
 				schemaVersion := new(string)
 				if !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.IsNull() {
 					*schemaVersion = r.Config.SchemaRegistry.Confluent.KeySchema.SchemaVersion.ValueString()
@@ -940,8 +1009,9 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 					subjectName = nil
 				}
 				keySchema = &shared.KeySchema{
-					SchemaVersion: schemaVersion,
-					SubjectName:   subjectName,
+					PayloadEncoding: payloadEncoding,
+					SchemaVersion:   schemaVersion,
+					SubjectName:     subjectName,
 				}
 			}
 			sslVerify1 := new(bool)
@@ -964,6 +1034,12 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 			}
 			var valueSchema *shared.ValueSchema
 			if r.Config.SchemaRegistry.Confluent.ValueSchema != nil {
+				payloadEncoding1 := new(shared.ConfluentPluginPayloadEncoding)
+				if !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.IsNull() {
+					*payloadEncoding1 = shared.ConfluentPluginPayloadEncoding(r.Config.SchemaRegistry.Confluent.ValueSchema.PayloadEncoding.ValueString())
+				} else {
+					payloadEncoding1 = nil
+				}
 				schemaVersion1 := new(string)
 				if !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsUnknown() && !r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.IsNull() {
 					*schemaVersion1 = r.Config.SchemaRegistry.Confluent.ValueSchema.SchemaVersion.ValueString()
@@ -977,8 +1053,9 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 					subjectName1 = nil
 				}
 				valueSchema = &shared.ValueSchema{
-					SchemaVersion: schemaVersion1,
-					SubjectName:   subjectName1,
+					PayloadEncoding: payloadEncoding1,
+					SchemaVersion:   schemaVersion1,
+					SubjectName:     subjectName1,
 				}
 			}
 			confluent = &shared.Confluent{
@@ -1027,6 +1104,7 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 		ClusterAPIKey:           clusterAPIKey,
 		ClusterAPISecret:        clusterAPISecret,
 		ClusterName:             clusterName,
+		CompressionType:         compressionType,
 		ConfluentCloudAPIKey:    confluentCloudAPIKey,
 		ConfluentCloudAPISecret: confluentCloudAPISecret,
 		ErrorHandling:           errorHandling,
@@ -1039,10 +1117,16 @@ func (r *PluginConfluentResourceModel) ToSharedConfluentPlugin(ctx context.Conte
 		KeepaliveEnabled:        keepaliveEnabled,
 		KeyQueryArg:             keyQueryArg,
 		MessageByLuaFunctions:   messageByLuaFunctions,
+		NewKafkaAsyncProducer:   newKafkaAsyncProducer,
 		Oauthbearer:             oauthbearer,
 		ProducerAsync:           producerAsync,
 		ProducerAsyncBufferingLimitsMessagesInMemory: producerAsyncBufferingLimitsMessagesInMemory,
 		ProducerAsyncFlushTimeout:                    producerAsyncFlushTimeout,
+		ProducerAsyncHealthFailureThreshold:          producerAsyncHealthFailureThreshold,
+		ProducerAsyncHealthGating:                    producerAsyncHealthGating,
+		ProducerAsyncHealthProbeInterval:             producerAsyncHealthProbeInterval,
+		ProducerAsyncHealthRecoveryThreshold:         producerAsyncHealthRecoveryThreshold,
+		ProducerConfigEnabled:                        producerConfigEnabled,
 		ProducerRequestAcks:                          producerRequestAcks,
 		ProducerRequestLimitsBytesPerRequest:         producerRequestLimitsBytesPerRequest,
 		ProducerRequestLimitsMessagesPerRequest:      producerRequestLimitsMessagesPerRequest,

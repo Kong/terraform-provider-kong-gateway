@@ -189,7 +189,7 @@ resource "kong-gateway_partial" "my_partial" {
   redis_ce = {
     config = {
       cloud_authentication = {
-        auth_provider            = "azure"
+        auth_provider            = "gcp"
         aws_access_key_id        = "...my_aws_access_key_id..."
         aws_assume_role_arn      = "...my_aws_assume_role_arn..."
         aws_cache_name           = "...my_aws_cache_name..."
@@ -201,6 +201,29 @@ resource "kong-gateway_partial" "my_partial" {
         azure_client_secret      = "...my_azure_client_secret..."
         azure_tenant_id          = "...my_azure_tenant_id..."
         gcp_service_account_json = "...my_gcp_service_account_json..."
+        oauth = {
+          auth_method           = "client_secret_basic"
+          client_id             = "...my_client_id..."
+          client_secret         = "...my_client_secret..."
+          client_secret_jwt_alg = "HS512"
+          grant_type            = "client_credentials"
+          password              = "...my_password..."
+          redis_username        = "...my_redis_username..."
+          redis_username_claim  = "...my_redis_username_claim..."
+          scopes = [
+            "..."
+          ]
+          ssl_verify     = false
+          timeout        = 8.78
+          token_endpoint = "...my_token_endpoint..."
+          token_headers = {
+            key = "value"
+          }
+          token_post_args = {
+            key = "value"
+          }
+          username = "...my_username..."
+        }
       }
       database    = 9
       host        = "...my_host..."
@@ -235,6 +258,29 @@ resource "kong-gateway_partial" "my_partial" {
         azure_client_secret      = "...my_azure_client_secret..."
         azure_tenant_id          = "...my_azure_tenant_id..."
         gcp_service_account_json = "...my_gcp_service_account_json..."
+        oauth = {
+          auth_method           = "client_secret_jwt"
+          client_id             = "...my_client_id..."
+          client_secret         = "...my_client_secret..."
+          client_secret_jwt_alg = "HS256"
+          grant_type            = "client_credentials"
+          password              = "...my_password..."
+          redis_username        = "...my_redis_username..."
+          redis_username_claim  = "...my_redis_username_claim..."
+          scopes = [
+            "..."
+          ]
+          ssl_verify     = false
+          timeout        = 608959579
+          token_endpoint = "...my_token_endpoint..."
+          token_headers = {
+            key = "value"
+          }
+          token_post_args = {
+            key = "value"
+          }
+          username = "...my_username..."
+        }
       }
       cluster_max_redirections = 5
       cluster_nodes = [
@@ -308,6 +354,29 @@ resource "kong-gateway_partial" "my_partial" {
           azure_client_secret      = "...my_azure_client_secret..."
           azure_tenant_id          = "...my_azure_tenant_id..."
           gcp_service_account_json = "...my_gcp_service_account_json..."
+          oauth = {
+            auth_method           = "client_secret_jwt"
+            client_id             = "...my_client_id..."
+            client_secret         = "...my_client_secret..."
+            client_secret_jwt_alg = "HS512"
+            grant_type            = "client_credentials"
+            password              = "...my_password..."
+            redis_username        = "...my_redis_username..."
+            redis_username_claim  = "...my_redis_username_claim..."
+            scopes = [
+              "..."
+            ]
+            ssl_verify     = false
+            timeout        = 753552848
+            token_endpoint = "...my_token_endpoint..."
+            token_headers = {
+              key = "value"
+            }
+            token_post_args = {
+              key = "value"
+            }
+            username = "...my_username..."
+          }
         }
         cluster_max_redirections = 1
         cluster_nodes = [
@@ -713,7 +782,7 @@ Optional:
 
 Optional:
 
-- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]
 - `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
 - `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
 - `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
@@ -725,6 +794,29 @@ Optional:
 - `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
 - `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
 - `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+- `oauth` (Attributes) OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`. (see [below for nested schema](#nestedatt--redis_ce--config--cloud_authentication--oauth))
+
+<a id="nestedatt--redis_ce--config--cloud_authentication--oauth"></a>
+### Nested Schema for `redis_ce.config.cloud_authentication.oauth`
+
+Optional:
+
+- `auth_method` (String) Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]
+- `client_id` (String) OAuth 2.0 client ID.
+- `client_secret` (String) OAuth 2.0 client secret.
+- `client_secret_jwt_alg` (String) Signing algorithm used for `client_secret_jwt` client authentication. must be one of ["HS256", "HS512"]
+- `grant_type` (String) OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]
+- `password` (String) Resource owner password, used with the `password` grant type.
+- `redis_username` (String) Static Redis ACL username sent with `AUTH <username> <token>`.
+- `redis_username_claim` (String) JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+- `scopes` (List of String) OAuth 2.0 scopes to request.
+- `ssl_verify` (Boolean) Whether to verify the TLS certificate of the token endpoint.
+- `timeout` (Number) Timeout, in milliseconds, for requests to the token endpoint.
+- `token_endpoint` (String) OAuth 2.0 token endpoint URL used to request access tokens.
+- `token_headers` (Map of String) Additional HTTP headers to send with the token request.
+- `token_post_args` (Map of String) Additional POST body arguments to send with the token request.
+- `username` (String) Resource owner username, used with the `password` grant type.
+
 
 
 
@@ -774,7 +866,7 @@ Optional:
 
 Optional:
 
-- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]
 - `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
 - `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
 - `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
@@ -786,6 +878,29 @@ Optional:
 - `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
 - `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
 - `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+- `oauth` (Attributes) OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`. (see [below for nested schema](#nestedatt--redis_ee--config--cloud_authentication--oauth))
+
+<a id="nestedatt--redis_ee--config--cloud_authentication--oauth"></a>
+### Nested Schema for `redis_ee.config.cloud_authentication.oauth`
+
+Optional:
+
+- `auth_method` (String) Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]
+- `client_id` (String) OAuth 2.0 client ID.
+- `client_secret` (String) OAuth 2.0 client secret.
+- `client_secret_jwt_alg` (String) Signing algorithm used for `client_secret_jwt` client authentication. must be one of ["HS256", "HS512"]
+- `grant_type` (String) OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]
+- `password` (String) Resource owner password, used with the `password` grant type.
+- `redis_username` (String) Static Redis ACL username sent with `AUTH <username> <token>`.
+- `redis_username_claim` (String) JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+- `scopes` (List of String) OAuth 2.0 scopes to request.
+- `ssl_verify` (Boolean) Whether to verify the TLS certificate of the token endpoint.
+- `timeout` (Number) Timeout, in milliseconds, for requests to the token endpoint.
+- `token_endpoint` (String) OAuth 2.0 token endpoint URL used to request access tokens.
+- `token_headers` (Map of String) Additional HTTP headers to send with the token request.
+- `token_post_args` (Map of String) Additional POST body arguments to send with the token request.
+- `username` (String) Resource owner username, used with the `password` grant type.
+
 
 
 <a id="nestedatt--redis_ee--config--cluster_nodes"></a>
@@ -884,7 +999,7 @@ Optional:
 
 Optional:
 
-- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp"]
+- `auth_provider` (String) Auth providers to be used to authenticate to a Cloud Provider's Redis instance. must be one of ["aws", "azure", "gcp", "oauth"]
 - `aws_access_key_id` (String) AWS Access Key ID to be used for authentication when `auth_provider` is set to `aws`.
 - `aws_assume_role_arn` (String) The ARN of the IAM role to assume for generating ElastiCache IAM authentication tokens.
 - `aws_cache_name` (String) The name of the AWS Elasticache cluster when `auth_provider` is set to `aws`.
@@ -896,6 +1011,29 @@ Optional:
 - `azure_client_secret` (String) Azure Client Secret to be used for authentication when `auth_provider` is set to `azure`.
 - `azure_tenant_id` (String) Azure Tenant ID to be used for authentication when `auth_provider` is set to `azure`.
 - `gcp_service_account_json` (String) GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
+- `oauth` (Attributes) OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`. (see [below for nested schema](#nestedatt--vectordb--config--redis--cloud_authentication--oauth))
+
+<a id="nestedatt--vectordb--config--redis--cloud_authentication--oauth"></a>
+### Nested Schema for `vectordb.config.redis.cloud_authentication.oauth`
+
+Optional:
+
+- `auth_method` (String) Client authentication method used against the token endpoint. must be one of ["client_secret_basic", "client_secret_jwt", "client_secret_post"]
+- `client_id` (String) OAuth 2.0 client ID.
+- `client_secret` (String) OAuth 2.0 client secret.
+- `client_secret_jwt_alg` (String) Signing algorithm used for `client_secret_jwt` client authentication. must be one of ["HS256", "HS512"]
+- `grant_type` (String) OAuth 2.0 grant type used to request access tokens. must be one of ["client_credentials", "password"]
+- `password` (String) Resource owner password, used with the `password` grant type.
+- `redis_username` (String) Static Redis ACL username sent with `AUTH <username> <token>`.
+- `redis_username_claim` (String) JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+- `scopes` (List of String) OAuth 2.0 scopes to request.
+- `ssl_verify` (Boolean) Whether to verify the TLS certificate of the token endpoint.
+- `timeout` (Number) Timeout, in milliseconds, for requests to the token endpoint.
+- `token_endpoint` (String) OAuth 2.0 token endpoint URL used to request access tokens.
+- `token_headers` (Map of String) Additional HTTP headers to send with the token request.
+- `token_post_args` (Map of String) Additional POST body arguments to send with the token request.
+- `username` (String) Resource owner username, used with the `password` grant type.
+
 
 
 <a id="nestedatt--vectordb--config--redis--cluster_nodes"></a>

@@ -1025,6 +1025,7 @@ const (
 	AiRagInjectorPluginAuthProviderAws   AiRagInjectorPluginAuthProvider = "aws"
 	AiRagInjectorPluginAuthProviderAzure AiRagInjectorPluginAuthProvider = "azure"
 	AiRagInjectorPluginAuthProviderGcp   AiRagInjectorPluginAuthProvider = "gcp"
+	AiRagInjectorPluginAuthProviderOauth AiRagInjectorPluginAuthProvider = "oauth"
 )
 
 func (e AiRagInjectorPluginAuthProvider) ToPointer() *AiRagInjectorPluginAuthProvider {
@@ -1041,11 +1042,247 @@ func (e *AiRagInjectorPluginAuthProvider) UnmarshalJSON(data []byte) error {
 	case "azure":
 		fallthrough
 	case "gcp":
+		fallthrough
+	case "oauth":
 		*e = AiRagInjectorPluginAuthProvider(v)
 		return nil
 	default:
 		return fmt.Errorf("invalid value for AiRagInjectorPluginAuthProvider: %v", v)
 	}
+}
+
+// AiRagInjectorPluginAuthMethod - Client authentication method used against the token endpoint.
+type AiRagInjectorPluginAuthMethod string
+
+const (
+	AiRagInjectorPluginAuthMethodClientSecretBasic AiRagInjectorPluginAuthMethod = "client_secret_basic"
+	AiRagInjectorPluginAuthMethodClientSecretJwt   AiRagInjectorPluginAuthMethod = "client_secret_jwt"
+	AiRagInjectorPluginAuthMethodClientSecretPost  AiRagInjectorPluginAuthMethod = "client_secret_post"
+)
+
+func (e AiRagInjectorPluginAuthMethod) ToPointer() *AiRagInjectorPluginAuthMethod {
+	return &e
+}
+func (e *AiRagInjectorPluginAuthMethod) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_secret_basic":
+		fallthrough
+	case "client_secret_jwt":
+		fallthrough
+	case "client_secret_post":
+		*e = AiRagInjectorPluginAuthMethod(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRagInjectorPluginAuthMethod: %v", v)
+	}
+}
+
+// AiRagInjectorPluginClientSecretJwtAlg - Signing algorithm used for `client_secret_jwt` client authentication.
+type AiRagInjectorPluginClientSecretJwtAlg string
+
+const (
+	AiRagInjectorPluginClientSecretJwtAlgHs256 AiRagInjectorPluginClientSecretJwtAlg = "HS256"
+	AiRagInjectorPluginClientSecretJwtAlgHs512 AiRagInjectorPluginClientSecretJwtAlg = "HS512"
+)
+
+func (e AiRagInjectorPluginClientSecretJwtAlg) ToPointer() *AiRagInjectorPluginClientSecretJwtAlg {
+	return &e
+}
+func (e *AiRagInjectorPluginClientSecretJwtAlg) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "HS256":
+		fallthrough
+	case "HS512":
+		*e = AiRagInjectorPluginClientSecretJwtAlg(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRagInjectorPluginClientSecretJwtAlg: %v", v)
+	}
+}
+
+// AiRagInjectorPluginGrantType - OAuth 2.0 grant type used to request access tokens.
+type AiRagInjectorPluginGrantType string
+
+const (
+	AiRagInjectorPluginGrantTypeClientCredentials AiRagInjectorPluginGrantType = "client_credentials"
+	AiRagInjectorPluginGrantTypePassword          AiRagInjectorPluginGrantType = "password"
+)
+
+func (e AiRagInjectorPluginGrantType) ToPointer() *AiRagInjectorPluginGrantType {
+	return &e
+}
+func (e *AiRagInjectorPluginGrantType) UnmarshalJSON(data []byte) error {
+	var v string
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch v {
+	case "client_credentials":
+		fallthrough
+	case "password":
+		*e = AiRagInjectorPluginGrantType(v)
+		return nil
+	default:
+		return fmt.Errorf("invalid value for AiRagInjectorPluginGrantType: %v", v)
+	}
+}
+
+// AiRagInjectorPluginOauth - OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+type AiRagInjectorPluginOauth struct {
+	// Client authentication method used against the token endpoint.
+	AuthMethod *AiRagInjectorPluginAuthMethod `json:"auth_method,omitempty"`
+	// OAuth 2.0 client ID.
+	ClientID *string `json:"client_id,omitempty"`
+	// OAuth 2.0 client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
+	// Signing algorithm used for `client_secret_jwt` client authentication.
+	ClientSecretJwtAlg *AiRagInjectorPluginClientSecretJwtAlg `json:"client_secret_jwt_alg,omitempty"`
+	// OAuth 2.0 grant type used to request access tokens.
+	GrantType *AiRagInjectorPluginGrantType `json:"grant_type,omitempty"`
+	// Resource owner password, used with the `password` grant type.
+	Password *string `json:"password,omitempty"`
+	// Static Redis ACL username sent with `AUTH <username> <token>`.
+	RedisUsername *string `json:"redis_username,omitempty"`
+	// JWT claim in the access token used to derive the Redis ACL username (for example, `oid` for Microsoft Entra ID).
+	RedisUsernameClaim *string `json:"redis_username_claim,omitempty"`
+	// OAuth 2.0 scopes to request.
+	Scopes []string `json:"scopes,omitempty"`
+	// Whether to verify the TLS certificate of the token endpoint.
+	SslVerify *bool `json:"ssl_verify,omitempty"`
+	// Timeout, in milliseconds, for requests to the token endpoint.
+	Timeout *int64 `json:"timeout,omitempty"`
+	// OAuth 2.0 token endpoint URL used to request access tokens.
+	TokenEndpoint *string `json:"token_endpoint,omitempty"`
+	// Additional HTTP headers to send with the token request.
+	TokenHeaders map[string]string `json:"token_headers,omitempty"`
+	// Additional POST body arguments to send with the token request.
+	TokenPostArgs map[string]string `json:"token_post_args,omitempty"`
+	// Resource owner username, used with the `password` grant type.
+	Username *string `json:"username,omitempty"`
+}
+
+func (a AiRagInjectorPluginOauth) MarshalJSON() ([]byte, error) {
+	return utils.MarshalJSON(a, "", false)
+}
+
+func (a *AiRagInjectorPluginOauth) UnmarshalJSON(data []byte) error {
+	if err := utils.UnmarshalJSON(data, &a, "", false, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AiRagInjectorPluginOauth) GetAuthMethod() *AiRagInjectorPluginAuthMethod {
+	if a == nil {
+		return nil
+	}
+	return a.AuthMethod
+}
+
+func (a *AiRagInjectorPluginOauth) GetClientID() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientID
+}
+
+func (a *AiRagInjectorPluginOauth) GetClientSecret() *string {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecret
+}
+
+func (a *AiRagInjectorPluginOauth) GetClientSecretJwtAlg() *AiRagInjectorPluginClientSecretJwtAlg {
+	if a == nil {
+		return nil
+	}
+	return a.ClientSecretJwtAlg
+}
+
+func (a *AiRagInjectorPluginOauth) GetGrantType() *AiRagInjectorPluginGrantType {
+	if a == nil {
+		return nil
+	}
+	return a.GrantType
+}
+
+func (a *AiRagInjectorPluginOauth) GetPassword() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Password
+}
+
+func (a *AiRagInjectorPluginOauth) GetRedisUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsername
+}
+
+func (a *AiRagInjectorPluginOauth) GetRedisUsernameClaim() *string {
+	if a == nil {
+		return nil
+	}
+	return a.RedisUsernameClaim
+}
+
+func (a *AiRagInjectorPluginOauth) GetScopes() []string {
+	if a == nil {
+		return nil
+	}
+	return a.Scopes
+}
+
+func (a *AiRagInjectorPluginOauth) GetSslVerify() *bool {
+	if a == nil {
+		return nil
+	}
+	return a.SslVerify
+}
+
+func (a *AiRagInjectorPluginOauth) GetTimeout() *int64 {
+	if a == nil {
+		return nil
+	}
+	return a.Timeout
+}
+
+func (a *AiRagInjectorPluginOauth) GetTokenEndpoint() *string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenEndpoint
+}
+
+func (a *AiRagInjectorPluginOauth) GetTokenHeaders() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenHeaders
+}
+
+func (a *AiRagInjectorPluginOauth) GetTokenPostArgs() map[string]string {
+	if a == nil {
+		return nil
+	}
+	return a.TokenPostArgs
+}
+
+func (a *AiRagInjectorPluginOauth) GetUsername() *string {
+	if a == nil {
+		return nil
+	}
+	return a.Username
 }
 
 // AiRagInjectorPluginCloudAuthentication - Cloud auth related configs for connecting to a Cloud Provider's Redis instance.
@@ -1074,6 +1311,8 @@ type AiRagInjectorPluginCloudAuthentication struct {
 	AzureTenantID *string `json:"azure_tenant_id,omitempty"`
 	// GCP Service Account JSON to be used for authentication when `auth_provider` is set to `gcp`.
 	GcpServiceAccountJSON *string `json:"gcp_service_account_json,omitempty"`
+	// OAuth 2.0 client configuration used to authenticate to Redis when `auth_provider` is set to `oauth`.
+	Oauth *AiRagInjectorPluginOauth `json:"oauth,omitempty"`
 }
 
 func (a AiRagInjectorPluginCloudAuthentication) MarshalJSON() ([]byte, error) {
@@ -1169,6 +1408,13 @@ func (a *AiRagInjectorPluginCloudAuthentication) GetGcpServiceAccountJSON() *str
 		return nil
 	}
 	return a.GcpServiceAccountJSON
+}
+
+func (a *AiRagInjectorPluginCloudAuthentication) GetOauth() *AiRagInjectorPluginOauth {
+	if a == nil {
+		return nil
+	}
+	return a.Oauth
 }
 
 type AiRagInjectorPluginClusterNodes struct {

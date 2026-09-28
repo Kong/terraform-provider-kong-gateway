@@ -329,9 +329,9 @@ func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportS
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		ID         string `json:"id"`
-		ConsumerID string `json:"consumer_id"`
-		Workspace  string `json:"workspace"`
+		ID         string  `json:"id"`
+		ConsumerID string  `json:"consumer_id"`
+		Workspace  *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -349,9 +349,9 @@ func (r *HMACAuthResource) ImportState(ctx context.Context, req resource.ImportS
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("consumer_id"), data.ConsumerID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

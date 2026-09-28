@@ -353,9 +353,9 @@ func (r *RbacRoleEntityResource) ImportState(ctx context.Context, req resource.I
 	dec := json.NewDecoder(bytes.NewReader([]byte(req.ID)))
 	dec.DisallowUnknownFields()
 	var data struct {
-		EntityID  string `json:"entity_id"`
-		RoleID    string `json:"role_id"`
-		Workspace string `json:"workspace"`
+		EntityID  string  `json:"entity_id"`
+		RoleID    string  `json:"role_id"`
+		Workspace *string `json:"workspace"`
 	}
 
 	if err := dec.Decode(&data); err != nil {
@@ -373,9 +373,9 @@ func (r *RbacRoleEntityResource) ImportState(ctx context.Context, req resource.I
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("role_id"), data.RoleID)...)
-	if len(data.Workspace) == 0 {
-		resp.Diagnostics.AddError("Missing required field", `The field workspace is required but was not found in the json encoded ID. It's expected to be a value alike '"team-payments"'`)
-		return
+	if data.Workspace == nil {
+		var workspaceDefault string = `default`
+		data.Workspace = &workspaceDefault
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("workspace"), data.Workspace)...)
 }

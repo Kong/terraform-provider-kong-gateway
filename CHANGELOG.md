@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.4.0
-> Released on 2026/09/??
+> Released on 2026/09/28
 
 ### Features
 * Upgrade to Kong Gateway v3.16

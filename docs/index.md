@@ -21,7 +21,7 @@ terraform {
   required_providers {
     kong-gateway = {
       source  = "kong/kong-gateway"
-      version = "1.4.0"
+      version = "1.4.1"
     }
   }
 }

@@ -1045,7 +1045,7 @@ func (r *PluginAiSemanticResponseGuardResource) Create(ctx context.Context, req 
 	}
 	res, err := r.client.Plugins.CreateAisemanticresponseguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1105,7 +1105,7 @@ func (r *PluginAiSemanticResponseGuardResource) Read(ctx context.Context, req re
 	}
 	res, err := r.client.Plugins.GetAisemanticresponseguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1159,7 +1159,7 @@ func (r *PluginAiSemanticResponseGuardResource) Update(ctx context.Context, req 
 	}
 	res, err := r.client.Plugins.UpdateAisemanticresponseguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1219,7 +1219,7 @@ func (r *PluginAiSemanticResponseGuardResource) Delete(ctx context.Context, req 
 	}
 	res, err := r.client.Plugins.DeleteAisemanticresponseguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

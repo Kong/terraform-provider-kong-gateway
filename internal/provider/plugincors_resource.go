@@ -298,7 +298,7 @@ func (r *PluginCorsResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 	res, err := r.client.Plugins.CreateCorsPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -358,7 +358,7 @@ func (r *PluginCorsResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 	res, err := r.client.Plugins.GetCorsPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -412,7 +412,7 @@ func (r *PluginCorsResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	res, err := r.client.Plugins.UpdateCorsPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -472,7 +472,7 @@ func (r *PluginCorsResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 	res, err := r.client.Plugins.DeleteCorsPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

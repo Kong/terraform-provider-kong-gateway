@@ -122,7 +122,7 @@ func (r *RbacUserRoleResource) Create(ctx context.Context, req resource.CreateRe
 	}
 	res, err := r.client.RBACUserRoles.CreateRbacUserRole(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -226,7 +226,7 @@ func (r *RbacUserRoleResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 	res, err := r.client.RBACUserRoles.DeleteRbacUserRole(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

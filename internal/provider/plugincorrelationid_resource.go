@@ -283,7 +283,7 @@ func (r *PluginCorrelationIDResource) Create(ctx context.Context, req resource.C
 	}
 	res, err := r.client.Plugins.CreateCorrelationidPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -343,7 +343,7 @@ func (r *PluginCorrelationIDResource) Read(ctx context.Context, req resource.Rea
 	}
 	res, err := r.client.Plugins.GetCorrelationidPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -397,7 +397,7 @@ func (r *PluginCorrelationIDResource) Update(ctx context.Context, req resource.U
 	}
 	res, err := r.client.Plugins.UpdateCorrelationidPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -457,7 +457,7 @@ func (r *PluginCorrelationIDResource) Delete(ctx context.Context, req resource.D
 	}
 	res, err := r.client.Plugins.DeleteCorrelationidPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

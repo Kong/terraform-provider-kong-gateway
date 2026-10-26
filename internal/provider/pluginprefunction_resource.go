@@ -299,7 +299,7 @@ func (r *PluginPreFunctionResource) Create(ctx context.Context, req resource.Cre
 	}
 	res, err := r.client.Plugins.CreatePrefunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -359,7 +359,7 @@ func (r *PluginPreFunctionResource) Read(ctx context.Context, req resource.ReadR
 	}
 	res, err := r.client.Plugins.GetPrefunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -413,7 +413,7 @@ func (r *PluginPreFunctionResource) Update(ctx context.Context, req resource.Upd
 	}
 	res, err := r.client.Plugins.UpdatePrefunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -473,7 +473,7 @@ func (r *PluginPreFunctionResource) Delete(ctx context.Context, req resource.Del
 	}
 	res, err := r.client.Plugins.DeletePrefunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

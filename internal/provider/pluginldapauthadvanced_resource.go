@@ -362,7 +362,7 @@ func (r *PluginLdapAuthAdvancedResource) Create(ctx context.Context, req resourc
 	}
 	res, err := r.client.Plugins.CreateLdapauthadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -422,7 +422,7 @@ func (r *PluginLdapAuthAdvancedResource) Read(ctx context.Context, req resource.
 	}
 	res, err := r.client.Plugins.GetLdapauthadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -476,7 +476,7 @@ func (r *PluginLdapAuthAdvancedResource) Update(ctx context.Context, req resourc
 	}
 	res, err := r.client.Plugins.UpdateLdapauthadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -536,7 +536,7 @@ func (r *PluginLdapAuthAdvancedResource) Delete(ctx context.Context, req resourc
 	}
 	res, err := r.client.Plugins.DeleteLdapauthadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

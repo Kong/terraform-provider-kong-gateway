@@ -125,7 +125,7 @@ func (r *CACertificateResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.CACertificates.CreateCaCertificate(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -185,7 +185,7 @@ func (r *CACertificateResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	res, err := r.client.CACertificates.GetCaCertificate(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -239,7 +239,7 @@ func (r *CACertificateResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res, err := r.client.CACertificates.UpsertCaCertificate(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -299,7 +299,7 @@ func (r *CACertificateResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.CACertificates.DeleteCaCertificate(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

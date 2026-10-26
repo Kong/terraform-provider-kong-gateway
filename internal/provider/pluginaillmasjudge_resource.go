@@ -891,7 +891,7 @@ func (r *PluginAiLlmAsJudgeResource) Create(ctx context.Context, req resource.Cr
 	}
 	res, err := r.client.Plugins.CreateAillmasjudgePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -951,7 +951,7 @@ func (r *PluginAiLlmAsJudgeResource) Read(ctx context.Context, req resource.Read
 	}
 	res, err := r.client.Plugins.GetAillmasjudgePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1005,7 +1005,7 @@ func (r *PluginAiLlmAsJudgeResource) Update(ctx context.Context, req resource.Up
 	}
 	res, err := r.client.Plugins.UpdateAillmasjudgePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1065,7 +1065,7 @@ func (r *PluginAiLlmAsJudgeResource) Delete(ctx context.Context, req resource.De
 	}
 	res, err := r.client.Plugins.DeleteAillmasjudgePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

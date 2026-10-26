@@ -673,7 +673,7 @@ func (r *PluginServiceProtectionResource) Create(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.CreateServiceprotectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -733,7 +733,7 @@ func (r *PluginServiceProtectionResource) Read(ctx context.Context, req resource
 	}
 	res, err := r.client.Plugins.GetServiceprotectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -787,7 +787,7 @@ func (r *PluginServiceProtectionResource) Update(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.UpdateServiceprotectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -847,7 +847,7 @@ func (r *PluginServiceProtectionResource) Delete(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.DeleteServiceprotectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

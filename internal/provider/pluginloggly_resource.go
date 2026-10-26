@@ -360,7 +360,7 @@ func (r *PluginLogglyResource) Create(ctx context.Context, req resource.CreateRe
 	}
 	res, err := r.client.Plugins.CreateLogglyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -420,7 +420,7 @@ func (r *PluginLogglyResource) Read(ctx context.Context, req resource.ReadReques
 	}
 	res, err := r.client.Plugins.GetLogglyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -474,7 +474,7 @@ func (r *PluginLogglyResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 	res, err := r.client.Plugins.UpdateLogglyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -534,7 +534,7 @@ func (r *PluginLogglyResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 	res, err := r.client.Plugins.DeleteLogglyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

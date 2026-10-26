@@ -307,7 +307,7 @@ func (r *PluginJwtResource) Create(ctx context.Context, req resource.CreateReque
 	}
 	res, err := r.client.Plugins.CreateJwtPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -367,7 +367,7 @@ func (r *PluginJwtResource) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 	res, err := r.client.Plugins.GetJwtPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -421,7 +421,7 @@ func (r *PluginJwtResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 	res, err := r.client.Plugins.UpdateJwtPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -481,7 +481,7 @@ func (r *PluginJwtResource) Delete(ctx context.Context, req resource.DeleteReque
 	}
 	res, err := r.client.Plugins.DeleteJwtPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

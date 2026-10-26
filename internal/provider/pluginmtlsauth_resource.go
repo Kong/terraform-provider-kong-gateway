@@ -357,7 +357,7 @@ func (r *PluginMtlsAuthResource) Create(ctx context.Context, req resource.Create
 	}
 	res, err := r.client.Plugins.CreateMtlsauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -417,7 +417,7 @@ func (r *PluginMtlsAuthResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 	res, err := r.client.Plugins.GetMtlsauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -471,7 +471,7 @@ func (r *PluginMtlsAuthResource) Update(ctx context.Context, req resource.Update
 	}
 	res, err := r.client.Plugins.UpdateMtlsauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -531,7 +531,7 @@ func (r *PluginMtlsAuthResource) Delete(ctx context.Context, req resource.Delete
 	}
 	res, err := r.client.Plugins.DeleteMtlsauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -157,7 +157,7 @@ func (r *ACLResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 	res, err := r.client.ACLs.CreateACLWithConsumer(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -217,7 +217,7 @@ func (r *ACLResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	}
 	res, err := r.client.ACLs.GetACLWithConsumer(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -295,7 +295,7 @@ func (r *ACLResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 	res, err := r.client.ACLs.DeleteACLWithConsumer(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

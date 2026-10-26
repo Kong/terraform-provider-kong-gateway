@@ -2240,7 +2240,7 @@ func (r *PartialResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 	res, err := r.client.Partials.CreatePartial(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -2300,7 +2300,7 @@ func (r *PartialResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 	res, err := r.client.Partials.GetPartial(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -2354,7 +2354,7 @@ func (r *PartialResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 	res, err := r.client.Partials.UpsertPartial(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -2414,7 +2414,7 @@ func (r *PartialResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 	res, err := r.client.Partials.DeletePartial(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

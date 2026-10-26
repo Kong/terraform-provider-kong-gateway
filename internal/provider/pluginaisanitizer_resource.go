@@ -389,7 +389,7 @@ func (r *PluginAiSanitizerResource) Create(ctx context.Context, req resource.Cre
 	}
 	res, err := r.client.Plugins.CreateAisanitizerPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -449,7 +449,7 @@ func (r *PluginAiSanitizerResource) Read(ctx context.Context, req resource.ReadR
 	}
 	res, err := r.client.Plugins.GetAisanitizerPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -503,7 +503,7 @@ func (r *PluginAiSanitizerResource) Update(ctx context.Context, req resource.Upd
 	}
 	res, err := r.client.Plugins.UpdateAisanitizerPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -563,7 +563,7 @@ func (r *PluginAiSanitizerResource) Delete(ctx context.Context, req resource.Del
 	}
 	res, err := r.client.Plugins.DeleteAisanitizerPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

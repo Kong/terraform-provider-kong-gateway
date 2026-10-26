@@ -2885,7 +2885,7 @@ func (r *PluginOpenidConnectResource) Create(ctx context.Context, req resource.C
 	}
 	res, err := r.client.Plugins.CreateOpenidconnectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -2945,7 +2945,7 @@ func (r *PluginOpenidConnectResource) Read(ctx context.Context, req resource.Rea
 	}
 	res, err := r.client.Plugins.GetOpenidconnectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -2999,7 +2999,7 @@ func (r *PluginOpenidConnectResource) Update(ctx context.Context, req resource.U
 	}
 	res, err := r.client.Plugins.UpdateOpenidconnectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -3059,7 +3059,7 @@ func (r *PluginOpenidConnectResource) Delete(ctx context.Context, req resource.D
 	}
 	res, err := r.client.Plugins.DeleteOpenidconnectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

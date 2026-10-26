@@ -831,7 +831,7 @@ func (r *PluginEntitlementEnforcementResource) Create(ctx context.Context, req r
 	}
 	res, err := r.client.Plugins.CreateEntitlementenforcementPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -891,7 +891,7 @@ func (r *PluginEntitlementEnforcementResource) Read(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.GetEntitlementenforcementPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -945,7 +945,7 @@ func (r *PluginEntitlementEnforcementResource) Update(ctx context.Context, req r
 	}
 	res, err := r.client.Plugins.UpdateEntitlementenforcementPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1005,7 +1005,7 @@ func (r *PluginEntitlementEnforcementResource) Delete(ctx context.Context, req r
 	}
 	res, err := r.client.Plugins.DeleteEntitlementenforcementPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

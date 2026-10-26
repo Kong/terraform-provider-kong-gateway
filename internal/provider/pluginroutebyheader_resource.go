@@ -287,7 +287,7 @@ func (r *PluginRouteByHeaderResource) Create(ctx context.Context, req resource.C
 	}
 	res, err := r.client.Plugins.CreateRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -347,7 +347,7 @@ func (r *PluginRouteByHeaderResource) Read(ctx context.Context, req resource.Rea
 	}
 	res, err := r.client.Plugins.GetRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -401,7 +401,7 @@ func (r *PluginRouteByHeaderResource) Update(ctx context.Context, req resource.U
 	}
 	res, err := r.client.Plugins.UpdateRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -461,7 +461,7 @@ func (r *PluginRouteByHeaderResource) Delete(ctx context.Context, req resource.D
 	}
 	res, err := r.client.Plugins.DeleteRoutebyheaderPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -658,7 +658,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Create(ctx context.Context, re
 	}
 	res, err := r.client.Plugins.CreateGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -718,7 +718,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Read(ctx context.Context, req 
 	}
 	res, err := r.client.Plugins.GetGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -772,7 +772,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Update(ctx context.Context, re
 	}
 	res, err := r.client.Plugins.UpdateGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -832,7 +832,7 @@ func (r *PluginGraphqlProxyCacheAdvancedResource) Delete(ctx context.Context, re
 	}
 	res, err := r.client.Plugins.DeleteGraphqlproxycacheadvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

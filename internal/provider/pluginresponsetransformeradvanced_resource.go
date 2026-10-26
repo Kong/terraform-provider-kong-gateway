@@ -430,7 +430,7 @@ func (r *PluginResponseTransformerAdvancedResource) Create(ctx context.Context, 
 	}
 	res, err := r.client.Plugins.CreateResponsetransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -490,7 +490,7 @@ func (r *PluginResponseTransformerAdvancedResource) Read(ctx context.Context, re
 	}
 	res, err := r.client.Plugins.GetResponsetransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -544,7 +544,7 @@ func (r *PluginResponseTransformerAdvancedResource) Update(ctx context.Context, 
 	}
 	res, err := r.client.Plugins.UpdateResponsetransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -604,7 +604,7 @@ func (r *PluginResponseTransformerAdvancedResource) Delete(ctx context.Context, 
 	}
 	res, err := r.client.Plugins.DeleteResponsetransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

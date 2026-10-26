@@ -352,7 +352,7 @@ func (r *PluginAiLakeraGuardResource) Create(ctx context.Context, req resource.C
 	}
 	res, err := r.client.Plugins.CreateAilakeraguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -412,7 +412,7 @@ func (r *PluginAiLakeraGuardResource) Read(ctx context.Context, req resource.Rea
 	}
 	res, err := r.client.Plugins.GetAilakeraguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -466,7 +466,7 @@ func (r *PluginAiLakeraGuardResource) Update(ctx context.Context, req resource.U
 	}
 	res, err := r.client.Plugins.UpdateAilakeraguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -526,7 +526,7 @@ func (r *PluginAiLakeraGuardResource) Delete(ctx context.Context, req resource.D
 	}
 	res, err := r.client.Plugins.DeleteAilakeraguardPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

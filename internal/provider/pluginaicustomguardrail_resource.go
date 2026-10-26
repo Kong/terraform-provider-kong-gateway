@@ -431,7 +431,7 @@ func (r *PluginAiCustomGuardrailResource) Create(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.CreateAicustomguardrailPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -491,7 +491,7 @@ func (r *PluginAiCustomGuardrailResource) Read(ctx context.Context, req resource
 	}
 	res, err := r.client.Plugins.GetAicustomguardrailPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -545,7 +545,7 @@ func (r *PluginAiCustomGuardrailResource) Update(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.UpdateAicustomguardrailPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -605,7 +605,7 @@ func (r *PluginAiCustomGuardrailResource) Delete(ctx context.Context, req resour
 	}
 	res, err := r.client.Plugins.DeleteAicustomguardrailPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

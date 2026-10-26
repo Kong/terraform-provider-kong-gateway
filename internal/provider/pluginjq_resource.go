@@ -336,7 +336,7 @@ func (r *PluginJqResource) Create(ctx context.Context, req resource.CreateReques
 	}
 	res, err := r.client.Plugins.CreateJqPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -396,7 +396,7 @@ func (r *PluginJqResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 	res, err := r.client.Plugins.GetJqPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -450,7 +450,7 @@ func (r *PluginJqResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 	res, err := r.client.Plugins.UpdateJqPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -510,7 +510,7 @@ func (r *PluginJqResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 	res, err := r.client.Plugins.DeleteJqPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

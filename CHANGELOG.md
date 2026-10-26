@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.1
+> Released on 2026/10/27
+
+### Breaking Changes
+* None
+
+### Chores
+* Bumping dependencies, including Go 1.26.10
+* Bump Speakeasy to 1.803.2
+
 ## 1.4.0
 > Released on 2026/09/28
 

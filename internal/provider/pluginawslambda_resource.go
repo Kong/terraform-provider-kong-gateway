@@ -445,7 +445,7 @@ func (r *PluginAwsLambdaResource) Create(ctx context.Context, req resource.Creat
 	}
 	res, err := r.client.Plugins.CreateAwslambdaPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -505,7 +505,7 @@ func (r *PluginAwsLambdaResource) Read(ctx context.Context, req resource.ReadReq
 	}
 	res, err := r.client.Plugins.GetAwslambdaPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -559,7 +559,7 @@ func (r *PluginAwsLambdaResource) Update(ctx context.Context, req resource.Updat
 	}
 	res, err := r.client.Plugins.UpdateAwslambdaPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -619,7 +619,7 @@ func (r *PluginAwsLambdaResource) Delete(ctx context.Context, req resource.Delet
 	}
 	res, err := r.client.Plugins.DeleteAwslambdaPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

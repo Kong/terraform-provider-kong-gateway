@@ -495,7 +495,7 @@ func (r *UpstreamResource) Create(ctx context.Context, req resource.CreateReques
 	}
 	res, err := r.client.Upstreams.CreateUpstream(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -555,7 +555,7 @@ func (r *UpstreamResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 	res, err := r.client.Upstreams.GetUpstream(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -609,7 +609,7 @@ func (r *UpstreamResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 	res, err := r.client.Upstreams.UpsertUpstream(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -669,7 +669,7 @@ func (r *UpstreamResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 	res, err := r.client.Upstreams.DeleteUpstream(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

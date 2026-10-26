@@ -4,6 +4,7 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/go-cleanhttp"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/action"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -150,10 +151,11 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 	if !data.AdminToken.IsUnknown() {
 		security.AdminToken = data.AdminToken.ValueStringPointer()
 	}
+	registerSensitiveValues(security.AdminToken)
 
 	providerHTTPTransportOpts := ProviderHTTPTransportOpts{
 		SetHeaders: make(map[string]string),
-		Transport:  http.DefaultTransport,
+		Transport:  cleanhttp.DefaultPooledTransport(),
 	}
 
 	resp.Diagnostics.Append(data.HTTPHeaders.ElementsAs(ctx, &providerHTTPTransportOpts.SetHeaders, false)...)
@@ -161,8 +163,7 @@ func (p *KongGatewayProvider) Configure(ctx context.Context, req provider.Config
 		return
 	}
 
-	httpClient := http.DefaultClient
-	httpClient.Transport = NewProviderHTTPTransport(providerHTTPTransportOpts)
+	httpClient := &http.Client{Transport: NewProviderHTTPTransport(providerHTTPTransportOpts)}
 
 	opts := []sdk.SDKOption{
 		sdk.WithTemplatedServerURL(serverUrl, serverUrlParams),

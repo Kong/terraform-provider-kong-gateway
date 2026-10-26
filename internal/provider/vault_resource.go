@@ -148,7 +148,7 @@ func (r *VaultResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 	res, err := r.client.Vaults.CreateVault(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -208,7 +208,7 @@ func (r *VaultResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 	res, err := r.client.Vaults.GetVault(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -262,7 +262,7 @@ func (r *VaultResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 	res, err := r.client.Vaults.UpsertVault(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -322,7 +322,7 @@ func (r *VaultResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	}
 	res, err := r.client.Vaults.DeleteVault(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

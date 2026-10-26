@@ -290,7 +290,7 @@ func (r *PluginRedirectResource) Create(ctx context.Context, req resource.Create
 	}
 	res, err := r.client.Plugins.CreateRedirectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -350,7 +350,7 @@ func (r *PluginRedirectResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 	res, err := r.client.Plugins.GetRedirectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -404,7 +404,7 @@ func (r *PluginRedirectResource) Update(ctx context.Context, req resource.Update
 	}
 	res, err := r.client.Plugins.UpdateRedirectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -464,7 +464,7 @@ func (r *PluginRedirectResource) Delete(ctx context.Context, req resource.Delete
 	}
 	res, err := r.client.Plugins.DeleteRedirectPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

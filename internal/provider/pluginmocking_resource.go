@@ -312,7 +312,7 @@ func (r *PluginMockingResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.Plugins.CreateMockingPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -372,7 +372,7 @@ func (r *PluginMockingResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	res, err := r.client.Plugins.GetMockingPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -426,7 +426,7 @@ func (r *PluginMockingResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res, err := r.client.Plugins.UpdateMockingPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -486,7 +486,7 @@ func (r *PluginMockingResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.Plugins.DeleteMockingPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

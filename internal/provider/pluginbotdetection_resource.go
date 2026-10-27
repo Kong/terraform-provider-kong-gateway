@@ -261,7 +261,7 @@ func (r *PluginBotDetectionResource) Create(ctx context.Context, req resource.Cr
 	}
 	res, err := r.client.Plugins.CreateBotdetectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -321,7 +321,7 @@ func (r *PluginBotDetectionResource) Read(ctx context.Context, req resource.Read
 	}
 	res, err := r.client.Plugins.GetBotdetectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -375,7 +375,7 @@ func (r *PluginBotDetectionResource) Update(ctx context.Context, req resource.Up
 	}
 	res, err := r.client.Plugins.UpdateBotdetectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -435,7 +435,7 @@ func (r *PluginBotDetectionResource) Delete(ctx context.Context, req resource.De
 	}
 	res, err := r.client.Plugins.DeleteBotdetectionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

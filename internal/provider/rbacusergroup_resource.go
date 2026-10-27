@@ -122,7 +122,7 @@ func (r *RbacUserGroupResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.RBACUserGroups.CreateRbacUserGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -226,7 +226,7 @@ func (r *RbacUserGroupResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.RBACUserGroups.DeleteRbacUserGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -543,7 +543,7 @@ func (r *PluginZipkinResource) Create(ctx context.Context, req resource.CreateRe
 	}
 	res, err := r.client.Plugins.CreateZipkinPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -603,7 +603,7 @@ func (r *PluginZipkinResource) Read(ctx context.Context, req resource.ReadReques
 	}
 	res, err := r.client.Plugins.GetZipkinPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -657,7 +657,7 @@ func (r *PluginZipkinResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 	res, err := r.client.Plugins.UpdateZipkinPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -717,7 +717,7 @@ func (r *PluginZipkinResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 	res, err := r.client.Plugins.DeleteZipkinPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

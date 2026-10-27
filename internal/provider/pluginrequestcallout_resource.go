@@ -1017,7 +1017,7 @@ func (r *PluginRequestCalloutResource) Create(ctx context.Context, req resource.
 	}
 	res, err := r.client.Plugins.CreateRequestcalloutPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1077,7 +1077,7 @@ func (r *PluginRequestCalloutResource) Read(ctx context.Context, req resource.Re
 	}
 	res, err := r.client.Plugins.GetRequestcalloutPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1131,7 +1131,7 @@ func (r *PluginRequestCalloutResource) Update(ctx context.Context, req resource.
 	}
 	res, err := r.client.Plugins.UpdateRequestcalloutPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1191,7 +1191,7 @@ func (r *PluginRequestCalloutResource) Delete(ctx context.Context, req resource.
 	}
 	res, err := r.client.Plugins.DeleteRequestcalloutPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

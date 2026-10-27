@@ -290,7 +290,7 @@ func (r *PluginVaultAuthResource) Create(ctx context.Context, req resource.Creat
 	}
 	res, err := r.client.Plugins.CreateVaultauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -350,7 +350,7 @@ func (r *PluginVaultAuthResource) Read(ctx context.Context, req resource.ReadReq
 	}
 	res, err := r.client.Plugins.GetVaultauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -404,7 +404,7 @@ func (r *PluginVaultAuthResource) Update(ctx context.Context, req resource.Updat
 	}
 	res, err := r.client.Plugins.UpdateVaultauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -464,7 +464,7 @@ func (r *PluginVaultAuthResource) Delete(ctx context.Context, req resource.Delet
 	}
 	res, err := r.client.Plugins.DeleteVaultauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -130,7 +130,7 @@ func (r *KeySetResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 	res, err := r.client.KeySets.CreateKeySet(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -190,7 +190,7 @@ func (r *KeySetResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 	res, err := r.client.KeySets.GetKeySet(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -244,7 +244,7 @@ func (r *KeySetResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 	res, err := r.client.KeySets.UpsertKeySet(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -304,7 +304,7 @@ func (r *KeySetResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	}
 	res, err := r.client.KeySets.DeleteKeySet(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

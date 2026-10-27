@@ -373,7 +373,7 @@ func (r *PluginAiGcpModelArmorResource) Create(ctx context.Context, req resource
 	}
 	res, err := r.client.Plugins.CreateAigcpmodelarmorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -433,7 +433,7 @@ func (r *PluginAiGcpModelArmorResource) Read(ctx context.Context, req resource.R
 	}
 	res, err := r.client.Plugins.GetAigcpmodelarmorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -487,7 +487,7 @@ func (r *PluginAiGcpModelArmorResource) Update(ctx context.Context, req resource
 	}
 	res, err := r.client.Plugins.UpdateAigcpmodelarmorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -547,7 +547,7 @@ func (r *PluginAiGcpModelArmorResource) Delete(ctx context.Context, req resource
 	}
 	res, err := r.client.Plugins.DeleteAigcpmodelarmorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

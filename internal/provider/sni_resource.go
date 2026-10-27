@@ -141,7 +141,7 @@ func (r *SniResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 	res, err := r.client.SNIs.CreateSni(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -201,7 +201,7 @@ func (r *SniResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	}
 	res, err := r.client.SNIs.GetSni(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -255,7 +255,7 @@ func (r *SniResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 	res, err := r.client.SNIs.UpsertSni(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -315,7 +315,7 @@ func (r *SniResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 	res, err := r.client.SNIs.DeleteSni(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

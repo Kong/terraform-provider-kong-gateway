@@ -846,7 +846,7 @@ func (r *PluginAiProxyResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.Plugins.CreateAiproxyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -906,7 +906,7 @@ func (r *PluginAiProxyResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	res, err := r.client.Plugins.GetAiproxyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -960,7 +960,7 @@ func (r *PluginAiProxyResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res, err := r.client.Plugins.UpdateAiproxyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1020,7 +1020,7 @@ func (r *PluginAiProxyResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.Plugins.DeleteAiproxyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

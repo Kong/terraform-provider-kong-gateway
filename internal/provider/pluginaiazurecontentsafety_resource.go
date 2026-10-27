@@ -386,7 +386,7 @@ func (r *PluginAiAzureContentSafetyResource) Create(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.CreateAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -446,7 +446,7 @@ func (r *PluginAiAzureContentSafetyResource) Read(ctx context.Context, req resou
 	}
 	res, err := r.client.Plugins.GetAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -500,7 +500,7 @@ func (r *PluginAiAzureContentSafetyResource) Update(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.UpdateAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -560,7 +560,7 @@ func (r *PluginAiAzureContentSafetyResource) Delete(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.DeleteAiazurecontentsafetyPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

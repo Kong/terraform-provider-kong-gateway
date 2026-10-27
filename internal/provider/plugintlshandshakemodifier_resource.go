@@ -257,7 +257,7 @@ func (r *PluginTLSHandshakeModifierResource) Create(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.CreateTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -317,7 +317,7 @@ func (r *PluginTLSHandshakeModifierResource) Read(ctx context.Context, req resou
 	}
 	res, err := r.client.Plugins.GetTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -371,7 +371,7 @@ func (r *PluginTLSHandshakeModifierResource) Update(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.UpdateTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -431,7 +431,7 @@ func (r *PluginTLSHandshakeModifierResource) Delete(ctx context.Context, req res
 	}
 	res, err := r.client.Plugins.DeleteTlshandshakemodifierPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

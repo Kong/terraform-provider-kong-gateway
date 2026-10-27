@@ -468,7 +468,7 @@ func (r *PluginDatadogResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.Plugins.CreateDatadogPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -528,7 +528,7 @@ func (r *PluginDatadogResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	res, err := r.client.Plugins.GetDatadogPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -582,7 +582,7 @@ func (r *PluginDatadogResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res, err := r.client.Plugins.UpdateDatadogPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -642,7 +642,7 @@ func (r *PluginDatadogResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.Plugins.DeleteDatadogPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

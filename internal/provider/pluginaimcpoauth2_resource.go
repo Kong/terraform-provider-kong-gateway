@@ -676,7 +676,7 @@ func (r *PluginAiMcpOauth2Resource) Create(ctx context.Context, req resource.Cre
 	}
 	res, err := r.client.Plugins.CreateAimcpoauth2Plugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -736,7 +736,7 @@ func (r *PluginAiMcpOauth2Resource) Read(ctx context.Context, req resource.ReadR
 	}
 	res, err := r.client.Plugins.GetAimcpoauth2Plugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -790,7 +790,7 @@ func (r *PluginAiMcpOauth2Resource) Update(ctx context.Context, req resource.Upd
 	}
 	res, err := r.client.Plugins.UpdateAimcpoauth2Plugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -850,7 +850,7 @@ func (r *PluginAiMcpOauth2Resource) Delete(ctx context.Context, req resource.Del
 	}
 	res, err := r.client.Plugins.DeleteAimcpoauth2Plugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

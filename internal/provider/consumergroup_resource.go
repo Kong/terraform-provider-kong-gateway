@@ -129,7 +129,7 @@ func (r *ConsumerGroupResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res, err := r.client.ConsumerGroups.CreateConsumerGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -166,7 +166,7 @@ func (r *ConsumerGroupResource) Create(ctx context.Context, req resource.CreateR
 	}
 	res1, err := r.client.ConsumerGroups.GetConsumerGroup(ctx, *request1)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res1 != nil && res1.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res1.RawResponse))
 		}
@@ -226,7 +226,7 @@ func (r *ConsumerGroupResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	res, err := r.client.ConsumerGroups.GetConsumerGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -280,7 +280,7 @@ func (r *ConsumerGroupResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res, err := r.client.ConsumerGroups.UpsertConsumerGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -317,7 +317,7 @@ func (r *ConsumerGroupResource) Update(ctx context.Context, req resource.UpdateR
 	}
 	res1, err := r.client.ConsumerGroups.GetConsumerGroup(ctx, *request1)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res1 != nil && res1.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res1.RawResponse))
 		}
@@ -377,7 +377,7 @@ func (r *ConsumerGroupResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 	res, err := r.client.ConsumerGroups.DeleteConsumerGroup(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

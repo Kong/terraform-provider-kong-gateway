@@ -423,7 +423,7 @@ func (r *PluginRequestTransformerAdvancedResource) Create(ctx context.Context, r
 	}
 	res, err := r.client.Plugins.CreateRequesttransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -483,7 +483,7 @@ func (r *PluginRequestTransformerAdvancedResource) Read(ctx context.Context, req
 	}
 	res, err := r.client.Plugins.GetRequesttransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -537,7 +537,7 @@ func (r *PluginRequestTransformerAdvancedResource) Update(ctx context.Context, r
 	}
 	res, err := r.client.Plugins.UpdateRequesttransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -597,7 +597,7 @@ func (r *PluginRequestTransformerAdvancedResource) Delete(ctx context.Context, r
 	}
 	res, err := r.client.Plugins.DeleteRequesttransformeradvancedPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

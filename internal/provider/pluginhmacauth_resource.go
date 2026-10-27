@@ -286,7 +286,7 @@ func (r *PluginHmacAuthResource) Create(ctx context.Context, req resource.Create
 	}
 	res, err := r.client.Plugins.CreateHmacauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -346,7 +346,7 @@ func (r *PluginHmacAuthResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 	res, err := r.client.Plugins.GetHmacauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -400,7 +400,7 @@ func (r *PluginHmacAuthResource) Update(ctx context.Context, req resource.Update
 	}
 	res, err := r.client.Plugins.UpdateHmacauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -460,7 +460,7 @@ func (r *PluginHmacAuthResource) Delete(ctx context.Context, req resource.Delete
 	}
 	res, err := r.client.Plugins.DeleteHmacauthPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

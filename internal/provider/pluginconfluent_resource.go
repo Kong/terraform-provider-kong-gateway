@@ -868,7 +868,7 @@ func (r *PluginConfluentResource) Create(ctx context.Context, req resource.Creat
 	}
 	res, err := r.client.Plugins.CreateConfluentPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -928,7 +928,7 @@ func (r *PluginConfluentResource) Read(ctx context.Context, req resource.ReadReq
 	}
 	res, err := r.client.Plugins.GetConfluentPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -982,7 +982,7 @@ func (r *PluginConfluentResource) Update(ctx context.Context, req resource.Updat
 	}
 	res, err := r.client.Plugins.UpdateConfluentPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -1042,7 +1042,7 @@ func (r *PluginConfluentResource) Delete(ctx context.Context, req resource.Delet
 	}
 	res, err := r.client.Plugins.DeleteConfluentPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

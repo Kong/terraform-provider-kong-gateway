@@ -299,7 +299,7 @@ func (r *PluginPostFunctionResource) Create(ctx context.Context, req resource.Cr
 	}
 	res, err := r.client.Plugins.CreatePostfunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -359,7 +359,7 @@ func (r *PluginPostFunctionResource) Read(ctx context.Context, req resource.Read
 	}
 	res, err := r.client.Plugins.GetPostfunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -413,7 +413,7 @@ func (r *PluginPostFunctionResource) Update(ctx context.Context, req resource.Up
 	}
 	res, err := r.client.Plugins.UpdatePostfunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -473,7 +473,7 @@ func (r *PluginPostFunctionResource) Delete(ctx context.Context, req resource.De
 	}
 	res, err := r.client.Plugins.DeletePostfunctionPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

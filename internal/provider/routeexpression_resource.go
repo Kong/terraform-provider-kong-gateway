@@ -216,7 +216,7 @@ func (r *RouteExpressionResource) Create(ctx context.Context, req resource.Creat
 	}
 	res, err := r.client.Routes.CreateRouteRouteExpression(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -276,7 +276,7 @@ func (r *RouteExpressionResource) Read(ctx context.Context, req resource.ReadReq
 	}
 	res, err := r.client.Routes.GetRouteRouteExpression(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -330,7 +330,7 @@ func (r *RouteExpressionResource) Update(ctx context.Context, req resource.Updat
 	}
 	res, err := r.client.Routes.UpsertRouteRouteExpression(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -390,7 +390,7 @@ func (r *RouteExpressionResource) Delete(ctx context.Context, req resource.Delet
 	}
 	res, err := r.client.Routes.DeleteRouteRouteExpression(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

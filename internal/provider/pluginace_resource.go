@@ -639,7 +639,7 @@ func (r *PluginAceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 	res, err := r.client.Plugins.CreateAcePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -699,7 +699,7 @@ func (r *PluginAceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 	res, err := r.client.Plugins.GetAcePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -753,7 +753,7 @@ func (r *PluginAceResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 	res, err := r.client.Plugins.UpdateAcePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -813,7 +813,7 @@ func (r *PluginAceResource) Delete(ctx context.Context, req resource.DeleteReque
 	}
 	res, err := r.client.Plugins.DeleteAcePlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -268,7 +268,7 @@ func (r *PluginJweDecryptResource) Create(ctx context.Context, req resource.Crea
 	}
 	res, err := r.client.Plugins.CreateJwedecryptPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -328,7 +328,7 @@ func (r *PluginJweDecryptResource) Read(ctx context.Context, req resource.ReadRe
 	}
 	res, err := r.client.Plugins.GetJwedecryptPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -382,7 +382,7 @@ func (r *PluginJweDecryptResource) Update(ctx context.Context, req resource.Upda
 	}
 	res, err := r.client.Plugins.UpdateJwedecryptPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -442,7 +442,7 @@ func (r *PluginJweDecryptResource) Delete(ctx context.Context, req resource.Dele
 	}
 	res, err := r.client.Plugins.DeleteJwedecryptPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

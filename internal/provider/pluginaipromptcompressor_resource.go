@@ -350,7 +350,7 @@ func (r *PluginAiPromptCompressorResource) Create(ctx context.Context, req resou
 	}
 	res, err := r.client.Plugins.CreateAipromptcompressorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -410,7 +410,7 @@ func (r *PluginAiPromptCompressorResource) Read(ctx context.Context, req resourc
 	}
 	res, err := r.client.Plugins.GetAipromptcompressorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -464,7 +464,7 @@ func (r *PluginAiPromptCompressorResource) Update(ctx context.Context, req resou
 	}
 	res, err := r.client.Plugins.UpdateAipromptcompressorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}
@@ -524,7 +524,7 @@ func (r *PluginAiPromptCompressorResource) Delete(ctx context.Context, req resou
 	}
 	res, err := r.client.Plugins.DeleteAipromptcompressorPlugin(ctx, *request)
 	if err != nil {
-		resp.Diagnostics.AddError("failure to invoke API", err.Error())
+		resp.Diagnostics.AddError("failure to invoke API", redactSensitiveValues(ctx, err.Error()))
 		if res != nil && res.RawResponse != nil {
 			resp.Diagnostics.AddError("unexpected http request/response", debugResponse(res.RawResponse))
 		}

@@ -2,7 +2,7 @@
 
 package sdk
 
-// Generated from OpenAPI doc version 3.16.0 and generator version 2.941.0
+// Generated from OpenAPI doc version 3.16.0 and generator version 2.950.13
 
 import (
 	"context"
@@ -317,11 +317,11 @@ func WithTimeout(timeout time.Duration) SDKOption {
 // New creates a new instance of the SDK with the provided options
 func New(opts ...SDKOption) *KongGateway {
 	sdk := &KongGateway{
-		SDKVersion: "1.4.0",
+		SDKVersion: "1.4.1",
 		sdkConfiguration: config.SDKConfiguration{
-			UserAgent:         "speakeasy-sdk/terraform 1.4.0 2.941.0 3.16.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
-			SDKVersion:        "1.4.0",
-			GenVersion:        "2.941.0",
+			UserAgent:         "speakeasy-sdk/terraform 1.4.1 2.950.13 3.16.0 github.com/kong/terraform-provider-kong-gateway/internal/sdk",
+			SDKVersion:        "1.4.1",
+			GenVersion:        "2.950.13",
 			OpenAPIDocVersion: "3.16.0",
 			ServerList:        ServerList,
 			ServerVariables: []map[string]string{
